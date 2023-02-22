@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -156,8 +156,6 @@
     <string name="login_connecting_to_server">กำลังเชื่อมต่อไปยังเซิร์ฟเวอร์</string>
     <!-- Status text when updating the file manager -->
     <string name="download_updating_filelist">กำลังอัปเดตรายการไฟล์</string>
-    <!-- title of the screen after creating an account when the user has to confirm the password to confirm the account -->
-    <string name="login_confirm_account">ยืนยันบัญชี</string>
     <!-- when the user clicks on the link sent by MEGA after creating the account, this message is shown -->
     <string name="login_querying_signup_link">กำลังตรวจสอบลิงก์</string>
     <!-- Attempting to activate a MEGA account for a user. -->
@@ -168,8 +166,6 @@
     <string name="login_before_share">กรุณาลงชื่อเข้าใช้เพื่อแชร์กับ MEGA</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">ลิงก์ยืนยันของคุณใช้ไม่ได้อีกต่อไป บัญชีของคุณอาจถูกเปิดใช้งานหรือคุณอาจยกเลิกการลงทะเบียนแล้ว</string>
-    <!-- category in sort by action -->
-    <string name="name_text">ชื่อ</string>
     <!-- First Name of the user -->
     <string name="first_name_text">ชื่อ</string>
     <!-- Last name of the user -->
@@ -303,11 +299,9 @@
         <item quantity="other">โฟลเดอร์ว่างเปล่า</item>
     </plurals>
     <!-- Hint how to cancel the download -->
-    <string name="download_touch_to_cancel">แตะเพื่อยกเลิก</string>
-    <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">ดูการถ่ายโอน</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">อุปกรณ์ส่วนใหญ่ไม่สามารถดาวน์โหลดไฟล์ที่มีขนาดใหญ่กว่า 4&#160;GB การดาวน์โหลดของคุณอาจล้มเหลวได้</string>
+    <string name="error_file_size_greater_than_4gb">ส่วนใหญ่แล้วอุปกรณ์ไม่สามารถดาวน์โหลดไฟล์ที่มีขนาดเกิน 4&#160;GB ได้ ดังนั้นการดาวน์โหลดของคุณอาจล้มเหลวได้</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">ไม่มีแอปใดที่สามารถเรียกใช้ไฟล์นี้บนอุปกรณ์ของคุณได้</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -1896,7 +1890,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">ครั้งต่อไปที่คุณลงชื่อเข้าใช้บัญชี ระบบจะขอให้คุณกรอกรหัส 6 หลักจากแอปตัวรับรองความถูกต้องที่ให้มา</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">กรุณาบันทึก<b>คีย์การกู้คืน</b>ของคุณไว้ในที่ปลอดภัย เพื่อหลีกเลี่ยงปัญหาในกรณีที่คุณไม่สามารถเข้าถึงแอปของคุณ หรือหากคุณต้องการปิดใช้งานการรับรองความถูกต้องด้วยสองปัจจัย</string>
+    <string name="recommendation_2fa_enabled"></string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">โค้ดไม่ถูกต้อง</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2063,8 +2057,6 @@
     <string name="title_alert_logged_out">ออกจากระบบ</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
     <string name="account_confirmed">บัญชีของคุณถูกเปิดใช้งานแล้ว กรุณาเข้าสู่ระบบ</string>
-    <!-- Text shown to indicate user that his account should be confirmed typing his password -->
-    <string name="confirm_account">กรุณาใส่รหัสผ่านเพื่อยืนยันบัญชีของคุณ</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
     <string name="error_own_email_as_contact">ไม่มีความจำเป็นที่จะเพิ่มที่อยู่อีเมลของคุณเอง</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2297,8 +2289,6 @@
     <string name="button_continue">ดำเนินการต่อ</string>
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (การสมัครใช้งาน)</string>
-    <!-- one of the payment methods -->
-    <string name="payment_method_huawei_wallet">[A]HUAWEI Pay[/A] (การสมัครใช้งาน)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">ใหม่</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
@@ -2787,8 +2777,6 @@
     <string name="select_message_title">เลือกข้อความ</string>
     <!-- The label that describes that a transfer failed. -->
     <string name="failed_label">ล้มเหลว</string>
-    <!-- Text warning of transfer over quota -->
-    <string name="warning_transfer_over_quota">การถ่ายโอนของคุณถูกขัดจังหวะ อัปเกรดบัญชีของคุณหรือรอ %s เพื่อดำเนินการต่อ</string>
     <!-- Label indicating transfer over quota -->
     <string name="label_transfer_over_quota">เกินโควต้าการถ่ายโอนแล้ว</string>
     <!-- Label indicating storage over quota -->
@@ -3129,10 +3117,6 @@
     <string name="months_view_button">เดือน</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">ปี</string>
-    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
-    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
-    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B] %3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="other">กำลังอยู่ในระหว่างอัปโหลด มี %1$d ไฟล์รอดำเนินการ</item>
@@ -3674,7 +3658,7 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">ไม่สามารถเชื่อมต่อใหม่ได้</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;ไบต์</string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -3912,7 +3896,7 @@
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_more_participants_label">ดูเพิ่มเติม</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
-    <string name="meetings_scheduled_meeting_info_leave_group_label">ออกจากกลุ่ม</string>
+    <string name="meetings_scheduled_meeting_info_leave_group_label">ออกจากการประชุม</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album">ไม่อนุญาตให้ใช้ชื่ออัลบั้มนี้ กรอกชื่ออื่น</string>
     <!-- Error message for creating an album with a duplicate name -->
@@ -3920,10 +3904,10 @@
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">อัลบั้มใหม่ (%d)</string>
     <!-- Title of album photos selection screen -->
-    <string name="photos_album_selection_title">เพิ่มรายการไปที่ “%s”</string>
+    <string name="photos_album_selection_title">เพิ่มรายการไปไว้ที่ “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="other">เพิ่ม %d รายการไปที่ “%s” แล้ว</item>
+        <item quantity="other">เพิ่ม %1$d รายการไปไว้ที่ “%2$s” แล้ว</item>
     </plurals>
     <!-- Title of a notification related to payments -->
     <string name="notifications_payment_title">ข้อมูลการชำระเงิน</string>
@@ -3954,7 +3938,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">การประชุมที่เป็นกิจวัตร</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label"></string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s ทุกสัปดาห์</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">มุมมองการค้นพบสื่อ</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -3968,7 +3952,7 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">ทุกคนที่มีลิงก์นี้สามารถเข้าร่วมการประชุมและดูแชทการประชุมได้</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">คัดลอกลิงก์ไปยังคลิปบอร์ดแล้ว</string>
+    <string name="scheduled_meetings_meeting_link_copied">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="other">ลบอัลบั้ม %d รายการออกแล้ว</item>
@@ -4017,72 +4001,446 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">ไม่ต้องให้สิทธิ์</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="other">ลบ %d รายการออกจาก “%s” แล้ว</item>
+        <item quantity="other">ลบ %1$d รายการออกจาก “%2$s” แล้ว</item>
     </plurals>
     <!-- Label to describe one off meetings -->
-    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <string name="meetings_list_one_off_meeting_label">การประชุมแบบครั้งเดียว</string>
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">เล่นวิดีโอต่อจากก่อนหน้านี้หรือไม่</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">ไฟล์ %1$s จะเริ่มเล่นต่อจาก %2$s</string>
+    <string name="video_playback_position_dialog_message">ไฟล์ %1$s จะเริ่มเล่นต่อตั้งแต่ %2$s เป็นต้นไป</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
-    <string name="video_playback_position_dialog_resume_button">ต่อ</string>
+    <string name="video_playback_position_dialog_resume_button">เล่นต่อ</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
-    <string name="video_playback_position_dialog_restart_button">รีสตาร์ท</string>
-    <!-- User Alert notification for new scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_new"></string>
+    <string name="video_playback_position_dialog_restart_button">เริ่มใหม่ตั้งแต่เต้น</string>
+    <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
+    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]เชิญคุณเข้าร่วมการประชุมตามเวลาที่กำหนดไว้แล้ว:[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled"></string>
+    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s ยกเลิก[/A][B]การประชุมตามเวลาที่กำหนดไว้แล้ว:[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s อัปเดต[/A][B]ชื่อการประชุมใหม่จาก “%s” เป็น [/B]“[A]%s[/A]”</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s อัปเดต[/A][B]วันที่ประชุมใหม่แล้ว[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s อัปเดต[/A][B]เวลาประชุมใหม่แล้ว[/B]</string>
     <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s อัปเดต[/A][B]คำอธิบายการประชุมใหม่แล้ว[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s อัปเดต[/A][B]รายละเอียดกำหนดการการประชุมใหม่แล้ว:[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">การเข้าถึงถูกปฏิเสธ</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
+    <string name="dialog_content_media_permissions_denied">MEGA ถูกปฏิเสธไม่ให้เข้าถึงที่เก็บข้อมูลและไฟล์มีเดียของอุปกรณ์ของคุณ หากคุณต้องการแชร์ต่อ กรุณาให้สิทธิ์ที่จำเป็นแก่ MEGA</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
-    <string name="dialog_positive_button_allow_permission">Allow permission</string>
+    <string name="dialog_positive_button_allow_permission">อนุญาตให้เข้าถึง</string>
     <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
-    <string name="dialog_negative_button_do_not_allow">Don’t allow</string>
+    <string name="dialog_negative_button_do_not_allow">ไม่อนุญาต</string>
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">เหตุการณ์</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
-    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle"></string>
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">กำหนดการรายวัน</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
-    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle"></string>
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">กำหนดการรายสัปดาห์</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
-    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle"></string>
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">กำหนดการรายเดือน</string>
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
-    <string name="meetings_recurring_meeting_info_see_more_occurrences_button"></string>
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button">ดูเพิ่มเติม</string>
     <!-- Label for scheduled monthly meetings -->
-    <string name="meetings_list_scheduled_meeting_monthly_label"></string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%s รายเดือน</string>
     <!-- Label for scheduled daily meetings -->
-    <string name="meetings_list_scheduled_meeting_daily_label"></string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%s รายวัน</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]เชิญคุณเข้าร่วมการประชุมที่กำหนดเวลาเป็นกิจวัตรไว้แล้ว:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s อัปเดต[/A][B]คำอธิบายการประชุมที่เป็นกิจวัตรใหม่แล้ว[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s อัปเดต[/A][B]รายละเอียดกำหนดการการประชุมที่เป็นกิจวัตรใหม่แล้ว:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s อัปเดต[/A][B] เหตุการณ์ใหม่แล้ว:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s อัปเดต[/A][B]เวลาการประชุมที่เป็นกิจวัตรใหม่แล้ว:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting frequency change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_canceled"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s ยกเลิก[/A][B]การประชุมและเหตุการณ์อื่น ๆ ทั้งหมดแล้ว[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s ยกเลิก[/A][B]เหตุการณ์ตามเวลาที่กำหนดไว้แล้ว:[/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_message">อีเมลที่คุณกำลังเข้าสู่ระบบในขณะนี้ ไม่ได้ถูกสร้างลิงก์มาเพื่อตรวจสอบที่อยู่อีเมล กรุณาเข้าสู่ระบบด้วยบัญชีที่สร้างลิงก์นี้แทน</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_title">ไม่สามารถอัปเดตที่อยู่อีเมลได้</string>
+    <!-- Select album cover -->
+    <string name="photos_album_select_cover">เลือกปกอัลบั้ม</string>
+    <!-- Album cover updated -->
+    <string name="photos_album_cover_updated">อัปเดตปกอัลบั้มแล้ว</string>
+    <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
+    <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] ตั้งแต่ [B]%2$s จนถึง %3$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">ทุกวัน มีผล [A]%1$s[/A] ตั้งแต่ [B]%2$s จนถึง %3$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">ทุกวัน มีผลตั้งแต่ [A]%1$s จนถึง %2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
+        <item quantity="other">%1$s ทุก %2$d สัปดาห์ มีผลตั้งแต่ [A]%3$s จนถึง %4$s[/A] ตั้งแต่ [B]%5$s จนถึง %6$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting without ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever">
+        <item quantity="other">%1$s ทุก %2$d สัปดาห์ มีผล [A]%3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
+        <item quantity="other">%1$s และ %2$s ทุก %3$d สัปดาห์ มีผลตั้งแต่ [A]%4$s จนถึง %5$s[/A] ตั้งแต่ [B]%6$s จนถึง %7$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
+        <item quantity="other">%1$s และ %2$s ทุก %3$d สัปดาห์ มีผล [A]%4$s[/A] ตั้งแต่ [B]%5$s จนถึง %6$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
+        <item quantity="other">วันที่ %1$d ของทุก %2$d เดือน มีผลตั้งแต่ [A]%3$s จนถึง %4$s[/A] ตั้งแต่ [B]%5$s จนถึง %6$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting without ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_forever">
+        <item quantity="other">วันที่ %1$d ของทุก %2$d เดือน มีผล [A]%3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_first">
+        <item quantity="other">จันทร์แรก ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_first">
+        <item quantity="other">จันทร์แรก ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_second">
+        <item quantity="other">จันทร์ที่สอง ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_second">
+        <item quantity="other">จันทร์ที่สอง ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_third">
+        <item quantity="other">จันทร์ที่สาม ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_third">
+        <item quantity="other">จันทร์ที่สาม ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fourth">
+        <item quantity="other">จันทร์ที่สี่ ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fourth">
+        <item quantity="other">จันทร์ที่สี่ ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fifth">
+        <item quantity="other">จันทร์สุดท้าย ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fifth">
+        <item quantity="other">จันทร์สุดท้าย ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_first">
+        <item quantity="other">อังคารแรก ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_first">
+        <item quantity="other">อังคารแรก ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_second">
+        <item quantity="other">อังคารที่สอง ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_second">
+        <item quantity="other">อังคารที่สอง ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_third">
+        <item quantity="other">อังคารที่สาม ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_third">
+        <item quantity="other">อังคารที่สาม ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fourth">
+        <item quantity="other">อังคารที่สี่ ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fourth">
+        <item quantity="other">อังคารที่สี่ ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fifth">
+        <item quantity="other">อังคารสุดท้าย ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fifth">
+        <item quantity="other">อังคารสุดท้าย ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_first">
+        <item quantity="other">พุธแรก ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_first">
+        <item quantity="other">พุธแรก ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_second">
+        <item quantity="other">พุธที่สอง ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_second">
+        <item quantity="other">พุธที่สอง ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_third">
+        <item quantity="other">พุธที่สาม ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_third">
+        <item quantity="other">พุธที่สาม ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fourth">
+        <item quantity="other">พุธที่สี่ ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fourth">
+        <item quantity="other">พุธที่สี่ ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fifth">
+        <item quantity="other">พุธสุดท้าย ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fifth">
+        <item quantity="other">พุธสุดท้าย ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_first">
+        <item quantity="other">พฤหัสบดีแรก ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_first">
+        <item quantity="other">พฤหัสบดีแรก ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_second">
+        <item quantity="other">พฤหัสบดีที่สอง ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_second">
+        <item quantity="other">พฤหัสบดีที่สอง ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_third">
+        <item quantity="other">พฤหัสบดีที่สาม ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_third">
+        <item quantity="other">พฤหัสบดีที่สาม ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fourth">
+        <item quantity="other">พฤหัสบดีที่สี่ ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fourth">
+        <item quantity="other">พฤหัสบดีที่สี่ ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fifth">
+        <item quantity="other">พฤหัสบดีสุดท้าย ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fifth">
+        <item quantity="other">พฤหัสบดีสุดท้าย ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_first">
+        <item quantity="other">ศุกร์แรก ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_first">
+        <item quantity="other">ศุกร์แรก ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_second">
+        <item quantity="other">ศุกร์ที่สอง ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_second">
+        <item quantity="other">ศุกร์ที่สอง ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_third">
+        <item quantity="other">ศุกร์ที่สาม ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_third">
+        <item quantity="other">ศุกร์ที่สาม ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fourth">
+        <item quantity="other">ศุกร์ที่สี่ ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fourth">
+        <item quantity="other">ศุกร์ที่สี่ ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fifth">
+        <item quantity="other">ศุกร์สุดท้าย ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fifth">
+        <item quantity="other">ศุกร์สุดท้าย ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_first">
+        <item quantity="other">เสาร์แรก ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_first">
+        <item quantity="other">เสาร์แรก ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_second">
+        <item quantity="other">เสาร์ที่สอง ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_second">
+        <item quantity="other">เสาร์ที่สอง ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_third">
+        <item quantity="other">เสาร์ที่สาม ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_third">
+        <item quantity="other">เสาร์ที่สาม ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fourth">
+        <item quantity="other">เสาร์ที่สี่ ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fourth">
+        <item quantity="other">เสาร์ที่สี่ ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fifth">
+        <item quantity="other">เสาร์สุดท้าย ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fifth">
+        <item quantity="other">เสาร์สุดท้าย ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_first">
+        <item quantity="other">อาทิตย์แรก ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_first">
+        <item quantity="other">อาทิตย์แรก ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_second">
+        <item quantity="other">อาทิตย์ที่สอง ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_second">
+        <item quantity="other">อาทิตย์ที่สอง ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_third">
+        <item quantity="other">อาทิตย์ที่สาม ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_third">
+        <item quantity="other">อาทิตย์ที่สาม ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fourth">
+        <item quantity="other">อาทิตย์ที่สี่ ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fourth">
+        <item quantity="other">อาทิตย์ที่สี่ ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fifth">
+        <item quantity="other">อาทิตย์สุดท้าย ของทุก %1$d เดือน มีผลตั้งแต่ [A]%2$s จนถึง %3$s[/A] ตั้งแต่ [B]%4$s จนถึง %5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fifth">
+        <item quantity="other">อาทิตย์สุดท้าย ของทุก %1$d เดือน มีผล [A]%2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</item>
+    </plurals>
+    <!-- In app notification description text representing the meeting repeats every Monday -->
+    <string name="notification_scheduled_meeting_week_day_mon">จ.</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday -->
+    <string name="notification_scheduled_meeting_week_day_tue">อ.</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday -->
+    <string name="notification_scheduled_meeting_week_day_wed">พ.</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday -->
+    <string name="notification_scheduled_meeting_week_day_thu">พฤ.</string>
+    <!-- In app notification description text representing the meeting repeats every Friday -->
+    <string name="notification_scheduled_meeting_week_day_fri">ศ.</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday -->
+    <string name="notification_scheduled_meeting_week_day_sat">ส.</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday -->
+    <string name="notification_scheduled_meeting_week_day_sun">อา.</string>
+    <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
+    <string name="meetings_one_off_occurrence_info_today">วันนี้ %1$s ตั้งแต่ %2$s จนถึง %3$s</string>
+    <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
+    <string name="meetings_one_off_occurrence_info_tomorrow">พรุ่งนี้ %1$s ตั้งแต่ %2$s จนถึง %3$s</string>
+    <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s อัปเดต[/A][B]เวลาการประชุมที่เป็นกิจวัตรใหม่แล้ว[/B]</string>
+    <!-- This is the title of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_title">อัปเกรดความปลอดภัย</string>
+    <!-- This is the body of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_content">การรักษาความปลอดภัยบัญชีของคุณกำลังอัปเกรดอยู่ การอัปเกรดนี้จะเกิดขึ้นเพียงครั้งเดียวเท่านั้น หากคุณเคยเห็นข้อความบนบัญชีนี้มาก่อนแล้ว กรุณาแตะ ยกเลิก</string>
+    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
+    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
+        <item quantity="other">คุณกำลังแชร์โฟลเดอร์ต่อไปนี้: %s</item>
+    </plurals>
+    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
+    <plurals name="cloud_drive_undecrypted_file">
+        <item quantity="other">[ไฟล์ที่ไม่ได้ถอดรหัส]</item>
+    </plurals>
+    <!-- In app notification description text representing the meeting repeats every Monday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_mon">จันทร์</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_tue">อังคาร</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_wed">พุธ</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_thu">พฤหัสบดี</string>
+    <!-- In app notification description text representing the meeting repeats every Friday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_fri">ศุกร์</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sat">เสาร์</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sun">อาทิตย์</string>
+    <!-- In app notification description text representing the meeting repeats every Monday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_mon">จันทร์</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_tue">อังคาร</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_wed">พุธ</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_thu">พฤหัสบดี</string>
+    <!-- In app notification description text representing the meeting repeats every Friday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_fri">ศุกร์</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">เสาร์</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">อาทิตย์</string>
 </resources>

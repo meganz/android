@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -156,8 +156,6 @@
     <string name="login_connecting_to_server">連接到伺服器</string>
     <!-- Status text when updating the file manager -->
     <string name="download_updating_filelist">更新檔案清單</string>
-    <!-- title of the screen after creating an account when the user has to confirm the password to confirm the account -->
-    <string name="login_confirm_account">確認帳戶</string>
     <!-- when the user clicks on the link sent by MEGA after creating the account, this message is shown -->
     <string name="login_querying_signup_link">正在檢查有效連結</string>
     <!-- Attempting to activate a MEGA account for a user. -->
@@ -168,8 +166,6 @@
     <string name="login_before_share">請先登入，以便使用MEGA共享功能</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">您的確認連結已無效。您的帳戶可能已啟用，或您可能已取消註冊</string>
-    <!-- category in sort by action -->
-    <string name="name_text">名稱</string>
     <!-- First Name of the user -->
     <string name="first_name_text">名字</string>
     <!-- Last name of the user -->
@@ -303,11 +299,9 @@
         <item quantity="other">資料夾是空的。</item>
     </plurals>
     <!-- Hint how to cancel the download -->
-    <string name="download_touch_to_cancel">請輕觸以取消</string>
-    <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">檢視傳輸</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">大多數的裝置無法下載大於4&#160;GB的檔案。因此您的下載可能會失敗。</string>
+    <string name="error_file_size_greater_than_4gb"></string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">你的裝置上沒有任何應用程式可以執行這個檔案</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -756,11 +750,11 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">免費帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I帳戶</string>
+    <string name="my_account_pro1"></string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II帳戶</string>
+    <string name="my_account_pro2"></string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III帳戶</string>
+    <string name="my_account_pro3"></string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro&#160;Lite帳戶</string>
     <!--  -->
@@ -1675,7 +1669,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">檔案載入中</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s&#160;B</string>
+    <string name="label_file_size_byte"></string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1685,7 +1679,7 @@
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte">%s&#160;B/秒</string>
+    <string name="label_file_speed_byte"></string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%s&#160;KB/秒</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -1896,7 +1890,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數字代碼。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">請將您的<b>還原金鑰</b>儲存在一個安全地方，以避免萬一您無法存取您的應用程式，或是您想要停用雙重驗證時遇到問題。</string>
+    <string name="recommendation_2fa_enabled"></string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">無效的二維條碼</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2063,8 +2057,6 @@
     <string name="title_alert_logged_out">已登出</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
     <string name="account_confirmed">您的帳戶已通過認證。請登入帳戶以開始使用。</string>
-    <!-- Text shown to indicate user that his account should be confirmed typing his password -->
-    <string name="confirm_account">請輸入您的密碼以確認帳戶</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
     <string name="error_own_email_as_contact">您無須增加個人的電子郵件</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2297,8 +2289,6 @@
     <string name="button_continue">繼續</string>
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A]（訂閱）</string>
-    <!-- one of the payment methods -->
-    <string name="payment_method_huawei_wallet">[A]華為支付[/A]（訂閱）</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">新的</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
@@ -2602,7 +2592,7 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">邀請聯絡人並開始在MEGA上使用加密對話功能。</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">您好。和我一起在MEGA上安全地對談並獲得20&#160;GB免費雲端空間。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">嗨。在MEGA上與我安全的進行對談並且可獲得20&#160;GB免費雲端空間。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">沒有可用的對話連結。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
@@ -2649,7 +2639,7 @@
     </plurals>
     <!-- First part of title of a media recents bucket that contains some images and some videos. The full string is '%1$d Images and %2$d Videos'. The string was split in 2 for pluralization. -->
     <plurals name="title_media_bucket_images_and_videos">
-        <item quantity="other">%1$d張圖片&#160;</item>
+        <item quantity="other">%1$d個圖片&#160;</item>
     </plurals>
     <!-- Label that indicates who uploaded a file into a recents bucket -->
     <string name="create_action_bucket">由%s[A]建立[/A]</string>
@@ -2787,8 +2777,6 @@
     <string name="select_message_title">選擇訊息</string>
     <!-- The label that describes that a transfer failed. -->
     <string name="failed_label">失敗</string>
-    <!-- Text warning of transfer over quota -->
-    <string name="warning_transfer_over_quota">您的傳輸已中斷。請升級您的帳戶或等待%s再繼續。</string>
     <!-- Label indicating transfer over quota -->
     <string name="label_transfer_over_quota">已超出傳輸配額</string>
     <!-- Label indicating storage over quota -->
@@ -3129,10 +3117,6 @@
     <string name="months_view_button">月</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">年</string>
-    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
-    <string name="cu_month_year_date">%2$s[B]%1$s[/B]</string>
-    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B],%3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="other">正在上傳，%1$d個待處理檔案</item>
@@ -3674,19 +3658,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">無法重新連線</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <string name="account_achievements_storage_quota_byte"></string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte"></string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <string name="account_achievements_storage_quota_mega_byte"></string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="account_achievements_storage_quota_giga_byte"></string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <string name="account_achievements_storage_quota_tera_byte"></string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <string name="account_achievements_storage_quota_peta_byte"></string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="account_achievements_storage_quota_exa_byte"></string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">通話將於%s後結束</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3872,19 +3856,19 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">安排會議</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">感謝您訂閱Pro&#160;Lite月方案</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">感謝您訂閱Pro Lite月方案</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly">感謝您訂閱Pro&#160;Lite年方案</string>
+    <string name="upgrade_account_successful_pro_lite_yearly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly">感謝您訂閱Pro&#160;I月方案</string>
+    <string name="upgrade_account_successful_pro_1_monthly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly">感謝您訂閱Pro&#160;I年方案</string>
+    <string name="upgrade_account_successful_pro_1_yearly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly">感謝您訂閱Pro&#160;II月方案</string>
+    <string name="upgrade_account_successful_pro_2_monthly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly">感謝您訂閱Pro&#160;II年方案</string>
+    <string name="upgrade_account_successful_pro_2_yearly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly">感謝您訂閱Pro&#160;III月方案</string>
+    <string name="upgrade_account_successful_pro_3_monthly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">感謝您訂閱Pro&#160;III年方案</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -3912,18 +3896,18 @@
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_more_participants_label">顯示更多</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
-    <string name="meetings_scheduled_meeting_info_leave_group_label">離開群組</string>
+    <string name="meetings_scheduled_meeting_info_leave_group_label">離開會議</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album">不允許使用此相簿名稱。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_create_album_error_message_duplicate">已存在相同名稱的相簿。請輸入不同的名稱。</string>
+    <string name="photos_create_album_error_message_duplicate">已存在相同名稱相簿。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_album_creation_dialog_input_placeholder_more_than_one">新相簿（%d）</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">新增項目到「%s」</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="other">已新增%d個項目到「%s」</item>
+        <item quantity="other">已新增%1$d個項目到「%2$s」</item>
     </plurals>
     <!-- Title of a notification related to payments -->
     <string name="notifications_payment_title">付款資訊</string>
@@ -3954,7 +3938,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">定期會議</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label"></string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">每週%s</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">媒體探索檢視</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4017,7 +4001,7 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">不要授予</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="other">已從「%s」移除%d個項目</item>
+        <item quantity="other">已從「%2$s」移除%1$d個項目</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">一次性會議</string>
@@ -4029,60 +4013,434 @@
     <string name="video_playback_position_dialog_resume_button">繼續</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">重頭播放</string>
-    <!-- User Alert notification for new scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_new"></string>
+    <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
+    <string name="notification_subtitle_scheduled_meeting_new">[A]%s[/A][B]邀請您參加會議，排定時間：[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled"></string>
+    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s取消[/A][B]以下排定時間的會議：[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s更新[/A][B]會議名稱，從「%s」更新為[/B]「[A]%s[/A]」</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s更新[/A][B]會議日期[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s更新[/A][B]會議時間[/B]</string>
     <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s更新[/A][B]會議說明[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s更新[/A][B]以下排定時間的會議說明：[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">存取拒絕</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
+    <string name="dialog_content_media_permissions_denied">您拒絕MEGA存取您裝置的儲存空間和媒體檔案。如果您想繼續共享，請允許MEGA存取權限。</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
-    <string name="dialog_positive_button_allow_permission">Allow permission</string>
+    <string name="dialog_positive_button_allow_permission">允許權限</string>
     <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
-    <string name="dialog_negative_button_do_not_allow">Don’t allow</string>
+    <string name="dialog_negative_button_do_not_allow">不允許</string>
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">事件</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
-    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle"></string>
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">每天發生</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
-    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle"></string>
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">每週發生</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
-    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle"></string>
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">每月發生</string>
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
-    <string name="meetings_recurring_meeting_info_see_more_occurrences_button"></string>
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button">顯示更多</string>
     <!-- Label for scheduled monthly meetings -->
-    <string name="meetings_list_scheduled_meeting_monthly_label"></string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">每月%s</string>
     <!-- Label for scheduled daily meetings -->
-    <string name="meetings_list_scheduled_meeting_daily_label"></string>
+    <string name="meetings_list_scheduled_meeting_daily_label">每天%s</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s[/A][B]邀請您參加定期性會議，排定時間：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s更新[/A][B]定期性會議說明[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s更新[/A][B]以下排定時間的定期性會議細節：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s更新[/A][B]一個事件：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s更新[/A][B]定期性會議時間[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting frequency change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_canceled"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s取消[/A][B]會議和其所有事件[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s取消[/A][B]以下排定時間的事件：[/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_message">這個連結並非使用您當前登入的帳戶生成。請登入與此連結相關連的帳戶以驗證您的電子郵件地址。</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_title">無法更新電子郵件地址</string>
+    <!-- Select album cover -->
+    <string name="photos_album_select_cover">設為相簿封面</string>
+    <!-- Album cover updated -->
+    <string name="photos_album_cover_updated">相簿封面已更新</string>
+    <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
+    <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] 從[B]%2$s到%3$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">從[A]%1$s[/A]起，每天的[B]%2$s到%3$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">從[A]%1$s到%2$s[/A]，每天的[B]%3$s到%4$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
+        <item quantity="other">從[A]%3$s到%4$s[/A]，每%2$d週的%1$s的[B]%5$s到%6$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting without ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever">
+        <item quantity="other">從[A]%3$s[/A]起，每%2$d週%1$s的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
+        <item quantity="other">從[A]%4$s到%5$s[/A]，每%3$d週%1$s和%2$s的[B]%6$s到%7$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
+        <item quantity="other">從[A]%4$s[/A]起，每%3$d週%1$s和%2$s的[B]%5$s到%6$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
+        <item quantity="other">從[A]%3$s到%4$s[/A]，每%2$d個月第%1$d天的[B]%5$s到%6$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting without ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_forever">
+        <item quantity="other">從[A]%3$s[/A]起，每%2$d個月第%1$d天的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_first">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第一個星期一的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_first">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第一個星期一的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_second">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第二個星期一的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_second">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第二個星期一的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_third">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第三個星期一的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_third">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第三個星期一的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fourth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第四個星期一的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fourth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第四個星期一的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fifth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第五個星期一的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fifth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第五個星期一的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_first">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第一個星期二的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_first">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第一個星期二的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_second">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第二個星期二的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_second">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第二個星期二的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_third">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第三個星期二的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_third">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第三個星期二的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fourth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第四個星期二的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fourth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第四個星期二的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fifth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第五個星期二的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fifth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第五個星期二的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_first">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第一個星期三的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_first">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第一個星期三的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_second">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第二個星期三的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_second">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第二個星期三的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_third">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第三個星期三的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_third">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第三個星期三的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fourth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第四個星期三的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fourth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第四個星期三的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fifth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第五個星期三的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fifth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第五個星期三的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_first">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第一個星期四的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_first">
+        <item quantity="other">從[A]%2$s[/A]，每%1$d個月第一個星期四的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_second">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第二個星期四的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_second">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第二個星期四的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_third">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第三個星期四的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_third">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第三個星期四的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fourth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第四個星期四的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fourth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第四個星期四的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fifth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第五個星期四的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fifth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第五個星期四的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_first">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第一個星期五的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_first">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第一個星期五的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_second">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第二個星期五的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_second">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第二個星期五的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_third">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第三個星期五的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_third">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第三個星期五的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fourth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第四個星期五的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fourth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第四個星期五的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fifth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第五個星期五的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fifth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第五個星期五的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_first">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第一個星期六的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_first">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第一個星期六的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_second">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第二個星期六的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_second">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第二個星期六的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_third">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第三個星期六的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_third">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第三個星期六的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fourth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第四個星期六的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fourth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第四個星期六的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fifth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第五個星期六的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fifth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第五個星期六的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_first">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第一個星期天的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_first">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第一個星期天的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_second">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第二個星期天的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_second">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第二個星期天的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_third">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第三個星期天的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_third">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第三個星期天的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fourth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第四個星期天的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fourth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第四個星期天的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fifth">
+        <item quantity="other">從[A]%2$s到%3$s[/A]，每%1$d個月第五個星期天的[B]%4$s到%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fifth">
+        <item quantity="other">從[A]%2$s[/A]起，每%1$d個月第五個星期天的[B]%3$s到%4$s[/B]</item>
+    </plurals>
+    <!-- In app notification description text representing the meeting repeats every Monday -->
+    <string name="notification_scheduled_meeting_week_day_mon">星期一</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday -->
+    <string name="notification_scheduled_meeting_week_day_tue">星期二</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday -->
+    <string name="notification_scheduled_meeting_week_day_wed">星期三</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday -->
+    <string name="notification_scheduled_meeting_week_day_thu">星期四</string>
+    <!-- In app notification description text representing the meeting repeats every Friday -->
+    <string name="notification_scheduled_meeting_week_day_fri">星期五</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday -->
+    <string name="notification_scheduled_meeting_week_day_sat">星期六</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday -->
+    <string name="notification_scheduled_meeting_week_day_sun">星期日</string>
+    <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
+    <string name="meetings_one_off_occurrence_info_today">今天，%1$s從%2$s到%3$s</string>
+    <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
+    <string name="meetings_one_off_occurrence_info_tomorrow">明天，%1$s從%2$s到%3$s</string>
+    <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s更新[/A][B]定期性會議日期[/B]</string>
+    <!-- This is the title of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_title">安全性升級</string>
+    <!-- This is the body of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_content">您帳戶的安全性現在已升級。這只會發生一次。如果您之前在此帳戶看過這個訊息，請按取消。</string>
+    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
+    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
+        <item quantity="other">您正在分享以下資料夹：%s</item>
+    </plurals>
+    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
+    <plurals name="cloud_drive_undecrypted_file">
+        <item quantity="other">[未解密檔案]</item>
+    </plurals>
+    <!-- In app notification description text representing the meeting repeats every Monday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_mon">星期一</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_tue">星期二</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_wed">星期三</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_thu">星期四</string>
+    <!-- In app notification description text representing the meeting repeats every Friday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_fri">星期五</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sat">星期六</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sun">星期日</string>
+    <!-- In app notification description text representing the meeting repeats every Monday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_mon">星期一</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_tue">星期二</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_wed">星期三</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_thu">星期四</string>
+    <!-- In app notification description text representing the meeting repeats every Friday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_fri">星期五</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">星期六</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">星期日</string>
 </resources>

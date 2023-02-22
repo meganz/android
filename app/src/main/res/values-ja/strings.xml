@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">外部ストレージが検出されませんでした</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">ログ&#160;アウト</string>
+    <string name="action_logout">ログアウト</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">アップロード</string>
     <!-- Menu item -->
@@ -127,7 +127,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">現在のログインプロセスをキャンセルしてもよろしいですか？</string>
     <!-- Login button -->
-    <string name="login_text">ログ&#160;イン</string>
+    <string name="login_text">ログイン</string>
     <!-- email label -->
     <string name="email_text">メール</string>
     <!-- password label -->
@@ -156,8 +156,6 @@
     <string name="login_connecting_to_server">サーバーに接続中</string>
     <!-- Status text when updating the file manager -->
     <string name="download_updating_filelist">ファイルリストを更新中</string>
-    <!-- title of the screen after creating an account when the user has to confirm the password to confirm the account -->
-    <string name="login_confirm_account">アカウントを確認</string>
     <!-- when the user clicks on the link sent by MEGA after creating the account, this message is shown -->
     <string name="login_querying_signup_link">検証リンクを確認中</string>
     <!-- Attempting to activate a MEGA account for a user. -->
@@ -168,8 +166,6 @@
     <string name="login_before_share">MEGAと共有するにはログインしてください</string>
     <!-- This toast message is shown on the login page when an email confirm link is no longer valid. -->
     <string name="reg_link_expired">あなたの確認リンクはもう有効ではありません。あなたのアカウントは既に有効になっているか、登録をキャンセルしたかもしれません。</string>
-    <!-- category in sort by action -->
-    <string name="name_text">名前</string>
     <!-- First Name of the user -->
     <string name="first_name_text">名前</string>
     <!-- Last name of the user -->
@@ -303,11 +299,9 @@
         <item quantity="other">フォルダが空です。</item>
     </plurals>
     <!-- Hint how to cancel the download -->
-    <string name="download_touch_to_cancel">タッチしてキャンセル</string>
-    <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">転送を表示</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb">ほとんどの端末は4&#160;GBを超えるファイルをダウンロードできません。あなたのダウンロードはおそらく失敗するでしょう。</string>
+    <string name="error_file_size_greater_than_4gb"></string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">端末上にこのファイルを実行できるアプリがありません</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -756,13 +750,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">無料アカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Pro&#160;I アカウント</string>
+    <string name="my_account_pro1"></string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Pro&#160;II アカウント</string>
+    <string name="my_account_pro2"></string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3">Pro&#160;III アカウント</string>
+    <string name="my_account_pro3"></string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Lite アカウント</string>
+    <string name="my_account_prolite_feedback_email">Pro&#160;Liteアカウント</string>
     <!--  -->
     <string name="backup_title">回復キーをバックアップ</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -1675,7 +1669,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">ファイルを読み込んでいます</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte">%s&#160;B</string>
+    <string name="label_file_size_byte"></string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1691,7 +1685,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
+    <string name="label_file_speed_giga_byte"></string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
@@ -1896,7 +1890,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">次回アカウントにログインすると、オーセンティケータアプリで提供される6桁のコードを入力するよう求められます。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled">アプリへのアクセスができなくなったり、二要素認証を無効にしたい場合の問題を回避するために、<b>回復キー</b>安全な場所に保存してください。</string>
+    <string name="recommendation_2fa_enabled"></string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">コードが無効です</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2063,8 +2057,6 @@
     <string name="title_alert_logged_out">ログアウト済み</string>
     <!-- Text shown to indicate user that his account has already been confirmed -->
     <string name="account_confirmed">あなたのアカウントは有効になっています。ログインしてください。</string>
-    <!-- Text shown to indicate user that his account should be confirmed typing his password -->
-    <string name="confirm_account">アカウント確認のため、パスワードを入力してください</string>
     <!-- Error shown if a user tries to add their own email address as a contact -->
     <string name="error_own_email_as_contact">ご自分のメールアドレスを追加する必要はありません</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
@@ -2297,8 +2289,6 @@
     <string name="button_continue">続行</string>
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A]（サブスクリプション）</string>
-    <!-- one of the payment methods -->
-    <string name="payment_method_huawei_wallet">[A]HUAWEI Pay[/A]（サブスクリプション）</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
     <string name="new_label_notification_item">新</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
@@ -2787,8 +2777,6 @@
     <string name="select_message_title">メッセージを選択</string>
     <!-- The label that describes that a transfer failed. -->
     <string name="failed_label">失敗しました</string>
-    <!-- Text warning of transfer over quota -->
-    <string name="warning_transfer_over_quota">あなたの転送が中断されました。アカウントをアップグレードするか、%s待ってからダウンロードを続行してください。</string>
     <!-- Label indicating transfer over quota -->
     <string name="label_transfer_over_quota">転送容量を超えました</string>
     <!-- Label indicating storage over quota -->
@@ -3129,10 +3117,6 @@
     <string name="months_view_button">月</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by years-->
     <string name="years_view_button">年</string>
-    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the month; %2$s is for the year. E.g.: "June 2020". -->
-    <string name="cu_month_year_date">[B]%1$s[/B] %2$s</string>
-    <!-- Text to show as a date on Camera Uploads section. Placeholders: [B][/B] are for formatting text; %1$s is for the day; %2$s is for the month; %3$s is for the year. E.g.: "30 December 2020". -->
-    <string name="cu_day_month_year_date">[B]%1$s %2$s[/B],%3$s</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="other">アップロード中、%1$d個のファイルを保留中</item>
@@ -3674,19 +3658,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">再接続できません</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
+    <string name="account_achievements_storage_quota_byte"></string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
+    <string name="account_achievements_storage_quota_kilo_byte"></string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
+    <string name="account_achievements_storage_quota_mega_byte"></string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
+    <string name="account_achievements_storage_quota_giga_byte"></string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
+    <string name="account_achievements_storage_quota_tera_byte"></string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
+    <string name="account_achievements_storage_quota_peta_byte"></string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
+    <string name="account_achievements_storage_quota_exa_byte"></string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">通話は%sに終了します</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3872,19 +3856,19 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">ミーティングをスケジュール</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">Pro&#160;Liteの月間サブスクリプションをご利用いただきありがとうございます</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Pro Liteの月間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly">Pro&#160;Liteの年間サブスクリプションをご利用いただきありがとうございます</string>
+    <string name="upgrade_account_successful_pro_lite_yearly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly">Pro&#160;Iの月間サブスクリプションをご利用いただきありがとうございます</string>
+    <string name="upgrade_account_successful_pro_1_monthly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly">Pro&#160;Iの年間サブスクリプションをご利用いただきありがとうございます</string>
+    <string name="upgrade_account_successful_pro_1_yearly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly">Pro&#160;IIの月間サブスクリプションをご利用いただきありがとうございます</string>
+    <string name="upgrade_account_successful_pro_2_monthly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly">Pro&#160;IIの年間サブスクリプションをご利用いただきありがとうございます</string>
+    <string name="upgrade_account_successful_pro_2_yearly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly">Pro&#160;IIIの月間サブスクリプションをご利用いただきありがとうございます</string>
+    <string name="upgrade_account_successful_pro_3_monthly"></string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Pro&#160;IIIの年間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -3912,7 +3896,7 @@
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_more_participants_label">もっと見る</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
-    <string name="meetings_scheduled_meeting_info_leave_group_label">グループから退出</string>
+    <string name="meetings_scheduled_meeting_info_leave_group_label">ミーティングを抜ける</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album">このアルバム名は使用できません。別の名前を入力してください。</string>
     <!-- Error message for creating an album with a duplicate name -->
@@ -3923,7 +3907,8 @@
     <string name="photos_album_selection_title">項目を「%s」に追加</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="other">%d項目を「%s」に追加しました</item>
+        <item quantity="one">Added %1$d item to “%2$s“</item>
+        <item quantity="other">Added %1$d items to “%2$s”</item>
     </plurals>
     <!-- Title of a notification related to payments -->
     <string name="notifications_payment_title">お支払い情報</string>
@@ -3954,7 +3939,7 @@
     <!-- Label for recurring meetings -->
     <string name="meetings_list_recurring_meeting_label">定期ミーティング</string>
     <!-- Label for scheduled weekly meetings -->
-    <string name="meetings_list_scheduled_meeting_weekly_label"></string>
+    <string name="meetings_list_scheduled_meeting_weekly_label">%s毎週</string>
     <!-- In Settings view the title of setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_title">メディア検出ビュー</string>
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
@@ -4017,7 +4002,8 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">許可しない</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="other">「%s」から%d個の項目を削除しました</item>
+        <item quantity="one">Removed %1$d item from “%2$s”</item>
+        <item quantity="other">Removed %1$d items from “%2$s”</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">一回限りのミーティング</string>
@@ -4029,20 +4015,20 @@
     <string name="video_playback_position_dialog_resume_button">再開</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">再起動</string>
-    <!-- User Alert notification for new scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_new"></string>
+    <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
+    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]さんが以下に予定されたミーティングにあなたを招待しました：[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled"></string>
+    <string name="notification_subtitle_scheduled_meeting_canceled">[B]以下に予定されたミーティングを[/B][A]%sさんがキャンセルしました[/A]：</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_date">[B]ミーティングの日付を[/B][A]%sさんが更新しました[/A]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_time">[B]ミーティングの時間を[/B][A]%sさんが更新しました[/A]</string>
     <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_description">[B]ミーティングの説明を[/B][A]%sさんが更新しました[/A]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple"></string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[B]以下に予定されたミーティングの詳細を[/B][A]%sさんが更新しました[/A]：</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">アクセスが拒否されました</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
@@ -4054,35 +4040,409 @@
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">開催</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
-    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle"></string>
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">毎日開催</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
-    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle"></string>
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">毎週開催</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
-    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle"></string>
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">毎月開催</string>
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
-    <string name="meetings_recurring_meeting_info_see_more_occurrences_button"></string>
+    <string name="meetings_recurring_meeting_info_see_more_occurrences_button">もっと見る</string>
     <!-- Label for scheduled monthly meetings -->
-    <string name="meetings_list_scheduled_meeting_monthly_label"></string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%s毎月</string>
     <!-- Label for scheduled daily meetings -->
-    <string name="meetings_list_scheduled_meeting_daily_label"></string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%s毎日</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]さんが以下に予定された定期的なミーティングにあなたを招待しました：[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[B]定期的なミーティングの説明を[/B][A]%sさんが更新しました[/A]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[B]以下に予定された定期的なミーティングの詳細を[/B][A]%sさんが更新しました[/A]：</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[B]開催日時を[/B][A]%sさんが更新しました[/A]：</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[B]定期的なミーティングの時間を[/B][A]%sさんが更新しました[/A]</string>
     <!-- User Alert notification for scheduled recurring meeting frequency change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_canceled"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[B]以下のミーティングとそのすべての開催を[/B][A]%sさんがキャンセルしました[/A]：</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled"></string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[B]以下に予定された開催日時を[/B][A]%sさんがキャンセルしました[/A]：</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
     <string name="account_change_email_error_not_logged_with_correct_account_message">このリンクは、現在ログインしているアカウントでは生成されていません。このリンクに関連するアカウントにログインして、メールアドレスを認証してください。</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
     <string name="account_change_email_error_not_logged_with_correct_account_title">メールアドレスを更新できません</string>
+    <!-- Select album cover -->
+    <string name="photos_album_select_cover">アルバムの表紙を選択</string>
+    <!-- Album cover updated -->
+    <string name="photos_album_cover_updated">アルバムカバーを更新しました</string>
+    <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
+    <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A]、[B]%2$sから%3$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">[A]%1$s[/A]から毎日、[B]%2$sから%3$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">[A]%1$sから毎日%2$sまで[/A]、[B]%3$s から%4$s[/B]</string>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
+        <item quantity="other">[A]%3$sから%4$s[/A]まで、%2$d週間ごとに%1$sに、[B]%5$sから %6$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting without ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever">
+        <item quantity="other">[A]%3$sから[/A]、%2$d週間ごとに%1$sに、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
+        <item quantity="other">[A]%4$sから%5$s[/A]まで、%3$d週間ごとに%1$sと%2$sに、[B]%6$sから%7$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
+        <item quantity="other">[A]%4$s[/A]から、%3$d週間ごとに%1$sと%2$sに、[B]%5$sから%6$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
+        <item quantity="other">[A]%3$sから%4$s[/A]まで、%2$dか月ごとに第%1$dに、[B]%5$sから %6$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting without ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_forever">
+        <item quantity="other">[A]%3$s[/A]から、%2$dか月ごとに第%1$dに、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_first">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第一月曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_first">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第一月曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_second">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第二月曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_second">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第二月曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_third">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第三月曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_third">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第三月曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fourth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第四月曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fourth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第四月曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fifth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第五月曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fifth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第五月曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_first">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第一火曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_first">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第一火曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_second">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第二火曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_second">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第二火曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_third">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第三火曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_third">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第三火曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fourth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第四火曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fourth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第四火曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fifth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第五火曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fifth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第五火曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_first">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第一水曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_first">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第一水曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_second">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第二水曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_second">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第二水曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_third">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第三水曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_third">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第三水曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fourth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第四水曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fourth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第四水曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fifth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第五水曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fifth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第五水曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_first">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第一木曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_first">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第一木曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_second">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第二木曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_second">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第二木曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_third">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第三木曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_third">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第三木曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fourth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第四木曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fourth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第四木曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fifth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第五木曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fifth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第五木曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_first">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第一金曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_first">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第一金曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_second">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第二金曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_second">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第二金曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_third">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第三金曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_third">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第三金曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fourth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第四金曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fourth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第四金曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fifth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第五金曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fifth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第五金曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_first">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第一土曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_first">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第一土曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_second">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第二土曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_second">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第二土曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_third">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第三土曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_third">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第三土曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fourth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第四土曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fourth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第四土曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fifth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第五土曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fifth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第五土曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_first">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第一日曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_first">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第一日曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_second">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第二日曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_second">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第二日曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_third">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第三日曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_third">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第三日曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fourth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第四日曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fourth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第四日曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fifth">
+        <item quantity="other">[A]%2$sから%3$s[/A]まで、%1$dか月ごとに第五日曜日に、[B]%4$sから%5$s[/B]</item>
+    </plurals>
+    <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
+    <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fifth">
+        <item quantity="other">[A]%2$s[/A]から、%1$dか月ごとに第五日曜日に、[B]%3$sから%4$s[/B]</item>
+    </plurals>
+    <!-- In app notification description text representing the meeting repeats every Monday -->
+    <string name="notification_scheduled_meeting_week_day_mon">月</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday -->
+    <string name="notification_scheduled_meeting_week_day_tue">火</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday -->
+    <string name="notification_scheduled_meeting_week_day_wed">水</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday -->
+    <string name="notification_scheduled_meeting_week_day_thu">木</string>
+    <!-- In app notification description text representing the meeting repeats every Friday -->
+    <string name="notification_scheduled_meeting_week_day_fri">金</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday -->
+    <string name="notification_scheduled_meeting_week_day_sat">土</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday -->
+    <string name="notification_scheduled_meeting_week_day_sun">日</string>
+    <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
+    <string name="meetings_one_off_occurrence_info_today">今日、%1$s%2$sから%3$s</string>
+    <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
+    <string name="meetings_one_off_occurrence_info_tomorrow">明日、%1$s%2$sから%3$s</string>
+    <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[B]定期的なミーティングの日付を[/B][A]%1$sさんが更新しました[/A]</string>
+    <!-- This is the title of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_title">セキュリティのアップグレード</string>
+    <!-- This is the body of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_content">アカウントのセキュリティは現在アップグレードされています。これは一度だけ発生します。このアカウントに関するこのメッセージが以前に表示されたことがある場合は、「キャンセル」をタップしてください。</string>
+    <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
+    <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
+        <item quantity="other">現在、次のフォルダを共有しています：%s</item>
+    </plurals>
+    <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
+    <plurals name="cloud_drive_undecrypted_file">
+        <item quantity="other">[ 未復号ファイル ]</item>
+    </plurals>
+    <!-- In app notification description text representing the meeting repeats every Monday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_mon">月</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_tue">火</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_wed">水</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_thu">木</string>
+    <!-- In app notification description text representing the meeting repeats every Friday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_fri">金</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sat">土</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday. This text is used at the start of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_start_sun">日</string>
+    <!-- In app notification description text representing the meeting repeats every Monday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_mon">月</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_tue">火</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_wed">水</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_thu">木</string>
+    <!-- In app notification description text representing the meeting repeats every Friday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_fri">金</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">土</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">日</string>
 </resources>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -4000,7 +4000,7 @@
     <!-- Title of option to show more participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_more_participants_label">See more</string>
     <!-- Title of option to leave a group chat in Scheduled meeting info screen-->
-    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave group</string>
+    <string name="meetings_scheduled_meeting_info_leave_group_label">Leave meeting</string>
     <!-- Error message for creating an album with a system albums name -->
     <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
     <!-- Error message for creating an album with a duplicate name -->
@@ -4011,8 +4011,8 @@
     <string name="photos_album_selection_title">Add items to “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %d item to “%s“</item>
-        <item quantity="other">Added %d items to “%s”</item>
+        <item quantity="one">Added %1$d item to “%2$s“</item>
+        <item quantity="other">Added %1$d items to “%2$s”</item>
     </plurals>
     <!-- Title of a notification related to payments -->
     <string name="notifications_payment_title">Payment info</string>
@@ -4112,8 +4112,8 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Don’t grant</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %d item from “%s”</item>
-        <item quantity="other">Removed %d items from “%s”</item>
+        <item quantity="one">Removed %1$d item from “%2$s”</item>
+        <item quantity="other">Removed %1$d items from “%2$s”</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
@@ -4130,7 +4130,7 @@
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s cancelled[/A][B] the meeting scheduled for:[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated the meeting name[/A][B] from “%s” to [/B]“[A]%s[/A]”</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
     <!-- User Alert notification for scheduled meeting date change -->
     <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s updated[/A][B] the meeting date[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
@@ -4571,6 +4571,20 @@
         <item quantity="one">Fifth Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
         <item quantity="other">Fifth Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
     </plurals>
+    <!-- In app notification description text representing the meeting repeats every Monday -->
+    <string name="notification_scheduled_meeting_week_day_mon">Mon</string>
+    <!-- In app notification description text representing the meeting repeats every Tuesday -->
+    <string name="notification_scheduled_meeting_week_day_tue">Tue</string>
+    <!-- In app notification description text representing the meeting repeats every Wednesday -->
+    <string name="notification_scheduled_meeting_week_day_wed">Wed</string>
+    <!-- In app notification description text representing the meeting repeats every Thursday -->
+    <string name="notification_scheduled_meeting_week_day_thu">Thu</string>
+    <!-- In app notification description text representing the meeting repeats every Friday -->
+    <string name="notification_scheduled_meeting_week_day_fri">Fri</string>
+    <!-- In app notification description text representing the meeting repeats every Saturday -->
+    <string name="notification_scheduled_meeting_week_day_sat">Sat</string>
+    <!-- In app notification description text representing the meeting repeats every Sunday -->
+    <string name="notification_scheduled_meeting_week_day_sun">Sun</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="meetings_one_off_occurrence_info_today">Today, %1$s from %2$s to %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
