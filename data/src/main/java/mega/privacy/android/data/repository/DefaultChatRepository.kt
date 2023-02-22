@@ -132,7 +132,9 @@ internal class DefaultChatRepository @Inject constructor(
 
     override suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>? =
         withContext(ioDispatcher) {
-            megaChatApiGateway.getScheduledMeetingsByChat(chatId)?.map(chatScheduledMeetingMapper)
+            megaChatApiGateway.getScheduledMeetingsByChat(chatId)
+                ?.filter { it.parentSchedId() == megaChatApiGateway.getChatInvalidHandle() }
+                ?.map(chatScheduledMeetingMapper)
         }
 
     override suspend fun setOpenInvite(chatId: Long): Boolean =

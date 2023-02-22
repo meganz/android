@@ -370,7 +370,8 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
     val createdTime = getTimestamp(CREATED_TIME_INDEX)
     val isRecurring = meeting?.rules != null
     val isOccurrence = pcrHandle.isValid()
-    if (isOccurrence) {
+//    if (isOccurrence) {
+    if (false) { // TODO Temporarily disabled until a fix is found
         scheduledMeetingOccurrProvider(nodeHandle)?.firstOrNull { occurr ->
             occurr.schedId == this.schedId
                     && occurr.parentSchedId == this.pcrHandle

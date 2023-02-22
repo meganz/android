@@ -272,7 +272,7 @@ class DefaultGetMeetings @Inject constructor(
                 chatId,
                 now.minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
             ).firstOrNull { occurr ->
-                !occurr.isCancelled &&
+                !occurr.isCancelled && occurr.parentSchedId == -1L &&
                         (occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
                                 || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true)
             }
