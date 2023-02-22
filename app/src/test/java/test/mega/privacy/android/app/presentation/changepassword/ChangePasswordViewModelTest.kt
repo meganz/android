@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.changepassword
 
+import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -10,8 +11,12 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.domain.usecase.GetRootFolder
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity.Companion.KEY_ACTION
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity.Companion.KEY_LINK_TO_RESET
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordViewModel
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePassword
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
@@ -34,6 +39,7 @@ internal class ChangePasswordViewModelTest {
     private val monitorConnectivity = mock<MonitorConnectivity> {
         onBlocking { invoke() }.thenReturn(testFlow)
     }
+    private val savedStateHandle = SavedStateHandle()
     private val changePassword = mock<ChangePassword>()
     private val getPasswordStrength = mock<GetPasswordStrength>()
     private val isCurrentPassword = mock<IsCurrentPassword>()
@@ -46,6 +52,7 @@ internal class ChangePasswordViewModelTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
 
         underTest = ChangePasswordViewModel(
+            savedStateHandle = savedStateHandle,
             monitorConnectivity = monitorConnectivity,
             isCurrentPassword = isCurrentPassword,
             getPasswordStrength = getPasswordStrength,
@@ -65,11 +72,11 @@ internal class ChangePasswordViewModelTest {
     fun `test that when user resets password successfully should return no error code`() = runTest {
         whenever(resetPassword(any(), any(), any())).thenReturn(true)
 
-        underTest.onExecuteResetPassword("", "", "")
+        underTest.onExecuteResetPassword("")
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.isPasswordReset).isEqualTo(true)
+            assertThat(state.isPasswordReset).isTrue()
             assertThat(state.errorCode).isEqualTo(null)
         }
     }
@@ -77,19 +84,31 @@ internal class ChangePasswordViewModelTest {
     @Test
     fun `test that when user resets password failed should return an error code`() = runTest {
         val fakeErrorCode = Random.nextInt()
+        val fakePassword = "Password"
+        val fakeLink = "Link"
+        val fakeMasterKey = "MasterKey"
 
-        whenever(resetPassword(any(), any(), any())).thenAnswer {
+        savedStateHandle[KEY_LINK_TO_RESET] = fakeLink
+        savedStateHandle[IntentConstants.EXTRA_MASTER_KEY] = fakeMasterKey
+
+        whenever(
+            resetPassword(
+                link = fakeLink,
+                newPassword = fakePassword,
+                masterKey = fakeMasterKey
+            )
+        ).thenAnswer {
             throw MegaException(
                 errorCode = fakeErrorCode,
                 errorString = "error"
             )
         }
 
-        underTest.onExecuteResetPassword("", "", "")
+        underTest.onExecuteResetPassword(fakePassword)
 
         underTest.uiState.test {
             val state = awaitItem()
-            assertThat(state.isPasswordReset).isEqualTo(true)
+            assertThat(state.isPasswordReset).isTrue()
             assertThat(state.errorCode).isEqualTo(fakeErrorCode)
         }
     }
@@ -104,7 +123,7 @@ internal class ChangePasswordViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.isPromptedMultiFactorAuth).isTrue()
-                assertThat(state.isPasswordChanged).isEqualTo(false)
+                assertThat(state.isPasswordChanged).isFalse()
             }
         }
 
@@ -132,8 +151,6 @@ internal class ChangePasswordViewModelTest {
         runTest {
             val isConnected = Random.nextBoolean()
             testFlow.emit(isConnected)
-
-            underTest.isConnectedToNetwork()
 
             underTest.uiState.test {
                 assertThat(awaitItem().isConnectedToNetwork).isEqualTo(isConnected)
@@ -179,33 +196,116 @@ internal class ChangePasswordViewModelTest {
     }
 
     @Test
-    fun `test that when checking password strength then passwordStrengthLevel state should be updated and isCurrentPassword should be true when validation enabled`() =
+    fun `test that when password character length is less than 4 then return very weak password strength`() =
+        runTest {
+            val fakePassword = "pas"
+            whenever(isCurrentPassword(fakePassword)).thenReturn(false)
+
+            underTest.checkPasswordStrength(fakePassword)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().passwordStrengthLevel).isEqualTo(0)
+            }
+        }
+
+    @Test
+    fun `test that when checking password strength then passwordStrengthLevel state should be updated and isCurrentPassword should be should also be updated`() =
         runTest {
             val fakePassword = "password"
             whenever(getPasswordStrength(fakePassword)).thenReturn(2)
             whenever(isCurrentPassword(fakePassword)).thenReturn(true)
 
-            underTest.checkPasswordStrength(fakePassword, true)
+            underTest.checkPasswordStrength(fakePassword)
 
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.passwordStrengthLevel).isEqualTo(2)
-                assertThat(state.isCurrentPassword).isEqualTo(true)
+                assertThat(state.isCurrentPassword).isTrue()
             }
         }
 
     @Test
-    fun `test that when password validation is disabled then isCurrentPassword will always return false even when result returns true`() =
+    fun `test that when action is reset password and master key or reset link null should update isShowAlertMessage ui state`() =
         runTest {
-            val fakePassword = "password"
-            whenever(isCurrentPassword(fakePassword)).thenReturn(true)
+            val fakeLink = "Link"
 
-            underTest.checkPasswordStrength(fakePassword, false)
+            savedStateHandle[KEY_LINK_TO_RESET] = fakeLink
+            savedStateHandle[KEY_ACTION] = Constants.ACTION_RESET_PASS_FROM_LINK
+
+            underTest.determineIfScreenIsResetPasswordMode()
 
             underTest.uiState.test {
-                assertThat(awaitItem().isCurrentPassword).isEqualTo(false)
+                val state = awaitItem()
+                assertThat(state.isResetPasswordMode).isTrue()
+                assertThat(state.isShowAlertMessage).isTrue()
             }
         }
+
+    @Test
+    fun `test that when action is reset password but link to reset is null should update isResetPasswordLinkInvalid ui state`() =
+        runTest {
+            savedStateHandle[KEY_ACTION] = Constants.ACTION_RESET_PASS_FROM_LINK
+
+            underTest.determineIfScreenIsResetPasswordMode()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isResetPasswordMode).isTrue()
+                assertThat(state.isResetPasswordLinkValid).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that when action is not reset password should not update reset password ui state`() =
+        runTest {
+            savedStateHandle[KEY_ACTION] = null
+
+            underTest.determineIfScreenIsResetPasswordMode()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isResetPasswordMode).isFalse()
+                assertThat(state.isResetPasswordLinkValid).isTrue()
+                assertThat(state.isShowAlertMessage).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that when action is reset password from parking account should update reset password ui state`() =
+        runTest {
+            savedStateHandle[KEY_ACTION] = Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT
+
+            underTest.determineIfScreenIsResetPasswordMode()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isResetPasswordMode).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that reset link should return valid value when not null`() =
+        runTest {
+            val fakeLink = "Link"
+            savedStateHandle[KEY_ACTION] = Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT
+            savedStateHandle[KEY_LINK_TO_RESET] = fakeLink
+
+            underTest.determineIfScreenIsResetPasswordMode()
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isResetPasswordLinkValid).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that when onAlertMessageShown called, should reset state to default`() = runTest {
+        underTest.onAlertMessageShown()
+
+        underTest.uiState.test {
+            assertThat(awaitItem().isShowAlertMessage).isFalse()
+        }
+    }
 
     private fun verifyChangePasswordUiState(
         isSuccessChangePassword: Boolean,

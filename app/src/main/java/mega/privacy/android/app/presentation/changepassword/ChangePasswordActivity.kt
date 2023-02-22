@@ -22,7 +22,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityChangePasswordBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.TestPasswordActivity
@@ -50,15 +49,9 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     @ApplicationScope
     @Inject
     internal lateinit var sharingScope: CoroutineScope
-
     private val viewModel: ChangePasswordViewModel by viewModels()
 
-    private var changePassword = true
-    private var linkToReset: String? = null
-    private var mk: String? = null
-
     // TOP for 'terms of password'
-    private var passwdValid = false
     private val imm: InputMethodManager by lazy(LazyThreadSafetyMode.NONE) {
         getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
     }
@@ -78,141 +71,171 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
             }
     }
 
+    /**
+     * Checks whether device is connected to network
+     * @return true when currently device has network connection, else false
+     * only true during this time, network connection status may change because of how flow works.
+     */
+    private val isConnectedToNetwork: Boolean
+        get() = viewModel.uiState.value.isConnectedToNetwork
+
+    /**
+     * Checks whether the password the user enters is the same as the current password
+     * returns true if it's the same, else false
+     */
+    private val isPasswordTheSame: Boolean
+        get() = viewModel.uiState.value.isCurrentPassword
+
+    /**
+     * Checks whether the password the user enters is a valid password
+     * returns true when valid, else false
+     */
+    private val isPasswordValid: Boolean
+        get() = viewModel.uiState.value.passwordStrengthLevel > MegaApiJava.PASSWORD_STRENGTH_VERYWEAK
+
+    /**
+     * Checks whether current screen mode is reset password
+     * returns true if reset password, false if change password
+     */
+    private val isResetPasswordMode: Boolean
+        get() = viewModel.uiState.value.isResetPasswordMode
+
+    /**
+     * Checks whether reset link is valid, returns true if valid, else false
+     */
+    private val isResetLinkValid: Boolean
+        get() = viewModel.uiState.value.isResetPasswordLinkValid
+
+    private fun initState() {
+        if (intent.getStringExtra(KEY_LINK_TO_RESET).isNullOrBlank()) {
+            intent.putExtra(KEY_LINK_TO_RESET, intent.dataString)
+        }
+
+        if (intent.getStringExtra(KEY_ACTION).isNullOrBlank()) {
+            intent.putExtra(KEY_ACTION, intent.action)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-
+        initState()
         collectUIState()
+        bindView(savedInstanceState)
+        viewModel.determineIfScreenIsResetPasswordMode()
+    }
 
-        passwdValid = false
-        binding.containerPasswdElements.visibility = View.GONE
-        binding.changePasswordNewPassword1Layout.isEndIconVisible = false
-        binding.changePasswordNewPassword1.setOnFocusChangeListener { _: View?, hasFocus: Boolean ->
-            binding.changePasswordNewPassword1Layout.isEndIconVisible = hasFocus
-            if (!hasFocus) {
-                checkFirstPasswordField()
-            }
-        }
-        binding.changePasswordNewPassword1ErrorIcon.visibility = View.GONE
-        binding.changePasswordNewPassword1.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                Timber.d("Text changed: ${s}_${start}_${before}_${count}")
-                if (s.isNotEmpty()) {
-                    val temp = s.toString()
-                    binding.containerPasswdElements.visibility = View.VISIBLE
-                    viewModel.checkPasswordStrength(temp.trim())
-                } else {
-                    passwdValid = false
-                    binding.containerPasswdElements.visibility = View.GONE
-                }
-            }
-
-            override fun afterTextChanged(editable: Editable) {
-                val normalHint =
-                    StringResourcesUtils.getString(R.string.my_account_change_password_newPassword1)
-                if (binding.changePasswordNewPassword1Layout.hint != null
-                    && binding.changePasswordNewPassword1Layout.hint.toString() != normalHint
-                ) {
-                    binding.changePasswordNewPassword1Layout.hint = normalHint
-                    binding.actionChangePassword.isEnabled = true
-                    binding.actionChangePassword.alpha = ENABLED_BUTTON_ALPHA
-                }
-                if (editable.toString().isEmpty()) {
-                    quitError(binding.changePasswordNewPassword1)
-                }
-                if (savedInstanceState != null && !binding.changePasswordNewPassword1.hasFocus()) {
+    private fun bindView(savedInstanceState: Bundle?) {
+        with(binding) {
+            containerPasswdElements.visibility = View.GONE
+            changePasswordNewPassword1Layout.isEndIconVisible = false
+            changePasswordNewPassword1.setOnFocusChangeListener { _: View?, hasFocus: Boolean ->
+                changePasswordNewPassword1Layout.isEndIconVisible = hasFocus
+                if (!hasFocus) {
                     checkFirstPasswordField()
                 }
             }
-        })
-        binding.changePasswordNewPassword2Layout.isEndIconVisible = false
-        binding.changePasswordNewPassword2.onFocusChangeListener =
-            View.OnFocusChangeListener { _, hasFocus: Boolean ->
-                binding.changePasswordNewPassword2Layout.isEndIconVisible = hasFocus
+            changePasswordNewPassword1ErrorIcon.visibility = View.GONE
+            changePasswordNewPassword1.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(
+                    charSequence: CharSequence,
+                    i: Int,
+                    i1: Int,
+                    i2: Int,
+                ) {
+                }
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                    Timber.d("Text changed: ${s}_${start}_${before}_${count}")
+                    if (s.isNotEmpty()) {
+                        val temp = s.toString()
+                        containerPasswdElements.visibility = View.VISIBLE
+                        viewModel.checkPasswordStrength(temp.trim())
+                    } else {
+                        containerPasswdElements.visibility = View.GONE
+                    }
+                }
+
+                override fun afterTextChanged(editable: Editable) {
+                    val normalHint =
+                        StringResourcesUtils.getString(R.string.my_account_change_password_newPassword1)
+                    if (changePasswordNewPassword1Layout.hint != null
+                        && changePasswordNewPassword1Layout.hint.toString() != normalHint
+                    ) {
+                        changePasswordNewPassword1Layout.hint = normalHint
+                        actionChangePassword.isEnabled = true
+                        actionChangePassword.alpha = ENABLED_BUTTON_ALPHA
+                    }
+                    if (editable.toString().isEmpty()) {
+                        quitError(changePasswordNewPassword1)
+                    }
+                    if (savedInstanceState != null && !changePasswordNewPassword1.hasFocus()) {
+                        checkFirstPasswordField()
+                    }
+                }
+            })
+            changePasswordNewPassword2Layout.isEndIconVisible = false
+            changePasswordNewPassword2.onFocusChangeListener =
+                View.OnFocusChangeListener { _, hasFocus: Boolean ->
+                    changePasswordNewPassword2Layout.isEndIconVisible = hasFocus
+                }
+            changePasswordNewPassword2ErrorIcon.visibility = View.GONE
+            changePasswordNewPassword2.doAfterTextChanged {
+                quitError(changePasswordNewPassword2)
             }
-        binding.changePasswordNewPassword2ErrorIcon.visibility = View.GONE
-        binding.changePasswordNewPassword2.doAfterTextChanged {
-            quitError(binding.changePasswordNewPassword2)
-        }
-        binding.actionChangePassword.setOnClickListener(this)
-        binding.actionCancel.setOnClickListener { finish() }
-        var textToShowTOP = getString(R.string.top)
-        try {
-            textToShowTOP = textToShowTOP.replace(
-                "[B]", "<font color=\'"
-                        + getThemeColorHexString(this, R.attr.colorSecondary)
-                        + "\'>"
-            )
-                .replace("[/B]", "</font>")
-                .replace("[A]", "<u>")
-                .replace("[/A]", "</u>")
-        } catch (e: Exception) {
-            Timber.e(e, "Exception formatting string")
-        }
-        val resultTOP = Html.fromHtml(textToShowTOP, Html.FROM_HTML_MODE_LEGACY)
-        binding.checkboxContainer.top.text = resultTOP
-        binding.checkboxContainer.top.setOnClickListener(this)
-        binding.checkboxContainer.chkTop.setOnClickListener(this)
-        setSupportActionBar(binding.changePasswordToolbar)
-        supportActionBar?.apply {
-            title = getString(R.string.my_account_change_password)
-            setHomeButtonEnabled(true)
-            setDisplayHomeAsUpEnabled(true)
-        }
-        binding.changePasswordScrollView.setOnScrollChangeListener { _: View?, _: Int, _: Int, _: Int, _: Int ->
-            Util.changeActionBarElevation(
-                this,
-                binding.appBarLayoutChangePassword,
-                binding.changePasswordScrollView.canScrollVertically(-1),
-            )
-        }
-        when (intent?.action) {
-            Constants.ACTION_RESET_PASS_FROM_LINK -> {
-                Timber.d("ACTION_RESET_PASS_FROM_LINK")
-                changePassword = false
-                linkToReset = intent.dataString
-                if (linkToReset == null) {
-                    Timber.w("link is NULL - close activity")
-                    finish()
-                }
-                mk = intent.getStringExtra(IntentConstants.EXTRA_MASTER_KEY)
-                if (mk == null) {
-                    Timber.w("MK is NULL - close activity")
-                    Util.showAlert(
-                        this,
-                        getString(R.string.general_text_error),
-                        getString(R.string.general_error_word)
-                    )
-                }
-                supportActionBar?.title = getString(R.string.title_enter_new_password)
+            actionChangePassword.setOnClickListener {
+                onClickChangePasswordButton()
             }
-            Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT -> {
-                changePassword = false
-                Timber.d("ACTION_RESET_PASS_FROM_PARK_ACCOUNT")
-                linkToReset = intent.dataString
-                if (linkToReset == null) {
-                    Timber.w("link is NULL - close activity")
-                    Util.showAlert(
-                        this,
-                        getString(R.string.general_text_error),
-                        getString(R.string.general_error_word)
-                    )
-                }
-                mk = null
-                supportActionBar?.title = getString(R.string.title_enter_new_password)
+            actionCancel.setOnClickListener { finish() }
+            checkboxContainer.top.text =
+                Html.fromHtml(getCheckboxTNCText(), Html.FROM_HTML_MODE_LEGACY)
+
+            checkboxContainer.top.setOnClickListener { onClickTNCCheckbox() }
+
+            setSupportActionBar(changePasswordToolbar)
+            supportActionBar?.apply {
+                title = getString(R.string.my_account_change_password)
+                setHomeButtonEnabled(true)
+                setDisplayHomeAsUpEnabled(true)
+            }
+            changePasswordScrollView.setOnScrollChangeListener { _: View?, _: Int, _: Int, _: Int, _: Int ->
+                Util.changeActionBarElevation(
+                    this@ChangePasswordActivity,
+                    appBarLayoutChangePassword,
+                    changePasswordScrollView.canScrollVertically(-1),
+                )
             }
         }
     }
 
     private fun collectUIState() {
         this.collectFlow(viewModel.uiState) { state ->
+            handleScreenModeState(state)
+            handleAlertMessageState(state)
             handleSnackBarMessageState(state)
             handleLoadingProgressState(state)
             handleMultiFactorAuthState(state)
             handlePasswordChangedState(state)
             handlePasswordResetState(state)
             handlePasswordValidationState(state)
+        }
+    }
+
+    private fun handleScreenModeState(state: ChangePasswordUIState) {
+        if (state.isResetPasswordLinkValid.not()) {
+            finish()
+            return
+        }
+
+        if (state.isResetPasswordMode) {
+            supportActionBar?.title = getString(R.string.title_enter_new_password)
+        }
+    }
+
+    private fun handleAlertMessageState(state: ChangePasswordUIState) {
+        if (state.isShowAlertMessage) {
+            showAlert()
+            viewModel.onAlertMessageShown()
         }
     }
 
@@ -288,8 +311,15 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     }
 
     private fun handlePasswordValidationState(state: ChangePasswordUIState) {
-        if (state.passwordStrengthLevel > -1 || state.isCurrentPassword) {
-            checkPasswordStrength(state.passwordStrengthLevel, state.isCurrentPassword)
+        if (state.passwordStrengthLevel > -1) {
+            checkPasswordStrength(
+                state.passwordStrengthLevel,
+                state.isCurrentPassword
+            )
+        }
+
+        if (state.isCurrentPassword) {
+            checkFirstPasswordField()
         }
     }
 
@@ -327,24 +357,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     override fun onClick(v: View) {
         Timber.d("onClick")
         when (v.id) {
-            R.id.action_change_password -> {
-                if (changePassword) {
-                    Timber.d("Ok proceed to change")
-                    onChangePasswordClick()
-                } else {
-                    Timber.d("Reset pass on click")
-                    if (linkToReset == null) {
-                        Timber.w("link is NULL")
-                        Util.showAlert(
-                            this,
-                            getString(R.string.general_text_error),
-                            getString(R.string.general_error_word)
-                        )
-                    } else {
-                        onResetPasswordClick()
-                    }
-                }
-            }
             R.id.lost_authentication_device -> {
                 try {
                     val openTermsIntent = Intent(this, WebViewActivity::class.java)
@@ -358,7 +370,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                 }
             }
             R.id.top -> {
-                Timber.d("Show top")
                 try {
                     val openTermsIntent = Intent(this, WebViewActivity::class.java)
                     openTermsIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -375,11 +386,10 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
 
     private fun checkPasswordStrength(passwordStrength: Int, isCurrentPassword: Boolean) {
         binding.apply {
-            val passwordText = binding.changePasswordNewPassword1.text.toString()
             changePasswordNewPassword1Layout.isErrorEnabled = false
 
             when {
-                isCurrentPassword || passwordStrength == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || passwordText.length < 4 -> {
+                isCurrentPassword || passwordStrength == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK -> {
                     shapePasswdFirst.background =
                         ContextCompat.getDrawable(
                             this@ChangePasswordActivity,
@@ -413,7 +423,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                         )
                     )
                     passwordAdviceText.text = getString(R.string.passwd_weak)
-                    passwdValid = false
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
                     changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
                 }
@@ -451,7 +460,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                         )
                     )
                     passwordAdviceText.text = getString(R.string.passwd_weak)
-                    passwdValid = true
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak)
                     changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Weak)
                 }
@@ -489,7 +497,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                         )
                     )
                     passwordAdviceText.text = getString(R.string.passwd_medium)
-                    passwdValid = true
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
                     changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium)
                 }
@@ -527,7 +534,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                         )
                     )
                     passwordAdviceText.text = getString(R.string.passwd_good)
-                    passwdValid = true
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good)
                     changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Good)
                 }
@@ -565,7 +571,6 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
                         )
                     )
                     passwordAdviceText.text = getString(R.string.passwd_strong)
-                    passwdValid = true
                     changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Strong)
                     changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Strong)
                 }
@@ -576,20 +581,77 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
         }
     }
 
-    private fun onResetPasswordClick() {
-        validatePassword(withOldPassword = false) {
-            viewModel.onExecuteResetPassword(linkToReset, passwordText, mk)
+    /*
+    * Format and replace HTML text for TNC checkbox text
+    */
+    private fun getCheckboxTNCText(): String? {
+        return try {
+            getString(R.string.top).replace(
+                "[B]", "<font color=\'"
+                        + getThemeColorHexString(this, R.attr.colorSecondary)
+                        + "\'>"
+            ).replace("[/B]", "</font>")
+                .replace("[A]", "<u>")
+                .replace("[/A]", "</u>")
+        } catch (e: Exception) {
+            Timber.e(e, "Exception formatting string")
+            null
         }
     }
 
-    private fun onChangePasswordClick() {
+    /*
+    * Action when TNC checkbox link is clicked
+    */
+    private fun onClickTNCCheckbox() {
+        try {
+            val intent = Intent(this, WebViewActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                data = Uri.parse(Constants.URL_E2EE)
+            }
+            startActivity(intent)
+        } catch (e: Exception) {
+            val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                data = Uri.parse(Constants.URL_E2EE)
+            }
+            startActivity(viewIntent)
+        }
+    }
+
+    /*
+     * Action when change password button is clicked
+     */
+    private fun onClickChangePasswordButton() {
+        if (isResetPasswordMode) {
+            if (isResetLinkValid) {
+                onTriggerResetPassword()
+            } else {
+                showAlert()
+            }
+        } else {
+            onTriggerChangePassword()
+        }
+    }
+
+    /*
+     * Action trigger when screen mode is reset password
+     */
+    private fun onTriggerResetPassword() {
+        validatePassword(withOldPassword = false) {
+            viewModel.onExecuteResetPassword(passwordText)
+        }
+    }
+
+    /*
+     * Action trigger when screen mode is change password
+     */
+    private fun onTriggerChangePassword() {
         validatePassword(withOldPassword = true) {
             viewModel.onUserClickChangePassword(passwordText)
         }
     }
 
     private fun validatePassword(withOldPassword: Boolean, onValidated: () -> Unit) {
-        if (viewModel.isConnectedToNetwork().not()) {
+        if (isConnectedToNetwork.not()) {
             showSnackbar(getString(R.string.error_server_connection_problem))
             return
         }
@@ -642,11 +704,10 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
      * Validate new password1
      */
     private fun getNewPassword1Error(): String? {
-        val value = passwordText
         return when {
-            value.isEmpty() -> getString(R.string.error_enter_password)
-            megaApi.checkPassword(value) -> StringResourcesUtils.getString(R.string.error_same_password)
-            passwdValid.not() -> getString(R.string.error_password).also {
+            passwordText.isEmpty() -> getString(R.string.error_enter_password)
+            isPasswordTheSame -> StringResourcesUtils.getString(R.string.error_same_password)
+            isPasswordValid.not() -> getString(R.string.error_password).also {
                 binding.containerPasswdElements.visibility = View.GONE
             }
             else -> null
@@ -658,10 +719,10 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
      */
     private fun getNewPassword2Error(): String? {
         val value = binding.changePasswordNewPassword2.text.toString()
-        val confirm = passwordText
+
         if (value.isEmpty()) {
             return getString(R.string.error_enter_password)
-        } else if (value != confirm) {
+        } else if (value != passwordText) {
             return getString(R.string.error_passwords_dont_match)
         }
         return null
@@ -675,7 +736,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
             R.id.change_password_newPassword1 -> {
                 val samePasswordError = StringResourcesUtils.getString(R.string.error_same_password)
                 if (error == samePasswordError) {
-                    viewModel.checkPasswordStrength(editText.text.toString(), true)
+                    viewModel.checkPasswordStrength(editText.text.toString())
                     binding.changePasswordNewPassword1Layout.hint = samePasswordError
                     binding.changePasswordNewPassword1Layout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
                     binding.changePasswordNewPassword1Layout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error)
@@ -712,6 +773,14 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
         }
     }
 
+    private fun showAlert() {
+        Util.showAlert(
+            this,
+            getString(R.string.general_text_error),
+            getString(R.string.general_error_word)
+        )
+    }
+
     private fun showSnackbar(s: String) {
         showSnackbar(binding.changePasswordContainer, s)
     }
@@ -726,6 +795,8 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     }
 
     companion object {
+        const val KEY_LINK_TO_RESET = "key_link_to_reset"
+        const val KEY_ACTION = "key_action"
         internal const val KEY_IS_LOGOUT = "logout"
         private const val DISABLED_BUTTON_ALPHA = 0.5f
         private const val ENABLED_BUTTON_ALPHA = 1f

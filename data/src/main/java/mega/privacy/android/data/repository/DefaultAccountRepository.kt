@@ -622,11 +622,13 @@ internal class DefaultAccountRepository @Inject constructor(
         link: String?,
         newPassword: String,
         masterKey: String?,
-    ) = suspendCancellableCoroutine { continuation ->
-        val listener = continuation.getRequestListener { it.email.isNotBlank() }
-        megaApiGateway.resetPasswordFromLink(link, newPassword, masterKey, listener)
-        continuation.invokeOnCancellation {
-            megaApiGateway.removeRequestListener(listener)
+    ) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { it.email.isNotBlank() }
+            megaApiGateway.resetPasswordFromLink(link, newPassword, masterKey, listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
         }
     }
 

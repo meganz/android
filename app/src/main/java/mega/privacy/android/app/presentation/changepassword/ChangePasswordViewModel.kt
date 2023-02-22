@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.changepassword
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -8,8 +9,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePassword
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
@@ -17,10 +20,12 @@ import mega.privacy.android.domain.usecase.GetPasswordStrength
 import mega.privacy.android.domain.usecase.IsCurrentPassword
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.ResetPassword
+import nz.mega.sdk.MegaApiJava
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ChangePasswordViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
     private val monitorConnectivity: MonitorConnectivity,
     private val isCurrentPassword: IsCurrentPassword,
     private val getPasswordStrength: GetPasswordStrength,
@@ -38,6 +43,15 @@ internal class ChangePasswordViewModel @Inject constructor(
      */
     val uiState = _uiState.asStateFlow()
 
+    private val linkToReset
+        get() = savedStateHandle.get<String>(ChangePasswordActivity.KEY_LINK_TO_RESET)
+
+    private val action
+        get() = savedStateHandle.get<String>(ChangePasswordActivity.KEY_ACTION)
+
+    private val masterKey
+        get() = savedStateHandle.get<String>(IntentConstants.EXTRA_MASTER_KEY)
+
     init {
         viewModelScope.launch {
             _uiState.update { it.copy(isUserLoggedIn = getRootFolder() != null) }
@@ -49,22 +63,11 @@ internal class ChangePasswordViewModel @Inject constructor(
     }
 
     /**
-     * Checks whether device is connected to network
-     * @return true when currently device has network connection, else false
-     * only true during this time, network connection status may change because of how flow works.
-     */
-    fun isConnectedToNetwork(): Boolean = uiState.value.isConnectedToNetwork
-
-    /**
      * Triggers password reset for the user
-     * @param link the reset link the user previously clicks to reset this account's password
      * @param newPassword the new password that the user inputs
-     * @param masterKey the master key needed to reset this account's password
      */
     fun onExecuteResetPassword(
-        link: String?,
         newPassword: String,
-        masterKey: String?,
     ) {
         viewModelScope.launch {
             _uiState.update {
@@ -72,9 +75,15 @@ internal class ChangePasswordViewModel @Inject constructor(
             }
 
             runCatching {
-                resetPassword(link, newPassword, masterKey)
+                resetPassword(
+                    link = linkToReset,
+                    newPassword = newPassword,
+                    masterKey = masterKey
+                )
             }.onSuccess {
-                _uiState.update { it.copy(isPasswordReset = true, loadingMessage = null) }
+                _uiState.update {
+                    it.copy(isPasswordReset = true, loadingMessage = null)
+                }
             }.onFailure { t ->
                 _uiState.update {
                     it.copy(
@@ -138,15 +147,31 @@ internal class ChangePasswordViewModel @Inject constructor(
         }
     }
 
-    fun checkPasswordStrength(password: String, shouldValidatePassword: Boolean = false) {
+    /**
+     * Action to check password strength level
+     * @param password the new password that the user inputs
+     * will update the password UI based on the strength level
+     */
+    fun checkPasswordStrength(password: String) {
         viewModelScope.launch {
-            val isCurrentPassword =
-                if (shouldValidatePassword) isCurrentPassword(password = password) else false
-
             _uiState.update {
                 it.copy(
-                    passwordStrengthLevel = getPasswordStrength(password = password),
-                    isCurrentPassword = isCurrentPassword
+                    passwordStrengthLevel = if (password.length < 4) MegaApiJava.PASSWORD_STRENGTH_VERYWEAK else getPasswordStrength(
+                        password = password
+                    ),
+                    isCurrentPassword = isCurrentPassword(password = password)
+                )
+            }
+        }
+    }
+
+    fun determineIfScreenIsResetPasswordMode() {
+        if (action == Constants.ACTION_RESET_PASS_FROM_LINK || action == Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT) {
+            _uiState.update {
+                it.copy(
+                    isShowAlertMessage = masterKey.isNullOrBlank() || linkToReset.isNullOrBlank(),
+                    isResetPasswordLinkValid = linkToReset != null,
+                    isResetPasswordMode = true
                 )
             }
         }
@@ -178,5 +203,9 @@ internal class ChangePasswordViewModel @Inject constructor(
      */
     fun onPasswordReset() {
         _uiState.update { it.copy(isPasswordReset = false, errorCode = null) }
+    }
+
+    fun onAlertMessageShown() {
+        _uiState.update { it.copy(isShowAlertMessage = false) }
     }
 }
