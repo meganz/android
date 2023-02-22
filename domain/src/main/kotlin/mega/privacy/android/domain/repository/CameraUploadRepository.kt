@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import java.util.Queue
 
 /**
@@ -77,18 +78,11 @@ interface CameraUploadRepository {
     suspend fun setSyncTimeStamp(timeStamp: Long, type: SyncTimeStamp)
 
     /**
-     * Get sync file upload
+     * Retrieves the upload option for Camera Uploads
      *
-     * @return sync file upload type
+     * @return The corresponding [UploadOption]
      */
-    suspend fun getSyncFileUpload(): String?
-
-    /**
-     * Set photos sync file upload
-     *
-     * @return
-     */
-    suspend fun setPhotosSyncFileUpload()
+    suspend fun getUploadOption(): UploadOption
 
     /**
      * Get all pending sync records to prepare for upload

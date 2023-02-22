@@ -22,6 +22,7 @@ import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
+import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
@@ -59,6 +60,7 @@ import kotlin.coroutines.Continuation
  * @property videoQualityMapper [VideoQualityMapper]
  * @property syncStatusIntMapper [SyncStatusIntMapper]
  * @property cameraUploadHandlesMapper [CameraUploadHandlesMapper]
+ * @property uploadOptionMapper [UploadOptionMapper]
  */
 internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
@@ -76,6 +78,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val cameraUploadHandlesMapper: CameraUploadHandlesMapper,
     private val videoCompressorGateway: VideoCompressorGateway,
     private val videoAttachmentMapper: VideoAttachmentMapper,
+    private val uploadOptionMapper: UploadOptionMapper,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -104,12 +107,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.getPendingSyncRecords()
     }
 
-    override suspend fun setPhotosSyncFileUpload() = withContext(ioDispatcher) {
-        localStorageGateway.setPhotosSyncUpload()
-    }
-
-    override suspend fun getSyncFileUpload(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getCameraSyncFileUpload()
+    override suspend fun getUploadOption() = withContext(ioDispatcher) {
+        uploadOptionMapper(localStorageGateway.getCameraSyncFileUpload())
     }
 
     override suspend fun getVideoQuality(): String = withContext(ioDispatcher) {

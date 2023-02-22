@@ -4,7 +4,6 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.domain.entity.SyncRecord
@@ -96,9 +95,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getPendingSyncRecords(): List<SyncRecord> =
         dbHandler.findAllPendingSyncRecords()
-
-    override suspend fun setPhotosSyncUpload() =
-        dbHandler.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS)
 
     override suspend fun getCameraSyncFileUpload(): String? =
         dbHandler.preferences?.camSyncFileUpload

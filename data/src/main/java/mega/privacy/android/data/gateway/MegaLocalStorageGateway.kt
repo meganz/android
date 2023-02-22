@@ -109,11 +109,6 @@ interface MegaLocalStorageGateway {
     suspend fun getPendingSyncRecords(): List<SyncRecord>
 
     /**
-     * Set photos sync upload
-     */
-    suspend fun setPhotosSyncUpload()
-
-    /**
      * Get sync file upload
      */
     suspend fun getCameraSyncFileUpload(): String?

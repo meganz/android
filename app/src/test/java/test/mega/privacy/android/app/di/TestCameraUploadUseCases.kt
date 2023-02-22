@@ -93,6 +93,7 @@ import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -362,4 +363,7 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideCompressVideos() = mock<CompressVideos>()
+
+    @Provides
+    fun provideGetUploadOption() = mock<GetUploadOption>()
 }

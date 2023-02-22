@@ -85,7 +85,8 @@ class DefaultCameraUploadRepositoryTest {
             videoQualityMapper = ::toVideoQuality,
             syncStatusIntMapper = ::syncStatusToInt,
             videoCompressorGateway = videoCompressorGateway,
-            videoAttachmentMapper = ::toVideoAttachment
+            videoAttachmentMapper = ::toVideoAttachment,
+            uploadOptionMapper = mock(),
         )
     }
 
@@ -99,12 +100,6 @@ class DefaultCameraUploadRepositoryTest {
     fun `test camera upload retrieves sync records`() = runTest {
         whenever(localStorageGateway.getPendingSyncRecords()).thenReturn(listOf(fakeRecord))
         assertThat(underTest.getPendingSyncRecords()).isEqualTo(listOf(fakeRecord))
-    }
-
-    @Test
-    fun `test camera upload gets sync file upload`() = runTest {
-        whenever(localStorageGateway.getCameraSyncFileUpload()).thenReturn(null)
-        assertThat(underTest.getSyncFileUpload()).isEqualTo(null)
     }
 
     @Test
