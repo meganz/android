@@ -44,6 +44,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ContactDoesNotExistException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -170,32 +171,7 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun getVisibleContacts(): List<ContactItem> = withContext(ioDispatcher) {
         megaApiGateway.getContacts()
             .filter { contact -> contact.visibility == MegaUser.VISIBILITY_VISIBLE }
-            .map { megaUser ->
-                val fullName = megaChatApiGateway.getUserFullNameFromCache(megaUser.handle)
-                val alias = megaChatApiGateway.getUserAliasFromCache(megaUser.handle)
-                val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
-                val avatarUri = cacheFolderGateway.getCacheFile(
-                    folderName = CacheFolderConstant.AVATAR_FOLDER,
-                    fileName = "${megaUser.email}.jpg"
-                )?.absolutePath
-
-                checkLastGreen(status, megaUser.handle)
-
-                val contactData = contactDataMapper(
-                    fullName?.ifEmpty { null },
-                    alias?.ifEmpty { null },
-                    avatarUri
-                )
-
-                contactItemMapper(
-                    megaUser,
-                    contactData,
-                    megaApiGateway.getUserAvatarColor(megaUser),
-                    megaApiGateway.areCredentialsVerified(megaUser),
-                    status,
-                    null
-                )
-            }
+            .map { getContactItem(it, false) }
             .sortList()
     }
 
@@ -221,6 +197,14 @@ internal class DefaultContactsRepository @Inject constructor(
             contactDataMapper(fullName, alias, avatarUri)
         }
 
+    override suspend fun getContactItem(userId: UserId): ContactItem? =
+        withContext(ioDispatcher) {
+            val email = getUserEmail(userId.id)
+            megaApiGateway.getContact(email)?.let {
+                getContactItem(it, true)
+            }
+        }
+
     private suspend fun getFullName(handle: Long): String? =
         runCatching { getUserFullName(handle) }.fold(
             onSuccess = { fullName -> fullName },
@@ -233,7 +217,7 @@ internal class DefaultContactsRepository @Inject constructor(
             onFailure = { null }
         )
 
-    override suspend fun getUserAlias(handle: Long): String? =
+    override suspend fun getUserAlias(handle: Long): String =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
                 megaApiGateway.getUserAlias(
@@ -245,7 +229,7 @@ internal class DefaultContactsRepository @Inject constructor(
             }
         }
 
-    private fun onRequestGetUserAliasCompleted(continuation: Continuation<String?>) =
+    private fun onRequestGetUserAliasCompleted(continuation: Continuation<String>) =
         { request: MegaRequest, error: MegaError ->
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request.name))
@@ -402,7 +386,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 updatedList.removeAll { (handle) -> handle == userId.id }
             } else if (megaUser != null) {
                 if (updatedContact == null && megaUser.visibility == MegaUser.VISIBILITY_VISIBLE) {
-                    updatedContact = getVisibleContact(megaUser)
+                    updatedContact = getContactItem(megaUser, true)
                     updatedList.add(updatedContact)
                 }
 
@@ -447,16 +431,35 @@ internal class DefaultContactsRepository @Inject constructor(
         return updatedList.sortList().toMutableList()
     }
 
-    private suspend fun getVisibleContact(megaUser: MegaUser): ContactItem {
-        val fullName = getFullName(megaUser.handle)
-        val alias = getAlias(megaUser.handle)
+    private suspend fun getContactItem(
+        megaUser: MegaUser,
+        skipCache: Boolean,
+    ): ContactItem {
+        val fullName: String?
+        val alias: String?
+        if (skipCache) {
+            fullName = getFullName(megaUser.handle)
+            alias = getAlias(megaUser.handle)
+        } else {
+            fullName = megaChatApiGateway.getUserFullNameFromCache(megaUser.handle)
+            alias = megaChatApiGateway.getUserAliasFromCache(megaUser.handle)
+        }
         val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
+        val avatarUri = if (skipCache) {
+            getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
+        } else {
+            cacheFolderGateway.getCacheFile(
+                folderName = CacheFolderConstant.AVATAR_FOLDER,
+                fileName = "${megaUser.email}.jpg"
+            )?.absolutePath
+        }
+
         checkLastGreen(status, megaUser.handle)
 
         val contactData = contactDataMapper(
-            fullName,
-            alias,
-            getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
+            fullName?.ifEmpty { null },
+            alias?.ifEmpty { null },
+            avatarUri
         )
 
         return contactItemMapper(
@@ -504,7 +507,7 @@ internal class DefaultContactsRepository @Inject constructor(
             if (updatedList.find { contact -> contact.email == contactRequest.sourceEmail } == null) {
                 val megaUser = megaApiGateway.getContact(contactRequest.sourceEmail)
                 if (megaUser != null) {
-                    updatedList.add(getVisibleContact(megaUser))
+                    updatedList.add(getContactItem(megaUser, true))
                 }
             }
         }

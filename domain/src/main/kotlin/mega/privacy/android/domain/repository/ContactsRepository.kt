@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
+import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
 
@@ -60,7 +61,7 @@ interface ContactsRepository {
     fun monitorChatOnlineStatusUpdates(): Flow<OnlineStatus>
 
     /**
-     * Gets visible contacts.
+     * Gets visible contacts with the cached data, not the updated one.
      *
      * @return A list with all visible contacts.
      */
@@ -73,6 +74,11 @@ interface ContactsRepository {
      * @return [ContactData] containing the updated data.
      */
     suspend fun getContactData(contactItem: ContactItem): ContactData
+
+    /**
+     * Gets the ContactItem for a given [UserId]
+     */
+    suspend fun getContactItem(userId: UserId): ContactItem?
 
     /**
      * Updates the contact list with the received contact updates.
@@ -99,13 +105,12 @@ interface ContactsRepository {
     ): List<ContactItem>
 
     /**
-     * Gets the name of the given user: The alias if any, the full name in other case.
-     * If not available then returns the email.
+     * Get the alias of the given user if any
      *
      * @param handle User identifier.
      * @return User alias.
      */
-    suspend fun getUserAlias(handle: Long): String?
+    suspend fun getUserAlias(handle: Long): String
 
     /**
      * Get the email of the given user.

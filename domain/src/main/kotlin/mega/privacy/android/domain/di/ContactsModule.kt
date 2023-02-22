@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.account.DefaultUpdateCurrentUserName
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.contact.DefaultReloadContactDatabase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
+import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
@@ -137,5 +138,9 @@ internal abstract class ContactsModule {
         @Provides
         fun provideGetContactEmail(contactsRepository: ContactsRepository): GetContactEmail =
             GetContactEmail(contactsRepository::getContactEmail)
+
+        @Provides
+        fun provideContactItem(contactsRepository: ContactsRepository): GetContactItem =
+            GetContactItem(contactsRepository::getContactItem)
     }
 }
