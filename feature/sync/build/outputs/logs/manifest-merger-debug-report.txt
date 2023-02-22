@@ -1,0 +1,25 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml:2:1-57
+INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml:2:1-57
+INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml:2:1-57
+	package
+		ADDED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml:2:11-54
+		INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+		INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml:2:1-57
+uses-sdk
+INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+		ADDED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+		INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+		ADDED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml
+		INJECTED from /Users/svmmvs/Secret/mother/feature/sync/src/main/AndroidManifest.xml

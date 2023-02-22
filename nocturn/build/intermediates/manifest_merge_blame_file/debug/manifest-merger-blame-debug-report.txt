@@ -1,0 +1,25 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="mega.privacy.android.nocturn" >
+4
+5    <uses-sdk
+6        android:minSdkVersion="24"
+6-->/Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+7        android:targetSdkVersion="33" />
+7-->/Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+8
+9    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+9-->/Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:5:5-77
+9-->/Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:5:22-74
+10
+11    <application>
+11-->/Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:7:5-11:19
+12        <receiver
+12-->/Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:8:9-10:40
+13            android:name="mega.privacy.android.nocturn.receiver.NocturnCopyTagReceiver"
+13-->/Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:9:13-88
+14            android:exported="false" />
+14-->/Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:10:13-37
+15    </application>
+16
+17</manifest>

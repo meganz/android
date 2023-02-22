@@ -1,0 +1,37 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:2:1-12:12
+INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:2:1-12:12
+INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:2:1-12:12
+	package
+		ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:3:5-43
+		INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+		INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.POST_NOTIFICATIONS
+ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:5:5-77
+	android:name
+		ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:5:22-74
+application
+ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:7:5-11:19
+receiver#mega.privacy.android.nocturn.receiver.NocturnCopyTagReceiver
+ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:8:9-10:40
+	android:exported
+		ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:10:13-37
+	android:name
+		ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml:9:13-88
+uses-sdk
+INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+		ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+		INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+		ADDED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
+		INJECTED from /Users/svmmvs/Secret/mother/nocturn/src/main/AndroidManifest.xml
