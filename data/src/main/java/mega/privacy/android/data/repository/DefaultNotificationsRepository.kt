@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -43,14 +44,16 @@ internal class DefaultNotificationsRepository @Inject constructor(
         .mapNotNull { (userAlerts) ->
             userAlerts?.map {
                 withContext(dispatcher) {
-                    userAlertsMapper(it,
+                    userAlertsMapper(
+                        it,
                         ::provideContact,
                         ::provideScheduledMeeting,
                         ::provideSchedMeetingOccurrences,
-                        megaApiGateway::getMegaNodeByHandle)
+                        megaApiGateway::getMegaNodeByHandle
+                    )
                 }
             }
-        }
+        }.flowOn(dispatcher)
 
     override fun monitorEvent(): Flow<Event> = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnEvent>()
