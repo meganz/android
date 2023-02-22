@@ -14,7 +14,9 @@ import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.GetCurrentCountryCode
 import mega.privacy.android.domain.usecase.IsSMSVerificationShown
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
+import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerifiedPhoneNumber
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.MonitorVerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
@@ -32,6 +34,9 @@ abstract class SMSVerificationModule {
 
     @Binds
     abstract fun bindSmsVerificationTextErrorMapper(implementation: SmsVerificationTextErrorMapperImpl): SmsVerificationTextErrorMapper
+
+    @Binds
+    abstract fun bindMonitorVerificationStatus(implementation: DefaultMonitorVerificationStatus): MonitorVerificationStatus
 
     companion object {
         /**

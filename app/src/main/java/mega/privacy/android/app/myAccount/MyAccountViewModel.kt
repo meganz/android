@@ -29,6 +29,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -77,9 +78,11 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -88,6 +91,8 @@ import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
+import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -101,6 +106,40 @@ import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
 
+/**
+ * My account view model
+ *
+ * @property context
+ * @property myAccountInfo
+ * @property megaApi
+ * @property setAvatarUseCase
+ * @property check2FAUseCase
+ * @property checkVersionsUseCase
+ * @property killSessionUseCase
+ * @property cancelSubscriptionsUseCase
+ * @property getMyAvatarUseCase
+ * @property checkPasswordReminderUseCase
+ * @property resetPhoneNumberUseCase
+ * @property resetSMSVerifiedPhoneNumber
+ * @property getUserDataUseCase
+ * @property getFileVersionsOption
+ * @property queryRecoveryLinkUseCase
+ * @property confirmCancelAccountUseCase
+ * @property confirmChangeEmailUseCase
+ * @property filePrepareUseCase
+ * @property monitorMyAvatarFile
+ * @property getAccountDetails
+ * @property getExtendedAccountDetail
+ * @property getNumberOfSubscription
+ * @property getPaymentMethod
+ * @property getCurrentUserFullName
+ * @property monitorUserUpdates
+ * @property changeEmail
+ * @property updateCurrentUserName
+ * @property getCurrentUserEmail
+ * @property monitorVerificationStatus
+ * @property getFeatureFlagValue
+ */
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
 class MyAccountViewModel @Inject constructor(
@@ -115,6 +154,7 @@ class MyAccountViewModel @Inject constructor(
     private val getMyAvatarUseCase: GetMyAvatarUseCase,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     private val resetPhoneNumberUseCase: ResetPhoneNumberUseCase,
+    private val resetSMSVerifiedPhoneNumber: ResetSMSVerifiedPhoneNumber,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getFileVersionsOption: GetFileVersionsOption,
     private val queryRecoveryLinkUseCase: QueryRecoveryLinkUseCase,
@@ -131,6 +171,8 @@ class MyAccountViewModel @Inject constructor(
     private val changeEmail: ChangeEmail,
     private val updateCurrentUserName: UpdateCurrentUserName,
     private val getCurrentUserEmail: GetCurrentUserEmail,
+    private val monitorVerificationStatus: MonitorVerificationStatus,
+    private val getFeatureFlagValue: GetFeatureFlagValue,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -190,6 +232,19 @@ class MyAccountViewModel @Inject constructor(
                     }
                 }
         }
+        viewModelScope.launch {
+            if (getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)) {
+                monitorVerificationStatus().collect { status ->
+                    _state.update {
+                        it.copy(
+                            verifiedPhoneNumber = (status.phoneNumber as? VerifiedPhoneNumber.PhoneNumber)
+                                ?.phoneNumberString,
+                            canVerifyPhoneNumber = status.canRequestOptInVerification,
+                        )
+                    }
+                }
+            }
+        }
     }
 
     override fun onCleared() {
@@ -222,6 +277,7 @@ class MyAccountViewModel @Inject constructor(
     /**
      * Refresh number of subscription
      *
+     * @param clearCache
      */
     fun refreshNumberOfSubscription(clearCache: Boolean) {
         viewModelScope.launch {
@@ -232,7 +288,8 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Check the subscription for current account
+     * Check subscription
+     *
      */
     fun checkSubscription() {
         PlatformInfo.values().firstOrNull {
@@ -270,14 +327,16 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Restore the SubscriptionDialogState value
+     * Restore subscription dialog state
+     *
      */
     fun restoreSubscriptionDialogState() {
         _subscriptionDialogState.value = defaultSubscriptionDialogState
     }
 
     /**
-     * Restore the CancelAccountDialogState value
+     * Restore cancel account dialog state
+     *
      */
     fun restoreCancelAccountDialogState() {
         _cancelAccountDialogState.value = defaultCancelAccountDialogState
@@ -285,7 +344,8 @@ class MyAccountViewModel @Inject constructor(
 
     /**
      * Set cancel account dialog state
-     * @param isVisible the dialog if is visible
+     *
+     * @param isVisible
      */
     fun setCancelAccountDialogState(isVisible: Boolean) {
         _cancelAccountDialogState.value = if (isVisible) {
@@ -307,9 +367,25 @@ class MyAccountViewModel @Inject constructor(
                         && subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET)
     }
 
+    /**
+     * Check elevation
+     *
+     * @return
+     */
     fun checkElevation(): LiveData<Boolean> = withElevation
+
+    /**
+     * On update account details
+     *
+     * @return
+     */
     fun onUpdateAccountDetails(): LiveData<Boolean> = updateAccountDetails
 
+    /**
+     * Set elevation
+     *
+     * @param withElevation
+     */
     fun setElevation(withElevation: Boolean) {
         this.withElevation.value = withElevation
     }
@@ -320,6 +396,10 @@ class MyAccountViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Update account details
+     *
+     */
     fun updateAccountDetails() {
         updateAccountDetails.value = true
     }
@@ -332,63 +412,194 @@ class MyAccountViewModel @Inject constructor(
 
     private var confirmationLink: String? = null
 
+    /**
+     * Get name
+     *
+     * @return
+     */
     fun getName(): String = state.value.name
 
+    /**
+     * Get email
+     *
+     * @return
+     */
     fun getEmail(): String = state.value.email
 
+    /**
+     * Get account type
+     *
+     * @return
+     */
     fun getAccountType(): Int = myAccountInfo.accountType
 
+    /**
+     * Is free account
+     *
+     * @return
+     */
     fun isFreeAccount(): Boolean = getAccountType() == FREE
 
+    /**
+     * Is pro flexi account
+     *
+     * @return
+     */
     fun isProFlexiAccount(): Boolean = getAccountType() == PRO_FLEXI
 
+    /**
+     * Get used storage
+     *
+     * @return
+     */
     fun getUsedStorage(): String = myAccountInfo.usedFormatted
 
+    /**
+     * Get used storage percentage
+     *
+     * @return
+     */
     fun getUsedStoragePercentage(): Int = myAccountInfo.usedPercentage
 
+    /**
+     * Get total storage
+     *
+     * @return
+     */
     fun getTotalStorage(): String = myAccountInfo.totalFormatted
 
+    /**
+     * Get used transfer
+     *
+     * @return
+     */
     fun getUsedTransfer(): String = myAccountInfo.usedTransferFormatted
 
+    /**
+     * Get used transfer percentage
+     *
+     * @return
+     */
     fun getUsedTransferPercentage(): Int = myAccountInfo.usedTransferPercentage
 
+    /**
+     * Get total transfer
+     *
+     * @return
+     */
     fun getTotalTransfer(): String = myAccountInfo.totalTransferFormatted
 
+    /**
+     * Get renew time
+     *
+     * @return
+     */
     fun getRenewTime(): Long = myAccountInfo.subscriptionRenewTime
 
+    /**
+     * Get bonus storage s m s
+     *
+     * @return
+     */
     fun getBonusStorageSMS(): String = myAccountInfo.bonusStorageSMS
 
+    /**
+     * Has renewable subscription
+     *
+     * @return
+     */
     fun hasRenewableSubscription(): Boolean {
         return myAccountInfo.subscriptionStatus == MegaAccountDetails.SUBSCRIPTION_STATUS_VALID
                 && myAccountInfo.subscriptionRenewTime > 0
     }
 
+    /**
+     * Get expiration time
+     *
+     * @return
+     */
     fun getExpirationTime(): Long = myAccountInfo.proExpirationTime
 
+    /**
+     * Has expirable subscription
+     *
+     * @return
+     */
     fun hasExpirableSubscription(): Boolean = myAccountInfo.proExpirationTime > 0
 
+    /**
+     * Get last session
+     *
+     * @return
+     */
     fun getLastSession(): String = myAccountInfo.lastSessionFormattedDate ?: ""
 
+    /**
+     * There is no subscription
+     *
+     * @return
+     */
     fun thereIsNoSubscription(): Boolean = _numberOfSubscription.value <= 0L
 
+    /**
+     * Get registered phone number
+     *
+     * @return
+     */
     fun getRegisteredPhoneNumber(): String? = megaApi.smsVerifiedPhoneNumber()
 
+    /**
+     * Is already registered phone number
+     *
+     * @return
+     */
     fun isAlreadyRegisteredPhoneNumber(): Boolean = !getRegisteredPhoneNumber().isNullOrEmpty()
 
+    /**
+     * Get cloud storage
+     *
+     * @return
+     */
     fun getCloudStorage(): String = myAccountInfo.formattedUsedCloud
 
+    /**
+     * Get backups storage
+     *
+     * @return
+     */
     fun getBackupsStorage(): String = myAccountInfo.formattedUsedBackups
 
+    /**
+     * Get incoming storage
+     *
+     * @return
+     */
     fun getIncomingStorage(): String = myAccountInfo.formattedUsedIncoming
 
+    /**
+     * Get rubbish storage
+     *
+     * @return
+     */
     fun getRubbishStorage(): String = myAccountInfo.formattedUsedRubbish
 
+    /**
+     * Is business account
+     *
+     * @return
+     */
     fun isBusinessAccount(): Boolean = megaApi.isBusinessAccount && getAccountType() == BUSINESS
 
+    /**
+     * Get master key
+     *
+     * @return
+     */
     fun getMasterKey(): String = megaApi.exportMasterKey()
 
     /**
-     * Checks versions info.
+     * Check versions
+     *
      */
     fun checkVersions() {
         if (myAccountInfo.numVersions == INVALID_VALUE) {
@@ -404,10 +615,11 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Gets the avatar of the current account.
+     * Get avatar
      *
-     * @param context Current context.
-     * @param action  Action to perform after the avatar has been get.
+     * @param context
+     * @param action
+     * @receiver
      */
     fun getAvatar(context: Context, action: (Boolean) -> Unit) {
         CacheFolderManager.buildAvatarFile(context, megaApi.myEmail)?.absolutePath?.let {
@@ -426,9 +638,10 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Kills other sessions.
+     * Kill sessions
      *
-     * @param action Action to perform after kill sessions.
+     * @param action
+     * @receiver
      */
     fun killSessions(action: (Boolean) -> Unit) {
         killSessionUseCase.kill()
@@ -445,9 +658,9 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Launches [LoginActivity] to perform an account refresh.
+     * Refresh
      *
-     * @param activity Current activity.
+     * @param activity
      */
     fun refresh(activity: Activity) {
         val intent = Intent(activity, LoginActivity::class.java)
@@ -458,17 +671,13 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Manages onActivityResult.
+     * Manage activity result
      *
-     * @param activity       Current activity.
-     * @param requestCode    The integer request code originally supplied to
-     *                       startActivityForResult(), allowing you to identify who this
-     *                       result came from.
-     * @param resultCode     The integer result code returned by the child activity
-     *                       through its setResult().
-     * @param data           An Intent, which can return result data to the caller
-     *                       (various data can be attached to Intent "extras").
-     * @param snackbarShower Callback to show the action result if needed.
+     * @param activity
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     * @param snackbarShower
      */
     fun manageActivityResult(
         activity: Activity,
@@ -552,9 +761,9 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Increments the number of clicks before show the change API server dialog.
+     * Increment last session click
      *
-     * @return True if already clicked CLICKS_TO_CHANGE_API_SERVER times, false otherwise.
+     * @return
      */
     fun incrementLastSessionClick(): Boolean {
         numOfClicksLastSession++
@@ -580,9 +789,9 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Checks if should show payment info.
+     * Should show payment info
      *
-     * @return True if should show payment info, false otherwise.
+     * @return
      */
     fun shouldShowPaymentInfo(): Boolean {
         val timeToCheck =
@@ -596,10 +805,11 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Cancel current subscriptions.
+     * Cancel subscriptions
      *
-     * @param feedback Message to send as feedback to cancel subscriptions.
-     * @param action   Action to perform after cancel subscriptions.
+     * @param feedback
+     * @param action
+     * @receiver
      */
     fun cancelSubscriptions(feedback: String?, action: (Boolean) -> Unit) {
         cancelSubscriptionsUseCase.cancel(feedback)
@@ -616,9 +826,9 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Checks if should show Password reminder before logout and logs out if not.
+     * Logout
      *
-     * @param context Current context.
+     * @param context
      */
     fun logout(context: Context) {
         checkPasswordReminderUseCase.check(true)
@@ -641,9 +851,9 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Checks if all permissions are granted before capture a photo.
+     * Capture photo
      *
-     * @param activity Current activity.
+     * @param activity
      */
     fun capturePhoto(activity: Activity) {
         val hasStoragePermission: Boolean = hasPermissions(
@@ -686,9 +896,9 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Launches an intent to choose a photo.
+     * Launch choose photo intent
      *
-     * @param activity Current activity.
+     * @param activity
      */
     fun launchChoosePhotoIntent(activity: Activity) {
         val intent = Intent()
@@ -703,7 +913,9 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Checks if can open QRCodeActivity and if so, launches an intent to do it.
+     * Open q r
+     *
+     * @param activity
      */
     fun openQR(activity: Activity) {
         if (CallUtil.isNecessaryDisableLocalCamera() != INVALID_VALUE.toLong()) {
@@ -757,10 +969,10 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Deletes the current avatar.
+     * Delete profile avatar
      *
-     * @param context        Current context.
-     * @param snackbarShower Callback to show the request result.
+     * @param context
+     * @param snackbarShower
      */
     fun deleteProfileAvatar(context: Context, snackbarShower: SnackbarShower) {
         CacheFolderManager.buildAvatarFile(context, megaApi.myEmail + JPG_EXTENSION)?.let {
@@ -781,13 +993,12 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Changes the name of the account.
+     * Change name
      *
      * @param oldFirstName
      * @param oldLastName
-     * @param newFirstName New first name if changed, same as current one if not.
-     * @param newLastName  New last name if changed, same as current one if not.
-     * @return True if something changed, false otherwise.
+     * @param newFirstName
+     * @param newLastName
      */
     fun changeName(
         oldFirstName: String,
@@ -810,7 +1021,8 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Checks if 2FA is enabled or not.
+     * Check2f a
+     *
      */
     fun check2FA() {
         check2FAUseCase.check()
@@ -821,11 +1033,11 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Changes the email of the account.
+     * Change email
      *
-     * @param context  Current context.
-     * @param newEmail New email if changed, same as the current one if not.
-     * @return An error string if something wrong happened, CHECKING_2FA if checking 2FA or null otherwise
+     * @param context
+     * @param newEmail
+     * @return
      */
     fun changeEmail(context: Context, newEmail: String): String? {
         return when {
@@ -851,22 +1063,34 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Resets the verified phone number of the current account.
+     * Reset phone number
      *
-     * @param isModify       True if the action is modify, false if is remove.
-     * @param snackbarShower Callback to show the request result if needed.
-     * @param action         Action to perform after reset the phone number if modifying.
+     * @param isModify
+     * @param snackbarShower
+     * @param action
+     * @receiver
      */
     fun resetPhoneNumber(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
         resetJob = viewModelScope.launch {
-            kotlin.runCatching { resetPhoneNumberUseCase() }
-                .onSuccess {
-                    getUserData(isModify, snackbarShower, action)
-                }
-                .onFailure {
-                    Timber.e(it, "Reset phone number failed")
-                    snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
-                }
+            if (getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)) {
+                runCatching { resetSMSVerifiedPhoneNumber() }
+                    .onSuccess {
+                        getUserData(isModify, snackbarShower, action)
+                    }
+                    .onFailure {
+                        Timber.e(it, "Reset phone number failed")
+                        snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
+                    }
+            } else {
+                runCatching { resetPhoneNumberUseCase() }
+                    .onSuccess {
+                        getUserData(isModify, snackbarShower, action)
+                    }
+                    .onFailure {
+                        Timber.e(it, "Reset phone number failed")
+                        snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
+                    }
+            }
         }
     }
 
@@ -894,7 +1118,8 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Gets file versions option.
+     * Get file versions option
+     *
      */
     fun getFileVersionsOption() {
         viewModelScope.launch {
@@ -909,10 +1134,11 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Queries if the provided account cancellation link is the right one before cancel it.
+     * Confirm cancel account
      *
-     * @param link   Confirmation link for the account cancellation.
-     * @param action Action to perform after query confirmation link.
+     * @param link
+     * @param action
+     * @receiver
      */
     fun confirmCancelAccount(link: String, action: (String) -> Unit) {
         queryRecoveryLinkUseCase.queryCancelAccount(link)
@@ -926,10 +1152,11 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Confirms the account cancellation.
+     * Finish confirm cancel account
      *
-     * @param password Password typed to cancel the account.
-     * @param action   Action to perform after confirm the account cancellation if it failed.
+     * @param password
+     * @param action
+     * @receiver
      */
     fun finishConfirmCancelAccount(password: String, action: (String) -> Unit) {
         confirmationLink?.let { link ->
@@ -944,10 +1171,11 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Queries if the provided email change link is the right one before change it.
+     * Confirm change email
      *
-     * @param link   Confirmation link for the email change.
-     * @param action Action to perform after query confirmation link.
+     * @param link
+     * @param action
+     * @receiver
      */
     fun confirmChangeEmail(link: String, action: (String) -> Unit) {
         queryRecoveryLinkUseCase.queryChangeEmail(link)
@@ -961,11 +1189,13 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Confirms the email change.
+     * Finish confirm change email
      *
-     * @param password      Password typed to change the email.
-     * @param actionSuccess Action to perform after confirm the email change finished with success.
-     * @param actionError   Action to perform after confirm the email change if it failed.
+     * @param password
+     * @param actionSuccess
+     * @param actionError
+     * @receiver
+     * @receiver
      */
     fun finishConfirmChangeEmail(
         password: String,
@@ -989,11 +1219,13 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Checks the result of a password change.
+     * Finish password change
      *
-     * @param result        Result of the password change.
-     * @param actionSuccess Action to perform after confirm the password change finished with success.
-     * @param actionError   Action to perform after confirm the password change if it failed.
+     * @param result
+     * @param actionSuccess
+     * @param actionError
+     * @receiver
+     * @receiver
      */
     fun finishPasswordChange(
         result: Int,
@@ -1019,7 +1251,8 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Sets the Upgrade screen has been opened from My account section.
+     * Set open upgrade from
+     *
      */
     fun setOpenUpgradeFrom() {
         myAccountInfo.upgradeOpenedFrom = MyAccountInfo.UpgradeFrom.ACCOUNT
