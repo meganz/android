@@ -83,6 +83,8 @@ import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.ViewTypeMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
+import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
+import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapperImpl
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -175,6 +177,9 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindUploadOptionMapper(implementation: UploadOptionMapperImpl): UploadOptionMapper
+
+    @Binds
+    abstract fun bindUploadOptionIntMapper(implementation: UploadOptionIntMapperImpl): UploadOptionIntMapper
 
     companion object {
         /**
