@@ -445,7 +445,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             chatRoom.ownPrivilege.let { permission ->
                 changeTitleItem.isVisible = permission == MegaChatRoom.PRIV_MODERATOR
                 addParticipantsMenuItem.isVisible =
-                    permission == MegaChatRoom.PRIV_MODERATOR || chatRoom.isOpenInvite
+                    chatRoom.isActive && (permission == MegaChatRoom.PRIV_MODERATOR || chatRoom.isOpenInvite)
             }
         }
 

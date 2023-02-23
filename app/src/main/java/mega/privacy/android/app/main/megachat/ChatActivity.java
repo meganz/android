@@ -357,8 +357,6 @@ import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.ContactInfoActivity;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileLinkActivity;
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
-import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.PdfViewerActivity;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
@@ -387,6 +385,8 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
+import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetAvatarUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
@@ -3040,7 +3040,7 @@ public class ChatActivity extends PasscodeActivity
                     leaveMenuItem.setVisible(false);
 
                     if (permission == MegaChatRoom.PRIV_MODERATOR) {
-                        inviteMenuItem.setVisible(true);
+                        inviteMenuItem.setVisible(chatRoom.isActive());
 
                         int lastMessageIndex = messages.size() - 1;
                         if (lastMessageIndex >= 0) {
@@ -3061,7 +3061,7 @@ public class ChatActivity extends PasscodeActivity
                             clearHistoryMenuItem.setVisible(false);
                         }
                     } else {
-                        inviteMenuItem.setVisible(chatRoom.isOpenInvite());
+                        inviteMenuItem.setVisible(chatRoom.isActive() && chatRoom.isOpenInvite());
                         clearHistoryMenuItem.setVisible(false);
                         if (permission == MegaChatRoom.PRIV_RM) {
                             Timber.d("Group chat PRIV_RM");
@@ -6190,7 +6190,7 @@ public class ChatActivity extends PasscodeActivity
         } else if (chat.hasChanged(MegaChatRoom.CHANGE_TYPE_OPEN_INVITE)) {
             if (chat.isGroup()) {
                 int permission = chat.getOwnPrivilege();
-                boolean visibility = permission == MegaChatRoom.PRIV_MODERATOR || chat.isOpenInvite();
+                boolean visibility = chat.isActive() && (permission == MegaChatRoom.PRIV_MODERATOR || chat.isOpenInvite());
                 inviteMenuItem.setVisible(visibility);
             }
 
