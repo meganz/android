@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
@@ -34,11 +35,12 @@ import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetMyChatFilesFolder
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
-import mega.privacy.android.domain.usecase.StartChatCall
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
+import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 
 /**
@@ -86,8 +88,8 @@ abstract class ChatModule {
          * Provides the Use Case [GetChatCall]
          */
         @Provides
-        fun provideGetChatCall(chatRepository: ChatRepository): GetChatCall =
-            GetChatCall(chatRepository::getChatCall)
+        fun provideGetChatCall(callRepository: CallRepository): GetChatCall =
+            GetChatCall(callRepository::getChatCall)
 
         /**
          * Provides the Use Case [GetScheduledMeetingByChat]
@@ -111,6 +113,20 @@ abstract class ChatModule {
             FetchNumberOfScheduledMeetingOccurrencesByChat(chatRepository::fetchScheduledMeetingOccurrencesByChat)
 
         /**
+         * Provides the Use Case [StartChatCallNoRinging]
+         */
+        @Provides
+        fun provideStartChatCallNoRinging(callRepository: CallRepository): StartChatCallNoRinging =
+            StartChatCallNoRinging(callRepository::startCallNoRinging)
+
+        /**
+         * Provides the Use Case [StartChatCall]
+         */
+        @Provides
+        fun provideStartChatCall(callRepository: CallRepository): StartChatCall =
+            StartChatCall(callRepository::startCallRinging)
+
+        /**
          * Provides the Use Case [SetOpenInvite]
          */
         @Provides
@@ -118,18 +134,11 @@ abstract class ChatModule {
             SetOpenInvite(chatRepository::setOpenInvite)
 
         /**
-         * Provides the Use Case [StartChatCall]
-         */
-        @Provides
-        fun provideStartChatCall(chatRepository: ChatRepository): StartChatCall =
-            StartChatCall(chatRepository::startChatCall)
-
-        /**
          * Provides the Use Case [AnswerChatCall]
          */
         @Provides
-        fun provideAnswerChatCall(chatRepository: ChatRepository): AnswerChatCall =
-            AnswerChatCall(chatRepository::answerChatCall)
+        fun provideAnswerChatCall(callRepository: CallRepository): AnswerChatCall =
+            AnswerChatCall(callRepository::answerChatCall)
 
         /**
          * Provides the Use Case [InviteToChat]

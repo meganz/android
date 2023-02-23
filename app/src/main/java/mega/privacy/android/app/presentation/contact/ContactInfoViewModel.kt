@@ -32,7 +32,7 @@ import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
-import mega.privacy.android.domain.usecase.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import timber.log.Timber
 import javax.inject.Inject
 

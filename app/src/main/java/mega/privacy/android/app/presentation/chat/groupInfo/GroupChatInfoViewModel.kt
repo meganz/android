@@ -31,7 +31,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.SetOpenInvite
-import mega.privacy.android.domain.usecase.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
 import javax.inject.Inject

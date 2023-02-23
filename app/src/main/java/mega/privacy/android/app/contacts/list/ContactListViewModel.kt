@@ -30,7 +30,7 @@ import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
-import mega.privacy.android.domain.usecase.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.util.concurrent.TimeUnit

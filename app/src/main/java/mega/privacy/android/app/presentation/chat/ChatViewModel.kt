@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.AnswerChatCall
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
-import mega.privacy.android.domain.usecase.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -156,7 +156,7 @@ class ChatViewModel @Inject constructor(
 
         viewModelScope.launch {
             runCatching {
-                answerChatCall(chatId, video, audio, speaker)
+                answerChatCall(chatId, video, audio)
             }.onFailure { exception ->
                 _state.update { it.copy(error = R.string.call_error) }
 

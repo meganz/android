@@ -19,6 +19,5 @@ fun interface AnswerChatCall {
         chatId: Long,
         enabledVideo: Boolean,
         enabledAudio: Boolean,
-        enabledSpeaker: Boolean,
     ): ChatRequest
 }

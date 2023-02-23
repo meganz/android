@@ -58,7 +58,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.SetOpenInvite
-import mega.privacy.android.domain.usecase.StartChatCall
+import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall.*
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR

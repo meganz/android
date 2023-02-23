@@ -60,9 +60,9 @@ import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
-import mega.privacy.android.domain.usecase.StartChatCall
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject

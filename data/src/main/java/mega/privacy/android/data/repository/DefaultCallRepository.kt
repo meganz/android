@@ -1,40 +1,116 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
+import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
+import mega.privacy.android.data.mapper.ChatCallMapper
+import mega.privacy.android.data.mapper.ChatRequestMapper
+import mega.privacy.android.data.model.ChatCallUpdate
+import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
-import mega.privacy.android.domain.repository.ChatRepository
-import timber.log.Timber
+import nz.mega.sdk.MegaChatError
+import nz.mega.sdk.MegaChatRequest
 import javax.inject.Inject
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.suspendCoroutine
 
 internal class DefaultCallRepository @Inject constructor(
-    private val chatRepository: ChatRepository,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val megaChatApiGateway: MegaChatApiGateway,
+    private val chatCallMapper: ChatCallMapper,
+    private val chatRequestMapper: ChatRequestMapper,
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : CallRepository {
 
-    override suspend fun startCall(
+    override suspend fun getChatCall(chatId: Long?): ChatCall? =
+        withContext(dispatcher) {
+            chatId?.let {
+                return@withContext megaChatApiGateway.getChatCall(chatId)?.let(chatCallMapper)
+            }
+
+            null
+        }
+
+    override suspend fun startCallRinging(
         chatId: Long,
-        video: Boolean,
-        audio: Boolean,
-    ): ChatCall? =
-        withContext(ioDispatcher) {
-            runCatching {
-                chatRepository.startChatCall(chatId = chatId,
-                    enabledVideo = video,
-                    enabledAudio = audio)
-            }.fold(
-                onSuccess = { request ->
-                    request.chatHandle?.let { id ->
-                        return@withContext chatRepository.getChatCall(id)
-                    }
-                    return@withContext null
-                },
-                onFailure = { exception ->
-                    Timber.e(exception)
-                    return@withContext null
-                }
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCoroutine { continuation ->
+            val callback = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
             )
+
+            megaChatApiGateway.startChatCall(
+                chatId,
+                enabledVideo,
+                enabledAudio,
+                callback
+            )
+        }
+    }
+
+    override suspend fun startCallNoRinging(
+        chatId: Long,
+        schedId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCoroutine { continuation ->
+            val callback = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.startChatCallNoRinging(
+                chatId,
+                schedId,
+                enabledVideo,
+                enabledAudio,
+                callback
+            )
+        }
+    }
+
+    override suspend fun answerChatCall(
+        chatId: Long,
+        enabledVideo: Boolean,
+        enabledAudio: Boolean,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCoroutine { continuation ->
+            val callback = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.answerChatCall(
+                chatId,
+                enabledVideo,
+                enabledAudio,
+                callback
+            )
+        }
+    }
+
+    override fun monitorChatCallUpdates(): Flow<ChatCall> =
+        megaChatApiGateway.chatCallUpdates
+            .filterIsInstance<ChatCallUpdate.OnChatCallUpdate>()
+            .mapNotNull { it.item }
+            .map(chatCallMapper)
+            .flowOn(dispatcher)
+
+    private fun onRequestCompleted(continuation: Continuation<ChatRequest>) =
+        { request: MegaChatRequest, error: MegaChatError ->
+            if (error.errorCode == MegaChatError.ERROR_OK) {
+                continuation.resumeWith(Result.success(chatRequestMapper(request)))
+            } else {
+                continuation.failWithError(error)
+            }
         }
 }

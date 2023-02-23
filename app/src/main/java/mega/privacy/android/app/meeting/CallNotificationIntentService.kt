@@ -255,7 +255,7 @@ class CallNotificationIntentService : Service(),
 
         coroutineScope?.launch {
             runCatching {
-                answerChatCall(chatId, false, enableAudio, false)
+                answerChatCall(chatId, false, enableAudio)
             }.onFailure { exception ->
                 Util.showSnackbar(app?.applicationContext,
                     StringResourcesUtils.getString(R.string.call_error))

@@ -116,11 +116,6 @@ internal class DefaultChatRepository @Inject constructor(
             megaChatApiGateway.getChatRoom(chatId)?.let(chatRoomMapper)
         }
 
-    override suspend fun getChatCall(chatId: Long): ChatCall? =
-        withContext(ioDispatcher) {
-            megaChatApiGateway.getChatCall(chatId)?.let(chatCallMapper)
-        }
-
     override suspend fun getScheduledMeeting(
         chatId: Long,
         scheduledMeetingId: Long,
@@ -158,40 +153,6 @@ internal class DefaultChatRepository @Inject constructor(
                 continuation.resumeWith(Result.success(request.flag))
             } else {
                 continuation.failWithError(error)
-            }
-        }
-
-
-    override suspend fun startChatCall(chatId: Long, enabledVideo: Boolean, enabledAudio: Boolean) =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.startChatCall(
-                    chatId,
-                    enabledVideo,
-                    enabledAudio,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestCompleted(continuation)
-                    )
-                )
-            }
-        }
-
-    override suspend fun answerChatCall(
-        chatId: Long,
-        enabledVideo: Boolean,
-        enabledAudio: Boolean,
-        enabledSpeaker: Boolean,
-    ): ChatRequest =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.answerChatCall(
-                    chatId,
-                    enabledVideo,
-                    enabledAudio,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = onRequestCompleted(continuation)
-                    )
-                )
             }
         }
 

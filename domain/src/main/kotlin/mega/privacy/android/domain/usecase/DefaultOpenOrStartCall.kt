@@ -5,7 +5,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.CallRepository
-import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
 
@@ -14,16 +13,21 @@ import javax.inject.Inject
  */
 class DefaultOpenOrStartCall @Inject constructor(
     private val callRepository: CallRepository,
-    private val chatRepository: ChatRepository,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : OpenOrStartCall {
 
     override suspend fun invoke(chatId: Long, video: Boolean, audio: Boolean): ChatCall? =
         withContext(defaultDispatcher) {
-            chatRepository.getChatCall(chatId)?.let {
-                return@withContext it
+            callRepository.getChatCall(chatId)?.let { call ->
+                return@withContext call
             }
 
-            return@withContext callRepository.startCall(chatId, video, audio)
+            callRepository.startCallRinging(chatId, video, audio).let { request ->
+                callRepository.getChatCall(request.chatHandle)?.let { call ->
+                    return@withContext call
+                }
+            }
+
+            return@withContext null
         }
 }

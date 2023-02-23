@@ -753,7 +753,7 @@ class MeetingActivityViewModel @Inject constructor(
 
             viewModelScope.launch {
                 runCatching {
-                    answerChatCall(chatId, enableVideo, enableAudio, speakerAudio)
+                    answerChatCall(chatId, enableVideo, enableAudio)
                 }.onFailure { exception ->
                     chatManagement.removeJoiningCallChatId(chatId)
                     rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
