@@ -22,6 +22,8 @@ import coil.load
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -31,6 +33,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUM
 import mega.privacy.android.app.databinding.ActivityEditProfileBinding
 import mega.privacy.android.app.databinding.DialogChangeEmailBinding
 import mega.privacy.android.app.databinding.DialogChangeNameBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
@@ -64,10 +67,13 @@ import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.exception.ChangeEmailException
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaChatApi
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.PhotoCallback,
     PhoneNumberBottomSheetDialogFragment.PhoneNumberCallback, SnackbarShower {
 
@@ -107,14 +113,20 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private var changeEmailDialog: AlertDialog? = null
     private var deletePhotoDialog: AlertDialog? = null
 
+    @Inject
+    lateinit var getFeatureFlagValue: GetFeatureFlagValue
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityEditProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupView()
-        setupObservers()
+        lifecycleScope.launch {
+            val monitorPhoneNumberEnabled = getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)
+            setupView(monitorPhoneNumberEnabled)
+            setupObservers(monitorPhoneNumberEnabled)
+        }
 
         if (savedInstanceState != null) {
             if (savedInstanceState.getBoolean(CHANGE_NAME_SHOWN, false)) {
@@ -216,7 +228,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
     }
 
-    private fun setupView() {
+    private fun setupView(monitorPhoneNumberEnabled: Boolean) {
         setUpActionBar()
         setUpHeader()
 
@@ -241,7 +253,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             startActivity(Intent(this, ChangePasswordActivity::class.java))
         }
 
-        setupPhoneNumber()
+        if (!monitorPhoneNumberEnabled) setupPhoneNumber()
 
         binding.recoveryKeyButton.setOnClickListener {
             startActivity(Intent(this, ExportRecoveryKeyActivity::class.java))
@@ -261,9 +273,11 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         binding.changeEmailSeparator.separator.isVisible = permitEditNameAndEmail
     }
 
-    private fun setupObservers() {
-        LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-            .observe(this) { setupPhoneNumber() }
+    private fun setupObservers(monitorPhoneNumberEnabled: Boolean) {
+        if (!monitorPhoneNumberEnabled) {
+            LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
+                .observe(this) { setupPhoneNumber() }
+        }
 
         collectFlow(viewModel.state) { state ->
             binding.headerLayout.firstLineToolbar.text = state.name
@@ -278,6 +292,13 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             state.changeUserNameResult?.let {
                 updateName(it.isSuccess)
                 viewModel.markHandleChangeUserNameResult()
+            }
+
+            if (monitorPhoneNumberEnabled){
+                setupPhoneNumber(
+                    alreadyRegistered = state.verifiedPhoneNumber != null,
+                    canVerify = state.canVerifyPhoneNumber,
+                )
             }
         }
 
@@ -451,8 +472,10 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         }
     }
 
-    private fun setupPhoneNumber() {
-        val alreadyRegistered = viewModel.isAlreadyRegisteredPhoneNumber()
+    private fun setupPhoneNumber(
+        alreadyRegistered: Boolean = viewModel.isAlreadyRegisteredPhoneNumber(),
+        canVerify: Boolean = canVoluntaryVerifyPhoneNumber(),
+    ) {
 
         binding.addPhoneNumber.text = StringResourcesUtils.getString(
             if (alreadyRegistered) R.string.title_modify_phone_number
@@ -460,9 +483,9 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         )
 
         binding.addPhoneNumberLayout.apply {
-            isVisible = alreadyRegistered || canVoluntaryVerifyPhoneNumber()
+            isVisible = alreadyRegistered || canVerify
             setOnClickListener {
-                if (canVoluntaryVerifyPhoneNumber()) {
+                if (canVerify) {
                     startActivity(
                         Intent(
                             this@EditProfileActivity,
