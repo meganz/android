@@ -9,7 +9,6 @@ import mega.privacy.android.domain.entity.photos.Album
 
 class AlbumContentActionModeCallback(
     private val fragment: AlbumDynamicContentFragment,
-    private val currentAlbum: Album?,
 ) : ActionMode.Callback {
 
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -58,10 +57,10 @@ class AlbumContentActionModeCallback(
 
     private fun handleActionItemVisibility(menu: Menu?) {
         menu?.let {
-            if (currentAlbum != Album.FavouriteAlbum) {
+            if (fragment.currentAlbum != Album.FavouriteAlbum) {
                 menu.findItem(R.id.cab_menu_remove_favourites)?.isVisible = false
             }
-            if (currentAlbum !is Album.UserAlbum) {
+            if (fragment.currentAlbum !is Album.UserAlbum) {
                 menu.findItem(R.id.cab_menu_remove_photos)?.isVisible = false
             }
             menu.findItem(R.id.cab_menu_select_all)?.isVisible = !fragment.checkSelectAll()

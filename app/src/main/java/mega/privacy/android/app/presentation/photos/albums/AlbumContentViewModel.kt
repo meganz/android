@@ -41,4 +41,10 @@ class AlbumContentViewModel @Inject constructor(
     fun updatePhotosAddingProgressCompleted(albumId: AlbumId) = viewModelScope.launch {
         updateAlbumPhotosAddingProgressCompleted(albumId)
     }
+
+    fun deleteAlbum() {
+        _state.update {
+            it.copy(isDeleteAlbum = true)
+        }
+    }
 }

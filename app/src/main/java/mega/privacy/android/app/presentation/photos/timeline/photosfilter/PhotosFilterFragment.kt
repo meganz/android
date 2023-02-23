@@ -4,26 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.photos.timeline.photosfilter.view.PhotosFilterView
+import mega.privacy.android.app.presentation.photos.compose.photosfilter.PhotosFilterScreen
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.applyFilter
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onMediaTypeSelected
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.onSourceSelected
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import javax.inject.Inject
 
 /**
@@ -59,32 +52,12 @@ class PhotosFilterFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    PhotosFilterBody()
+                    PhotosFilterScreen(
+                        timelineViewModel = timelineViewModel,
+                        onExitScreen = { activity?.onBackPressedDispatcher?.onBackPressed() },
+                    )
                 }
             }
-        }
-    }
-
-    @Composable
-    fun PhotosFilterBody() {
-        val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
-
-        PhotosFilterView(
-            timelineViewState = timelineViewState,
-            onMediaTypeSelected = timelineViewModel::onMediaTypeSelected,
-            onSourceSelected = timelineViewModel::onSourceSelected,
-            applyFilter = this::applyFilter
-        )
-    }
-
-    /**
-     * Apply the filter from the Photos Filter
-     */
-    fun applyFilter() {
-        lifecycleScope.launch {
-            timelineViewModel.showingFilterPage(false)
-            timelineViewModel.applyFilter()
-            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 }

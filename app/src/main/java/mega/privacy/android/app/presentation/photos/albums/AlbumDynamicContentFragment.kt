@@ -8,86 +8,38 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
-import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
-import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
-import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
-import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
-import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.model.Sort
-import mega.privacy.android.app.presentation.photos.view.FilterDialog
-import mega.privacy.android.app.presentation.photos.view.RemovePhotosFromAlbumDialog
-import mega.privacy.android.app.presentation.photos.view.SortByDialog
-import mega.privacy.android.app.utils.StringUtils.formatColorTag
-import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
+import mega.privacy.android.app.presentation.photos.compose.albumcontent.AlbumContentScreen
+import mega.privacy.android.app.presentation.photos.compose.albumcontent.isFilterable
+import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album
-import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.controls.MegaEmptyView
-import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.dark_grey
-import mega.privacy.android.core.ui.theme.teal_300
-import mega.privacy.android.core.ui.theme.white
 import javax.inject.Inject
 
 /**
@@ -95,8 +47,9 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class AlbumDynamicContentFragment : Fragment() {
-
+    internal val timelineViewModel: TimelineViewModel by activityViewModels()
     internal val albumsViewModel: AlbumsViewModel by activityViewModels()
+
     private val photosViewModel: PhotosViewModel by activityViewModels()
     private val albumContentViewModel: AlbumContentViewModel by viewModels()
 
@@ -109,24 +62,18 @@ class AlbumDynamicContentFragment : Fragment() {
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: AlbumContentActionModeCallback
 
-    private var closeScreen by mutableStateOf(false)
-
     companion object {
         @JvmStatic
         fun getInstance(isAccountHasPhotos: Boolean): AlbumDynamicContentFragment {
-            return AlbumDynamicContentFragment().apply {
-                arguments =
-                    bundleOf(INTENT_KEY_IS_ACCOUNT_HAS_PHOTOS to isAccountHasPhotos)
-            }
+            return AlbumDynamicContentFragment()
         }
-
-        internal const val INTENT_KEY_IS_ACCOUNT_HAS_PHOTOS = "IS_ACCOUNT_HAS_PHOTOS"
     }
 
-    private val isAccountHasPhotos: Boolean by lazy(LazyThreadSafetyMode.NONE) {
-        arguments?.getBoolean(INTENT_KEY_IS_ACCOUNT_HAS_PHOTOS,
-            false) ?: false
-    }
+    private val albumPhotosSelectionLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+            ::handleAlbumPhotosSelectionResult,
+        )
 
     private val albumCoverSelectionLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(
@@ -137,8 +84,7 @@ class AlbumDynamicContentFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
-        actionModeCallback =
-            AlbumContentActionModeCallback(this, albumsViewModel.state.value.currentAlbum)
+        actionModeCallback = AlbumContentActionModeCallback(this)
     }
 
     override fun onCreateView(
@@ -151,7 +97,14 @@ class AlbumDynamicContentFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    AlbumContentBody(albumsViewModel, albumContentViewModel)
+                    AlbumContentScreen(
+                        photosViewModel = photosViewModel,
+                        timelineViewModel = timelineViewModel,
+                        albumsViewModel = albumsViewModel,
+                        albumContentViewModel = albumContentViewModel,
+                        onNavigatePhotoPreview = ::openPhotoPreview,
+                        onNavigatePhotosSelection = ::openAlbumPhotosSelection,
+                    )
                 }
             }
         }
@@ -162,12 +115,6 @@ class AlbumDynamicContentFragment : Fragment() {
         setHasOptionsMenu(true)
         setupFlow()
         setupParentActivityUI()
-        observePhotosAddingProgress()
-    }
-
-    private fun observePhotosAddingProgress() {
-        val album = albumsViewModel.state.value.currentUserAlbum ?: return
-        albumContentViewModel.observePhotosAddingProgress(albumId = album.id)
     }
 
     /**
@@ -208,378 +155,43 @@ class AlbumDynamicContentFragment : Fragment() {
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    @Composable
-    fun AlbumContentBody(
-        viewModel: AlbumsViewModel = viewModel(),
-        contentViewModel: AlbumContentViewModel = viewModel(),
-    ) {
-        val uiState by viewModel.state.collectAsStateWithLifecycle()
-        val contentState by contentViewModel.state.collectAsStateWithLifecycle()
-        val configuration = LocalConfiguration.current
-        val smallWidth = remember(configuration) {
-            (configuration.screenWidthDp.dp - 1.dp) / 3
-        }
-
-        val photos = remember(uiState.albums, uiState.currentSort, uiState.currentMediaType) {
-            uiState.currentAlbum?.let { album ->
-                val sourcePhotos = uiState.albums.getAlbumPhotos(album)
-                sourcePhotos
-                    .applyFilter(currentMediaType = uiState.currentMediaType)
-                    .takeIf {
-                        sourcePhotos.setFilterMenuItemVisibility()
-                    }?.applySortBy(currentSort = uiState.currentSort)
-                    ?: sourcePhotos.applySortBy(currentSort = uiState.currentSort)
-            } ?: emptyList()
-        }
-
-        if (closeScreen) Back()
-
-        if (uiState.showDeleteAlbumsConfirmation) {
-            val album = uiState.currentAlbum as? Album.UserAlbum
-            DeleteAlbumsConfirmationDialog(
-                selectedAlbumIds = listOfNotNull(album?.id),
-                onCancelClicked = albumsViewModel::closeDeleteAlbumsConfirmation,
-                onDeleteClicked = { deleteAlbum() },
-            )
-        }
-
-        Box {
-            if (photos.isNotEmpty()) {
-                DynamicView(
-                    photos = photos,
-                    smallWidth = smallWidth,
-                    photoDownload = photosViewModel::downloadPhoto,
-                    onClick = this@AlbumDynamicContentFragment::onClick,
-                    onLongPress = this@AlbumDynamicContentFragment::onLongPress,
-                    selectedPhotos = uiState.selectedPhotos
-                )
-
-                if (contentState.isAddingPhotos) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp),
-                        color = teal_300,
-                    )
-                }
-            } else if (contentState.isAddingPhotos) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .align(Alignment.Center),
-                    color = teal_300,
-                )
-            } else {
-                when (uiState.currentAlbum) {
-                    Album.FavouriteAlbum -> MegaEmptyView(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_favourite_album),
-                        text = getString(R.string.empty_hint_favourite_album)
-                            .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
-                            .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
-                            .toSpannedHtmlText()
-                    )
-                    Album.GifAlbum -> Back()
-                    Album.RawAlbum -> Back()
-                    is Album.UserAlbum -> MegaEmptyView(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_photos_user_album_empty),
-                        text = getString(R.string.photos_user_album_empty_album)
-                            .formatColorTag(requireContext(), 'A', R.color.grey_900_grey_100)
-                            .formatColorTag(requireContext(), 'B', R.color.grey_300_grey_600)
-                            .toSpannedHtmlText()
-                    )
-                    null -> Back()
-                }
-            }
-
-            Column(modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()) {
-                val userAlbum = uiState.currentUserAlbum
-                if (userAlbum != null && contentState.isAddingPhotosProgressCompleted) {
-                    val message = pluralStringResource(
-                        id = R.plurals.photos_album_selection_added,
-                        count = contentState.totalAddedPhotos,
-                        contentState.totalAddedPhotos,
-                        userAlbum.title,
-                    )
-                    Snackbar(
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .padding(8.dp),
-                        backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
-                    ) {
-                        Text(text = message)
-                    }
-
-                    LaunchedEffect(message) {
-                        delay(3000L)
-                        albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = userAlbum.id)
-                    }
-                }
-
-                if (uiState.snackBarMessage.isNotEmpty()) {
-                    SnackBar(
-                        message = uiState.snackBarMessage,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                    )
-                }
-
-                if (showFilterFabButton(uiState)) {
-                    FilterFabButton(
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .padding(end = 24.dp)
-                    )
-                    Spacer(modifier = Modifier.padding(top = 16.dp))
-                }
-
-                if (showAddFabButton(uiState) && !contentState.isAddingPhotos) {
-                    AddFabButton(
-                        modifier = Modifier
-                            .align(Alignment.End)
-                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-                    )
-                }
-            }
-
-            if (uiState.showSortByDialog) {
-                SortByDialog(
-                    onDialogDismissed = {
-                        albumsViewModel.showSortByDialog(showSortByDialog = false)
-                    },
-                    selectedOption = uiState.currentSort,
-                    onOptionSelected = {
-                        albumsViewModel.setCurrentSort(it)
-                    }
-                )
-            }
-
-            if (uiState.showFilterDialog) {
-                FilterDialog(
-                    onDialogDismissed = {
-                        albumsViewModel.showFilterDialog(showFilterDialog = false)
-                    },
-                    selectedOption = uiState.currentMediaType,
-                    onOptionSelected = {
-                        albumsViewModel.setCurrentMediaType(it)
-                    }
-                )
-            }
-
-            if (uiState.showRemovePhotosDialog) {
-                RemovePhotosFromAlbumDialog(
-                    onDialogDismissed = {
-                        with(albumsViewModel) {
-                            clearSelectedPhotos()
-                            setShowRemovePhotosFromAlbumDialog(false)
-                        }
-                    },
-                    onPositiveButtonClick = {
-                        with(albumsViewModel) {
-                            removePhotosFromAlbum()
-                            setSnackBarMessage(
-                                requireContext()
-                                    .getQuantityStringOrDefault(
-                                        R.plurals.photos_album_photos_removal_snackbar_message,
-                                        state.value.selectedPhotos.size,
-                                        state.value.selectedPhotos.size,
-                                        getCurrentAlbumTitle(),
-                                    )
-                            )
-                            clearSelectedPhotos()
-                            setShowRemovePhotosFromAlbumDialog(false)
-                        }
-                    }
-                )
-            }
-
-            if (uiState.showRenameDialog) {
-                CreateNewAlbumDialog(
-                    titleResID = R.string.context_rename,
-                    positiveButtonTextResID = R.string.context_rename,
-                    onDismissRequest = {
-                        albumsViewModel.showRenameDialog(showRenameDialog = false)
-                        albumsViewModel.setNewAlbumNameValidity(true)
-                    },
-                    onDialogPositiveButtonClicked = albumsViewModel::updateAlbumName,
-                    onDialogInputChange = albumsViewModel::setNewAlbumNameValidity,
-                    initialInputText = { (uiState.currentAlbum as Album.UserAlbum).title },
-                    errorMessage = uiState.createDialogErrorMessage,
-                ) {
-                    uiState.isInputNameValid
-                }
-            }
-
-        }
-    }
-
-    @Composable
-    private fun showFilterFabButton(uiState: AlbumsViewState) =
-        (uiState.currentMediaType != FilterMediaType.ALL_MEDIA
-                && uiState.selectedPhotos.isEmpty())
-
-    @Composable
-    private fun showAddFabButton(uiState: AlbumsViewState) =
-        uiState.currentAlbum is Album.UserAlbum
-                && isAccountHasPhotos
-                && uiState.selectedPhotos.isEmpty()
-
-    @Composable
-    private fun AddFabButton(
-        modifier: Modifier,
-    ) {
-        FloatingActionButton(
-            onClick = this::onFabClick,
-            modifier = modifier
-                .size(56.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = if (MaterialTheme.colors.isLight) {
-                    R.drawable.ic_add_white
-                } else {
-                    R.drawable.ic_add
-                }),
-                contentDescription = "Add",
-                tint = if (!MaterialTheme.colors.isLight) {
-                    Color.Black
-                } else {
-                    Color.White
-                }
-            )
-        }
-    }
-
-    @Composable
-    private fun FilterFabButton(
-        modifier: Modifier,
-    ) {
-        FloatingActionButton(
-            onClick = { albumsViewModel.showFilterDialog(true) },
-            modifier = modifier
-                .size(40.dp),
-            backgroundColor = if (MaterialTheme.colors.isLight) {
-                Color.White
-            } else {
-                dark_grey
-            }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_filter_light),
-                contentDescription = "Filter",
-                tint = if (MaterialTheme.colors.isLight) {
-                    Color.Black
-                } else {
-                    Color.White
-                }
-            )
-        }
-    }
-
-    @Composable
-    private fun SnackBar(
-        message: String,
-        modifier: Modifier,
-    ) {
-        Snackbar(
-            modifier = modifier.padding(8.dp),
-            backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
-        ) {
-            Text(
-                text = message
-            )
-        }
-
-        LaunchedEffect(message) {
-            delay(3000L)
-            albumsViewModel.setSnackBarMessage("")
-        }
-    }
-
-    @Composable
-    private fun Back() {
-        val onBackPressedDispatcher =
-            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-        LaunchedEffect(key1 = true) {
-            onBackPressedDispatcher?.onBackPressed()
-        }
-    }
-
-    private fun List<Photo>.applySortBy(currentSort: Sort) =
-        if (currentSort == Sort.NEWEST) {
-            this.sortedByDescending { it.modificationTime }
-        } else {
-            this.sortedBy { it.modificationTime }
-        }
-
-    private fun List<Photo>.applyFilter(currentMediaType: FilterMediaType) =
-        when (currentMediaType) {
-            FilterMediaType.ALL_MEDIA -> this
-            FilterMediaType.IMAGES -> this.filterIsInstance<Photo.Image>()
-            FilterMediaType.VIDEOS -> this.filterIsInstance<Photo.Video>()
-        }
-
-    private fun openPhoto(photo: Photo) {
-        albumsViewModel.state.value.currentAlbum?.let { album ->
-            albumsViewModel.state.value.apply {
-                val sourcePhotos = albums.getAlbumPhotos(album)
-                val currentAlbumPhotos = sourcePhotos
-                    .applyFilter(currentMediaType = currentMediaType)
-                    .takeIf {
-                        currentMediaType != FilterMediaType.ALL_MEDIA
-                    }?.applySortBy(currentSort = currentSort)
-                    ?: sourcePhotos.applySortBy(currentSort = currentSort)
-
-                val intent = ImageViewerActivity.getIntentForChildren(
-                    requireContext(),
-                    currentAlbumPhotos.map { it.id }.toLongArray(),
-                    photo.id,
-                )
-
-                startActivity(intent)
-                managerActivity.overridePendingTransition(0, 0)
-            }
-        }
-    }
-
-    private fun onFabClick() {
-        if (albumsViewModel.state.value.currentAlbum is Album.UserAlbum) {
-            val userAlbum = albumsViewModel.state.value.currentAlbum as Album.UserAlbum
-            openAlbumPhotosSelection(albumId = userAlbum.id)
-        }
-    }
-
-    private val albumPhotosSelectionLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult(),
-            ::handleAlbumPhotosSelectionResult,
+    private fun openPhotoPreview(anchorPhoto: Photo, photos: List<Photo>) {
+        val intent = ImageViewerActivity.getIntentForChildren(
+            requireContext(),
+            photos.map { it.id }.toLongArray(),
+            anchorPhoto.id,
         )
+        startActivity(intent)
+        managerActivity.overridePendingTransition(0, 0)
+    }
 
-    private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {}
-
-    private fun openAlbumPhotosSelection(albumId: AlbumId) {
+    private fun openAlbumPhotosSelection(album: Album.UserAlbum) {
         val intent = AlbumScreenWrapperActivity.createAlbumPhotosSelectionScreen(
             context = requireContext(),
-            albumId = albumId,
+            albumId = album.id,
             albumFlow = AlbumFlow.Addition,
         )
         albumPhotosSelectionLauncher.launch(intent)
         managerActivity.overridePendingTransition(0, 0)
     }
 
-    fun onClick(photo: Photo) {
-        if (albumsViewModel.state.value.selectedPhotos.isEmpty()) {
-            openPhoto(photo)
-        } else {
-            if (actionMode != null) {
-                albumsViewModel.togglePhotoSelection(photo)
-            }
-        }
+    private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {}
+
+    private fun openAlbumCoverSelectionScreen() {
+        val album = albumsViewModel.state.value.currentAlbum
+        if (album !is Album.UserAlbum) return
+
+        val intent = AlbumScreenWrapperActivity.createAlbumCoverSelectionScreen(
+            context = requireContext(),
+            albumId = album.id,
+        )
+        albumCoverSelectionLauncher.launch(intent)
+        managerActivity.overridePendingTransition(0, 0)
     }
 
-    fun onLongPress(photo: Photo) {
-        handleActionMode(photo)
+    private fun handleAlbumCoverSelectionResult(result: ActivityResult) {
+        val message = result.data?.getStringExtra(AlbumScreenWrapperActivity.MESSAGE)
+        albumsViewModel.setSnackBarMessage(message.orEmpty())
     }
 
     private fun enterActionMode() {
@@ -591,17 +203,6 @@ class AlbumDynamicContentFragment : Fragment() {
     private fun exitActionMode() {
         actionMode?.finish()
         actionMode = null
-    }
-
-    private fun handleActionMode(photo: Photo) {
-        if (albumsViewModel.state.value.selectedPhotos.isEmpty()) {
-            if (actionMode == null) {
-                enterActionMode()
-            }
-            albumsViewModel.togglePhotoSelection(photo)
-        } else {
-            onClick(photo)
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -625,21 +226,6 @@ class AlbumDynamicContentFragment : Fragment() {
         }
     }
 
-    private fun List<Photo>.setFilterMenuItemVisibility(): Boolean {
-        val imageCount = this.count { it is Photo.Image }
-        val showFilterMenuItem = this.isNotEmpty() &&
-                imageCount != this.size && imageCount != 0
-        if (!showFilterMenuItem) {
-            albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
-        }
-        menu?.findItem(R.id.action_menu_filter)?.isVisible = showFilterMenuItem
-        return showFilterMenuItem
-    }
-
-    private fun List<Photo>.setSelectAlbumCoverMenuItemVisibility() {
-        menu?.findItem(R.id.action_menu_select_album_cover)?.isVisible = this.isNotEmpty()
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_menu_sort_by -> {
@@ -661,44 +247,21 @@ class AlbumDynamicContentFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    private fun List<Photo>.setFilterMenuItemVisibility() {
+        menu?.findItem(R.id.action_menu_filter)?.isVisible = isFilterable()
+    }
+
+    private fun List<Photo>.setSelectAlbumCoverMenuItemVisibility() {
+        menu?.findItem(R.id.action_menu_select_album_cover)?.isVisible = this.isNotEmpty()
+    }
+
     private fun handleAlbumDeletion() {
         val photos = albumsViewModel.state.value.currentUIAlbum?.photos.orEmpty()
         if (photos.isEmpty()) {
-            deleteAlbum()
+            albumContentViewModel.deleteAlbum()
         } else {
             albumsViewModel.showDeleteAlbumsConfirmation()
         }
-    }
-
-    private fun deleteAlbum() {
-        val album = albumsViewModel.state.value.currentAlbum as? Album.UserAlbum
-        albumsViewModel.deleteAlbums(albumIds = listOfNotNull(album?.id))
-        albumsViewModel.updateAlbumDeletedMessage(
-            message = context?.getQuantityStringOrDefault(
-                R.plurals.photos_album_deleted_message,
-                quantity = 1,
-                album?.title,
-            ).orEmpty()
-        )
-
-        closeScreen = true
-    }
-
-    private fun openAlbumCoverSelectionScreen() {
-        val album = albumsViewModel.state.value.currentAlbum
-        if (album !is Album.UserAlbum) return
-
-        val intent = AlbumScreenWrapperActivity.createAlbumCoverSelectionScreen(
-            context = requireContext(),
-            albumId = album.id,
-        )
-        albumCoverSelectionLauncher.launch(intent)
-        managerActivity.overridePendingTransition(0, 0)
-    }
-
-    private fun handleAlbumCoverSelectionResult(result: ActivityResult) {
-        val message = result.data?.getStringExtra(AlbumScreenWrapperActivity.MESSAGE)
-        albumsViewModel.setSnackBarMessage(message.orEmpty())
     }
 
     /**
@@ -712,6 +275,8 @@ class AlbumDynamicContentFragment : Fragment() {
             getString(R.string.tab_title_album)
         }
     }
+
+    val currentAlbum: Album? get() = albumsViewModel.state.value.currentAlbum
 
     override fun onPause() {
         ackPhotosAddingProgressCompleted()
