@@ -1,14 +1,20 @@
-package mega.privacy.android.data.mapper
+package mega.privacy.android.data.mapper.viewtype
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.preference.ViewType
+import org.junit.Before
 import org.junit.Test
 
 /**
  * Test class for [ViewTypeMapper]
  */
-class ViewTypeMapperTest {
-    private val underTest: ViewTypeMapper = { ViewType(it) }
+class ViewTypeMapperImplTest {
+    private lateinit var underTest: ViewTypeMapper
+
+    @Before
+    fun setUp() {
+        underTest = ViewTypeMapperImpl()
+    }
 
     @Test
     fun `test that null id returns null`() {

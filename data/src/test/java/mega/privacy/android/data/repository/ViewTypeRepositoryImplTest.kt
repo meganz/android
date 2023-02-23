@@ -6,7 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
-import mega.privacy.android.data.mapper.ViewTypeMapper
+import mega.privacy.android.data.mapper.viewtype.ViewTypeMapper
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.repository.ViewTypeRepository
 import org.junit.Before

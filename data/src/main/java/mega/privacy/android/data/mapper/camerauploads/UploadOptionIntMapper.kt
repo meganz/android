@@ -6,7 +6,7 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
  * Mapper that converts [UploadOption] into related MegaPreferences values for selecting
  * the Upload Option of Camera Uploads
  */
-fun interface UploadOptionIntMapper {
+internal fun interface UploadOptionIntMapper {
 
     /**
      * Invocation function

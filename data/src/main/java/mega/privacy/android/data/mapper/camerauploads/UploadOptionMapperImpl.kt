@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Default implementation of [UploadOptionMapper]
  */
-class UploadOptionMapperImpl @Inject constructor() : UploadOptionMapper {
+internal class UploadOptionMapperImpl @Inject constructor() : UploadOptionMapper {
     override fun invoke(state: String?) = when {
         state == null -> UploadOption.PHOTOS
         state.toInt() == MegaPreferences.ONLY_PHOTOS -> UploadOption.PHOTOS

@@ -2,7 +2,7 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
-import mega.privacy.android.data.mapper.ViewTypeMapper
+import mega.privacy.android.data.mapper.viewtype.ViewTypeMapper
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.repository.ViewTypeRepository
 import javax.inject.Inject

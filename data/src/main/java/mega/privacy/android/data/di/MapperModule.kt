@@ -80,7 +80,6 @@ import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
-import mega.privacy.android.data.mapper.ViewTypeMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapperImpl
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
@@ -158,10 +157,11 @@ import mega.privacy.android.data.mapper.toVideoQuality
 import mega.privacy.android.data.mapper.verification.SmsPermissionMapper
 import mega.privacy.android.data.mapper.verification.SmsPermissionMapperImpl
 import mega.privacy.android.data.mapper.videoQualityToInt
+import mega.privacy.android.data.mapper.viewtype.ViewTypeMapper
+import mega.privacy.android.data.mapper.viewtype.ViewTypeMapperImpl
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
-import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaNode
 
@@ -186,6 +186,9 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindUploadOptionIntMapper(implementation: UploadOptionIntMapperImpl): UploadOptionIntMapper
+
+    @Binds
+    abstract fun bindViewTypeMapper(implementation: ViewTypeMapperImpl): ViewTypeMapper
 
     companion object {
         /**
@@ -217,14 +220,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
-
-        /**
-         * Provide view type mapper
-         *
-         * @return [ViewTypeMapper]
-         */
-        @Provides
-        fun provideViewTypeMapper(): ViewTypeMapper = { ViewType(it) }
 
         /**
          * Provide user last green mapper

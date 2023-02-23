@@ -8,7 +8,7 @@ import javax.inject.Inject
 /**
  * Sms permission mapper impl
  */
-class SmsPermissionMapperImpl @Inject constructor() : SmsPermissionMapper {
+internal class SmsPermissionMapperImpl @Inject constructor() : SmsPermissionMapper {
     override fun invoke(state: Int) = when (state) {
         0 -> emptyList()
         1 -> listOf(Unblock)

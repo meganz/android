@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 /**
  * Mapper that converts a specific [String] from MegaPreferences into [UploadOption]
  */
-fun interface UploadOptionMapper {
+internal fun interface UploadOptionMapper {
 
     /**
      * Invocation function

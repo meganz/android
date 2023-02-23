@@ -5,7 +5,7 @@ import mega.privacy.android.domain.entity.verification.SmsPermission
 /**
  * Sms permission mapper
  */
-fun interface SmsPermissionMapper {
+internal fun interface SmsPermissionMapper {
     /**
      * Invoke
      *

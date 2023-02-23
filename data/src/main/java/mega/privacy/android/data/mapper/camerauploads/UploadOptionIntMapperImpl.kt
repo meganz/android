@@ -7,7 +7,7 @@ import javax.inject.Inject
 /**
  * Default implementation of [UploadOptionIntMapper]
  */
-class UploadOptionIntMapperImpl @Inject constructor() : UploadOptionIntMapper {
+internal class UploadOptionIntMapperImpl @Inject constructor() : UploadOptionIntMapper {
     override fun invoke(option: UploadOption) = when (option) {
         UploadOption.PHOTOS -> MegaPreferences.ONLY_PHOTOS
         UploadOption.VIDEOS -> MegaPreferences.ONLY_VIDEOS
