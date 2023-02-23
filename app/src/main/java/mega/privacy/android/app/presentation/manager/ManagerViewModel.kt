@@ -56,11 +56,11 @@ import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import mega.privacy.android.domain.usecase.account.Check2FADialog
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
@@ -115,6 +115,7 @@ class ManagerViewModel @Inject constructor(
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
     monitorFinishActivity: MonitorFinishActivity,
+    private val check2FADialog: Check2FADialog,
 ) : ViewModel() {
 
     /**
@@ -432,6 +433,18 @@ class ManagerViewModel @Inject constructor(
         Timber.d("askForFullAccountInfo")
         viewModelScope.launch {
             getFullAccountInfo()
+        }
+    }
+
+    /**
+     * Checks if 2FA alert should be shown
+     * @param newAccount checks if its a new user
+     * @param firstLogin checks if its a first login
+     */
+    fun checkToShow2FADialog(newAccount: Boolean, firstLogin: Boolean) {
+        viewModelScope.launch {
+            val result = check2FADialog(newAccount = newAccount, firstLogin = firstLogin)
+            _state.update { it.copy(show2FADialog = result) }
         }
     }
 

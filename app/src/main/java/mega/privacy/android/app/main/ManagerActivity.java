@@ -600,6 +600,8 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public boolean openFolderRefresh = false;
     boolean newAccount = false;
+
+    private boolean firstLogin = false;
     public boolean newCreationAccount;
 
     private StorageState storageState = StorageState.Unknown; //Default value
@@ -2279,7 +2281,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     boolean upgradeAccount = getIntent().getBooleanExtra(EXTRA_UPGRADE_ACCOUNT, false);
                     newAccount = getIntent().getBooleanExtra(EXTRA_NEW_ACCOUNT, false);
                     newCreationAccount = getIntent().getBooleanExtra(NEW_CREATION_ACCOUNT, false);
-                    boolean firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, false);
+                    firstLogin = getIntent().getBooleanExtra(EXTRA_FIRST_LOGIN, false);
                     viewModel.setIsFirstLogin(firstLogin);
                     setRequestNotificationsPermissionFirstLogin(savedInstanceState);
                     askPermissions = getIntent().getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
@@ -2317,7 +2319,7 @@ public class ManagerActivity extends TransfersManagementActivity
                     //reset flag to fix incorrect view loaded when orientation changes
                     getIntent().removeExtra(EXTRA_NEW_ACCOUNT);
                     getIntent().removeExtra(EXTRA_UPGRADE_ACCOUNT);
-                    boolean firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, false);
+                    firstLogin = intentRec.getBooleanExtra(EXTRA_FIRST_LOGIN, false);
                     viewModel.setIsFirstLogin(firstLogin);
                     setRequestNotificationsPermissionFirstLogin(savedInstanceState);
                     askPermissions = intentRec.getBooleanExtra(EXTRA_ASK_PERMISSIONS, askPermissions);
@@ -2481,6 +2483,11 @@ public class ManagerActivity extends TransfersManagementActivity
                 TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.pending_actions_badge_text);
                 tvPendingActionsCount.setText(String.valueOf(managerState.getPendingActionsCount()));
             }
+
+            //Show 2FA dialog to the user on Second Launch after sign up
+            if(managerState.getShow2FADialog() || isEnable2FADialogShown){
+                showEnable2FADialog();
+            }
             return Unit.INSTANCE;
         });
         ViewExtensionsKt.collectFlow(this, viewModel.getOnViewTypeChanged(), Lifecycle.State.STARTED, viewType -> {
@@ -2524,6 +2531,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
             return Unit.INSTANCE;
         });
+
     }
 
     /**
@@ -4614,11 +4622,7 @@ public class ManagerActivity extends TransfersManagementActivity
         setTabsVisibility();
         checkScrollElevation();
 
-        if (megaApi.multiFactorAuthAvailable()) {
-            if (newAccount || isEnable2FADialogShown) {
-                showEnable2FADialog();
-            }
-        }
+        viewModel.checkToShow2FADialog(newAccount, firstLogin);
     }
 
     private void navigateToSettingsActivity(TargetPreference targetPreference) {

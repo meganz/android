@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import mega.privacy.android.domain.usecase.account.Check2FADialog
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import org.junit.Before
 import org.junit.Rule
@@ -75,6 +76,7 @@ class ManagerViewModelTest {
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>()
     private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares>()
     private val monitorFinishActivity = mock<MonitorFinishActivity>()
+    private val check2FADialog = mock<Check2FADialog>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -116,6 +118,7 @@ class ManagerViewModelTest {
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
             monitorFinishActivity = monitorFinishActivity,
+            check2FADialog = check2FADialog,
         )
     }
 
@@ -370,4 +373,24 @@ class ManagerViewModelTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    fun `test when check2FADialog returns false show2FADialog flow updated to false`() = runTest {
+        whenever(check2FADialog(newAccount = false, firstLogin = true)).thenReturn(false)
+        setUnderTest()
+        underTest.checkToShow2FADialog(newAccount = false, firstLogin = true)
+        underTest.state.map { it }.distinctUntilChanged().test {
+            assertThat(awaitItem().show2FADialog).isFalse()
+        }
+    }
+
+    @Test
+    fun `test when check2FADialog returns true show2FADialog flow updated to true`() = runTest {
+        whenever(check2FADialog(newAccount = false, firstLogin = true)).thenReturn(true)
+        setUnderTest()
+        underTest.checkToShow2FADialog(newAccount = false, firstLogin = true)
+        underTest.state.map { it }.distinctUntilChanged().test {
+            assertThat(awaitItem().show2FADialog).isTrue()
+        }
+    }
 }

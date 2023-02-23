@@ -34,6 +34,8 @@ import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorUserAlertUpdates
+import mega.privacy.android.domain.usecase.account.Check2FADialog
+import mega.privacy.android.domain.usecase.account.DefaultCheck2FADialog
 
 /**
  * Manager module
@@ -47,6 +49,9 @@ abstract class ManagerUseCases {
 
     @Binds
     abstract fun bindMonitorGlobalUpdates(useCase: DefaultMonitorGlobalUpdates): MonitorGlobalUpdates
+
+    @Binds
+    abstract fun bindCheck2FADialog(useCase: DefaultCheck2FADialog): Check2FADialog
 
     @Binds
     abstract fun bindRubbishBinChildrenNode(useCase: DefaultGetRubbishBinChildrenNode): GetRubbishBinChildrenNode

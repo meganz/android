@@ -8,7 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -642,10 +642,10 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun resetAccountInfo() = myAccountInfoFacade.resetAccountInfo()
     override suspend fun update2FADialogPreference(show2FA: Boolean) =
-        accountPreferencesGateway.setDisplay2FADialog(show2FA)
+        withContext(ioDispatcher) { accountPreferencesGateway.setDisplay2FADialog(show2FA) }
 
     override suspend fun get2FADialogPreference() =
-        accountPreferencesGateway.monitorShow2FADialog().last()
+        withContext(ioDispatcher) { accountPreferencesGateway.monitorShow2FADialog().first() }
 
     override suspend fun is2FAEnabled() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->

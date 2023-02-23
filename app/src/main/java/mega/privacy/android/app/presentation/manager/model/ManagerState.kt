@@ -14,6 +14,7 @@ package mega.privacy.android.app.presentation.manager.model
  * @param pendingActionsCount Pending actions count
  * @param shouldAlertUserAboutSecurityUpgrade Boolean to decide whether to display security upgrade dialog or not
  * @param showSyncSection Boolean to show sync section
+ * @param show2FADialog Boolean to show sync section
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -26,5 +27,6 @@ data class ManagerState(
     val nodeUpdateReceived: Boolean = false,
     val pendingActionsCount: Int = 0,
     val shouldAlertUserAboutSecurityUpgrade: Boolean = false,
-    val showSyncSection: Boolean = false
+    val showSyncSection: Boolean = false,
+    val show2FADialog: Boolean = false
 )

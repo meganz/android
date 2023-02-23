@@ -23,6 +23,7 @@ import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.account.Check2FADialog
 import nz.mega.sdk.MegaNode
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -107,4 +108,7 @@ object TestManagerUseCases {
 
     @Provides
     fun provideCheckCameraUpload() = mock<CheckCameraUpload> {}
+
+    @Provides
+    fun provideCheck2FADialog() = mock<Check2FADialog> {}
 }
