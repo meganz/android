@@ -547,13 +547,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     private var coroutineScope: CoroutineScope? = null
 
     /**
-     * Temporary Flag to know if the service has been cancelled
-     * Should be removed once every process is handled through coroutine
-     * and replaced with coroutine is active condition check instead
-     */
-    private var cancelled = false
-
-    /**
      * True if the camera uploads attributes have already been requested
      * from the server
      */
@@ -1252,7 +1245,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             copyFileAsyncList.joinAll()
         }
         if (totalToUpload == totalUploaded) {
-            if (compressedVideoPending() && !cancelled && isCompressorAvailable()) {
+            if (compressedVideoPending() && isCompressorAvailable()) {
                 Timber.d("Got pending videos, will start compress.")
                 startVideoCompression()
             } else {
@@ -1308,18 +1301,17 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      *
      * @param globalTransfer [GlobalTransfer.OnTransferFinish]
      */
-    @Synchronized
-    private fun onTransferUpdated(globalTransfer: GlobalTransfer.OnTransferUpdate) {
+    private suspend fun onTransferUpdated(globalTransfer: GlobalTransfer.OnTransferUpdate) {
         val transfer = globalTransfer.transfer
-        if (cancelled) {
+        runCatching {
+            updateProgressNotification()
+            if (isOverQuota) {
+                return
+            }
+        }.onFailure {
             Timber.d("Cancelled Transfer Node: ${transfer.nodeHandle}")
-            coroutineScope?.launch { cancelPendingTransfer(transfer) }
-            return
+            cancelPendingTransfer(transfer)
         }
-        if (isOverQuota) {
-            return
-        }
-        updateProgressNotification()
     }
 
     /**
@@ -1543,7 +1535,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         lastUpdated = 0
         totalUploaded = 0
         totalToUpload = 0
-        cancelled = false
         isOverQuota = false
         missingAttributesChecked = false
 
@@ -1606,7 +1597,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             coroutineScope?.cancel(CancellationException(cancelMessage))
         }
 
-        cancelled = true
         stopForeground(STOP_FOREGROUND_REMOVE)
         cancelNotification()
         stopSelf()
@@ -1789,9 +1779,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         } else {
             Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, e.errorString)
         }
-        if (cancelled) {
-            Timber.w("Image sync cancelled: %s", transfer.nodeHandle)
-        }
         updateUpload()
     }
 
@@ -1813,9 +1800,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     }
 
     private suspend fun updateUpload() {
-        if (!cancelled) {
-            updateProgressNotification()
-        }
+        updateProgressNotification()
+
         totalUploaded++
         @Suppress("DEPRECATION")
         Timber.d(
@@ -1826,7 +1812,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         )
         if (totalToUpload == totalUploaded) {
             Timber.d("Photo upload finished, now checking videos")
-            if (compressedVideoPending() && !cancelled && isCompressorAvailable()) {
+            if (compressedVideoPending() && isCompressorAvailable()) {
                 Timber.d("Got pending videos, will start compress")
                 startVideoCompression()
             } else {
@@ -1955,16 +1941,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     /**
      * Update compression progress
      */
-    private fun onCompressUpdateProgress(progress: Int, currentFileIndex: Int, totalCount: Int) {
-        if (!cancelled) {
-            val message = getString(R.string.message_compress_video, "$progress%")
-            val subText = getString(
-                R.string.title_compress_video,
-                currentFileIndex,
-                totalCount
-            )
-            showProgressNotification(progress, pendingIntent, message, subText, "")
-        }
+    private fun onCompressUpdateProgress(
+        progress: Int,
+        currentFileIndex: Int,
+        totalCount: Int
+    ) {
+        val message = getString(R.string.message_compress_video, "$progress%")
+        val subText = getString(
+            R.string.title_compress_video,
+            currentFileIndex,
+            totalCount
+        )
+        showProgressNotification(progress, pendingIntent, message, subText, "")
     }
 
     /**
@@ -2014,23 +2002,17 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     /**
      * Compression finished
      */
-    private fun onCompressFinished() {
+    private suspend fun onCompressFinished() {
         Timber.d("Video Compression Finished")
         videoCompressionJob?.cancel()
         videoCompressionJob = null
-        coroutineScope?.launch {
-            if (!cancelled) {
-                Timber.d("Preparing to upload compressed video.")
-                val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
-                if (compressedList.isNotEmpty()) {
-                    Timber.d("Start to upload %d compressed videos.", compressedList.size)
-                    startParallelUpload(compressedList, true)
-                } else {
-                    onQueueComplete()
-                }
-            } else {
-                Timber.d("Compress finished, but process is canceled.")
-            }
+        Timber.d("Preparing to upload compressed video.")
+        val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
+        if (compressedList.isNotEmpty()) {
+            Timber.d("Start to upload ${compressedList.size} compressed videos.")
+            startParallelUpload(compressedList, true)
+        } else {
+            onQueueComplete()
         }
     }
 
