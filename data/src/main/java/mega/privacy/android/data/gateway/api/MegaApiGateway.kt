@@ -1641,6 +1641,12 @@ interface MegaApiGateway {
     fun setMasterKeyExported(listener: MegaRequestListenerInterface?)
 
     /**
+     * Check if the master key has been exported
+     * @param listener as [MegaRequestListenerInterface]
+     */
+    fun isMasterKeyExported(listener: MegaRequestListenerInterface?)
+
+    /**
      * Set a public attribute of the current user
      *
      *

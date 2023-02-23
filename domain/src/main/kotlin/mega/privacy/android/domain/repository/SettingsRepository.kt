@@ -429,4 +429,9 @@ interface SettingsRepository {
      * Set master key exported
      */
     suspend fun setMasterKeyExported()
+
+    /**
+     * Check is the master key has been exported
+     */
+    suspend fun isMasterKeyExported(): Boolean
 }

@@ -11,8 +11,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.main.controllers.AccountController
-import mega.privacy.android.app.main.TwoFactorAuthenticationActivity
 
 @AndroidEntryPoint
 class RecoveryKeyBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {

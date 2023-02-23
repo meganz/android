@@ -722,6 +722,10 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.confirmResetPassword(link, newPassword, masterKey, listener)
 
+    override fun isMasterKeyExported(listener: MegaRequestListenerInterface?) {
+        megaApi.isMasterKeyExported(listener)
+    }
+
     override suspend fun getPasswordStrength(password: String) =
         megaApi.getPasswordStrength(password)
 

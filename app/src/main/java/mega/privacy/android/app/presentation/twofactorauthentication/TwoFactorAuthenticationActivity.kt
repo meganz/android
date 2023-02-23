@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.twofactorauthentication
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -39,6 +39,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityTwoFactorAuthenticationBinding
 import mega.privacy.android.app.databinding.Dialog2faHelpBinding
 import mega.privacy.android.app.databinding.DialogNoAuthenticationAppsBinding
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants

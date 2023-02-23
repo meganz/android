@@ -312,6 +312,7 @@ import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
+import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;

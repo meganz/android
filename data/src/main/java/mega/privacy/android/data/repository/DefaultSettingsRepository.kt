@@ -31,12 +31,14 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequest.TYPE_GET_ATTR_USER
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -49,7 +51,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property databaseHandler
  * @property context
- * @property apiFacade
+ * @property megaApiGateway
  * @property ioDispatcher
  * @property chatPreferencesGateway
  * @property callsPreferencesGateway
@@ -63,7 +65,7 @@ import kotlin.coroutines.suspendCoroutine
 internal class DefaultSettingsRepository @Inject constructor(
     private val databaseHandler: DatabaseHandler,
     @ApplicationContext private val context: Context,
-    private val apiFacade: MegaApiGateway,
+    private val megaApiGateway: MegaApiGateway,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val chatPreferencesGateway: ChatPreferencesGateway,
@@ -104,7 +106,7 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun fetchContactLinksOption(): Boolean = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
-            apiFacade.isAutoAcceptContactsFromLinkEnabled(
+            megaApiGateway.isAutoAcceptContactsFromLinkEnabled(
                 OptionalMegaRequestListenerInterface(
                     onRequestFinish = onGetContactLinksOptionRequestFinished(continuation)
                 )
@@ -121,8 +123,7 @@ internal class DefaultSettingsRepository @Inject constructor(
                     }
                     MegaError.API_ENOENT -> continuation.failWithException(
                         SettingNotFoundException(
-                            error.errorCode,
-                            error.errorString
+                            error.errorCode, error.errorString
                         )
                     )
                     else -> continuation.failWithError(error)
@@ -130,25 +131,21 @@ internal class DefaultSettingsRepository @Inject constructor(
             }
         }
 
-    private fun isFetchAutoAcceptQRResponse(request: MegaRequest?) =
-        request.isTypeWithParam(
-            MegaRequest.TYPE_GET_ATTR_USER,
-            MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
-        )
+    private fun isFetchAutoAcceptQRResponse(request: MegaRequest?) = request.isTypeWithParam(
+        TYPE_GET_ATTR_USER, MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
+    )
 
-    override suspend fun setAutoAcceptQR(accept: Boolean): Boolean =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                apiFacade.setAutoAcceptContactsFromLink(
-                    !accept, OptionalMegaRequestListenerInterface(
-                        onRequestFinish = onSetContactLinksOptionRequestFinished(
-                            continuation,
-                            accept
-                        )
+    override suspend fun setAutoAcceptQR(accept: Boolean): Boolean = withContext(ioDispatcher) {
+        suspendCoroutine { continuation ->
+            megaApiGateway.setAutoAcceptContactsFromLink(
+                !accept, OptionalMegaRequestListenerInterface(
+                    onRequestFinish = onSetContactLinksOptionRequestFinished(
+                        continuation, accept
                     )
                 )
-            }
+            )
         }
+    }
 
     private fun onSetContactLinksOptionRequestFinished(
         continuation: Continuation<Boolean>,
@@ -164,11 +161,9 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
-    private fun isSetAutoAcceptQRResponse(request: MegaRequest?) =
-        request.isTypeWithParam(
-            MegaRequest.TYPE_SET_ATTR_USER,
-            MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
-        )
+    private fun isSetAutoAcceptQRResponse(request: MegaRequest?) = request.isTypeWithParam(
+        MegaRequest.TYPE_SET_ATTR_USER, MegaApiJava.USER_ATTR_CONTACT_LINK_VERIFICATION
+    )
 
     override fun monitorHideRecentActivity(): Flow<Boolean?> =
         uiPreferencesGateway.monitorHideRecentActivity()
@@ -238,7 +233,7 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setStorageDownloadLocation(storageDownloadLocation)
 
     override suspend fun setShowCopyright() {
-        if (apiFacade.getPublicLinks().isEmpty()) {
+        if (megaApiGateway.getPublicLinks().isEmpty()) {
             Timber.d("No public links: showCopyright set true")
             megaLocalStorageGateway.setShowCopyright(true)
         } else {
@@ -339,8 +334,7 @@ internal class DefaultSettingsRepository @Inject constructor(
     }
 
     override fun monitorPreferredStartScreen() =
-        uiPreferencesGateway.monitorPreferredStartScreen()
-            .map { startScreenMapper(it) }
+        uiPreferencesGateway.monitorPreferredStartScreen().map { startScreenMapper(it) }
 
     override suspend fun setPreferredStartScreen(screen: StartScreen) {
         uiPreferencesGateway.setPreferredStartScreen(screen.id)
@@ -366,54 +360,46 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
-    override suspend fun getPrimaryHandle() =
-        withContext(ioDispatcher) {
-            cameraTimestampsPreferenceGateway.getPrimaryHandle()
-        }
+    override suspend fun getPrimaryHandle() = withContext(ioDispatcher) {
+        cameraTimestampsPreferenceGateway.getPrimaryHandle()
+    }
 
-    override suspend fun getSecondaryHandle() =
-        withContext(ioDispatcher) {
-            cameraTimestampsPreferenceGateway.getSecondaryHandle()
-        }
+    override suspend fun getSecondaryHandle() = withContext(ioDispatcher) {
+        cameraTimestampsPreferenceGateway.getSecondaryHandle()
+    }
 
-    override suspend fun getPrimaryFolderPhotoSyncTime() =
-        withContext(ioDispatcher) {
-            cameraTimestampsPreferenceGateway.getPrimaryFolderPhotoSyncTime()
-        }
+    override suspend fun getPrimaryFolderPhotoSyncTime() = withContext(ioDispatcher) {
+        cameraTimestampsPreferenceGateway.getPrimaryFolderPhotoSyncTime()
+    }
 
-    override suspend fun getSecondaryFolderPhotoSyncTime() =
-        withContext(ioDispatcher) {
-            cameraTimestampsPreferenceGateway.getSecondaryFolderPhotoSyncTime()
-        }
+    override suspend fun getSecondaryFolderPhotoSyncTime() = withContext(ioDispatcher) {
+        cameraTimestampsPreferenceGateway.getSecondaryFolderPhotoSyncTime()
+    }
 
-    override suspend fun getPrimaryFolderVideoSyncTime() =
-        withContext(ioDispatcher) {
-            cameraTimestampsPreferenceGateway.getPrimaryFolderVideoSyncTime()
-        }
+    override suspend fun getPrimaryFolderVideoSyncTime() = withContext(ioDispatcher) {
+        cameraTimestampsPreferenceGateway.getPrimaryFolderVideoSyncTime()
+    }
 
-    override suspend fun getSecondaryFolderVideoSyncTime() =
-        withContext(ioDispatcher) {
-            cameraTimestampsPreferenceGateway.getSecondaryFolderVideoSyncTime()
-        }
+    override suspend fun getSecondaryFolderVideoSyncTime() = withContext(ioDispatcher) {
+        cameraTimestampsPreferenceGateway.getSecondaryFolderVideoSyncTime()
+    }
 
-    override suspend fun clearPrimaryCameraSyncRecords() =
-        withContext(ioDispatcher) {
-            cameraTimestampsPreferenceGateway.clearPrimaryCameraSyncRecords()
-        }
+    override suspend fun clearPrimaryCameraSyncRecords() = withContext(ioDispatcher) {
+        cameraTimestampsPreferenceGateway.clearPrimaryCameraSyncRecords()
+    }
 
-    override suspend fun clearSecondaryCameraSyncRecords() =
-        withContext(ioDispatcher) {
-            cameraTimestampsPreferenceGateway.clearSecondaryCameraSyncRecords()
-        }
+    override suspend fun clearSecondaryCameraSyncRecords() = withContext(ioDispatcher) {
+        cameraTimestampsPreferenceGateway.clearSecondaryCameraSyncRecords()
+    }
 
     override suspend fun enableFileVersionsOption(enabled: Boolean) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener {
                 return@getRequestListener
             }
-            apiFacade.setFileVersionsOption(enabled.not(), listener)
+            megaApiGateway.setFileVersionsOption(enabled.not(), listener)
             continuation.invokeOnCancellation {
-                apiFacade.removeRequestListener(listener)
+                megaApiGateway.removeRequestListener(listener)
             }
         }
     }
@@ -427,10 +413,38 @@ internal class DefaultSettingsRepository @Inject constructor(
     }
 
     override suspend fun getExportMasterKey(): String? = withContext(ioDispatcher) {
-        apiFacade.getExportMasterKey()
+        megaApiGateway.getExportMasterKey()
     }
 
     override suspend fun setMasterKeyExported() = withContext(ioDispatcher) {
-        apiFacade.setMasterKeyExported(null)
+        megaApiGateway.setMasterKeyExported(null)
     }
+
+    @Throws(MegaException::class)
+    override suspend fun isMasterKeyExported(): Boolean = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            megaApiGateway.isMasterKeyExported(
+                OptionalMegaRequestListenerInterface(
+                    onRequestFinish = onIsMasterKeyExportedRequestFinished(
+                        continuation = continuation
+                    )
+                )
+            )
+        }
+    }
+
+    private fun onIsMasterKeyExportedRequestFinished(continuation: Continuation<Boolean>) =
+        { request: MegaRequest, error: MegaError ->
+            if (request.access == TYPE_GET_ATTR_USER
+                && request.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER
+            ) {
+                Timber.d("TYPE_GET_ATTR_USER")
+                if (error.errorCode == MegaError.API_OK
+                    || error.errorCode == MegaError.API_ENOENT
+                ) {
+                    Timber.d("TYPE_GET_ATTR_USER API_OK")
+                    continuation.resumeWith(Result.success(request.flag))
+                } else continuation.failWithError(error)
+            }
+        }
 }
