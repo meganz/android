@@ -126,6 +126,9 @@ abstract class UtilWrapperModule {
 
             override fun getSpecificAvatarColor(typeColor: String): Int =
                 AvatarUtil.getSpecificAvatarColor(typeColor)
+
+            override fun getFirstLetter(name: String): String =
+                AvatarUtil.getFirstLetter(name)
         }
     }
 }

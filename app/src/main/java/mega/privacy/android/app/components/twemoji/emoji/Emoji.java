@@ -1,5 +1,8 @@
 package mega.privacy.android.app.components.twemoji.emoji;
 
+import static android.graphics.Color.WHITE;
+import static java.util.Arrays.asList;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -7,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,15 +22,12 @@ import java.util.List;
 
 import mega.privacy.android.app.MegaApplication;
 
-import static android.graphics.Color.WHITE;
-import static java.util.Arrays.asList;
-
 public class Emoji implements Serializable {
 
   private static final long serialVersionUID = 3L;
   @NonNull private final String unicode;
   private int[] codePoints;
-  @DrawableRes private final int resource;
+  @DrawableRes public final int resource;
   @NonNull private final List<Emoji> variants;
   @Nullable private Emoji base;
 

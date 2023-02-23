@@ -1,5 +1,20 @@
 package mega.privacy.android.app.utils;
 
+import static mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile;
+import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_PHONE_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_PRIMARY_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.DEFAULT_AVATAR_WIDTH_HEIGHT;
+import static mega.privacy.android.app.utils.Constants.UNKNOWN_USER_NAME_AVATAR;
+import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
+import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getRoundedRect;
+import static mega.privacy.android.app.utils.Util.calculateInSampleSize;
+import static mega.privacy.android.app.utils.Util.getCircleBitmap;
+import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,7 +32,9 @@ import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+
 import com.vdurmont.emoji.EmojiParser;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,13 +52,6 @@ import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.ShareContactInfo;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaUser;
-import static mega.privacy.android.app.utils.CacheFolderManager.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.FileUtil.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 
 public class AvatarUtil {
 
@@ -355,8 +365,8 @@ public class AvatarUtil {
      * Checks if already exists the avatar of a participant.
      * First with the handle and if not exists, then with the email.
      *
-     * @param nameFileHandle    participant's handle
-     * @param nameFileEmail     participant's email
+     * @param nameFileHandle participant's handle
+     * @param nameFileEmail  participant's email
      * @return The participan's avatar if exists
      */
     public static Bitmap getUserAvatar(String nameFileHandle, String nameFileEmail) {
@@ -372,10 +382,10 @@ public class AvatarUtil {
     /**
      * Sets the user's avatar
      *
-     * @param handle            user's handle
-     * @param email             user's email
-     * @param fullName          user's full name
-     * @param avatarImageView   view in which the avatar has to be set
+     * @param handle          user's handle
+     * @param email           user's email
+     * @param fullName        user's full name
+     * @param avatarImageView view in which the avatar has to be set
      */
     public static void setImageAvatar(long handle, String email, String fullName, ImageView avatarImageView) {
         if (avatarImageView == null) {
