@@ -16,12 +16,14 @@ class DefaultGetImageByNodeHandle(
         nodeHandle: Long,
         fullSize: Boolean,
         highPriority: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult> {
         return imageRepository.getImageByNodeHandle(
             nodeHandle,
             fullSize,
             highPriority,
-            networkRepository.isMeteredConnection() ?: false
+            networkRepository.isMeteredConnection() ?: false,
+            resetDownloads
         )
     }
 }

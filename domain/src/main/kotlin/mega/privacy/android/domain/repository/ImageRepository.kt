@@ -59,10 +59,11 @@ interface ImageRepository {
     /**
      * Get Image Result given Node Handle
      *
-     * @param nodeHandle    Image Node handle to request.
-     * @param fullSize      Flag to request full size image despite data/size requirements.
-     * @param highPriority  Flag to request image with high priority.
+     * @param nodeHandle            Image Node handle to request.
+     * @param fullSize              Flag to request full size image despite data/size requirements
+     * @param highPriority          Flag to request image with high priority.
      * @param isMeteredConnection   Boolean indicating if network connection is metered
+     * @param resetDownloads        Callback to reset downloads
      *
      * @return Flow<ImageResult>
      */
@@ -71,15 +72,17 @@ interface ImageRepository {
         fullSize: Boolean,
         highPriority: Boolean,
         isMeteredConnection: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult>
 
     /**
      * Get Image Result given Public Link
      *
      * @param nodeFileLink          Public link to a file in MEGA.
-     * @param fullSize              Flag to request full size image despite data/size requirements.
+     * @param fullSize              Flag to request full size image despite data/size requirements
      * @param highPriority          Flag to request image with high priority.
      * @param isMeteredConnection   Boolean indicating if network connection is metered
+     * @param resetDownloads        Callback to reset downloads
      *
      * @return Flow<ImageResult>
      */
@@ -88,6 +91,7 @@ interface ImageRepository {
         fullSize: Boolean,
         highPriority: Boolean,
         isMeteredConnection: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult>
 
     /**
@@ -95,9 +99,10 @@ interface ImageRepository {
      *
      * @param chatRoomId            Chat Message Room Id
      * @param chatMessageId         Chat Message Id
-     * @param fullSize              Flag to request full size image despite data/size requirements.
+     * @param fullSize              Flag to request full size image despite data/size requirements
      * @param highPriority          Flag to request image with high priority.
      * @param isMeteredConnection   Boolean indicating if network connection is metered
+     * @param resetDownloads        Callback to reset downloads
      *
      * @return Flow<ImageResult>
      */
@@ -107,6 +112,7 @@ interface ImageRepository {
         fullSize: Boolean,
         highPriority: Boolean,
         isMeteredConnection: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult>
 
     /**

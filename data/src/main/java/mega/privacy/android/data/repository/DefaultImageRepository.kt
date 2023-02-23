@@ -62,7 +62,6 @@ import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
 import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * The repository implementation class regarding thumbnail feature.
@@ -227,10 +226,17 @@ internal class DefaultImageRepository @Inject constructor(
         fullSize: Boolean,
         highPriority: Boolean,
         isMeteredConnection: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult> = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeHandle)?.let {
             if (!it.isFile) throw IllegalArgumentException("Node is not a file")
-            return@let getImageByNode(it, fullSize, highPriority, isMeteredConnection)
+            return@let getImageByNode(
+                it,
+                fullSize,
+                highPriority,
+                isMeteredConnection,
+                resetDownloads
+            )
         } ?: throw IllegalArgumentException("Node is null")
     }
 
@@ -239,13 +245,15 @@ internal class DefaultImageRepository @Inject constructor(
         fullSize: Boolean,
         highPriority: Boolean,
         isMeteredConnection: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult> = withContext(ioDispatcher) {
         if (nodeFileLink.isBlank()) throw IllegalArgumentException("Invalid megaFileLink")
         return@withContext getImageByNode(
             getPublicNode(nodeFileLink),
             fullSize,
             highPriority,
-            isMeteredConnection
+            isMeteredConnection,
+            resetDownloads
         )
     }
 
@@ -255,9 +263,16 @@ internal class DefaultImageRepository @Inject constructor(
         fullSize: Boolean,
         highPriority: Boolean,
         isMeteredConnection: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult> = withContext(ioDispatcher) {
         getChatNode(chatRoomId, chatMessageId)?.let {
-            return@let getImageByNode(it, fullSize, highPriority, isMeteredConnection)
+            return@let getImageByNode(
+                it,
+                fullSize,
+                highPriority,
+                isMeteredConnection,
+                resetDownloads
+            )
         } ?: throw IllegalArgumentException("Node is null")
     }
 
@@ -427,6 +442,7 @@ internal class DefaultImageRepository @Inject constructor(
         fullFile: File,
         highPriority: Boolean,
         isValidNodeFile: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<FullImageDownloadResult> = callbackFlow {
         val listener = OptionalMegaTransferListenerInterface(
             onTransferStart = { transfer ->
@@ -476,6 +492,7 @@ internal class DefaultImageRepository @Inject constructor(
                         )
                     }
                 }
+                resetDownloads()
             },
             onTransferTemporaryError = { _, error ->
                 if (error.errorCode == MegaError.API_EOVERQUOTA) {
@@ -513,6 +530,7 @@ internal class DefaultImageRepository @Inject constructor(
         fullSize: Boolean,
         highPriority: Boolean,
         isMeteredConnection: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult> = flow {
         val fullSizeRequired =
             isFullSizeRequired(
@@ -579,7 +597,8 @@ internal class DefaultImageRepository @Inject constructor(
                                     node,
                                     fullFile,
                                     highPriority,
-                                    isValidNodeFile
+                                    isValidNodeFile,
+                                    resetDownloads
                                 ).collect { result ->
                                     result.imageResult?.let { downloadImageResult ->
                                         emit(downloadImageResult)

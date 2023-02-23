@@ -16,12 +16,14 @@ class DefaultGetImageByNodePublicLink(
         nodeFileLink: String,
         fullSize: Boolean,
         highPriority: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult> {
         return imageRepository.getImageByNodePublicLink(
             nodeFileLink,
             fullSize,
             highPriority,
-            networkRepository.isMeteredConnection() ?: false
+            networkRepository.isMeteredConnection() ?: false,
+            resetDownloads
         )
     }
 }

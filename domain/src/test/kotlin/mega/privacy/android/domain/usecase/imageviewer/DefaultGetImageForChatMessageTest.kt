@@ -31,7 +31,8 @@ class DefaultGetImageForChatMessageTest {
                 chatRoomId = 1L,
                 chatMessageId = 1L,
                 fullSize = false,
-                highPriority = false
+                highPriority = false,
+                resetDownloads = {}
             )
             verify(networkRepository, times(1)).isMeteredConnection()
         }
@@ -45,12 +46,14 @@ class DefaultGetImageForChatMessageTest {
             val fullSize = false
             val highPriority = true
             val isMeteredConnection = false
+            val resetDownloads = {}
 
             underTest.invoke(
                 chatRoomId = chatRoomId,
                 chatMessageId = chatMessageId,
                 fullSize = fullSize,
-                highPriority = highPriority
+                highPriority = highPriority,
+                resetDownloads = resetDownloads
             )
 
             whenever(networkRepository.isMeteredConnection()).thenReturn(isMeteredConnection)
@@ -60,7 +63,8 @@ class DefaultGetImageForChatMessageTest {
                 chatMessageId = chatMessageId,
                 fullSize = fullSize,
                 highPriority = highPriority,
-                isMeteredConnection = isMeteredConnection
+                isMeteredConnection = isMeteredConnection,
+                resetDownloads = resetDownloads
             )
         }
     }

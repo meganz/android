@@ -13,8 +13,9 @@ fun interface GetImageForChatMessage {
      *
      * @param chatRoomId        Chat Message Room Id
      * @param chatMessageId     Chat Message Id
-     * @param fullSize          Flag to request full size image despite data/size requirements.
-     * @param highPriority      Flag to request image with high priority.
+     * @param fullSize          Flag to request full size image despite data/size requirements
+     * @param highPriority      Flag to request image with high priority
+     * @param resetDownloads    Callback to reset downloads
      *
      * @return Flow<ImageResult>
      */
@@ -23,5 +24,6 @@ fun interface GetImageForChatMessage {
         chatMessageId: Long,
         fullSize: Boolean,
         highPriority: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult>
 }

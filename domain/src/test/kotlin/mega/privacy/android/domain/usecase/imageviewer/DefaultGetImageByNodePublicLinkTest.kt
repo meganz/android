@@ -27,7 +27,7 @@ class DefaultGetImageByNodePublicLinkTest {
     @Test
     fun `test that network repository function is called on invoke`() {
         runTest {
-            underTest.invoke("", fullSize = false, highPriority = false)
+            underTest.invoke("", fullSize = false, highPriority = false, resetDownloads = {})
             verify(networkRepository, times(1)).isMeteredConnection()
         }
     }
@@ -39,11 +39,13 @@ class DefaultGetImageByNodePublicLinkTest {
             val fullSize = false
             val highPriority = true
             val isMeteredConnection = false
+            val resetDownloads = {}
 
             underTest.invoke(
                 nodeFileLink = nodeFileLink,
                 fullSize = fullSize,
-                highPriority = highPriority
+                highPriority = highPriority,
+                resetDownloads = resetDownloads
             )
 
             whenever(networkRepository.isMeteredConnection()).thenReturn(isMeteredConnection)
@@ -52,7 +54,8 @@ class DefaultGetImageByNodePublicLinkTest {
                 nodeFileLink = nodeFileLink,
                 fullSize = fullSize,
                 highPriority = highPriority,
-                isMeteredConnection = isMeteredConnection
+                isMeteredConnection = isMeteredConnection,
+                resetDownloads = resetDownloads
             )
         }
     }

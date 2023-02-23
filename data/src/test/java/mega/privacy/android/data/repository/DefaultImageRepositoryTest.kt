@@ -139,7 +139,8 @@ class DefaultImageRepositoryTest {
                 nodeHandle = 1L,
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
         }
     }
@@ -154,7 +155,8 @@ class DefaultImageRepositoryTest {
                 nodeHandle = 1L,
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
         }
     }
@@ -168,7 +170,8 @@ class DefaultImageRepositoryTest {
                 nodeHandle = 1L,
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
         }
     }
@@ -180,7 +183,8 @@ class DefaultImageRepositoryTest {
                 nodeFileLink = "",
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
         }
     }
@@ -208,7 +212,8 @@ class DefaultImageRepositoryTest {
                 nodeFileLink = "abc",
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
         }
     }
@@ -230,7 +235,8 @@ class DefaultImageRepositoryTest {
                 chatMessageId = chatMessageId,
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
         }
     }
@@ -243,7 +249,8 @@ class DefaultImageRepositoryTest {
                 chatMessageId = chatMessageId,
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
 
             verify(megaChatApiGateway, times(1)).getMessage(chatRoomId, chatMessageId)
@@ -266,7 +273,8 @@ class DefaultImageRepositoryTest {
                 chatMessageId = chatMessageId,
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
 
             verify(megaChatApiGateway, times(1)).getChatRoom(chatRoomId)
@@ -289,7 +297,8 @@ class DefaultImageRepositoryTest {
                 chatMessageId = chatMessageId,
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
 
             verify(megaChatApiGateway, times(1)).getChatRoom(chatRoomId)
@@ -315,7 +324,8 @@ class DefaultImageRepositoryTest {
                 chatMessageId = chatMessageId,
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
 
             verify(megaApiGateway, times(1)).authorizeChatNode(node, authToken)
@@ -340,7 +350,8 @@ class DefaultImageRepositoryTest {
                 chatMessageId = chatMessageId,
                 fullSize = false,
                 highPriority = false,
-                isMeteredConnection = false
+                isMeteredConnection = false,
+                resetDownloads = {}
             )
 
             verify(megaApiGateway, times(0)).authorizeChatNode(node, authToken)

@@ -17,13 +17,15 @@ class DefaultGetImageForChatMessage(
         chatMessageId: Long,
         fullSize: Boolean,
         highPriority: Boolean,
+        resetDownloads: () -> Unit,
     ): Flow<ImageResult> {
         return imageRepository.getImageForChatMessage(
             chatRoomId,
             chatMessageId,
             fullSize,
             highPriority,
-            networkRepository.isMeteredConnection() ?: false
+            networkRepository.isMeteredConnection() ?: false,
+            resetDownloads
         )
     }
 }
