@@ -666,6 +666,9 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun getInShares(user: MegaUser): List<MegaNode> = megaApi.getInShares(user)
 
+    override suspend fun getUserFromInShare(node: MegaNode, recursive: Boolean): MegaUser? =
+        megaApi.getUserFromInShare(node, recursive)
+
     override suspend fun getOutShares(order: Int): List<MegaShare> = megaApi.getOutShares(order)
 
     override suspend fun getRubbishNode(): MegaNode = megaApi.rubbishNode

@@ -36,6 +36,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.NodeRepository
@@ -218,6 +219,15 @@ internal class NodeRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             megaLocalStorageGateway.getOfflineInformation(nodeHandle)
                 ?.let { offlineNodeInformationMapper(it) }
+        }
+
+    override suspend fun getOwnerIdFromInShare(nodeId: NodeId, recursive: Boolean): UserId? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->
+                megaApiGateway.getUserFromInShare(node, recursive)?.let { user ->
+                    UserId(user.handle)
+                }
+            }
         }
 
     private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =

@@ -1056,6 +1056,14 @@ interface MegaApiGateway {
     suspend fun getInShares(user: MegaUser): List<MegaNode>
 
     /**
+     * Get the owner of this inShare node
+     * @param node that is being shared
+     * @param recursive if true root node of [node] will be checked, if false the [node] itself will be checked
+     * @return the owner of this shared folder
+     */
+    suspend fun getUserFromInShare(node: MegaNode, recursive: Boolean): MegaUser?
+
+    /**
      * Get a list with all active and pending outbound sharings
      *
      * @param order Sorting order to use
@@ -1790,7 +1798,7 @@ interface MegaApiGateway {
     suspend fun searchOnOutShares(
         query: String,
         megaCancelToken: MegaCancelToken,
-        order: Int
+        order: Int,
     ): List<MegaNode>
 
     /**
@@ -1802,7 +1810,7 @@ interface MegaApiGateway {
     suspend fun searchOnLinkShares(
         query: String,
         megaCancelToken: MegaCancelToken,
-        order: Int
+        order: Int,
     ): List<MegaNode>
 
     /**

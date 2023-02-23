@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.user.UserId
 
 /**
  * Node repository
@@ -120,4 +121,12 @@ interface NodeRepository {
      * @return Offline node information if found
      */
     suspend fun getOfflineNodeInformation(nodeHandle: Long): OfflineNodeInformation?
+
+    /**
+     * Get the [UserId] of the owner of this [FolderNode] if it's a inShare folder
+     * @param nodeId [NodeId]
+     * @param recursive  if true it checks the root of the node with [nodeId],
+     * if false it only returns the owner if this [nodeId] represents the root of an in share folder node,
+     */
+    suspend fun getOwnerIdFromInShare(nodeId: NodeId, recursive: Boolean): UserId?
 }
