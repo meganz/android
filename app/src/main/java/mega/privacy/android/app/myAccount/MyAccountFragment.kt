@@ -14,13 +14,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
@@ -28,6 +27,7 @@ import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
@@ -52,6 +52,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaUser
@@ -70,6 +71,9 @@ class MyAccountFragment : Fragment(), Scrollable {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
+
+    @Inject
+    lateinit var getFeatureFlagValue: GetFeatureFlagValue
 
     private val viewModel: MyAccountViewModel by activityViewModels()
 
@@ -104,8 +108,11 @@ class MyAccountFragment : Fragment(), Scrollable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupView()
-        setupObservers()
+        lifecycleScope.launch {
+            val monitorPhoneFlagEnabled = getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)
+            setupView(monitorPhoneFlagEnabled)
+            setupObservers(monitorPhoneFlagEnabled)
+        }
 
         if (savedInstanceState != null) {
             if (savedInstanceState.getBoolean(CHANGE_API_SERVER_SHOWN, false)) {
@@ -114,7 +121,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         }
     }
 
-    private fun setupView() {
+    private fun setupView(monitorPhoneFlagEnabled: Boolean) {
         binding.scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             checkScroll()
         }
@@ -129,7 +136,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             findNavController().navigate(R.id.action_my_account_to_edit_profile)
         }
 
-        setupPhoneNumber()
+        if (!monitorPhoneFlagEnabled) setupPhoneNumber()
         setupAccountDetails()
 
         binding.backupRecoveryKeyLayout.setOnClickListener {
@@ -149,21 +156,27 @@ class MyAccountFragment : Fragment(), Scrollable {
         viewModel.setElevation(withElevation)
     }
 
-    private fun setupObservers() {
-        lifecycleScope.launchWhenStarted {
-            viewModel.onMyAvatarFileChanged.flowWithLifecycle(viewLifecycleOwner.lifecycle,
-                Lifecycle.State.STARTED)
-                .collect {
-                    setupAvatar(true)
-                }
+    private fun setupObservers(monitorPhoneFlagEnabled: Boolean) {
+        viewLifecycleOwner.collectFlow(viewModel.onMyAvatarFileChanged) {
+            setupAvatar(true)
         }
+
         viewLifecycleOwner.collectFlow(viewModel.state) { state ->
             binding.nameText.text = state.name
             binding.emailText.text = state.email
+            if (monitorPhoneFlagEnabled) {
+                setupPhoneNumber(
+                    canVerifyPhoneNumber = state.canVerifyPhoneNumber,
+                    alreadyRegisteredPhoneNumber = state.verifiedPhoneNumber != null,
+                    registeredPhoneNumber = state.verifiedPhoneNumber,
+                )
+            }
         }
 
-        LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-            .observe(viewLifecycleOwner) { setupPhoneNumber() }
+        if (!monitorPhoneFlagEnabled) {
+            LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
+                .observe(viewLifecycleOwner) { setupPhoneNumber() }
+        }
 
         viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }
     }
@@ -179,11 +192,6 @@ class MyAccountFragment : Fragment(), Scrollable {
         changeApiServerDialog?.dismiss()
     }
 
-    /**
-     * Checks if an avatar file already exist for the current account.
-     *
-     * @param retry True if should request for avatar if it's not available, false otherwise.
-     */
     private fun setupAvatar(retry: Boolean) {
         val avatar =
             CacheFolderManager.buildAvatarFile(
@@ -198,10 +206,6 @@ class MyAccountFragment : Fragment(), Scrollable {
         }
     }
 
-    /**
-     * Sets the avatar file if available.
-     * If not, requests it if should retry, sets the default one if not.
-     */
     private fun setProfileAvatar(avatar: File, retry: Boolean) {
         val avatarBitmap: Bitmap?
 
@@ -221,9 +225,6 @@ class MyAccountFragment : Fragment(), Scrollable {
         } else setDefaultAvatar()
     }
 
-    /**
-     * Sets as avatar the default one.
-     */
     private fun setDefaultAvatar() {
         binding.myAccountThumbnail.setImageBitmap(
             AvatarUtil.getDefaultAvatar(
@@ -235,9 +236,6 @@ class MyAccountFragment : Fragment(), Scrollable {
         )
     }
 
-    /**
-     * Sets as avatar the current avatar if has been get, the default one if not.
-     */
     private fun showAvatarResult(success: Boolean) {
         if (success) {
             setupAvatar(false)
@@ -437,9 +435,6 @@ class MyAccountFragment : Fragment(), Scrollable {
         }
     }
 
-    /**
-     * Shows the payment info if the subscriptions is almost to renew or expiry.
-     */
     private fun expandPaymentInfoIfNeeded() {
         if (!viewModel.shouldShowPaymentInfo())
             return
@@ -479,14 +474,15 @@ class MyAccountFragment : Fragment(), Scrollable {
         v.startAnimation(a)
     }
 
-    private fun setupPhoneNumber() {
-        val canVerifyPhoneNumber = Util.canVoluntaryVerifyPhoneNumber()
-        val alreadyRegisteredPhoneNumber = viewModel.isAlreadyRegisteredPhoneNumber()
-
+    private fun setupPhoneNumber(
+        canVerifyPhoneNumber: Boolean = Util.canVoluntaryVerifyPhoneNumber(),
+        alreadyRegisteredPhoneNumber: Boolean = viewModel.isAlreadyRegisteredPhoneNumber(),
+        registeredPhoneNumber: String? = viewModel.getRegisteredPhoneNumber(),
+    ) {
         binding.phoneText.apply {
             if (alreadyRegisteredPhoneNumber) {
                 isVisible = true
-                text = viewModel.getRegisteredPhoneNumber()
+                text = registeredPhoneNumber
             } else {
                 isVisible = false
             }
@@ -498,7 +494,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             isVisible = addPhoneNumberVisible
 
             setOnClickListener {
-                if (Util.canVoluntaryVerifyPhoneNumber()) {
+                if (canVerifyPhoneNumber) {
                     findNavController().navigate(R.id.action_my_account_to_add_phone_number)
                 } else if (!phoneNumberBottomSheet.isBottomSheetDialogShown()) {
                     phoneNumberBottomSheet = PhoneNumberBottomSheetDialogFragment()
