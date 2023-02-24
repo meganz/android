@@ -297,7 +297,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             if (monitorPhoneNumberEnabled){
                 setupPhoneNumber(
                     alreadyRegistered = state.verifiedPhoneNumber != null,
-                    canVerify = state.canVerifyPhoneNumber,
+                    canVerify = state.canVerifyPhoneNumber && state.verifiedPhoneNumber == null,
                 )
             }
         }
