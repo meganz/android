@@ -196,11 +196,13 @@ pipeline {
                         String sdkCommit = parseCommandParameter()["sdk-commit"]
                         if (sdkCommit != null && sdkCommit.length() > 0) {
                             common.checkoutSdkByCommit(sdkCommit)
+                            SDK_BRANCH = "N/A"
                         }
 
                         String chatCommit = parseCommandParameter()["chat-commit"]
                         if (chatCommit != null && chatCommit.length() > 0) {
                             common.checkoutMegaChatSdkByCommit(chatCommit)
+                            MEGACHAT_BRANCH = "N/A"
                         }
                     }
                 }
@@ -325,7 +327,9 @@ pipeline {
                                 "ARTIFACTORY_ACCESS_TOKEN=${ARTIFACTORY_ACCESS_TOKEN}",
                                 "SDK_PUBLISH_TYPE=${getSdkPublishType()}",
                                 "SDK_COMMIT=${getSdkGitHash()}",
-                                "CHAT_COMMIT=${getMegaChatSdkGitHash()}"
+                                "CHAT_COMMIT=${getMegaChatSdkGitHash()}",
+                                "SDK_BRANCH=${SDK_BRANCH}",
+                                "MEGACHAT_BRANCH=${MEGACHAT_BRANCH}"
                         ]) {
                             sh """
                                 cd ${WORKSPACE}
@@ -844,15 +848,12 @@ private void checkSDKVersion() {
     SDK_COMMIT = getValueInMRDescriptionBy("SDK_COMMIT")
     MEGACHAT_COMMIT = getValueInMRDescriptionBy("MEGACHAT_COMMIT")
 
-    SDK_TAG = getValueInMRDescriptionBy("SDK_TAG")
-    MEGACHAT_TAG = getValueInMRDescriptionBy("MEGACHAT_TAG")
-
-    SDK_BRANCH = getValueInMRDescriptionBy("SDK_BRANCH")
+    SDK_BRANCH = parseCommandParameter()["sdk-branch"]
     if (!isDefined(SDK_BRANCH)) {
         SDK_BRANCH = "develop"
     }
 
-    MEGACHAT_BRANCH = getValueInMRDescriptionBy("MEGACHAT_BRANCH")
+    MEGACHAT_BRANCH = parseCommandParameter()["chat-branch"]
     if (!isDefined(MEGACHAT_BRANCH)) {
         MEGACHAT_BRANCH = "develop"
     }

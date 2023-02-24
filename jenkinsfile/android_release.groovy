@@ -139,8 +139,6 @@ pipeline {
                             "<br/><b>Command</b>: ${env.gitlabTriggerPhrase}"
                     )
 
-                    common.checkSDKVersion()
-
                     REBUILD_SDK = common.getValueInMRDescriptionBy("REBUILD_SDK")
 
                     sh("rm -frv $ARCHIVE_FOLDER")
@@ -423,8 +421,8 @@ private String getBuildVersionInfo(Object common) {
        - Google (GMS):  [AAB](${gmsAabUrl}) | [APK](${gmsApkUrl}) <br/>
     Build info: <br/>
        - [Android commit](${appCommitLink}) (`${appBranch}`) <br/>
-       - [SDK commit](${sdkCommitLink}) (`${common.sdkBranchName()}`) <br/>
-       - [Karere commit](${chatCommitLink}) (`${common.megaChatBranchName()}`) <br/>
+       - [SDK commit](${sdkCommitLink}) (`${common.queryPrebuiltSdkProperty("sdk-branch", sdkVersion)}`) <br/>
+       - [Karere commit](${chatCommitLink}) (`${common.queryPrebuiltSdkProperty("chat-branch", sdkVersion)}`) <br/>
     """
     return message
 }

@@ -46,6 +46,8 @@ def getEnvironmentVariable = { param ->
 def SDK_COMMIT = getEnvironmentVariable("SDK_COMMIT")
 def CHAT_COMMIT = getEnvironmentVariable("CHAT_COMMIT")
 def SDK_BUILDER_NAME = getEnvironmentVariable("gitlabUserName")
+def SDK_BRANCH = getEnvironmentVariable("SDK_BRANCH")
+def MEGACHAT_BRANCH = getEnvironmentVariable("MEGACHAT_BRANCH")
 
 println("SDK_COMMIT = $SDK_COMMIT")
 println("CHAT_COMMIT = $CHAT_COMMIT")
@@ -89,6 +91,8 @@ artifactory {
             properties = [
                     'sdk-commit' : "$SDK_COMMIT",
                     'chat-commit': "$CHAT_COMMIT",
+                    'sdk-branch': "$SDK_BRANCH",
+                    'chat-branch': "$MEGACHAT_BRANCH",
                     'builder': "$SDK_BUILDER_NAME"
             ]
             publishPom = true // Publish generated POM files to Artifactory (true by default)

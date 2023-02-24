@@ -139,7 +139,7 @@ def queryPrebuiltSdkProperty(String property, String version) {
     def response = stdout.toString().trim()
 
     def properties = new JsonSlurperClassic().parseText(response).properties
-    if (properties != null) {
+    if (properties != null && properties.containsKey(property)) {
         commit = properties[property][0]
     }
     return commit

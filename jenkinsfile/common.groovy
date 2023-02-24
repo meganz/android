@@ -55,11 +55,11 @@ void fetchSdkSubmodules() {
                     git submodule update --init --recursive --remote
                     cd sdk/src/main/jni/mega/sdk
                     git fetch
-                    git checkout develop
+                    git checkout ${SDK_BRANCH}
                     git pull
                     cd ../../megachat/sdk
                     git fetch
-                    git checkout develop
+                    git checkout ${MEGACHAT_BRANCH}
                     git pull
                     cd ${WORKSPACE}
                 """
@@ -368,25 +368,6 @@ SDK version: ${readPrebuiltSdkVersion()}
 """
     sh "rm -fv ${ARTIFACTORY_BUILD_INFO}"
     sh "echo \"${content}\" >> ${WORKSPACE}/${ARCHIVE_FOLDER}/${ARTIFACTORY_BUILD_INFO}"
-}
-
-/**
- * Read SDK versions from MR description and assign the values into environment.
- */
-void checkSDKVersion() {
-    SDK_TAG = getValueInMRDescriptionBy("SDK_TAG")
-    MEGACHAT_TAG = getValueInMRDescriptionBy("MEGACHAT_TAG")
-
-    SDK_BRANCH = getValueInMRDescriptionBy("SDK_BRANCH")
-    MEGACHAT_BRANCH = getValueInMRDescriptionBy("MEGACHAT_BRANCH")
-
-    if (!isDefined(SDK_BRANCH)) {
-        SDK_BRANCH = "develop"
-    }
-
-    if (!isDefined(MEGACHAT_BRANCH)) {
-        MEGACHAT_BRANCH = "develop"
-    }
 }
 
 /**

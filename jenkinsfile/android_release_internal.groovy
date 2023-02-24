@@ -97,8 +97,6 @@ pipeline {
                 script {
                     BUILD_STEP = 'Preparation'
 
-                    common.checkSDKVersion()
-
                     REBUILD_SDK = common.getValueInMRDescriptionBy("REBUILD_SDK")
 
                     sh("rm -frv ${WORKSPACE}/$ARCHIVE_FOLDER")
