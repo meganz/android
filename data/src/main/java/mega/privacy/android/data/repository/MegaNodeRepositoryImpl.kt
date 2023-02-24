@@ -76,7 +76,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,
-    private val getLinksSortOrder: GetLinksSortOrder
+    private val getLinksSortOrder: GetLinksSortOrder,
 ) : MegaNodeRepository {
 
     override suspend fun copyNode(
@@ -341,6 +341,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             }
         }
 
+
     override suspend fun openShareDialog(megaNode: MegaNode) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener { return@getRequestListener }
@@ -351,11 +352,25 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.upgradeSecurity(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
+        megaApiGateway.setSecureFlag(enable)
+    }
+
     override suspend fun getUnverifiedOutgoingShares(): Int = 5
     override suspend fun searchInShares(
         query: String,
         megaCancelToken: MegaCancelToken,
-        order: SortOrder
+        order: SortOrder,
     ): List<MegaNode> {
         return withContext(ioDispatcher) {
             return@withContext if (query.isEmpty()) {
@@ -425,25 +440,12 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         parentNode: MegaNode,
         query: String,
         order: SortOrder,
-        megaCancelToken: MegaCancelToken
+        megaCancelToken: MegaCancelToken,
     ): List<MegaNode> {
         return withContext(ioDispatcher) {
             return@withContext megaApiGateway.search(
                 parentNode, query, megaCancelToken, sortOrderIntMapper(order)
             )
         }
-    }
-    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { return@getRequestListener }
-            megaApiGateway.upgradeSecurity(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
-        megaApiGateway.setSecureFlag(enable)
     }
 }

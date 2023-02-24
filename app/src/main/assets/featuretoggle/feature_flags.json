@@ -2,5 +2,9 @@
   {
     "name": "AppTest",
     "value": true
+  },
+  {
+    "name": "SetSecureFlag",
+    "value": false
   }
 ]

@@ -14,7 +14,6 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -916,6 +915,23 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun cancelTransfers(direction: Int) = megaApi.cancelTransfers(direction)
 
+    override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
+        megaApi.getUnverifiedIncomingShares(order)
+
+    override suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare> =
+        megaApi.getUnverifiedOutgoingShares(order)
+
+    override fun openShareDialog(
+        megaNode: MegaNode,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.openShareDialog(megaNode, listener)
+
+    override fun upgradeSecurity(listener: MegaRequestListenerInterface) =
+        megaApi.upgradeSecurity(listener)
+
+    @Deprecated("This API is for testing purpose, will be deleted later")
+    override fun setSecureFlag(enable: Boolean) = megaApi.setSecureFlag(enable)
+
     override suspend fun getVerifiedPhoneNumber(): String? = megaApi.smsVerifiedPhoneNumber()
 
     override fun verifyPhoneNumber(pin: String, listener: MegaRequestListenerInterface) =
@@ -973,23 +989,5 @@ internal class MegaApiFacade @Inject constructor(
         )
     }
 
-    override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
-        megaApi.getUnverifiedIncomingShares(order)
-
-    override suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare> =
-        megaApi.getUnverifiedOutgoingShares(order)
-
-    override fun openShareDialog(
-        megaNode: MegaNode,
-        listener: MegaRequestListenerInterface,
-    ) = megaApi.openShareDialog(megaNode, listener)
-
-    override fun upgradeSecurity(listener: MegaRequestListenerInterface) =
-        megaApi.upgradeSecurity(listener)
-
-    @Deprecated("This API is for testing purpose, will be deleted later")
-    override fun setSecureFlag(enable: Boolean) = megaApi.setSecureFlag(enable)
-
     override suspend fun getSmsAllowedState() = megaApi.smsAllowedState()
-
 }

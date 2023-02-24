@@ -33,19 +33,6 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     val state: StateFlow<NodeOptionsBottomSheetState> = _state
 
     /**
-     * Check if the handle is valid or not
-     *
-     * @param handle
-     * @return true if the handle is invalid
-     */
-    private suspend fun isInvalidHandle(handle: Long = _state.value.currentNodeHandle): Boolean {
-        return handle
-            .takeUnless { it == -1L || it == MegaApiJava.INVALID_HANDLE }
-            ?.let { getNodeByHandle(it) == null }
-            ?: true
-    }
-
-    /**
      * Calls OpenShareDialog use case to create crypto key for sharing
      *
      * @param nodeHandle: [MegaNode] handle
@@ -53,7 +40,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     fun callOpenShareDialog(nodeHandle: Long) {
         kotlin.runCatching {
             viewModelScope.launch {
-                if (!isInvalidHandle(nodeHandle)) {
+                if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
                     getNodeByHandle(nodeHandle)?.let { megaNode ->
                         openShareDialog(megaNode)
                     }

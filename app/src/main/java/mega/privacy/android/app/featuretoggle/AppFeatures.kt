@@ -39,6 +39,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     ),
 
 
+
     /**
      * Sets the MegaApi::setSecureFlag
      */

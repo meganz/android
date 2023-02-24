@@ -286,13 +286,6 @@ interface MegaNodeRepository {
     suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData>
 
     /**
-     * Provides Unverified outgoing shares count from SDK
-     *
-     * @return List of [ShareData]
-     */
-    suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData>
-
-    /**
      * Creates a new share key for the node if there is no share key already created.
      *
      * @param megaNode : [MegaNode] object which needs to be shared
@@ -330,7 +323,7 @@ interface MegaNodeRepository {
         query: String,
         megaCancelToken: MegaCancelToken,
         order: SortOrder,
-        isFirstLevelNavigation: Boolean
+        isFirstLevelNavigation: Boolean,
     ): List<MegaNode>
 
     /**
@@ -344,8 +337,22 @@ interface MegaNodeRepository {
         parentNode: MegaNode,
         query: String,
         order: SortOrder,
-        megaCancelToken: MegaCancelToken
+        megaCancelToken: MegaCancelToken,
     ): List<MegaNode>
+
+    /**
+     * Provides Unverified outgoing shares count from SDK
+     *
+     * @return Integer count
+     * @return List of [ShareData]
+     */
+    suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData>
+
+    /**
+     * Creates a new share key for the node if there is no share key already created.
+     *
+     * @param megaNode : [MegaNode] object which needs to be shared
+     */
     suspend fun openShareDialog(megaNode: MegaNode)
 
     /**

@@ -1738,6 +1738,48 @@ interface MegaApiGateway {
     suspend fun cancelTransfers(direction: Int)
 
     /**
+     * Function to get unverified incoming shares from [MegaApi]
+     *
+     * @param order : Sort order
+     * @return List of [MegaShare]
+     */
+    suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare>
+
+    /**
+     * Function to get unverified outgoing shares from [MegaApi]
+     *
+     * @param order : Sort order
+     * @return List of [MegaShare]
+     */
+    suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare>
+
+    /**
+     * Creates a new share key for the node if there is no share key already created.
+     *
+     * @param megaNode : [MegaNode] object which needs to be shared
+     * @param listener : Listener to track this request
+     */
+    fun openShareDialog(
+        megaNode: MegaNode,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
+     * Update cryptographic security
+     *
+     * @param listener : Listener to track this request
+     */
+    fun upgradeSecurity(listener: MegaRequestListenerInterface)
+
+    /**
+     * Sets the secure flag to true or false while sharing a node
+     *
+     * @param enable : Boolean value
+     */
+    @Deprecated("This API is for testing purpose, will be deleted later")
+    fun setSecureFlag(enable: Boolean)
+
+    /**
      * Get verified phone number
      *
      * @return verified phone number if present else null
@@ -1784,7 +1826,7 @@ interface MegaApiGateway {
     suspend fun searchOnOutShares(
         query: String,
         megaCancelToken: MegaCancelToken,
-        order: Int
+        order: Int,
     ): List<MegaNode>
 
     /**
@@ -1796,7 +1838,7 @@ interface MegaApiGateway {
     suspend fun searchOnLinkShares(
         query: String,
         megaCancelToken: MegaCancelToken,
-        order: Int
+        order: Int,
     ): List<MegaNode>
 
     /**
@@ -1813,48 +1855,6 @@ interface MegaApiGateway {
         megaCancelToken: MegaCancelToken,
         order: Int,
     ): List<MegaNode>
-
-    /**
-     * Function to get unverified incoming shares from [MegaApi]
-     *
-     * @param order : Sort order
-     * @return List of [MegaShare]
-     */
-    suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare>
-
-    /**
-     * Function to get unverified outgoing shares from [MegaApi]
-     *
-     * @param order : Sort order
-     * @return List of [MegaShare]
-     */
-    suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare>
-
-    /**
-     * Creates a new share key for the node if there is no share key already created.
-     *
-     * @param megaNode : [MegaNode] object which needs to be shared
-     * @param listener : Listener to track this request
-     */
-    fun openShareDialog(
-        megaNode: MegaNode,
-        listener: MegaRequestListenerInterface,
-    )
-
-    /**
-     * Update cryptographic security
-     *
-     * @param listener : Listener to track this request
-     */
-    fun upgradeSecurity(listener: MegaRequestListenerInterface)
-
-    /**
-     * Sets the secure flag to true or false while sharing a node
-     *
-     * @param enable : Boolean value
-     */
-    @Deprecated("This API is for testing purpose, will be deleted later")
-    fun setSecureFlag(enable: Boolean)
 
     /**
      * Get sms allowed state

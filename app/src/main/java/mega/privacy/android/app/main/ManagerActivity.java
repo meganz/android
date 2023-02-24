@@ -2443,7 +2443,7 @@ public class ManagerActivity extends TransfersManagementActivity
         });
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
-            if (viewModel.getState().getValue().getShouldAlertUserAboutSecurityUpgrade()) {
+            if (managerState.getShouldAlertUserAboutSecurityUpgrade()) {
                 ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
                     outgoingFolderNames.clear();
                     for (int i = 0; i < outgoingSharesState.getNodes().size(); i++) {

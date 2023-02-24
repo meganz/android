@@ -4,7 +4,6 @@ import android.text.TextUtils
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -87,45 +86,60 @@ fun SecurityUpgradeDialogView(
 
                     Spacer(Modifier.height(20.dp))
 
-                    Text(modifier = Modifier.testTag("SharedNodeInfo"),
-                        text = pluralStringResource(id = R.plurals.shared_items_security_upgrade_dialog_node_sharing_info,
-                            folderNames.size, TextUtils.join(", ", folderNames)),
-                        style = body2.copy(textAlign = TextAlign.Center),
-                        color = if (MaterialTheme.colors.isLight) {
-                            Color.Black
-                        } else {
-                            Color.White
-                        })
+                    if (folderNames.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier.testTag("SharedNodeInfo"),
+                            text = pluralStringResource(
+                                id = R.plurals.shared_items_security_upgrade_dialog_node_sharing_info,
+                                folderNames.size, TextUtils.join(", ", folderNames)
+                            ),
+                            style = body2.copy(textAlign = TextAlign.Center),
+                            color = if (MaterialTheme.colors.isLight) {
+                                Color.Black
+                            } else {
+                                Color.White
+                            }
+                        )
 
-                    Spacer(Modifier.height(20.dp))
+                        Spacer(Modifier.height(20.dp))
 
-                    Button(modifier = Modifier
-                        .height(45.dp)
-                        .fillMaxWidth()
-                        .padding(start = 25.dp, end = 25.dp),
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .height(45.dp)
+                            .fillMaxWidth()
+                            .padding(start = 25.dp, end = 25.dp),
                         shape = RoundedCornerShape(8.dp),
                         content = {
-                            Text(text = stringResource(id = R.string.general_ok),
-                                color = Color.White)
+                            Text(
+                                text = stringResource(id = R.string.general_ok),
+                                color = Color.White
+                            )
                         },
                         colors = ButtonDefaults.buttonColors(backgroundColor = jade_300),
-                        onClick = onOkClick)
+                        onClick = onOkClick
+                    )
 
                     Spacer(Modifier.height(10.dp))
 
-                    Button(modifier = Modifier
-                        .height(45.dp)
-                        .fillMaxWidth()
-                        .padding(start = 25.dp, end = 25.dp),
+                    Button(
+                        modifier = Modifier
+                            .height(45.dp)
+                            .fillMaxWidth()
+                            .padding(start = 25.dp, end = 25.dp),
                         shape = RoundedCornerShape(8.dp),
                         colors = ButtonDefaults.buttonColors(backgroundColor = if (MaterialTheme.colors.isLight) Color.White else Color.DarkGray),
-                        onClick = onCancelClick) {
-                        Text(text = stringResource(id = R.string.button_cancel),
+                        onClick = onCancelClick
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.button_cancel),
                             color = if (MaterialTheme.colors.isLight) {
                                 Color.Black
                             } else {
                                 jade_300
-                            })
+                            }
+                        )
                     }
                 })
         })
