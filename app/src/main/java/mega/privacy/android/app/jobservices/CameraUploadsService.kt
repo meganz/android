@@ -168,7 +168,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         /**
          * Camera Uploads Cache Folder
          */
-        const val CU_CACHE_FOLDER = "cu"
+        private const val CU_CACHE_FOLDER = "cu"
 
         /**
          * Is Camera Upload running now
@@ -552,20 +552,58 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      */
     private var missingAttributesChecked = false
 
+    /**
+     * Broadcast receiver that monitors the network changes
+     */
     private var receiver: NetworkTypeChangeReceiver? = null
-    private var notification: Notification? = null
+
+    /**
+     * Notification manager used to display notifications
+     */
     private var notificationManager: NotificationManager? = null
-    private var builder: NotificationCompat.Builder? = null
-    private var intent: Intent? = null
+
+    /**
+     * True if the battery level of the device is above
+     * the required battery level to run the CU
+     */
     private var deviceAboveMinimumBatteryLevel: Boolean = true
-    private var pendingIntent: PendingIntent? = null
+
+    /**
+     * Default pending intent used to redirect user when clicking on a notification
+     */
+    private var defaultPendingIntent: PendingIntent? = null
+
+    /**
+     * Temp root path used for generating temporary files in the CU process
+     * This folder is created at the beginning of the CU process
+     * and deleted at the end of the process
+     */
     private var tempRoot: String? = null
-    private var isOverQuota = false
-    private var stopByNetworkStateChange = false
+
+    /**
+     * Count of total files uploaded
+     */
     private var totalUploaded = 0
+
+    /**
+     * Count of total files to upload
+     */
     private var totalToUpload = 0
+
+    /**
+     * Time in milliseconds to flag the last update of the notification
+     * Used to prevent updating the notification too often
+     */
     private var lastUpdated: Long = 0
+
+    /**
+     * Dedicated job to encapsulate video compression process
+     */
     private var videoCompressionJob: Job? = null
+
+    /**
+     * Total video size to upload in MB
+     */
     private var totalVideoSize = 0L
 
     private fun monitorUploadPauseStatus() {
@@ -640,9 +678,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     override fun onTypeChanges(type: Int) {
         Timber.d("Network type change to: %s", type)
         coroutineScope?.launch {
-            stopByNetworkStateChange =
-                type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()
-            if (stopByNetworkStateChange) {
+            if (type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()) {
                 endService(
                     cancelMessage = "Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload",
                     aborted = true
@@ -1054,7 +1090,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         showNotification(
             getString(R.string.section_photo_sync),
             getString(R.string.settings_camera_notif_checking_title),
-            pendingIntent,
+            defaultPendingIntent,
             false
         )
         checkUploadNodes()
@@ -1305,9 +1341,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         val transfer = globalTransfer.transfer
         runCatching {
             updateProgressNotification()
-            if (isOverQuota) {
-                return
-            }
         }.onFailure {
             Timber.d("Cancelled Transfer Node: ${transfer.nodeHandle}")
             cancelPendingTransfer(transfer)
@@ -1326,7 +1359,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         if (error.errorCode == MegaError.API_EOVERQUOTA) {
             if (error.value != 0L) Timber.w("Transfer Over Quota Error: ${error.errorCode}")
             else Timber.w("Storage Over Quota Error: ${error.errorCode}")
-            isOverQuota = true
+            showStorageOverQuotaNotification()
             endService(aborted = true)
         }
     }
@@ -1468,7 +1501,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             }
         }
         if (!isShowing) {
-            notification = createNotification(
+            val notification = createNotification(
                 getString(R.string.section_photo_sync),
                 getString(resId),
                 null,
@@ -1531,20 +1564,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         registerNetworkTypeChangeReceiver()
         startWakeAndWifiLocks()
 
-        stopByNetworkStateChange = false
         lastUpdated = 0
         totalUploaded = 0
         totalToUpload = 0
-        isOverQuota = false
         missingAttributesChecked = false
 
         cameraServiceIpChangeHandler.start()
         // end new logic
-        intent = Intent(this, ManagerActivity::class.java)
-        intent?.action = Constants.ACTION_CANCEL_CAM_SYNC
-        intent?.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-        intent?.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
-        pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        createDefaultNotificationPendingIntent()
 
         coroutineScope?.launch {
             tempRoot = "${File(cacheDir, CU_CACHE_FOLDER).absolutePath}${File.separator}"
@@ -1555,6 +1582,21 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             clearSyncRecords()
         }
     }
+
+    /**
+     * Create a default notification pending intent
+     * that will redirect to the manager activity with a [Constants.ACTION_CANCEL_CAM_SYNC] action
+     */
+    private fun createDefaultNotificationPendingIntent() {
+        val intent = Intent(this, ManagerActivity::class.java).apply {
+            action = Constants.ACTION_CANCEL_CAM_SYNC
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
+        }
+        defaultPendingIntent =
+            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+    }
+
 
     /**
      * When [CameraUploadsService] is initialized, start the Wake and Wifi Locks
@@ -1585,10 +1627,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     ) {
         Timber.d("Finish Camera upload process.")
         stopWakeAndWifiLocks()
-
-        if (isOverQuota) {
-            showStorageOverQuotaNotification()
-        }
 
         if (coroutineScope?.isActive == true) {
             sendStatusToBackupCenter(aborted = aborted)
@@ -1695,10 +1733,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
 
     private suspend fun transferFinished(transfer: MegaTransfer, e: MegaError) {
         val path = transfer.path
-        if (isOverQuota) {
-            return
-        }
-
         if (transfer.state == MegaTransfer.STATE_COMPLETED) {
             addCompletedTransfer(
                 AndroidCompletedTransfer(transfer, e),
@@ -1774,7 +1808,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             }
         } else if (e.errorCode == MegaError.API_EOVERQUOTA) {
             Timber.w("Over quota error: %s", e.errorCode)
-            isOverQuota = true
+            showStorageOverQuotaNotification()
             endService(aborted = true)
         } else {
             Timber.w("Image Sync FAIL: %d___%s", transfer.nodeHandle, e.errorString)
@@ -1952,7 +1986,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             currentFileIndex,
             totalCount
         )
-        showProgressNotification(progress, pendingIntent, message, subText, "")
+        showProgressNotification(progress, defaultPendingIntent, message, subText, "")
     }
 
     /**
@@ -2069,11 +2103,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
 
         val info =
             Util.getProgressSize(this, totalSizeTransferred, totalSizePendingTransfer)
-        val pendingIntent =
-            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
         showProgressNotification(
             progressPercent,
-            pendingIntent,
+            defaultPendingIntent,
             message,
             info,
             getString(R.string.settings_camera_notif_title)
@@ -2085,7 +2118,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         content: String,
         intent: PendingIntent?,
         isAutoCancel: Boolean,
-    ): Notification? {
+    ): Notification {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 notificationChannelId,
@@ -2097,18 +2130,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             notificationManager?.createNotificationChannel(channel)
         }
 
-        builder = NotificationCompat.Builder(this, notificationChannelId)
-        builder?.setSmallIcon(R.drawable.ic_stat_camera_sync)
-            ?.setOngoing(false)
-            ?.setContentTitle(title)
-            ?.setStyle(NotificationCompat.BigTextStyle().bigText(content))
-            ?.setContentText(content)
-            ?.setOnlyAlertOnce(true)
-            ?.setAutoCancel(isAutoCancel)
+        val builder = NotificationCompat.Builder(this, notificationChannelId)
+        builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
+            .setOngoing(false)
+            .setContentTitle(title)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(content))
+            .setContentText(content)
+            .setOnlyAlertOnce(true)
+            .setAutoCancel(isAutoCancel)
         if (intent != null) {
-            builder?.setContentIntent(intent)
+            builder.setContentIntent(intent)
         }
-        return builder?.build()
+        return builder.build()
     }
 
     private fun showNotification(
@@ -2117,7 +2150,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         intent: PendingIntent?,
         isAutoCancel: Boolean,
     ) {
-        notification = createNotification(title, content, intent, isAutoCancel)
+        val notification = createNotification(title, content, intent, isAutoCancel)
         notificationManager?.notify(notificationId, notification)
     }
 
@@ -2128,16 +2161,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         subText: String,
         contentText: String,
     ) {
-        notification = null
-        builder = NotificationCompat.Builder(this, notificationChannelId)
-        builder?.setSmallIcon(R.drawable.ic_stat_camera_sync)
-            ?.setProgress(100, progressPercent, false)
-            ?.setContentIntent(pendingIntent)
-            ?.setOngoing(true)
-            ?.setStyle(NotificationCompat.BigTextStyle().bigText(subText))
-            ?.setContentTitle(message)
-            ?.setContentText(contentText)
-            ?.setOnlyAlertOnce(true)
+        val builder = NotificationCompat.Builder(this, notificationChannelId)
+        builder.setSmallIcon(R.drawable.ic_stat_camera_sync)
+            .setProgress(100, progressPercent, false)
+            .setContentIntent(pendingIntent)
+            .setOngoing(true)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(subText))
+            .setContentTitle(message)
+            .setContentText(contentText)
+            .setOnlyAlertOnce(true)
+            .setSubText(subText)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -2148,12 +2181,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             channel.setShowBadge(true)
             channel.setSound(null, null)
             notificationManager?.createNotificationChannel(channel)
-            builder?.setSubText(subText)
-        } else {
-            builder?.setSubText(subText)
         }
-        notification = builder?.build()
-        notificationManager?.notify(notificationId, notification)
+        notificationManager?.notify(notificationId, builder.build())
     }
 
     private fun showStorageOverQuotaNotification() {
@@ -2177,6 +2206,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             .setTicker(contentText)
             .setContentTitle(message)
             .setOngoing(false)
+            .setContentText(contentText)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 OVER_QUOTA_NOTIFICATION_CHANNEL_ID,
@@ -2186,9 +2217,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             channel.setShowBadge(true)
             channel.setSound(null, null)
             notificationManager?.createNotificationChannel(channel)
-            builder.setContentText(contentText)
-        } else {
-            builder.setContentText(contentText)
         }
         notificationManager?.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, builder.build())
     }
