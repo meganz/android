@@ -53,6 +53,7 @@ import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.inbox.InboxViewModel
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
+import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel
 import mega.privacy.android.app.presentation.shares.links.LinksViewModel
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
@@ -137,9 +138,12 @@ class SearchFragment : RotatableFragment() {
 
     private var actionMode: ActionMode? = null
 
-    private var nodes = mutableListOf<MegaNode>()
-
     private lateinit var activityContext: Context
+
+    /**
+     * Returns [SearchState] of [SearchViewModel]
+     */
+    private fun state() = searchViewModel.state.value
 
     /**
      * [Boolean] value referenced from [managerActivity]
@@ -176,8 +180,8 @@ class SearchFragment : RotatableFragment() {
             adapter = MegaNodeAdapter(
                 requireActivity(),
                 this@SearchFragment,
-                nodes,
-                searchViewModel.state.value.searchParentHandle,
+                mutableListOf(),
+                state().searchParentHandle,
                 recyclerView,
                 Constants.SEARCH_ADAPTER,
                 if (isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
@@ -200,7 +204,7 @@ class SearchFragment : RotatableFragment() {
             EventObserver { state ->
                 updateSearchProgressView(state.isInProgress)
                 state.nodes?.let {
-                    setNodes(ArrayList(it))
+                    setNodes(it)
                 }
             }
         )
@@ -276,7 +280,7 @@ class SearchFragment : RotatableFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val query = searchViewModel.state.value.searchQuery
+        val query = state().searchQuery
         query?.let {
             if (isAdded) {
                 newSearchNodesTask()
@@ -683,23 +687,23 @@ class SearchFragment : RotatableFragment() {
      * This method set nodes and updates the adapter
      * @param nodes List of Mega Nodes
      */
-    fun setNodes(nodes: ArrayList<MegaNode>) {
-        this.nodes = nodes
-        adapter.setNodes(nodes)
+    private fun setNodes(nodes: List<MegaNode>) {
+        val mutableListNodes = ArrayList(nodes)
+        adapter.setNodes(mutableListNodes)
         visibilityFastScroller()
         if (adapter.itemCount == 0) {
             recyclerView?.visibility = View.GONE
             emptyImageView.visibility = View.VISIBLE
             emptyTextView.visibility = View.VISIBLE
 
-            if (searchViewModel.state.value.searchParentHandle == -1L) {
+            if (state().searchParentHandle == -1L) {
                 if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     emptyImageView.setImageResource(R.drawable.empty_folder_landscape)
                 } else {
                     emptyImageView.setImageResource(R.drawable.empty_folder_portrait)
                 }
                 emptyTextViewFirst.setText(R.string.no_results_found)
-            } else if (megaApi.rootNode.handle == searchViewModel.state.value.searchParentHandle) {
+            } else if (megaApi.rootNode.handle == state().searchParentHandle) {
                 if (requireContext().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                     emptyImageView.setImageResource(R.drawable.cloud_empty_landscape)
                 } else {
@@ -818,7 +822,7 @@ class SearchFragment : RotatableFragment() {
     fun onBackPressed(): Int {
         Timber.d("onBackPressed")
         searchViewModel.onBackClicked()
-        val levelSearch = searchViewModel.state.value.searchDepth
+        val levelSearch = state().searchDepth
         if (levelSearch >= 0) {
             searchViewModel.decreaseSearchDepth()
             clickAction()
@@ -846,7 +850,9 @@ class SearchFragment : RotatableFragment() {
      * @param position Position of item which is clicked
      */
     fun itemClick(position: Int) {
-        Timber.d("Position: $position")
+        val actualPosition = position - 1
+        val nodes: List<MegaNode> = state().nodes ?: emptyList()
+        Timber.d("Position: $actualPosition")
         if (adapter.isMultipleSelect) {
             adapter.toggleSelection(position)
             if (adapter.selectedNodes.size > 0) {
@@ -855,12 +861,12 @@ class SearchFragment : RotatableFragment() {
         } else {
             Timber.d("nodes.size(): ${nodes.size}")
             managerActivity.setTextSubmitted()
-            if (!searchViewModel.isSearchQueryValid() && nodes[position].isFolder) {
+            if (!searchViewModel.isSearchQueryValid() && nodes[actualPosition].isFolder) {
                 managerActivity.closeSearchView()
-                managerActivity.openSearchFolder(nodes[position])
+                managerActivity.openSearchFolder(nodes[actualPosition])
                 return
             }
-            if (nodes[position].isFolder) {
+            if (nodes[actualPosition].isFolder) {
                 var lastFirstVisiblePosition: Int
                 if (isList) {
                     lastFirstVisiblePosition =
@@ -874,11 +880,14 @@ class SearchFragment : RotatableFragment() {
                             (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
                     }
                 }
-                searchViewModel.onFolderClicked(nodes[position].handle, lastFirstVisiblePosition)
+                searchViewModel.onFolderClicked(
+                    nodes[actualPosition].handle,
+                    lastFirstVisiblePosition
+                )
                 Timber.d("Push to stack $lastFirstVisiblePosition position")
                 clickAction()
             } else {
-                openFile(node = nodes[position], position = position)
+                openFile(node = nodes[actualPosition], position = actualPosition)
             }
         }
     }
@@ -890,6 +899,7 @@ class SearchFragment : RotatableFragment() {
      */
     private fun openFile(node: MegaNode, position: Int) {
         //Is FILE
+        val nodes: List<MegaNode> = state().nodes ?: emptyList()
         if (MimeTypeList.typeForName(node.name).isImage) {
             val currentNodeHandle = node.handle
             val nodeHandles = nodes.stream().mapToLong {
@@ -934,11 +944,11 @@ class SearchFragment : RotatableFragment() {
             intentInternalIntentPair.first.apply {
                 putExtra("placeholder", adapter.placeholderCount)
                 putExtra("position", position)
-                putExtra("searchQuery", searchViewModel.state.value.searchQuery)
+                putExtra("searchQuery", state().searchQuery)
                 putExtra("adapterType", Constants.SEARCH_ADAPTER)
                 putExtra(
                     "parentNodeHandle",
-                    if (searchViewModel.state.value.searchParentHandle == -1L) -1L
+                    if (state().searchParentHandle == -1L) -1L
                     else megaApi.getParentNode(node).handle
                 )
                 putExtra("orderGetChildren", searchViewModel.getOrder())
