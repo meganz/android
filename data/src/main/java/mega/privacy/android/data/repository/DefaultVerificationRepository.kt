@@ -47,7 +47,7 @@ internal class DefaultVerificationRepository @Inject constructor(
     @ApplicationScope private val appScope: CoroutineScope,
 ) : VerificationRepository {
 
-    private val verifiedPhoneNumberFlow = MutableSharedFlow<VerifiedPhoneNumber>()
+    private val verifiedPhoneNumberFlow = MutableSharedFlow<VerifiedPhoneNumber>(replay = 1)
 
     override suspend fun setSMSVerificationShown(isShown: Boolean) =
         appEventGateway.setSMSVerificationShown(isShown)

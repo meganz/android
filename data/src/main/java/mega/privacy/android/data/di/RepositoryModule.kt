@@ -193,6 +193,7 @@ internal abstract class RepositoryModule {
     @Binds
     abstract fun bindPhotosRepository(repository: DefaultPhotosRepository): PhotosRepository
 
+    @Singleton
     @Binds
     abstract fun bindVerificationRepository(repository: DefaultVerificationRepository): VerificationRepository
 

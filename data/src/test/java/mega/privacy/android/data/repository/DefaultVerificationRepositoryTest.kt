@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -380,5 +381,32 @@ class DefaultVerificationRepositoryTest {
 
             underTest.verifyPhoneNumber("1234")
         }
+
+    @Test
+    fun `test that latest verified phone number is supplied to each caller`() = runTest {
+        val okResponse = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+        megaApiGateway.stub {
+            onBlocking { getVerifiedPhoneNumber() }.thenReturn("12345", null)
+            on { resetSmsVerifiedPhoneNumber(any()) }.thenAnswer {
+                (it.arguments[0] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    okResponse
+                )
+            }
+        }
+
+        underTest.monitorVerifiedPhoneNumber()
+            .onCompletion {
+                underTest.monitorVerifiedPhoneNumber().test {
+                    assertThat(awaitItem()).isInstanceOf(VerifiedPhoneNumber.NoVerifiedPhoneNumber::class.java)
+                }
+            }.test {
+                assertThat(awaitItem()).isInstanceOf(VerifiedPhoneNumber.PhoneNumber::class.java)
+                underTest.resetSMSVerifiedPhoneNumber()
+                assertThat(awaitItem()).isInstanceOf(VerifiedPhoneNumber.NoVerifiedPhoneNumber::class.java)
+                cancelAndIgnoreRemainingEvents()
+            }
+    }
 
 }
