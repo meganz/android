@@ -176,7 +176,7 @@ class PhotosFragment : Fragment() {
                     if (usePhotosCompose) {
                         val animatedNavController = rememberAnimatedNavController()
                         AnimatedNavHost(
-                            animatedNavController,
+                            navController = animatedNavController,
                             startDestination = photosRoute,
                             enterTransition = { EnterTransition.None },
                             exitTransition = { ExitTransition.None },
@@ -195,6 +195,7 @@ class PhotosFragment : Fragment() {
 
     override fun onResume() {
         timelineViewModel.resetCUButtonAndProgress()
+        albumsViewModel.revalidateInput()
         registerCUUpdateReceiver()
         super.onResume()
     }
@@ -456,7 +457,6 @@ class PhotosFragment : Fragment() {
         }
     )
 
-
     @Composable
     private fun albumsView(
         albumsViewState: AlbumsViewState,
@@ -468,6 +468,7 @@ class PhotosFragment : Fragment() {
             downloadPhoto = photosViewModel::downloadPhoto,
             onDialogPositiveButtonClicked = albumsViewModel::createNewAlbum,
             setDialogInputPlaceholder = albumsViewModel::setPlaceholderAlbumTitle,
+            setShowCreateAlbumDialog = albumsViewModel::setShowCreateAlbumDialog,
             setInputValidity = albumsViewModel::setNewAlbumNameValidity,
             openPhotosSelectionActivity = this::openAlbumPhotosSelection,
             setIsAlbumCreatedSuccessfully = albumsViewModel::setIsAlbumCreatedSuccessfully,

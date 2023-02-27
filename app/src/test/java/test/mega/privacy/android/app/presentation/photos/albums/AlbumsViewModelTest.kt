@@ -375,6 +375,7 @@ class AlbumsViewModelTest {
         underTest.createNewAlbum(expectedAlbumName)
 
         underTest.state.drop(1).test {
+            awaitItem()
             val actualAlbum = awaitItem().currentAlbum as Album.UserAlbum
             assertEquals(expectedAlbumName, actualAlbum.title)
         }

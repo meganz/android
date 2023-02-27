@@ -93,6 +93,7 @@ fun AlbumsView(
     downloadPhoto: PhotoDownload,
     onDialogPositiveButtonClicked: (name: String) -> Unit,
     setDialogInputPlaceholder: (String) -> Unit = {},
+    setShowCreateAlbumDialog: (Boolean) -> Unit = {},
     setInputValidity: (Boolean) -> Unit = {},
     openPhotosSelectionActivity: (AlbumId) -> Unit = {},
     setIsAlbumCreatedSuccessfully: (Boolean) -> Unit = {},
@@ -159,7 +160,7 @@ fun AlbumsView(
                 ) {
                     FloatingActionButton(
                         onClick = {
-                            openDialog.value = true
+                            setShowCreateAlbumDialog(true)
                             setDialogInputPlaceholder(placeholderText)
                         },
                     ) {
@@ -309,26 +310,24 @@ fun AlbumsView(
     }
 
     if (displayFAB && albumsViewState.selectedAlbumIds.isEmpty()) {
-        if (!albumsViewState.isAlbumCreatedSuccessfully) {
-            if (openDialog.value) {
-                CreateNewAlbumDialog(
-                    titleResID = R.string.photos_album_creation_dialog_title,
-                    positiveButtonTextResID = R.string.general_create,
-                    onDismissRequest = {
-                        openDialog.value = false
-                        setInputValidity(true)
-                    },
-                    onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
-                    onDialogInputChange = setInputValidity,
-                    inputPlaceHolderText = { albumsViewState.createAlbumPlaceholderTitle },
-                    errorMessage = albumsViewState.createDialogErrorMessage,
-                ) {
-                    albumsViewState.isInputNameValid
-                }
+        if (albumsViewState.showCreateAlbumDialog) {
+            CreateNewAlbumDialog(
+                titleResID = R.string.photos_album_creation_dialog_title,
+                positiveButtonTextResID = R.string.general_create,
+                onDismissRequest = {
+                    setShowCreateAlbumDialog(false)
+                    setInputValidity(true)
+                },
+                onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
+                onDialogInputChange = setInputValidity,
+                inputPlaceHolderText = { albumsViewState.createAlbumPlaceholderTitle },
+                errorMessage = albumsViewState.createDialogErrorMessage,
+            ) {
+                albumsViewState.isInputNameValid
             }
-        } else {
+        }
+        if (albumsViewState.isAlbumCreatedSuccessfully) {
             setIsAlbumCreatedSuccessfully(false)
-            openDialog.value = false
             if (allPhotos.isNotEmpty()) {
                 openPhotosSelectionActivity((albumsViewState.currentAlbum as Album.UserAlbum).id)
             }

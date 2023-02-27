@@ -300,12 +300,14 @@ class AlbumsViewModel @Inject constructor(
                 val finalTitle = title.ifEmpty {
                     _state.value.createAlbumPlaceholderTitle
                 }.trim()
-                if (checkTitleValidity(finalTitle, true)) {
+                if (checkTitleValidity(finalTitle)) {
                     val album = createAlbum(finalTitle)
                     _state.update {
                         it.copy(
                             currentAlbum = album,
                             isAlbumCreatedSuccessfully = true,
+                            newAlbumTitleInput = "",
+                            showCreateAlbumDialog = false
                         )
                     }
                     Timber.d("Current album: ${album.title}")
@@ -323,7 +325,7 @@ class AlbumsViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val finalTitle = title.trim()
-                if (checkTitleValidity(finalTitle, showEmptyError = true)) {
+                if (checkTitleValidity(finalTitle)) {
                     val currentAlbumId = (_state.value.currentAlbum as Album.UserAlbum).id
                     updateAlbumNameUseCase(currentAlbumId, finalTitle)
                     _state.update {
@@ -375,14 +377,13 @@ class AlbumsViewModel @Inject constructor(
 
     private suspend fun checkTitleValidity(
         title: String,
-        showEmptyError: Boolean = false,
     ): Boolean {
         val proscribedStrings = getProscribedAlbumNames()
 
         var errorMessage: Int? = null
         var isTitleValid = true
 
-        if (showEmptyError && title.isEmpty()) {
+        if (title.isEmpty()) {
             isTitleValid = false
             errorMessage = R.string.invalid_string
         } else if (title.isEmpty() || proscribedStrings.any { it.equals(title, true) }) {
@@ -400,11 +401,15 @@ class AlbumsViewModel @Inject constructor(
             it.copy(
                 isInputNameValid = isTitleValid,
                 createDialogErrorMessage = errorMessage,
+                newAlbumTitleInput = title,
             )
         }
 
         return isTitleValid
+    }
 
+    private fun checkLatestNameInputValidity() = viewModelScope.launch {
+        checkTitleValidity(_state.value.newAlbumTitleInput)
     }
 
     fun setNewAlbumNameValidity(valid: Boolean) = _state.update {
@@ -538,4 +543,13 @@ class AlbumsViewModel @Inject constructor(
         }
     }
 
+    fun setShowCreateAlbumDialog(showCreateDialog: Boolean) = _state.update {
+        it.copy(showCreateAlbumDialog = showCreateDialog)
+    }
+
+    fun revalidateInput() {
+        if (state.value.showCreateAlbumDialog || state.value.showRenameDialog) {
+            checkLatestNameInputValidity()
+        }
+    }
 }

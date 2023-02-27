@@ -12,11 +12,13 @@ import mega.privacy.android.domain.entity.photos.Photo
  * @property selectedPhotos
  * @property currentSort
  * @property currentMediaType
+ * @property newAlbumTitleInput
  * @property createAlbumPlaceholderTitle
  * @property isInputNameValid
  * @property createDialogErrorMessage
  * @property isAlbumCreatedSuccessfully
  * @property snackBarMessage
+ * @property showCreateAlbumDialog
  * @property showSortByDialog
  * @property showFilterDialog
  * @property showRemovePhotosDialog
@@ -33,11 +35,13 @@ data class AlbumsViewState(
     val selectedPhotos: Set<Photo> = emptySet(),
     val currentSort: Sort = Sort.NEWEST,
     val currentMediaType: FilterMediaType = FilterMediaType.ALL_MEDIA,
+    val newAlbumTitleInput: String = "",
     val createAlbumPlaceholderTitle: String = "",
     val isInputNameValid: Boolean = true,
     val createDialogErrorMessage: Int? = null,
     val isAlbumCreatedSuccessfully: Boolean = false,
     val snackBarMessage: String = "",
+    val showCreateAlbumDialog: Boolean = false,
     val showSortByDialog: Boolean = false,
     val showFilterDialog: Boolean = false,
     val showRemovePhotosDialog: Boolean = false,

@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.photos.albums
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -7,6 +8,7 @@ import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import junit.framework.TestCase.assertEquals
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
@@ -25,9 +27,6 @@ import test.mega.privacy.android.app.onNodeWithText
 
 @RunWith(AndroidJUnit4::class)
 class AlbumsViewTest {
-    private val proscribedStrings =
-        listOf("My albums", "Shared albums", "Favourites", "GIFs", "RAW")
-
     @get:Rule
     var composeRule = createComposeRule()
 
@@ -36,11 +35,16 @@ class AlbumsViewTest {
     @Test
     fun `test that clicking create album fab opens the dialog`() {
         val onDialogPositiveButtonClicked = mock<(String) -> Unit>()
+        val setShowCreateAlbumDialog = mock<(Boolean) -> Unit>()
+
+        val showCreateAlbumDialog = mutableStateOf(false)
+
         composeRule.setContent {
             AlbumsView(
-                albumsViewState = AlbumsViewState(),
+                albumsViewState = AlbumsViewState(showCreateAlbumDialog = showCreateAlbumDialog.value),
                 openAlbum = {},
                 downloadPhoto = mock(),
+                setShowCreateAlbumDialog = setShowCreateAlbumDialog,
                 onDialogPositiveButtonClicked = onDialogPositiveButtonClicked,
                 isUserAlbumsEnabled = isUserAlbumsEnabled,
             )
@@ -48,6 +52,8 @@ class AlbumsViewTest {
 
         composeRule.onNodeWithContentDescription("Create new album").performClick()
 
+        verify(setShowCreateAlbumDialog).invoke(true)
+        showCreateAlbumDialog.value = true
         composeRule.onNodeWithText(R.string.photos_album_creation_dialog_title)
             .onParent()
             .onParent()
