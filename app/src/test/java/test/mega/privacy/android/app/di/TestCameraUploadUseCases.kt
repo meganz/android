@@ -94,6 +94,7 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import org.mockito.kotlin.mock
 
@@ -160,6 +161,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetRemoveGps() = mock<GetRemoveGps>()
+
+    @Provides
+    fun provideSetLocationTagsEnabled() = mock<SetLocationTagsEnabled>()
 
     @Provides
     fun provideFileNameExists() = mock<FileNameExists>()

@@ -279,6 +279,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.getRemoveGpsDefault()
     }
 
+    override suspend fun setLocationTagsEnabled(enable: Boolean) = withContext(ioDispatcher) {
+        localStorageGateway.setLocationTagsEnabled(enable)
+    }
+
     override suspend fun getUploadVideoQuality(): VideoQuality? = withContext(ioDispatcher) {
         videoQualityMapper(localStorageGateway.getUploadVideoQuality())
     }

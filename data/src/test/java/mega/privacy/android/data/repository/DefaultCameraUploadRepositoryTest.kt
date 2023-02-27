@@ -198,6 +198,12 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
+    fun `test that setLocationTagsEnabled is invoked`() = runTest {
+        underTest.setLocationTagsEnabled(true)
+        verify(localStorageGateway).setLocationTagsEnabled(true)
+    }
+
+    @Test
     fun `test camera upload retrieves keep file names preference`() = runTest {
         whenever(localStorageGateway.getKeepFileNames()).thenReturn(true)
         assertThat(underTest.getKeepFileNames()).isEqualTo(true)

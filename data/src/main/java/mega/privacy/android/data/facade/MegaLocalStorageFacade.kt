@@ -195,6 +195,9 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getRemoveGpsDefault(): Boolean =
         dbHandler.preferences?.removeGPS?.toBoolean() ?: true
 
+    override suspend fun setLocationTagsEnabled(enable: Boolean) =
+        dbHandler.setRemoveGPS(!enable)
+
     override suspend fun getUploadVideoQuality(): String? =
         dbHandler.preferences?.uploadVideoQuality
 

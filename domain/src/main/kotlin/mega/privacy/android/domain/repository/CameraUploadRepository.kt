@@ -263,6 +263,14 @@ interface CameraUploadRepository {
     suspend fun getRemoveGpsDefault(): Boolean
 
     /**
+     * Sets the new value in the Database, as to whether Location Tags should be added or not
+     * when uploading Photos
+     *
+     * @param enable true if Location Tags should be added when uploading Photos, and false if otherwise
+     */
+    suspend fun setLocationTagsEnabled(enable: Boolean)
+
+    /**
      * Get upload video quality
      *
      * @return upload video quality

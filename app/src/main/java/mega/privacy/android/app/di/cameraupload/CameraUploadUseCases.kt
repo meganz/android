@@ -153,6 +153,7 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 
 /**
@@ -342,6 +343,17 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetRemoveGps(cameraUploadRepository: CameraUploadRepository): GetRemoveGps =
             GetRemoveGps(cameraUploadRepository::getRemoveGpsDefault)
+
+        /**
+         * Provide the [SetLocationTagsEnabled] implementation
+         *
+         * @param cameraUploadRepository [CameraUploadRepository]
+         *
+         * @return [SetLocationTagsEnabled]
+         */
+        @Provides
+        fun provideSetLocationTagsEnabled(cameraUploadRepository: CameraUploadRepository): SetLocationTagsEnabled =
+            SetLocationTagsEnabled(cameraUploadRepository::setLocationTagsEnabled)
 
         /**
          * Provide the [FileNameExists] implementation
