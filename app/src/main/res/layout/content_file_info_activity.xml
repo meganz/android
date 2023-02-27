@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:rounded="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nested_layout"
     android:layout_width="match_parent"
@@ -23,23 +22,17 @@
             android:id="@+id/file_properties_owner_layout"
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:gravity="left">
+            android:gravity="left"
+            android:visibility="gone"
+            tools:visibility="visible">
 
-            <RelativeLayout
-                android:id="@+id/contact_list_relative_layout_avatar"
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/contact_list_thumbnail"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="18dp">
-
-                <mega.privacy.android.app.components.RoundedImageView
-                    android:id="@+id/contact_list_thumbnail"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:layout_centerInParent="true"
-                    android:scaleType="fitCenter"
-                    rounded:corner_radius="20dp" />
-            </RelativeLayout>
+                android:layout_marginLeft="18dp"
+                app:roundedCornerRadius="20dp" />
 
             <RelativeLayout
                 android:layout_width="match_parent"

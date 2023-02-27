@@ -30,6 +30,7 @@ import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
+import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.core.ui.controls.MarqueeText
 import mega.privacy.android.core.ui.theme.grey_alpha_012
@@ -168,21 +169,7 @@ fun ContactStatus(
     modifier: Modifier = Modifier,
     status: UserStatus,
 ) {
-    val isLightTheme = MaterialTheme.colors.isLight
-    val statusIcon = when (status) {
-        UserStatus.Online ->
-            if (isLightTheme) R.drawable.ic_online_light
-            else R.drawable.ic_online_dark_standard
-        UserStatus.Away ->
-            if (isLightTheme) R.drawable.ic_away_light
-            else R.drawable.ic_away_dark_standard
-        UserStatus.Busy ->
-            if (isLightTheme) R.drawable.ic_busy_light
-            else R.drawable.ic_busy_dark_standard
-        else ->
-            if (isLightTheme) R.drawable.ic_offline_light
-            else R.drawable.ic_offline_dark_standard
-    }
+    val statusIcon = status.iconRes(MaterialTheme.colors.isLight)
 
     Image(
         modifier = modifier.padding(start = 5.dp, top = 2.dp),

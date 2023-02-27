@@ -21,6 +21,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -43,6 +45,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import java.net.URI
@@ -68,6 +71,7 @@ internal class FileInfoViewModelTest {
     private lateinit var getPreview: GetPreview
     private lateinit var getFolderTreeInfo: GetFolderTreeInfo
     private lateinit var getNodeById: GetNodeById
+    private lateinit var getContactItemFromInShareFolder: GetContactItemFromInShareFolder
 
     private lateinit var typedFileNode: TypedFileNode
     private lateinit var previewFile: File
@@ -103,6 +107,7 @@ internal class FileInfoViewModelTest {
         getPreview = mock()
         getFolderTreeInfo = mock()
         getNodeById = mock()
+        getContactItemFromInShareFolder = mock()
 
         typedFileNode = mock()
         previewFile = mock()
@@ -123,7 +128,8 @@ internal class FileInfoViewModelTest {
             deleteNodeVersionsByHandle = deleteNodeVersionsByHandle,
             getPreview = getPreview,
             getFolderTreeInfo = getFolderTreeInfo,
-            getNodeById = getNodeById
+            getNodeById = getNodeById,
+            getContactItemFromInShareFolder = getContactItemFromInShareFolder,
         )
         underTest.updateNode(node)
     }
@@ -514,6 +520,14 @@ internal class FileInfoViewModelTest {
             Truth.assertThat(state).isEqualTo(previewUri)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `test getContactItemFromInShareFolder is invoked when the node is a Folder`() = runTest {
+        val folderNode = mock<TypedFolderNode>()
+        whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
+        underTest.updateNode(node)
+        verify(getContactItemFromInShareFolder).invoke(folderNode)
     }
 
     @Suppress("UNCHECKED_CAST")

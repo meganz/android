@@ -30,6 +30,7 @@ import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import nz.mega.sdk.MegaNode
 import java.io.File
 import javax.inject.Inject
@@ -53,6 +54,7 @@ class FileInfoViewModel @Inject constructor(
     private val getPreview: GetPreview,
     private val getNodeById: GetNodeById,
     private val getFolderTreeInfo: GetFolderTreeInfo,
+    private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -108,6 +110,7 @@ class FileInfoViewModel @Inject constructor(
                     is TypedFolderNode -> {
                         uiState.copy(
                             folderTreeInfo = getFolderTreeInfo(typedNode),
+                            incomingSharesOwnerContactItem = getContactItemFromInShareFolder(typedNode)
                         )
                     }
                     is TypedFileNode -> {

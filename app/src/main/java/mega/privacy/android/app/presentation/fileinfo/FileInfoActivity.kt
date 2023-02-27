@@ -9,9 +9,8 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Rect
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -20,7 +19,6 @@ import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.CompoundButton
-import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -29,6 +27,8 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toColorInt
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -67,8 +67,10 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
+import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
@@ -76,10 +78,7 @@ import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.CameraUploadUtil
-import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
@@ -100,6 +99,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -108,8 +108,6 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaSet
 import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
@@ -133,26 +131,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
     private val viewModel: FileInfoViewModel by viewModels()
 
-    private val megaRequestListener = object : MegaRequestListenerInterface {
-        override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-            Timber.d("onRequestStart: ${request.name}")
-        }
-
-        override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {
-            Timber.d("onRequestUpdate: ${request?.name}")
-        }
-
-        override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, error: MegaError?) {
-            this@FileInfoActivity.onRequestFinish(request, error)
-        }
-
-        override fun onRequestTemporaryError(
-            api: MegaApiJava, request: MegaRequest,
-            e: MegaError,
-        ) {
-            Timber.w("onRequestTemporaryError:  ${request.name}")
-        }
-    }
     private val megaGlobalListener = object : MegaGlobalListenerInterface {
         override fun onUsersUpdate(api: MegaApiJava?, users: java.util.ArrayList<MegaUser>?) {
             Timber.d("onUsersUpdate")
@@ -257,7 +235,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     private var shareIt = true
     private var from = 0
     private var permissionsDialog: AlertDialog? = null
-    private var contactMail: String? = null
     private var isRemoveOffline = false
     private var handle: Long = 0
     private var adapterType = 0
@@ -522,7 +499,35 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             previousVersionsSize = viewState.folderVersionsSizeInBytesString
         )
         updateAvailableOffline(!viewModel.node.isTakenDown && !viewState.isNodeInRubbish)
+        updateIncomeShared(viewState.incomingSharesOwnerContactItem)
+
         refreshProperties(viewState)
+    }
+
+    private fun updateIncomeShared(incomeSharesOwnerContactItem: ContactItem?) {
+        bindingContent.filePropertiesOwnerLayout.isVisible = incomeSharesOwnerContactItem != null
+        incomeSharesOwnerContactItem?.let { contactItem ->
+            bindingContent.filePropertiesOwnerLabel.text = contactItem.contactData.alias
+            bindingContent.filePropertiesOwnerInfo.text = contactItem.email
+            bindingContent.filePropertiesOwnerStateIcon.setImageResource(
+                contactItem.status.iconRes(Util.isDarkMode(this))
+            )
+
+            val defaultAvatar = BitmapDrawable(
+                resources,
+                AvatarUtil.getDefaultAvatar(
+                    contactItem.defaultAvatarColor.toColorInt(),
+                    contactItem.getAvatarFirstLetter(),
+                    Constants.AVATAR_SIZE,
+                    true
+                )
+            )
+            bindingContent.contactListThumbnail.hierarchy.setFailureImage(defaultAvatar)
+            bindingContent.contactListThumbnail.setImageURI(
+                File(contactItem.contactData.avatarUri ?: "").toUri(),
+                null,
+            )
+        }
     }
 
     private fun updateFileHistoryVersions(show: Boolean, versions: Int) = with(bindingContent) {
@@ -720,7 +725,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 filePropertiesOwnerLabel.setMaxWidthEmojis(Util.dp2px(MAX_WIDTH_FILENAME_PORT))
                 filePropertiesOwnerInfo.maxWidth = Util.dp2px(MAX_WIDTH_FILENAME_PORT_2)
             }
-            filePropertiesOwnerLayout.isVisible = false
 
             //Folder Versions Layout
             filePropertiesFolderVersionsLayout.isVisible = false
@@ -812,14 +816,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             })
     }
 
-
-    private fun setOwnerState(userHandle: Long) =
-        ChatUtil.setContactStatus(
-            megaChatApi.getUserOnlineStatus(userHandle),
-            bindingContent.filePropertiesOwnerStateIcon,
-            StatusIconLocation.STANDARD
-        )
-
     /**
      * creates the options menu for this activity
      */
@@ -903,7 +899,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     .setView(dialogLayout.root)
                     .setPositiveButton(getFormattedStringOrDefault(R.string.context_remove)) { _: DialogInterface?, _: Int ->
                         typeExport = TYPE_EXPORT_REMOVE
-                        megaApi.disableExport(viewModel.node, megaRequestListener)
+                        megaApi.disableExport(viewModel.node)
                     }.setNegativeButton(getFormattedStringOrDefault(R.string.general_cancel), null)
                     .show()
             }
@@ -1097,62 +1093,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         } else if (viewModel.node.isFolder) {
             Timber.d("Node is FOLDER")
             setIconResource()
-            if (from == Constants.FROM_INCOMING_SHARES) {
-                //Show who is the owner
-                bindingContent.contactListThumbnail.setImageBitmap(null)
-                val sharesIncoming = megaApi.inSharesList
-                for (j in sharesIncoming.indices) {
-                    val mS = sharesIncoming[j]
-                    if (mS.nodeHandle == viewModel.node.handle) {
-                        val user = megaApi.getContact(mS.user)
-                        contactMail = user?.email
-                        if (user != null) {
-                            val name = ContactUtil.getMegaUserNameDB(user) ?: user.email
-                            bindingContent.filePropertiesOwnerLabel.text = name
-                            bindingContent.filePropertiesOwnerInfo.text = user.email
-                            setOwnerState(user.handle)
-                            createDefaultAvatar(bindingContent.contactListThumbnail, user, name)
-                        } else {
-                            bindingContent.filePropertiesOwnerLabel.text = mS.user
-                            bindingContent.filePropertiesOwnerInfo.text = mS.user
-                            setOwnerState(-1)
-                            createDefaultAvatar(bindingContent.contactListThumbnail, null, mS.user)
-                        }
-                        val avatar = buildAvatarFile(this, "$contactMail.jpg")
-                        var bitmap: Bitmap?
-                        if (FileUtil.isFileAvailable(avatar)) {
-                            avatar?.takeIf { it.length() > 0 }?.let { avatarNoEmpty ->
-                                val bOpts = BitmapFactory.Options()
-                                bitmap = BitmapFactory.decodeFile(avatarNoEmpty.absolutePath, bOpts)
-                                if (bitmap == null) {
-                                    avatarNoEmpty.delete()
-                                    megaApi.getUserAvatar(
-                                        user,
-                                        buildAvatarFile(this, "$contactMail.jpg")?.absolutePath,
-                                        megaRequestListener
-                                    )
-                                } else {
-                                    bindingContent.contactListThumbnail.setImageBitmap(bitmap)
-                                }
-                            } ?: run {
-                                //avatar.length == 0
-                                megaApi.getUserAvatar(
-                                    user,
-                                    buildAvatarFile(this, "$contactMail.jpg")?.absolutePath,
-                                    megaRequestListener
-                                )
-                            }
-                        } else {
-                            megaApi.getUserAvatar(
-                                user,
-                                buildAvatarFile(this, "$contactMail.jpg")?.absolutePath,
-                                megaRequestListener
-                            )
-                        }
-                        bindingContent.filePropertiesOwnerLayout.isVisible = true
-                    }
-                }
-            }
             sl = megaApi.getOutShares(viewModel.node)
             sl?.let { sl ->
                 if (sl.size == 0) {
@@ -1245,19 +1185,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         availableOfflineBoolean = false
         bindingContent.filePropertiesSwitch.isChecked = false
     }
-
-    private fun createDefaultAvatar(
-        contactListThumbnail: ImageView,
-        user: MegaUser?,
-        name: String?,
-    ) = contactListThumbnail.setImageBitmap(
-        AvatarUtil.getDefaultAvatar(
-            AvatarUtil.getColorAvatar(user),
-            name,
-            Constants.AVATAR_SIZE,
-            true
-        )
-    )
 
     private fun sharedContactClicked() {
         val sharedContactLayout = bindingContent.sharedContactListContainer
@@ -1385,39 +1312,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             }
             setNegativeButton(R.string.general_cancel, null)
             show()
-        }
-    }
-
-    @SuppressLint("NewApi")
-    private fun onRequestFinish(request: MegaRequest, e: MegaError?) {
-        if (adapter.isMultipleSelect) {
-            adapter.clearSelections()
-            hideMultipleSelect()
-        }
-        Timber.d("onRequestFinish: %d__%s", request.type, request.requestString)
-        if (request.type == MegaApiJava.USER_ATTR_AVATAR) {
-            try {
-                progressDialog?.first?.dismiss()
-            } catch (ex: Exception) {
-                Timber.e(ex)
-            }
-            if (e?.errorCode == MegaError.API_OK) {
-                if (contactMail?.compareTo(request.email) == 0) {
-                    val avatar = buildAvatarFile(this, "$contactMail.jpg")
-                    if (FileUtil.isFileAvailable(avatar)) {
-                        if ((avatar?.length() ?: 0) > 0) {
-                            val bOpts = BitmapFactory.Options()
-                            val bitmap = BitmapFactory.decodeFile(avatar?.absolutePath, bOpts)
-                            if (bitmap == null) {
-                                avatar?.delete()
-                            } else {
-                                bindingContent.contactListThumbnail.setImageBitmap(bitmap)
-                                bindingContent.contactListThumbnail.isVisible = true
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -1653,7 +1547,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     override fun onDestroy() {
         super.onDestroy()
         megaApi.removeGlobalListener(megaGlobalListener)
-        megaApi.removeRequestListener(megaRequestListener)
         unregisterReceiver(contactUpdateReceiver)
         unregisterReceiver(manageShareReceiver)
         nodeSaver.destroy()
