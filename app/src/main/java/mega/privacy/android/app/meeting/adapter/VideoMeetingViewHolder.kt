@@ -406,7 +406,8 @@ class VideoMeetingViewHolder(
         if (isInvalid(participant)) return
 
         Timber.d("Update audio icon")
-        binding.muteIcon.isVisible = !participant.isAudioOn
+        binding.muteIcon.isVisible =
+            inMeetingViewModel.getSession(participant.clientId)?.hasAudio()?.not() == true
     }
 
     /**
