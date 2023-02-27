@@ -25,10 +25,12 @@ import mega.privacy.android.domain.usecase.DefaultGetThumbnail
 import mega.privacy.android.domain.usecase.DefaultGetTimelinePhotos
 import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.DefaultObserveAlbumPhotosAddingProgress
+import mega.privacy.android.domain.usecase.DefaultObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.DefaultRemoveAlbums
 import mega.privacy.android.domain.usecase.DefaultSetInitialCUPreferences
 import mega.privacy.android.domain.usecase.DefaultUpdateAlbumCover
 import mega.privacy.android.domain.usecase.DefaultUpdateAlbumPhotosAddingProgressCompleted
+import mega.privacy.android.domain.usecase.DefaultUpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
@@ -46,12 +48,14 @@ import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
+import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateAlbumCover
 import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
+import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.impl.DefaultGetProscribedAlbumNames
 import mega.privacy.android.domain.usecase.impl.DefaultRemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.impl.DefaultUpdateAlbumNameUseCase
@@ -123,6 +127,12 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindUpdateAlbumPhotosAddingProgressCompleted(useCase: DefaultUpdateAlbumPhotosAddingProgressCompleted): UpdateAlbumPhotosAddingProgressCompleted
+
+    @Binds
+    abstract fun bindObserveAlbumPhotosRemovingProgress(useCase: DefaultObserveAlbumPhotosRemovingProgress): ObserveAlbumPhotosRemovingProgress
+
+    @Binds
+    abstract fun bindUpdateAlbumPhotosRemovingProgressCompleted(useCase: DefaultUpdateAlbumPhotosRemovingProgressCompleted): UpdateAlbumPhotosRemovingProgressCompleted
 
     @Binds
     abstract fun bindUpdateAlbumCover(useCase: DefaultUpdateAlbumCover): UpdateAlbumCover
