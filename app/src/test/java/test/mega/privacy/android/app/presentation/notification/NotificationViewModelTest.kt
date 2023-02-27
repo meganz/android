@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.notification.NotificationViewModel
 import mega.privacy.android.app.presentation.notification.model.Notification
+import mega.privacy.android.app.presentation.notification.model.SchedMeetingNotification
 import mega.privacy.android.domain.entity.UserAlert
 import mega.privacy.android.domain.usecase.AcknowledgeUserAlerts
 import mega.privacy.android.domain.usecase.MonitorUserAlerts
@@ -77,14 +78,12 @@ class NotificationViewModelTest {
             titleMaxWidth = { 200 },
             description = { "" },
             descriptionMaxWidth = { 300 },
+            schedMeetingNotification = null,
             dateText = { "" },
             isNew = true,
             backgroundColor = { "#D3D3D3" },
             separatorMargin = { 0 },
-            onClick = {},
-            chatDateText = { null },
-            recurringSchedMeeting = null,
-        )
+        ) {}
 
         val alert = mock<UserAlert>()
         whenever(monitorUserAlerts()).thenReturn(flowOf(listOf(alert)))
@@ -111,14 +110,12 @@ class NotificationViewModelTest {
             titleMaxWidth = { 200 },
             description = { "" },
             descriptionMaxWidth = { 300 },
+            schedMeetingNotification = null,
             dateText = { "" },
             isNew = true,
             backgroundColor = { "#D3D3D3" },
             separatorMargin = { 0 },
-            onClick = {},
-            chatDateText = { null },
-            recurringSchedMeeting = null,
-        )
+        ) {}
         val newNotification = initialNotification.copy(title = {"New title"})
         whenever(notificationMapper(initialAlert)).thenReturn(initialNotification)
         whenever(notificationMapper(newAlert)).thenReturn(newNotification)

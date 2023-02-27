@@ -33,7 +33,7 @@ data class ChatScheduledMeeting constructor(
     val endDateTime: Long? = null,
     val title: String? = "",
     val description: String? = "",
-    val attributes: String?,
+    val attributes: String? = "",
     val overrides: Long? = null,
     val flags: ChatScheduledFlags? = null,
     val rules: ChatScheduledRules? = null,

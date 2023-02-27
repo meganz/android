@@ -392,7 +392,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     scheduledMeeting = meeting,
                 )
             } else {
-                val dateTimeChanges = getDateTimeChanges()
+                val dateTimeChanges = getDateTimeChanges(updatedOccurrence)
                 UpdatedScheduledMeetingDateTimeAlert(
                     id = id,
                     seen = seen,
@@ -592,13 +592,15 @@ private fun getChildNodes(megaUserAlert: MegaUserAlert) =
 private fun MegaUserAlert.getScheduledMeetingChanges(): List<ScheduledMeetingChangeType> =
     ScheduledMeetingChangeType.values().filter { hasSchedMeetingChanged(it.value) }
 
-private fun Long?.isValid() = this != null && this != -1L
-
-private fun MegaUserAlert.getDateTimeChanges(): Pair<Boolean, Boolean> {
+private fun MegaUserAlert.getDateTimeChanges(
+    occurrence: ChatScheduledMeetingOccurr? = null,
+): Pair<Boolean, Boolean> {
     var hasDateChanged = false
     var hasTimeChanged = false
     val oldStartDateTime = updatedStartDate?.get(0)?.toZonedDateTime()
+        ?: getNumber(0).toZonedDateTime()
     val newStartDateTime = updatedStartDate?.get(1)?.toZonedDateTime()
+        ?: occurrence?.startDateTime?.toZonedDateTime()
     val oldEndDateTime = updatedEndDate?.get(0)?.toZonedDateTime()
     val newEndDateTime = updatedEndDate?.get(1)?.toZonedDateTime()
 
@@ -618,5 +620,9 @@ private fun MegaUserAlert.getDateTimeChanges(): Pair<Boolean, Boolean> {
     return hasDateChanged to hasTimeChanged
 }
 
-private fun Long.toZonedDateTime(): ZonedDateTime =
-    ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
+private fun Long?.isValid() = this != null && this != -1L
+
+private fun Long.toZonedDateTime(): ZonedDateTime? =
+    takeIf(Long::isValid)?.let { timeStamp ->
+        ZonedDateTime.ofInstant(Instant.ofEpochSecond(timeStamp), ZoneOffset.UTC)
+    }

@@ -3,9 +3,7 @@ package mega.privacy.android.app.presentation.notification.model
 import android.content.Context
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 
 /**
  * Notification
@@ -18,8 +16,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
  * @property titleMaxWidth
  * @property description
  * @property descriptionMaxWidth
- * @property chatDateText
- * @property recurringSchedMeeting
+ * @property schedMeetingNotification
  * @property dateText
  * @property isNew
  * @property backgroundColor
@@ -36,8 +33,7 @@ data class Notification constructor(
     val titleMaxWidth: (Context) -> Int?,
     val description: (Context) -> CharSequence?,
     val descriptionMaxWidth: (Context) -> Int?,
-    val chatDateText: (Context) -> AnnotatedString?,
-    val recurringSchedMeeting: ChatScheduledMeeting?,
+    val schedMeetingNotification: SchedMeetingNotification?,
     val dateText: (Context) -> String,
     val isNew: Boolean,
     val backgroundColor: (Context) -> String,

@@ -11,16 +11,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 /**
@@ -66,7 +61,7 @@ class DefaultGetMeetings @Inject constructor(
     private suspend fun MutableList<MeetingRoomItem>.addScheduledMeetings(mutex: Mutex): Flow<MutableList<MeetingRoomItem>> =
         flow {
             toList().forEach { item ->
-                getScheduledMeetingItem(item)?.let { updatedItem ->
+                item.getScheduledMeetingItem()?.let { updatedItem ->
                     mutex.withLock {
                         val newIndex = indexOfFirst { updatedItem.chatId == it.chatId }
                         if (newIndex != -1) {
@@ -151,7 +146,7 @@ class DefaultGetMeetings @Inject constructor(
                         ?.let { getMeetingsRepository.getUpdatedMeetingItem(it) }
                         ?: return@apply
 
-                    val newUpdatedItem = getScheduledMeetingItem(newItem) ?: newItem
+                    val newUpdatedItem = newItem.getScheduledMeetingItem() ?: newItem
                     if (currentItemIndex != -1) {
                         val currentItem = get(currentItemIndex)
                         if (currentItem != newUpdatedItem) {
@@ -180,7 +175,7 @@ class DefaultGetMeetings @Inject constructor(
                     }
 
                     val currentItem = get(currentItemIndex)
-                    getScheduledMeetingItem(currentItem)?.let { updatedItem ->
+                    currentItem.getScheduledMeetingItem()?.let { updatedItem ->
                         mutex.withLock {
                             val newIndex = indexOfFirst { updatedItem.chatId == it.chatId }
                             if (newIndex != -1) {
@@ -201,19 +196,11 @@ class DefaultGetMeetings @Inject constructor(
                 }
             }
 
-    private suspend fun CombinedChatRoom.toMeetingRoomItem(): MeetingRoomItem =
-        meetingRoomMapper.invoke(
-            this,
-            chatRepository::isChatNotifiable,
-            chatRepository::isChatLastMessageGeolocation
-        )
-
-    private suspend fun getScheduledMeetingItem(item: MeetingRoomItem): MeetingRoomItem? =
-        chatRepository.getScheduledMeetingsByChat(item.chatId)
-            ?.firstOrNull()
+    private suspend fun MeetingRoomItem.getScheduledMeetingItem(): MeetingRoomItem? =
+        chatRepository.getScheduledMeetingsByChat(chatId)?.firstOrNull()
             ?.takeIf { !it.isCanceled }
             ?.let { schedMeeting ->
-                val isPending = item.isActive && schedMeeting.isPending()
+                val isPending = isActive && schedMeeting.isPending()
                 val isRecurringDaily = schedMeeting.rules?.freq == OccurrenceFrequencyType.Daily
                 val isRecurringWeekly = schedMeeting.rules?.freq == OccurrenceFrequencyType.Weekly
                 val isRecurringMonthly = schedMeeting.rules?.freq == OccurrenceFrequencyType.Monthly
@@ -221,13 +208,14 @@ class DefaultGetMeetings @Inject constructor(
                 var endTimestamp = schedMeeting.endDateTime
 
                 if (isPending && schedMeeting.rules != null) {
-                    getNextOccurrence(item.chatId)?.let { nextOccurrence ->
-                        startTimestamp = nextOccurrence.startDateTime
-                        endTimestamp = nextOccurrence.endDateTime
-                    } ?: return null
+                    runCatching { chatRepository.getNextScheduledMeetingOccurrence(chatId) }
+                        .getOrNull()?.let { nextOccurrence ->
+                            startTimestamp = nextOccurrence.startDateTime
+                            endTimestamp = nextOccurrence.endDateTime
+                        } ?: return null
                 }
 
-                item.copy(
+                copy(
                     schedId = schedMeeting.schedId,
                     scheduledStartTimestamp = startTimestamp,
                     scheduledEndTimestamp = endTimestamp,
@@ -237,6 +225,13 @@ class DefaultGetMeetings @Inject constructor(
                     isPending = isPending,
                 )
             }
+
+    private suspend fun CombinedChatRoom.toMeetingRoomItem(): MeetingRoomItem =
+        meetingRoomMapper.invoke(
+            this,
+            chatRepository::isChatNotifiable,
+            chatRepository::isChatLastMessageGeolocation
+        )
 
     private suspend fun MutableList<MeetingRoomItem>.sortMeetings(mutex: Mutex) {
         mutex.withLock {
@@ -264,20 +259,4 @@ class DefaultGetMeetings @Inject constructor(
             }
         }
     }
-
-    private suspend fun getNextOccurrence(chatId: Long): ChatScheduledMeetingOccurr? =
-        runCatching {
-            val now = Instant.now().atZone(ZoneOffset.UTC)
-            chatRepository.fetchScheduledMeetingOccurrencesByChat(
-                chatId,
-                now.minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
-            ).firstOrNull { occurr ->
-                !occurr.isCancelled && occurr.parentSchedId == -1L &&
-                        (occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
-                                || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true)
-            }
-        }.getOrNull()
-
-    private fun Long.toZonedDateTime(): ZonedDateTime =
-        ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
 }

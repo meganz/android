@@ -4,6 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.getCompleteStartDate
 import mega.privacy.android.app.presentation.extensions.getEndDate
@@ -19,33 +24,44 @@ import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.entity.meeting.WeekOfMonth
 import mega.privacy.android.domain.entity.meeting.Weekday
 
+private const val PLACEHOLDER_A_OPEN = "[A]"
+private const val PLACEHOLDER_A_CLOSE = "[/A]"
+private const val PLACEHOLDER_B_OPEN = "[B]"
+private const val PLACEHOLDER_B_CLOSE = "[/B]"
+
 /**
  * Get the appropriate day and time string for a scheduled meeting.
  *
  * @param scheduledMeeting  [ChatScheduledMeeting]
  * @param is24HourFormat    True, if it's 24 hour format. False, if not.
+ * @param highLightTime     Flag to highlight time differences
+ * @param highLightDate     Flag to highlight date differences
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun getRecurringMeetingDateTime(
     scheduledMeeting: ChatScheduledMeeting,
     is24HourFormat: Boolean,
-): String {
+    highLightTime: Boolean = false,
+    highLightDate: Boolean = false,
+): AnnotatedString {
+    var result = ""
     val rules = scheduledMeeting.rules
     val startTime = scheduledMeeting.getStartTime(is24HourFormat)
     val endTime = scheduledMeeting.getEndTime(is24HourFormat)
     val startDate = scheduledMeeting.getStartDate()
     val endDate = scheduledMeeting.getEndDate()
 
-    if (rules == null) {
-        return getTextForOneOffMeeting(scheduledMeeting, startTime, endTime)
-    }
-
-    when (rules.freq) {
-        OccurrenceFrequencyType.Invalid -> {
-            return getTextForOneOffMeeting(scheduledMeeting, startTime, endTime)
+    when (rules?.freq) {
+        null, OccurrenceFrequencyType.Invalid -> {
+            result = getTextForOneOffMeeting(
+                scheduledMeeting,
+                startTime,
+                endTime,
+                highLightTime || highLightDate
+            )
         }
-        OccurrenceFrequencyType.Daily -> return when {
+        OccurrenceFrequencyType.Daily -> result = when {
             scheduledMeeting.isForever() -> stringResource(
                 id = R.string.notification_subtitle_scheduled_meeting_recurring_daily_forever,
                 startDate,
@@ -61,81 +77,76 @@ fun getRecurringMeetingDateTime(
             )
         }
         OccurrenceFrequencyType.Weekly -> {
-            rules.weekDayList?.takeIf { it.isNotEmpty() }?.let { weekDaysList ->
-                val interval = scheduledMeeting.getIntervalValue()
-                when (weekDaysList.size) {
-                    1 -> {
-                        val weekDay = getWeekDay(weekDaysList.first(), true)
-                        return when {
-                            scheduledMeeting.isForever() -> pluralStringResource(
-                                R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever,
-                                interval,
-                                weekDay,
-                                interval,
-                                startDate,
-                                startTime,
-                                endTime
-                            )
-                            else -> pluralStringResource(
-                                R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until,
-                                interval,
-                                weekDay,
-                                interval,
-                                startDate,
-                                endDate,
-                                startTime,
-                                endTime
-                            )
-                        }
-                    }
-                    else -> {
-                        var weekdayStringList: String
-                        val firstPos = weekDaysList.sorted().indexOf(weekDaysList.minOf { it })
-                        val lastPos = weekDaysList.sorted().indexOf(weekDaysList.maxOf { it })
-                        mutableListOf<String>().apply {
-                            weekDaysList.sorted().forEach { day ->
-                                val index = weekDaysList.indexOf(day)
-                                if (index != lastPos) {
-                                    this@apply.add(getWeekDay(day, index == firstPos))
-                                }
+            rules.weekDayList?.takeIf { it.isNotEmpty() }?.sortedBy { it.ordinal }
+                ?.let { weekDaysList ->
+                    val interval = scheduledMeeting.getIntervalValue()
+                    when (weekDaysList.size) {
+                        1 -> {
+                            val weekDay = getWeekDay(weekDaysList.first(), true)
+                            result = when {
+                                scheduledMeeting.isForever() -> pluralStringResource(
+                                    R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever,
+                                    interval,
+                                    weekDay,
+                                    interval,
+                                    startDate,
+                                    startTime,
+                                    endTime
+                                )
+                                else -> pluralStringResource(
+                                    R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until,
+                                    interval,
+                                    weekDay,
+                                    interval,
+                                    startDate,
+                                    endDate,
+                                    startTime,
+                                    endTime
+                                )
                             }
-                            val separator = ", "
-                            weekdayStringList = this@apply.joinToString(separator)
                         }
-                        val lastWeekDay = getWeekDay(weekDaysList.last(), false)
-                        return when {
-                            scheduledMeeting.isForever() ->
-                                pluralStringResource(
+                        else -> {
+                            val lastWeekDay = getWeekDay(weekDaysList.last(), false)
+                            val weekDaysListString = StringBuilder().apply {
+                                weekDaysList.forEachIndexed { index, weekday ->
+                                    if (index != weekDaysList.size - 1) {
+                                        append(getWeekDay(weekday, index == 0))
+                                        if (index != weekDaysList.size - 2) append(", ")
+                                    }
+                                }
+                            }.toString()
+                            result = when {
+                                scheduledMeeting.isForever() -> pluralStringResource(
                                     R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever,
                                     interval,
-                                    weekdayStringList,
+                                    weekDaysListString,
                                     lastWeekDay,
                                     interval,
                                     startDate,
                                     startTime,
                                     endTime
                                 )
-                            else -> pluralStringResource(
-                                R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until,
-                                interval,
-                                weekdayStringList,
-                                lastWeekDay,
-                                interval,
-                                startDate,
-                                endDate,
-                                startTime,
-                                endTime
-                            )
+                                else -> pluralStringResource(
+                                    R.plurals.notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until,
+                                    interval,
+                                    weekDaysListString,
+                                    lastWeekDay,
+                                    interval,
+                                    startDate,
+                                    endDate,
+                                    startTime,
+                                    endTime
+                                )
+                            }
                         }
                     }
                 }
-            }
         }
         OccurrenceFrequencyType.Monthly -> {
             val interval = scheduledMeeting.getIntervalValue()
             rules.monthDayList?.takeIf { it.isNotEmpty() }?.let { monthDayList ->
                 val dayOfTheMonth = monthDayList.first()
-                return when {
+                result = when {
                     scheduledMeeting.isForever() -> pluralStringResource(
                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_single_day_forever,
                         interval,
@@ -166,7 +177,7 @@ fun getRecurringMeetingDateTime(
                     Weekday.Monday -> {
                         when (weekOfMonth) {
                             WeekOfMonth.First ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_first,
                                         interval,
@@ -186,7 +197,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Second ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_second,
                                         interval,
@@ -206,7 +217,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Third ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_third,
                                         interval,
@@ -226,7 +237,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fourth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fourth,
                                         interval,
@@ -246,7 +257,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fifth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fifth,
                                         interval,
@@ -270,7 +281,7 @@ fun getRecurringMeetingDateTime(
                     Weekday.Tuesday -> {
                         when (weekOfMonth) {
                             WeekOfMonth.First ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_first,
                                         interval,
@@ -290,7 +301,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Second ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_second,
                                         interval,
@@ -310,7 +321,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Third ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_third,
                                         interval,
@@ -330,7 +341,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fourth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fourth,
                                         interval,
@@ -350,7 +361,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fifth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fifth,
                                         interval,
@@ -374,7 +385,7 @@ fun getRecurringMeetingDateTime(
                     Weekday.Wednesday -> {
                         when (weekOfMonth) {
                             WeekOfMonth.First ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_first,
                                         interval,
@@ -394,7 +405,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Second ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_second,
                                         interval,
@@ -414,7 +425,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Third ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_third,
                                         interval,
@@ -434,7 +445,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fourth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fourth,
                                         interval,
@@ -454,7 +465,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fifth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fifth,
                                         interval,
@@ -478,7 +489,7 @@ fun getRecurringMeetingDateTime(
                     Weekday.Thursday -> {
                         when (weekOfMonth) {
                             WeekOfMonth.First ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_first,
                                         interval,
@@ -498,7 +509,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Second ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_second,
                                         interval,
@@ -518,7 +529,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Third ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_third,
                                         interval,
@@ -538,7 +549,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fourth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fourth,
                                         interval,
@@ -558,7 +569,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fifth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fifth,
                                         interval,
@@ -582,7 +593,7 @@ fun getRecurringMeetingDateTime(
                     Weekday.Friday -> {
                         when (weekOfMonth) {
                             WeekOfMonth.First -> {
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_first,
                                         interval,
@@ -603,7 +614,7 @@ fun getRecurringMeetingDateTime(
                                 }
                             }
                             WeekOfMonth.Second -> {
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_second,
                                         interval,
@@ -624,7 +635,7 @@ fun getRecurringMeetingDateTime(
                                 }
                             }
                             WeekOfMonth.Third -> {
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_third,
                                         interval,
@@ -645,7 +656,7 @@ fun getRecurringMeetingDateTime(
                                 }
                             }
                             WeekOfMonth.Fourth -> {
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fourth,
                                         interval,
@@ -666,7 +677,7 @@ fun getRecurringMeetingDateTime(
                                 }
                             }
                             WeekOfMonth.Fifth -> {
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fifth,
                                         interval,
@@ -691,7 +702,7 @@ fun getRecurringMeetingDateTime(
                     Weekday.Saturday -> {
                         when (weekOfMonth) {
                             WeekOfMonth.First ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_first,
                                         interval,
@@ -711,7 +722,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Second ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_second,
                                         interval,
@@ -731,7 +742,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Third ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_third,
                                         interval,
@@ -751,7 +762,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fourth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fourth,
                                         interval,
@@ -771,7 +782,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fifth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fifth,
                                         interval,
@@ -795,7 +806,7 @@ fun getRecurringMeetingDateTime(
                     Weekday.Sunday -> {
                         when (weekOfMonth) {
                             WeekOfMonth.First ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_first,
                                         interval,
@@ -815,7 +826,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Second ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_second,
                                         interval,
@@ -835,7 +846,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Third ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_third,
                                         interval,
@@ -855,7 +866,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fourth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fourth,
                                         interval,
@@ -875,7 +886,7 @@ fun getRecurringMeetingDateTime(
                                     )
                                 }
                             WeekOfMonth.Fifth ->
-                                return when {
+                                result = when {
                                     scheduledMeeting.isForever() -> pluralStringResource(
                                         R.plurals.notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fifth,
                                         interval,
@@ -900,9 +911,71 @@ fun getRecurringMeetingDateTime(
             }
         }
     }
-
-    return ""
+    return formatAnnotatedString(result, highLightTime, highLightDate)
 }
+
+private fun formatAnnotatedString(
+    dateTime: String,
+    highLightTime: Boolean,
+    highLightDate: Boolean
+): AnnotatedString =
+    buildAnnotatedString {
+        if (!highLightDate && !highLightTime) {
+            append(
+                dateTime
+                    .replace(PLACEHOLDER_A_OPEN, "").replace(PLACEHOLDER_A_CLOSE, "")
+                    .replace(PLACEHOLDER_B_OPEN, "").replace(PLACEHOLDER_B_CLOSE, "")
+            )
+        } else {
+            val indexAOpenStart = dateTime.indexOf(PLACEHOLDER_A_OPEN)
+            val indexAOpenEnd = indexAOpenStart + PLACEHOLDER_A_OPEN.length
+            val indexACloseStart = dateTime.indexOf(PLACEHOLDER_A_CLOSE)
+            val indexACloseEnd = indexACloseStart + PLACEHOLDER_A_CLOSE.length
+
+            val indexBOpenStart = dateTime.indexOf(PLACEHOLDER_B_OPEN)
+            val indexBOpenEnd = indexBOpenStart + PLACEHOLDER_B_OPEN.length
+            val indexBCloseStart = dateTime.indexOf(PLACEHOLDER_B_CLOSE)
+            val indexBCloseEnd = indexBCloseStart + PLACEHOLDER_B_CLOSE.length
+
+            if (indexAOpenStart != -1) {
+                append(dateTime.substring(0, indexAOpenStart))
+            } else if (indexBOpenStart != -1) {
+                append(dateTime.substring(0, indexBOpenStart))
+            } else { // Nothing to highlight
+                append(dateTime)
+                return@buildAnnotatedString
+            }
+
+            if (indexAOpenStart != -1) {
+                if (highLightDate) {
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append(dateTime.substring(indexAOpenEnd, indexACloseStart))
+                    }
+                } else {
+                    append(dateTime.substring(indexAOpenEnd, indexACloseStart))
+                }
+            }
+
+            if (indexBOpenStart != -1) {
+                append(dateTime.substring(indexACloseEnd, indexBOpenStart))
+            } else {
+                append(dateTime.substring(indexACloseEnd, dateTime.lastIndex))
+                return@buildAnnotatedString
+            }
+
+            if (highLightTime) {
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(dateTime.substring(indexBOpenEnd, indexBCloseStart))
+                }
+            } else {
+                append(dateTime.substring(indexBOpenEnd, indexBCloseStart))
+            }
+
+            if (indexBCloseEnd < dateTime.lastIndex) {
+                append(dateTime.substring(indexBCloseEnd, dateTime.lastIndex))
+            }
+        }
+    }
 
 /**
  * Get Text of subtitle for one off meeting
@@ -910,6 +983,7 @@ fun getRecurringMeetingDateTime(
  * @param scheduledMeeting      [ChatScheduledMeeting]
  * @param startTime             Start time
  * @param endTime               End time
+ * @param highlightDateTime     Flag to highlight date or time
  * @return                      Text of one off meeting
  */
 @Composable
@@ -917,9 +991,11 @@ private fun getTextForOneOffMeeting(
     scheduledMeeting: ChatScheduledMeeting,
     startTime: String,
     endTime: String,
+    highlightDateTime: Boolean,
 ): String =
     stringResource(
         id = when {
+            highlightDateTime -> R.string.notification_subtitle_scheduled_meeting_one_off
             scheduledMeeting.isToday() -> R.string.meetings_one_off_occurrence_info_today
             scheduledMeeting.isTomorrow() -> R.string.meetings_one_off_occurrence_info_tomorrow
             else -> R.string.notification_subtitle_scheduled_meeting_one_off
