@@ -231,7 +231,7 @@ internal class DefaultAlbumRepository @Inject constructor(
         getAlbumPhotosRemovingProgressFlow(albumId).distinctUntilChanged()
 
     override suspend fun updateAlbumPhotosRemovingProgressCompleted(albumId: AlbumId) {
-        val progressFlow = getAlbumPhotosAddingProgressFlow(albumId)
+        val progressFlow = getAlbumPhotosRemovingProgressFlow(albumId)
         progressFlow.tryEmit(null)
     }
 

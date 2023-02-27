@@ -5,7 +5,11 @@ data class AlbumContentState(
     val totalAddedPhotos: Int = 0,
     /** A temporary field to support compatibility between view and compose architecture. */
     val isDeleteAlbum: Boolean = false,
+    val isRemovingPhotos: Boolean = false,
+    val totalRemovedPhotos: Int = 0,
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0
+    val isRemovingPhotosProgressCompleted: Boolean
+        get() = !isRemovingPhotos && totalRemovedPhotos > 0
 }

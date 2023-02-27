@@ -81,6 +81,7 @@ fun AlbumContentScreen(
     LaunchedEffect(Unit) {
         albumsState.currentUserAlbum?.also { album ->
             albumContentViewModel.observePhotosAddingProgress(albumId = album.id)
+            albumContentViewModel.observePhotosRemovingProgress(albumId = album.id)
         }
     }
 
@@ -148,7 +149,7 @@ fun AlbumContentScreen(
                 selectedPhotos = albumsState.selectedPhotos
             )
 
-            if (albumContentState.isAddingPhotos) {
+            if (albumContentState.isAddingPhotos || albumContentState.isRemovingPhotos) {
                 LinearProgressIndicator(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -211,6 +212,28 @@ fun AlbumContentScreen(
                 }
             }
 
+            if (userAlbum != null && albumContentState.isRemovingPhotosProgressCompleted) {
+                val message = pluralStringResource(
+                    id = R.plurals.photos_album_photos_removal_snackbar_message,
+                    count = albumContentState.totalRemovedPhotos,
+                    albumContentState.totalRemovedPhotos,
+                    userAlbum.title,
+                )
+                Snackbar(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(8.dp),
+                    backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
+                ) {
+                    Text(text = message)
+                }
+
+                LaunchedEffect(message) {
+                    delay(3000L)
+                    albumContentViewModel.updatePhotosRemovingProgressCompleted(albumId = userAlbum.id)
+                }
+            }
+
             if (albumsState.snackBarMessage.isNotEmpty()) {
                 SnackBar(
                     message = albumsState.snackBarMessage,
@@ -265,13 +288,6 @@ fun AlbumContentScreen(
         }
 
         if (albumsState.showRemovePhotosDialog) {
-            val removePhotosMessage = pluralStringResource(
-                id = R.plurals.photos_album_photos_removal_snackbar_message,
-                count = albumsState.selectedPhotos.size,
-                albumsState.selectedPhotos.size,
-                albumsState.currentUIAlbum?.title ?: stringResource(id = R.string.tab_title_album),
-            )
-
             RemovePhotosFromAlbumDialog(
                 onDialogDismissed = {
                     with(albumsViewModel) {
@@ -282,7 +298,6 @@ fun AlbumContentScreen(
                 onPositiveButtonClick = {
                     with(albumsViewModel) {
                         removePhotosFromAlbum()
-                        setSnackBarMessage(removePhotosMessage)
                         clearSelectedPhotos()
                         setShowRemovePhotosFromAlbumDialog(false)
                     }

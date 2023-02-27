@@ -280,6 +280,7 @@ class AlbumDynamicContentFragment : Fragment() {
 
     override fun onPause() {
         ackPhotosAddingProgressCompleted()
+        ackPhotosRemovingProgressCompleted()
         super.onPause()
     }
 
@@ -289,5 +290,13 @@ class AlbumDynamicContentFragment : Fragment() {
 
         if (!isProgressCompleted) return
         albumContentViewModel.updatePhotosAddingProgressCompleted(albumId = album.id)
+    }
+
+    private fun ackPhotosRemovingProgressCompleted() {
+        val album = albumsViewModel.state.value.currentUserAlbum ?: return
+        val isProgressCompleted = albumContentViewModel.state.value.isRemovingPhotosProgressCompleted
+
+        if (!isProgressCompleted) return
+        albumContentViewModel.updatePhotosRemovingProgressCompleted(albumId = album.id)
     }
 }

@@ -11,17 +11,41 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
+import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
+import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
+import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import javax.inject.Inject
 
 @HiltViewModel
 class AlbumContentViewModel @Inject constructor(
     private val observeAlbumPhotosAddingProgress: ObserveAlbumPhotosAddingProgress,
     private val updateAlbumPhotosAddingProgressCompleted: UpdateAlbumPhotosAddingProgressCompleted,
+    private val observeAlbumPhotosRemovingProgress: ObserveAlbumPhotosRemovingProgress,
+    private val updateAlbumPhotosRemovingProgressCompleted: UpdateAlbumPhotosRemovingProgressCompleted,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentState())
     val state = _state.asStateFlow()
+
+    fun observePhotosRemovingProgress(albumId: AlbumId) {
+        observeAlbumPhotosRemovingProgress(albumId)
+            .onEach(::handlePhotosRemovingProgress)
+            .launchIn(viewModelScope)
+    }
+
+    private fun handlePhotosRemovingProgress(progress: AlbumPhotosRemovingProgress?) {
+        _state.update {
+            it.copy(
+                isRemovingPhotos = progress?.isProgressing ?: false,
+                totalRemovedPhotos = progress?.totalRemovedPhotos ?: 0,
+            )
+        }
+    }
+
+    fun updatePhotosRemovingProgressCompleted(albumId: AlbumId) = viewModelScope.launch {
+        updateAlbumPhotosRemovingProgressCompleted(albumId)
+    }
 
     fun observePhotosAddingProgress(albumId: AlbumId) {
         observeAlbumPhotosAddingProgress(albumId)
