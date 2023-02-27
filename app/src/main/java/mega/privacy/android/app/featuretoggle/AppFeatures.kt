@@ -18,8 +18,8 @@ enum class AppFeatures(override val description: String, private val defaultValu
      * Monitor phone number
      */
     MonitorPhoneNumber(
-        "Switch to using the new notification mechanism for monitoring the verified phone number. Enabling this before implementation is complete might result in updates not being received by all screens",
-        false
+        "Switch to using the new notification mechanism for monitoring the verified phone number.",
+        true
     ),
 
     /**
