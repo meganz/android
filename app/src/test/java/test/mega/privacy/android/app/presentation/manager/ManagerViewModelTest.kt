@@ -7,28 +7,35 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
-import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.verification.UnVerified
+import mega.privacy.android.domain.entity.verification.VerificationStatus
+import mega.privacy.android.domain.entity.verification.Verified
+import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -37,45 +44,98 @@ import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
-import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.Check2FADialog
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import nz.mega.sdk.MegaUserAlert
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
-import java.util.concurrent.TimeUnit
 
 @ExperimentalCoroutinesApi
 class ManagerViewModelTest {
     private lateinit var underTest: ManagerViewModel
 
-    private val monitorGlobalUpdates = mock<MonitorGlobalUpdates>()
-    private val monitorNodeUpdates = FakeMonitorUpdates()
-    private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
-    private val hasInboxChildren = mock<HasInboxChildren>()
-    private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
+    private val monitorGlobalUpdates = MutableStateFlow<GlobalUpdate>(GlobalUpdate.OnReloadNeeded)
+    private val monitorNodeUpdates = MutableSharedFlow<NodeUpdate>()
+    private val getNumUnreadUserAlerts =
+        mock<GetNumUnreadUserAlerts> { onBlocking { invoke() }.thenReturn(0) }
+    private val hasInboxChildren =
+        mock<HasInboxChildren> { onBlocking { invoke() }.thenReturn(false) }
+    private val monitorContactRequestUpdates = MutableStateFlow(emptyList<ContactRequest>())
+
+    private val initialIsFirsLoginValue = true
     private val sendStatisticsMediaDiscovery = mock<SendStatisticsMediaDiscovery>()
-    private val savedStateHandle = SavedStateHandle(mapOf())
-    private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
-    private val getInboxNode = mock<GetInboxNode>()
-    private val monitorStorageState = mock<MonitorStorageStateEvent>()
-    private val monitorViewType = mock<MonitorViewType>()
+    private val savedStateHandle = SavedStateHandle(
+        mapOf(
+            ManagerViewModel.isFirstLoginKey to initialIsFirsLoginValue
+        )
+    )
+    private val monitorMyAvatarFile = mock<MonitorMyAvatarFile> {
+        onBlocking { invoke() }.thenReturn(
+            flow { awaitCancellation() })
+    }
+    private val getInboxNode = mock<GetInboxNode> { onBlocking { invoke() }.thenReturn(null) }
+    private val monitorStorageState = mock<MonitorStorageStateEvent> {
+        onBlocking { invoke() }.thenReturn(
+            MutableStateFlow(
+                StorageStateEvent(
+                    0L,
+                    "",
+                    0L,
+                    "",
+                    EventType.Storage,
+                    StorageState.Unknown
+                )
+            )
+        )
+    }
+    private val monitorViewType = mock<MonitorViewType> {
+        onBlocking { invoke() }.thenReturn(
+            flow { awaitCancellation() })
+    }
     private val getPrimarySyncHandle = mock<GetPrimarySyncHandle>()
     private val getSecondarySyncHandle = mock<GetSecondarySyncHandle>()
     private val checkCameraUpload = mock<CheckCameraUpload>()
-    private val getCloudSortOrder = mock<GetCloudSortOrder>()
+    private val getCloudSortOrder =
+        mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC) }
     private val monitorConnectivity = mock<MonitorConnectivity>()
-    private val getFeatureFlagValue = mock<GetFeatureFlagValue>()
-    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>()
-    private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares>()
-    private val monitorFinishActivity = mock<MonitorFinishActivity>()
+    private val getFeatureFlagValue =
+        mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(false) }
+    private val shareDataList = listOf(
+        ShareData("user", 8766L, 0, 987654678L, true),
+        ShareData("user", 8766L, 0, 987654678L, true)
+    )
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
+        onBlocking {
+            invoke(
+                any()
+            )
+        }.thenReturn(
+            shareDataList
+        )
+    }
+    private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares> {
+        onBlocking {
+            invoke(
+                any()
+            )
+        }.thenReturn(shareDataList)
+    }
+    private val initialFinishActivityValue = false
+    private val monitorFinishActivity = MutableStateFlow(initialFinishActivityValue)
+    private val monitorVerificationStatus = MutableStateFlow<VerificationStatus>(
+        UnVerified(
+            canRequestUnblockSms = false,
+            canRequestOptInVerification = false
+        )
+    )
     private val check2FADialog = mock<Check2FADialog>()
 
     @get:Rule
@@ -83,24 +143,16 @@ class ManagerViewModelTest {
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
-    }
-
-
-    /**
-     * Initialize the view model under test
-     */
-    private fun setUnderTest() {
+        Dispatchers.setMain(StandardTestDispatcher())
         underTest = ManagerViewModel(
-            monitorNodeUpdates = monitorNodeUpdates,
-            monitorGlobalUpdates = monitorGlobalUpdates,
-            monitorContactRequestUpdates = monitorContactRequestUpdates,
+            monitorNodeUpdates = { monitorNodeUpdates },
+            monitorGlobalUpdates = { monitorGlobalUpdates },
+            monitorContactRequestUpdates = { monitorContactRequestUpdates },
             getNumUnreadUserAlerts = getNumUnreadUserAlerts,
             hasInboxChildren = hasInboxChildren,
             sendStatisticsMediaDiscovery = sendStatisticsMediaDiscovery,
             savedStateHandle = savedStateHandle,
             monitorMyAvatarFile = monitorMyAvatarFile,
-            ioDispatcher = StandardTestDispatcher(),
             getInboxNode = getInboxNode,
             monitorStorageStateEvent = monitorStorageState,
             monitorViewType = monitorViewType,
@@ -117,31 +169,19 @@ class ManagerViewModelTest {
             getFeatureFlagValue = getFeatureFlagValue,
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
-            monitorFinishActivity = monitorFinishActivity,
+            monitorFinishActivity = { monitorFinishActivity },
+            monitorVerificationStatus = { monitorVerificationStatus },
             check2FADialog = check2FADialog,
         )
     }
 
-    /**
-     * Simulate a repository emission and setup the [ManagerViewModel]
-     *
-     * @param updates the values to emit from the repository
-     * @param after a lambda function to call after setting up the viewModel
-     */
-    @Suppress("DEPRECATION")
-    private fun triggerRepositoryUpdate(updates: List<GlobalUpdate>, after: () -> Unit) {
-        whenever(monitorGlobalUpdates()).thenReturn(updates.asFlow())
-        executeTest(after)
-    }
-
-    private fun executeTest(after: () -> Unit) {
-        setUnderTest()
-        after()
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
     fun `test that initial state is returned`() = runTest {
-        setUnderTest()
         underTest.state.test {
             val initial = awaitItem()
             assertThat(initial.isFirstNavigationLevel).isTrue()
@@ -157,8 +197,6 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that is first navigation level is updated if new value provided`() = runTest {
-        setUnderTest()
-
         underTest.state.map { it.isFirstNavigationLevel }.distinctUntilChanged()
             .test {
                 val newValue = false
@@ -170,8 +208,6 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that shares tab is updated if new value provided`() = runTest {
-        setUnderTest()
-
         underTest.state.map { it.sharesTab }.distinctUntilChanged()
             .test {
                 val newValue = SharesTab.OUTGOING_TAB
@@ -183,8 +219,6 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that transfers tab is updated if new value provided`() = runTest {
-        setUnderTest()
-
         underTest.state.map { it.transfersTab }.distinctUntilChanged()
             .test {
                 val newValue = TransfersTab.PENDING_TAB
@@ -197,110 +231,97 @@ class ManagerViewModelTest {
     @Test
     fun `test that user alert updates live data is not set when no updates triggered from use case`() =
         runTest {
-            setUnderTest()
-
             underTest.updateUserAlerts.test().assertNoValue()
         }
 
     @Test
     fun `test that contact request updates live data is not set when no updates triggered from use case`() =
         runTest {
-            setUnderTest()
-
             underTest.updateContactsRequests.test().assertNoValue()
         }
 
     @Test
     fun `test that user alert updates live data is set when user alert updates triggered from use case`() =
         runTest {
-            triggerRepositoryUpdate(listOf(GlobalUpdate.OnUserAlertsUpdate(arrayListOf(mock())))) {
-
-                runCatching {
-                    underTest.updateUserAlerts.test().awaitValue(50, TimeUnit.MILLISECONDS)
-                }.onSuccess { result ->
-                    result.assertValue { it.getContentIfNotHandled()?.size == 1 }
-                }
-            }
+            val testObserver = underTest.updateUserAlerts.test()
+            testObserver.assertNoValue()
+            val userAlert = mock<MegaUserAlert>()
+            monitorGlobalUpdates.emit(
+                GlobalUpdate.OnUserAlertsUpdate(
+                    userAlerts = arrayListOf(userAlert)
+                )
+            )
+            testScheduler.advanceUntilIdle()
+            testObserver.assertValue { it.getContentIfNotHandled()?.size == 1 }
         }
 
     @Test
     fun `test that user alert updates live data is not set when user alert updates triggered from use case with null`() =
         runTest {
-            triggerRepositoryUpdate(
-                listOf(
-                    GlobalUpdate.OnUserAlertsUpdate(null),
-                )
-            ) {
-                underTest.updateUserAlerts.test().assertNoValue()
-            }
+            val testObserver = underTest.updateUserAlerts.test()
+
+            monitorGlobalUpdates.emit(
+                GlobalUpdate.OnUserAlertsUpdate(null)
+            )
+            testScheduler.advanceUntilIdle()
+
+            testObserver.assertNoValue()
         }
 
     @Test
     fun `test that contact request updates live data is set when contact request updates triggered from use case`() =
         runTest {
-            whenever(monitorContactRequestUpdates()).thenReturn(
-                flowOf(
-                    listOf(
-                        ContactRequest(
-                            handle = 1L,
-                            sourceEmail = "",
-                            sourceMessage = null,
-                            targetEmail = "",
-                            creationTime = 1L,
-                            modificationTime = 1L,
-                            status = ContactRequestStatus.Unresolved,
-                            isOutgoing = false,
-                            isAutoAccepted = false
-                        )
+            val testObserver = underTest.updateContactsRequests.test()
+            monitorContactRequestUpdates.emit(
+                listOf(
+                    ContactRequest(
+                        handle = 1L,
+                        sourceEmail = "",
+                        sourceMessage = null,
+                        targetEmail = "",
+                        creationTime = 1L,
+                        modificationTime = 1L,
+                        status = ContactRequestStatus.Unresolved,
+                        isOutgoing = false,
+                        isAutoAccepted = false
                     )
                 )
             )
-            executeTest {
+            testScheduler.advanceUntilIdle()
 
-                runCatching {
-                    underTest.updateContactsRequests.test().awaitValue(50, TimeUnit.MILLISECONDS)
-                }.onSuccess { result ->
-                    result.assertValue { it.getContentIfNotHandled()?.size == 1 }
-                }
-            }
+            testObserver.assertValue { it.getContentIfNotHandled()?.size == 1 }
         }
 
     @Test
     fun `test that contact request updates live data is not set when contact request updates triggered from use case with null`() =
         runTest {
-            executeTest {
-                underTest.updateContactsRequests.test().assertNoValue()
-            }
+            underTest.updateContactsRequests.test().assertNoValue()
         }
 
     @Test
-    fun `test that saved state values are returned`() = runTest {
-        setUnderTest()
-
-        savedStateHandle[underTest.isFirstLoginKey] = true
-
-        underTest.state.filter {
+    fun `test that saved initial state values are returned`() = runTest {
+        testScheduler.advanceUntilIdle()
+        underTest.state.map {
             it.isFirstLogin
-        }.test(200) {
-            val latest = awaitItem()
-            assertThat(latest.isFirstLogin).isTrue()
+        }.test {
+            assertThat(awaitItem()).isEqualTo(initialIsFirsLoginValue)
         }
     }
 
     @Test
     fun `test that is first login is updated if new boolean is provided`() = runTest {
-        setUnderTest()
+        testScheduler.advanceUntilIdle()
         underTest.state.map { it.isFirstLogin }.distinctUntilChanged()
             .test {
-                assertThat(awaitItem()).isFalse()
-                underTest.setIsFirstLogin(true)
-                assertThat(awaitItem()).isTrue()
+                assertThat(awaitItem()).isEqualTo(initialIsFirsLoginValue)
+                underTest.setIsFirstLogin(!initialIsFirsLoginValue)
+                assertThat(awaitItem()).isEqualTo(!initialIsFirsLoginValue)
             }
     }
 
     @Test
     fun `test that get order returns cloud sort order`() = runTest {
-        setUnderTest()
+
         val expected = SortOrder.ORDER_MODIFICATION_DESC
         whenever(getCloudSortOrder()).thenReturn(expected)
         assertThat(underTest.getOrder()).isEqualTo(expected)
@@ -308,8 +329,7 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that updateToolbarTitle is true when a node update occurs`() = runTest {
-        setUnderTest()
-
+        testScheduler.advanceUntilIdle()
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
             monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
@@ -319,11 +339,11 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that updateToolbarTitle is set when calling setUpdateToolbar`() = runTest {
-        setUnderTest()
-
+        testScheduler.advanceUntilIdle()
         underTest.state.map { it.nodeUpdateReceived }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
             monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
+            testScheduler.advanceUntilIdle()
             assertThat(awaitItem()).isTrue()
             underTest.nodeUpdateHandled()
             assertThat(awaitItem()).isFalse()
@@ -331,53 +351,36 @@ class ManagerViewModelTest {
     }
 
     @Test
-    fun `test that pending actions count is not null`() = runTest {
-        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
-        val shareData1 = ShareData("user", 8766L, 0, 987654678L, true)
-        whenever(getUnverifiedIncomingShares(getCloudSortOrder())).thenReturn(
-            listOf(
-                shareData,
-                shareData1
-            )
-        )
-        setUnderTest()
+    fun `test that pending actions count matches incoming and outgoing shares size`() = runTest {
+        testScheduler.advanceUntilIdle()
         underTest.state.map { it.pendingActionsCount }.distinctUntilChanged().test {
-            assertThat(awaitItem()).isEqualTo(2)
+            assertThat(awaitItem()).isEqualTo(shareDataList.size * 2)
         }
     }
 
     @Test
-    fun `test that monitor finish activity event value matches the true value returned by use case`() =
+    fun `test that monitor finish activity event value matches the initial value returned by use case`() =
         runTest {
-            whenever(monitorFinishActivity.invoke()).thenReturn(
-                flowOf(true)
-            )
-            setUnderTest()
-
             underTest.monitorFinishActivityEvent.distinctUntilChanged().test {
-                assertThat(awaitItem()).isEqualTo(true)
-                awaitComplete()
+                assertThat(awaitItem()).isEqualTo(initialFinishActivityValue)
+                cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
-    fun `test that monitor finish activity event value matches the false value returned by use case`() =
+    fun `test that monitor finish activity events are returned`() =
         runTest {
-            whenever(monitorFinishActivity.invoke()).thenReturn(
-                flowOf(false)
-            )
-            setUnderTest()
-
             underTest.monitorFinishActivityEvent.distinctUntilChanged().test {
-                assertThat(awaitItem()).isEqualTo(false)
-                awaitComplete()
+                assertThat(awaitItem()).isEqualTo(initialFinishActivityValue)
+                monitorFinishActivity.emit(!initialFinishActivityValue)
+                assertThat(awaitItem()).isEqualTo(!initialFinishActivityValue)
+                cancelAndIgnoreRemainingEvents()
             }
         }
 
     @Test
     fun `test when check2FADialog returns false show2FADialog flow updated to false`() = runTest {
         whenever(check2FADialog(newAccount = false, firstLogin = true)).thenReturn(false)
-        setUnderTest()
         underTest.checkToShow2FADialog(newAccount = false, firstLogin = true)
         underTest.state.map { it }.distinctUntilChanged().test {
             assertThat(awaitItem().show2FADialog).isFalse()
@@ -387,10 +390,45 @@ class ManagerViewModelTest {
     @Test
     fun `test when check2FADialog returns true show2FADialog flow updated to true`() = runTest {
         whenever(check2FADialog(newAccount = false, firstLogin = true)).thenReturn(true)
-        setUnderTest()
         underTest.checkToShow2FADialog(newAccount = false, firstLogin = true)
+        testScheduler.advanceUntilIdle()
         underTest.state.map { it }.distinctUntilChanged().test {
             assertThat(awaitItem().show2FADialog).isTrue()
         }
     }
+
+    @Test
+    fun `test that canVerifyPhoneNumber matches canRequestOptInVerification if unverified`() {
+        val expectedCanVerify = true
+        runTest {
+            monitorVerificationStatus.emit(
+                UnVerified(
+                    canRequestUnblockSms = false,
+                    canRequestOptInVerification = expectedCanVerify
+                )
+            )
+            testScheduler.advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().canVerifyPhoneNumber).isEqualTo(expectedCanVerify)
+            }
+        }
+    }
+
+    @Test
+    fun `test that canVerifyPhoneNumber is false if a phone number has already been verified`() =
+        runTest {
+            monitorVerificationStatus.emit(
+                Verified(
+                    phoneNumber = VerifiedPhoneNumber.PhoneNumber("766543"),
+                    canRequestUnblockSms = false,
+                    canRequestOptInVerification = true
+                )
+            )
+            testScheduler.advanceUntilIdle()
+
+            underTest.state.test {
+                assertThat(awaitItem().canVerifyPhoneNumber).isFalse()
+            }
+        }
 }

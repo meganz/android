@@ -1,20 +1,25 @@
 package mega.privacy.android.app.presentation.manager.model
 
+import mega.privacy.android.domain.entity.Feature
+
+
 /**
- * Manager UI state
+ * Manager state
  *
- * @param isFirstNavigationLevel true if the navigation level is the first level
- * @param sharesTab current tab in shares screen
- * @param transfersTab current tab in transfers screen
- * @param isFirstLogin is first login
- * @param hasInboxChildren whether any nodes for Inbox
- * @param shouldStopCameraUpload camera upload should be stopped or not
- * @param shouldSendCameraBroadcastEvent broadcast event should be sent or not
- * @param nodeUpdateReceived one-off event to notify UI that a node update occurred
- * @param pendingActionsCount Pending actions count
- * @param shouldAlertUserAboutSecurityUpgrade Boolean to decide whether to display security upgrade dialog or not
- * @param showSyncSection Boolean to show sync section
- * @param show2FADialog Boolean to show sync section
+ * @property isFirstNavigationLevel
+ * @property sharesTab
+ * @property transfersTab
+ * @property isFirstLogin
+ * @property hasInboxChildren
+ * @property shouldStopCameraUpload
+ * @property shouldSendCameraBroadcastEvent
+ * @property nodeUpdateReceived
+ * @property pendingActionsCount
+ * @property shouldAlertUserAboutSecurityUpgrade
+ * @property showSyncSection
+ * @property show2FADialog
+ * @property canVerifyPhoneNumber
+ * @property enabledFlags
  */
 data class ManagerState(
     val isFirstNavigationLevel: Boolean = true,
@@ -28,5 +33,7 @@ data class ManagerState(
     val pendingActionsCount: Int = 0,
     val shouldAlertUserAboutSecurityUpgrade: Boolean = false,
     val showSyncSection: Boolean = false,
-    val show2FADialog: Boolean = false
+    val show2FADialog: Boolean = false,
+    val canVerifyPhoneNumber: Boolean = false,
+    val enabledFlags: Set<Feature> = emptySet(),
 )

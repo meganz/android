@@ -6,14 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,19 +29,20 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.manager.model.ManagerState
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.preference.ViewType
-import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.entity.verification.UnVerified
+import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -58,6 +62,7 @@ import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.Check2FADialog
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaNode
@@ -67,24 +72,34 @@ import java.io.File
 import javax.inject.Inject
 
 /**
- * ViewModel associated to ManagerActivity
+ * Manager view model
  *
- * @param monitorNodeUpdates Monitor global node updates
- * @param monitorGlobalUpdates Monitor global updates
+ * @property monitorGlobalUpdates
+ * @property getInboxNode
+ * @property getNumUnreadUserAlerts
+ * @property hasInboxChildren
+ * @property sendStatisticsMediaDiscovery
+ * @property savedStateHandle
+ * @property monitorMyAvatarFile
+ * @property monitorStorageStateEvent
+ * @property monitorViewType
+ * @property getPrimarySyncHandle
+ * @property getSecondarySyncHandle
+ * @property checkCameraUpload
+ * @property getCloudSortOrder
+ * @property monitorConnectivity
+ * @property broadcastUploadPauseState
+ * @property getExtendedAccountDetail
+ * @property getPricing
+ * @property getFullAccountInfo
+ * @property getActiveSubscription
+ * @property getFeatureFlagValue
+ * @property getUnverifiedIncomingShares
+ * @property getUnverifiedOutgoingShares
+ * @property monitorVerificationStatus
+ *
+ * @param monitorNodeUpdates
  * @param monitorContactRequestUpdates
- * @param getInboxNode
- * @param getNumUnreadUserAlerts
- * @param hasInboxChildren
- * @param sendStatisticsMediaDiscovery
- * @param savedStateHandle
- * @param ioDispatcher
- * @param monitorMyAvatarFile
- * @param monitorStorageStateEvent monitor global storage state changes
- * @param monitorViewType
- * @param getCloudSortOrder
- * @param getFeatureFlagValue
- * @param getUnverifiedIncomingShares
- * @param getUnverifiedOutgoingShares
  * @param monitorFinishActivity
  */
 @HiltViewModel
@@ -97,7 +112,6 @@ class ManagerViewModel @Inject constructor(
     private val hasInboxChildren: HasInboxChildren,
     private val sendStatisticsMediaDiscovery: SendStatisticsMediaDiscovery,
     private val savedStateHandle: SavedStateHandle,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
     private val monitorViewType: MonitorViewType,
@@ -116,6 +130,7 @@ class ManagerViewModel @Inject constructor(
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
     monitorFinishActivity: MonitorFinishActivity,
     private val check2FADialog: Check2FADialog,
+    private val monitorVerificationStatus: MonitorVerificationStatus,
 ) : ViewModel() {
 
     /**
@@ -127,8 +142,6 @@ class ManagerViewModel @Inject constructor(
      * public UI State
      */
     val state: StateFlow<ManagerState> = _state
-
-    internal val isFirstLoginKey = "EXTRA_FIRST_LOGIN"
 
     /**
      * private Inbox Node
@@ -153,12 +166,39 @@ class ManagerViewModel @Inject constructor(
         get() = monitorConnectivity().value
 
     private val isFirstLogin = savedStateHandle.getStateFlow(
-        viewModelScope,
-        isFirstLoginKey,
-        false
+        key = isFirstLoginKey,
+        initialValue = false
     )
 
     init {
+        viewModelScope.launch {
+            val order = getCloudSortOrder()
+            combine(
+                isFirstLogin,
+                monitorVerificationStatus()
+                    .onEach {
+                            Timber.d("Verification status returned: $it")
+                    },
+                flowOf(
+                    getUnverifiedIncomingShares(order) +
+                            getUnverifiedOutgoingShares(order)
+                ).map { it.size },
+                flowOf(getEnabledFeatures()),
+            ) { firstLogin: Boolean, verificationStatus: VerificationStatus, pendingShares: Int, features: Set<Feature> ->
+                { state: ManagerState ->
+                    state.copy(
+                        isFirstLogin = firstLogin,
+                        canVerifyPhoneNumber = verificationStatus is UnVerified && verificationStatus.canRequestOptInVerification,
+                        pendingActionsCount = state.pendingActionsCount + pendingShares,
+                        enabledFlags = features
+                    )
+                }
+            }.collectLatest {
+                _state.update(it)
+            }
+        }
+
+
         viewModelScope.launch {
             monitorNodeUpdates().collect {
                 val nodeList = it.changes.keys.toList()
@@ -167,32 +207,14 @@ class ManagerViewModel @Inject constructor(
                 checkCameraUploadFolder(false, nodeList)
             }
         }
-        viewModelScope.launch(ioDispatcher) {
-            isFirstLogin.map {
-                { state: ManagerState -> state.copy(isFirstLogin = it) }
-            }.collect {
-                _state.update(it)
-            }
-        }
 
-        viewModelScope.launch {
-            val showSyncSection = getFeatureFlagValue(AppFeatures.AndroidSync)
-            _state.value = _state.value.copy(showSyncSection = showSyncSection)
-        }
+    }
 
-        viewModelScope.launch {
-            val incomingShares = getUnverifiedIncomingShares(getCloudSortOrder()).size
-            _state.update {
-                it.copy(pendingActionsCount = _state.value.pendingActionsCount + incomingShares)
-            }
-        }
-
-        viewModelScope.launch {
-            val outgoingShares = getUnverifiedOutgoingShares(getCloudSortOrder()).size
-            _state.update {
-                it.copy(pendingActionsCount = _state.value.pendingActionsCount + outgoingShares)
-            }
-        }
+    private suspend fun getEnabledFeatures(): Set<Feature> {
+        return setOfNotNull(
+            AppFeatures.AndroidSync.takeIf { getFeatureFlagValue(it) },
+            AppFeatures.MonitorPhoneNumber.takeIf { getFeatureFlagValue(it) }
+        )
     }
 
     /**
@@ -341,9 +363,7 @@ class ManagerViewModel @Inject constructor(
      * Set first login status
      */
     fun setIsFirstLogin(newIsFirstLogin: Boolean) {
-        isFirstLogin.update {
-            newIsFirstLogin
-        }
+        savedStateHandle[Companion.isFirstLoginKey] = newIsFirstLogin
     }
 
     /**
@@ -466,5 +486,9 @@ class ManagerViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    internal companion object {
+        internal const val isFirstLoginKey = "EXTRA_FIRST_LOGIN"
     }
 }

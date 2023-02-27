@@ -245,6 +245,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -276,6 +277,7 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.contacts.ContactsActivity;
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase;
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding;
+import mega.privacy.android.app.featuretoggle.AppFeatures;
 import mega.privacy.android.app.fragments.homepage.EventObserver;
 import mega.privacy.android.app.fragments.homepage.HomepageSearchable;
 import mega.privacy.android.app.fragments.homepage.documents.DocumentsFragment;
@@ -312,7 +314,6 @@ import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.RecentChatsFragment;
 import mega.privacy.android.app.main.qrcode.QRCodeActivity;
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask;
-import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController;
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
@@ -366,6 +367,7 @@ import mega.privacy.android.app.presentation.shares.links.LinksViewModel;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity;
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity;
+import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity;
 import mega.privacy.android.app.psa.Psa;
 import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
@@ -410,6 +412,7 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper;
 import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.data.model.MegaPreferences;
+import mega.privacy.android.domain.entity.Feature;
 import mega.privacy.android.domain.entity.Product;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
@@ -795,7 +798,7 @@ public class ManagerActivity extends TransfersManagementActivity
             if (drawerLayout != null) {
                 closeDrawer();
             }
-            refreshAddPhoneNumberButton();
+            hideAddPhoneNumberButton();
         }
     };
 
@@ -1033,6 +1036,15 @@ public class ManagerActivity extends TransfersManagementActivity
     };
 
     private FileBackupManager fileBackupManager;
+
+
+    public Boolean isFeatureEnabled(Feature feature) {
+        return enabledFeatures == null || enabledFeatures.contains(feature);
+    }
+
+    private Set<Feature> enabledFeatures;
+
+    private boolean canVerifyPhoneNumber = false;
 
     /**
      * Method for updating the visible elements related to a call.
@@ -1414,10 +1426,12 @@ public class ManagerActivity extends TransfersManagementActivity
         LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean.class)
                 .observe(this, this::updateViews);
 
-        registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
+        if (!isFeatureEnabled(AppFeatures.MonitorPhoneNumber)) {
+            LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
+                    .observeForever(refreshAddPhoneNumberButtonObserver);
+        }
 
-        LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
-                .observeForever(refreshAddPhoneNumberButtonObserver);
+        registerReceiver(chatArchivedReceiver, new IntentFilter(BROADCAST_ACTION_INTENT_CHAT_ARCHIVED));
 
         registerReceiver(transferFinishReceiver, new IntentFilter(BROADCAST_ACTION_TRANSFER_FINISH));
 
@@ -2431,7 +2445,7 @@ public class ManagerActivity extends TransfersManagementActivity
         } else {
             Timber.d("Backup warning dialog is not show");
         }
-     }
+    }
 
     /**
      * collecting Flows from ViewModels
@@ -2443,6 +2457,13 @@ public class ManagerActivity extends TransfersManagementActivity
         });
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
+            enabledFeatures = managerState.getEnabledFlags();
+            if (enabledFeatures.contains(AppFeatures.MonitorPhoneNumber)) {
+                canVerifyPhoneNumber = managerState.getCanVerifyPhoneNumber();
+                if (!canVerifyPhoneNumber) {
+                    hideAddPhoneNumberButton();
+                }
+            }
             if (managerState.getShouldAlertUserAboutSecurityUpgrade()) {
                 ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
                     outgoingFolderNames.clear();
@@ -2461,7 +2482,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
             updateInboxSectionVisibility(managerState.getHasInboxChildren());
             stopUploadProcessAndSendBroadcast(managerState.getShouldStopCameraUpload(), managerState.getShouldSendCameraBroadcastEvent());
-            if (managerState.getShowSyncSection()) {
+            if (managerState.getEnabledFlags().contains(AppFeatures.AndroidSync)) {
                 syncSection.setVisibility(View.VISIBLE);
             }
             if (managerState.getNodeUpdateReceived()) {
@@ -2485,7 +2506,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             //Show 2FA dialog to the user on Second Launch after sign up
-            if(managerState.getShow2FADialog() || isEnable2FADialogShown){
+            if (managerState.getShow2FADialog() || isEnable2FADialogShown) {
                 showEnable2FADialog();
             }
             return Unit.INSTANCE;
@@ -2563,16 +2584,24 @@ public class ManagerActivity extends TransfersManagementActivity
 
         if (firstTimeAfterInstallation || askPermissions) {
             //haven't verified phone number
-            if (canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
+            if (canVerifyPhoneNumber() && !onAskingPermissionsFragment && !newCreationAccount) {
                 askForSMSVerification();
             } else {
                 drawerItem = DrawerItem.ASK_PERMISSIONS;
                 askForAccess();
             }
-        } else if (getFirstLogin() && !newCreationAccount && canVoluntaryVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+        } else if (getFirstLogin() && !newCreationAccount && canVerifyPhoneNumber() && !onAskingPermissionsFragment) {
             askForSMSVerification();
         } else if (requestNotificationsPermissionFirstLogin) {
             askForNotificationsPermission();
+        }
+    }
+
+    private boolean canVerifyPhoneNumber() {
+        if (isFeatureEnabled(AppFeatures.MonitorPhoneNumber)) {
+            return canVerifyPhoneNumber;
+        } else {
+            return canVoluntaryVerifyPhoneNumber();
         }
     }
 
@@ -3426,8 +3455,10 @@ public class ManagerActivity extends TransfersManagementActivity
         unregisterReceiver(updateMyAccountReceiver);
         unregisterReceiver(receiverUpdateOrder);
         unregisterReceiver(chatArchivedReceiver);
+
         LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean.class)
                 .removeObserver(refreshAddPhoneNumberButtonObserver);
+
         unregisterReceiver(receiverCUAttrChanged);
         unregisterReceiver(transferFinishReceiver);
         LiveEventBus.get(EVENT_REFRESH, Boolean.class).removeObserver(refreshObserver);
@@ -3584,7 +3615,7 @@ public class ManagerActivity extends TransfersManagementActivity
             return;
         }
 
-        if (canVoluntaryVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing) && !newCreationAccount) {
+        if (canVerifyPhoneNumber() && (smsDialogTimeChecker.shouldShow() || isSMSDialogShowing) && !newCreationAccount) {
             showSMSVerificationDialog();
         }
     }
@@ -10265,12 +10296,12 @@ public class ManagerActivity extends TransfersManagementActivity
         return searchViewModel.getState().getValue().getSearchQuery() != null && searchExpand;
     }
 
-    private void refreshAddPhoneNumberButton() {
+    private void hideAddPhoneNumberButton() {
         navigationDrawerAddPhoneContainer.setVisibility(View.GONE);
     }
 
     public void showAddPhoneNumberInMenu() {
-        if (canVoluntaryVerifyPhoneNumber()) {
+        if (canVerifyPhoneNumber()) {
             if (megaApi.isAchievementsEnabled()) {
                 String message = String.format(getString(R.string.sms_add_phone_number_dialog_msg_achievement_user), myAccountInfo.getBonusStorageSMS());
                 addPhoneNumberLabel.setText(message);
