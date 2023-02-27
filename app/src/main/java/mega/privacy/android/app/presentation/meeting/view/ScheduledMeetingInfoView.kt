@@ -430,10 +430,7 @@ private fun ScheduledMeetingSubtitle(state: ScheduledMeetingInfoState) {
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis)
         } else {
-            val text =
-                getRecurringMeetingDateTime(schedMeet, state.is24HourFormat).replace("[A]", "")
-                    .replace("[/A]", "")
-                    .replace("[B]", "").replace("[/B]", "")
+            val text = getRecurringMeetingDateTime(schedMeet, state.is24HourFormat)
             if (text.isNotEmpty()) {
                 Text(text = text,
                     style = MaterialTheme.typography.subtitle2,

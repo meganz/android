@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.notification.view
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.text.TextUtils
-import android.text.format.DateFormat
 import android.util.TypedValue
 import android.widget.TextView
 import androidx.compose.foundation.background
@@ -25,7 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.toColorInt
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.meeting.view.getRecurringMeetingDateTime
 import mega.privacy.android.app.presentation.notification.model.Notification
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
 import mega.privacy.android.core.ui.controls.dpToSp
@@ -76,22 +73,8 @@ internal fun NotificationItemView(
             NotificationDescription(notification)
         }
 
-        val schedMeetingText = notification.recurringSchedMeeting?.let { meeting ->
-            val is24HourFormat = DateFormat.is24HourFormat(LocalContext.current)
-            getRecurringMeetingDateTime(scheduledMeeting = meeting, is24HourFormat = is24HourFormat)
-                .replace("[A]", "")
-                .replace("[/A]", "")
-                .replace("[B]", "")
-                .replace("[/B]", "")
-        }
-
-        if (!schedMeetingText.isNullOrBlank()) {
-            NotificationSchedMeetingTime(AnnotatedString(schedMeetingText))
-        } else {
-            val chatDateText = notification.chatDateText(LocalContext.current)
-            if (!chatDateText.isNullOrBlank()) {
-                NotificationSchedMeetingTime(chatDateText)
-            }
+        if (notification.schedMeetingNotification != null) {
+            NotificationSchedMeetingView(notification.schedMeetingNotification)
         }
         NotificationDate(notification)
 
@@ -227,21 +210,6 @@ private fun NotificationDescription(
 }
 
 @Composable
-private fun NotificationSchedMeetingTime(dateText: AnnotatedString) {
-    Text(
-        text = dateText,
-        modifier = Modifier
-            .padding(start = 16.dp, top = 2.dp, end = 16.dp)
-            .testTag("SchedMeetingTime"),
-        color = if (MaterialTheme.colors.isLight) grey_alpha_087 else white_alpha_087,
-        style = MaterialTheme.typography.caption,
-        fontSize = 12.sp,
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis
-    )
-}
-
-@Composable
 private fun NotificationDate(
     notification: Notification,
 ) {
@@ -271,7 +239,8 @@ private fun NotificationDivider(horizontalPadding: Int) {
 @Preview(uiMode = UI_MODE_NIGHT_YES, name = "PreviewNotificationItemViewDark")
 @Composable
 private fun PreviewNotificationItemView() {
-    val notification = Notification(sectionTitle = { "CONTACTS" },
+    val notification = Notification(
+        sectionTitle = { "CONTACTS" },
         sectionColour = R.color.orange_400_orange_300,
         sectionIcon = null,
         title = { "New Contact" },
@@ -279,13 +248,12 @@ private fun PreviewNotificationItemView() {
         titleMaxWidth = { 200 },
         description = { "xyz@gmail.com is now a contact" },
         descriptionMaxWidth = { 300 },
-        chatDateText = { AnnotatedString("Tue, 30 Jun, 2022 • 10:00 - 11:00") },
-        recurringSchedMeeting = null,
+        schedMeetingNotification = null,
         dateText = { "11 October 2022 6:46 pm" },
         isNew = true,
         backgroundColor = { "#D3D3D3" },
-        separatorMargin = { 0 },
-        onClick = {})
+        separatorMargin = { 0 }
+    ) {}
     NotificationItemView(modifier = Modifier,
         notification, position = 0, notifications = listOf(notification), onClick = {})
 

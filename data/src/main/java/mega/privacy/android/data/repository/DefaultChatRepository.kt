@@ -56,6 +56,10 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -280,22 +284,33 @@ internal class DefaultChatRepository @Inject constructor(
             var fetch: Boolean
 
             do {
-                val newOccurrences = runCatching {
-                    fetchScheduledMeetingOccurrencesByChat(chatId, lastTimeStamp)
-                }.getOrNull()
-                if (newOccurrences.isNullOrEmpty()) {
-                    fetch = false
-                } else {
+                val newOccurrences = fetchScheduledMeetingOccurrencesByChat(chatId, lastTimeStamp)
+                if (newOccurrences.isNotEmpty()) {
                     occurrences.apply {
                         addAll(newOccurrences)
                         sortBy(ChatScheduledMeetingOccurr::startDateTime)
                     }
                     lastTimeStamp = newOccurrences.last().startDateTime!!
                     fetch = occurrences.size < count
+                } else {
+                    fetch = false
                 }
             } while (fetch)
 
             occurrences.toList()
+        }
+
+    override suspend fun getNextScheduledMeetingOccurrence(chatId: Long): ChatScheduledMeetingOccurr? =
+        withContext(ioDispatcher) {
+            val now = Instant.now().atZone(ZoneOffset.UTC)
+            fetchScheduledMeetingOccurrencesByChat(
+                chatId,
+                now.minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
+            ).firstOrNull { occurr ->
+                !occurr.isCancelled && occurr.parentSchedId == megaChatApiGateway.getChatInvalidHandle()
+                        && (occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
+                        || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true)
+            }
         }
 
     override suspend fun inviteToChat(chatId: Long, contactsData: List<String>) =
@@ -526,4 +541,7 @@ internal class DefaultChatRepository @Inject constructor(
             localStorageGateway.setChatSettings(ChatSettings())
         }
     }
+
+    private fun Long.toZonedDateTime(): ZonedDateTime =
+        ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
 }

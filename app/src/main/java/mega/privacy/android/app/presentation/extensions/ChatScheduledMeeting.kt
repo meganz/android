@@ -40,13 +40,11 @@ fun ChatScheduledMeeting.isTomorrow(): Boolean {
  * @param is24HourFormat True, if it's 24 hour format.
  * @return Text of start time.
  */
-fun ChatScheduledMeeting.getStartTime(is24HourFormat: Boolean): String {
-    this.startDateTime?.let {
-        return getHourFormatter(Instant.ofEpochSecond(it), is24HourFormat).format(it.parseDate())
-    }
-
-    return ""
-}
+fun ChatScheduledMeeting.getStartTime(is24HourFormat: Boolean): String =
+    this.startDateTime?.let { startDate ->
+        val hourFormatter = getHourFormatter(is24HourFormat)
+        return hourFormatter.format(startDate.parseDate())
+    } ?: ""
 
 /**
  * Get end time formatted
@@ -54,43 +52,33 @@ fun ChatScheduledMeeting.getStartTime(is24HourFormat: Boolean): String {
  * @param is24HourFormat True, if it's 24 hour format.
  * @return Text of end time.
  */
-fun ChatScheduledMeeting.getEndTime(is24HourFormat: Boolean): String {
-    this.endDateTime?.let {
-        return getHourFormatter(Instant.ofEpochSecond(it), is24HourFormat).format(it.parseDate())
-    }
-
-    return ""
-}
+fun ChatScheduledMeeting.getEndTime(is24HourFormat: Boolean): String =
+    this.endDateTime?.let { endDate ->
+        val hourFormatter = getHourFormatter(is24HourFormat)
+        return hourFormatter.format(endDate.parseDate())
+    } ?: ""
 
 /**
  * Get start date with weekday
  *
  * @return Text of start date
  */
-fun ChatScheduledMeeting.getCompleteStartDate(): String {
-    val dateFormatter = getCompleteDateFormatter()
-
+fun ChatScheduledMeeting.getCompleteStartDate(): String =
     this.startDateTime?.let { start ->
+        val dateFormatter = getCompleteDateFormatter()
         return dateFormatter.format(start.parseDate())
-    }
-
-    return ""
-}
+    } ?: ""
 
 /**
  * Get start date without weekday
  *
  * @return Text of start date
  */
-fun ChatScheduledMeeting.getStartDate(): String {
-    val dateFormatter = getDateFormatter()
-
+fun ChatScheduledMeeting.getStartDate(): String =
     this.startDateTime?.let { start ->
+        val dateFormatter = getDateFormatter()
         return dateFormatter.format(start.parseDate())
-    }
-
-    return ""
-}
+    } ?: ""
 
 /**
  * Get end date without weekday
@@ -174,23 +162,22 @@ private fun Long.parseDate(): ZonedDateTime =
     ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
 
 private fun getUntilDate(until: Long): String? {
-    val dateFormatter = getDateFormatter()
     if (until != 0L) {
+        val dateFormatter = getDateFormatter()
         return dateFormatter.format(until.parseDate())
     }
 
     return null
 }
 
-private fun getHourFormatter(instant: Instant, is24HourFormat: Boolean): String =
+private fun getHourFormatter(is24HourFormat: Boolean): DateTimeFormatter =
     DateTimeFormatter
         .ofPattern(if (is24HourFormat) "HH:mm" else "hh:mma")
         .withZone(ZoneId.systemDefault())
-        .format(instant)
 
 private fun getCompleteDateFormatter(): DateTimeFormatter =
     DateTimeFormatter
-        .ofPattern("EEEE',' d MMM yyyy")
+        .ofPattern("E',' d MMM',' yyyy")
         .withZone(ZoneId.systemDefault())
 
 private fun getDateFormatter(): DateTimeFormatter =

@@ -59,7 +59,7 @@ sealed interface IncomingShareAlert {
 sealed interface ScheduledMeetingAlert {
     val chatId: Long
     val title: String
-    val email: String
+    val email: String?
     val startDate: Long?
     val endDate: Long?
     val isRecurring: Boolean
@@ -690,7 +690,7 @@ data class UpdatedScheduledMeetingDateTimeAlert(
     override val isOwnChange: Boolean,
     override val chatId: Long,
     override val title: String,
-    override val email: String,
+    override val email: String?,
     override val startDate: Long?,
     override val endDate: Long?,
     override val isRecurring: Boolean,
@@ -754,7 +754,7 @@ data class UpdatedScheduledMeetingFieldsAlert(
     override val isOwnChange: Boolean,
     override val chatId: Long,
     override val title: String,
-    override val email: String,
+    override val email: String?,
     override val startDate: Long?,
     override val endDate: Long?,
     override val isRecurring: Boolean,
