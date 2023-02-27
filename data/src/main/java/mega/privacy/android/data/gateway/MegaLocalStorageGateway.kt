@@ -280,9 +280,13 @@ interface MegaLocalStorageGateway {
     suspend fun getSecondaryFolderPath(): String?
 
     /**
-     * Get remove GPS default setting
+     * Checks the value in the Database, as to whether Location Tags should be added or not
+     * when uploading Photos
+     *
+     * @return true if Location Tags should be added when uploading Photos, and false if otherwise
+     * It will default to false when the value does not exist in the Database yet
      */
-    suspend fun getRemoveGpsDefault(): Boolean
+    suspend fun areLocationTagsEnabled(): Boolean
 
     /**
      * Sets the new value in the Database, as to whether Location Tags should be added or not

@@ -47,7 +47,7 @@ import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.GetRemoveGps
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
@@ -160,7 +160,7 @@ object TestCameraUploadUseCases {
     fun provideSetSyncLocalPath() = mock<SetSyncLocalPath>()
 
     @Provides
-    fun provideGetRemoveGps() = mock<GetRemoveGps>()
+    fun provideAreLocationTagsEnabled() = mock<AreLocationTagsEnabled>()
 
     @Provides
     fun provideSetLocationTagsEnabled() = mock<SetLocationTagsEnabled>()

@@ -275,8 +275,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.getSecondaryFolderPath()
     }
 
-    override suspend fun getRemoveGpsDefault(): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.getRemoveGpsDefault()
+    override suspend fun areLocationTagsEnabled(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.areLocationTagsEnabled()
     }
 
     override suspend fun setLocationTagsEnabled(enable: Boolean) = withContext(ioDispatcher) {

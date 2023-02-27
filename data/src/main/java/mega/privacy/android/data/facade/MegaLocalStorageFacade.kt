@@ -192,8 +192,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getSecondaryFolderPath(): String? =
         dbHandler.preferences?.localPathSecondaryFolder
 
-    override suspend fun getRemoveGpsDefault(): Boolean =
-        dbHandler.preferences?.removeGPS?.toBoolean() ?: true
+    override suspend fun areLocationTagsEnabled(): Boolean =
+        dbHandler.preferences?.removeGPS?.toBoolean()?.not() ?: false
 
     override suspend fun setLocationTagsEnabled(enable: Boolean) =
         dbHandler.setRemoveGPS(!enable)

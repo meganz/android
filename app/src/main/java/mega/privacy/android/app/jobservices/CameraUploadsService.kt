@@ -97,7 +97,7 @@ import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.GetRemoveGps
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
@@ -277,10 +277,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     lateinit var clearSyncRecords: ClearSyncRecords
 
     /**
-     * GetRemoveGps
+     * Are Location Tags Enabled
      */
     @Inject
-    lateinit var getRemoveGps: GetRemoveGps
+    lateinit var areLocationTagsEnabled: AreLocationTagsEnabled
 
     /**
      * GetSyncRecordByPath
@@ -1156,7 +1156,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
 
             if (file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_PHOTO) && !file.isCopyOnly) {
-                if (getRemoveGps()) {
+                if (!areLocationTagsEnabled()) {
                     var newPath = createTempFile(file)
                     // IOException occurs.
                     if (ERROR_CREATE_FILE_IO_ERROR == newPath) continue

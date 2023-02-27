@@ -106,7 +106,7 @@ import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetNumberOfPendingUploads
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.GetRemoveGps
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
@@ -338,11 +338,15 @@ abstract class CameraUploadUseCases {
             SetSyncLocalPath(cameraUploadRepository::setSyncLocalPath)
 
         /**
-         * Provide the [GetRemoveGps] implementation
+         * Provide the [AreLocationTagsEnabled] implementation
+         *
+         * @param cameraUploadRepository [CameraUploadRepository]
+         *
+         * @return [AreLocationTagsEnabled]
          */
         @Provides
-        fun provideGetRemoveGps(cameraUploadRepository: CameraUploadRepository): GetRemoveGps =
-            GetRemoveGps(cameraUploadRepository::getRemoveGpsDefault)
+        fun provideAreLocationTagsEnabled(cameraUploadRepository: CameraUploadRepository): AreLocationTagsEnabled =
+            AreLocationTagsEnabled(cameraUploadRepository::areLocationTagsEnabled)
 
         /**
          * Provide the [SetLocationTagsEnabled] implementation

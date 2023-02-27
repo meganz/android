@@ -192,9 +192,9 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload retrieves remove GPS preference`() = runTest {
-        whenever(localStorageGateway.getRemoveGpsDefault()).thenReturn(false)
-        assertThat(underTest.getRemoveGpsDefault()).isEqualTo(false)
+    fun `test that calling areLocationTagsEnabled retrieves the value`() = runTest {
+        whenever(localStorageGateway.areLocationTagsEnabled()).thenReturn(false)
+        assertThat(underTest.areLocationTagsEnabled()).isEqualTo(false)
     }
 
     @Test

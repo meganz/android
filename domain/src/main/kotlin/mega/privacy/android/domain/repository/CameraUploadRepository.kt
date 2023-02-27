@@ -255,12 +255,12 @@ interface CameraUploadRepository {
     suspend fun setSecondaryFolderPath(secondaryFolderPath: String)
 
     /**
-     * Get remove GPS preference
-     * if not set (null), then remove GPS
+     * Checks the value in the Database, as to whether Location Tags should be added or not
+     * when uploading Photos
      *
-     * @return remove GPS preference
+     * @return true if Location Tags should be added when uploading Photos, and false if otherwise
      */
-    suspend fun getRemoveGpsDefault(): Boolean
+    suspend fun areLocationTagsEnabled(): Boolean
 
     /**
      * Sets the new value in the Database, as to whether Location Tags should be added or not
