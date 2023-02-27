@@ -1,10 +1,13 @@
 package mega.privacy.android.app.di.avatar
 
 import android.graphics.Bitmap
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
+import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapperImpl
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarMapper
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
@@ -14,7 +17,13 @@ import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
  */
 @Module
 @InstallIn(SingletonComponent::class)
-class AvatarMapperModule {
+abstract class AvatarMapperModule {
+
+    /**
+     * Provide the instance of [AvatarContentMapper]
+     */
+    @Binds
+    abstract fun bindAvatarContentMapper(implementation: AvatarContentMapperImpl): AvatarContentMapper
 
     companion object {
 
@@ -29,6 +38,5 @@ class AvatarMapperModule {
                 isList: Boolean,
             ): Bitmap = AvatarUtil.getDefaultAvatar(color, text, AVATAR_SIZE, isList)
         }
-
     }
 }

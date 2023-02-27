@@ -13,5 +13,5 @@ interface EmojiManagerWrapper {
      * @return drawable resource ID of the emoji. Return null if emoji not found.
      *
      */
-    fun getFirstEmoji(text: String): Int?
+    suspend fun getFirstEmoji(text: String): Int?
 }
