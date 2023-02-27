@@ -36,6 +36,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -367,13 +368,13 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                 checkNameCollisionUseCase.check(selectedNode, toHandle, NameCollisionType.COPY)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { collision: NameCollision, throwable: Throwable? ->
-                        if (throwable == null) {
+                    .subscribeBy(
+                        onSuccess = { collisionResult ->
                             dismissAlertDialogIfExists(statusDialog)
-                            val list: ArrayList<NameCollision> = ArrayList()
-                            list.add(collision)
-                            nameCollisionActivityContract?.launch(list)
-                        } else {
+                            nameCollisionActivityContract?.launch(arrayListOf(collisionResult))
+                        },
+                        onError = { error ->
+                            Timber.e(error, "No collision.")
                             copyNodeUseCase.copy(selectedNode, toHandle)
                                 .subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
@@ -383,7 +384,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                                         showCopyResult(null, copyThrowable)
                                     })
                         }
-                    }
+                    )
 
             } else {
                 Timber.w("Selected Node is NULL")
@@ -836,6 +837,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
      * @param throwable
      */
     private fun showCopyResult(copyRequestResult: CopyRequestResult?, throwable: Throwable?) {
+        dismissAlertDialogIfExists(statusDialog)
         clearSelections()
         hideMultipleSelect()
         if (copyRequestResult != null) {
