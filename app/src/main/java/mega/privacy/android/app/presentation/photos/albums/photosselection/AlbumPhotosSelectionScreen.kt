@@ -21,6 +21,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,14 +31,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
@@ -49,6 +51,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhoto
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CAMERA_UPLOAD
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource.CLOUD_DRIVE
 import mega.privacy.android.app.presentation.photos.view.PhotosGridView
+import mega.privacy.android.core.ui.controls.MegaDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
@@ -59,6 +62,8 @@ import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+
+private const val MAX_SELECTION_NUM = 150
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -74,6 +79,7 @@ fun AlbumPhotosSelectionScreen(
 
     var showSelectLocationDialog by rememberSaveable { mutableStateOf(false) }
     var showMoreMenu by rememberSaveable { mutableStateOf(false) }
+    var showMaxSelectionDialog by rememberSaveable { mutableStateOf(false) }
 
     if (state.isInvalidAlbum) onBackClicked()
 
@@ -90,6 +96,12 @@ fun AlbumPhotosSelectionScreen(
         onDialogDismissed = {
             showSelectLocationDialog = false
         },
+    )
+    handleMaxSelectionDialog(
+        showMaxSelectionDialog = showMaxSelectionDialog,
+        onDialogDismissed = {
+            showMaxSelectionDialog = false
+        }
     )
 
     handleAddPhotosCompletion(
@@ -108,7 +120,7 @@ fun AlbumPhotosSelectionScreen(
                 numSelectedPhotos = state.selectedPhotoIds.size,
                 showFilterMenu = state.showFilterMenu,
                 showMoreMenu = showMoreMenu,
-                showSelectAllMenu = (state.filteredPhotoIds - state.selectedPhotoIds).isNotEmpty(),
+                showSelectAllMenu = false,
                 onBackClicked = {
                     if (state.selectedPhotoIds.isEmpty()) {
                         onBackClicked()
@@ -169,7 +181,12 @@ fun AlbumPhotosSelectionScreen(
                     if (photo.id in state.selectedPhotoIds) {
                         viewModel.unselectPhoto(photo)
                     } else {
-                        viewModel.selectPhoto(photo)
+                        if (state.selectedPhotoIds.size + 1 == MAX_SELECTION_NUM) {
+                            showMaxSelectionDialog = true
+                        }
+                        if (state.selectedPhotoIds.size < MAX_SELECTION_NUM) {
+                            viewModel.selectPhoto(photo)
+                        }
                     }
                 },
             )
@@ -294,6 +311,7 @@ private fun AlbumPhotosSelectionContent(
         onLongPress = onPhotoSelection,
         selectedPhotoIds = selectedPhotoIds,
         uiPhotoList = uiPhotos,
+        isBlurUnselectItem = selectedPhotoIds.size == MAX_SELECTION_NUM
     )
 }
 
@@ -376,7 +394,52 @@ private fun SelectLocationDialog(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun handleMaxSelectionDialog(
+    showMaxSelectionDialog: Boolean,
+    onDialogDismissed: () -> Unit,
+) {
+    if (showMaxSelectionDialog) {
+        MaxSelectionDialog(
+            onDialogDismissed = onDialogDismissed,
+        )
+    }
+}
+
+@Composable
+private fun MaxSelectionDialog(
+    onDialogDismissed: () -> Unit = {},
+) {
+    MegaDialog(
+        body = {
+            Text(
+                text = stringResource(id = R.string.photos_album_selection_dialog_body),
+                color = colorResource(id = R.color.grey_alpha_054)
+            )
+        },
+        onDismissRequest = onDialogDismissed,
+        titleString = stringResource(id = R.string.photos_album_selection_dialog_title),
+        confirmButton = {},
+        dismissButton = {
+            TextButton(
+                onClick = onDialogDismissed,
+            ) {
+                Text(
+                    text = stringResource(id = R.string.general_ok).uppercase(),
+                    style = MaterialTheme.typography.button,
+                    color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
+                        id = R.color.teal_300
+                    )
+                )
+            }
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        ),
+    )
+}
+
 @Composable
 private fun handleAddPhotosCompletion(
     album: Album.UserAlbum?,

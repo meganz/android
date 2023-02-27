@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -234,7 +234,7 @@
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Links</string>
     <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
-    <string name="title_incoming_shares_explorer">Incoming Shares</string>
+    <string name="title_incoming_shares_explorer">Incoming shares</string>
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Incoming shares with</string>
     <!-- message when there are no files in the Cloud drive -->
@@ -242,7 +242,7 @@
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Empty Folder</string>
     <!-- Title of the fragment Choose Account -->
-    <string name="choose_account_fragment">CHOOSE ACCOUNT</string>
+    <string name="choose_account_fragment">Choose account</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
     <string name="file_properties_available_offline">Available Offline</string>
     <!-- category in sort by action -->
@@ -677,7 +677,7 @@
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
     <string name="settings_camera_upload_photos_and_videos">Photos and videos</string>
     <!-- Settings of the Passcode -->
-    <string name="settings_passcode_lock_switch">Passcode Lock</string>
+    <string name="settings_passcode_lock_switch">Passcode lock</string>
     <!-- Settings option to change Passcode. -->
     <string name="settings_change_passcode">Change passcode</string>
     <!-- Settings option screen to change Passcode. -->
@@ -1527,7 +1527,7 @@
     <!-- Title of the dialog to create a new text file by inserting the name -->
     <string name="dialog_title_new_text_file">New text file</string>
     <!-- Input field description in the create file dialog. -->
-    <string name="context_new_file_name">File Name</string>
+    <string name="context_new_file_name">File name</string>
     <!-- Title of the dialog to create a new link by inserting the name, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
     <string name="dialog_title_new_link">Link name</string>
     <!-- Input field description in the create link dialog, e.g. when try to share a web link to your Cloud Drive or incoming shares. -->
@@ -1635,8 +1635,6 @@
     <string name="button_copy_link">Copy link</string>
     <!-- Create QR code -->
     <string name="button_create_qr">Create QR code</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">QR code successfully created</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">Line up the QR code to scan it with your device’s camera</string>
     <!-- positive button on dialog to view a contact -->
@@ -1757,7 +1755,7 @@
     <!-- Label for the option on setting to set up the quality of multimedia files uploaded to the chat -->
     <string name="settings_chat_upload_quality">Video quality</string>
     <!-- Label for the option on setting to set up the quality of video files to be uploaded -->
-    <string name="settings_video_upload_quality">Video Quality</string>
+    <string name="settings_video_upload_quality">Video quality</string>
     <!-- Text shown when the user refuses to permit the storage permission when enable camera upload -->
     <string name="on_refuse_storage_permission">Camera uploads needs to access your photos and other media on your device. Please go to the settings page and grant permission.</string>
     <!-- Available options for the setting to set up the quality of multimedia files uploaded to the chat or the Camera Uploads -->
@@ -1880,9 +1878,9 @@
     <!-- Title of the dialog to disable the rich links previews on chat -->
     <string name="option_enable_chat_rich_preview">Rich URL Previews</string>
     <!-- Button to allow the rich links previews on chat -->
-    <string name="button_always_rich_links">Always Allow</string>
+    <string name="button_always_rich_links">Always allow</string>
     <!-- Button do not allow now the rich links previews on chat -->
-    <string name="button_not_now_rich_links">Not Now</string>
+    <string name="button_not_now_rich_links">Not now</string>
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">Never</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
@@ -1941,7 +1939,7 @@
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Invalid code</string>
     <!-- Title of screen Lost authenticator decive -->
-    <string name="lost_your_authenticator_device">Lost your Authenticator device?</string>
+    <string name="lost_your_authenticator_device">Lost your authenticator device?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
     <string name="login_verification">Login Verification</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
@@ -2026,29 +2024,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">This action cannot be completed as it would take you over your current storage limit. Would you like to upgrade your account?</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">Archived chats</string>
+    <string name="archived_chats_title_section">Archived</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Archived chats (%d)</string>
+    <string name="archived_chats_show_option">Archived (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Archive chat</string>
+    <string name="archive_chat_option">Archive</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Unarchive chat</string>
+    <string name="unarchive_chat_option">Unarchive</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archive</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Unarchive</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">%s chat was archived.</string>
+    <string name="success_archive_chat">%s was archived</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Error. %s chat was not archived.</string>
+    <string name="error_archive_chat">Error. %s was not archived</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">%s chat was unarchived.</string>
+    <string name="success_unarchive_chat">%s was unarchived</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Error. %s chat was not able to be unarchived.</string>
+    <string name="error_unarchive_chat">Error. %s can\’t be unarchived</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Inactive chat</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">Archived chat</string>
+    <string name="archived_chat">Archived</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Tap to join the call</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2085,7 +2083,7 @@
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">An error occurred while trying to delete all previous versions of your files, please try again later.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
-    <string name="settings_enable_file_versioning_title">File Versioning</string>
+    <string name="settings_enable_file_versioning_title">File versioning</string>
     <!-- Subtitle of the option to enable or disable file versioning on Settings section -->
     <string name="settings_enable_file_versioning_subtitle">Enable or disable file versioning for your entire account.\nDisabling file versioning does not prevent your contacts from creating new versions in shared folders.</string>
     <!-- Hint shown to guide user on activity add contacts -->
@@ -2414,7 +2412,7 @@
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
     <string name="upgrade_comment">* Recurring subscription can be cancelled any time before the renewal date.</string>
     <!-- Message shown when a call starts. -->
-    <string name="call_started_messages">Call Started</string>
+    <string name="call_started_messages">Call started</string>
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">SSL key error</string>
     <!-- Text of the dialog to inform about a SSL error -->
@@ -2503,7 +2501,7 @@
     <!-- Message shown in a dialog explaining the consequences of accesing the location -->
     <string name="explanation_send_location">This location will be opened using a third party maps provider outside the end-to-end encrypted MEGA platform.</string>
     <!-- Title of the location marker set by the user -->
-    <string name="title_marker_maps">Send this Location</string>
+    <string name="title_marker_maps">Send this location</string>
     <!-- Title of the dialog shown when the location is disabled -->
     <string name="gps_disabled">The GPS is disabled</string>
     <!-- Text of the dialog shown when the location is disabled for open location settings -->
@@ -2636,13 +2634,13 @@
     <!-- Subtitle of the call screen when the call is on hold -->
     <string name="call_on_hold">Call on hold</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and put the current one on hold and answer the other. -->
-    <string name="hold_and_answer_call_incoming">Hold and Answer</string>
+    <string name="hold_and_answer_call_incoming">Hold and answer</string>
     <!-- The text of the notification button that is displayed when I receive a group call and put the current one on hold and answer the other. -->
     <string name="hold_and_join_call_incoming">Hold and Join</string>
     <!-- The text of the notification button that is displayed when I receive a individual call and hang the current one and answer the other. -->
-    <string name="end_and_answer_call_incoming">End and Answer</string>
+    <string name="end_and_answer_call_incoming">End and answer</string>
     <!-- The text of the notification button that is displayed when I receive a group call and hand the current one and answer the other. -->
-    <string name="end_and_join_call_incoming">End and Join</string>
+    <string name="end_and_join_call_incoming">End and join</string>
     <!-- when trying to download a file that is already downloaded in the device and has to copy in another path -->
     <string name="copy_already_downloaded">File already downloaded. Copied to the selected path.</string>
     <!-- Title of the dialog shown when you want to join a group call -->
@@ -3065,9 +3063,9 @@
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Password copied to the clipboard.</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Link and key successfully sent.</string>
+    <string name="link_and_key_sent">Link and key sent</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">Link and password successfully sent.</string>
+    <string name="link_and_password_sent">Link and password sent</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Upgrade to Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3121,7 +3119,7 @@
     <!-- Preferences screen item title for Cookie Policy -->
     <string name="settings_about_cookie_policy">Cookie Policy</string>
     <!-- Preferences screen item title for cookie settings -->
-    <string name="settings_about_cookie_settings">Cookie Settings</string>
+    <string name="settings_about_cookie_settings">Cookie settings</string>
     <!-- Cookie dialog title -->
     <string name="dialog_cookie_alert_title">Your privacy</string>
     <!-- Cookie dialog message. Please, keep the placeholders to format the string. -->
@@ -3141,7 +3139,7 @@
     <!-- Preference screen item summary -->
     <string name="preference_cookies_performance_summary">Help us to understand how you use our services and provide us data that we can use to make improvements. Not accepting these Cookies will mean we will have less data available to us to help design improvements.</string>
     <!-- Preference screen item state description -->
-    <string name="preference_cookies_always_on">Always On</string>
+    <string name="preference_cookies_always_on">Always on</string>
     <!-- Menu option that allows the user to scan document and upload it directly to MEGA. -->
     <string name="menu_scan_document">Scan document</string>
     <!-- Message displayed when clicking on a contact attached to the chat that is not my contact -->
@@ -3301,7 +3299,7 @@
         <item quantity="other">%1$d connections</item>
     </plurals>
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
-    <string name="section_recently_added">Recently Added</string>
+    <string name="section_recently_added">Recently added</string>
     <!-- Text of the empty screen when there are not groups. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
     <string name="context_empty_groups">[B]No [/B][A]groups[/A]</string>
     <!-- Section name for the “Contact Requests” section. Preferably one word. -->
@@ -3315,7 +3313,7 @@
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
         <item quantity="one">Link successfully sent.</item>
-        <item quantity="other">Links successfully sent.</item>
+        <item quantity="other">Links sent</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
@@ -3993,6 +3991,10 @@
     <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Enter album name</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">Cannot add more</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">New album</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
@@ -4005,32 +4007,12 @@
     <string name="photos_create_album_error_message_systems_album">This album name is not allowed. Enter a different name.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">An album with this name already exists. Enter a different name.</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">New album (%d)</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">Add items to “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
         <item quantity="one">Added %1$d item to “%2$s“</item>
         <item quantity="other">Added %1$d items to “%2$s”</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">Payment info</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">Pro membership plan expiring soon</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">Your payment for the %1$s plan was received.</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">Your payment for the %1$s plan was unsuccessful.</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="one">Your Pro membership plan will expire in 1 day.</item>
-        <item quantity="other">Your Pro membership plan will expire in %1$d days.</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="one">Your Pro membership plan expired 1 day ago.</item>
-        <item quantity="other">Your Pro membership plan expired %1$d days ago.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[B]Empty[/B] [A]album[/A]</string>

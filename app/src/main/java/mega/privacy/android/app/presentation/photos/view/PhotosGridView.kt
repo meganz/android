@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -70,6 +71,7 @@ internal fun PhotosGridView(
     onLongPress: (Photo) -> Unit = {},
     selectedPhotoIds: Set<Long>,
     uiPhotoList: List<UIPhoto>,
+    isBlurUnselectItem: Boolean = false,
 ) {
 
     val configuration = LocalConfiguration.current
@@ -121,7 +123,8 @@ internal fun PhotosGridView(
                             PhotoView(
                                 photo = item.photo,
                                 isPreview = isDownloadPreview(configuration, currentZoomLevel),
-                                downloadPhoto = photoDownland
+                                downloadPhoto = photoDownland,
+                                alpha = if (isBlurUnselectItem && !isSelected) 0.4f else 1.0f,
                             )
                         }
                     )
@@ -217,6 +220,7 @@ internal fun PhotoView(
     photo: Photo,
     isPreview: Boolean,
     downloadPhoto: PhotoDownload,
+    alpha: Float = DefaultAlpha,
 ) {
     val imageState = produceState<String?>(initialValue = null) {
         downloadPhoto(isPreview, photo) { downloadSuccess ->
@@ -235,6 +239,7 @@ internal fun PhotoView(
             .data(imageState.value)
             .crossfade(true)
             .build(),
+        alpha = alpha,
         contentDescription = null,
         placeholder = painterResource(id = R.drawable.ic_image_thumbnail),
         error = painterResource(id = R.drawable.ic_image_thumbnail),
