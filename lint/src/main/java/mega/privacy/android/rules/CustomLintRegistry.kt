@@ -13,7 +13,8 @@ class CustomLintRegistry : IssueRegistry() {
     override val issues =
         listOf(
             CallIsSystemInDarkThemeDetector.ISSUE,
-            TranslatedStringTemplateDetector.ISSUE
+            TranslatedStringTemplateDetector.ISSUE,
+            NonIndexStringTemplateDetector.ISSUE,
         )
 
     override val api: Int = CURRENT_API
