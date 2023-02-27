@@ -419,8 +419,8 @@
             android:name=".main.VerifyTwoFactorActivity" />
         <activity
             android:name=".BusinessExpiredAlertActivity" />
-        <activity android:name=".smsVerification.SMSVerificationActivity" />
-        <activity android:name=".smsVerification.SMSVerificationTextActivity" />
+        <activity android:name=".presentation.verification.SMSVerificationActivity" />
+        <activity android:name=".presentation.verification.SMSVerificationTextActivity" />
         <activity
             android:name=".activities.settingsActivities.CameraUploadsPreferencesActivity"
             android:label="@string/section_photo_sync"

@@ -20,7 +20,7 @@ import androidx.fragment.app.Fragment;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
+import mega.privacy.android.app.presentation.verification.SMSVerificationActivity;
 import nz.mega.sdk.MegaAchievementsDetails;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaError;

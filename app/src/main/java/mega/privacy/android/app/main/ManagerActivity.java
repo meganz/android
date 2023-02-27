@@ -373,7 +373,7 @@ import mega.privacy.android.app.psa.PsaManager;
 import mega.privacy.android.app.psa.PsaViewHolder;
 import mega.privacy.android.app.service.iar.RatingHandlerImpl;
 import mega.privacy.android.app.service.push.MegaMessageService;
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity;
+import mega.privacy.android.app.presentation.verification.SMSVerificationActivity;
 import mega.privacy.android.app.sync.BackupState;
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;

@@ -51,7 +51,7 @@ import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.smsVerification.usecase.ResetPhoneNumberUseCase
+import mega.privacy.android.app.presentation.verification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR

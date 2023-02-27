@@ -1,4 +1,4 @@
-package mega.privacy.android.app.smsVerification
+package mega.privacy.android.app.presentation.verification
 
 import android.content.DialogInterface
 import android.content.Intent

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.smsVerification.usecase
+package mega.privacy.android.app.presentation.verification.usecase
 
 import com.jeremyliao.liveeventbus.LiveEventBus
 import kotlinx.coroutines.CoroutineDispatcher
@@ -14,6 +14,11 @@ import nz.mega.sdk.MegaError.API_ENOENT
 import nz.mega.sdk.MegaError.API_OK
 import javax.inject.Inject
 
+@Deprecated(
+    "This use case is being replaced with a domain implementation. Also see [AppFeatures.MonitorPhoneNumber]",
+    replaceWith = ReplaceWith("mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber"),
+    level = DeprecationLevel.WARNING
+)
 class ResetPhoneNumberUseCase @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

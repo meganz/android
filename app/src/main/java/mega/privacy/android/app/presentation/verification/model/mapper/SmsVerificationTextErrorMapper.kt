@@ -1,4 +1,4 @@
-package mega.privacy.android.app.smsVerification.model.mapper
+package mega.privacy.android.app.presentation.verification.model.mapper
 
 /**
  * Sms verification text error mapper

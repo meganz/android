@@ -1,4 +1,4 @@
-package mega.privacy.android.app.smsVerification
+package mega.privacy.android.app.presentation.verification
 
 import android.content.ClipboardManager
 import android.content.Intent
@@ -39,7 +39,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.smsVerification.model.SmsVerificationTextState
+import mega.privacy.android.app.presentation.verification.model.SmsVerificationTextState
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue

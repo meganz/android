@@ -9,9 +9,9 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.smsVerification.SMSVerificationTextViewModel
-import mega.privacy.android.app.smsVerification.model.SmsVerificationTextState
-import mega.privacy.android.app.smsVerification.model.mapper.SmsVerificationTextErrorMapper
+import mega.privacy.android.app.presentation.verification.SMSVerificationTextViewModel
+import mega.privacy.android.app.presentation.verification.model.SmsVerificationTextState
+import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.usecase.verification.VerifyPhoneNumber
 import org.junit.After
 import org.junit.Before

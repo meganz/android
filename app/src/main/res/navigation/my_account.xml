@@ -56,7 +56,7 @@
 
     <activity
         android:id="@+id/add_phone_number"
-        android:name="mega.privacy.android.app.smsVerification.SMSVerificationActivity"
+        android:name="mega.privacy.android.app.presentation.verification.SMSVerificationActivity"
         tools:layout="@layout/activity_sms_verification"/>
 
     <activity

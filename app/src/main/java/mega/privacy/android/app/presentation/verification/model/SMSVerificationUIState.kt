@@ -1,4 +1,4 @@
-package mega.privacy.android.app.smsVerification.model
+package mega.privacy.android.app.presentation.verification.model
 
 /**
  * SMSVerificationUIState

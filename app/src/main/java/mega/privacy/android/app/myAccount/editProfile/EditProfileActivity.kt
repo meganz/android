@@ -43,7 +43,7 @@ import mega.privacy.android.app.myAccount.MyAccountViewModel.Companion.CHECKING_
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
-import mega.privacy.android.app.smsVerification.SMSVerificationActivity
+import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
 import mega.privacy.android.app.utils.AlertDialogUtil.setEditTextError

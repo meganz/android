@@ -1,4 +1,4 @@
-package mega.privacy.android.app.smsVerification
+package mega.privacy.android.app.presentation.verification
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
-import mega.privacy.android.app.smsVerification.model.SMSVerificationUIState
+import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
 import mega.privacy.android.domain.usecase.GetAccountAchievements

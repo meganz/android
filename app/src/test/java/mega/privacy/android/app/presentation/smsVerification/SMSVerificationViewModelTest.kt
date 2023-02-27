@@ -11,8 +11,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
-import mega.privacy.android.app.smsVerification.SMSVerificationViewModel
-import mega.privacy.android.app.smsVerification.model.SMSVerificationUIState
+import mega.privacy.android.app.presentation.verification.SMSVerificationViewModel
+import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
 import mega.privacy.android.domain.usecase.GetAccountAchievements

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.smsVerification
+package mega.privacy.android.app.presentation.verification
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,8 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.smsVerification.model.SmsVerificationTextState
-import mega.privacy.android.app.smsVerification.model.mapper.SmsVerificationTextErrorMapper
+import mega.privacy.android.app.presentation.verification.model.SmsVerificationTextState
+import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.usecase.verification.VerifyPhoneNumber
 import javax.inject.Inject
 
