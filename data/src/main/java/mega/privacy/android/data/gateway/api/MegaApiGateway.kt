@@ -1100,8 +1100,9 @@ interface MegaApiGateway {
      *
      * @param sid the ID of the set
      * @param eid the SetElement ID that will be removed
+     * @param listener MegaRequestListener to track this request
      */
-    suspend fun removeSetElement(sid: Long, eid: Long)
+    suspend fun removeSetElement(sid: Long, eid: Long, listener: MegaRequestListenerInterface)
 
     /**
      * Get a list of all Sets available for current user.

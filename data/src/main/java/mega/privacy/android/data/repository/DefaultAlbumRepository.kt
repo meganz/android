@@ -19,12 +19,14 @@ import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.listener.RemoveSetElementListenerInterface
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
+import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AlbumRepository
@@ -38,6 +40,7 @@ import javax.inject.Singleton
 import kotlin.coroutines.suspendCoroutine
 
 typealias AlbumPhotosAddingProgressPool = MutableMap<AlbumId, MutableSharedFlow<AlbumPhotosAddingProgress?>>
+typealias AlbumPhotosRemovingProgressPool = MutableMap<AlbumId, MutableSharedFlow<AlbumPhotosRemovingProgress?>>
 
 /**
  * Default [AlbumRepository] implementation
@@ -57,6 +60,8 @@ internal class DefaultAlbumRepository @Inject constructor(
     private val albumElements: MutableMap<AlbumId, List<AlbumPhotoId>> = mutableMapOf()
 
     private val albumPhotosAddingProgressPool: AlbumPhotosAddingProgressPool = mutableMapOf()
+
+    private val albumPhotosRemovingProgressPool: AlbumPhotosRemovingProgressPool = mutableMapOf()
 
     override suspend fun createAlbum(name: String): UserSet = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
@@ -168,8 +173,28 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     override suspend fun removePhotosFromAlbum(albumID: AlbumId, photoIDs: List<AlbumPhotoId>) =
         withContext(ioDispatcher) {
+            val progressFlow = getAlbumPhotosRemovingProgressFlow(albumID)
+            progressFlow.tryEmit(
+                AlbumPhotosRemovingProgress(
+                    isProgressing = true,
+                    totalRemovedPhotos = 0,
+                )
+            )
+
+            val listener = RemoveSetElementListenerInterface(
+                target = photoIDs.size,
+                onCompletion = { success, _ ->
+                    progressFlow.tryEmit(
+                        AlbumPhotosRemovingProgress(
+                            isProgressing = false,
+                            totalRemovedPhotos = success,
+                        )
+                    )
+                }
+            )
+
             for (photoID in photoIDs) {
-                megaApiGateway.removeSetElement(albumID.id, photoID.id)
+                megaApiGateway.removeSetElement(albumID.id, photoID.id, listener)
             }
         }
 
@@ -198,6 +223,14 @@ internal class DefaultAlbumRepository @Inject constructor(
         getAlbumPhotosAddingProgressFlow(albumId).distinctUntilChanged()
 
     override suspend fun updateAlbumPhotosAddingProgressCompleted(albumId: AlbumId) {
+        val progressFlow = getAlbumPhotosAddingProgressFlow(albumId)
+        progressFlow.tryEmit(null)
+    }
+
+    override fun observeAlbumPhotosRemovingProgress(albumId: AlbumId): Flow<AlbumPhotosRemovingProgress?> =
+        getAlbumPhotosRemovingProgressFlow(albumId).distinctUntilChanged()
+
+    override suspend fun updateAlbumPhotosRemovingProgressCompleted(albumId: AlbumId) {
         val progressFlow = getAlbumPhotosAddingProgressFlow(albumId)
         progressFlow.tryEmit(null)
     }
@@ -232,6 +265,9 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     private fun getAlbumPhotosAddingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosAddingProgress?> =
         albumPhotosAddingProgressPool.getOrPut(albumId) { MutableSharedFlow(replay = 1) }
+
+    private fun getAlbumPhotosRemovingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosRemovingProgress?> =
+        albumPhotosRemovingProgressPool.getOrPut(albumId) { MutableSharedFlow(replay = 1) }
 
     private suspend fun MegaSet.toUserSet(): UserSet {
         var cover = cover()

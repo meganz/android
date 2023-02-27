@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
+import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.set.UserSet
 
 /**
@@ -94,6 +95,21 @@ interface AlbumRepository {
      * @param albumId the album id to be observed its photos adding progress
      */
     suspend fun updateAlbumPhotosAddingProgressCompleted(albumId: AlbumId)
+
+    /**
+     * Observe album photos removing progress
+     *
+     * @param albumId the album id to be observed its photos removing progress
+     * @return a flow of progress
+     */
+    fun observeAlbumPhotosRemovingProgress(albumId: AlbumId): Flow<AlbumPhotosRemovingProgress?>
+
+    /**
+     * Update to acknowledge album photos removing progress is completed
+     *
+     * @param albumId the album id to be observed its photos removing progress
+     */
+    suspend fun updateAlbumPhotosRemovingProgressCompleted(albumId: AlbumId)
 
     /**
      * Update album name

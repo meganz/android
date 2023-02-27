@@ -117,17 +117,29 @@ class DefaultAlbumRepositoryTest {
         }
 
     @Test
-    fun `test that removePhotosFromAlbum invokes the removeSetElement api function for each photoID`() =
+    fun `test that removePhotosFromAlbum triggers adding sharing progress`() =
         runTest {
             val testAlbumId = AlbumId(1L)
             val testPhotos = (1..2L).map {
                 AlbumPhotoId(it, NodeId(1L), testAlbumId)
             }
 
+            whenever(megaApiGateway.removeSetElement(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as MegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock {
+                        on { errorCode }.thenReturn(MegaError.API_OK)
+                    }
+                )
+            }
+
             underTest.removePhotosFromAlbum(albumID = testAlbumId, photoIDs = testPhotos)
 
-            for (photo in testPhotos) {
-                verify(megaApiGateway).removeSetElement(testAlbumId.id, photo.id)
+            underTest.observeAlbumPhotosRemovingProgress(testAlbumId).test {
+                val progress = awaitItem()
+                assertThat(progress?.isProgressing).isEqualTo(false)
+                assertThat(progress?.totalRemovedPhotos).isEqualTo(testPhotos.size)
             }
         }
 
