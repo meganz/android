@@ -50,7 +50,7 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.ChangeEmailException
-import mega.privacy.android.domain.exception.ChatNotInitializedException
+import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NoLoggedInUserException
 import mega.privacy.android.domain.exception.NotMasterBusinessAccountException
@@ -243,7 +243,7 @@ internal class DefaultAccountRepository @Inject constructor(
                                         Result.success(Unit)
                                     )
                                     MegaChatError.ERROR_ACCESS -> continuation.resumeWith(
-                                        Result.failure(ChatNotInitializedException())
+                                        Result.failure(ChatNotInitializedErrorStatus())
                                     )
                                     else -> continuation.failWithError(error)
                                 }

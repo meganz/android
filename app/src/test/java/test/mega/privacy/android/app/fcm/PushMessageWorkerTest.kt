@@ -20,13 +20,13 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.fcm.PushMessageWorker
-import mega.privacy.android.domain.exception.ChatNotInitializedException
+import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
-import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
-import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
+import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -117,8 +117,7 @@ class PushMessageWorkerTest {
         runTest {
             whenever(backgroundFastLogin()).thenReturn("good_session")
             whenever(pushMessageMapper(any())).thenReturn(mock())
-            whenever(retryPendingConnections(any())).thenThrow(
-                ChatNotInitializedException())
+            whenever(retryPendingConnections(any())).thenThrow(ChatNotInitializedErrorStatus())
 
             underTest.doWork()
             verify(initialiseMegaChat).invoke("good_session")
@@ -130,7 +129,8 @@ class PushMessageWorkerTest {
             whenever(backgroundFastLogin()).thenReturn("good_session")
             whenever(pushMessageMapper(any())).thenReturn(mock())
             whenever(retryPendingConnections(any())).thenThrow(
-                EmptyFolderException())
+                EmptyFolderException()
+            )
 
             underTest.doWork()
             verifyNoInteractions(initialiseMegaChat)
@@ -142,9 +142,8 @@ class PushMessageWorkerTest {
             val sessionId = "good_session"
             whenever(backgroundFastLogin()).thenReturn(sessionId)
             whenever(pushMessageMapper(any())).thenReturn(mock())
-            whenever(retryPendingConnections(any())).thenThrow(
-                ChatNotInitializedException())
-            whenever(initialiseMegaChat(sessionId)).thenThrow(ChatNotInitializedException())
+            whenever(retryPendingConnections(any())).thenThrow(ChatNotInitializedErrorStatus())
+            whenever(initialiseMegaChat(sessionId)).thenThrow(ChatNotInitializedErrorStatus())
 
             val result = underTest.doWork()
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())

@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.login.LoginStatus
 
 /**
  * Login repository.
@@ -8,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface LoginRepository {
 
     /**
-     * Initializes megaChat API.
+     * Initializes megaChat API for fast login.
      *
      * @param session Required account session.
      */
@@ -66,4 +67,19 @@ interface LoginRepository {
      *
      */
     suspend fun broadcastFinishActivity()
+
+    /**
+     * Initializes megaChat API for login.
+     *
+     */
+    suspend fun initMegaChat()
+
+    /**
+     * Logs in.
+     *
+     * @param email Account email.
+     * @param email Account password.
+     * @return [LoginStatus].
+     */
+    fun login(email: String, password: String): Flow<LoginStatus>
 }

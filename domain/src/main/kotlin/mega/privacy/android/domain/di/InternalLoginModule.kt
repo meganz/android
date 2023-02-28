@@ -16,8 +16,10 @@ import mega.privacy.android.domain.usecase.login.ChatLogout
 import mega.privacy.android.domain.usecase.login.DefaultBackgroundFastLogin
 import mega.privacy.android.domain.usecase.login.DefaultChatLogout
 import mega.privacy.android.domain.usecase.login.DefaultLocalLogout
+import mega.privacy.android.domain.usecase.login.DefaultLogin
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.login.LocalLogout
+import mega.privacy.android.domain.usecase.login.Login
 import mega.privacy.android.domain.usecase.login.MonitorLogout
 import javax.inject.Singleton
 
@@ -42,6 +44,12 @@ internal abstract class InternalLoginModule {
      */
     @Binds
     abstract fun bindChatLogout(useCase: DefaultChatLogout): ChatLogout
+
+    /**
+     * Provides [Login]
+     */
+    @Binds
+    abstract fun bindLogin(useCase: DefaultLogin): Login
 
     companion object {
 

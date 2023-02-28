@@ -1902,4 +1902,21 @@ interface MegaApiGateway {
      * @return current sms allowed state: 2 = Opt-in and unblock SMS allowed.  1 = Only unblock SMS allowed.  0 = No SMS allowed
      */
     suspend fun getSmsAllowedState(): Int
+
+    /**
+     * Logs in to a MEGA account.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_LOGIN.
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getEmail - Returns the first parameter
+     * - MegaRequest::getPassword - Returns the second parameter
+     * <p>
+     * If the email/password aren't valid the error code provided in onRequestFinish is
+     * MegaError::API_ENOENT.
+     *
+     * @param email    Email of the user
+     * @param password Password
+     * @param listener MegaRequestListener to track this request
+     */
+    fun login(email: String, password: String, listener: MegaRequestListenerInterface)
 }

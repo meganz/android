@@ -18,12 +18,12 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.data.mapper.PushMessageMapper
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.domain.exception.ChatNotInitializedException
+import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
-import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
+import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
+import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import timber.log.Timber
 
 /**
@@ -63,7 +63,7 @@ class PushMessageWorker @AssistedInject constructor(
                 Timber.d("Fast login success.")
                 runCatching { retryPendingConnections(disconnect = false) }
                     .recoverCatching { error ->
-                        if (error is ChatNotInitializedException) {
+                        if (error is ChatNotInitializedErrorStatus) {
                             Timber.d("chat engine not ready. try to initialise megachat.")
                             initialiseMegaChat(result.getOrDefault(""))
                         } else {
@@ -101,8 +101,10 @@ class PushMessageWorker @AssistedInject constructor(
     override suspend fun getForegroundInfo(): ForegroundInfo {
         val notification = when (pushMessageMapper(inputData).type) {
             TYPE_CALL -> getNotification(R.drawable.ic_call_started)
-            TYPE_CHAT -> getNotification(R.drawable.ic_stat_notify,
-                R.string.notification_chat_undefined_content)
+            TYPE_CHAT -> getNotification(
+                R.drawable.ic_stat_notify,
+                R.string.notification_chat_undefined_content
+            )
             else -> getNotification(R.drawable.ic_stat_notify)
         }
 
@@ -114,7 +116,8 @@ class PushMessageWorker @AssistedInject constructor(
             val notificationChannel = NotificationChannel(
                 RETRIEVING_NOTIFICATIONS_ID,
                 RETRIEVING_NOTIFICATIONS,
-                NotificationManager.IMPORTANCE_NONE).apply {
+                NotificationManager.IMPORTANCE_NONE
+            ).apply {
                 enableVibration(false)
                 setSound(null, null)
             }

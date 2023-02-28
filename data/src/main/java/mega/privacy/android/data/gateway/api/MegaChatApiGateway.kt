@@ -33,7 +33,7 @@ interface MegaChatApiGateway {
      * @param session   Account session.
      * @return Init state.
      */
-    fun init(session: String): Int
+    fun init(session: String?): Int
 
     /**
      * Logouts API.

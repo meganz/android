@@ -46,7 +46,7 @@ internal class MegaChatApiFacade @Inject constructor(
     override val initState: Int
         get() = chatApi.initState
 
-    override fun init(session: String): Int =
+    override fun init(session: String?): Int =
         chatApi.init(session)
 
     override fun logout(listener: MegaChatRequestListenerInterface?) = chatApi.logout(listener)
