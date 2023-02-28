@@ -131,6 +131,24 @@ class ChatViewModel @Inject constructor(
     }
 
     /**
+     * Set if the chat has been initialised.
+     *
+     * @param value  True, if the chat has been initialised. False, otherwise.
+     */
+    fun setChatInitialised(value: Boolean) {
+        _state.update { it.copy(isChatInitialised = value) }
+    }
+
+    /**
+     * Check if the chat has been initialised.
+     *
+     * @return True, if the chat has been initialised. False, otherwise.
+     */
+    fun isChatInitialised(): Boolean {
+        return state.value.isChatInitialised
+    }
+
+    /**
      * Answers a call.
      *
      * @param chatId

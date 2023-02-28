@@ -2095,7 +2095,6 @@ public class ChatActivity extends PasscodeActivity
 
                     composite.clear();
                     checkChatChanges();
-
                     myUserHandle = megaChatApi.getMyUserHandle();
 
                     if (savedInstanceState != null) {
@@ -2180,6 +2179,7 @@ public class ChatActivity extends PasscodeActivity
                         }
                     }
                     initEmptyScreen(text);
+                    initAndShowChat();
                 }
             }
         } else {
@@ -2294,6 +2294,7 @@ public class ChatActivity extends PasscodeActivity
 
         megaChatApi.closeChatRoom(idChat, this);
         if (megaChatApi.openChatRoom(idChat, this)) {
+            viewModel.setChatInitialised(true);
             MegaApplication.setClosedChat(false);
             return true;
         }
@@ -8376,6 +8377,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onStop() {
         super.onStop();
+        viewModel.setChatInitialised(false);
     }
 
     private void cleanBuffers() {
@@ -8390,12 +8392,17 @@ public class ChatActivity extends PasscodeActivity
         }
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
-        cleanBuffers();
-        initAndShowChat();
+        if(!viewModel.isChatInitialised()) {
+            cleanBuffers();
+
+            if (!initChat()) {
+                return;
+            }
+            loadHistory();
+        }
     }
 
     @Override
