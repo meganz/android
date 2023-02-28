@@ -409,7 +409,7 @@ class AlbumsViewModelTest {
     @Test
     fun `test that setPlaceholderAlbumTitle set the right text if an album with default name already exists`() =
         runTest {
-            val expectedName = "New album(1)"
+            val expectedName = "New album (1)"
             val newUserAlbum = createUserAlbum(title = "New album")
             whenever(uiAlbumMapper(any(), eq(newUserAlbum))).thenReturn(
                 UIAlbum(
@@ -441,11 +441,11 @@ class AlbumsViewModelTest {
     @Test
     fun `test that setPlaceholderAlbumTitle set the right text if two albums with default name already exist`() =
         runTest {
-            val expectedName = "New album(2)"
+            val expectedName = "New album (2)"
             val newAlbum1 =
                 createUserAlbum(id = AlbumId(1L), title = "New album", modificationTime = 1L)
             val newAlbum2 =
-                createUserAlbum(id = AlbumId(2L), title = "New album(1)", modificationTime = 2L)
+                createUserAlbum(id = AlbumId(2L), title = "New album (1)", modificationTime = 2L)
 
             whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
                 UIAlbum(

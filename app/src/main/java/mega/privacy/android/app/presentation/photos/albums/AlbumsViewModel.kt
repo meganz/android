@@ -363,7 +363,7 @@ class AlbumsViewModel @Inject constructor(
         var currentDefaultTitle = placeholderTitle
 
         while (currentDefaultTitle in allUserAlbumsTitle) {
-            currentDefaultTitle = placeholderTitle + "(${++i})"
+            currentDefaultTitle = placeholderTitle + " (${++i})"
         }
 
         _state.update {
@@ -548,7 +548,7 @@ class AlbumsViewModel @Inject constructor(
     }
 
     fun revalidateInput() {
-        if (state.value.showCreateAlbumDialog || state.value.showRenameDialog) {
+        if (!_state.value.isInputNameValid && (_state.value.showCreateAlbumDialog || _state.value.showRenameDialog)) {
             checkLatestNameInputValidity()
         }
     }
