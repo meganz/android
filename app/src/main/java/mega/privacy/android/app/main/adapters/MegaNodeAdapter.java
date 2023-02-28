@@ -1100,7 +1100,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 }
 
             } else if (type == OUTGOING_SHARES_ADAPTER) {
-                holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
                 boolean hasUnverifiedNodes = !unverifiedOutgoingNodeHandles.isEmpty()

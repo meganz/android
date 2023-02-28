@@ -8,6 +8,7 @@ package mega.privacy.android.domain.entity
  * @property access
  * @property timeStamp
  * @property isPending
+ * @param isVerified
  */
 data class ShareData(
     val user: String?,
@@ -15,4 +16,5 @@ data class ShareData(
     val access: Int,
     val timeStamp: Long,
     val isPending: Boolean,
+    val isVerified: Boolean,
 )

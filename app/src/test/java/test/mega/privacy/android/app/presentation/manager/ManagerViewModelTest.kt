@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -29,6 +30,8 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.verification.UnVerified
+import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
@@ -71,9 +74,36 @@ class ManagerViewModelTest {
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
     private val monitorConnectivity = mock<MonitorConnectivity>()
-    private val getFeatureFlagValue = mock<GetFeatureFlagValue>()
-    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares>()
-    private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares>()
+    private val getFeatureFlagValue =
+        mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(false) }
+    private val shareDataList = listOf(
+        ShareData("user", 8766L, 0, 987654678L, true, false),
+        ShareData("user", 8766L, 0, 987654678L, true, false)
+    )
+    private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
+        onBlocking {
+            invoke(
+                any()
+            )
+        }.thenReturn(
+            shareDataList
+        )
+    }
+    private val getUnverifiedIncomingShares = mock<GetUnverifiedIncomingShares> {
+        onBlocking {
+            invoke(
+                any()
+            )
+        }.thenReturn(shareDataList)
+    }
+    private val initialFinishActivityValue = false
+    private val monitorFinishActivity = MutableStateFlow(initialFinishActivityValue)
+    private val monitorVerificationStatus = MutableStateFlow<VerificationStatus>(
+        UnVerified(
+            canRequestUnblockSms = false,
+            canRequestOptInVerification = false
+        )
+    )
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -327,10 +357,14 @@ class ManagerViewModelTest {
 
     @Test
     fun `test that pending actions count is not null`() = runTest {
-        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
-        val shareData1 = ShareData("user", 8766L, 0, 987654678L, true)
-        whenever(getUnverifiedIncomingShares(getCloudSortOrder())).thenReturn(listOf(shareData,
-            shareData1))
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true, false)
+        val shareData1 = ShareData("user", 8766L, 0, 987654678L, true, false)
+        whenever(getUnverifiedIncomingShares(getCloudSortOrder())).thenReturn(
+            listOf(
+                shareData,
+                shareData1
+            )
+        )
         setUnderTest()
         underTest.state.map { it.pendingActionsCount }.distinctUntilChanged().test {
             assertThat(awaitItem()).isEqualTo(2)

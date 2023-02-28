@@ -336,11 +336,10 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData> =
         withContext(ioDispatcher) {
-            megaApiGateway.getUnverifiedOutgoingShares(sortOrderIntMapper(order)).map {
+            megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order)).map {
                 megaShareMapper(it)
             }
         }
-
 
     override suspend fun openShareDialog(megaNode: MegaNode) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
@@ -352,21 +351,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
-        suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { return@getRequestListener }
-            megaApiGateway.upgradeSecurity(listener)
-            continuation.invokeOnCancellation {
-                megaApiGateway.removeRequestListener(listener)
-            }
-        }
-    }
-
-    override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
-        megaApiGateway.setSecureFlag(enable)
-    }
-
-    override suspend fun getUnverifiedOutgoingShares(): Int = 5
     override suspend fun searchInShares(
         query: String,
         megaCancelToken: MegaCancelToken,
@@ -447,5 +431,19 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
                 parentNode, query, megaCancelToken, sortOrderIntMapper(order)
             )
         }
+    }
+
+    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.upgradeSecurity(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
+        megaApiGateway.setSecureFlag(enable)
     }
 }

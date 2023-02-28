@@ -52,7 +52,7 @@ class OutgoingSharesViewModelTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
-        val shareData = ShareData("user", 8766L, 0, 987654678L, true)
+        val shareData = ShareData("user", 8766L, 0, 987654678L, true, false)
         onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
     }
 

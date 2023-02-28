@@ -675,8 +675,9 @@ internal class MegaApiFacade @Inject constructor(
     override fun createSetElement(sid: Long, node: Long, listener: MegaRequestListenerInterface) =
         megaApi.createSetElement(sid, node, "", listener)
 
-    override suspend fun removeSetElement(sid: Long, eid: Long) =
+    override suspend fun removeSetElement(sid: Long, eid: Long) {
         megaApi.removeSetElement(sid, eid)
+    }
 
     override suspend fun getSets(): MegaSetList = megaApi.sets
 
@@ -915,23 +916,6 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun cancelTransfers(direction: Int) = megaApi.cancelTransfers(direction)
 
-    override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
-        megaApi.getUnverifiedIncomingShares(order)
-
-    override suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare> =
-        megaApi.getUnverifiedOutgoingShares(order)
-
-    override fun openShareDialog(
-        megaNode: MegaNode,
-        listener: MegaRequestListenerInterface,
-    ) = megaApi.openShareDialog(megaNode, listener)
-
-    override fun upgradeSecurity(listener: MegaRequestListenerInterface) =
-        megaApi.upgradeSecurity(listener)
-
-    @Deprecated("This API is for testing purpose, will be deleted later")
-    override fun setSecureFlag(enable: Boolean) = megaApi.setSecureFlag(enable)
-
     override suspend fun getVerifiedPhoneNumber(): String? = megaApi.smsVerifiedPhoneNumber()
 
     override fun verifyPhoneNumber(pin: String, listener: MegaRequestListenerInterface) =
@@ -989,5 +973,23 @@ internal class MegaApiFacade @Inject constructor(
         )
     }
 
+    override suspend fun getUnverifiedIncomingShares(order: Int): List<MegaShare> =
+        megaApi.getUnverifiedIncomingShares(order)
+
+    override suspend fun getUnverifiedOutgoingShares(order: Int): List<MegaShare> =
+        megaApi.getOutShares(order)
+
+    override fun openShareDialog(
+        megaNode: MegaNode,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.openShareDialog(megaNode, listener)
+
+    override fun upgradeSecurity(listener: MegaRequestListenerInterface) =
+        megaApi.upgradeSecurity(listener)
+
+    @Deprecated("This API is for testing purpose, will be deleted later")
+    override fun setSecureFlag(enable: Boolean) = megaApi.setSecureFlag(enable)
+
     override suspend fun getSmsAllowedState() = megaApi.smsAllowedState()
+
 }
