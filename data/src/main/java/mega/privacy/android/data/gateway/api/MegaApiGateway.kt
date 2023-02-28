@@ -1651,9 +1651,34 @@ interface MegaApiGateway {
 
     /**
      * Check if the master key has been exported
-     * @param listener as [MegaRequestListenerInterface]
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_GET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getParamType - Returns the attribute type MegaApi::USER_ATTR_PWD_REMINDER
+     * <p>
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getAccess - Returns true if the master key has been exported
+     * <p>
+     * If the corresponding user attribute is not set yet, the request will fail with the
+     * error code MegaError::API_ENOENT.
+     * @param listener MegaRequestListener to track this request
      */
     fun isMasterKeyExported(listener: MegaRequestListenerInterface?)
+
+    /**
+     * Enable multi-factor authentication for the account
+     * The MegaApi object must be logged into an account to successfully use this function.
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_MULTI_FACTOR_AUTH_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getFlag - Returns true
+     * - MegaRequest::getPassword - Returns the pin sent in the first parameter
+     * @param pin      Valid pin code for multi-factor authentication
+     * @param listener MegaRequestListener to track this request
+     */
+    fun enableMultiFactorAuth(pin: String, listener: MegaRequestListenerInterface?)
+
 
     /**
      * Set a public attribute of the current user

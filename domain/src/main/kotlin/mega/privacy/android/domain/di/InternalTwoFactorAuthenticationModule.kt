@@ -4,9 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.usecase.GetExportMasterKey
+import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
 import mega.privacy.android.domain.usecase.IsMasterKeyExported
-import mega.privacy.android.domain.usecase.SetMasterKeyExported
 
 @Module
 @DisableInstallInCheck
@@ -17,5 +16,12 @@ internal object InternalTwoFactorAuthenticationModule {
     @Provides
     fun providesIsMasterKeyExported(repository: SettingsRepository): IsMasterKeyExported =
         IsMasterKeyExported(repository::isMasterKeyExported)
+
+    /**
+     * Provides EnableMultiFactorAuth Use Case
+     */
+    @Provides
+    fun providesEnableMultiFactorAuth(repository: SettingsRepository): EnableMultiFactorAuth =
+        EnableMultiFactorAuth(repository::enableMultiFactorAuth)
 
 }

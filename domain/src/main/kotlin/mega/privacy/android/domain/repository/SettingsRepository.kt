@@ -434,4 +434,10 @@ interface SettingsRepository {
      * Check is the master key has been exported
      */
     suspend fun isMasterKeyExported(): Boolean
+
+    /**
+     * Check if multi-factor authentication got enabled successfully or not
+     * @param pin the valid pin code for multi-factor authentication
+     */
+    suspend fun enableMultiFactorAuth(pin: String): Boolean
 }

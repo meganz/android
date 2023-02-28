@@ -31,7 +31,6 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
-import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -420,7 +419,14 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaApiGateway.setMasterKeyExported(null)
     }
 
-    @Throws(MegaException::class)
+    override suspend fun enableMultiFactorAuth(pin: String): Boolean = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { it.flag }
+            megaApiGateway.enableMultiFactorAuth(pin, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
     override suspend fun isMasterKeyExported(): Boolean = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             megaApiGateway.isMasterKeyExported(
