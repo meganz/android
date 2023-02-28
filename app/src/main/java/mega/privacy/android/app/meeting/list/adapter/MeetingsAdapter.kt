@@ -100,7 +100,7 @@ class MeetingsAdapter constructor(
             return this?.map(MeetingAdapterItem::Data)
         }
 
-        val itemsWithHeader = mutableListOf<MeetingAdapterItem>()
+        val itemsWithHeader = mutableSetOf<MeetingAdapterItem>()
         forEachIndexed { index, item ->
             val previousItem = getOrNull(index - 1)
             when {
@@ -113,7 +113,7 @@ class MeetingsAdapter constructor(
             }
             itemsWithHeader.add(MeetingAdapterItem.Data(item))
         }
-        return itemsWithHeader
+        return itemsWithHeader.toList()
     }
 
     private fun isSameDay(timeStampA: Long?, timeStampB: Long?): Boolean =
