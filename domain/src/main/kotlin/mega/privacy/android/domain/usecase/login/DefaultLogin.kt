@@ -11,6 +11,7 @@ import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import javax.inject.Inject
 
@@ -21,6 +22,7 @@ class DefaultLogin @Inject constructor(
     private val loginRepository: LoginRepository,
     private val chatLogout: ChatLogout,
     private val resetChatSettings: ResetChatSettings,
+    private val saveAccountCredentials: SaveAccountCredentials,
     @LoginMutex private val loginMutex: Mutex,
 ) : Login {
 
@@ -43,6 +45,8 @@ class DefaultLogin @Inject constructor(
 
                 runCatching {
                     emitAll(loginRepository.login(email, password))
+                }.onSuccess {
+                    saveAccountCredentials()
                 }.onFailure {
                     if (it !is LoginLoggedOutFromOtherLocation
                         && it !is LoginMultiFactorAuthRequired

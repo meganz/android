@@ -11,6 +11,7 @@ import mega.privacy.android.domain.exception.ChatNotInitializedUnknownStatus
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginRequireValidation
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import org.junit.Before
 import org.mockito.kotlin.mock
@@ -30,6 +31,7 @@ class DefaultLoginTest {
     }
     private val resetChatSettings = mock<ResetChatSettings>()
     private val disableChatApi = mock<DisableChatApi>()
+    private val saveAccountCredentials = mock<SaveAccountCredentials>()
 
     private val email = "test@email.com"
     private val password = "testPassword"
@@ -40,6 +42,7 @@ class DefaultLoginTest {
             loginRepository = loginRepository,
             chatLogout = chatLogout,
             resetChatSettings = resetChatSettings,
+            saveAccountCredentials = saveAccountCredentials,
             loginMutex = mock()
         )
     }
@@ -59,6 +62,7 @@ class DefaultLoginTest {
             verify(loginRepository).initMegaChat()
             verify(chatLogout).invoke(disableChatApi)
             verify(loginRepository).login(email, password)
+            verify(saveAccountCredentials).invoke()
         }
 
     @Test
@@ -107,7 +111,7 @@ class DefaultLoginTest {
         }
 
     @Test
-    fun `test that login success without error`() = runTest {
+    fun `test that login success without error and invokes saveAccountCredentials`() = runTest {
         whenever(loginRepository.login(email, password))
             .thenReturn(flowOf(LoginStatus.LoginSucceed))
 
@@ -118,5 +122,6 @@ class DefaultLoginTest {
 
         verify(loginRepository).initMegaChat()
         verify(loginRepository).login(email, password)
+        verify(saveAccountCredentials).invoke()
     }
 }
