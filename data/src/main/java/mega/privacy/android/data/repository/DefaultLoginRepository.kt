@@ -195,11 +195,12 @@ internal class DefaultLoginRepository @Inject constructor(
                             Timber.e("Init chat error: ${exception.message}. Logout...")
                             continuation.resumeWith(Result.failure(exception))
                         }
+                        else -> {
+                            continuation.resumeWith(
+                                Result.failure(ChatNotInitializedUnknownStatus())
+                            )
+                        }
                     }
-
-                    continuation.resumeWith(
-                        Result.failure(ChatNotInitializedUnknownStatus())
-                    )
                 }
             }
         }

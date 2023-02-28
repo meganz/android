@@ -46,6 +46,7 @@ import mega.privacy.android.app.MegaApplication.Companion.setHeartBeatAlive
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.activities.WebViewActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.FragmentLoginBinding
@@ -88,7 +89,6 @@ import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -191,6 +191,29 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
     private fun setupObservers() = with(viewModel) {
         onQuerySignupLinkFinished().observe(viewLifecycleOwner, ::showQuerySignupLinkResult)
+        viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
+            with(uiState) {
+                if (disableLoginButton) disableLoginButton() else enableLoginButton()
+                if (is2FAScreenShown) show2FAScreen()
+                if (showAlertLoggedOut) (requireActivity() as LoginActivity).showAlertLoggedOut()
+                if (showLoginScreen) {
+                    confirmLogoutDialog?.dismiss()
+                    returnToLogin()
+                }
+                error?.let {
+                    //Map the error and show the snackbar
+                }
+                if (showFetchingNodesScreen) {
+                    if (uiState.is2FAEnabled) {
+                        binding.login2fa.isVisible = false
+                        (requireActivity() as LoginActivity).hideAB()
+                    }
+                    showLoggingInScreen()
+                    getInstance().checkEnabledCookies()
+                    megaApi.fetchNodes(this@LoginFragment)
+                }
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -205,8 +228,10 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 }
             }
             val onTap = Runnable {
-                handler.postDelayed(onLongPress,
-                    LONG_CLICK_DELAY - ViewConfiguration.getTapTimeout())
+                handler.postDelayed(
+                    onLongPress,
+                    LONG_CLICK_DELAY - ViewConfiguration.getTapTimeout()
+                )
             }
             setOnTouchListener { view, event ->
                 when (event.action) {
@@ -220,7 +245,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                     }
                     MotionEvent.ACTION_MOVE -> if (loginTitleBoundaries != null && !loginTitleBoundaries!!.contains(
                             view.left + event.x.toInt(),
-                            view.top + event.y.toInt())
+                            view.top + event.y.toInt()
+                        )
                     ) {
                         handler.removeCallbacks(onLongPress)
                         handler.removeCallbacks(onTap)
@@ -528,11 +554,15 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                                 Constants.ACTION_OPEN_CONTACTS_SECTION -> {
                                     newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                     intentAction = Constants.ACTION_OPEN_CONTACTS_SECTION
-                                    if (newIntent.getLongExtra(Constants.CONTACT_HANDLE,
-                                            -1) != -1L
+                                    if (newIntent.getLongExtra(
+                                            Constants.CONTACT_HANDLE,
+                                            -1
+                                        ) != -1L
                                     ) {
-                                        newIntent.putExtra(Constants.CONTACT_HANDLE,
-                                            newIntent.getLongExtra(Constants.CONTACT_HANDLE, -1))
+                                        newIntent.putExtra(
+                                            Constants.CONTACT_HANDLE,
+                                            newIntent.getLongExtra(Constants.CONTACT_HANDLE, -1)
+                                        )
                                     }
                                 }
                             }
@@ -582,8 +612,10 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                             newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 
                             if (intent.getLongExtra(Constants.CONTACT_HANDLE, -1) != -1L) {
-                                newIntent.putExtra(Constants.CONTACT_HANDLE,
-                                    intent.getLongExtra(Constants.CONTACT_HANDLE, -1))
+                                newIntent.putExtra(
+                                    Constants.CONTACT_HANDLE,
+                                    intent.getLongExtra(Constants.CONTACT_HANDLE, -1)
+                                )
                             }
                         }
                     }
@@ -712,12 +744,14 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     private fun hideError() = with(binding) {
         viewModel.setIs2FAErrorNotShown()
         pin2faErrorLogin.isVisible = false
-        listOf(pinFirstLogin,
+        listOf(
+            pinFirstLogin,
             pinSecondLogin,
             pinThirdLogin,
             pinFourthLogin,
             pinFifthLogin,
-            pinSixthLogin).forEach { it.setTextColor(pin2FAColor) }
+            pinSixthLogin
+        ).forEach { it.setTextColor(pin2FAColor) }
     }
 
     /**
@@ -727,12 +761,14 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         viewModel.setWas2FAErrorShown()
         pin2faErrorLogin.isVisible = true
         confirmLogoutDialog?.dismiss()
-        listOf(pinFirstLogin,
+        listOf(
+            pinFirstLogin,
             pinSecondLogin,
             pinThirdLogin,
             pinFourthLogin,
             pinFifthLogin,
-            pinSixthLogin).forEach { it.setTextColor(pin2FAErrorColor) }
+            pinSixthLogin
+        ).forEach { it.setTextColor(pin2FAErrorColor) }
     }
 
 
@@ -766,10 +802,12 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             progressbarVerify2fa.isVisible = true
             isLoggingIn = true
             with(uiState) {
-                megaApi.multiFactorAuthLogin(accountSession?.email,
+                megaApi.multiFactorAuthLogin(
+                    accountSession?.email,
                     password,
                     twoFAPin,
-                    this@LoginFragment)
+                    this@LoginFragment
+                )
             }
         }
     }
@@ -802,9 +840,11 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         if (!isLoggingIn) {
             isLoggingIn = true
             val gSession = uiState.accountSession?.session
-            ChatUtil.initMegaChatApi(gSession,
-                ChatLogoutListener(requireActivity(), loggingSettings))
-            disableLoginButton()
+            ChatUtil.initMegaChatApi(
+                gSession,
+                ChatLogoutListener(requireActivity(), loggingSettings)
+            )
+            viewModel.updateDisableLoginButton(true)
 
             megaApi.fastLogin(gSession, this)
 
@@ -833,9 +873,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         showLoggingInScreen(fetchingNodes = false, generatingKeys = true)
         Timber.d("Generating keys")
 
-        with(uiState) {
-            onKeysGenerated(accountSession?.email, password)
-        }
+        onKeysGenerated()
     }
 
     /**
@@ -863,7 +901,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         val lastPassword = loginPasswordText.text.toString()
         Timber.d("Generating keys")
         viewModel.updateCredentials(email = lastEmail, password = lastPassword)
-        onKeysGenerated(lastEmail, lastPassword)
+        onKeysGenerated()
     }
 
     /**
@@ -886,11 +924,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
     /**
      * Updates the UI and launches the login request if there is network connection.
-     *
-     * @param email    Typed email.
-     * @param password Typed password.
      */
-    private fun onKeysGenerated(email: String?, password: String?) {
+    private fun onKeysGenerated() {
         Timber.d("onKeysGenerated")
         if (!isConnected()) {
             return
@@ -906,25 +941,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 loginServersBusyText.isVisible = false
             }
 
-            Timber.d("fastLogin with publicKey & privateKey")
-            val initState = megaChatApi.initState
-            Timber.d("INIT STATE: %s", initState)
-            if (initState == MegaChatApi.INIT_NOT_DONE || initState == MegaChatApi.INIT_ERROR) {
-                val ret = megaChatApi.init(null)
-                Timber.d("result of init ---> %s", ret)
-                when (ret) {
-                    MegaChatApi.INIT_WAITING_NEW_SESSION -> {
-                        disableLoginButton()
-                        megaApi.login(email, password, this)
-                    }
-                    MegaChatApi.INIT_ERROR -> {
-                        Timber.w("ERROR INIT CHAT: %s", ret)
-                        viewModel.performChatLogout()
-                        disableLoginButton()
-                        megaApi.login(email, password, this)
-                    }
-                }
-            }
+            viewModel.performLogin()
         }
     }
 
@@ -1023,6 +1040,8 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     }
 
     override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
+        if (!isAdded) return
+
         timer?.let {
             it.cancel()
             binding.loginServersBusyText.isVisible = false
@@ -1224,18 +1243,22 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     }
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
+        if (!isAdded) return
+
         Timber.d("onRequestStart: %s", request.requestString)
         if (request.type == MegaRequest.TYPE_LOGIN) {
-            disableLoginButton()
+            viewModel.updateDisableLoginButton(true)
+            viewModel.update2FAScreenShown()
         }
         if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             viewModel.updateIsFetchingNodes(true)
-            disableLoginButton()
+            viewModel.updateDisableLoginButton(true)
         }
     }
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, error: MegaError) {
-        enableLoginButton()
+        viewModel.updateDisableLoginButton(false)
+
         timer?.let {
             it.cancel()
             binding.loginServersBusyText.isVisible = false
@@ -1250,19 +1273,14 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             if (error.errorCode != MegaError.API_OK) {
                 isLoggingIn = false
                 confirmLogoutDialog?.dismiss()
-                enableLoginButton()
                 val errorMessage: String
                 when (error.errorCode) {
                     MegaError.API_ESID -> {
-                        Timber.w("MegaError.API_ESID %s",
-                            requireContext().getFormattedStringOrDefault(R.string.error_server_expired_session))
+                        Timber.w(
+                            "MegaError.API_ESID %s",
+                            requireContext().getFormattedStringOrDefault(R.string.error_server_expired_session)
+                        )
                         (requireActivity() as LoginActivity).showAlertLoggedOut()
-                    }
-                    MegaError.API_EMFAREQUIRED -> {
-                        Timber.d("require 2fa")
-                        viewModel.setIs2FAEnabled()
-                        show2FAScreen()
-                        return
                     }
                     MegaError.API_EFAILED, MegaError.API_EEXPIRED -> {
                         binding.progressbarVerify2fa.isVisible = false
@@ -1323,30 +1341,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 // Get cookies settings after login.
                 getInstance().checkEnabledCookies()
             }
-        } else if (request.type == MegaRequest.TYPE_GET_RECOVERY_LINK) {
-            Timber.d("TYPE_GET_RECOVERY_LINK")
-            when (error.errorCode) {
-                MegaError.API_OK -> {
-                    Timber.d("The recovery link has been sent")
-                    Util.showAlert(requireContext(),
-                        requireContext().getFormattedStringOrDefault(R.string.email_verification_text),
-                        requireContext().getFormattedStringOrDefault(R.string.email_verification_title))
-                }
-                MegaError.API_ENOENT -> {
-                    Timber.e("No account with this mail: %s %d", error.errorString, error.errorCode)
-                    Util.showAlert(requireContext(),
-                        requireContext().getFormattedStringOrDefault(R.string.invalid_email_text),
-                        requireContext().getFormattedStringOrDefault(R.string.invalid_email_title))
-                }
-                else -> {
-                    Timber.e("Error when asking for recovery pass link \n %s__%d",
-                        error.errorString,
-                        error.errorCode)
-                    Util.showAlert(requireContext(),
-                        requireContext().getFormattedStringOrDefault(R.string.general_text_error),
-                        requireContext().getFormattedStringOrDefault(R.string.general_error_word))
-                }
-            }
         } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             //cancel login process by press back.
             if (!isLoggingIn) {
@@ -1359,20 +1353,26 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 if (!isAdded) return
 
                 (requireActivity() as LoginActivity).intent?.apply {
-                    @Suppress("UNCHECKED_CAST") intentShareInfo =
+                    @Suppress("UNCHECKED_CAST")
+                    intentShareInfo =
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS,
-                                ArrayList::class.java)
+                            getSerializableExtra(
+                                FileExplorerActivity.EXTRA_SHARE_INFOS,
+                                ArrayList::class.java
+                            )
                         } else {
-                            @Suppress("DEPRECATION") getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS)
+                            @Suppress("DEPRECATION")
+                            getSerializableExtra(FileExplorerActivity.EXTRA_SHARE_INFOS)
                         } as ArrayList<ShareInfo>?
 
                     when {
                         intentShareInfo?.isNotEmpty() == true -> {
-                            val permissions = arrayOf(getImagePermissionByVersion(),
+                            val permissions = arrayOf(
+                                getImagePermissionByVersion(),
                                 getAudioPermissionByVersion(),
                                 getVideoPermissionByVersion(),
-                                getReadExternalStoragePermission())
+                                getReadExternalStoragePermission()
+                            )
                             if (hasPermissions(requireContext(), *permissions)) {
                                 toSharePage()
                             } else {
@@ -1381,13 +1381,25 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                             return
                         }
                         Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == type -> {
-                            startActivity(Intent(requireContext(),
-                                FileExplorerActivity::class.java).putExtra(Intent.EXTRA_TEXT,
-                                    getStringExtra(Intent.EXTRA_TEXT))
-                                .putExtra(Intent.EXTRA_SUBJECT,
-                                    getStringExtra(Intent.EXTRA_SUBJECT))
-                                .putExtra(Intent.EXTRA_EMAIL, getStringExtra(Intent.EXTRA_EMAIL))
-                                .setAction(Intent.ACTION_SEND).setType(Constants.TYPE_TEXT_PLAIN))
+                            startActivity(
+                                Intent(
+                                    requireContext(),
+                                    FileExplorerActivity::class.java
+                                ).putExtra(
+                                    Intent.EXTRA_TEXT,
+                                    getStringExtra(Intent.EXTRA_TEXT)
+                                )
+                                    .putExtra(
+                                        Intent.EXTRA_SUBJECT,
+                                        getStringExtra(Intent.EXTRA_SUBJECT)
+                                    )
+                                    .putExtra(
+                                        Intent.EXTRA_EMAIL,
+                                        getStringExtra(Intent.EXTRA_EMAIL)
+                                    )
+                                    .setAction(Intent.ACTION_SEND)
+                                    .setType(Constants.TYPE_TEXT_PLAIN)
+                            )
                             requireActivity().finish()
                             return
                         }
@@ -1403,8 +1415,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 readyToManager()
             } else {
                 Timber.e("Error fetch nodes: %s", error.errorCode)
-
-                enableLoginButton()
                 showLoginScreen()
 
                 if (error.errorCode == MegaError.API_EACCESS) {
@@ -1428,14 +1438,16 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      */
     private fun toSharePage() = with(requireActivity()) {
         startActivity(Intent(requireContext(), FileExplorerActivity::class.java).apply {
-                putExtra(FileExplorerActivity.EXTRA_SHARE_INFOS, intentShareInfo)
-                action = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_ACTION)
-                type = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_TYPE)
-            })
+            putExtra(FileExplorerActivity.EXTRA_SHARE_INFOS, intentShareInfo)
+            action = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_ACTION)
+            type = intent?.getStringExtra(FileExplorerActivity.EXTRA_SHARE_TYPE)
+        })
         finish()
     }
 
     override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
+        if (!isAdded) return
+
         Timber.w("onRequestTemporaryError: %s%d", request.requestString, e.errorCode)
         timer = object : CountDownTimer(10000, 2000) {
             override fun onTick(millisUntilFinished: Long) {
@@ -1447,41 +1459,45 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 binding.loginServersBusyText.apply {
                     isVisible = true
                     text =
-                        requireContext().getFormattedStringOrDefault(if (e.errorCode == MegaError.API_EAGAIN) {
-                            Timber.w("onRequestTemporaryError:onFinish:API_EAGAIN: :value: %s",
-                                e.value)
-                            when (e.value) {
-                                MegaApiJava.RETRY_CONNECTIVITY.toLong() -> {
-                                    binding.textLoginTip.text =
-                                        requireContext().getFormattedStringOrDefault(R.string.login_connectivity_issues)
-                                    R.string.login_connectivity_issues
+                        requireContext().getFormattedStringOrDefault(
+                            if (e.errorCode == MegaError.API_EAGAIN) {
+                                Timber.w(
+                                    "onRequestTemporaryError:onFinish:API_EAGAIN: :value: %s",
+                                    e.value
+                                )
+                                when (e.value) {
+                                    MegaApiJava.RETRY_CONNECTIVITY.toLong() -> {
+                                        binding.textLoginTip.text =
+                                            requireContext().getFormattedStringOrDefault(R.string.login_connectivity_issues)
+                                        R.string.login_connectivity_issues
+                                    }
+                                    MegaApiJava.RETRY_SERVERS_BUSY.toLong() -> {
+                                        binding.textLoginTip.text =
+                                            requireContext().getFormattedStringOrDefault(R.string.login_servers_busy)
+                                        R.string.login_servers_busy
+                                    }
+                                    MegaApiJava.RETRY_API_LOCK.toLong() -> {
+                                        binding.textLoginTip.text =
+                                            requireContext().getFormattedStringOrDefault(R.string.login_API_lock)
+                                        R.string.login_API_lock
+                                    }
+                                    MegaApiJava.RETRY_RATE_LIMIT.toLong() -> {
+                                        binding.textLoginTip.text =
+                                            requireContext().getFormattedStringOrDefault(R.string.login_API_rate)
+                                        R.string.login_API_rate
+                                    }
+                                    else -> {
+                                        binding.textLoginTip.text =
+                                            requireContext().getFormattedStringOrDefault(R.string.servers_busy)
+                                        R.string.servers_busy
+                                    }
                                 }
-                                MegaApiJava.RETRY_SERVERS_BUSY.toLong() -> {
-                                    binding.textLoginTip.text =
-                                        requireContext().getFormattedStringOrDefault(R.string.login_servers_busy)
-                                    R.string.login_servers_busy
-                                }
-                                MegaApiJava.RETRY_API_LOCK.toLong() -> {
-                                    binding.textLoginTip.text =
-                                        requireContext().getFormattedStringOrDefault(R.string.login_API_lock)
-                                    R.string.login_API_lock
-                                }
-                                MegaApiJava.RETRY_RATE_LIMIT.toLong() -> {
-                                    binding.textLoginTip.text =
-                                        requireContext().getFormattedStringOrDefault(R.string.login_API_rate)
-                                    R.string.login_API_rate
-                                }
-                                else -> {
-                                    binding.textLoginTip.text =
-                                        requireContext().getFormattedStringOrDefault(R.string.servers_busy)
-                                    R.string.servers_busy
-                                }
+                            } else {
+                                binding.textLoginTip.text =
+                                    requireContext().getFormattedStringOrDefault(R.string.servers_busy)
+                                R.string.servers_busy
                             }
-                        } else {
-                            binding.textLoginTip.text =
-                                requireContext().getFormattedStringOrDefault(R.string.servers_busy)
-                            R.string.servers_busy
-                        })
+                        )
                 }
             }
         }.start()
@@ -1496,12 +1512,16 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         Timber.d("link: %s", link)
         val layout = LinearLayout(requireContext())
         layout.orientation = LinearLayout.VERTICAL
-        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT)
-        params.setMargins(Util.scaleWidthPx(20, resources.displayMetrics),
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(
+            Util.scaleWidthPx(20, resources.displayMetrics),
             Util.scaleHeightPx(20, resources.displayMetrics),
             Util.scaleWidthPx(17, resources.displayMetrics),
-            0)
+            0
+        )
         val input = EditText(requireContext())
         layout.addView(input, params)
         input.setSingleLine()
@@ -1533,18 +1553,24 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             }
             false
         }
-        input.setImeActionLabel(requireContext().getFormattedStringOrDefault(R.string.general_add),
-            EditorInfo.IME_ACTION_DONE)
-        val builder = MaterialAlertDialogBuilder(requireContext(),
-            R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+        input.setImeActionLabel(
+            requireContext().getFormattedStringOrDefault(R.string.general_add),
+            EditorInfo.IME_ACTION_DONE
+        )
+        val builder = MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        )
         builder.setTitle(requireContext().getFormattedStringOrDefault(R.string.title_dialog_insert_MK))
         builder.setMessage(requireContext().getFormattedStringOrDefault(R.string.text_dialog_insert_MK))
         builder.setPositiveButton(requireContext().getFormattedStringOrDefault(R.string.general_ok)) { _, _ -> }
         builder.setOnDismissListener {
             Util.hideKeyboard(requireActivity(), InputMethodManager.HIDE_NOT_ALWAYS)
         }
-        builder.setNegativeButton(requireContext().getFormattedStringOrDefault(R.string.general_cancel),
-            null)
+        builder.setNegativeButton(
+            requireContext().getFormattedStringOrDefault(R.string.general_cancel),
+            null
+        )
         builder.setView(layout)
         insertMKDialog = builder.create().apply {
             show()
@@ -1597,10 +1623,13 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             }
         val message = requireContext().getFormattedStringOrDefault(R.string.confirm_cancel_login)
         confirmLogoutDialog = builder.setCancelable(true).setMessage(message).setPositiveButton(
-                requireContext().getFormattedStringOrDefault(R.string.general_positive_button),
-                dialogClickListener)
-            .setNegativeButton(requireContext().getFormattedStringOrDefault(R.string.general_negative_button),
-                dialogClickListener).show()
+            requireContext().getFormattedStringOrDefault(R.string.general_positive_button),
+            dialogClickListener
+        )
+            .setNegativeButton(
+                requireContext().getFormattedStringOrDefault(R.string.general_negative_button),
+                dialogClickListener
+            ).show()
     }
 
     /**
@@ -1779,17 +1808,25 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      */
     private fun showAlertIncorrectRK() {
         Timber.d("showAlertIncorrectRK")
-        MaterialAlertDialogBuilder(requireContext()).setTitle(requireContext().getFormattedStringOrDefault(
-                R.string.incorrect_MK_title))
+        MaterialAlertDialogBuilder(requireContext()).setTitle(
+            requireContext().getFormattedStringOrDefault(
+                R.string.incorrect_MK_title
+            )
+        )
             .setMessage(requireContext().getFormattedStringOrDefault(R.string.incorrect_MK))
             .setCancelable(false)
-            .setPositiveButton(requireContext().getFormattedStringOrDefault(R.string.general_ok),
-                null).show()
+            .setPositiveButton(
+                requireContext().getFormattedStringOrDefault(R.string.general_ok),
+                null
+            ).show()
     }
 
     private fun showMessage(stringId: Int) =
-        (requireActivity() as LoginActivity).showSnackbar(requireContext().getFormattedStringOrDefault(
-            stringId))
+        (requireActivity() as LoginActivity).showSnackbar(
+            requireContext().getFormattedStringOrDefault(
+                stringId
+            )
+        )
 
     private fun isConnected(): Boolean = if (!viewModel.isConnected) {
         showLoginScreen()

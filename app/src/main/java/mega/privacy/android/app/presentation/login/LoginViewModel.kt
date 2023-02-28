@@ -5,8 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -22,6 +25,9 @@ import mega.privacy.android.app.presentation.login.model.LoginState.Companion.CL
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.login.LoginStatus
+import mega.privacy.android.domain.exception.LoginException
+import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.usecase.CancelTransfers
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.GetAccountCredentials
@@ -38,6 +44,7 @@ import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.login.ChatLogout
 import mega.privacy.android.domain.usecase.login.DisableChatApi
 import mega.privacy.android.domain.usecase.login.LocalLogout
+import mega.privacy.android.domain.usecase.login.Login
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import javax.inject.Inject
 
@@ -64,6 +71,7 @@ class LoginViewModel @Inject constructor(
     private val cancelTransfers: CancelTransfers,
     private val localLogout: LocalLogout,
     private val chatLogout: ChatLogout,
+    private val login: Login,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -169,7 +177,12 @@ class LoginViewModel @Inject constructor(
      * Updates isFetchingNodes value in state.
      */
     fun updateIsFetchingNodes(isFetchingNodes: Boolean) {
-        _state.update { it.copy(isFetchingNodes = isFetchingNodes) }
+        _state.update {
+            it.copy(
+                isFetchingNodes = isFetchingNodes,
+                showFetchingNodesScreen = isFetchingNodes
+            )
+        }
     }
 
     /**
@@ -191,13 +204,6 @@ class LoginViewModel @Inject constructor(
      */
     fun setIs2FAErrorNotShown() {
         _state.update { it.copy(is2FAErrorShown = false) }
-    }
-
-    /**
-     * Updates is2FAEnabled value as true in state.
-     */
-    fun setIs2FAEnabled() {
-        _state.update { it.copy(is2FAEnabled = true) }
     }
 
     /**
@@ -262,6 +268,34 @@ class LoginViewModel @Inject constructor(
      */
     fun setTemporalCredentials(email: String?, password: String?) {
         _state.update { it.copy(temporalEmail = email, temporalPassword = password) }
+    }
+
+    /**
+     * Sets to false show alert logged out in state.
+     */
+    fun updateShowAlertLoggedOut() {
+        _state.update { it.copy(showAlertLoggedOut = false) }
+    }
+
+    /**
+     * Sets to false 2FA screen shown in state.
+     */
+    fun update2FAScreenShown() {
+        _state.update { it.copy(is2FAScreenShown = false) }
+    }
+
+    /**
+     * Sets to false fetching nodes screen shown in state.
+     */
+    fun updateShowFetchingNodesScreen() {
+        _state.update { it.copy(showFetchingNodesScreen = false) }
+    }
+
+    /**
+     * Updates value for disabling login button in state.
+     */
+    fun updateDisableLoginButton(disable: Boolean) {
+        _state.update { it.copy(disableLoginButton = disable) }
     }
 
     /**
@@ -361,5 +395,64 @@ class LoginViewModel @Inject constructor(
      */
     fun performChatLogout() = viewModelScope.launch {
         chatLogout(DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi })
+    }
+
+    /**
+     * Login.
+     */
+    fun performLogin() = viewModelScope.launch {
+        with(state.value) {
+            runCatching {
+                login(
+                    accountSession?.email ?: return@launch,
+                    password ?: return@launch,
+                    DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
+                ).collectLatest { status ->
+                    when (status) {
+                        LoginStatus.LoginStarted -> {
+                            _state.update {
+                                it.copy(disableLoginButton = true, is2FAScreenShown = false)
+                            }
+                        }
+                        LoginStatus.LoginRequire2FA -> {
+                            _state.update { it.copy(is2FAEnabled = true, is2FAScreenShown = true) }
+                        }
+                        LoginStatus.LoginSucceed -> {
+                            _state.update {
+                                it.copy(showFetchingNodesScreen = true, is2FAScreenShown = false)
+                            }
+                            performFetchNodes()
+                        }
+                        else -> {
+                            //LoginStatus.LoginCannotStart no action required.
+                        }
+                    }
+
+                    if (status != LoginStatus.LoginStarted) {
+                        currentCoroutineContext().cancel()
+                    }
+                }
+            }.onFailure { exception ->
+                if (exception !is LoginException) return@onFailure
+
+                _state.update { it.copy(showLoginScreen = true, disableLoginButton = false) }
+
+                when (exception) {
+                    is LoginLoggedOutFromOtherLocation -> {
+                        _state.update { it.copy(showAlertLoggedOut = true) }
+                    }
+                    else -> {
+                        _state.update { it.copy(error = exception) }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Fetch nodes.
+     */
+    fun performFetchNodes() = viewModelScope.launch {
+
     }
 }
