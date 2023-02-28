@@ -74,5 +74,6 @@ internal suspend fun toNode(
         isIncomingShare = megaNode.isInShare,
         fingerprint = megaNode.fingerprint,
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
+        hasPreview = megaNode.hasPreview(),
     )
 }

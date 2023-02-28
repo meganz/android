@@ -77,6 +77,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedMediaId: Long = 1234567
     private val expectedTotalDuration: Long = 200000
     private val expectedCurrentPosition: Long = 16000
+    private val expectedHasPreview = false
 
     @Before
     fun setUp() {
@@ -311,6 +312,7 @@ class DefaultMediaPlayerRepositoryTest {
         thumbnailPath = expectedThumbnailPath,
         type = expectedType,
         isNodeKeyDecrypted = isNodeKetDecrypted,
+        hasPreview = expectedHasPreview,
     )
 
     private suspend fun initTestConditions(megaNode: MegaNode, typeInfo: FileTypeInfo) {

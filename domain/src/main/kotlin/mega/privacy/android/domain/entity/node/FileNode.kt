@@ -30,4 +30,9 @@ interface FileNode : UnTypedNode {
      * Fingerprint
      */
     val fingerprint: String?
+
+    /**
+     * Has preview
+     */
+    val hasPreview: Boolean
 }
