@@ -185,8 +185,8 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         for (i in productAccounts.indices) {
             val account = productAccounts[i]
 
-            if (account.months == 1) {
-                val textToShow: Spanned = viewModel.getPriceString(this, account, true)
+            if (account.isMonthly) {
+                val textToShow: Spanned = viewModel.getPriceString(this, account)
                 val textStorage: Spanned = viewModel.generateByteString(
                     this,
                     account.storage.toLong(),

@@ -4,8 +4,6 @@ import android.content.Context
 import android.text.Spanned
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,30 +13,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
-import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.Constants.FREE
 import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_II
 import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import mega.privacy.android.app.utils.Util.convertToBitSet
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
-import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
-import mega.privacy.android.domain.entity.PaymentMethod
-import mega.privacy.android.domain.entity.PaymentMethodType
 import mega.privacy.android.domain.entity.Product
-import mega.privacy.android.domain.entity.account.Skus
-import mega.privacy.android.domain.usecase.GetCurrentPayment
 import mega.privacy.android.domain.usecase.GetLocalPricing
-import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
-import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
-import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import java.text.NumberFormat
 import java.util.Currency
@@ -47,27 +32,14 @@ import javax.inject.Inject
 @HiltViewModel
 internal class ChooseUpgradeAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
-    private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
-    private val paymentMethodTypeMapper: PaymentMethodTypeMapper,
     private val getLocalPricing: GetLocalPricing,
-    private val isBillingAvailable: IsBillingAvailable,
-    private val getActiveSubscription: GetActiveSubscription,
-    private val getCurrentPayment: GetCurrentPayment,
 ) : ViewModel() {
 
     companion object {
         const val TYPE_STORAGE_LABEL = 0
         const val TYPE_TRANSFER_LABEL = 1
-
-        const val NOT_SUBSCRIBED = 0
-        const val MONTHLY_SUBSCRIBED = 1
-        const val YEARLY_SUBSCRIBED = 2
     }
-
-    private val upgradeClick = SingleLiveEvent<Int>()
-    private val currentUpgradeClickedAndSubscription =
-        MutableLiveData<Pair<Int, PaymentMethod>?>()
 
     private val _state = MutableStateFlow(ChooseUpgradeAccountState())
 
@@ -76,61 +48,13 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
      */
     val state = _state.asStateFlow()
 
-    fun onUpgradeClick(): LiveData<Int> = upgradeClick
-    fun onUpgradeClickWithSubscription(): LiveData<Pair<Int, PaymentMethod>?> =
-        currentUpgradeClickedAndSubscription
-
     init {
-        getPaymentMethod()
         refreshPricing()
     }
 
-    /**
-     * Get payment method
-     *
-     */
-    fun getPaymentMethod() {
-        viewModelScope.launch {
-            val paymentMethod = getPaymentMethod(false)
-            _state.update {
-                it.copy(paymentBitSet = convertToBitSet(paymentMethod.flag))
-            }
-        }
-    }
-
-    /**
-     * Check the current subscription
-     * @param upgradeType upgrade type
-     */
-    fun subscriptionCheck(upgradeType: Int) {
-        viewModelScope.launch {
-            val currentPayment = getCurrentPayment()
-            currentPayment?.let {
-                currentUpgradeClickedAndSubscription.value = Pair(upgradeType, currentPayment)
-            } ?: run {
-                upgradeClick.value = upgradeType
-            }
-        }
-    }
-
-    /**
-     * Resets the currentUpgradeClickedAndSubscription ensuring the subscription warning
-     * is not shown again.
-     */
-    fun dismissSubscriptionWarningClicked() {
-        currentUpgradeClickedAndSubscription.value = null
-    }
-
-    fun isGettingInfo(): Boolean =
-        myAccountInfo.accountType < FREE || myAccountInfo.accountType > PRO_LITE
-
     fun getAccountType(): Int = myAccountInfo.accountType
 
-    private fun isPurchasedAlready(sku: String): Boolean = getActiveSubscription()?.sku == sku
-
     fun getProductAccounts(): List<Product> = state.value.product
-
-    fun isBillingAvailable(): Boolean = isBillingAvailable.invoke()
 
     /**
      * Asks for pricing if needed.
@@ -149,13 +73,11 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
      *
      * @param context          Current context.
      * @param product          Selected product plan.
-     * @param monthlyBasePrice True if the plan is monthly based, false otherwise.
      * @return The formatted string.
      */
     fun getPriceString(
         context: Context,
         product: Product,
-        monthlyBasePrice: Boolean,
     ): Spanned {
         // First get the "default" pricing details from the MEGA server
         var price = product.amount / 100.00
@@ -175,25 +97,18 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
         var stringPrice = format.format(price)
         var color = getColorHexString(context, R.color.grey_087_white_087)
 
-        if (monthlyBasePrice) {
-            if (product.months != 1) {
-                return HtmlCompat.fromHtml("", HtmlCompat.FROM_HTML_MODE_LEGACY)
-            }
-
-            when (product.level) {
-                PRO_I, PRO_II, PRO_III -> color =
-                    ContextCompat.getColor(context, R.color.red_600_red_300).toString()
-                PRO_LITE -> color =
-                    ContextCompat.getColor(context, R.color.orange_400_orange_300).toString()
-            }
-
-            stringPrice = getString(R.string.type_month, stringPrice)
-        } else {
-            stringPrice = getString(
-                if (product.months == 12) R.string.billed_yearly_text else R.string.billed_monthly_text,
-                stringPrice
-            )
+        if (product.months != 1) {
+            return HtmlCompat.fromHtml("", HtmlCompat.FROM_HTML_MODE_LEGACY)
         }
+
+        when (product.level) {
+            PRO_I, PRO_II, PRO_III -> color =
+                ContextCompat.getColor(context, R.color.red_600_red_300).toString()
+            PRO_LITE -> color =
+                ContextCompat.getColor(context, R.color.orange_400_orange_300).toString()
+        }
+
+        stringPrice = getString(R.string.type_month, stringPrice)
 
         try {
             stringPrice = stringPrice.replace("[A]", "<font color='$color'>")
@@ -242,30 +157,6 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
             TYPE_TRANSFER_LABEL -> getString(R.string.account_upgrade_transfer_quota_label,
                 getSizeStringGBBased(gb))
             else -> ""
-        }
-    }
-
-    /**
-     * Gets the subscription depending on the upgrade type.
-     *
-     * @param upgradeType Type of upgrade.
-     * @return The subscription type:
-     *          - MONTHLY_SUBSCRIBED if already subscribed to the monthly plan
-     *          - YEARLY_SUBSCRIBED if already subscribed to the yearly plan
-     *          - NOT_SUBSCRIBED if not subscribed.
-     */
-    fun getSubscription(upgradeType: Int): Int {
-        val skus = when (upgradeType) {
-            PRO_I -> Skus.SKU_PRO_I_MONTH to Skus.SKU_PRO_I_YEAR
-            PRO_II -> Skus.SKU_PRO_II_MONTH to Skus.SKU_PRO_II_YEAR
-            PRO_III -> Skus.SKU_PRO_III_MONTH to Skus.SKU_PRO_III_YEAR
-            PRO_LITE -> Skus.SKU_PRO_LITE_MONTH to Skus.SKU_PRO_LITE_MONTH
-            else -> "" to ""
-        }
-        return when {
-            skus.first.isNotEmpty() && isPurchasedAlready(skus.first) -> MONTHLY_SUBSCRIBED
-            skus.second.isNotEmpty() && isPurchasedAlready(skus.second) -> YEARLY_SUBSCRIBED
-            else -> NOT_SUBSCRIBED
         }
     }
 }

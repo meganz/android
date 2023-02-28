@@ -63,7 +63,7 @@ import mega.privacy.android.app.psa.PsaWebBrowser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
-import mega.privacy.android.app.upgradeAccount.PaymentActivity
+import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
 import mega.privacy.android.app.usecase.exception.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException

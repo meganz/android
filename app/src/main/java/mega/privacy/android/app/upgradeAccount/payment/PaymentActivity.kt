@@ -1,4 +1,4 @@
-package mega.privacy.android.app.upgradeAccount
+package mega.privacy.android.app.upgradeAccount.payment
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -13,8 +13,8 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityPaymentBinding
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
-import mega.privacy.android.app.upgradeAccount.ChooseUpgradeAccountViewModel.Companion.MONTHLY_SUBSCRIBED
-import mega.privacy.android.app.upgradeAccount.ChooseUpgradeAccountViewModel.Companion.YEARLY_SUBSCRIBED
+import mega.privacy.android.app.upgradeAccount.payment.PaymentViewModel.Companion.MONTHLY_SUBSCRIBED
+import mega.privacy.android.app.upgradeAccount.payment.PaymentViewModel.Companion.YEARLY_SUBSCRIBED
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.PRO_I
@@ -25,12 +25,9 @@ import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.app.utils.Util.isPaymentMethodAvailable
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.account.Skus
-import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
-import java.util.BitSet
 
 /**
  * Activity for managing upgrade account payments.
@@ -46,7 +43,7 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
     }
 
     private lateinit var binding: ActivityPaymentBinding
-    private val viewModel by viewModels<ChooseUpgradeAccountViewModel>()
+    private val viewModel by viewModels<PaymentViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +69,7 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
 
         setupUpgradeType(upgradeType)
         collectFlow(viewModel.state) { state ->
-            setupPaymentMethods(upgradeType, state.paymentBitSet, state.product)
+            setupPaymentMethods(upgradeType, state.isPaymentMethodAvailable, state.product)
         }
 
         binding.monthlyButton.setOnClickListener { binding.yearlyButton.isChecked = false }
@@ -155,34 +152,24 @@ class PaymentActivity : PasscodeActivity(), Scrollable {
 
     private fun setupPaymentMethods(
         upgradeType: Int,
-        paymentBitSet: BitSet,
-        product: List<Product>,
+        isPaymentMethodAvailable: Boolean,
+        products: List<Product>,
     ) {
-        if (paymentBitSet.isEmpty) {
-            Timber.w("Not payment bit set received!!!")
-            hideBilling()
-            return
-        }
-        if (viewModel.isBillingAvailable().not()
-            || !isPaymentMethodAvailable(paymentBitSet, MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET)
-        ) {
+        if (isPaymentMethodAvailable.not() || products.isEmpty()) {
             hideBilling()
             return
         }
 
-        for (i in product.indices) {
-            val account = product[i]
+        products.forEach { product ->
+            val textToShow = viewModel.getPriceString(this, product)
 
-            if (account.level == upgradeType) {
-                val textToShow = viewModel.getPriceString(this, account, false)
-
-                if (account.months == 1) {
-                    binding.monthlyText.text = textToShow
-                } else if (account.months == 12) {
-                    binding.yearlyText.text = textToShow
-                }
+            if (product.isMonthly) {
+                binding.monthlyText.text = textToShow
+            } else if (product.isYearly) {
+                binding.yearlyText.text = textToShow
             }
         }
+
 
         when (viewModel.getSubscription(upgradeType)) {
             MONTHLY_SUBSCRIBED -> {
