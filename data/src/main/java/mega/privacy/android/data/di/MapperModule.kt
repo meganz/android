@@ -66,7 +66,6 @@ import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
-import mega.privacy.android.data.mapper.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
@@ -79,6 +78,8 @@ import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoMapper
 import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
+import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
+import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapperImpl
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeMapperImpl
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
@@ -144,7 +145,6 @@ import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionOptionList
 import mega.privacy.android.data.mapper.toSubscriptionStatus
-import mega.privacy.android.data.mapper.toSyncRecordTypeInt
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
@@ -192,6 +192,9 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindSyncRecordTypeMapper(implementation: SyncRecordTypeMapperImpl): SyncRecordTypeMapper
+
+    @Binds
+    abstract fun bindSyncRecordTypeIntMapper(implementation: SyncRecordTypeIntMapperImpl): SyncRecordTypeIntMapper
 
     companion object {
         /**
@@ -282,12 +285,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideSortOrderIntMapper(): SortOrderIntMapper = ::sortOrderToInt
-
-        /**
-         * Provide sync record type int mapper
-         */
-        @Provides
-        fun provideSyncRecordTypeIntMapper(): SyncRecordTypeIntMapper = ::toSyncRecordTypeInt
 
         /**
          * Provide media store file type mapper
