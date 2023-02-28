@@ -7,12 +7,12 @@ import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.DefaultGetFolderTreeInfo
 import mega.privacy.android.domain.usecase.DefaultGetNodeById
-import mega.privacy.android.domain.usecase.DefaultMonitorFolderChildrenUpdates
+import mega.privacy.android.domain.usecase.DefaultMonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.DefaultMonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.IsNodeInInbox
-import mega.privacy.android.domain.usecase.MonitorFolderChildrenUpdates
+import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 
@@ -42,10 +42,10 @@ abstract class InternalNodeModule {
     abstract fun bindMonitorNodeUpdatesById(implementation: DefaultMonitorNodeUpdatesById): MonitorNodeUpdatesById
 
     /**
-     * Provide implementation for [MonitorFolderChildrenUpdates]
+     * Provide implementation for [MonitorChildrenUpdates]
      */
     @Binds
-    abstract fun bindMonitorFolderChildrenUpdates(implementation: DefaultMonitorFolderChildrenUpdates): MonitorFolderChildrenUpdates
+    abstract fun bindMonitorFolderChildrenUpdates(implementation: DefaultMonitorChildrenUpdates): MonitorChildrenUpdates
 
     companion object {
         /**

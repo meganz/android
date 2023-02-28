@@ -17,9 +17,9 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultMonitorFolderChildrenUpdatesTest {
+class DefaultMonitorChildrenUpdatesTest {
 
-    private lateinit var underTest: MonitorFolderChildrenUpdates
+    private lateinit var underTest: MonitorChildrenUpdates
     private val nodeRepository = mock<NodeRepository>()
     private val folder = mock<FolderNode> {
         on { id }.thenReturn(folderId)
@@ -34,7 +34,7 @@ class DefaultMonitorFolderChildrenUpdatesTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultMonitorFolderChildrenUpdates(nodeRepository = nodeRepository)
+        underTest = DefaultMonitorChildrenUpdates(nodeRepository = nodeRepository)
     }
 
 
@@ -57,7 +57,7 @@ class DefaultMonitorFolderChildrenUpdatesTest {
                 NodeUpdate(filteredUpdate2),
             )
         )
-        underTest.invoke(folder).test {
+        underTest.invoke(folder.id).test {
             val firstChange = awaitItem()
             Truth.assertThat(firstChange.changes.values).containsExactly(expectedChanges1)
             Truth.assertThat(firstChange.changes.keys).hasSize(1)
