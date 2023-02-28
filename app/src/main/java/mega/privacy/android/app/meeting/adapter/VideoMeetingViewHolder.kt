@@ -352,7 +352,9 @@ class VideoMeetingViewHolder(
         if (isInvalid(participant)) return
 
         if (shouldAddListener) {
-            if (participant.isVideoOn && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)) {
+            if (inMeetingViewModel.getSession(participant.clientId)
+                    ?.hasVideo() == true && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)
+            ) {
                 if (participant.videoListener == null) {
                     createListener(participant)
                 }
@@ -418,7 +420,9 @@ class VideoMeetingViewHolder(
     fun checkVideoOn(participant: Participant) {
         if (isInvalid(participant)) return
 
-        if (participant.isVideoOn && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)) {
+        if (inMeetingViewModel.getSession(participant.clientId)
+                ?.hasVideo() == true && !inMeetingViewModel.isCallOrSessionOnHold(participant.clientId)
+        ) {
             Timber.d("Video should be on")
             videoOnUI(participant)
             return
@@ -755,7 +759,7 @@ class VideoMeetingViewHolder(
         inMeetingViewModel.getParticipant(peerId, clientId)?.let { participant ->
             inMeetingViewModel.removeParticipantVisible(participant)
 
-            if (participant.isVideoOn) {
+            if (inMeetingViewModel.getSession(participant.clientId)?.hasVideo() == true) {
                 Timber.d("Recycle participant in the list, participant clientId is ${participant.clientId}")
                 participant.videoListener?.let {
                     removeResolutionAndListener(participant)
