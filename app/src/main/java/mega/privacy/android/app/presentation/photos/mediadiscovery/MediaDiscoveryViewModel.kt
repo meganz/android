@@ -54,11 +54,10 @@ class MediaDiscoveryViewModel @Inject constructor(
             val sortOrder = getCameraSortOrder()
             setCurrentSort(sort = mapSortOrderToSort(sortOrder))
 
-            monitorMediaDiscoveryView().collectLatest { mediaDiscoverViewSettings ->
-                mediaDiscoverViewSettings?.let { settings ->
-                    _state.update {
-                        it.copy(mediaDiscoveryViewSettings = settings)
-                    }
+            monitorMediaDiscoveryView().collectLatest { mediaDiscoveryViewSettings ->
+                _state.update {
+                    it.copy(mediaDiscoveryViewSettings = mediaDiscoveryViewSettings
+                        ?: MediaDiscoveryViewSettings.INITIAL.ordinal)
                 }
             }
         }
