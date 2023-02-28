@@ -331,6 +331,10 @@ public class OfflineUtils {
     public static File getOfflineParentFile(Context context, int from, MegaNode node, MegaApiAndroid megaApi) {
         String path = context.getFilesDir().getAbsolutePath() + File.separator;
 
+        if (megaApi == null) {
+            megaApi = MegaApplication.getInstance().getMegaApi();
+        }
+
         switch (from) {
             case FROM_INCOMING_SHARES: {
                 path = path + OFFLINE_DIR + File.separator + findIncomingParentHandle(node, megaApi);
