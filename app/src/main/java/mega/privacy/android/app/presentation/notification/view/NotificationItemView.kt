@@ -73,7 +73,7 @@ internal fun NotificationItemView(
             NotificationDescription(notification)
         }
 
-        if (notification.schedMeetingNotification != null) {
+        if (notification.schedMeetingNotification?.scheduledMeeting != null) {
             NotificationSchedMeetingView(notification.schedMeetingNotification)
         }
         NotificationDate(notification)
