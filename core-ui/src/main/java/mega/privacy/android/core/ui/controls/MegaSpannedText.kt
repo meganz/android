@@ -10,6 +10,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import mega.privacy.android.core.ui.model.SpanIndicator
 
 /**
  * High light text from mega format
@@ -23,27 +24,27 @@ import androidx.compose.ui.tooling.preview.Preview
  * first is open tag, second is close tag and third is custom style
  */
 @Composable
-fun MegaHighLightText(
+fun MegaSpannedText(
     modifier: Modifier = Modifier,
     value: String,
     baseStyle: TextStyle,
-    styles: List<Triple<String, String, SpanStyle>>,
+    styles: Map<SpanIndicator, SpanStyle>,
 ) {
     var temp = value
     Text(
         modifier = modifier,
         text = buildAnnotatedString {
-            styles.forEach { item ->
-                val start = temp.indexOf(string = item.first)
-                val end = temp.indexOf(string = item.second, startIndex = start)
+            styles.toSortedMap(compareBy { value.indexOf(it.openTag) }).forEach { item ->
+                val start = temp.indexOf(string = item.key.openTag)
+                val end = temp.indexOf(string = item.key.closeTag, startIndex = start)
                 if (start > 0) {
                     append(temp.substring(0, start))
                 }
-                if (start >= 0 && (start + item.first.length < end)) {
-                    withStyle(item.third) {
-                        append(temp.substring(start + item.first.length, end))
+                if (start >= 0 && (start + item.key.openTag.length < end)) {
+                    withStyle(item.value) {
+                        append(temp.substring(start + item.key.openTag.length, end))
                     }
-                    val index = end + item.second.length
+                    val index = end + item.key.closeTag.length
                     if (index < temp.length) {
                         temp = temp.substring(index)
                     }
@@ -69,12 +70,12 @@ fun MegaHighLightText(
  */
 @Preview(showBackground = true)
 @Composable
-fun HighLightTextPreviewOne() {
-    MegaHighLightText(
+fun MegaSpannedTextPreviewOne() {
+    MegaSpannedText(
         value = "[A]Google Pay[/A] (subscription)",
         baseStyle = MaterialTheme.typography.subtitle1,
-        styles = listOf(
-            Triple("[A]", "[/A]", SpanStyle(color = Color.Red))
+        styles = hashMapOf(
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
         )
     )
 }
@@ -85,12 +86,12 @@ fun HighLightTextPreviewOne() {
  */
 @Preview(showBackground = true)
 @Composable
-fun HighLightTextPreviewTwo() {
-    MegaHighLightText(
+fun MegaSpannedTextPreviewTwo() {
+    MegaSpannedText(
         value = "Do you want to [A]Google Pay[/A] (subscription)",
         baseStyle = MaterialTheme.typography.subtitle1,
-        styles = listOf(
-            Triple("[A]", "[/A]", SpanStyle(color = Color.Red))
+        styles = hashMapOf(
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
         )
     )
 }
@@ -101,13 +102,13 @@ fun HighLightTextPreviewTwo() {
  */
 @Preview(showBackground = true)
 @Composable
-fun HighLightTextPreviewThree() {
-    MegaHighLightText(
+fun MegaSpannedTextPreviewThree() {
+    MegaSpannedText(
         value = "Do you want to [A]Google Pay[/A] [B]Huawei[/B] (subscription)",
         baseStyle = MaterialTheme.typography.subtitle1,
-        styles = listOf(
-            Triple("[A]", "[/A]", SpanStyle(color = Color.Red)),
-            Triple("[B]", "[/B]", SpanStyle(color = Color.Green)),
+        styles = hashMapOf(
+            SpanIndicator('B') to SpanStyle(color = Color.Green),
+            SpanIndicator('A') to SpanStyle(color = Color.Red)
         )
     )
 }
