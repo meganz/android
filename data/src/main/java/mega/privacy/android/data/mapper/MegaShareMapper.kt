@@ -13,5 +13,6 @@ internal fun toShareModel(share: MegaShare) = ShareData(
     isPending = share.isPending,
     timeStamp = share.timestamp,
     access = share.access,
-    nodeHandle = share.nodeHandle
+    nodeHandle = share.nodeHandle,
+    isVerified = share.isVerified,
 )

@@ -293,13 +293,6 @@ interface MegaNodeRepository {
     suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData>
 
     /**
-     * Creates a new share key for the node if there is no share key already created.
-     *
-     * @param megaNode : [MegaNode] object which needs to be shared
-     */
-    suspend fun getUnverifiedOutgoingShares(): Int
-
-    /**
      * Provides searched nodes InShares from query
      * @param query String to be searched
      * @param megaCancelToken [MegaCancelToken]
@@ -330,7 +323,7 @@ interface MegaNodeRepository {
         query: String,
         megaCancelToken: MegaCancelToken,
         order: SortOrder,
-        isFirstLevelNavigation: Boolean
+        isFirstLevelNavigation: Boolean,
     ): List<MegaNode>
 
     /**
@@ -344,8 +337,13 @@ interface MegaNodeRepository {
         parentNode: MegaNode,
         query: String,
         order: SortOrder,
-        megaCancelToken: MegaCancelToken
+        megaCancelToken: MegaCancelToken,
     ): List<MegaNode>
+
+    /**
+     * Creates a new share key for the node if there is no share key already created.
+     * @param megaNode : [MegaNode] object which needs to be shared
+     */
     suspend fun openShareDialog(megaNode: MegaNode)
 
     /**

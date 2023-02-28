@@ -109,8 +109,8 @@ class ManagerViewModelTest {
     private val getFeatureFlagValue =
         mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(false) }
     private val shareDataList = listOf(
-        ShareData("user", 8766L, 0, 987654678L, true),
-        ShareData("user", 8766L, 0, 987654678L, true)
+        ShareData("user", 8766L, 0, 987654678L, true, false),
+        ShareData("user", 8766L, 0, 987654678L, true, false)
     )
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
         onBlocking {

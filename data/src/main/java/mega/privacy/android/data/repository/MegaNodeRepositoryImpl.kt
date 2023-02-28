@@ -336,7 +336,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData> =
         withContext(ioDispatcher) {
-            megaApiGateway.getUnverifiedOutgoingShares(sortOrderIntMapper(order)).map {
+            megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order)).map {
                 megaShareMapper(it)
             }
         }
@@ -351,7 +351,6 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUnverifiedOutgoingShares(): Int = 5
     override suspend fun searchInShares(
         query: String,
         megaCancelToken: MegaCancelToken,
@@ -433,6 +432,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             )
         }
     }
+
     override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener { return@getRequestListener }
