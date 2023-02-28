@@ -84,10 +84,10 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -100,8 +100,8 @@ import java.io.File
 class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var cameraUploadOnOff: SwitchPreferenceCompat? = null
     private var optionHowToUpload: ListPreference? = null
-    private var cameraUploadWhat: ListPreference? = null
-    private var cameraUploadIncludeGPS: SwitchPreferenceCompat? = null
+    private var optionFileUpload: ListPreference? = null
+    private var optionIncludeLocationTags: SwitchPreferenceCompat? = null
     private var videoQuality: ListPreference? = null
     private var cameraUploadCharging: SwitchPreferenceCompat? = null
     private var cameraUploadVideoQueueSize: Preference? = null
@@ -122,7 +122,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var camSyncHandle: Long? = null
     private var camSyncMegaNode: MegaNode? = null
     private var camSyncMegaPath = ""
-    private var fileUpload = ""
     private var compressionQueueSizeDialog: AlertDialog? = null
     private var queueSizeInput: EditText? = null
     private var mediaPermissionsDialog: AlertDialog? = null
@@ -238,11 +237,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         optionHowToUpload = findPreference(KEY_CAMERA_UPLOAD_HOW_TO)
         optionHowToUpload?.onPreferenceChangeListener = this
 
-        cameraUploadWhat = findPreference(KEY_CAMERA_UPLOAD_WHAT_TO)
-        cameraUploadWhat?.onPreferenceChangeListener = this
+        optionFileUpload = findPreference(KEY_CAMERA_UPLOAD_WHAT_TO)
+        optionFileUpload?.onPreferenceChangeListener = this
 
-        cameraUploadIncludeGPS = findPreference(KEY_CAMERA_UPLOAD_INCLUDE_GPS)
-        cameraUploadIncludeGPS?.onPreferenceClickListener = this
+        optionIncludeLocationTags = findPreference(KEY_CAMERA_UPLOAD_INCLUDE_GPS)
+        optionIncludeLocationTags?.onPreferenceClickListener = this
 
         videoQuality = findPreference(KEY_CAMERA_UPLOAD_VIDEO_QUALITY)
         videoQuality?.onPreferenceChangeListener = this
@@ -306,52 +305,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             } else {
                 nodeForCameraSyncDoesNotExist()
             }
-            setWhatToUploadForCameraUpload()
-
-            if (getString(R.string.settings_camera_upload_only_photos) != fileUpload) {
-                val uploadQuality = prefs.uploadVideoQuality
-                val quality: Int = if (uploadQuality == null || uploadQuality.isEmpty()) {
-                    dbH.setCameraUploadVideoQuality(VideoQuality.ORIGINAL.value)
-                    VideoQuality.ORIGINAL.value
-                } else {
-                    uploadQuality.toInt()
-                }
-
-                videoQuality?.let {
-                    it.setValueIndex(quality)
-                    it.summary = it.entry
-                }
-
-                if (quality == VideoQuality.ORIGINAL.value) {
-                    disableChargingSettings()
-                } else {
-                    enableChargingSettings()
-                    // Handle Charging behavior
-                    charging = if (prefs.conversionOnCharging == null) {
-                        dbH.setConversionOnCharging(true)
-                        true
-                    } else {
-                        prefs.conversionOnCharging.toBoolean()
-                    }
-                    cameraUploadCharging?.isChecked = charging
-
-                    // Handle Video Compression Size Settings depending if it is charging or not
-                    if (charging) {
-                        enableVideoCompressionSizeSettings()
-                    } else {
-                        disableVideoCompressionSizeSettings()
-                    }
-                }
-            } else {
-                hideVideoQualitySettingsSection()
-                with(dbH) {
-                    setConversionOnCharging(false)
-                    setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE)
-                }
-            }
-            if (getString(R.string.settings_camera_upload_only_videos) != fileUpload) {
-                setupRemoveGPS()
-            }
             fileNames = if (prefs.keepFileNames == null) {
                 dbH.setKeepFileNames(false)
                 false
@@ -398,14 +351,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             megaSecondaryFolder?.summary = megaPathSecMediaFolder
             cameraUploadCharging?.isChecked = charging
 
-            viewModel.setCameraUploadsEnabled(true)
+            viewModel.setCameraUploadsRunning(true)
 
             localCameraUploadFolder?.let {
                 it.summary = camSyncLocalPath
-                preferenceScreen.addPreference(it)
-            }
-            cameraUploadWhat?.let {
-                it.summary = fileUpload
                 preferenceScreen.addPreference(it)
             }
             keepFileNames?.let {
@@ -423,13 +372,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             keepFileNames?.let { preferenceScreen.removePreference(it) }
             secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
 
-            viewModel.setCameraUploadsEnabled(false)
+            viewModel.setCameraUploadsRunning(false)
 
             localCameraUploadFolder?.let {
-                it.summary = ""
-                preferenceScreen.removePreference(it)
-            }
-            cameraUploadWhat?.let {
                 it.summary = ""
                 preferenceScreen.removePreference(it)
             }
@@ -447,7 +392,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             }
 
             hideVideoQualitySettingsSection()
-            removeRemoveGPS()
+            removeLocationTags()
         }
 
         val sizeInDB = prefs.chargingOnSize
@@ -487,7 +432,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         val intent: Intent
         when (preference.key) {
             KEY_CAMERA_UPLOAD_INCLUDE_GPS -> {
-                includeGPS = cameraUploadIncludeGPS?.isChecked ?: false
+                includeGPS = optionIncludeLocationTags?.isChecked ?: false
                 if (!includeGPS) {
                     dbH.setRemoveGPS(true)
                     JobUtil.rescheduleCameraUpload(context)
@@ -513,7 +458,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                             Timber.d("ACCESS_MEDIA_LOCATION permission denied. Launching permission window")
                             includeGPS = false
                             dbH.setRemoveGPS(true)
-                            cameraUploadIncludeGPS?.isChecked = includeGPS
+                            optionIncludeLocationTags?.isChecked = includeGPS
                             enableCameraUploadsWithLocationPermissionLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION)
                         }
                     }
@@ -643,31 +588,15 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             KEY_CAMERA_UPLOAD_WHAT_TO -> {
                 when (value) {
                     CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS -> {
-                        dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS)
-                        fileUpload = getString(R.string.settings_camera_upload_only_photos)
-                        cameraUploadWhat?.setValueIndex(0)
-                        setupRemoveGPS()
-                        dbH.setConversionOnCharging(true)
-                        disableVideoQualitySettings()
+                        viewModel.changeUploadOption(UploadOption.PHOTOS)
                     }
                     CAMERA_UPLOAD_FILE_UPLOAD_VIDEOS -> {
-                        dbH.setCamSyncFileUpload(MegaPreferences.ONLY_VIDEOS)
-                        fileUpload = getString(R.string.settings_camera_upload_only_videos)
-                        cameraUploadWhat?.setValueIndex(1)
-                        dbH.setConversionOnCharging(true)
-                        enableVideoQualitySettings()
-                        removeRemoveGPS()
+                        viewModel.changeUploadOption(UploadOption.VIDEOS)
                     }
                     CAMERA_UPLOAD_FILE_UPLOAD_PHOTOS_AND_VIDEOS -> {
-                        dbH.setCamSyncFileUpload(MegaPreferences.PHOTOS_AND_VIDEOS)
-                        fileUpload = getString(R.string.settings_camera_upload_photos_and_videos)
-                        cameraUploadWhat?.setValueIndex(2)
-                        setupRemoveGPS()
-                        dbH.setConversionOnCharging(true)
-                        enableVideoQualitySettings()
+                        viewModel.changeUploadOption(UploadOption.PHOTOS_AND_VIDEOS)
                     }
                 }
-                cameraUploadWhat?.summary = fileUpload
                 viewModel.resetTimestampsAndCacheDirectory()
                 JobUtil.rescheduleCameraUpload(context)
             }
@@ -837,7 +766,15 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 setOnlineOptions(isConnected)
             }
             collectFlow(viewModel.state) {
-                handleHowToUploadVisibility(it.howToUploadEnabled)
+                handleFileUploadVisibility(
+                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    uploadOption = it.uploadOption,
+                )
+                handleUploadOption(it.uploadOption)
+                handleHowToUploadVisibility(
+                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    uploadConnectionType = it.uploadConnectionType,
+                )
                 handleUploadConnectionType(it.uploadConnectionType)
                 handleBusinessAccountPrompt(it.shouldShowBusinessAccountPrompt)
                 handleBusinessAccountSuspendedPrompt(it.shouldShowBusinessAccountSuspendedPrompt)
@@ -849,27 +786,85 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Handles the display of the "How to Upload" option when a UI State change happens
+     * Handles the "File upload" option visibility when a UI State change happens
      *
-     * @param showOption If true, display the option. Otherwise, hide it
+     * @param isCameraUploadsRunning If true, display the option. Otherwise, hide it
+     * @param uploadOption the specific [UploadOption] which can be nullable
      */
-    private fun handleHowToUploadVisibility(showOption: Boolean) {
-        optionHowToUpload?.run {
-            if (showOption) preferenceScreen.addPreference(this)
+    private fun handleFileUploadVisibility(
+        isCameraUploadsRunning: Boolean,
+        uploadOption: UploadOption?,
+    ) {
+        optionFileUpload?.run {
+            if (isCameraUploadsRunning && uploadOption != null) preferenceScreen.addPreference(this)
             else preferenceScreen.removePreference(this)
+        }
+    }
+
+    /**
+     * Handles the content and behavior of the "File upload" option when a UI State change happens
+     *
+     * @param uploadOption the specific [UploadOption] which can be nullable
+     */
+    private fun handleUploadOption(uploadOption: UploadOption?) {
+        when (uploadOption) {
+            UploadOption.PHOTOS -> {
+                optionFileUpload?.run {
+                    summary = getString(R.string.settings_camera_upload_only_photos)
+                    setValueIndex(0)
+                }
+                disableVideoQualitySettings()
+                setupLocationTags()
+            }
+            UploadOption.VIDEOS -> {
+                optionFileUpload?.run {
+                    summary = getString(R.string.settings_camera_upload_only_videos)
+                    setValueIndex(1)
+                }
+                enableVideoQualitySettings()
+                removeLocationTags()
+            }
+            UploadOption.PHOTOS_AND_VIDEOS -> {
+                optionFileUpload?.run {
+                    summary = getString(R.string.settings_camera_upload_photos_and_videos)
+                    setValueIndex(2)
+                }
+                enableVideoQualitySettings()
+                setupLocationTags()
+            }
+            else -> optionFileUpload?.summary = ""
+        }
+    }
+
+    /**
+     * Handles the "How to Upload" option visibility when a UI State change happens
+     *
+     * @param isCameraUploadsRunning If true, display the option. Otherwise, hide it
+     * @param uploadConnectionType the specific [UploadConnectionType] which can be nullable
+     */
+    private fun handleHowToUploadVisibility(
+        isCameraUploadsRunning: Boolean,
+        uploadConnectionType: UploadConnectionType?,
+    ) {
+        optionHowToUpload?.run {
+            if (isCameraUploadsRunning && uploadConnectionType != null) {
+                preferenceScreen.addPreference(this)
+            } else preferenceScreen.removePreference(this)
         }
     }
 
     /**
      * Handles the information shown for the "How to Upload" option when a UI State change happens
      *
-     * @param uploadConnectionTypeType the specific [UploadConnectionType]
+     * @param uploadConnectionType the specific [UploadConnectionType] which can be nullable
      */
-    private fun handleUploadConnectionType(uploadConnectionTypeType: UploadConnectionType) {
-        optionHowToUpload?.run {
-            summary = getString(uploadConnectionTypeType.textRes)
-            setValueIndex(uploadConnectionTypeType.position)
-        }
+    private fun handleUploadConnectionType(uploadConnectionType: UploadConnectionType?) {
+        if (uploadConnectionType != null) {
+            optionHowToUpload?.run {
+                summary = getString(uploadConnectionType.textRes)
+                setValueIndex(uploadConnectionType.position)
+            }
+        } else optionHowToUpload?.summary = ""
     }
 
     /**
@@ -1174,9 +1169,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Setup the Remove GPS option
+     * Setup location tags
      */
-    private fun setupRemoveGPS() {
+    private fun setupLocationTags() {
         val removeGPSString = prefs.removeGPS
 
         if (removeGPSString.isNullOrBlank()) {
@@ -1187,19 +1182,21 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             includeGPS = !removeGPSString.toBoolean()
         }
 
-        cameraUploadIncludeGPS?.let {
+        optionIncludeLocationTags?.let {
             it.isChecked = includeGPS
-            it.summary = getString(R.string.settings_camera_upload_include_gps_helper_label)
-            preferenceScreen.addPreference(it)
+
+            // This will eventually be moved to the UI State
+            if (viewModel.state.value.isCameraUploadsRunning) {
+                preferenceScreen.addPreference(it)
+            }
         }
     }
 
     /**
-     * Remove the Remove GPS option
+     * Remove location tags
      */
-    private fun removeRemoveGPS() {
-        cameraUploadIncludeGPS?.let {
-            it.summary = ""
+    private fun removeLocationTags() {
+        optionIncludeLocationTags?.let {
             preferenceScreen.removePreference(it)
         }
     }
@@ -1371,7 +1368,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun disableChargingSettings() {
         charging = false
-        dbH.setConversionOnCharging(charging)
+        dbH.setConversionOnCharging(false)
 
         cameraUploadCharging?.let {
             it.isChecked = charging
@@ -1408,7 +1405,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun enableVideoCompressionSizeSettings() {
         prefs = dbH.preferences
-        cameraUploadVideoQueueSize?.let { preferenceScreen.addPreference(it) }
         val sizeInDB = prefs.chargingOnSize
         val size = if (sizeInDB == null) {
             dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE)
@@ -1416,8 +1412,15 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         } else {
             sizeInDB.toInt()
         }
-        cameraUploadVideoQueueSize?.summary =
-            getString(R.string.label_file_size_mega_byte, size.toString())
+
+        cameraUploadVideoQueueSize?.run {
+            summary = getString(R.string.label_file_size_mega_byte, size.toString())
+
+            // This will eventually be moved to the UI State
+            if (viewModel.state.value.isCameraUploadsRunning) {
+                preferenceScreen.addPreference(this)
+            }
+        }
     }
 
     /**
@@ -1434,7 +1437,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
         cameraUploadCharging?.let {
             it.isChecked = charging
-            preferenceScreen.addPreference(it)
+
+            // This will eventually be moved to the UI State
+            if (viewModel.state.value.isCameraUploadsRunning) {
+                preferenceScreen.addPreference(it)
+            }
         }
 
         if (charging) {
@@ -1447,21 +1454,33 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun enableVideoQualitySettings() {
         prefs = dbH.preferences
-        videoQuality?.let { preferenceScreen.addPreference(it) }
+
         val uploadQuality = prefs.uploadVideoQuality
-        if (uploadQuality.isNullOrBlank()) {
-            prefs.uploadVideoQuality =
-                VideoQuality.ORIGINAL.value.toString()
-            dbH.setCameraUploadVideoQuality(VideoQuality.ORIGINAL.value)
-            videoQuality?.setValueIndex(VideoQuality.ORIGINAL.value)
+        val quality = if (uploadQuality.isNullOrBlank()) {
+            VideoQuality.ORIGINAL.value
         } else {
-            val quality = uploadQuality.toInt()
-            videoQuality?.setValueIndex(quality)
-            if (quality != VideoQuality.ORIGINAL.value) {
-                enableChargingSettings()
+            uploadQuality.toInt()
+        }
+
+        if (uploadQuality.isNullOrBlank()) {
+            dbH.setCameraUploadVideoQuality(quality)
+        }
+
+        if (quality == VideoQuality.ORIGINAL.value) {
+            disableChargingSettings()
+        } else {
+            enableChargingSettings()
+        }
+
+        videoQuality?.run {
+            setValueIndex(quality)
+            summary = this.entry
+
+            // This will eventually be moved to the UI State
+            if (viewModel.state.value.isCameraUploadsRunning) {
+                preferenceScreen.addPreference(this)
             }
         }
-        videoQuality?.summary = videoQuality?.entry
     }
 
     /**
@@ -1474,57 +1493,12 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Sets up what to upload when Camera Uploads is enabled
-     */
-    private fun setWhatToUploadForCameraUpload() {
-        if (prefs.camSyncFileUpload == null) {
-            dbH.setCamSyncFileUpload(MegaPreferences.ONLY_PHOTOS)
-            fileUpload = getString(R.string.settings_camera_upload_only_photos)
-            cameraUploadWhat?.setValueIndex(0)
-            setupRemoveGPS()
-        } else {
-            when (prefs.camSyncFileUpload.toInt()) {
-                MegaPreferences.ONLY_PHOTOS -> {
-                    fileUpload = getString(R.string.settings_camera_upload_only_photos)
-                    cameraUploadWhat?.setValueIndex(0)
-                    disableVideoQualitySettings()
-                    setupRemoveGPS()
-                }
-                MegaPreferences.ONLY_VIDEOS -> {
-                    fileUpload = getString(R.string.settings_camera_upload_only_videos)
-                    cameraUploadWhat?.setValueIndex(1)
-                    removeRemoveGPS()
-                }
-                MegaPreferences.PHOTOS_AND_VIDEOS -> {
-                    fileUpload = getString(R.string.settings_camera_upload_photos_and_videos)
-                    cameraUploadWhat?.setValueIndex(2)
-                    setupRemoveGPS()
-                }
-            }
-        }
-        cameraUploadWhat?.summary = fileUpload
-    }
-
-    /**
-     * Sets up Video Options for Camera Uploads
-     */
-    private fun setupVideoOptionsForCameraUpload() {
-        if (prefs.camSyncFileUpload == null) {
-            disableVideoQualitySettings()
-        } else {
-            if (prefs.camSyncFileUpload.toInt() != MegaPreferences.ONLY_PHOTOS) {
-                enableVideoQualitySettings()
-            }
-        }
-    }
-
-    /**
      * Enables the Camera Uploads functionality with location data embedded in each upload
      */
     private fun enableCameraUploadsWithLocation() {
         includeGPS = true
         dbH.setRemoveGPS(false)
-        cameraUploadIncludeGPS?.isChecked = includeGPS
+        optionIncludeLocationTags?.isChecked = includeGPS
         JobUtil.rescheduleCameraUpload(context)
     }
 
@@ -1537,11 +1511,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         cameraUpload = true
         prefs = dbH.preferences
 
-        // Upload Type
-        setWhatToUploadForCameraUpload()
-
-        // Video Type
-        setupVideoOptionsForCameraUpload()
+        viewModel.setCameraUploadsRunning(true)
 
         // Local Primary Folder
         setupLocalPathForCameraUpload()
@@ -1557,8 +1527,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         dbH.setCamSyncEnabled(true)
 
         cameraUploadOnOff?.isChecked = true
-        viewModel.setCameraUploadsEnabled(true)
-        cameraUploadWhat?.let { preferenceScreen.addPreference(it) }
         keepFileNames?.let { preferenceScreen.addPreference(it) }
         megaCameraFolder?.let { preferenceScreen.addPreference(it) }
         secondaryMediaFolderOn?.let { preferenceScreen.addPreference(it) }
@@ -1591,10 +1559,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         cameraUpload = false
         cameraUploadOnOff?.isChecked = false
 
-        viewModel.setCameraUploadsEnabled(false)
-        cameraUploadWhat?.let { preferenceScreen.removePreference(it) }
+        viewModel.setCameraUploadsRunning(false)
         localCameraUploadFolder?.let { preferenceScreen.removePreference(it) }
-        cameraUploadIncludeGPS?.let { preferenceScreen.removePreference(it) }
+        optionIncludeLocationTags?.let { preferenceScreen.removePreference(it) }
 
         hideVideoQualitySettingsSection()
 
