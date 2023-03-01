@@ -325,4 +325,14 @@ interface AccountRepository {
      * Checks if user already enabled 2FA
      */
     suspend fun is2FAEnabled(): Boolean
+
+    /**
+     * Set last target path of move/copy
+     */
+    suspend fun setLatestTargetPathPreference(path: Long)
+
+    /**
+     * Get last target path of move/copy
+     */
+    suspend fun getLatestTargetPathPreference(): Long?
 }

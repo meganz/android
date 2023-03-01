@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.Check2FADialog
+import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -131,6 +132,7 @@ class ManagerViewModel @Inject constructor(
     monitorFinishActivity: MonitorFinishActivity,
     private val check2FADialog: Check2FADialog,
     private val monitorVerificationStatus: MonitorVerificationStatus,
+    private val setLatestTargetPath: SetLatestTargetPath,
 ) : ViewModel() {
 
     /**
@@ -485,6 +487,15 @@ class ManagerViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Set last used path of copy/move as target path for next copy/move
+     */
+    fun setTargetPath(path: Long) {
+        viewModelScope.launch {
+            setLatestTargetPath(path)
         }
     }
 

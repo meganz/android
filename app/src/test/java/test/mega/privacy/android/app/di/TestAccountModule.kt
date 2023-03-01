@@ -21,6 +21,8 @@ import mega.privacy.android.domain.usecase.ResetAccountInfo
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.account.ChangeEmail
+import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 import org.mockito.kotlin.mock
 
@@ -100,4 +102,10 @@ object TestAccountModule {
 
     @Provides
     fun provideLocalLogoutApp() = mock<LocalLogoutApp>()
+
+    @Provides
+    fun provideSetLatestTargetPath() = mock<SetLatestTargetPath>()
+
+    @Provides
+    fun provideGetLatestTargetPath() = mock<GetLatestTargetPath>()
 }

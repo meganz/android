@@ -7926,6 +7926,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe((moveResult, moveThrowable) -> {
                                             if (!manageCopyMoveException(moveThrowable)) {
+                                                viewModel.setTargetPath(toHandle);
                                                 showMovementResult(moveResult, handlesWithoutCollision[0]);
                                             }
                                         });
@@ -7963,6 +7964,7 @@ public class ManagerActivity extends TransfersManagementActivity
                                         .subscribe((copyResult, copyThrowable) -> {
                                             dismissAlertDialogIfExists(statusDialog);
                                             if (!manageCopyMoveException(copyThrowable)) {
+                                                viewModel.setTargetPath(toHandle);
                                                 showCopyResult(copyResult);
                                             }
                                         });

@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.Check2FADialog
+import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaUserAlert
 import org.junit.After
@@ -137,6 +138,7 @@ class ManagerViewModelTest {
         )
     )
     private val check2FADialog = mock<Check2FADialog>()
+    private val setLatestTargetPath = mock<SetLatestTargetPath>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -172,6 +174,7 @@ class ManagerViewModelTest {
             monitorFinishActivity = { monitorFinishActivity },
             monitorVerificationStatus = { monitorVerificationStatus },
             check2FADialog = check2FADialog,
+            setLatestTargetPath = setLatestTargetPath
         )
     }
 

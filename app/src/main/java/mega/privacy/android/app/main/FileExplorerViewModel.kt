@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.ShareInfo
@@ -20,6 +22,7 @@ import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
 import javax.inject.Inject
 
 /**
@@ -33,6 +36,7 @@ import javax.inject.Inject
 class FileExplorerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val getLatestTargetPath: GetLatestTargetPath,
 ) : ViewModel() {
 
     private var dataAlreadyRequested = false
@@ -65,6 +69,13 @@ class FileExplorerViewModel @Inject constructor(
      * Gets [ShareTextInfo].
      */
     val textInfoContent get() = _textInfo.value
+
+    private val _targetPathFlow = MutableSharedFlow<Long?>()
+
+    /**
+     * Gets the latest used target path of move/copy
+     */
+    val targetPathFlow: SharedFlow<Long?> = _targetPathFlow
 
     /**
      * Set file names
@@ -252,4 +263,14 @@ class FileExplorerViewModel @Inject constructor(
         intent.action == Intent.ACTION_SEND
                 && intent.type == Constants.TYPE_TEXT_PLAIN
                 && intent.extras?.containsKey(Intent.EXTRA_STREAM)?.not() ?: true
+
+    /**
+     * Get the last target path of move/copy if not valid then return null
+     */
+    fun getTargetPath() {
+        viewModelScope.launch {
+            _targetPathFlow.emit(getLatestTargetPath())
+        }
+    }
+
 }

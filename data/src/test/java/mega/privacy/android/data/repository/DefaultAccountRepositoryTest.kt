@@ -58,6 +58,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
@@ -943,5 +944,38 @@ class DefaultAccountRepositoryTest {
         runTest {
             underTest.resetAccountInfo()
             verify(accountInfoWrapper).resetAccountInfo()
+        }
+
+    @Test
+    fun `test that getLatestTargetPathPreference is not invoked whenever latestTargetTimeStamp is over 60 mins old`() =
+        runTest {
+            val latestTargetTimestamp = System.currentTimeMillis().minus(3700000)
+            whenever(accountPreferencesGateway.getLatestTargetTimestampPreference()).thenReturn(
+                flowOf(latestTargetTimestamp)
+            )
+            underTest.getLatestTargetPathPreference()
+            verify(accountPreferencesGateway, never()).getLatestTargetPathPreference()
+        }
+
+    @Test
+    fun `test that getLatestTargetPathPreference is invoked whenever latestTargetTimeStamp is less than 60 mins old`() =
+        runTest {
+            val latestTargetTimestamp = System.currentTimeMillis().minus(3500000)
+            whenever(accountPreferencesGateway.getLatestTargetTimestampPreference()).thenReturn(
+                flowOf(latestTargetTimestamp)
+            )
+            whenever(accountPreferencesGateway.getLatestTargetPathPreference()).thenReturn(
+                flowOf(1234)
+            )
+            underTest.getLatestTargetPathPreference()
+            verify(accountPreferencesGateway).getLatestTargetPathPreference()
+        }
+
+    @Test
+    fun `test that setLatestTargetPathPreference is invoked when setLatestTargetPathPreference called`() =
+        runTest {
+            val handle = 1234L
+            underTest.setLatestTargetPathPreference(handle)
+            verify(accountPreferencesGateway).setLatestTargetPathPreference(handle)
         }
 }

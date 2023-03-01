@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -62,6 +63,7 @@ import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 import kotlin.coroutines.Continuation
@@ -114,9 +116,9 @@ internal class DefaultAccountRepository @Inject constructor(
     private val userCredentialsMapper: UserCredentialsMapper,
     private val accountSessionMapper: AccountSessionMapper,
     private val chatPreferencesGateway: ChatPreferencesGateway,
-    private val accountPreferencesGateway: AccountPreferencesGateway,
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val cacheFolderGateway: CacheFolderGateway,
+    private val accountPreferencesGateway: AccountPreferencesGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -657,6 +659,21 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
+    override suspend fun setLatestTargetPathPreference(path: Long) = withContext(ioDispatcher) {
+        accountPreferencesGateway.setLatestTargetPathPreference(path)
+        accountPreferencesGateway.setLatestTargetTimestampPreference(System.currentTimeMillis())
+    }
+
+    override suspend fun getLatestTargetPathPreference(): Long? = withContext(ioDispatcher) {
+        val timestamp = accountPreferencesGateway.getLatestTargetTimestampPreference().firstOrNull()
+        timestamp?.let {
+            if (TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - it) > LATEST_TARGET_PATH_VALID_DURATION)
+                null
+            else
+                accountPreferencesGateway.getLatestTargetPathPreference().firstOrNull()
+        }
+    }
+
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"
         private const val USER_INTERFACE_PREFERENCES = "USER_INTERFACE_PREFERENCES"
@@ -672,5 +689,6 @@ internal class DefaultAccountRepository @Inject constructor(
             "settings_audio_background_play_enabled"
         private const val KEY_AUDIO_SHUFFLE_ENABLED = "settings_audio_shuffle_enabled"
         private const val KEY_AUDIO_REPEAT_MODE = "settings_audio_repeat_mode"
+        private const val LATEST_TARGET_PATH_VALID_DURATION = 60
     }
 }

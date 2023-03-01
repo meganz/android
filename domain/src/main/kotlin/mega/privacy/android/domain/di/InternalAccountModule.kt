@@ -27,6 +27,8 @@ import mega.privacy.android.domain.usecase.ResetAccountInfo
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.account.ChangeEmail
+import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 
 /**
@@ -138,5 +140,13 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideResetAccountInfo(accountRepository: AccountRepository): ResetAccountInfo =
             ResetAccountInfo(accountRepository::resetAccountInfo)
+
+        @Provides
+        fun provideSetLatestTargetPath(accountRepository: AccountRepository): SetLatestTargetPath =
+            SetLatestTargetPath(accountRepository::setLatestTargetPathPreference)
+
+        @Provides
+        fun provideGetLatestTargetPath(accountRepository: AccountRepository): GetLatestTargetPath =
+            GetLatestTargetPath(accountRepository::getLatestTargetPathPreference)
     }
 }

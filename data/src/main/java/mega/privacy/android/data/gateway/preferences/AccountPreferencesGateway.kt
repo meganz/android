@@ -17,7 +17,27 @@ interface AccountPreferencesGateway {
      * Checks is 2FA dialog should be shown to user
      * @return true if alert should be shown
      */
-    suspend fun monitorShow2FADialog(): Flow<Boolean>
+    fun monitorShow2FADialog(): Flow<Boolean>
+
+    /**
+     * Set last target path of move/copy
+     */
+    suspend fun setLatestTargetPathPreference(path: Long)
+
+    /**
+     * Get last target path of move/copy
+     */
+    fun getLatestTargetPathPreference(): Flow<Long?>
+
+    /**
+     * Set timestamp of last target path of move/copy
+     */
+    suspend fun setLatestTargetTimestampPreference(timestamp: Long)
+
+    /**
+     * Get timestamp of last target path of move/copy
+     */
+    fun getLatestTargetTimestampPreference(): Flow<Long?>
 
     /**
      * Clears account preferences.

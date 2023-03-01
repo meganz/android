@@ -7,6 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import mega.privacy.android.app.main.FileExplorerViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -14,12 +15,14 @@ import org.mockito.kotlin.mock
 @OptIn(ExperimentalCoroutinesApi::class)
 class FileExplorerViewModelTest {
     private lateinit var underTest: FileExplorerViewModel
+    private val getLatestTargetPath = mock<GetLatestTargetPath>()
 
     @Before
     fun setUp() {
         underTest = FileExplorerViewModel(
             ioDispatcher = StandardTestDispatcher(),
-            monitorStorageStateEvent = mock()
+            monitorStorageStateEvent = mock(),
+            getLatestTargetPath = getLatestTargetPath
         )
     }
 

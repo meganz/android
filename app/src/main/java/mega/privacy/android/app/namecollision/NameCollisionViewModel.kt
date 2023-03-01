@@ -30,6 +30,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
+import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import timber.log.Timber
 import javax.inject.Inject
@@ -51,7 +52,8 @@ class NameCollisionViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
-    private val getNodeUseCase: GetNodeUseCase
+    private val getNodeUseCase: GetNodeUseCase,
+    private val setLatestTargetPath: SetLatestTargetPath,
 ) : BaseRxViewModel() {
 
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
@@ -576,7 +578,10 @@ class NameCollisionViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { result ->
-                    setCopyResult(result)
+                    setCopyResult(
+                        result,
+                        currentCollision.value?.nameCollision?.parentHandle ?: -1
+                    )
                     continueWithNext(choice)
                 },
                 onError = { error ->
@@ -597,7 +602,12 @@ class NameCollisionViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { result -> setCopyResult(result) },
+                onSuccess = { result ->
+                    setCopyResult(
+                        result,
+                        list[0].nameCollision.parentHandle
+                    )
+                },
                 onError = { error ->
                     throwable.value = error
                     Timber.w(error)
@@ -610,10 +620,21 @@ class NameCollisionViewModel @Inject constructor(
      *
      * @param copyResult    [CopyRequestResult] containing all the required info about the copy.
      */
-    private fun setCopyResult(copyResult: CopyRequestResult) {
+    private fun setCopyResult(copyResult: CopyRequestResult, copyToHandle: Long) {
+        if (copyToHandle != -1L)
+            setLatestPath(copyToHandle)
         actionResult.value = NameCollisionActionResult(
             message = copyResult.getResultText(),
             shouldFinish = pendingCollisions.isEmpty()
         )
+    }
+
+    /**
+     * Set last used path of copy/move as target path for next copy/move
+     */
+    private fun setLatestPath(path: Long) {
+        viewModelScope.launch {
+            setLatestTargetPath(path)
+        }
     }
 }

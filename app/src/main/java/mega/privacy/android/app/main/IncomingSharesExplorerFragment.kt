@@ -279,6 +279,15 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
             }
         }
 
+        val latestTargetPathTab = (requireActivity() as FileExplorerActivity).latestTargetPathTab
+        if (latestTargetPathTab == FileExplorerActivity.INCOMING_TAB && parentHandle == INVALID_HANDLE && (modeCloud == COPY || modeCloud == MOVE)) {
+            fileExplorerActivity.latestTargetPath?.let {
+                fileExplorerActivity.hideTabs(true, INCOMING_FRAGMENT)
+                setDeepBrowserTree(it)
+                setParentHandle(it)
+            }
+        }
+
         initOriginalData()
 
         when {
@@ -647,6 +656,15 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
                 fileExplorerActivity.invalidateOptionsMenu()
                 return 0
             }
+        }
+    }
+
+    private fun setDeepBrowserTree(handle: Long) {
+        fileExplorerActivity.increaseDeepBrowserTree()
+        var parentNode = megaApi.getParentNode(megaApi.getNodeByHandle(handle))
+        while (parentNode != null) {
+            fileExplorerActivity.increaseDeepBrowserTree()
+            parentNode = megaApi.getParentNode(parentNode)
         }
     }
 

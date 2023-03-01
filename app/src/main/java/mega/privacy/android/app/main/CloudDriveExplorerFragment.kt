@@ -123,6 +123,9 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
     private var disposable: Disposable? = null
 
+    private val fileExplorerActivity: FileExplorerActivity
+        get() = (requireActivity() as FileExplorerActivity)
+
     private val actionModeCallback = object : ActionMode.Callback {
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             Timber.d("onCreateActionMode")
@@ -294,7 +297,18 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
         when {
             modeCloud == FileExplorerActivity.SELECT_CAMERA_FOLDER -> setParentHandle(INVALID_HANDLE)
-            parentHandle == INVALID_HANDLE -> setParentHandle(megaApi.rootNode.handle)
+            parentHandle == INVALID_HANDLE -> {
+                val latestTargetPathTab =
+                    (requireActivity() as FileExplorerActivity).latestTargetPathTab
+                var targetPath = megaApi.rootNode.handle
+                if (latestTargetPathTab == FileExplorerActivity.CLOUD_TAB && (modeCloud == FileExplorerActivity.COPY || modeCloud == FileExplorerActivity.MOVE)) {
+                    targetPath = fileExplorerActivity.latestTargetPath?.let {
+                        fileExplorerActivity.hideTabs(true, CLOUD_FRAGMENT)
+                        it
+                    } ?: megaApi.rootNode.handle
+                }
+                setParentHandle(targetPath)
+            }
         }
 
         getPreferences().let { prefs ->
@@ -388,6 +402,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             }
             binding.fileListViewBrowser.isVisible = isList
             binding.fileGridViewBrowser.isVisible = !isList
+            initOriginalData()
             updateNodesByAdapter(originalData)
         }
 
@@ -484,7 +499,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         var lastFirstVisiblePosition = 0
         if (sortByHeaderViewModel.isListView()) {
             listLayoutManager?.let {
-                lastFirstVisiblePosition = it.findLastCompletelyVisibleItemPosition()
+                lastFirstVisiblePosition = it.findFirstCompletelyVisibleItemPosition()
             } ?: let {
                 Timber.e("mLayoutManager is null")
                 listLayoutManager = LinearLayoutManager(requireContext())
@@ -492,7 +507,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
             }
         } else {
             lastFirstVisiblePosition =
-                gridLayoutManager?.findLastCompletelyVisibleItemPosition() ?: 0
+                gridLayoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
         }
 
         Timber.d("Push to stack $lastFirstVisiblePosition position")
