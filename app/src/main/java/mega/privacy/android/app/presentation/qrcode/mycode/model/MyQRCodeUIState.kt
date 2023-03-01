@@ -1,7 +1,9 @@
 package mega.privacy.android.app.presentation.qrcode.mycode.model
 
 import android.graphics.Bitmap
+import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
+import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import java.io.File
 
 /**
@@ -33,4 +35,15 @@ data class MyQRCodeUIState(
      * Handle to the local QR code file, for the purpose of share.
      */
     val localQRCodeFile: File? = null,
+
+    /**
+     * If background color of default avatar.
+     * This is needed to generate default avatar, when avatar file is not available.
+     */
+    @ColorInt val avatarBgColor: Int? = null,
+
+    /**
+     * avatar content
+     */
+    val avatarContent: AvatarContent? = null,
 )

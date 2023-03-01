@@ -29,9 +29,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
+import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.dark_grey
@@ -55,6 +57,12 @@ fun Avatar(modifier: Modifier = Modifier, content: AvatarContent, @ColorInt avat
                 modifier = modifier,
                 avatarBgColor = avatarBgColor,
                 resId = content.emojiContent,
+            )
+        }
+        is PhotoAvatarContent -> {
+            PhotoAvatar(
+                modifier = modifier,
+                photoPath = content.path,
             )
         }
     }
@@ -124,6 +132,26 @@ fun EmojiAvatar(
 }
 
 @Composable
+fun PhotoAvatar(
+    modifier: Modifier = Modifier,
+    photoPath: String,
+) {
+    AsyncImage(
+        modifier = modifier
+            .size(66.dp)
+            .clip(CircleShape)
+            .border(
+                width = 3.dp,
+                color = borderColor(),
+                shape = CircleShape
+            )
+            .testTag("PhotoAvatar"),
+        model = photoPath,
+        contentDescription = "Photo Avatar"
+    )
+}
+
+@Composable
 private fun AvatarBackground(modifier: Modifier = Modifier, avatarBgColor: Int) {
     Image(
         painter = ColorPainter(color = Color(avatarBgColor)),
@@ -133,12 +161,15 @@ private fun AvatarBackground(modifier: Modifier = Modifier, avatarBgColor: Int) 
             .clip(CircleShape)
             .border(
                 width = 3.dp,
-                color = white.takeIf { MaterialTheme.colors.isLight } ?: dark_grey,
+                color = borderColor(),
                 shape = CircleShape
             )
             .testTag("AvatarBackground")
     )
 }
+
+@Composable
+private fun borderColor() = white.takeIf { MaterialTheme.colors.isLight } ?: dark_grey
 
 /**
  * PreviewEmojiAvatar
@@ -155,6 +186,7 @@ fun PreviewEmojiAvatar() {
         )
     }
 }
+
 
 /**
  * Preview TextAvatar

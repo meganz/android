@@ -20,3 +20,10 @@ data class TextAvatarContent(val avatarText: String) : AvatarContent
  * emoji.
  */
 data class EmojiAvatarContent(@DrawableRes val emojiContent: Int) : AvatarContent
+
+
+/**
+ * A photo avatar
+ * @property path Path of a photo avatar
+ */
+data class PhotoAvatarContent(val path: String) : AvatarContent

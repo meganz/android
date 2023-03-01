@@ -12,6 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.avatar.model.EmojiAvatarContent
+import mega.privacy.android.app.presentation.avatar.model.PhotoAvatarContent
 import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import org.junit.Rule
@@ -44,7 +45,6 @@ class AvatarViewTest {
 
     @Test
     fun `test that text avatar is shown when there is no emoji at beginning of name`() = runTest {
-
         composeTestRule.setContent {
             Avatar(
                 modifier = Modifier,
@@ -56,6 +56,22 @@ class AvatarViewTest {
         }
         composeTestRule.run {
             onNodeWithTag(testTag = "TextAvatar").assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun `test that photo avatar is shown when local photo avatar is available`() = runTest {
+        composeTestRule.setContent {
+            Avatar(
+                modifier = Modifier,
+                avatarBgColor = Color.Red.toArgb(),
+                content = PhotoAvatarContent(
+                    path = "file:/path/to/avatar/file.jpg"
+                )
+            )
+        }
+        composeTestRule.run {
+            onNodeWithTag(testTag = "PhotoAvatar").assertIsDisplayed()
         }
     }
 }
