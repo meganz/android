@@ -749,7 +749,7 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
      * @param searchString search strings
      */
     fun search(searchString: String?) {
-        if (searchString == null && !shouldResetNodes) {
+        if (searchString == null || !shouldResetNodes) {
             return
         }
         searchCancelToken = initNewSearch()
