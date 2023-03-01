@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" ?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -516,7 +516,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">There is no payment method set for this plan currently. Please select one.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">The link has been copied to the clipboard</string>
+    <string name="file_properties_get_link">Link copied to clipboard</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Please log out before creating the account</string>
     <!-- menu item -->
@@ -1122,8 +1122,8 @@
     <string name="non_format_change_title_messages">%1$s changed the group chat name to “%2$s”</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s left the group chat</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
-    <string name="messages_copied_clipboard">Copied to the clipboard</string>
+    <!-- Success alert when the user copies one message to the clipboard -->
+    <string name="messages_copied_clipboard">Copied to clipboard</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chat error</string>
     <!-- Message of the error dialog when opening a chat -->
@@ -1335,8 +1335,8 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="one">Link removed successfully.</item>
-        <item quantity="other">Links removed successfully.</item>
+        <item quantity="one">Link removed</item>
+        <item quantity="other">Links removed</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Contacts attached</string>
@@ -1596,7 +1596,7 @@
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA users who scan your QR code will be automatically added to your contact list.</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Link copied to the clipboard</string>
+    <string name="qrcode_link_copied">Link copied to clipboard</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">QR code successfully reset</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -2042,7 +2042,7 @@
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
     <string name="success_unarchive_chat">%s was unarchived</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Error. %s can\’t be unarchived</string>
+    <string name="error_unarchive_chat">Error. %s can’t be unarchived</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Inactive chat</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2406,7 +2406,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Before you can generate a link for this chat, you need to set a description:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Chat link copied to the clipboard</string>
+    <string name="chat_link_copied_clipboard">Chat link copied to clipboard</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]From[/A] %s / [A]month[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -3059,12 +3059,12 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Copy password</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Key copied to the clipboard.</string>
+    <string name="key_copied_clipboard">Key copied to clipboard</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Password copied to the clipboard.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
+    <string name="password_copied_clipboard">Password copied to clipboard</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
     <string name="link_and_key_sent">Link and key sent</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
     <string name="link_and_password_sent">Link and password sent</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Upgrade to Pro</string>
@@ -3312,13 +3312,13 @@
     <string name="action_copy_all">Copy all</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link successfully sent.</item>
+        <item quantity="one">Link sent</item>
         <item quantity="other">Links sent</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Link copied to the clipboard.</item>
-        <item quantity="other">Links copied to the clipboard.</item>
+        <item quantity="one">Link copied to clipboard</item>
+        <item quantity="other">Links copied to clipboard</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3991,10 +3991,6 @@
     <string name="media_player_video_snackbar_screenshot_saved">Saved image to your device gallery</string>
     <!-- Album creation dialog title -->
     <string name="photos_album_creation_dialog_title">Enter album name</string>
-    <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot add more</string>
-    <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
     <!-- Album creation input name placeholder -->
     <string name="photos_album_creation_dialog_input_placeholder">New album</string>
     <!-- Title of option to share the meeting link in Scheduled meeting info screen -->
@@ -4170,9 +4166,9 @@
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Everyday effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Every day effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Everyday effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Every day effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="one">%1$s every week effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
@@ -4615,4 +4611,8 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">Sat</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">Sun</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
 </resources>
