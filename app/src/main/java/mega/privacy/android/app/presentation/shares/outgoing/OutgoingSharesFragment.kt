@@ -96,13 +96,14 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
         val clickedNodeHandle = adapter?.getItem(position)?.handle
-        viewModel.getUnVerifiedOutgoingNodeShare(clickedNodeHandle)?.let {
-            if (!it.isVerified && it.isPending) {
-                showCanNotVerifyContact(it.user)
+        val shareData = viewModel.getUnVerifiedOutgoingNodeShare(clickedNodeHandle)
+        if (shareData != null) {
+            if (!shareData.isVerified && shareData.isPending) {
+                showCanNotVerifyContact(shareData.user)
             } else {
-                openAuthenticityCredentials(it.user)
+                openAuthenticityCredentials(shareData.user)
             }
-        } ?: run {
+        } else {
             when {
                 // select mode
                 adapter?.isMultipleSelect == true -> {
@@ -245,6 +246,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                     visibilityFastScroller()
                     hideActionMode()
                     setEmptyView(it.isInvalidHandle)
+                    adapter?.setUnverifiedOutgoingShareData(it.unverifiedOutgoingShares)
                     adapter?.setUnverifiedOutgoingNodeHandles(it.unVerifiedOutgoingNodeHandles)
                     updateNodes(it.nodes)
                 }

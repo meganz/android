@@ -102,6 +102,7 @@ import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.ShareData;
 import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -147,6 +148,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private SortByHeaderViewModel sortByViewModel;
     private final Set<Long> unverifiedIncomingNodeHandles = new HashSet<>();
     private final Set<Long> unverifiedOutgoingNodeHandles = new HashSet<>();
+
+    private final List<ShareData> unverifiedOutGoingShareData = new ArrayList<>();
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 
@@ -1092,7 +1095,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     boolean hasUnverifiedNodes = !unverifiedIncomingNodeHandles.isEmpty()
                             && unverifiedIncomingNodeHandles.contains(node.getHandle());
                     if (hasUnverifiedNodes) {
-                        showUnverifiedNodeUi(holder, true);
+                        showUnverifiedNodeUi(holder, true, node);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
                 } else {
@@ -1105,7 +1108,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 boolean hasUnverifiedNodes = !unverifiedOutgoingNodeHandles.isEmpty()
                         && unverifiedOutgoingNodeHandles.contains(node.getHandle());
                 if (hasUnverifiedNodes) {
-                    showUnverifiedNodeUi(holder, false);
+                    showUnverifiedNodeUi(holder, false, node);
                 }
             }
         } else {
@@ -1537,6 +1540,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         unverifiedOutgoingNodeHandles.addAll(handles);
     }
 
+    public void setUnverifiedOutgoingShareData(List<ShareData> shareDataList) {
+        unverifiedOutGoingShareData.clear();
+        unverifiedOutGoingShareData.addAll(shareDataList);
+    }
+
     /**
      * Function to show Unverified node UI items accordingly
      *
@@ -1544,9 +1552,19 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * @param isIncomingNode boolean to indicate if the node is incoming so that
      *                       "Undecrypted folder" is displayed instead of node name
      */
-    private void showUnverifiedNodeUi(ViewHolderBrowserList holder, Boolean isIncomingNode) {
+    private void showUnverifiedNodeUi(ViewHolderBrowserList holder, Boolean isIncomingNode, MegaNode node) {
         if (isIncomingNode) {
-            holder.textViewFileName.setText(context.getString(R.string.shared_items_verify_credentials_undecrypted_folder));
+            if(node.isNodeKeyDecrypted()) {
+                holder.textViewFileName.setText(node.getName());
+            } else {
+                holder.textViewFileName.setText(context.getString(R.string.shared_items_verify_credentials_undecrypted_folder));
+            }
+        } else {
+            for (int i = 0; i < unverifiedOutGoingShareData.size(); i++) {
+                if(unverifiedOutGoingShareData.get(i).getNodeHandle() == (node.getHandle()) && unverifiedOutGoingShareData.get(i).isPending()) {
+                    holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
+                }
+            }
         }
         holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));
         holder.permissionsIcon.setVisibility(View.VISIBLE);

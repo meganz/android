@@ -167,7 +167,17 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                     binding.threeDots.setOnClickListener {
                         onThreeDotsClickListener?.invoke(node)
                     }
-                    binding.firstLineText.text = node.name
+                    if (!item.isKeyVerified) {
+                        binding.firstLineText.text =
+                            context.resources.getQuantityString(
+                                R.plurals.cloud_drive_undecrypted_file,
+                                nodeList.size)
+                        binding.nameText.text =
+                            context.getString(R.string.shared_items_verify_credentials_undecrypted_folder)
+                    } else {
+                        binding.firstLineText.text = node.name
+                    }
+
                     if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
                         val drawable =
                             getNodeLabelDrawable(node.label, holder.itemView.resources)
