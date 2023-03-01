@@ -503,6 +503,44 @@ internal class DefaultChatRepository @Inject constructor(
         }
     }
 
+    override suspend fun signalPresenceActivity() =
+        withContext(ioDispatcher) {
+            if (megaChatApiGateway.isSignalActivityRequired()) {
+                suspendCoroutine { continuation ->
+                    megaChatApiGateway.signalPresenceActivity(
+                        OptionalMegaChatRequestListenerInterface(
+                            onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                                if (error.errorCode == MegaChatError.ERROR_OK) {
+                                    continuation.resume(Unit)
+                                } else {
+                                    continuation.failWithError(error)
+                                }
+                            }
+                        )
+                    )
+                }
+            }
+        }
+
+    override suspend fun archiveChat(chatId: Long, archive: Boolean) =
+        withContext(ioDispatcher) {
+            suspendCoroutine { continuation ->
+                megaChatApiGateway.archiveChat(
+                    chatId = chatId,
+                    archive = archive,
+                    OptionalMegaChatRequestListenerInterface(
+                        onRequestFinish = { _: MegaChatRequest, error: MegaChatError ->
+                            if (error.errorCode == MegaChatError.ERROR_OK) {
+                                continuation.resume(Unit)
+                            } else {
+                                continuation.failWithError(error)
+                            }
+                        }
+                    )
+                )
+            }
+        }
+
     private fun Long.toZonedDateTime(): ZonedDateTime =
         ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
 }

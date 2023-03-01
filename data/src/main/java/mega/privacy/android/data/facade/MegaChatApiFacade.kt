@@ -389,4 +389,16 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun removeRequestListener(listener: MegaChatRequestListenerInterface) =
         chatApi.removeChatRequestListener(listener)
+
+    override fun isSignalActivityRequired(): Boolean =
+        chatApi.isSignalActivityRequired
+
+    override fun signalPresenceActivity(listener: MegaChatRequestListenerInterface) =
+        chatApi.signalPresenceActivity(listener)
+
+    override fun archiveChat(
+        chatId: Long,
+        archive: Boolean,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.archiveChat(chatId, archive, listener)
 }

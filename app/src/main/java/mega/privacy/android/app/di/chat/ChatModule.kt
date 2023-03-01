@@ -10,6 +10,7 @@ import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
 import mega.privacy.android.domain.usecase.AnswerChatCall
+import mega.privacy.android.domain.usecase.ArchiveChat
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetMyChatFilesFolder
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
+import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.meeting.DefaultStartChatCallNoRinging
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
@@ -252,5 +254,19 @@ abstract class ChatModule {
         @Provides
         fun provideResetChatSettings(chatRepository: ChatRepository): ResetChatSettings =
             ResetChatSettings(chatRepository::resetChatSettings)
+
+        /**
+         * Provides the Use case [SignalChatPresenceActivity]
+         */
+        @Provides
+        fun provideSignalChatPresenceActivity(chatRepository: ChatRepository): SignalChatPresenceActivity =
+            SignalChatPresenceActivity(chatRepository::signalPresenceActivity)
+
+        /**
+         * Provides the Use case [ArchiveChat]
+         */
+        @Provides
+        fun provideArchiveChat(chatRepository: ChatRepository): ArchiveChat =
+            ArchiveChat(chatRepository::archiveChat)
     }
 }

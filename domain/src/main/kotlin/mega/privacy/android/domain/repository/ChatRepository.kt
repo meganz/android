@@ -287,4 +287,17 @@ interface ChatRepository {
      * Reset chat settings if not initialized yet.
      */
     suspend fun resetChatSettings()
+
+    /**
+     * Signal chat presence activity
+     */
+    suspend fun signalPresenceActivity()
+
+    /**
+     * Archive chat
+     *
+     * @param chatId    Chat id
+     * @param archive   True to archive, false to unarchive
+     */
+    suspend fun archiveChat(chatId: Long, archive: Boolean)
 }

@@ -1,11 +1,14 @@
 package mega.privacy.android.app.presentation.meeting.model
 
+import mega.privacy.android.domain.entity.chat.MeetingRoomItem
+
 /**
- * UI state class for MeetingListFragment
+ * Meeting list state
+ *
+ * @property meetings
+ * @property currentCallChatId
  */
-data class MeetingListState(
-    /**
-     * Chat id of the meeting to be opened
-     */
-    val meetingChatId: Long? = null,
+data class MeetingListState constructor(
+    val meetings: List<MeetingRoomItem> = listOf(),
+    val currentCallChatId: Long? = null,
 )

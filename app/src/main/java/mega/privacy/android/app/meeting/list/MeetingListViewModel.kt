@@ -1,44 +1,37 @@
 package mega.privacy.android.app.meeting.list
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestampMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingListState
-import mega.privacy.android.app.usecase.chat.ArchiveChatUseCase
-import mega.privacy.android.app.usecase.chat.LeaveChatUseCase
-import mega.privacy.android.app.usecase.chat.SignalChatPresenceUseCase
 import mega.privacy.android.app.usecase.meeting.GetLastMessageUseCase
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
-import mega.privacy.android.domain.qualifier.DefaultDispatcher
+import mega.privacy.android.domain.usecase.ArchiveChat
 import mega.privacy.android.domain.usecase.GetMeetings
+import mega.privacy.android.domain.usecase.LeaveChat
+import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
 import timber.log.Timber
 import javax.inject.Inject
@@ -51,16 +44,17 @@ import javax.inject.Inject
  * @property signalChatPresenceUseCase
  * @property getMeetingsUseCase
  * @property getLastMessageUseCase
- * @property startChatCallNoRinging         [StartChatCallNoRinging]
- * @property megaChatApiGateway             [MegaChatApiGateway]
- * @property dispatcher
+ * @property meetingLastTimestampMapper
+ * @property scheduledMeetingTimestampMapper
+ * @property startChatCallNoRinging
+ * @property deviceGateway
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class MeetingListViewModel @Inject constructor(
-    private val archiveChatUseCase: ArchiveChatUseCase,
-    private val leaveChatUseCase: LeaveChatUseCase,
-    private val signalChatPresenceUseCase: SignalChatPresenceUseCase,
+    private val archiveChatUseCase: ArchiveChat,
+    private val leaveChatUseCase: LeaveChat,
+    private val signalChatPresenceUseCase: SignalChatPresenceActivity,
     private val getMeetingsUseCase: GetMeetings,
     private val getLastMessageUseCase: GetLastMessageUseCase,
     private val meetingLastTimestampMapper: MeetingLastTimestampMapper,
@@ -70,66 +64,71 @@ class MeetingListViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val passcodeManagement: PasscodeManagement,
     private val megaChatApiGateway: MegaChatApiGateway,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
-) : BaseRxViewModel() {
+) : ViewModel() {
 
-    private var queryString: String? = null
-    private val meetings: MutableLiveData<List<MeetingRoomItem>> = MutableLiveData(emptyList())
-    private val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
-
-    private val _uiState = MutableStateFlow(MeetingListState())
-
-    /**
-     * UI state
-     */
-    val uiState = _uiState.asStateFlow()
-
-
-    private val mutex = Mutex()
-
-    init {
-        retrieveMeetings()
-        signalChatPresence()
+    companion object {
+        private const val DEBOUNCE_TIMEOUT_MS = 250L
     }
 
-    private fun retrieveMeetings() {
-        viewModelScope.launch(dispatcher) {
-            getMeetingsUseCase(mutex)
-                .mapLatest { items ->
-                    mutex.withLock {
-                        items.map { item ->
-                            item.copy(
-                                lastMessage = getLastMessageUseCase.get(item.chatId)
-                                    .blockingGetOrNull(),
-                                lastTimestampFormatted = meetingLastTimestampMapper
-                                    (item.lastTimestamp, is24HourFormat),
-                                scheduledTimestampFormatted = scheduledMeetingTimestampMapper
-                                    (item, is24HourFormat)
-                            )
-                        }
+    private val state = MutableStateFlow(MeetingListState())
+    private val searchQueryState = MutableStateFlow<String?>(null)
+    private val is24HourFormat: Boolean by lazy { deviceGateway.is24HourFormat() }
+    private val mutex = Mutex()
+
+    /**
+     * Get Meeting List state
+     *
+     * @return  MeetingListState
+     */
+    fun getState(): StateFlow<MeetingListState> = state
+
+    init {
+        viewModelScope.launch {
+            combine(searchQueryState, getMeetings(), ::mapToFilteredMeetings)
+                .catch { Timber.e(it) }
+                .collectLatest { lastMeetings ->
+                    state.update {
+                        it.copy(meetings = lastMeetings)
                     }
                 }
-                .flowOn(dispatcher)
-                .catch { Timber.e(it) }
-                .collectLatest(meetings::postValue)
         }
+
+        signalChatPresence()
     }
 
     /**
      * Get meetings
      *
-     * @return  LiveData with a list of filtered MeetingRoomItem
+     * @return  Flow of MeetingRoomItems
      */
-    fun getMeetings(): LiveData<List<MeetingRoomItem>> =
-        meetings.map { items ->
-            val searchQuery = queryString
-            if (!searchQuery.isNullOrBlank() && !items.isNullOrEmpty()) {
-                items.filter { (_, title, lastMessage, _, _, _, _, _, _, _, _, _, _) ->
-                    title.contains(searchQuery, true)
-                            || lastMessage?.contains(searchQuery, true) == true
+    private fun getMeetings(): Flow<List<MeetingRoomItem>> =
+        getMeetingsUseCase(mutex)
+            .debounce(DEBOUNCE_TIMEOUT_MS) // Needed for backpressure
+            .mapLatest { items ->
+                mutex.withLock {
+                    items.map { item ->
+                        item.copy(
+                            lastMessage = getLastMessageUseCase.get(item.chatId)
+                                .blockingGetOrNull(),
+                            lastTimestampFormatted = meetingLastTimestampMapper
+                                (item.lastTimestamp, is24HourFormat),
+                            scheduledTimestampFormatted = scheduledMeetingTimestampMapper
+                                (item, is24HourFormat)
+                        )
+                    }
                 }
-            } else {
-                items
+            }
+
+    private fun mapToFilteredMeetings(
+        searchQuery: String?,
+        meetings: List<MeetingRoomItem>,
+    ): List<MeetingRoomItem> =
+        if (searchQuery.isNullOrBlank()) {
+            meetings
+        } else {
+            meetings.filter { meeting ->
+                meeting.title.contains(searchQuery, true) ||
+                        meeting.lastMessage?.contains(searchQuery, true) == true
             }
         }
 
@@ -139,7 +138,7 @@ class MeetingListViewModel @Inject constructor(
      * @return  true if search query is empty, false otherwise
      */
     fun isSearchQueryEmpty(): Boolean =
-        queryString.isNullOrBlank()
+        searchQueryState.value.isNullOrBlank()
 
     /**
      * Get specific meeting given its chat id
@@ -147,8 +146,9 @@ class MeetingListViewModel @Inject constructor(
      * @param chatId    Chat id to identify chat
      * @return          LiveData with MeetingRoomItem
      */
-    fun getMeeting(chatId: Long): LiveData<MeetingRoomItem?> =
-        meetings.map { meeting -> meeting.find { it.chatId == chatId } }
+    fun getMeeting(chatId: Long): Flow<MeetingRoomItem?> =
+        state.mapLatest { it.meetings.firstOrNull { item -> item.chatId == chatId } }
+            .also { signalChatPresence() }
 
     /**
      * Set search query string
@@ -156,39 +156,45 @@ class MeetingListViewModel @Inject constructor(
      * @param query Search query
      */
     fun setSearchQuery(query: String?) {
-        queryString = query
-        meetings.notifyObserver()
+        searchQueryState.update { query }
+        signalChatPresence()
     }
 
     /**
-     * Start scheduled meeting
+     * Start scheduled meeting call
      *
      * @param chatId    Chat Id.
      * @param schedId   Scheduled meeting Id.
      */
-    fun startSchedMeeting(chatId: Long, schedId: Long) =
+    fun startSchedMeeting(chatId: Long, schedId: Long) {
         viewModelScope.launch {
-            startChatCallNoRinging(
-                chatId = chatId,
-                schedId = schedId,
-                enabledVideo = false,
-                enabledAudio = false
-            )?.let { call ->
-                if (call.chatId != megaChatApiGateway.getChatInvalidHandle()) {
-                    chatManagement.setSpeakerStatus(chatId, false)
-                    chatManagement.setRequestSentCall(call.callId, true)
-                    passcodeManagement.showPasscodeScreen = true
-                    getInstance().openCallService(chatId)
-                    _uiState.update { it.copy(meetingChatId = call.chatId) }
-                }
+            runCatching {
+                startChatCallNoRinging(
+                    chatId = chatId,
+                    schedId = schedId,
+                    enabledVideo = false,
+                    enabledAudio = false
+                )
+            }.onSuccess { result ->
+                result?.chatId?.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                    ?.let { callChatId ->
+                        chatManagement.setSpeakerStatus(chatId, false)
+                        chatManagement.setRequestSentCall(callChatId, true)
+                        passcodeManagement.showPasscodeScreen = true
+                        MegaApplication.getInstance().openCallService(chatId)
+                        state.update { it.copy(currentCallChatId = callChatId) }
+                    }
+            }.onFailure { exception ->
+                Timber.e(exception)
             }
         }
+    }
 
     /**
-     * Remove chat id of the meeting
+     * Remove current chat call
      */
-    fun removeMeetingChatIdValue() {
-        _uiState.update { it.copy(meetingChatId = megaChatApiGateway.getChatInvalidHandle()) }
+    fun removeCurrentCall() {
+        state.update { it.copy(currentCallChatId = null) }
     }
 
     /**
@@ -197,10 +203,13 @@ class MeetingListViewModel @Inject constructor(
      * @param chatId    Chat id to be archived
      */
     fun archiveChat(chatId: Long) {
-        archiveChatUseCase.archive(chatId, true)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = Timber::e)
+        viewModelScope.launch {
+            runCatching {
+                archiveChatUseCase(chatId, true)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
     }
 
     /**
@@ -218,10 +227,13 @@ class MeetingListViewModel @Inject constructor(
      * @param chatId    Chat id to leave
      */
     fun leaveChat(chatId: Long) {
-        leaveChatUseCase.leave(chatId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = Timber::e)
+        viewModelScope.launch {
+            runCatching {
+                leaveChatUseCase(chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
     }
 
     /**
@@ -237,10 +249,12 @@ class MeetingListViewModel @Inject constructor(
      * Signal chat presence
      */
     fun signalChatPresence() {
-        signalChatPresenceUseCase.signal()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onError = Timber::e)
-            .addTo(composite)
+        viewModelScope.launch {
+            runCatching {
+                signalChatPresenceUseCase()
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }
+        }
     }
 }

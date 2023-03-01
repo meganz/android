@@ -70,7 +70,6 @@ class MeetingListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
-        setupFlow()
         setupObservers(savedInstanceState)
     }
 
@@ -147,31 +146,10 @@ class MeetingListFragment : Fragment() {
         }
     }
 
-    private fun setupFlow() {
-        viewLifecycleOwner.collectFlow(viewModel.uiState, Lifecycle.State.RESUMED) { state ->
-            state.meetingChatId?.let { id ->
-                if (id != -1L) {
-                    viewModel.removeMeetingChatIdValue()
-                    activity?.startActivity(
-                        Intent(
-                            context,
-                            MeetingActivity::class.java
-                        ).apply {
-                            action = MEETING_ACTION_IN
-                            putExtra(MeetingActivity.MEETING_CHAT_ID, id)
-                            putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, true)
-                            putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, false)
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        })
-                }
-            }
-        }
-    }
-
     private fun setupObservers(savedInstanceState: Bundle?) {
-        viewModel.getMeetings().observe(viewLifecycleOwner) { items ->
-            meetingsAdapter.submitRoomList(items) {
-                if (!scrolled && items.isNotEmpty()) {
+        viewLifecycleOwner.collectFlow(viewModel.getState(), Lifecycle.State.RESUMED) { state ->
+            meetingsAdapter.submitRoomList(state.meetings) {
+                if (!scrolled && state.meetings.isNotEmpty()) {
                     binding.list.scrollToPosition(0)
                 }
 
@@ -187,7 +165,7 @@ class MeetingListFragment : Fragment() {
                     actionModeRestored = true
                 }
             }
-            if (items.isNullOrEmpty()) {
+            if (state.meetings.isEmpty()) {
                 val searchQueryEmpty = viewModel.isSearchQueryEmpty()
                 binding.viewEmpty.isVisible = searchQueryEmpty
                 binding.viewEmptySearch.root.isVisible = !searchQueryEmpty
@@ -195,7 +173,29 @@ class MeetingListFragment : Fragment() {
                 binding.viewEmpty.isVisible = false
                 binding.viewEmptySearch.root.isVisible = false
             }
+
+            if (state.currentCallChatId != null) {
+                viewModel.removeCurrentCall()
+                launchChatCallScreen(state.currentCallChatId)
+            }
         }
+    }
+
+    /**
+     * Launch chat call screen
+     *
+     * @param chatId    Chat id to be shown
+     */
+    private fun launchChatCallScreen(chatId: Long) {
+        activity?.startActivity(
+            Intent(context, MeetingActivity::class.java).apply {
+                action = MEETING_ACTION_IN
+                putExtra(MeetingActivity.MEETING_CHAT_ID, chatId)
+                putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, true)
+                putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, false)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        )
     }
 
     /**
@@ -205,7 +205,6 @@ class MeetingListFragment : Fragment() {
      */
     fun setSearchQuery(query: String?) {
         viewModel.setSearchQuery(query)
-        viewModel.signalChatPresence()
     }
 
     /**

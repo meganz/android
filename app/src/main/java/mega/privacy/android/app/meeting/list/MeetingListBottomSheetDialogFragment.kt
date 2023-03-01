@@ -12,17 +12,16 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
 import com.facebook.drawee.drawable.ScalingUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.internal.ViewUtils.dpToPx
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetMeetingDetailBinding
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
-import mega.privacy.android.app.meeting.activity.MeetingActivity
-import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_IN
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
@@ -59,8 +58,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private lateinit var binding: BottomSheetMeetingDetailBinding
 
     private val chatId by lazy {
-        arguments?.getLong(CHAT_ID,
-            MEGACHAT_INVALID_HANDLE) ?: MEGACHAT_INVALID_HANDLE
+        arguments?.getLong(CHAT_ID, MEGACHAT_INVALID_HANDLE) ?: MEGACHAT_INVALID_HANDLE
     }
 
     private val viewModel by viewModels<MeetingListViewModel>({ requireParentFragment() })
@@ -84,20 +82,24 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel.signalChatPresence()
-        viewModel.getMeeting(chatId).observe(viewLifecycleOwner, ::showMeeting)
+        viewLifecycleOwner.collectFlow(
+            viewModel.getMeeting(chatId),
+            Lifecycle.State.RESUMED,
+            ::showMeeting
+        )
     }
 
     private fun showMeeting(room: MeetingRoomItem?) {
         requireNotNull(room) { "Meeting not found" }
 
         binding.header.txtTitle.text = room.title
-        binding.header.txtTimestamp.setText(when {
-            room.isRecurring() -> R.string.meetings_list_recurring_meeting_label
-            room.isPending -> R.string.meetings_list_one_off_meeting_label
-            else -> R.string.context_meeting
-        })
+        binding.header.txtTimestamp.setText(
+            when {
+                room.isRecurring() -> R.string.meetings_list_recurring_meeting_label
+                room.isPending -> R.string.meetings_list_one_off_meeting_label
+                else -> R.string.context_meeting
+            }
+        )
 
         if (room.firstUserChar == null && room.lastUserChar == null) {
             binding.header.groupThumbnails.isVisible = false
@@ -150,10 +152,10 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.dividerStartSchedMeeting.isVisible = binding.btnStartSchedMeeting.isVisible
 
         binding.btnStartSchedMeeting.setOnClickListener {
-            room.schedId?.let {
-                viewModel.startSchedMeeting(room.chatId, it)
+            room.schedId?.let { schedId ->
+                viewModel.startSchedMeeting(room.chatId, schedId)
+                dismissAllowingStateLoss()
             }
-            dismissAllowingStateLoss()
         }
 
         binding.btnInfo.setOnClickListener {

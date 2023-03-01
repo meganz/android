@@ -505,4 +505,55 @@ interface MegaChatApiGateway {
      * Removes chat request listener.
      */
     fun removeRequestListener(listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Returns whether the autoaway mechanism is active.
+     *
+     * This function may return false even when the Presence settings
+     * establish that autoaway option is active. It happens when the persist
+     * option is enabled and when the status is offline or away.
+     *
+     * @return  True if the app should call [signalPresenceActivity], false otherwise
+     */
+    fun isSignalActivityRequired(): Boolean
+
+    /**
+     * Signal there is some user activity
+     *
+     * When the presence configuration is set to autoaway (and persist is false), this
+     * function should be called regularly to not turn into away status automatically.
+     *
+     * A good approach is to call this function with every mouse move or keypress on desktop
+     * platforms; or at any finger tap or gesture and any keypress on mobile platforms.
+     *
+     * Failing to call this function, you risk a user going "Away" while typing a lengthy message,
+     * which would be awkward.
+     *
+     * The associated request type with this request is [TYPE_SIGNAL_ACTIVITY].
+     *
+     * @param listener  [MegaChatRequestListenerInterface] to track this request
+     */
+    fun signalPresenceActivity(listener: MegaChatRequestListenerInterface)
+
+    /**
+     * Allows to un/archive chats
+     *
+     * This is a per-chat and per-user option, and it's intended to be used when the user does
+     * not care anymore about an specific chatroom. Archived chatrooms should be displayed in a
+     * different section or alike, so it can be clearly identified as archived.
+     *
+     * The associated request type with this request is MegaChatRequest::TYPE_ARCHIVE_CHATROOM
+     * Valid data in the MegaChatRequest object received on callbacks:
+     * - MegaChatRequest::getChatHandle - Returns the chat identifier
+     * - MegaChatRequest::getFlag - Returns if chat is to be archived or unarchived
+     *
+     * On the onRequestFinish error, the error code associated to the MegaChatError can be:
+     * - MegaChatError::ERROR_ENOENT - If the chatroom doesn't exists.
+     * - MegaChatError::ERROR_ACCESS - If caller is not operator.
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @param archive True to set the chat as archived, false to unarchive it.
+     * @param listener [MegaChatRequestListenerInterface] to track this request
+     */
+    fun archiveChat(chatId: Long, archive: Boolean, listener: MegaChatRequestListenerInterface)
 }

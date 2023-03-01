@@ -447,7 +447,7 @@ private suspend fun MegaUserAlert.getUpdatedMeetingAlert(
                     oldTitle = updatedTitle[0],
                     isRecurring = isRecurring,
                     isOccurrence = isOccurrence,
-                    scheduledMeeting = meeting,
+                    scheduledMeeting = meeting?.takeIf { !isRecurring },
                 )
             }
             ScheduledMeetingChangeType.Description -> {
