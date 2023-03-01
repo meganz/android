@@ -15,6 +15,7 @@ import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
+import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 
 /**
  * module to provide FileNode modules
@@ -61,5 +62,12 @@ abstract class InternalNodeModule {
         @Provides
         fun provideIsNodeInInbox(nodeRepository: NodeRepository): IsNodeInInbox =
             IsNodeInInbox(nodeRepository::isNodeInInbox)
+
+        /**
+         * provides [GetNodeVersionsByHandle]
+         */
+        @Provides
+        fun provideGetNodeVersionsByHandle(nodeRepository: NodeRepository): GetNodeVersionsByHandle =
+            GetNodeVersionsByHandle(nodeRepository::getNodeHistoryVersions)
     }
 }
