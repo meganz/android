@@ -71,6 +71,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.jeremyliao.liveeventbus.LiveEventBus;
 
@@ -1106,10 +1107,14 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 requireActivity().startActivityForResult(version, REQUEST_CODE_DELETE_VERSIONS_HISTORY);
                 break;
             case R.id.verify_user_option:
-                Intent authenticityCredentialsIntent = new Intent(getActivity(), AuthenticityCredentialsActivity.class);
-                authenticityCredentialsIntent.putExtra(Constants.IS_NODE_INCOMING, nC.nodeComesFromIncoming(node));
-                authenticityCredentialsIntent.putExtra(Constants.EMAIL, user.getEmail());
-                requireActivity().startActivity(authenticityCredentialsIntent);
+                ShareData shareData = outgoingSharesViewModel.getUnVerifiedOutgoingNodeShare(node.getHandle());
+                if (shareData != null) {
+                    if (!shareData.isVerified() && shareData.isPending()) {
+                        showCanNotVerifyContact(shareData.getUser());
+                    } else {
+                        openAuthenticityCredentials(shareData.getUser());
+                    }
+                }
                 break;
             default:
                 break;
@@ -1263,5 +1268,27 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             }
         }
         dismissAllowingStateLoss();
+    }
+
+    /**
+     * Show cannot verify contact dialog
+     * @param email : Email of the user
+     */
+    private void showCanNotVerifyContact(String email) {
+        new MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                .setTitle(getString(R.string.shared_items_contact_not_in_contact_list_dialog_title))
+                .setMessage(StringResourcesUtils.getString(R.string.shared_items_contact_not_in_contact_list_dialog_content, email))
+                .setPositiveButton(getString(R.string.general_ok), (dialogInterface, i2) -> dialogInterface.dismiss()).show();
+    }
+
+    /**
+     * Open authenticityCredentials screen to verify user
+     * @param email : Email of the user
+     */
+    private void openAuthenticityCredentials(String email) {
+        Intent authenticityCredentialsIntent = new Intent(getActivity(), AuthenticityCredentialsActivity.class);
+        authenticityCredentialsIntent.putExtra(Constants.IS_NODE_INCOMING, nC.nodeComesFromIncoming(node));
+        authenticityCredentialsIntent.putExtra(Constants.EMAIL, email);
+        requireActivity().startActivity(authenticityCredentialsIntent);
     }
 }

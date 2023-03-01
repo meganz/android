@@ -183,7 +183,7 @@ class ManagerViewModel @Inject constructor(
                     },
                 flowOf(
                     getUnverifiedIncomingShares(order) +
-                            getUnverifiedOutgoingShares(order)
+                            getUnverifiedOutgoingShares(order).filter { shareData -> !shareData.isVerified }
                 ).map { it.size },
                 flowOf(getEnabledFeatures()),
             ) { firstLogin: Boolean, verificationStatus: VerificationStatus, pendingShares: Int, features: Set<Feature> ->
