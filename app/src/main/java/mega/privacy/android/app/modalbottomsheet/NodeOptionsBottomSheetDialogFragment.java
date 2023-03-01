@@ -99,6 +99,7 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
+import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -1114,6 +1115,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     } else {
                         openAuthenticityCredentials(shareData.getUser());
                     }
+                } else if(!node.isNodeKeyDecrypted()) {
+                    openAuthenticityCredentials(user.getEmail());
                 }
                 break;
             default:
