@@ -188,4 +188,11 @@ class OutgoingSharesViewModel @Inject constructor(
             ?.let { getNodeByHandle(it) == null }
             ?: true
     }
+
+    /**
+     * Find if nodehandle is in unverifiedOutgoingShares list
+     */
+    fun getUnVerifiedOutgoingNodeShare(handle: Long?) =
+        state.value.unverifiedOutgoingShares.find { node -> node.nodeHandle == handle }
+
 }

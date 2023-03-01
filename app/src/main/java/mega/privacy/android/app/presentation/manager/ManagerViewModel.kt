@@ -178,7 +178,8 @@ class ManagerViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val outgoingShares = getUnverifiedOutgoingShares(getCloudSortOrder()).size
+            val outgoingShares =
+                getUnverifiedOutgoingShares(getCloudSortOrder()).filter { !it.isVerified }.size
             _state.update {
                 it.copy(pendingActionsCount = _state.value.pendingActionsCount + outgoingShares)
             }

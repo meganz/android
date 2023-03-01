@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.shares.outgoing
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -12,11 +13,13 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
+import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
 import mega.privacy.android.app.presentation.shares.MegaNodeBaseFragment
@@ -27,6 +30,7 @@ import mega.privacy.android.app.utils.Constants.ORDER_OTHERS
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
+import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -91,27 +95,35 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
-
-        when {
-            // select mode
-            adapter?.isMultipleSelect == true -> {
-                adapter?.toggleSelection(position)
-                val selectedNodes = adapter?.selectedNodes
-                if ((selectedNodes?.size ?: 0) > 0)
-                    updateActionModeTitle()
+        val clickedNodeHandle = adapter?.getItem(position)?.handle
+        viewModel.getUnVerifiedOutgoingNodeShare(clickedNodeHandle)?.let {
+            if (!it.isVerified && it.isPending) {
+                showCanNotVerifyContact(it.user)
+            } else {
+                openAuthenticityCredentials(it.user)
             }
+        } ?: run {
+            when {
+                // select mode
+                adapter?.isMultipleSelect == true -> {
+                    adapter?.toggleSelection(position)
+                    val selectedNodes = adapter?.selectedNodes
+                    if ((selectedNodes?.size ?: 0) > 0)
+                        updateActionModeTitle()
+                }
 
-            // click on a folder
-            state().nodes[actualPosition].isFolder ->
-                navigateToFolder(state().nodes[actualPosition])
+                // click on a folder
+                state().nodes[actualPosition].isFolder ->
+                    navigateToFolder(state().nodes[actualPosition])
 
-            // click on a file
-            else ->
-                openFile(
-                    state().nodes[actualPosition],
-                    Constants.OUTGOING_SHARES_ADAPTER,
-                    actualPosition
-                )
+                // click on a file
+                else ->
+                    openFile(
+                        state().nodes[actualPosition],
+                        Constants.OUTGOING_SHARES_ADAPTER,
+                        actualPosition
+                    )
+            }
         }
     }
 
@@ -378,6 +390,41 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
             CloudStorageOptionControlUtil.applyControl(menu, control)
             return true
+        }
+    }
+
+    /**
+     * Show cannot verify contact dialog
+     * @param email : Email of the user
+     */
+    private fun showCanNotVerifyContact(email: String?) {
+        MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        ).setTitle(getString(R.string.shared_items_contact_not_in_contact_list_dialog_title))
+            .setMessage(
+                StringResourcesUtils.getString(
+                    R.string.shared_items_contact_not_in_contact_list_dialog_content,
+                    email
+                )
+            )
+            .setPositiveButton(
+                getString(R.string.general_ok)
+            ) { dialogInterface, _ -> dialogInterface.dismiss() }
+            .show()
+    }
+
+    /**
+     * Open authenticityCredentials screen to verify user
+     * @param email : Email of the user
+     */
+    private fun openAuthenticityCredentials(email: String?) {
+        Intent(
+            requireActivity(),
+            AuthenticityCredentialsActivity::class.java
+        ).apply {
+            putExtra(Constants.EMAIL, email)
+            requireActivity().startActivity(this)
         }
     }
 }
