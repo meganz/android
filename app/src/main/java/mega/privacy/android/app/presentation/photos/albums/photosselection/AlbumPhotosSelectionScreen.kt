@@ -181,11 +181,10 @@ fun AlbumPhotosSelectionScreen(
                     if (photo.id in state.selectedPhotoIds) {
                         viewModel.unselectPhoto(photo)
                     } else {
-                        if (state.selectedPhotoIds.size + 1 == MAX_SELECTION_NUM) {
-                            showMaxSelectionDialog = true
-                        }
                         if (state.selectedPhotoIds.size < MAX_SELECTION_NUM) {
                             viewModel.selectPhoto(photo)
+                        } else {
+                            showMaxSelectionDialog = true
                         }
                     }
                 },
@@ -414,7 +413,7 @@ private fun MaxSelectionDialog(
         body = {
             Text(
                 text = stringResource(id = R.string.photos_album_selection_dialog_body),
-                color = colorResource(id = R.color.grey_alpha_054)
+                color = grey_alpha_054.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_054,
             )
         },
         onDismissRequest = onDialogDismissed,

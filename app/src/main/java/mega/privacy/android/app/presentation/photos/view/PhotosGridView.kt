@@ -114,7 +114,6 @@ internal fun PhotosGridView(
                         isSelected = isSelected,
                         currentZoomLevel = currentZoomLevel,
                         modifier = Modifier
-                            .isSelected(isSelected)
                             .combinedClickable(
                                 onClick = { onClick(item.photo) },
                                 onLongClick = { onLongPress(item.photo) }
@@ -159,7 +158,7 @@ internal fun PhotoViewContainer(
             ZoomLevel.Grid_5 -> modifier
                 .fillMaxSize()
                 .padding(all = 1.dp)
-        }
+        }.isSelected(isSelected)
     ) {
 
         photoView()
