@@ -211,12 +211,17 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
 
     override fun reselectUnHandledSingleItem(position: Int) {}
 
-    override fun checkScroll() =
+    override fun checkScroll() {
+        if (!isAdded) return
+
         (recyclerView.canScrollHorizontally(SCROLLING_UP_DIRECTION) || (adapter.multipleSelected))
             .let { elevate ->
-                (requireActivity() as FileExplorerActivity).changeActionBarElevation(elevate,
-                    CLOUD_FRAGMENT)
+                (requireActivity() as FileExplorerActivity).changeActionBarElevation(
+                    elevate,
+                    CLOUD_FRAGMENT
+                )
             }
+    }
 
     private fun showSortByPanel() = (requireActivity() as FileExplorerActivity).showSortByPanel()
 
@@ -765,7 +770,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
      * @param searchString search strings
      */
     fun search(searchString: String?) {
-        if (searchString == null && !shouldResetNodes) {
+        if (searchString == null || !shouldResetNodes) {
             return
         }
         if (parentHandle == INVALID_HANDLE)

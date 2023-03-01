@@ -189,11 +189,14 @@ class IncomingSharesExplorerFragment : RotatableFragment(), CheckScrollInterface
 
     override fun reselectUnHandledSingleItem(position: Int) {}
 
-    override fun checkScroll() =
+    override fun checkScroll() {
+        if (!isAdded) return
+
         (recyclerView.canScrollHorizontally(SCROLLING_UP_DIRECTION) || adapter.multipleSelected)
             .let { elevate ->
                 fileExplorerActivity.changeActionBarElevation(elevate, INCOMING_FRAGMENT)
             }
+    }
 
     /**
      * Shows the Sort by panel.
