@@ -427,30 +427,32 @@ internal class DefaultSettingsRepository @Inject constructor(
         }
     }
 
+    override suspend fun getMultiFactorAuthCode(): String = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { it.text }
+            megaApiGateway.getMultiFactorAuthCode(listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
     override suspend fun isMasterKeyExported(): Boolean = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            megaApiGateway.isMasterKeyExported(
-                OptionalMegaRequestListenerInterface(
-                    onRequestFinish = onIsMasterKeyExportedRequestFinished(
-                        continuation = continuation
-                    )
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = onIsMasterKeyExportedRequestFinished(
+                    continuation = continuation
                 )
             )
+            megaApiGateway.isMasterKeyExported(listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
 
     private fun onIsMasterKeyExportedRequestFinished(continuation: Continuation<Boolean>) =
         { request: MegaRequest, error: MegaError ->
-            if (request.access == TYPE_GET_ATTR_USER
-                && request.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER
+            if (error.errorCode == MegaError.API_OK
+                || error.errorCode == MegaError.API_ENOENT
             ) {
-                Timber.d("TYPE_GET_ATTR_USER")
-                if (error.errorCode == MegaError.API_OK
-                    || error.errorCode == MegaError.API_ENOENT
-                ) {
-                    Timber.d("TYPE_GET_ATTR_USER API_OK")
-                    continuation.resumeWith(Result.success(request.flag))
-                } else continuation.failWithError(error)
-            }
+                continuation.resumeWith(Result.success(request.access == 1))
+            } else continuation.failWithError(error)
         }
 }

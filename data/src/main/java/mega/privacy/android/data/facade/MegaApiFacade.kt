@@ -732,6 +732,10 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.isMasterKeyExported(listener)
     }
 
+    override fun getMultiFactorAuthCode(listener: MegaRequestListenerInterface?) {
+        megaApi.multiFactorAuthGetCode(listener)
+    }
+
     override suspend fun getPasswordStrength(password: String) =
         megaApi.getPasswordStrength(password)
 

@@ -440,4 +440,9 @@ interface SettingsRepository {
      * @param pin the valid pin code for multi-factor authentication
      */
     suspend fun enableMultiFactorAuth(pin: String): Boolean
+
+    /**
+     * Get the secret code of the account to enable multi-factor authentication
+     */
+    suspend fun getMultiFactorAuthCode(): String
 }

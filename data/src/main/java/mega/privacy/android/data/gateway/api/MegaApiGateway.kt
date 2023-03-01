@@ -1667,6 +1667,12 @@ interface MegaApiGateway {
     fun isMasterKeyExported(listener: MegaRequestListenerInterface?)
 
     /**
+     * Get the secret code of the account to enable multi-factor authentication
+     * @param listener as [MegaRequestListenerInterface]
+     */
+    fun getMultiFactorAuthCode(listener: MegaRequestListenerInterface?)
+
+    /**
      * Enable multi-factor authentication for the account
      * The MegaApi object must be logged into an account to successfully use this function.
      * <p>
@@ -1678,7 +1684,6 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun enableMultiFactorAuth(pin: String, listener: MegaRequestListenerInterface?)
-
 
     /**
      * Set a public attribute of the current user

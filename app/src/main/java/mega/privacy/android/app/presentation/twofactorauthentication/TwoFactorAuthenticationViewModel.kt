@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.twofactorauthentication
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
+import mega.privacy.android.domain.usecase.GetMultiFactorAuthCode
 import mega.privacy.android.domain.usecase.IsMasterKeyExported
 import javax.inject.Inject
 
@@ -13,6 +14,7 @@ import javax.inject.Inject
 class TwoFactorAuthenticationViewModel @Inject constructor(
     private val isMasterKeyExported: IsMasterKeyExported,
     private val enableMultiFactorAuth: EnableMultiFactorAuth,
-) : ViewModel() {
+    private val getMultiFactorAuthCode: GetMultiFactorAuthCode,
+    ) : ViewModel() {
 
 }
