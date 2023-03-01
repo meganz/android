@@ -16,11 +16,11 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.CameraUploadHandlesMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.VideoAttachmentMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
+import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
@@ -61,7 +61,7 @@ import kotlin.coroutines.Continuation
  * @property broadcastReceiverGateway [BroadcastReceiverGateway]
  * @property videoQualityMapper [VideoQualityMapper]
  * @property syncStatusIntMapper [SyncStatusIntMapper]
- * @property cameraUploadHandlesMapper [CameraUploadHandlesMapper]
+ * @property cameraUploadsHandlesMapper [CameraUploadsHandlesMapper]
  * @property uploadOptionMapper [UploadOptionMapper]
  * @property uploadOptionIntMapper [UploadOptionIntMapper]
  */
@@ -78,7 +78,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityMapper: VideoQualityMapper,
     private val syncStatusIntMapper: SyncStatusIntMapper,
-    private val cameraUploadHandlesMapper: CameraUploadHandlesMapper,
+    private val cameraUploadsHandlesMapper: CameraUploadsHandlesMapper,
     private val videoCompressorGateway: VideoCompressorGateway,
     private val videoAttachmentMapper: VideoAttachmentMapper,
     private val uploadOptionMapper: UploadOptionMapper,
@@ -466,7 +466,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         return@withContext request?.let { megaRequest ->
             var primaryHandle = getInvalidHandle()
             var secondaryHandle = getInvalidHandle()
-            cameraUploadHandlesMapper(megaRequest.megaStringMap).let { handles ->
+            cameraUploadsHandlesMapper(megaRequest.megaStringMap).let { handles ->
                 handles.first?.let { primaryHandle = convertBase64ToHandle(it) }
                 handles.second?.let { secondaryHandle = convertBase64ToHandle(it) }
             }

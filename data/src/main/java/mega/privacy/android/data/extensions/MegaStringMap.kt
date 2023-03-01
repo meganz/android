@@ -33,3 +33,15 @@ fun String.decodeBase64(): String =
     } catch (ignore: IllegalArgumentException) {
         Base64.decode(this.trim(), Base64.URL_SAFE).toString(Charsets.UTF_8)
     }
+
+/**
+ * Decode value in the [MegaStringMap] into a corresponding [String]
+ *
+ * @param key The [String] key
+ *
+ * @return The corresponding [String] value, or null if it does not exist
+ */
+fun MegaStringMap?.getValueFor(key: String) =
+    this?.takeIf { it.size() > 0 && this[key].isNullOrEmpty().not() }?.let {
+        return@let this[key]
+    }
