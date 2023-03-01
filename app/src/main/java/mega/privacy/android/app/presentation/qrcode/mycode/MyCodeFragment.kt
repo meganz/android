@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.qrcode
+package mega.privacy.android.app.presentation.qrcode.mycode
 
 import android.content.res.Configuration
 import android.os.Bundle
@@ -21,8 +21,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMycodeBinding
+import mega.privacy.android.app.main.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
-import mega.privacy.android.app.presentation.qrcode.mycode.MyCodeViewModel
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import timber.log.Timber

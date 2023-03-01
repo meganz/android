@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.main.qrcode.MyCodeFragment
 import mega.privacy.android.app.presentation.avatar.mapper.AvatarMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.CombineQRCodeAndAvatarMapper
 import mega.privacy.android.app.presentation.qrcode.mapper.GetCircleBitmapMapper

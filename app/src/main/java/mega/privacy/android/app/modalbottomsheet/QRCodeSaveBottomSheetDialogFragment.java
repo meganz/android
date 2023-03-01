@@ -1,6 +1,6 @@
 package mega.privacy.android.app.modalbottomsheet;
 
-import static mega.privacy.android.app.main.qrcode.MyCodeFragment.QR_IMAGE_FILE_NAME;
+import static mega.privacy.android.app.presentation.qrcode.mycode.MyCodeFragment.QR_IMAGE_FILE_NAME;
 import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning;
 import static mega.privacy.android.app.utils.CacheFolderManager.buildQrFile;
 import static mega.privacy.android.app.utils.Constants.REQUEST_DOWNLOAD_FOLDER;

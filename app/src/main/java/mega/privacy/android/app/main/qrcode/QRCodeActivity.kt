@@ -23,6 +23,7 @@ import mega.privacy.android.app.databinding.ActivityQrCodeBinding
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.qrcode.mycode.MyCodeFragment
 import mega.privacy.android.app.presentation.qrcode.mycode.MyCodeViewModel
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeViewModel
 import mega.privacy.android.app.presentation.settings.SettingsActivity.Companion.getIntent
