@@ -12,6 +12,7 @@ import androidx.appcompat.view.ActionMode
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.selection.SelectionPredicates
 import androidx.recyclerview.selection.SelectionTracker
 import androidx.recyclerview.selection.StorageStrategy
@@ -21,10 +22,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatDividerItemDecoration
 import mega.privacy.android.app.databinding.FragmentMeetingListBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_IN
 import mega.privacy.android.app.meeting.chats.ChatTabsFragment
 import mega.privacy.android.app.meeting.list.adapter.MeetingAdapterItem
 import mega.privacy.android.app.meeting.list.adapter.MeetingItemDetailsLookup
@@ -66,6 +70,7 @@ class MeetingListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupView()
+        setupFlow()
         setupObservers(savedInstanceState)
     }
 
@@ -139,6 +144,27 @@ class MeetingListFragment : Fragment() {
         binding.btnNewMeeting.setOnClickListener {
             MeetingBottomSheetDialogFragment.newInstance(true)
                 .show(childFragmentManager, MeetingBottomSheetDialogFragment.TAG)
+        }
+    }
+
+    private fun setupFlow() {
+        viewLifecycleOwner.collectFlow(viewModel.uiState, Lifecycle.State.RESUMED) { state ->
+            state.meetingChatId?.let { id ->
+                if (id != -1L) {
+                    viewModel.removeMeetingChatIdValue()
+                    activity?.startActivity(
+                        Intent(
+                            context,
+                            MeetingActivity::class.java
+                        ).apply {
+                            action = MEETING_ACTION_IN
+                            putExtra(MeetingActivity.MEETING_CHAT_ID, id)
+                            putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, true)
+                            putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, false)
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        })
+                }
+            }
         }
     }
 

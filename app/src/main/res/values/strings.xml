@@ -4611,6 +4611,8 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">Sat</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">Sun</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">Start</string>
     <!-- Album selection dialog title -->
     <string name="photos_album_selection_dialog_title">Cannot add more</string>
     <!-- Album selection dialog body -->

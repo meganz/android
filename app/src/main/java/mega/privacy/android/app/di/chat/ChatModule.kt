@@ -15,7 +15,7 @@ import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.DefaultGetMeetings
 import mega.privacy.android.domain.usecase.DefaultMeetingRoomMapper
-import mega.privacy.android.domain.usecase.DefaultOpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.DefaultOpenOrStartCall
 import mega.privacy.android.domain.usecase.GetChatCall
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
@@ -28,7 +28,7 @@ import mega.privacy.android.domain.usecase.MeetingRoomMapper
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
-import mega.privacy.android.domain.usecase.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.SetMyChatFilesFolder
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.meeting.DefaultStartChatCallNoRinging
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
@@ -76,6 +77,12 @@ abstract class ChatModule {
     @Binds
     abstract fun bindOpenOrStartChatCall(useCase: DefaultOpenOrStartCall): OpenOrStartCall
 
+    /**
+     * Open call or start call and open it
+     */
+    @Binds
+    abstract fun bindStartChatCallNoRinging(useCase: DefaultStartChatCallNoRinging): StartChatCallNoRinging
+
     companion object {
         /**
          * Provides the Use Case [GetChatRoom]
@@ -111,13 +118,6 @@ abstract class ChatModule {
         @Provides
         fun provideFetchNumberOfScheduledMeetingOccurrencesByChat(chatRepository: ChatRepository): FetchNumberOfScheduledMeetingOccurrencesByChat =
             FetchNumberOfScheduledMeetingOccurrencesByChat(chatRepository::fetchScheduledMeetingOccurrencesByChat)
-
-        /**
-         * Provides the Use Case [StartChatCallNoRinging]
-         */
-        @Provides
-        fun provideStartChatCallNoRinging(callRepository: CallRepository): StartChatCallNoRinging =
-            StartChatCallNoRinging(callRepository::startCallNoRinging)
 
         /**
          * Provides the Use Case [StartChatCall]

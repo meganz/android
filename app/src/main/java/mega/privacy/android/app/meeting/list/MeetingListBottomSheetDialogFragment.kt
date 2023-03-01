@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.facebook.drawee.drawable.ScalingUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.internal.ViewUtils.dpToPx
@@ -20,6 +21,8 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingDetailBinding
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity
+import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_IN
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
@@ -130,7 +133,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         binding.dividerArchive.isVisible = binding.btnCancel.isVisible
 
         binding.btnRecurringMeeting.isVisible = room.isRecurring()
-        binding.dividerRecurringMeeting.isVisible = room.isRecurring()
+        binding.dividerRecurringMeeting.isVisible = binding.btnRecurringMeeting.isVisible
 
         binding.btnRecurringMeeting.setOnClickListener {
             activity?.startActivity(
@@ -140,6 +143,16 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 ).apply {
                     putExtra(CHAT_ID, chatId)
                 })
+            dismissAllowingStateLoss()
+        }
+
+        binding.btnStartSchedMeeting.isVisible = room.isScheduledMeeting() && room.isActive
+        binding.dividerStartSchedMeeting.isVisible = binding.btnStartSchedMeeting.isVisible
+
+        binding.btnStartSchedMeeting.setOnClickListener {
+            room.schedId?.let {
+                viewModel.startSchedMeeting(room.chatId, it)
+            }
             dismissAllowingStateLoss()
         }
 

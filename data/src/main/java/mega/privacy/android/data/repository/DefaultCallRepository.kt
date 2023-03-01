@@ -19,6 +19,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -110,6 +111,7 @@ internal class DefaultCallRepository @Inject constructor(
             if (error.errorCode == MegaChatError.ERROR_OK) {
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
             } else {
+                Timber.e("Error: ${error.errorString}")
                 continuation.failWithError(error)
             }
         }

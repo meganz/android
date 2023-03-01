@@ -11,16 +11,23 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestampMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
+import mega.privacy.android.app.presentation.meeting.model.MeetingListState
 import mega.privacy.android.app.usecase.chat.ArchiveChatUseCase
 import mega.privacy.android.app.usecase.chat.LeaveChatUseCase
 import mega.privacy.android.app.usecase.chat.SignalChatPresenceUseCase
@@ -28,9 +35,11 @@ import mega.privacy.android.app.usecase.meeting.GetLastMessageUseCase
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.GetMeetings
+import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,6 +51,8 @@ import javax.inject.Inject
  * @property signalChatPresenceUseCase
  * @property getMeetingsUseCase
  * @property getLastMessageUseCase
+ * @property startChatCallNoRinging         [StartChatCallNoRinging]
+ * @property megaChatApiGateway             [MegaChatApiGateway]
  * @property dispatcher
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -54,13 +65,25 @@ class MeetingListViewModel @Inject constructor(
     private val getLastMessageUseCase: GetLastMessageUseCase,
     private val meetingLastTimestampMapper: MeetingLastTimestampMapper,
     private val scheduledMeetingTimestampMapper: ScheduledMeetingTimestampMapper,
+    private val startChatCallNoRinging: StartChatCallNoRinging,
     private val deviceGateway: DeviceGateway,
+    private val chatManagement: ChatManagement,
+    private val passcodeManagement: PasscodeManagement,
+    private val megaChatApiGateway: MegaChatApiGateway,
     @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
     private var queryString: String? = null
     private val meetings: MutableLiveData<List<MeetingRoomItem>> = MutableLiveData(emptyList())
     private val is24HourFormat by lazy { deviceGateway.is24HourFormat() }
+
+    private val _uiState = MutableStateFlow(MeetingListState())
+
+    /**
+     * UI state
+     */
+    val uiState = _uiState.asStateFlow()
+
 
     private val mutex = Mutex()
 
@@ -135,6 +158,37 @@ class MeetingListViewModel @Inject constructor(
     fun setSearchQuery(query: String?) {
         queryString = query
         meetings.notifyObserver()
+    }
+
+    /**
+     * Start scheduled meeting
+     *
+     * @param chatId    Chat Id.
+     * @param schedId   Scheduled meeting Id.
+     */
+    fun startSchedMeeting(chatId: Long, schedId: Long) =
+        viewModelScope.launch {
+            startChatCallNoRinging(
+                chatId = chatId,
+                schedId = schedId,
+                enabledVideo = false,
+                enabledAudio = false
+            )?.let { call ->
+                if (call.chatId != megaChatApiGateway.getChatInvalidHandle()) {
+                    chatManagement.setSpeakerStatus(chatId, false)
+                    chatManagement.setRequestSentCall(call.callId, true)
+                    passcodeManagement.showPasscodeScreen = true
+                    getInstance().openCallService(chatId)
+                    _uiState.update { it.copy(meetingChatId = call.chatId) }
+                }
+            }
+        }
+
+    /**
+     * Remove chat id of the meeting
+     */
+    fun removeMeetingChatIdValue() {
+        _uiState.update { it.copy(meetingChatId = megaChatApiGateway.getChatInvalidHandle()) }
     }
 
     /**

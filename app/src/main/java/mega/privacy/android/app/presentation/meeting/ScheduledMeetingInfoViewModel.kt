@@ -54,7 +54,7 @@ import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
-import mega.privacy.android.domain.usecase.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -62,7 +62,6 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
-import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -86,7 +85,6 @@ import javax.inject.Inject
  * @property updateChatPermissions          [UpdateChatPermissions]
  * @property getPublicChatToPrivate         [SetPublicChatToPrivate]
  * @property getChatRoomUseCase             [GetChatRoomUseCase]
- * @property startChatCall                  [StartChatCall]
  * @property passcodeManagement             [PasscodeManagement]
  * @property chatManagement                 [ChatManagement]
  * @property startConversation              [StartConversation]
@@ -118,7 +116,6 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val updateChatPermissions: UpdateChatPermissions,
     private val getPublicChatToPrivate: SetPublicChatToPrivate,
     private val getChatRoomUseCase: GetChatRoomUseCase,
-    private val startChatCall: StartChatCall,
     private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
     private val startConversation: StartConversation,
