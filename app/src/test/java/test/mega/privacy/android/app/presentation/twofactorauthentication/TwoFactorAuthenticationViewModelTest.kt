@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationViewModel
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
 import org.junit.After
 import org.junit.Before
@@ -73,7 +74,7 @@ internal class TwoFactorAuthenticationViewModelTest {
             val fakeErrorCode = Random.nextInt()
             whenever(enableMultiFactorAuth(any()))
                 .thenAnswer {
-                    throw EnableMultiFactorAuthException(
+                    throw MegaException(
                         errorCode = fakeErrorCode,
                         errorString = ""
                     )
