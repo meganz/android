@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivi
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity.Companion.KEY_LINK_TO_RESET
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePassword
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
@@ -204,7 +205,7 @@ internal class ChangePasswordViewModelTest {
             underTest.checkPasswordStrength(fakePassword)
 
             underTest.uiState.test {
-                assertThat(awaitItem().passwordStrengthLevel).isEqualTo(0)
+                assertThat(awaitItem().passwordStrength).isEqualTo(PasswordStrength.VERY_WEAK)
             }
         }
 
@@ -212,14 +213,14 @@ internal class ChangePasswordViewModelTest {
     fun `test that when checking password strength then passwordStrengthLevel state should be updated and isCurrentPassword should be should also be updated`() =
         runTest {
             val fakePassword = "password"
-            whenever(getPasswordStrength(fakePassword)).thenReturn(2)
+            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
             whenever(isCurrentPassword(fakePassword)).thenReturn(true)
 
             underTest.checkPasswordStrength(fakePassword)
 
             underTest.uiState.test {
                 val state = awaitItem()
-                assertThat(state.passwordStrengthLevel).isEqualTo(2)
+                assertThat(state.passwordStrength).isEqualTo(PasswordStrength.MEDIUM)
                 assertThat(state.isCurrentPassword).isTrue()
             }
         }

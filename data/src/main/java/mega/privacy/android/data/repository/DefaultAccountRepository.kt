@@ -42,6 +42,7 @@ import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
@@ -120,6 +121,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val cacheFolderGateway: CacheFolderGateway,
     private val accountPreferencesGateway: AccountPreferencesGateway,
+    private val passwordStrengthMapper: PasswordStrengthMapper
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -672,7 +674,7 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun getPasswordStrength(password: String) = withContext(ioDispatcher) {
-        megaApiGateway.getPasswordStrength(password)
+        passwordStrengthMapper(megaApiGateway.getPasswordStrength(password))
     }
 
     override suspend fun resetAccountInfo() = myAccountInfoFacade.resetAccountInfo()

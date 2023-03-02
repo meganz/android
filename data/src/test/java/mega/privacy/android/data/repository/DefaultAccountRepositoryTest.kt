@@ -26,6 +26,7 @@ import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserCredentialsMapper
+import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.model.GlobalUpdate
@@ -88,6 +89,7 @@ class DefaultAccountRepositoryTest {
     private val callsPreferencesGateway = mock<CallsPreferencesGateway>()
     private val accountPreferencesGateway = mock<AccountPreferencesGateway>()
     private val cacheFolderGateway = mock<CacheFolderGateway>()
+    private val passwordStrengthMapper = mock<PasswordStrengthMapper>()
 
     private val myAccountCredentialsMapper: MyAccountCredentialsMapper =
         { credentials: String? ->
@@ -144,6 +146,7 @@ class DefaultAccountRepositoryTest {
             callsPreferencesGateway = callsPreferencesGateway,
             accountPreferencesGateway = accountPreferencesGateway,
             cacheFolderGateway = cacheFolderGateway,
+            passwordStrengthMapper = passwordStrengthMapper
         )
 
         whenever(megaChatApiGateway.getMyEmail()).thenReturn("my@email.com")

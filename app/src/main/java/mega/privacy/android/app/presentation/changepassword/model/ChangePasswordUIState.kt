@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.changepassword.model
 
 import androidx.annotation.StringRes
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 
 /**
  * UI State for Change Password Activity
@@ -13,7 +14,7 @@ import androidx.annotation.StringRes
  * @param isResetPasswordMode ui state to determine whether screen is on change password mode or reset password mode
  * @param isResetPasswordLinkValid ui state to determine whether link is valid when mode is password reset
  * @param isShowAlertMessage ui state to show alert dialog
- * @param passwordStrengthLevel password level strength to show password level animation
+ * @param passwordStrength password level strength to show password level animation
  * @param errorCode error code when navigating to other screen
  * @param snackBarMessage ui state to show SnackBar message
  * @param loadingMessage ui state to show progress loading and its message
@@ -29,7 +30,7 @@ data class ChangePasswordUIState(
     val isResetPasswordMode: Boolean = false,
     val isResetPasswordLinkValid: Boolean = true,
     val isShowAlertMessage: Boolean = false,
-    val passwordStrengthLevel: Int = -1,
+    val passwordStrength: PasswordStrength = PasswordStrength.INVALID,
     @Deprecated("Legacy screen still needs this as parameter during navigation")
     val errorCode: Int? = null,
     @StringRes val snackBarMessage: Int? = null,

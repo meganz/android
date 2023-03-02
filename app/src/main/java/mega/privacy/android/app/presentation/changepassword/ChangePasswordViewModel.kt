@@ -13,6 +13,7 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePassword
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
@@ -20,7 +21,6 @@ import mega.privacy.android.domain.usecase.GetPasswordStrength
 import mega.privacy.android.domain.usecase.IsCurrentPassword
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.ResetPassword
-import nz.mega.sdk.MegaApiJava
 import javax.inject.Inject
 
 @HiltViewModel
@@ -156,8 +156,8 @@ internal class ChangePasswordViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
-                    passwordStrengthLevel = if (password.length < 4) MegaApiJava.PASSWORD_STRENGTH_VERYWEAK else getPasswordStrength(
-                        password = password
+                    passwordStrength = if (password.length < 4) PasswordStrength.VERY_WEAK else getPasswordStrength(
+                        password
                     ),
                     isCurrentPassword = isCurrentPassword(password = password)
                 )

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -304,7 +305,7 @@ interface AccountRepository {
      * @param password as password to test
      * @return password strength level from 0 - 4
      */
-    suspend fun getPasswordStrength(password: String): Int
+    suspend fun getPasswordStrength(password: String): PasswordStrength
 
     /**
      * Resets account info.

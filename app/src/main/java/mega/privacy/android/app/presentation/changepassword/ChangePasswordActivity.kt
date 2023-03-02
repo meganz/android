@@ -38,6 +38,7 @@ import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -91,7 +92,7 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
      * returns true when valid, else false
      */
     private val isPasswordValid: Boolean
-        get() = viewModel.uiState.value.passwordStrengthLevel > MegaApiJava.PASSWORD_STRENGTH_VERYWEAK
+        get() = viewModel.uiState.value.passwordStrength > PasswordStrength.INVALID
 
     /**
      * Checks whether current screen mode is reset password
@@ -311,9 +312,9 @@ internal class ChangePasswordActivity : PasscodeActivity(), View.OnClickListener
     }
 
     private fun handlePasswordValidationState(state: ChangePasswordUIState) {
-        if (state.passwordStrengthLevel > -1) {
+        if (state.passwordStrength > PasswordStrength.INVALID) {
             checkPasswordStrength(
-                state.passwordStrengthLevel,
+                state.passwordStrength.value,
                 state.isCurrentPassword
             )
         }
