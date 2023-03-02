@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
+import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.SettingNotFoundException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.SettingsRepository
@@ -421,11 +422,28 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun enableMultiFactorAuth(pin: String): Boolean = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { it.flag }
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = onEnableMultiFactorAuthRequestFinished(continuation)
+            )
             megaApiGateway.enableMultiFactorAuth(pin, listener)
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
     }
+
+    private fun onEnableMultiFactorAuthRequestFinished(
+        continuation: Continuation<Boolean>,
+    ) =
+        { request: MegaRequest, error: MegaError ->
+            if (request.flag && error.errorCode == MegaError.API_OK) {
+                continuation.resumeWith(Result.success(request.flag))
+            } else if (request.flag && error.errorCode == MegaError.API_EFAILED) {
+                continuation.failWithException(
+                    EnableMultiFactorAuthException(
+                        error.errorCode, error.errorString
+                    )
+                )
+            } else continuation.failWithError(error)
+        }
 
     override suspend fun getMultiFactorAuthCode(): String = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->

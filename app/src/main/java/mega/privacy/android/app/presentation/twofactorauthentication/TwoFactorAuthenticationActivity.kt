@@ -22,6 +22,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -34,6 +35,7 @@ import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityTwoFactorAuthenticationBinding
@@ -41,6 +43,8 @@ import mega.privacy.android.app.databinding.Dialog2faHelpBinding
 import mega.privacy.android.app.databinding.DialogNoAuthenticationAppsBinding
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
+import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -59,6 +63,7 @@ import java.util.EnumMap
 class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerInterface {
 
     private lateinit var binding: ActivityTwoFactorAuthenticationBinding
+    private val viewModel: TwoFactorAuthenticationViewModel by viewModels()
 
     private var seed: String? = null
     private var url: String? = null
@@ -234,6 +239,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                 }
             }
         }
+        observeUIState()
     }
 
     private fun showError() {
@@ -805,10 +811,35 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                 }
                 pin = sb.toString().trim()
                 if (pin.isNotEmpty()) {
-                    megaApi.multiFactorAuthEnable(pin, this@TwoFactorAuthenticationActivity)
+                    viewModel.submitMultiFactorAuthPin(pin)
                 }
             }
+        }
+    }
 
+    private fun observeUIState() {
+        this.collectFlow(viewModel.uiState) { state ->
+            handleEnableMultiFactorAuthState(state)
+        }
+    }
+
+    private fun handleEnableMultiFactorAuthState(state: TwoFactorAuthenticationUIState) {
+        with(state) {
+            if (isPinSubmitted) {
+                when (authenticationState) {
+                    AuthenticationState.AuthenticationPassed -> {
+                        confirm2FAIsShown = false
+                        isEnabled2FA = true
+                        megaApi.isMasterKeyExported(this@TwoFactorAuthenticationActivity)
+                    }
+                    AuthenticationState.AuthenticationFailed -> {
+                        showError()
+                    }
+                    else -> {
+                        showSnackbar(getString(R.string.error_enable_2fa))
+                    }
+                }
+            }
         }
     }
 
