@@ -578,8 +578,13 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
         icon.isVisible = false
     }
 
-    override fun onVisibilityChanged(visible: Boolean) = with(binding) {
-        createAccountAndAcceptLayout.isVisible = !visible && createAccountCreateLayout.isVisible
+    override fun onVisibilityChanged(visible: Boolean) {
+        if (isAdded) {
+            with(binding) {
+                createAccountAndAcceptLayout.isVisible =
+                    !visible && createAccountCreateLayout.isVisible
+            }
+        }
     }
 
     companion object {
