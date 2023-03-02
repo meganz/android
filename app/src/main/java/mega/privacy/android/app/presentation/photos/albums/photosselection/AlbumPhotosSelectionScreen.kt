@@ -418,13 +418,14 @@ private fun MaxSelectionDialog(
         },
         onDismissRequest = onDialogDismissed,
         titleString = stringResource(id = R.string.photos_album_selection_dialog_title),
+        fontWeight = FontWeight.W500,
         confirmButton = {},
         dismissButton = {
             TextButton(
                 onClick = onDialogDismissed,
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_ok).uppercase(),
+                    text = stringResource(id = R.string.general_camelcase_ok),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300

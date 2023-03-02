@@ -10,6 +10,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -26,6 +27,7 @@ fun MegaDialog(
     onDismissRequest: () -> Unit,
     titleAlign: TextAlign? = null,
     titleString: String? = null,
+    fontWeight: FontWeight? = null,
     body: @Composable (() -> Unit) = {},
     confirmButton: @Composable () -> Unit,
     dismissButton: @Composable () -> Unit,
@@ -46,6 +48,7 @@ fun MegaDialog(
                         textAlign = titleAlign ?: TextAlign.Center,
                         text = titleString,
                         style = h6,
+                        fontWeight = fontWeight,
                         modifier = Modifier.padding(bottom = 16.dp),
                     )
                 }

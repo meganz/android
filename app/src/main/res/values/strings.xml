@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -4614,9 +4614,11 @@
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Start</string>
     <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot add more</string>
+    <string name="photos_album_selection_dialog_title">Cannot select more</string>
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
     <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">Ok</string>
 </resources>
