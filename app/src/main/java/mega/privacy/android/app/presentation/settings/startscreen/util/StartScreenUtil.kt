@@ -1,12 +1,12 @@
 package mega.privacy.android.app.presentation.settings.startscreen.util
 
 import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.di.settings.startscreen.getMonitorStartScreenPreference
 import mega.privacy.android.app.main.DrawerItem
-import mega.privacy.android.app.main.ManagerActivity.MODE_PRIVATE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SharedPreferenceConstants.DO_NOT_ALERT_ABOUT_START_SCREEN
 import mega.privacy.android.app.utils.SharedPreferenceConstants.START_SCREEN_LOGIN_TIMESTAMP

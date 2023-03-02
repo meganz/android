@@ -60,12 +60,12 @@ import mega.privacy.android.app.presentation.account.CameraUploadsBusinessAlertD
 import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
+import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
-import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavGraph
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosRoute
@@ -203,7 +203,7 @@ class PhotosFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        if (managerActivity.firstLogin) {
+        if (managerActivity.getFirstLogin()) {
             timelineViewModel.shouldEnableCUPage(true)
         }
         setUpFlow()
@@ -239,7 +239,7 @@ class PhotosFragment : Fragment() {
                     if (
                         timelineViewModel.state.value.enableCameraUploadPageShowing
                         && timelineViewModel.state.value.currentShowingPhotos.isNotEmpty()
-                        || managerActivity.firstLogin
+                        || managerActivity.getFirstLogin()
                     ) {
                         photosViewModel.setMenuShowing(false)
                     }
@@ -675,9 +675,9 @@ class PhotosFragment : Fragment() {
      * Performs actions when the Button to enable Camera Uploads has been clicked
      */
     private fun onCameraUploadsButtonClicked() {
-        if (managerActivity.firstLogin) {
+        if (managerActivity.getFirstLogin()) {
             timelineViewModel.setInitialPreferences()
-            managerActivity.firstLogin = false
+            managerActivity.setFirstLogin(false)
         }
         MegaApplication.getInstance().sendSignalPresenceActivity()
 
@@ -714,7 +714,7 @@ class PhotosFragment : Fragment() {
     private fun skipInitialCUSetup() {
         with(managerActivity) {
             isFirstNavigationLevel = false
-            firstLogin = false
+            setFirstLogin(false)
             refreshPhotosFragment()
         }
     }

@@ -99,7 +99,6 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
-import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -727,7 +726,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         super.onViewCreated(view, savedInstanceState);
-        if(nC.nodeComesFromIncoming(node)) {
+        if (nC.nodeComesFromIncoming(node)) {
             ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
                 if (mMode == SHARED_ITEMS_MODE
                         && isNodeUnverified(state.getUnVerifiedIncomingNodeHandles())) {
@@ -748,7 +747,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), nodeOptionsBottomSheetViewModel.getState(), Lifecycle.State.STARTED, state -> {
-            if(state.isOpenShareDialogSuccess() != null) {
+            if (state.isOpenShareDialogSuccess() != null) {
                 if (state.isOpenShareDialogSuccess()) {
                     showShareFolderOptions();
                 } else {
@@ -764,11 +763,21 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null && savedInstanceState.getBoolean(CANNOT_OPEN_FILE_SHOWN, false)) {
             contentView.post(() -> cannotOpenFileDialog =
-                    showCannotOpenFileDialog(this, requireActivity(),
-                            node, ((ManagerActivity) requireActivity())::saveNodeByTap));
+                    showCannotOpenFileDialog(
+                            this,
+                            requireActivity(),
+                            node,
+                            (MegaNode node) -> callSaveNodeByTap((ManagerActivity) requireActivity(), node)
+                    )
+            );
         }
 
         super.onViewStateRestored(savedInstanceState);
+    }
+
+    private Unit callSaveNodeByTap(ManagerActivity receiver, MegaNode node) {
+        receiver.saveNodeByTap(node);
+        return null;
     }
 
     @Override
@@ -918,7 +927,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
         optionVerifyUser.setText(StringResourcesUtils.getString(R.string.shared_items_bottom_sheet_menu_verify_user, getMegaUserNameDB(user)));
         TextView nodeName = contentView.findViewById(R.id.node_name_text);
-        if(nC.nodeComesFromIncoming(node)) {
+        if (nC.nodeComesFromIncoming(node)) {
             nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
         } else {
             nodeName.setText(node.getName());
@@ -1082,7 +1091,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 MegaNodeUtil.onNodeTapped(
                         requireActivity(),
                         node,
-                        ((ManagerActivity) requireActivity())::saveNodeByOpenWith,
+                        (MegaNode node) -> callSaveNodeByOpenWith((ManagerActivity) requireActivity(), node),
                         (ManagerActivity) requireActivity(),
                         (ManagerActivity) requireActivity(),
                         true);
@@ -1124,6 +1133,11 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         setStateBottomSheetBehaviorHidden();
+    }
+
+    private Unit callSaveNodeByOpenWith(ManagerActivity receiver, MegaNode node) {
+        receiver.saveNodeByOpenWith(node);
+        return null;
     }
 
     private void refreshView() {

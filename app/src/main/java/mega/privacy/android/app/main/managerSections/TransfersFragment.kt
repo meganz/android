@@ -91,7 +91,11 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
 
         setupFlow()
 
-        viewModel.setActiveTransfers((requireActivity() as ManagerActivity).transfersInProgress)
+        (requireActivity() as ManagerActivity).transfersInProgress?.let {
+            viewModel.setActiveTransfers(
+                it
+            )
+        }
 
         binding.transfersListView.let { recyclerView ->
             adapter = MegaTransfersAdapter(

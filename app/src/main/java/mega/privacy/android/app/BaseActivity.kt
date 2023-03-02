@@ -58,10 +58,10 @@ import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.billing.BillingViewModel
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.psa.Psa
 import mega.privacy.android.app.psa.PsaWebBrowser
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
-import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.snackbarListeners.SnackbarNavigateOption
 import mega.privacy.android.app.upgradeAccount.payment.PaymentActivity
 import mega.privacy.android.app.usecase.exception.ForeignNodeException
@@ -197,7 +197,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     protected val billingViewModel by viewModels<BillingViewModel>()
 
     @JvmField
-    protected var app: MegaApplication? = MegaApplication.getInstance()
+    protected var app: MegaApplication = MegaApplication.getInstance()
     private var sslErrorDialog: AlertDialog? = null
     private var delaySignalPresence = false
     private var isGeneralTransferOverQuotaWarningShown = false

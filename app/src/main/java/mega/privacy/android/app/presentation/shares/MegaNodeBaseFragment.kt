@@ -479,7 +479,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     onNodeTapped(
                         requireActivity(),
                         node,
-                        { node: MegaNode? -> it.saveNodeByTap(node) },
+                        { node: MegaNode -> it.saveNodeByTap(node) },
                         it,
                         it
                     )

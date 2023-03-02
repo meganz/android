@@ -452,7 +452,7 @@ class MediaDiscoveryFragment : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        if (!managerActivity.isInMDMode) {
+        if (!managerActivity.isInMDMode()) {
             return
         }
         inflater.inflate(R.menu.fragment_media_discovery_toolbar, menu)

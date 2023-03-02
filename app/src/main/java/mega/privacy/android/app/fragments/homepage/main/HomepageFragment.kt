@@ -305,7 +305,7 @@ class HomepageFragment : Fragment() {
 
         searchInputView = viewDataBinding.searchView
         searchInputView.attachNavigationDrawerToMenuButton(
-            activity.drawerLayout!!
+            activity.drawerLayout
         )
 
         viewModel.notificationCount.observe(viewLifecycleOwner) {

@@ -43,10 +43,11 @@ import mega.privacy.android.app.main.AddContactActivity;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.FileLinkActivity;
-import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.listeners.MultipleRequestListener;
 import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage;
+import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
+import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaNode;
@@ -409,7 +410,7 @@ public class NodeController {
                             ((ManagerActivity) context).setDeepBrowserTreeIncoming(deepBrowserTreeIncoming, parentIntentN.getHandle());
                             Timber.d("After calculating deepBrowserTreeIncoming: %s", deepBrowserTreeIncoming);
                         }
-                        ((ManagerActivity) context).setTabItemShares(0);
+                        ((ManagerActivity) context).setTabItemShares(SharesTab.Companion.fromPosition(0));
                         break;
                     }
                     default: {
@@ -426,7 +427,7 @@ public class NodeController {
                 drawerItem = DrawerItem.SHARED_ITEMS;
                 ((ManagerActivity) context).setDeepBrowserTreeIncoming(0, -1L);
                 firstNavigationLevel = true;
-                ((ManagerActivity) context).setTabItemShares(0);
+                ((ManagerActivity) context).setTabItemShares(SharesTab.Companion.fromPosition(0));
             }
             ((ManagerActivity) context).setFirstNavigationLevel(firstNavigationLevel);
             ((ManagerActivity) context).setDrawerItem(drawerItem);

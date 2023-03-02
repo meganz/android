@@ -308,7 +308,7 @@ class RecentActionsFragment : Fragment() {
             Timber.d("itemClick:isFile:otherOption")
             onNodeTapped(requireActivity(),
                 node,
-                { n: MegaNode? -> (requireActivity() as ManagerActivity).saveNodeByTap(n) },
+                { n: MegaNode -> (requireActivity() as ManagerActivity).saveNodeByTap(n) },
                 (requireActivity() as ManagerActivity),
                 (requireActivity() as ManagerActivity))
         }

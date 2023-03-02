@@ -711,7 +711,7 @@ class InboxFragment : RotatableFragment() {
             onNodeTapped(
                 context = requireActivity(),
                 node = node,
-                nodeDownloader = { nodeToDownload: MegaNode? ->
+                nodeDownloader = { nodeToDownload: MegaNode ->
                     (requireActivity() as ManagerActivity).saveNodeByTap(nodeToDownload)
                 },
                 activityLauncher = (requireActivity() as ManagerActivity),

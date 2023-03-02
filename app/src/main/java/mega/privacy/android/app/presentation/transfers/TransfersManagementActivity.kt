@@ -21,7 +21,7 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SCANNING_TRANSFER
 import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRANSFERS_DIALOG
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.main.ManagerActivity.TRANSFERS_TAB
+import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS

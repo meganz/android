@@ -276,9 +276,11 @@ class FileBrowserFragment : RotatableFragment() {
                     clearSelections()
                     hideMultipleSelect()
                 }
-                R.id.cab_menu_remove_share -> (activity as? ManagerActivity)?.showConfirmationRemoveAllSharingContacts(
-                    documents
-                )
+                R.id.cab_menu_remove_share -> documents?.let {
+                    (activity as? ManagerActivity)?.showConfirmationRemoveAllSharingContacts(
+                        it
+                    )
+                }
             }
             return true
         }
@@ -944,7 +946,7 @@ class FileBrowserFragment : RotatableFragment() {
             onNodeTapped(
                 requireActivity(),
                 node,
-                { saveNode: MegaNode? -> (activity as? ManagerActivity)?.saveNodeByTap(saveNode) },
+                { saveNode: MegaNode -> (activity as? ManagerActivity)?.saveNodeByTap(saveNode) },
                 managerActivity,
                 managerActivity
             )
