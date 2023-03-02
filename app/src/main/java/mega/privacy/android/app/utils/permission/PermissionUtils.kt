@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils.permission
 
+import android.Manifest.permission.ACCESS_MEDIA_LOCATION
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_AUDIO
@@ -90,6 +91,25 @@ object PermissionUtils {
     }
 
     /**
+     * Checks whether the app has granted the [ACCESS_MEDIA_LOCATION] permission or not
+     *
+     * @param context [Context]
+     *
+     * @return true if the Permission has been granted, and false if otherwise
+     */
+    @JvmStatic
+    fun hasAccessMediaLocationPermission(context: Context?): Boolean =
+        if (context != null) {
+            (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) ||
+                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && ContextCompat.checkSelfPermission(
+                        context,
+                        ACCESS_MEDIA_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED)
+        } else {
+            false
+        }
+
+    /**
      * Get read permission regarding image based on sdk version
      *
      * @return read image permission based on sdk version
@@ -178,9 +198,11 @@ object PermissionUtils {
             if (shouldShowRequestPermissionRationale(activity, getNotificationsPermission())) {
                 displayNotificationPermissionRationale(activity)
             } else {
-                requestPermission(activity,
+                requestPermission(
+                    activity,
                     REQUEST_NOTIFICATIONS_PERMISSION,
-                    getNotificationsPermission())
+                    getNotificationsPermission()
+                )
             }
         }
     }

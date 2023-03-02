@@ -10,9 +10,10 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
-import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
@@ -24,7 +25,9 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import org.junit.After
 import org.junit.Before
@@ -43,6 +46,7 @@ class SettingsCameraUploadsViewModelTest {
 
     private lateinit var underTest: SettingsCameraUploadsViewModel
 
+    private val areLocationTagsEnabled = mock<AreLocationTagsEnabled>()
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
@@ -54,6 +58,7 @@ class SettingsCameraUploadsViewModelTest {
     private val restorePrimaryTimestamps = mock<RestorePrimaryTimestamps>()
     private val restoreSecondaryTimestamps = mock<RestoreSecondaryTimestamps>()
     private val setCameraUploadsByWifi = mock<SetCameraUploadsByWifi>()
+    private val setLocationTagsEnabled = mock<SetLocationTagsEnabled>()
     private val setUploadOption = mock<SetUploadOption>()
 
     @Before
@@ -71,6 +76,7 @@ class SettingsCameraUploadsViewModelTest {
      */
     private fun setupUnderTest() {
         underTest = SettingsCameraUploadsViewModel(
+            areLocationTagsEnabled = areLocationTagsEnabled,
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             clearCacheDirectory = clearCacheDirectory,
             disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
@@ -83,6 +89,7 @@ class SettingsCameraUploadsViewModelTest {
             restorePrimaryTimestamps = restorePrimaryTimestamps,
             restoreSecondaryTimestamps = restoreSecondaryTimestamps,
             setCameraUploadsByWifi = setCameraUploadsByWifi,
+            setLocationTagsEnabled = setLocationTagsEnabled,
             setUploadOption = setUploadOption,
         )
     }
@@ -93,6 +100,8 @@ class SettingsCameraUploadsViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
+            assertThat(state.accessMediaLocationRationaleText).isNull()
+            assertThat(state.areLocationTagsIncluded).isFalse()
             assertThat(state.isCameraUploadsRunning).isFalse()
             assertThat(state.shouldShowBusinessAccountPrompt).isFalse()
             assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isFalse()
@@ -238,6 +247,20 @@ class SettingsCameraUploadsViewModelTest {
         }
 
     @Test
+    fun `test that accessMediaLocationRationaleText is updated correctly`() = runTest {
+        setupUnderTest()
+
+        underTest.setAccessMediaLocationRationaleShown(true)
+
+        underTest.state.map { it.accessMediaLocationRationaleText }.distinctUntilChanged().test {
+            assertThat(awaitItem()).isEqualTo(R.string.on_refuse_storage_permission)
+
+            underTest.setAccessMediaLocationRationaleShown(false)
+            assertThat(awaitItem()).isNull()
+        }
+    }
+
+    @Test
     fun `test that uploadConnectionType is updated correctly when calling changeUploadConnectionType`() =
         runTest {
             setupUnderTest()
@@ -276,6 +299,23 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(awaitItem().uploadOption).isEqualTo(uploadOption)
         }
     }
+
+    @Test
+    fun `test that the value of areLocationTagsIncluded is updated when calling includeLocationTags`() =
+        runTest {
+            setupUnderTest()
+
+            whenever(areLocationTagsEnabled()).thenReturn(true)
+            underTest.includeLocationTags(true)
+
+            underTest.state.map { it.areLocationTagsIncluded }.distinctUntilChanged().test {
+                assertThat(awaitItem()).isTrue()
+
+                whenever(areLocationTagsEnabled()).thenReturn(false)
+                underTest.includeLocationTags(false)
+                assertThat(awaitItem()).isFalse()
+            }
+        }
 
     @Test
     fun `test that restorePrimaryTimestamps is invoked when calling restorePrimaryTimestampsAndSyncRecordProcess`() =

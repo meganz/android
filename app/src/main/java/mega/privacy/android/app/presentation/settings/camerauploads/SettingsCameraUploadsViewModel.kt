@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
@@ -30,13 +31,16 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import javax.inject.Inject
 
 /**
  * [ViewModel] class for SettingsCameraUploadsFragment
  *
+ * @property areLocationTagsEnabled When uploading Photos, this checks whether Location Tags should be embedded in each Photo or not
  * @property checkEnableCameraUploadsStatus Check the Camera Uploads status before enabling
  * @property clearCacheDirectory Clear all the contents of the internal cache directory
  * @property disableCameraUploadsInDatabase Disable Camera Uploads by manipulating values in the database
@@ -49,10 +53,12 @@ import javax.inject.Inject
  * @property restorePrimaryTimestamps Restore the Primary Timestamps
  * @property restoreSecondaryTimestamps Restore the Secondary Timestamps
  * @property setCameraUploadsByWifi Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
+ * @property setLocationTagsEnabled Sets whether Location Tags should be embedded in each Photo to be uploaded or not
  * @property setUploadOption Sets the new upload option of Camera Uploads
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
+    private val areLocationTagsEnabled: AreLocationTagsEnabled,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
     private val clearCacheDirectory: ClearCacheDirectory,
     private val disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase,
@@ -65,6 +71,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
     private val setCameraUploadsByWifi: SetCameraUploadsByWifi,
+    private val setLocationTagsEnabled: SetLocationTagsEnabled,
     private val setUploadOption: SetUploadOption,
 ) : ViewModel() {
 
@@ -211,6 +218,17 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * Shows / hides the Access Media Location Permission rationale by updating the
+     * value of [SettingsCameraUploadsState.accessMediaLocationRationaleText]
+     *
+     * @param showRationale true if the rationale should be shown, and false if otherwise
+     */
+    fun setAccessMediaLocationRationaleShown(showRationale: Boolean) =
+        _state.update {
+            it.copy(accessMediaLocationRationaleText = if (showRationale) R.string.on_refuse_storage_permission else null)
+        }
+
+    /**
      * Resets all Timestamps and cleans the Cache Directory
      */
     fun resetTimestampsAndCacheDirectory() = viewModelScope.launch {
@@ -264,11 +282,23 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * Sets whether to include Location Tags in Photos or not
+     *
+     * @param include If true, Location Tags will be included for every Photo upload
+     * If false, no Location Tags will be included when uploading Photos
+     */
+    fun includeLocationTags(include: Boolean) = viewModelScope.launch {
+        setLocationTagsEnabled(include)
+        refreshLocationTags()
+    }
+
+    /**
      * When [SettingsCameraUploadsViewModel] is instantiated, initialize the UI Elements
      */
     private fun initializeSettings() = viewModelScope.launch {
         _state.update {
             it.copy(
+                areLocationTagsIncluded = areLocationTagsEnabled(),
                 uploadConnectionType = getUploadConnectionType(),
                 uploadOption = getUploadOption(),
             )
@@ -288,6 +318,13 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     private suspend fun refreshUploadOption() =
         _state.update { it.copy(uploadOption = getUploadOption()) }
+
+    /**
+     * Updates the value of [SettingsCameraUploadsState.areLocationTagsIncluded] whenever changes
+     * to include / exclude Location Tags for Photo uploads are found
+     */
+    private suspend fun refreshLocationTags() =
+        _state.update { it.copy(areLocationTagsIncluded = areLocationTagsEnabled()) }
 
     /**
      * Retrieves the current Upload Connection Type

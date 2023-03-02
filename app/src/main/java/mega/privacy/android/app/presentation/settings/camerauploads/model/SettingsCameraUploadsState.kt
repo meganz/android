@@ -1,10 +1,13 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.model
 
+import androidx.annotation.StringRes
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 
 /**
  * Data class representing the state of Camera Uploads in Settings
  *
+ * @property accessMediaLocationRationaleText Displays the Access Media Location rationale with the message
+ * @property areLocationTagsIncluded When uploading Photos, this checks whether Location Tags should be embedded in each Photo or not
  * @property isCameraUploadsRunning Checks whether Camera Uploads is running or not
  * @property shouldShowBusinessAccountPrompt Checks whether the Dialog indicating that the account is a Business Account should be shown or not
  * @property shouldShowBusinessAccountSuspendedPrompt Checks whether the Dialog indicating that the account is a suspended Business account should be shown or not
@@ -15,6 +18,8 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
  * @property uploadOption Determines what content should be uploaded
  */
 data class SettingsCameraUploadsState(
+    @StringRes val accessMediaLocationRationaleText: Int? = null,
+    val areLocationTagsIncluded: Boolean = false,
     val isCameraUploadsRunning: Boolean = false,
     val shouldShowBusinessAccountPrompt: Boolean = false,
     val shouldShowBusinessAccountSuspendedPrompt: Boolean = false,

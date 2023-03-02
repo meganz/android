@@ -34,7 +34,8 @@
         android:defaultValue="false"
         app:allowDividerAbove="true"
         app:allowDividerBelow="true"
-        app:iconSpaceReserved="false" />
+        app:iconSpaceReserved="false"
+        app:summary="@string/settings_camera_upload_include_gps_helper_label"/>
 
     <androidx.preference.ListPreference
         android:key="settings_video_upload_quality"

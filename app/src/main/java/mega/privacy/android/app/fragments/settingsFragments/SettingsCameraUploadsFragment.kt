@@ -23,8 +23,9 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.preference.ListPreference
@@ -87,6 +88,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasAccessMediaLocationPermission
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -115,7 +117,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var cameraUpload = false
     private var secondaryUpload = false
     private var charging = false
-    private var includeGPS = false
     private var fileNames = false
     private var camSyncLocalPath: String? = ""
     private var isExternalSDCardCU = false
@@ -147,20 +148,15 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         }
 
     /**
-     * Register the permissions callback, used when the user attempts to enable Camera Uploads
-     * with location tags without granting the ACCESS_MEDIA_LOCATION permission
+     * Registers the Access Media Location permission callback when the user
+     * enables the "Include location tags" option
      */
-    private val enableCameraUploadsWithLocationPermissionLauncher =
-        registerForActivityResult(RequestPermission()) { result: Boolean ->
-            if (result) {
-                // If the permission is granted, then enable Camera Uploads with location tags
-                Timber.d("Permission ACCESS_MEDIA_LOCATION granted")
-                enableCameraUploadsWithLocation()
+    private val includeLocationTagsLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            if (hasAccessMediaLocationPermission(context)) {
+                includeLocationTags(true)
             } else {
-                // Otherwise, display a Snackbar explaining that permission ACCESS_MEDIA_LOCATION should be
-                // granted before enabling Camera Uploads
-                Timber.d("Permission ACCESS_MEDIA_LOCATION denied")
-                showMediaPermissionRejectedSnackbar()
+                viewModel.setAccessMediaLocationRationaleShown(true)
             }
         }
 
@@ -392,7 +388,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             }
 
             hideVideoQualitySettingsSection()
-            removeLocationTags()
         }
 
         val sizeInDB = prefs.chargingOnSize
@@ -432,36 +427,17 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         val intent: Intent
         when (preference.key) {
             KEY_CAMERA_UPLOAD_INCLUDE_GPS -> {
-                includeGPS = optionIncludeLocationTags?.isChecked ?: false
-                if (!includeGPS) {
-                    dbH.setRemoveGPS(true)
-                    JobUtil.rescheduleCameraUpload(context)
-                } else {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                        // Devices whose Android OS is below Android 10 do not need to request for the
-                        // ACCESS_MEDIA_LOCATION permission. Enable Camera Uploads with Location Tags immediately
-                        Timber.d("Device OS is below Android 10. Enable Camera Uploads with Location Tags")
-                        dbH.setRemoveGPS(false)
-                        JobUtil.rescheduleCameraUpload(context)
+                val isChecked = optionIncludeLocationTags?.isChecked ?: false
+                if (isChecked) {
+                    if (hasAccessMediaLocationPermission(context)) {
+                        includeLocationTags(true)
                     } else {
-                        // Otherwise if the device is running on Android 10 above, check whether the
-                        // ACCESS_MEDIA_LOCATION permission is granted or not
-                        Timber.d("Device OS is Android 10 above. Checking if ACCESS_MEDIA_LOCATION is granted")
-                        if (hasPermissions(context, Manifest.permission.ACCESS_MEDIA_LOCATION)) {
-                            // ACCESS_MEDIA_LOCATION permission is granted. Enable Camera Uploads with Location Tags
-                            Timber.d("ACCESS_MEDIA_LOCATION permission granted. Enable Camera Uploads with Location Tags")
-                            dbH.setRemoveGPS(false)
-                            JobUtil.rescheduleCameraUpload(context)
-                        } else {
-                            // ACCESS_MEDIA_LOCATION permission is denied. Request to enable the
-                            // ACCESS_MEDIA_LOCATION permission
-                            Timber.d("ACCESS_MEDIA_LOCATION permission denied. Launching permission window")
-                            includeGPS = false
-                            dbH.setRemoveGPS(true)
-                            optionIncludeLocationTags?.isChecked = includeGPS
-                            enableCameraUploadsWithLocationPermissionLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            includeLocationTagsLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION)
                         }
                     }
+                } else {
+                    includeLocationTags(false)
                 }
             }
             KEY_CAMERA_UPLOAD_CHARGING -> {
@@ -776,11 +752,17 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     uploadConnectionType = it.uploadConnectionType,
                 )
                 handleUploadConnectionType(it.uploadConnectionType)
+                handleLocationTagsVisibility(
+                    areLocationTagsIncluded = it.areLocationTagsIncluded,
+                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    uploadOption = it.uploadOption,
+                )
                 handleBusinessAccountPrompt(it.shouldShowBusinessAccountPrompt)
                 handleBusinessAccountSuspendedPrompt(it.shouldShowBusinessAccountSuspendedPrompt)
                 handleTriggerCameraUploads(it.shouldTriggerCameraUploads)
                 handleMediaPermissionsRationale(it.shouldShowMediaPermissionsRationale)
                 handleNotificationPermissionRationale(it.shouldShowNotificationPermissionRationale)
+                handleAccessMediaLocationPermissionRationale(it.accessMediaLocationRationaleText)
             }
         }
     }
@@ -788,7 +770,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Handles the "File upload" option visibility when a UI State change happens
      *
-     * @param isCameraUploadsRunning If true, display the option. Otherwise, hide it
+     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
      * @param uploadOption the specific [UploadOption] which can be nullable
      */
     private fun handleFileUploadVisibility(
@@ -814,7 +796,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     setValueIndex(0)
                 }
                 disableVideoQualitySettings()
-                setupLocationTags()
             }
             UploadOption.VIDEOS -> {
                 optionFileUpload?.run {
@@ -822,7 +803,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     setValueIndex(1)
                 }
                 enableVideoQualitySettings()
-                removeLocationTags()
             }
             UploadOption.PHOTOS_AND_VIDEOS -> {
                 optionFileUpload?.run {
@@ -830,7 +810,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     setValueIndex(2)
                 }
                 enableVideoQualitySettings()
-                setupLocationTags()
             }
             else -> optionFileUpload?.summary = ""
         }
@@ -839,7 +818,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     /**
      * Handles the "How to Upload" option visibility when a UI State change happens
      *
-     * @param isCameraUploadsRunning If true, display the option. Otherwise, hide it
+     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
      * @param uploadConnectionType the specific [UploadConnectionType] which can be nullable
      */
     private fun handleHowToUploadVisibility(
@@ -865,6 +844,31 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 setValueIndex(uploadConnectionType.position)
             }
         } else optionHowToUpload?.summary = ""
+    }
+
+    /**
+     * Handles the "Include location tags" option visibility when a UI State change happens
+     *
+     * @param areLocationTagsIncluded Whether Location Tags are embedded when uploading Photos or not
+     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param uploadOption The specific [UploadOption] which can be nullable
+     */
+    private fun handleLocationTagsVisibility(
+        areLocationTagsIncluded: Boolean,
+        isCameraUploadsRunning: Boolean,
+        uploadOption: UploadOption?,
+    ) {
+        val allowedOptions = listOf(UploadOption.PHOTOS, UploadOption.PHOTOS_AND_VIDEOS)
+
+        optionIncludeLocationTags?.run {
+            if (isCameraUploadsRunning && allowedOptions.contains(uploadOption)) {
+                preferenceScreen.addPreference(this)
+                this.isChecked = areLocationTagsIncluded
+            } else {
+                preferenceScreen.removePreference(this)
+                this.isChecked = false
+            }
+        }
     }
 
     /**
@@ -981,17 +985,34 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Display a [Snackbar] explaining that the Media permissions should be granted
-     * in order to enable Camera Uploads
+     * Handle the display of the Access Media Location Permission rationale when a UI State change happens
+     *
+     * @param accessMediaLocationRationaleText A [StringRes] message to be displayed, which can be nullable
      */
-    private fun showMediaPermissionRejectedSnackbar() {
-        view?.let {
-            Snackbar.make(
-                it,
-                getString(R.string.on_refuse_storage_permission),
-                Snackbar.LENGTH_SHORT
-            ).show()
+    private fun handleAccessMediaLocationPermissionRationale(@StringRes accessMediaLocationRationaleText: Int?) {
+        if (accessMediaLocationRationaleText != null) {
+            view?.let {
+                Snackbar.make(
+                    it,
+                    getString(accessMediaLocationRationaleText),
+                    Snackbar.LENGTH_SHORT
+                ).show()
+            }
+
+            // Once the Rationale has been shown, notify the ViewModel
+            viewModel.setAccessMediaLocationRationaleShown(false)
         }
+    }
+
+    /**
+     * Includes or excludes adding Location tags to Photo uploads. This also reschedules
+     * Camera Uploads
+     *
+     * @param include true if Location data should be added to Photos, and false if otherwise
+     */
+    private fun includeLocationTags(include: Boolean) {
+        viewModel.includeLocationTags(include)
+        JobUtil.rescheduleCameraUpload(context)
     }
 
     /**
@@ -1165,39 +1186,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 localSecondaryFolderPath = getString(R.string.settings_empty_folder)
                 dbH.setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
             }
-        }
-    }
-
-    /**
-     * Setup location tags
-     */
-    private fun setupLocationTags() {
-        val removeGPSString = prefs.removeGPS
-
-        if (removeGPSString.isNullOrBlank()) {
-            includeGPS = false
-            dbH.setRemoveGPS(true)
-        } else {
-            Timber.d("Remove GPS is $removeGPSString")
-            includeGPS = !removeGPSString.toBoolean()
-        }
-
-        optionIncludeLocationTags?.let {
-            it.isChecked = includeGPS
-
-            // This will eventually be moved to the UI State
-            if (viewModel.state.value.isCameraUploadsRunning) {
-                preferenceScreen.addPreference(it)
-            }
-        }
-    }
-
-    /**
-     * Remove location tags
-     */
-    private fun removeLocationTags() {
-        optionIncludeLocationTags?.let {
-            preferenceScreen.removePreference(it)
         }
     }
 
@@ -1493,16 +1481,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Enables the Camera Uploads functionality with location data embedded in each upload
-     */
-    private fun enableCameraUploadsWithLocation() {
-        includeGPS = true
-        dbH.setRemoveGPS(false)
-        optionIncludeLocationTags?.isChecked = includeGPS
-        JobUtil.rescheduleCameraUpload(context)
-    }
-
-    /**
      * Enables the Camera Uploads functionality
      */
     private fun enableCameraUploads() {
@@ -1561,7 +1539,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
         viewModel.setCameraUploadsRunning(false)
         localCameraUploadFolder?.let { preferenceScreen.removePreference(it) }
-        optionIncludeLocationTags?.let { preferenceScreen.removePreference(it) }
 
         hideVideoQualitySettingsSection()
 
