@@ -299,7 +299,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.setCamSyncFileUpload(fileUpload)
     }
 
-    override suspend fun setCameraUploadVideoQuality(quality: Int) {
+    override suspend fun setUploadVideoQuality(quality: Int) {
         dbHandler.setCameraUploadVideoQuality(quality)
     }
 

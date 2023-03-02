@@ -468,11 +468,11 @@ interface MegaLocalStorageGateway {
     suspend fun setCamSyncFileUpload(fileUpload: Int)
 
     /**
-     * Set Video upload quality
+     * Sets the new Video Quality when uploading Videos through Camera Uploads
      *
-     * @param quality
+     * @param quality The Video Quality, represented as an [Int]
      */
-    suspend fun setCameraUploadVideoQuality(quality: Int)
+    suspend fun setUploadVideoQuality(quality: Int)
 
     /**
      * Set Conversion on charging

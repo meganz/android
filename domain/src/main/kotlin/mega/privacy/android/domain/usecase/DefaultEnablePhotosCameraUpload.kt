@@ -2,15 +2,18 @@ package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import javax.inject.Inject
 
 /**
- * Default enable photos camera upload
+ * Default implementation of [EnablePhotosCameraUpload]
  *
- * @property settingsRepository
+ * @property settingsRepository [SettingsRepository]
+ * @property setUploadVideoQuality [SetUploadVideoQuality]
  */
 class DefaultEnablePhotosCameraUpload @Inject constructor(
     private val settingsRepository: SettingsRepository,
+    private val setUploadVideoQuality: SetUploadVideoQuality,
 ) : EnablePhotosCameraUpload {
 
     override suspend fun invoke(
@@ -25,7 +28,7 @@ class DefaultEnablePhotosCameraUpload @Inject constructor(
             setCamSyncWifi(!enableCellularSync)
             setCameraUploadFileType(syncVideo)
             setCameraFolderExternalSDCard(false)
-            setCameraUploadVideoQuality(videoQuality)
+            setUploadVideoQuality(videoQuality)
             setConversionOnCharging(true)
             setChargingOnSize(conversionChargingOnSize)
             // After target and local folder setup, then enable CU.

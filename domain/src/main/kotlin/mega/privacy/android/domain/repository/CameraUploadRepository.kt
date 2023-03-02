@@ -278,6 +278,13 @@ interface CameraUploadRepository {
     suspend fun getUploadVideoQuality(): VideoQuality?
 
     /**
+     * Sets the new Video Quality
+     *
+     * @param videoQuality The new [VideoQuality]
+     */
+    suspend fun setUploadVideoQuality(videoQuality: VideoQuality)
+
+    /**
      * Get keep file names preference
      *
      * @return keep file names preference

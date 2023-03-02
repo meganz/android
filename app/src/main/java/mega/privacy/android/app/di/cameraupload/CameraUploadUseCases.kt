@@ -155,6 +155,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 
 /**
  * Provides the use case implementation for camera upload
@@ -568,6 +569,17 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetUploadVideoQuality(cameraUploadRepository: CameraUploadRepository): GetUploadVideoQuality =
             GetUploadVideoQuality(cameraUploadRepository::getUploadVideoQuality)
+
+        /**
+         * Provides the [SetUploadVideoQuality] implementation
+         *
+         * @param cameraUploadRepository [CameraUploadRepository]
+         *
+         * @return [SetUploadVideoQuality]
+         */
+        @Provides
+        fun provideSetUploadVideoQuality(cameraUploadRepository: CameraUploadRepository): SetUploadVideoQuality =
+            SetUploadVideoQuality(cameraUploadRepository::setUploadVideoQuality)
     }
 
     /**

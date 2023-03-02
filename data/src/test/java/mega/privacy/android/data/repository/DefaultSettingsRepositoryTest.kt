@@ -16,7 +16,6 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.mapper.StartScreenMapper
-import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -31,6 +30,9 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
+/**
+ * Test class for [DefaultSettingsRepository]
+ */
 @OptIn(ExperimentalContracts::class)
 @ExperimentalCoroutinesApi
 internal class DefaultSettingsRepositoryTest {
@@ -50,26 +52,24 @@ internal class DefaultSettingsRepositoryTest {
     private val uiPreferencesGateway: UIPreferencesGateway = mock()
     private val startScreenMapper: StartScreenMapper = mock()
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway = mock()
-    private val videoQualityIntMapper: VideoQualityIntMapper = mock()
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway = mock()
 
     @Before
     fun setUp() {
         underTest = DefaultSettingsRepository(
-            databaseHandler,
-            context,
-            apiFacade,
-            megaLocalStorageGateway,
-            ioDispatcher,
-            chatPreferencesGateway,
-            callsPreferencesGateway,
-            appPreferencesGateway,
-            cacheFolderGateway,
-            uiPreferencesGateway,
-            startScreenMapper,
-            cameraTimestampsPreferenceGateway,
-            videoQualityIntMapper,
-            fileManagementPreferencesGateway,
+            databaseHandler = databaseHandler,
+            context = context,
+            megaApiGateway = apiFacade,
+            megaLocalStorageGateway = megaLocalStorageGateway,
+            ioDispatcher = ioDispatcher,
+            chatPreferencesGateway = chatPreferencesGateway,
+            callsPreferencesGateway = callsPreferencesGateway,
+            appPreferencesGateway = appPreferencesGateway,
+            cacheFolderGateway = cacheFolderGateway,
+            uiPreferencesGateway = uiPreferencesGateway,
+            startScreenMapper = startScreenMapper,
+            cameraTimestampsPreferenceGateway = cameraTimestampsPreferenceGateway,
+            fileManagementPreferencesGateway = fileManagementPreferencesGateway,
         )
     }
 

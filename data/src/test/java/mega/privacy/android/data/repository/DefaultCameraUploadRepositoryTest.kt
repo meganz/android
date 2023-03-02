@@ -17,6 +17,7 @@ import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.data.mapper.toVideoQuality
+import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
@@ -33,6 +34,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.LinkedList
@@ -83,6 +85,7 @@ class DefaultCameraUploadRepositoryTest {
             ioDispatcher = UnconfinedTestDispatcher(),
             appEventGateway = mock(),
             broadcastReceiverGateway = mock(),
+            videoQualityIntMapper = ::videoQualityToInt,
             videoQualityMapper = ::toVideoQuality,
             syncStatusIntMapper = ::syncStatusToInt,
             videoCompressorGateway = videoCompressorGateway,
@@ -108,6 +111,13 @@ class DefaultCameraUploadRepositoryTest {
     fun `test camera upload retrieves video quality for upload`() = runTest {
         whenever(localStorageGateway.getUploadVideoQuality()).thenReturn("3")
         assertThat(underTest.getUploadVideoQuality()).isEqualTo(VideoQuality.ORIGINAL)
+    }
+
+    @Test
+    fun `test that the new video quality is set for camera uploads`() = runTest {
+        underTest.setUploadVideoQuality(VideoQuality.ORIGINAL)
+
+        verify(localStorageGateway, times(1)).setUploadVideoQuality(3)
     }
 
     @Test

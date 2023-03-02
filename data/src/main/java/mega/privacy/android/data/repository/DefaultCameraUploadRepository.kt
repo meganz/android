@@ -19,6 +19,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.VideoAttachmentMapper
+import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.mapper.VideoQualityMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
@@ -76,6 +77,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val broadcastReceiverGateway: BroadcastReceiverGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
     private val syncStatusIntMapper: SyncStatusIntMapper,
     private val cameraUploadsHandlesMapper: CameraUploadsHandlesMapper,
@@ -282,6 +284,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun getUploadVideoQuality(): VideoQuality? = withContext(ioDispatcher) {
         videoQualityMapper(localStorageGateway.getUploadVideoQuality())
     }
+
+    override suspend fun setUploadVideoQuality(videoQuality: VideoQuality) =
+        withContext(ioDispatcher) {
+            localStorageGateway.setUploadVideoQuality(videoQualityIntMapper(videoQuality))
+        }
 
     override suspend fun getKeepFileNames(): Boolean = withContext(ioDispatcher) {
         localStorageGateway.getKeepFileNames()

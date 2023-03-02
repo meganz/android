@@ -4,20 +4,28 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 
+/**
+ * Test class for [DefaultEnablePhotosCameraUpload]
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultEnablePhotosCameraUploadTest {
     private lateinit var underTest: EnablePhotosCameraUpload
 
     private val settingsRepository = mock<SettingsRepository>()
+    private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
 
     @Before
     fun setUp() {
-        underTest = DefaultEnablePhotosCameraUpload(settingsRepository = settingsRepository)
+        underTest = DefaultEnablePhotosCameraUpload(
+            settingsRepository = settingsRepository,
+            setUploadVideoQuality = setUploadVideoQuality,
+        )
     }
 
     @Test
@@ -36,13 +44,13 @@ class DefaultEnablePhotosCameraUploadTest {
             conversionChargingOnSize = expectedConversionChargingOnSize,
         )
 
-        val inOrder = inOrder(settingsRepository)
+        val inOrder = inOrder(settingsRepository, setUploadVideoQuality)
 
         inOrder.verify(settingsRepository).setCameraUploadLocalPath(expectedPath)
         inOrder.verify(settingsRepository).setCamSyncWifi(!expectedEnableCellularSync)
         inOrder.verify(settingsRepository).setCameraUploadFileType(expectedSyncVideo)
         inOrder.verify(settingsRepository).setCameraFolderExternalSDCard(false)
-        inOrder.verify(settingsRepository).setCameraUploadVideoQuality(expectedVideoQuality)
+        inOrder.verify(setUploadVideoQuality).invoke(expectedVideoQuality)
         inOrder.verify(settingsRepository).setConversionOnCharging(true)
         inOrder.verify(settingsRepository).setChargingOnSize(expectedConversionChargingOnSize)
         inOrder.verify(settingsRepository).setEnableCameraUpload(true)

@@ -25,11 +25,9 @@ import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGa
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.StartScreenMapper
-import mega.privacy.android.data.mapper.VideoQualityIntMapper
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
-import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.SettingNotFoundException
@@ -49,17 +47,19 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default settings repository implementation
  *
- * @property databaseHandler
- * @property context
- * @property megaApiGateway
- * @property ioDispatcher
- * @property chatPreferencesGateway
- * @property callsPreferencesGateway
- * @property appPreferencesGateway
- * @property cacheFolderGateway
- * @property uiPreferencesGateway
- * @property startScreenMapper
- * @property cameraTimestampsPreferenceGateway
+ * @property databaseHandler [DatabaseHandler]
+ * @property context [Context]
+ * @property megaApiGateway [MegaApiGateway]
+ * @property megaLocalStorageGateway [MegaLocalStorageGateway]
+ * @property ioDispatcher [CoroutineDispatcher]
+ * @property chatPreferencesGateway [ChatPreferencesGateway]
+ * @property callsPreferencesGateway [CallsPreferencesGateway]
+ * @property appPreferencesGateway [AppPreferencesGateway]
+ * @property cacheFolderGateway [CacheFolderGateway]
+ * @property uiPreferencesGateway [UIPreferencesGateway]
+ * @property startScreenMapper [StartScreenMapper]
+ * @property cameraTimestampsPreferenceGateway [CameraTimestampsPreferenceGateway]
+ * @property fileManagementPreferencesGateway [FileManagementPreferencesGateway]
  */
 @ExperimentalContracts
 internal class DefaultSettingsRepository @Inject constructor(
@@ -75,7 +75,6 @@ internal class DefaultSettingsRepository @Inject constructor(
     private val uiPreferencesGateway: UIPreferencesGateway,
     private val startScreenMapper: StartScreenMapper,
     private val cameraTimestampsPreferenceGateway: CameraTimestampsPreferenceGateway,
-    private val videoQualityIntMapper: VideoQualityIntMapper,
     private val fileManagementPreferencesGateway: FileManagementPreferencesGateway,
 ) : SettingsRepository {
     init {
@@ -182,10 +181,6 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     override suspend fun setEnableCameraUpload(enable: Boolean) {
         megaLocalStorageGateway.setCamSyncEnabled(enable)
-    }
-
-    override suspend fun setCameraUploadVideoQuality(quality: VideoQuality) {
-        megaLocalStorageGateway.setCameraUploadVideoQuality(videoQualityIntMapper(quality))
     }
 
     override suspend fun setCameraUploadFileType(syncVideo: Boolean) {

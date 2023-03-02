@@ -3,7 +3,6 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.CallsSoundNotifications
 import mega.privacy.android.domain.entity.ChatImageQuality
-import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.preference.StartScreen
 import java.io.File
 
@@ -86,11 +85,6 @@ interface SettingsRepository {
      * Set camera upload
      */
     suspend fun setEnableCameraUpload(enable: Boolean)
-
-    /**
-     * Set camera upload video quality
-     */
-    suspend fun setCameraUploadVideoQuality(quality: VideoQuality)
 
     /**
      * Set if photos only or photos and videos
