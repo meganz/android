@@ -11,9 +11,11 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Spanned
 import android.text.format.DateUtils
 import android.util.TypedValue
 import android.view.Menu
@@ -37,6 +39,7 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToCopyActivityContract
 import mega.privacy.android.app.activities.contract.SelectFolderToMoveActivityContract
@@ -80,6 +83,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmD
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
@@ -95,6 +99,8 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncoming
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
@@ -115,7 +121,6 @@ import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
-import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -920,6 +925,13 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 Timber.d("Send chat option")
                 nodeAttacher.attachNode(viewModel.node)
             }
+            R.id.cab_menu_file_info_dispute -> {
+                startActivity(
+                    Intent(this, WebViewActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        .setData(Uri.parse(Constants.DISPUTE_URL))
+                )
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -1052,6 +1064,17 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             bindingContent.filePropertiesInfoMenuSize.text =
                 getFormattedStringOrDefault(R.string.file_properties_info_size_file)
             bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(viewModel.node.size)
+            if (viewModel.node.isTakenDown) {
+                bindingContent.takenDownFileWarningBanner.text =
+                    underlineText(R.string.cloud_drive_info_taken_down_file_warning)
+                bindingContent.takenDownFileWarningBanner.setOnClickListener {
+                    redirectToTakedownPolicy()
+                }
+                bindingContent.warningBannerLayout.isVisible = true
+                bindingContent.takenDownFileWarningClose.setOnClickListener {
+                    bindingContent.warningBannerLayout.isVisible = false
+                }
+            }
             if (viewModel.node.creationTime != 0L) {
                 try {
                     bindingContent.filePropertiesInfoDataAdded.text =
@@ -1093,6 +1116,17 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         } else if (viewModel.node.isFolder) {
             Timber.d("Node is FOLDER")
             setIconResource()
+            if (viewModel.node.isTakenDown) {
+                bindingContent.takenDownFileWarningBanner.text =
+                    underlineText(R.string.cloud_drive_info_taken_down_folder_warning)
+                bindingContent.takenDownFileWarningBanner.setOnClickListener {
+                    redirectToTakedownPolicy()
+                }
+                bindingContent.warningBannerLayout.isVisible = true
+                bindingContent.takenDownFileWarningClose.setOnClickListener {
+                    bindingContent.warningBannerLayout.isVisible = false
+                }
+            }
             sl = megaApi.getOutShares(viewModel.node)
             sl?.let { sl ->
                 if (sl.size == 0) {
@@ -1115,17 +1149,14 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                             MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> {
                                 binding.filePropertiesPermissionInfo.text =
                                     getFormattedStringOrDefault(R.string.file_properties_shared_folder_full_access)
-                                        .uppercase(Locale.getDefault())
                             }
                             MegaShare.ACCESS_READ -> {
                                 binding.filePropertiesPermissionInfo.text =
                                     getFormattedStringOrDefault(R.string.file_properties_shared_folder_read_only)
-                                        .uppercase(Locale.getDefault())
                             }
                             MegaShare.ACCESS_READWRITE -> {
                                 binding.filePropertiesPermissionInfo.text =
                                     getFormattedStringOrDefault(R.string.file_properties_shared_folder_read_write)
-                                        .uppercase(Locale.getDefault())
                             }
                         }
                     }
@@ -1479,17 +1510,14 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                             MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> {
                                 binding.filePropertiesPermissionInfo.text =
                                     getFormattedStringOrDefault(R.string.file_properties_shared_folder_full_access)
-                                        .uppercase(Locale.getDefault())
                             }
                             MegaShare.ACCESS_READ -> {
                                 binding.filePropertiesPermissionInfo.text =
                                     getFormattedStringOrDefault(R.string.file_properties_shared_folder_read_only)
-                                        .uppercase(Locale.getDefault())
                             }
                             MegaShare.ACCESS_READWRITE -> {
                                 binding.filePropertiesPermissionInfo.text =
                                     getFormattedStringOrDefault(R.string.file_properties_shared_folder_read_write)
-                                        .uppercase(Locale.getDefault())
                             }
                         }
                     }
@@ -1778,6 +1806,21 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             MimeTypeThumbnail.typeForName(viewModel.node.name).iconResourceId
         }
         binding.fileInfoToolbarIcon.setImageResource(resource)
+    }
+
+    private fun redirectToTakedownPolicy() {
+        val uriUrl = Uri.parse(TAKEDOWN_URL)
+        val launchBrowser = Intent(this, WebViewActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .setData(uriUrl)
+        startActivity(launchBrowser)
+    }
+
+    private fun underlineText(@StringRes res: Int): Spanned {
+        return getString(res)
+            .replace("[A]", "<u>")
+            .replace("[/A]", "</u>")
+            .toSpannedHtmlText()
     }
 
     companion object {

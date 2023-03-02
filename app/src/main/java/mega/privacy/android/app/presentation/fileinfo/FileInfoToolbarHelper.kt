@@ -50,6 +50,10 @@ internal class FileInfoToolbarHelper(
     private var drawableLeave: Drawable? = null
     private var drawableCopy: Drawable? = null
     private var drawableChat: Drawable? = null
+    private var drawableRename: Drawable? = null
+    private var drawableRubbishBin: Drawable? = null
+    private var drawableMove: Drawable? = null
+    private var drawableDisputeTakeDown: Drawable? = null
     private val allDrawables
         get() = arrayListOf(
             upArrow,
@@ -61,6 +65,10 @@ internal class FileInfoToolbarHelper(
             drawableLeave,
             drawableCopy,
             drawableChat,
+            drawableRename,
+            drawableRubbishBin,
+            drawableMove,
+            drawableDisputeTakeDown,
         )
 
     private var downloadMenuItem: MenuItem? = null
@@ -75,6 +83,7 @@ internal class FileInfoToolbarHelper(
     private var deleteMenuItem: MenuItem? = null
     private var leaveMenuItem: MenuItem? = null
     private var sendToChatMenuItem: MenuItem? = null
+    private var disputeTakeDownMenuItem: MenuItem? = null
     private val allMenuItems
         get() = arrayListOf(
             downloadMenuItem,
@@ -89,6 +98,7 @@ internal class FileInfoToolbarHelper(
             deleteMenuItem,
             leaveMenuItem,
             sendToChatMenuItem,
+            disputeTakeDownMenuItem,
         )
 
     private var currentColorFilter = 0
@@ -139,6 +149,7 @@ internal class FileInfoToolbarHelper(
         deleteMenuItem = menu.findItem(R.id.cab_menu_file_info_delete)
         leaveMenuItem = menu.findItem(R.id.cab_menu_file_info_leave)
         sendToChatMenuItem = menu.findItem(R.id.cab_menu_file_info_send_to_chat)
+        disputeTakeDownMenuItem = menu.findItem(R.id.cab_menu_file_info_dispute)
     }
 
     fun updateOptionsMenu(
@@ -195,6 +206,10 @@ internal class FileInfoToolbarHelper(
         drawableLeave = getMutatedDrawable(R.drawable.ic_leave_share_w)
         drawableCopy = getMutatedDrawable(R.drawable.ic_copy_white)
         drawableChat = getMutatedDrawable(R.drawable.ic_send_to_contact)
+        drawableRename = getMutatedDrawable(R.drawable.ic_rename)
+        drawableRubbishBin = getMutatedDrawable(R.drawable.ic_move_to_rubbish_bin)
+        drawableMove = getMutatedDrawable(R.drawable.ic_move_white)
+        drawableDisputeTakeDown = getMutatedDrawable(R.drawable.ic_taken_down_file_info)
     }
 
     private fun getMutatedDrawable(@DrawableRes res: Int) =
@@ -216,6 +231,10 @@ internal class FileInfoToolbarHelper(
         leaveMenuItem?.icon = drawableLeave
         copyMenuItem?.icon = drawableCopy
         sendToChatMenuItem?.icon = drawableChat
+        renameMenuItem?.icon = drawableRename
+        rubbishMenuItem?.icon = drawableRubbishBin
+        moveMenuItem?.icon = drawableMove
+        disputeTakeDownMenuItem?.icon = drawableDisputeTakeDown
     }
 
     /**
@@ -333,6 +352,12 @@ internal class FileInfoToolbarHelper(
                     getLinkMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
                 }
                 copyMenuItem?.isVisible = true
+            } else {
+                rubbishMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                renameMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                disputeTakeDownMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                moveMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                disputeTakeDownMenuItem?.isVisible = true
             }
             rubbishMenuItem?.isVisible = true
             renameMenuItem?.isVisible = true
