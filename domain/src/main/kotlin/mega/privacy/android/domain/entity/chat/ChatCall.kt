@@ -1,5 +1,8 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+
 /**
  * Chat call
  *
@@ -36,11 +39,11 @@ package mega.privacy.android.domain.entity.chat
 data class ChatCall(
     val callId: Long,
     val chatId: Long,
-    val status: Int? = null,
+    val status: ChatCallStatus? = null,
     val caller: Long? = null,
     val duration: Long? = null,
     val numParticipants: Int? = null,
-    val changes: Int? = null,
+    val changes: ChatCallChanges? = null,
     val endCallReason: Int? = null,
     val callCompositionChange: Int? = null,
     val peeridCallCompositionChange: Long? = null,

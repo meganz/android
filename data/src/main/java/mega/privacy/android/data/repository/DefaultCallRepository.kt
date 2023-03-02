@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.data.mapper.ChatCallMapper
+import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.domain.entity.ChatRequest
@@ -34,7 +34,9 @@ internal class DefaultCallRepository @Inject constructor(
     override suspend fun getChatCall(chatId: Long?): ChatCall? =
         withContext(dispatcher) {
             chatId?.let {
-                return@withContext megaChatApiGateway.getChatCall(chatId)?.let(chatCallMapper)
+                megaChatApiGateway.getChatCall(chatId)?.let { call ->
+                    return@withContext chatCallMapper(call)
+                }
             }
 
             null
@@ -103,7 +105,7 @@ internal class DefaultCallRepository @Inject constructor(
         megaChatApiGateway.chatCallUpdates
             .filterIsInstance<ChatCallUpdate.OnChatCallUpdate>()
             .mapNotNull { it.item }
-            .map(chatCallMapper)
+            .map { chatCallMapper(it) }
             .flowOn(dispatcher)
 
     private fun onRequestCompleted(continuation: Continuation<ChatRequest>) =

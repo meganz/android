@@ -20,7 +20,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.ChatCallMapper
+import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
@@ -448,7 +448,7 @@ internal class DefaultChatRepository @Inject constructor(
         megaChatApiGateway.chatCallUpdates
             .filterIsInstance<ChatCallUpdate.OnChatCallUpdate>()
             .mapNotNull { it.item }
-            .map(chatCallMapper)
+            .map { chatCallMapper(it) }
             .flowOn(ioDispatcher)
 
     override suspend fun isChatNotifiable(chatId: Long): Boolean =

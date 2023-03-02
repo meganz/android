@@ -15,7 +15,6 @@ import mega.privacy.android.data.mapper.AccountTransferDetailMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
-import mega.privacy.android.data.mapper.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
@@ -96,6 +95,10 @@ import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
+import mega.privacy.android.data.mapper.meeting.ChatCallMapper
+import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
+import mega.privacy.android.data.mapper.HandleListMapper
+import mega.privacy.android.data.mapper.HandleListMapperImpl
 import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
@@ -107,7 +110,6 @@ import mega.privacy.android.data.mapper.toAccountStorageDetail
 import mega.privacy.android.data.mapper.toAccountTransferDetail
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toAchievementsOverview
-import mega.privacy.android.data.mapper.toChatCall
 import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
 import mega.privacy.android.data.mapper.toChatListItem
 import mega.privacy.android.data.mapper.toChatRequest
@@ -206,6 +208,18 @@ internal abstract class MapperModule {
      */
     @Binds
     abstract fun bindsPasswordStrengthMapper(implementation: PasswordStrengthMapperImpl): PasswordStrengthMapper
+
+    /**
+     * Provides Chat call Mapper
+     */
+    @Binds
+    abstract fun bindChatCallMapper(implementation: ChatCallMapperImpl): ChatCallMapper
+
+    /**
+     * Provides Handle list Mapper
+     */
+    @Binds
+    abstract fun bindHandleListMapper(implementation: HandleListMapperImpl): HandleListMapper
 
     companion object {
         /**
@@ -545,12 +559,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideChatListItemMapper(): ChatListItemMapper = ::toChatListItem
-
-        /**
-         * Provide chat call mapper
-         */
-        @Provides
-        fun provideChatCallMapper(): ChatCallMapper = ::toChatCall
 
         /**
          * Provide country calling codes mapper
