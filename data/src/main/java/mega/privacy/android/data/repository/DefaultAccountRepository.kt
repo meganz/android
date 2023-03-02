@@ -55,6 +55,7 @@ import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.exception.NoLoggedInUserException
 import mega.privacy.android.domain.exception.NotMasterBusinessAccountException
+import mega.privacy.android.domain.exception.QRCodeException
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
@@ -388,7 +389,25 @@ internal class DefaultAccountRepository @Inject constructor(
                         val value = megaApiGateway.handleToBase64(request.nodeHandle)
                         continuation.resumeWith(Result.success("https://mega.nz/C!$value"))
                     } else {
-                        continuation.failWithError(error)
+                        if (renew) {
+                            continuation.resumeWith(
+                                Result.failure(
+                                    QRCodeException.ResetFailed(
+                                        error.errorCode,
+                                        error.errorString
+                                    )
+                                )
+                            )
+                        } else {
+                            continuation.resumeWith(
+                                Result.failure(
+                                    QRCodeException.CreateFailed(
+                                        error.errorCode,
+                                        error.errorString
+                                    )
+                                )
+                            )
+                        }
                     }
                 }
             )
@@ -401,9 +420,23 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun deleteContactLink(handle: Long) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
-                return@getRequestListener
-            }
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { _, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        continuation.resumeWith(Result.success(Unit))
+                    } else {
+                        continuation.resumeWith(
+                            Result.failure(
+                                QRCodeException.DeleteFailed(
+                                    error.errorCode,
+                                    error.errorString
+                                )
+                            )
+                        )
+                    }
+
+                }
+            )
             megaApiGateway.contactLinkDelete(handle, listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)

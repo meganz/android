@@ -7,7 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
-import mega.privacy.android.domain.exception.MyQRCodeException
+import mega.privacy.android.domain.exception.QRCodeException
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,7 +30,7 @@ class MyQRCodeTextErrorMapperImplTest {
         runTest {
             assertThat(
                 underTest(
-                    MyQRCodeException.ResetFailed(
+                    QRCodeException.ResetFailed(
                         1,
                         null
                     )
@@ -43,7 +43,7 @@ class MyQRCodeTextErrorMapperImplTest {
         runTest {
             assertThat(
                 underTest(
-                    MyQRCodeException.DeleteFailed(
+                    QRCodeException.DeleteFailed(
                         1,
                         null
                     )
@@ -55,7 +55,7 @@ class MyQRCodeTextErrorMapperImplTest {
     fun `test that MyQRCodeException CreateFailed maps to general_error`() = runTest {
         assertThat(
             underTest(
-                MyQRCodeException.CreateFailed(
+                QRCodeException.CreateFailed(
                     1, null
                 )
             )

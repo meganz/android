@@ -27,9 +27,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
-import mega.privacy.android.app.presentation.qrcode.mycode.model.MyQRCodeUIState
+import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.core.ui.controls.LoadingDialog
 import mega.privacy.android.core.ui.theme.grey_700
 import mega.privacy.android.core.ui.theme.secondary_light
@@ -42,7 +43,7 @@ import mega.privacy.android.core.ui.theme.white
  */
 @Composable
 fun MyQRCodeView(
-    uiState: MyQRCodeUIState,
+    uiState: MyCodeUIState,
     modifier: Modifier = Modifier,
     onButtonClicked: () -> Unit,
     onScroll: (Int) -> Unit,
@@ -62,40 +63,45 @@ fun MyQRCodeView(
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        uiState.contactLink?.let { contactLink ->
-            Box(
-                modifier = Modifier
-                    .padding(top = 60.dp, bottom = 58.dp)
-                    .size(280.dp)
-                    .testTag("QR Code Container"),
-                contentAlignment = Alignment.Center,
-            ) {
-                QRCode(
-                    modifier = Modifier
-                        .fillMaxSize(),
-                    text = contactLink,
-                    qrCodeMapper = qrCodeMapper
-                )
 
-                uiState.avatarContent?.let {
+        when (uiState) {
+            is MyCodeUIState.QRCodeAvailable -> {
+                val contactLink = uiState.contactLink
+                Box(
+                    modifier = Modifier
+                        .padding(top = 60.dp, bottom = 58.dp)
+                        .size(280.dp)
+                        .testTag("QR Code Container"),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    QRCode(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        text = contactLink,
+                        qrCodeMapper = qrCodeMapper
+                    )
+
                     Avatar(
                         modifier = Modifier,
                         content = uiState.avatarContent,
                         avatarBgColor = uiState.avatarBgColor ?: secondary_light.toArgb(),
                     )
+
                 }
             }
-        } ?: run {
-            Box(
-                modifier = Modifier
-                    .padding(top = 60.dp, bottom = 58.dp)
-                    .height(280.dp)
-                    .background(color = Color.Transparent)
-            )
+            else -> {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 60.dp, bottom = 58.dp)
+                        .height(280.dp)
+                        .background(color = Color.Transparent)
+                )
+            }
         }
 
+        val text = if (uiState is MyCodeUIState.QRCodeAvailable) uiState.contactLink else ""
         Text(
-            text = uiState.contactLink ?: "",
+            text = text,
             modifier = Modifier.padding(bottom = 15.dp),
             style = MaterialTheme.typography.body1
         )
@@ -108,7 +114,7 @@ fun MyQRCodeView(
             ),
         ) {
             val textId =
-                uiState.contactLink?.let { R.string.button_copy_link } ?: R.string.button_create_qr
+                if (uiState is MyCodeUIState.QRCodeAvailable) R.string.button_copy_link else R.string.button_create_qr
             Text(
                 text = stringResource(id = textId),
                 style = MaterialTheme.typography.body1,
@@ -116,7 +122,7 @@ fun MyQRCodeView(
         }
     }
 
-    if (uiState.isInProgress) {
+    if (uiState is MyCodeUIState.CreatingQRCode) {
         LoadingDialog(text = stringResource(id = R.string.generatin_qr))
     }
 }
@@ -131,10 +137,10 @@ fun MyQRCodeView(
 )
 @Composable
 fun MyQRCodeViewPreview() {
-    val uiState = MyQRCodeUIState(
+    val uiState = MyCodeUIState.QRCodeAvailable(
         contactLink = "https://conatctlink",
-        snackBarMessage = R.string.generatin_qr,
-        avatarBgColor = Color.Red.toArgb()
+        avatarBgColor = Color.Red.toArgb(),
+        avatarContent = TextAvatarContent(avatarText = "Jackson")
     )
     MyQRCodeView(
         uiState = uiState,
