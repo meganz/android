@@ -110,7 +110,6 @@ import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
-import mega.privacy.android.domain.usecase.GetVideoQuality
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.HasCameraSyncEnabled
 import mega.privacy.android.domain.usecase.HasCredentials
@@ -153,6 +152,7 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 
@@ -414,13 +414,6 @@ abstract class CameraUploadUseCases {
             GetVideoSyncRecordsByStatus { cameraUploadRepository.getVideoSyncRecordsByStatus(it) }
 
         /**
-         * Provide the [GetVideoQuality] implementation
-         */
-        @Provides
-        fun provideGetVideoQuality(cameraUploadRepository: CameraUploadRepository): GetVideoQuality =
-            GetVideoQuality { cameraUploadRepository.getVideoQuality().toInt() }
-
-        /**
          * Provide the [GetFingerprint] implementation
          */
         @Provides
@@ -564,6 +557,17 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideSetUploadOption(cameraUploadRepository: CameraUploadRepository): SetUploadOption =
             SetUploadOption(cameraUploadRepository::setUploadOption)
+
+        /**
+         * Provides the [GetUploadVideoQuality] implementation
+         *
+         * @param cameraUploadRepository [CameraUploadRepository]
+         *
+         * @return [GetUploadVideoQuality]
+         */
+        @Provides
+        fun provideGetUploadVideoQuality(cameraUploadRepository: CameraUploadRepository): GetUploadVideoQuality =
+            GetUploadVideoQuality(cameraUploadRepository::getUploadVideoQuality)
     }
 
     /**

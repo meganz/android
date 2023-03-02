@@ -119,10 +119,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.setCameraSyncFileUpload(uploadOptionIntMapper(uploadOption))
     }
 
-    override suspend fun getVideoQuality(): String = withContext(ioDispatcher) {
-        localStorageGateway.getVideoQuality()
-    }
-
     @Suppress("DEPRECATION")
     @Deprecated(
         "Function related to statistics will be reviewed in future updates to\n" +

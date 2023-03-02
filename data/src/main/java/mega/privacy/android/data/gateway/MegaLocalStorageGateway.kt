@@ -121,11 +121,6 @@ interface MegaLocalStorageGateway {
     suspend fun setCameraSyncFileUpload(uploadOption: Int)
 
     /**
-     * Get video quality
-     */
-    suspend fun getVideoQuality(): String
-
-    /**
      * Delete sync records by type
      */
     suspend fun deleteAllSyncRecords(syncRecordType: Int)
@@ -299,7 +294,7 @@ interface MegaLocalStorageGateway {
     /**
      * Get video quality for camera upload
      */
-    suspend fun getUploadVideoQuality(): String?
+    suspend fun getUploadVideoQuality(): String
 
     /**
      * Keep file names for camera upload or not

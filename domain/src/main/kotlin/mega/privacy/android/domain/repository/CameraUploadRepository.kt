@@ -334,13 +334,6 @@ interface CameraUploadRepository {
     suspend fun getVideoSyncRecordsByStatus(syncStatusType: SyncStatus): List<SyncRecord>
 
     /**
-     * Get uploaded video quality
-     *
-     * @return uploaded video quality
-     */
-    suspend fun getVideoQuality(): String
-
-    /**
      * Reset total uploads
      */
     suspend fun resetTotalUploads()

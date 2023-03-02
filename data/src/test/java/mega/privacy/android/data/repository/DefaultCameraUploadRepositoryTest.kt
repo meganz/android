@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import nz.mega.sdk.MegaError
@@ -105,8 +106,8 @@ class DefaultCameraUploadRepositoryTest {
 
     @Test
     fun `test camera upload retrieves video quality for upload`() = runTest {
-        whenever(localStorageGateway.getVideoQuality()).thenReturn("3")
-        assertThat(underTest.getVideoQuality()).isEqualTo("3")
+        whenever(localStorageGateway.getUploadVideoQuality()).thenReturn("3")
+        assertThat(underTest.getUploadVideoQuality()).isEqualTo(VideoQuality.ORIGINAL)
     }
 
     @Test

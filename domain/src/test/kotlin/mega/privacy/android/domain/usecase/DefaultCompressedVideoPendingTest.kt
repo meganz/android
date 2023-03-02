@@ -7,26 +7,34 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 
+/**
+ * Test class for [DefaultCompressedVideoPending]
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultCompressedVideoPendingTest {
     private lateinit var underTest: CompressedVideoPending
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val getUploadVideoQuality = mock<GetUploadVideoQuality>()
 
     @Before
     fun setUp() {
-        underTest = DefaultCompressedVideoPending(cameraUploadRepository = cameraUploadRepository)
+        underTest = DefaultCompressedVideoPending(
+            cameraUploadRepository = cameraUploadRepository,
+            getUploadVideoQuality = getUploadVideoQuality,
+        )
     }
 
     @Test
     fun `test that false is returned if upload quality is set to original`() = runTest {
-        cameraUploadRepository.stub {
-            onBlocking { getUploadVideoQuality() }.thenReturn(VideoQuality.ORIGINAL)
+        getUploadVideoQuality.stub {
+            onBlocking { invoke() }.thenReturn(VideoQuality.ORIGINAL)
         }
 
         assertThat(underTest()).isFalse()
@@ -35,10 +43,13 @@ class DefaultCompressedVideoPendingTest {
     @Test
     fun `test that false is returned if upload quality is set to original but to compress sync records are empty`() =
         runTest {
+            getUploadVideoQuality.stub {
+                onBlocking { invoke() }.thenReturn(VideoQuality.LOW)
+            }
             cameraUploadRepository.stub {
-                onBlocking { getUploadVideoQuality() }.thenReturn(VideoQuality.LOW)
                 onBlocking { getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS) }.thenReturn(
-                    emptyList())
+                    emptyList()
+                )
             }
 
             assertThat(underTest()).isFalse()
@@ -63,10 +74,13 @@ class DefaultCompressedVideoPendingTest {
                 isCopyOnly = false,
                 isSecondary = false,
             )
+            getUploadVideoQuality.stub {
+                onBlocking { invoke() }.thenReturn(VideoQuality.LOW)
+            }
             cameraUploadRepository.stub {
-                onBlocking { getUploadVideoQuality() }.thenReturn(VideoQuality.LOW)
                 onBlocking { getVideoSyncRecordsByStatus(SyncStatus.STATUS_TO_COMPRESS) }.thenReturn(
-                    listOf(record))
+                    listOf(record)
+                )
             }
 
             assertThat(underTest()).isTrue()

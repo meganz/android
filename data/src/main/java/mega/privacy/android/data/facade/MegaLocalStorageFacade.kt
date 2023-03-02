@@ -102,9 +102,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setCameraSyncFileUpload(uploadOption: Int) =
         dbHandler.setCamSyncFileUpload(uploadOption)
 
-    override suspend fun getVideoQuality(): String =
-        dbHandler.preferences?.uploadVideoQuality ?: VideoQuality.ORIGINAL.value.toString()
-
     override suspend fun deleteAllSyncRecords(syncRecordType: Int) =
         dbHandler.deleteAllSyncRecords(syncRecordType)
 
@@ -198,8 +195,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setLocationTagsEnabled(enable: Boolean) =
         dbHandler.setRemoveGPS(!enable)
 
-    override suspend fun getUploadVideoQuality(): String? =
-        dbHandler.preferences?.uploadVideoQuality
+    override suspend fun getUploadVideoQuality(): String =
+        dbHandler.preferences?.uploadVideoQuality ?: VideoQuality.ORIGINAL.value.toString()
 
     override suspend fun getKeepFileNames(): Boolean =
         dbHandler.preferences?.keepFileNames.toBoolean()
