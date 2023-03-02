@@ -462,6 +462,11 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
+    override suspend fun getFileUrlByNodeHandle(handle: Long): String? =
+        megaApi.getMegaNodeByHandle(handle)?.let { node ->
+            megaApi.httpServerGetLocalLink(node)
+        }
+
     private fun filterByNodeName(isAudio: Boolean, name: String): Boolean =
         MimeTypeList.typeForName(name).let { mimeType ->
             if (isAudio) {

@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery
 
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -34,6 +37,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -45,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -62,10 +67,15 @@ import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
+import mega.privacy.android.app.utils.Constants.BUFFER_COMP
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -357,10 +367,62 @@ class MediaDiscoveryFragment : Fragment() {
 
     private fun onClick(photo: Photo) {
         if (mediaDiscoveryViewModel.state.value.selectedPhotoIds.isEmpty()) {
-            openPhoto(photo)
+            if (photo is Photo.Video) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    launchVideoScreen(photo)
+                }
+            } else {
+                openPhoto(photo)
+            }
         } else if (actionMode != null) {
             mediaDiscoveryViewModel.togglePhotoSelection(photo.id)
         }
+    }
+
+    /**
+     * Launch video player
+     *
+     * @param photo Photo item
+     */
+    private suspend fun launchVideoScreen(photo: Photo) {
+        val nodeHandle = photo.id
+        val nodeName = photo.name
+        val intent = Util.getMediaIntent(requireActivity(), nodeName).apply {
+            putExtra(Constants.INTENT_EXTRA_KEY_POSITION, 0)
+            putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
+            putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
+            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_MEDIA_DISCOVERY)
+            putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+                mediaDiscoveryViewModel.getNodeParentHandle(nodeHandle))
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+        startActivity(
+            mediaDiscoveryViewModel.isLocalFile(nodeHandle)?.let { localPath ->
+                File(localPath).let { mediaFile ->
+                    kotlin.runCatching {
+                        FileProvider.getUriForFile(requireActivity(),
+                            AUTHORITY_STRING_FILE_PROVIDER,
+                            mediaFile)
+                    }.onFailure {
+                        Uri.fromFile(mediaFile)
+                    }.map { mediaFileUri ->
+                        intent.setDataAndType(mediaFileUri, MimeTypeList.typeForName(nodeName).type)
+                        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    }
+                }
+                intent
+            } ?: let {
+                val memoryInfo = ActivityManager.MemoryInfo()
+                (requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)
+                    .getMemoryInfo(memoryInfo)
+                mediaDiscoveryViewModel.updateIntent(
+                    handle = nodeHandle,
+                    name = nodeName,
+                    isNeedsMoreBufferSize = memoryInfo.totalMem > BUFFER_COMP,
+                    intent = intent,
+                )
+            }
+        )
     }
 
     private fun onLongPress(photo: Photo) {

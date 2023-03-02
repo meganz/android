@@ -49,6 +49,8 @@ import mega.privacy.android.app.utils.Constants.FILE_BROWSER_ADAPTER
 import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
 import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.FROM_IMAGE_VIEWER
+import mega.privacy.android.app.utils.Constants.FROM_MEDIA_DISCOVERY
 import mega.privacy.android.app.utils.Constants.INBOX_ADAPTER
 import mega.privacy.android.app.utils.Constants.INCOMING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -384,6 +386,8 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     INCOMING_SHARES_ADAPTER,
                     OUTGOING_SHARES_ADAPTER,
                     CONTACT_FILE_ADAPTER,
+                    FROM_MEDIA_DISCOVERY,
+                    FROM_IMAGE_VIEWER,
                     -> {
                         val parentHandle = intent.getLongExtra(
                             INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,

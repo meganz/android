@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.photos.mediadiscovery
 
+import android.content.Intent
+import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +12,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MimeTypeList.Companion.typeForName
+import mega.privacy.android.app.domain.usecase.GetFingerprint
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment.Companion.INTENT_KEY_CURRENT_FOLDER_ID
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
@@ -23,14 +28,23 @@ import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER
+import mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB
+import mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB
+import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.GetPhotosByFolderId
+import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandle
+import mega.privacy.android.domain.usecase.MegaApiHttpServerIsRunning
+import mega.privacy.android.domain.usecase.MegaApiHttpServerSetMaxBufferSize
+import mega.privacy.android.domain.usecase.MegaApiHttpServerStart
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import org.jetbrains.anko.collections.forEachWithIndex
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -42,6 +56,12 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val setCameraSortOrder: SetCameraSortOrder,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
+    private val getNodeByHandle: GetNodeByHandle,
+    private val getFingerprint: GetFingerprint,
+    private val httpServerIsRunning: MegaApiHttpServerIsRunning,
+    private val httpServerStart: MegaApiHttpServerStart,
+    private val httpServerSetMaxBufferSize: MegaApiHttpServerSetMaxBufferSize,
+    private val getFileUrlByNodeHandle: GetFileUrlByNodeHandle,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MediaDiscoveryViewState())
@@ -247,4 +267,71 @@ class MediaDiscoveryViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Get node parent handle
+     *
+     * @param handle node handle
+     * @return parent handle
+     */
+    suspend fun getNodeParentHandle(handle: Long): Long? =
+        getNodeByHandle(handle)?.parentHandle
+
+    /**
+     * Update intent
+     *
+     * @param handle node handle
+     * @param name node name
+     * @param isNeedsMoreBufferSize true is that sets 32MB, otherwise is false
+     * @param intent Intent
+     * @return updated intent
+     */
+    suspend fun updateIntent(
+        handle: Long,
+        name: String,
+        isNeedsMoreBufferSize: Boolean,
+        intent: Intent,
+    ): Intent {
+        if (httpServerIsRunning() == 0) {
+            httpServerStart()
+            intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
+        }
+
+        httpServerSetMaxBufferSize(
+            if (isNeedsMoreBufferSize) {
+                MAX_BUFFER_32MB
+            } else {
+                MAX_BUFFER_16MB
+            }
+        )
+
+        getFileUrlByNodeHandle(handle)?.let { url ->
+            Uri.parse(url)?.let { uri ->
+                intent.setDataAndType(uri, typeForName(name).type)
+            }
+        }
+        return intent
+    }
+
+    /**
+     * Detect the node whether is local file
+     *
+     * @param handle node handle
+     * @return true is local file, otherwise is false
+     */
+    suspend fun isLocalFile(
+        handle: Long,
+    ): String? =
+        getNodeByHandle(handle)?.let { node ->
+            val localPath = FileUtil.getLocalFile(node)
+            File(FileUtil.getDownloadLocation(), node.name).let { file ->
+                if (localPath != null && ((FileUtil.isFileAvailable(file) && file.length() == node.size)
+                            || (node.fingerprint == getFingerprint(localPath)))
+                ) {
+                    localPath
+                } else {
+                    null
+                }
+            }
+        }
 }

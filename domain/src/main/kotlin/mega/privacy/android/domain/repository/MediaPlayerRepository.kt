@@ -338,4 +338,12 @@ interface MediaPlayerRepository {
      * @return Flow<Map<Long, PlaybackInformation>?>
      */
     fun monitorPlaybackTimes(): Flow<Map<Long, PlaybackInformation>?>
+
+    /**
+     * Get file url by node handle
+     *
+     * @param handle node handle
+     * @return local link
+     */
+    suspend fun getFileUrlByNodeHandle(handle: Long): String?
 }

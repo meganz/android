@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
-import androidx.core.content.ContextCompat
 import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
@@ -69,7 +68,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
@@ -394,7 +392,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
                 binding.toolbar.updatePadding(0, insets.top, 0, 0)
-                binding.imagesNavHostFragment.updatePadding(insets.left, 0, insets.right, insets.bottom)
+                binding.imagesNavHostFragment.updatePadding(insets.left,
+                    0,
+                    insets.right,
+                    insets.bottom)
                 WindowInsetsCompat.CONSUMED
             }
         }
@@ -631,6 +632,8 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
+            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+                megaApi.getNodeByHandle(nodeHandle).parentHandle)
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 

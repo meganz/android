@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.GetVideosByParentHandleFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandle
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStart
@@ -364,5 +365,12 @@ abstract class MediaPlayerUseCases {
         @Provides
         fun provideMegaApiHttpServerStart(mediaPlayerRepository: MediaPlayerRepository): MegaApiHttpServerStart =
             MegaApiHttpServerStart(mediaPlayerRepository::megaApiHttpServerStart)
+
+        /**
+         * Provide implementation for [GetFileUrlByNodeHandle]
+         */
+        @Provides
+        fun provideHttpServerGetLocalLink(mediaPlayerRepository: MediaPlayerRepository): GetFileUrlByNodeHandle =
+            GetFileUrlByNodeHandle(mediaPlayerRepository::getFileUrlByNodeHandle)
     }
 }
