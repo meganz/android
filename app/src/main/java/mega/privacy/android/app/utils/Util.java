@@ -740,35 +740,6 @@ public class Util {
         }
     }
 
-    public static BitSet convertToBitSet(long value) {
-        BitSet bits = new BitSet();
-        int index = 0;
-        while (value != 0L) {
-            if (value % 2L != 0) {
-                bits.set(index);
-            }
-            ++index;
-            value = value >>> 1;
-        }
-        return bits;
-    }
-
-    /**
-     * Method to check if a payment method is available.
-     *
-     * @param paymentBitSet Bit set of payment methods.
-     * @param paymentMethod Payment method bit position to check (e.g. MegaApiAndroid.PAYMENT_METHOD_GOOGLE_WALLET)
-     * @return TRUE if the payment method is available or FALSE otherwise.
-     * @see nz.mega.sdk.MegaApiJava
-     */
-    public static boolean isPaymentMethodAvailable(BitSet paymentBitSet, int paymentMethod) {
-        if (paymentBitSet == null) {
-            return false;
-        }
-
-        return paymentBitSet.get(paymentMethod);
-    }
-
     public static int scaleHeightPx(int px, DisplayMetrics metrics) {
         int myHeightPx = metrics.heightPixels;
 
