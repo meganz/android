@@ -10,6 +10,8 @@ import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
@@ -750,12 +752,14 @@ class PhotosFragment : Fragment() {
 
     fun openAlbum(album: UIAlbum, resetMessage: Boolean = true) {
         resetAlbumContentState(album = album, resetMessage = resetMessage)
-        activity?.lifecycleScope?.launch {
-            managerActivity.skipToAlbumContentFragment(
-                AlbumDynamicContentFragment.getInstance(
-                    doesAccountHavePhotos()
+        viewLifecycleOwner.lifecycleScope.launch {
+            Handler(Looper.getMainLooper()).post {
+                managerActivity.skipToAlbumContentFragment(
+                    AlbumDynamicContentFragment.getInstance(
+                        doesAccountHavePhotos()
+                    )
                 )
-            )
+            }
         }
     }
 
