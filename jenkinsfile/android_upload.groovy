@@ -523,14 +523,8 @@ pipeline {
                         // data coverage
                         sh "./gradlew data:testGmsDebugUnitTestCoverage"
 
-                        // temporarily disable the failed test cases
-                        sh "rm -frv ${WORKSPACE}/app/src/testDebug"
-
                         // run coverage for app module
                         sh "./gradlew app:createUnitTestCoverageReport"
-
-                        // restore failed test cases
-                        sh "git checkout -- app/src/testDebug"
 
                         APP_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/app/build/test-results/testGmsDebugUnitTest")
                         DOMAIN_UNIT_TEST_SUMMARY = unitTestSummary("${WORKSPACE}/domain/build/test-results/test")

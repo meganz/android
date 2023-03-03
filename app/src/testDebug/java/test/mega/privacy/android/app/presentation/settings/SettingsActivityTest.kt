@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.SettingsActivity
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -26,6 +27,7 @@ import test.mega.privacy.android.app.di.TestSettingsAdvancedUseCases
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
+@Ignore("Ignore the unstable test. Will add the tests back once stability issue is resolved.")
 class SettingsActivityTest{
 
     var hiltRule = HiltAndroidRule(this)

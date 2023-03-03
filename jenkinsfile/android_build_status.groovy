@@ -328,14 +328,8 @@ pipeline {
                         DATA_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/data/build/reports/jacoco/testGmsDebugUnitTestCoverage/testGmsDebugUnitTestCoverage.csv")}"
                         println("DATA_COVERAGE = ${DATA_COVERAGE}")
 
-                        // temporarily disable the failed test cases
-                        sh "rm -frv ${WORKSPACE}/app/src/testDebug"
-
                         // run coverage for app module
                         sh "./gradlew app:createUnitTestCoverageReport"
-
-                        // restore failed test cases
-                        sh "git checkout -- app/src/testDebug"
 
                         APP_COVERAGE = "${getTestCoverageSummary("$WORKSPACE/app/build/reports/jacoco/gmsDebugUnitTestCoverage.csv")}"
                         println("APP_COVERAGE = ${APP_COVERAGE}")

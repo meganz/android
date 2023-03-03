@@ -53,6 +53,7 @@ import test.mega.privacy.android.app.launchFragmentInHiltContainer
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
+@Ignore("Ignore the unstable test. Will add the tests back once stability issue is resolved.")
 class SettingsFragmentTest {
 
     @get:Rule(order = 0)

@@ -31,6 +31,7 @@ import org.hamcrest.Matcher
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,6 +49,7 @@ import test.mega.privacy.android.app.testFragment
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
+@Ignore("Ignore the unstable test. Will add the tests back once stability issue is resolved.")
 class FavouritesFragmentTest {
     @get: Rule
     val hiltRule = HiltAndroidRule(this)
