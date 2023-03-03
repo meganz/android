@@ -219,9 +219,13 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     }
 
     fun selectPhoto(photo: Photo) {
-        _state.update {
-            val selectedPhotoIds = it.selectedPhotoIds + photo.id
-            it.copy(selectedPhotoIds = selectedPhotoIds)
+        synchronized(Unit) {
+            if (_state.value.selectedPhotoIds.size < MAX_SELECTION_NUM) {
+                _state.update {
+                    val selectedPhotoIds = it.selectedPhotoIds + photo.id
+                    it.copy(selectedPhotoIds = selectedPhotoIds)
+                }
+            }
         }
     }
 
@@ -251,5 +255,10 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
                 photoIds = photoIds.map { NodeId(it) },
             )
         }
+    }
+
+    companion object {
+        /** Max selection number **/
+        const val MAX_SELECTION_NUM = 150
     }
 }

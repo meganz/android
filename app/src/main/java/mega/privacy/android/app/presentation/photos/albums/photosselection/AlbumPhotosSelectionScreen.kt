@@ -44,6 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionViewModel.Companion.MAX_SELECTION_NUM
 import mega.privacy.android.app.presentation.photos.model.UIPhoto
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
@@ -63,7 +64,6 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 
-private const val MAX_SELECTION_NUM = 150
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -310,7 +310,7 @@ private fun AlbumPhotosSelectionContent(
         onLongPress = onPhotoSelection,
         selectedPhotoIds = selectedPhotoIds,
         uiPhotoList = uiPhotos,
-        isBlurUnselectItem = selectedPhotoIds.size == MAX_SELECTION_NUM
+        isBlurUnselectItem = selectedPhotoIds.size >= MAX_SELECTION_NUM
     )
 }
 
