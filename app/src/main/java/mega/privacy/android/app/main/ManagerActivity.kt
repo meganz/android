@@ -2363,6 +2363,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     bundle.putStringArrayList("nodeNames", outgoingFolderNames)
                     dialog.arguments = bundle
                     dialog.show(supportFragmentManager, SecurityUpgradeDialogFragment.TAG)
+
+                    viewModel.setShouldAlertUserAboutSecurityUpgrade(false);
                 }
             }
             updateInboxSectionVisibility(managerState.hasInboxChildren)

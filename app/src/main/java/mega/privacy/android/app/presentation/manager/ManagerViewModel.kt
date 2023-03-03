@@ -482,9 +482,7 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             updateGlobalEvents.collect { megaEvent ->
                 if (megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
-                    _state.update {
-                        it.copy(shouldAlertUserAboutSecurityUpgrade = true)
-                    }
+                    setShouldAlertUserAboutSecurityUpgrade(true)
                 }
             }
         }
@@ -496,6 +494,17 @@ class ManagerViewModel @Inject constructor(
     fun setTargetPath(path: Long) {
         viewModelScope.launch {
             setLatestTargetPath(path)
+        }
+    }
+
+    /**
+     * Set the security upgrade alert state
+     *
+     * @param shouldShow true if the security upgrade alert needs to be shown
+     */
+    fun setShouldAlertUserAboutSecurityUpgrade(shouldShow: Boolean) {
+        _state.update {
+            it.copy(shouldAlertUserAboutSecurityUpgrade = shouldShow)
         }
     }
 
