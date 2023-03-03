@@ -43,6 +43,6 @@ data class PushMessage(
          * Key defining silent.
          */
         const val KEY_SILENT = "silent"
-        private const val NO_BEEP = "1"
+        private const val NO_BEEP = "0"
     }
 }

@@ -138,6 +138,8 @@ public final class ChatAdvancedNotificationBuilder {
 
     private ChatController chatC;
 
+    private static long latestNotificationTimestamp = 0;
+
     public static ChatAdvancedNotificationBuilder newInstance(Context context) {
         Context appContext = context.getApplicationContext();
         Context safeContext = ContextCompat.createDeviceProtectedStorageContext(appContext);
@@ -261,6 +263,8 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (uriParameter != null) {
             notificationBuilder.setSound(uriParameter);
+        } else {
+            notificationBuilder.setSilent(true);
         }
 
         if (STRING_TRUE.equals(vibration)) {
@@ -495,9 +499,6 @@ public final class ChatAdvancedNotificationBuilder {
                     .setContentIntent(pendingIntent);
         }
 
-        //Set when on notification
-        int size = (int) unreadMessageList.size();
-
         MegaChatMessage lastMsg = unreadMessageList.get(0);
 
         if (lastMsg != null) {
@@ -511,17 +512,19 @@ public final class ChatAdvancedNotificationBuilder {
 
         setSilentNotificationIfUpdatingUserName(uriParameter, vibration);
 
-        if (uriParameter != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (uriParameter != null) {
                 notificationBuilderO.setSound(uriParameter);
             } else {
-                notificationBuilder.setSound(uriParameter);
+                notificationBuilderO.setSilent(true);
             }
-        }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationBuilderO.setChannelId(STRING_TRUE.equals(vibration) ? notificationChannelIdChatSummaryV2 : notificationChannelIdChatSummaryNoVibrate);
         } else {
+            if (uriParameter != null) {
+                notificationBuilder.setSound(uriParameter);
+            }
+
             if (STRING_TRUE.equals(vibration)) {
                 notificationBuilder.setVibrate(new long[]{0, 500});
             }
@@ -630,7 +633,8 @@ public final class ChatAdvancedNotificationBuilder {
                         .setGroupSummary(true)
                         .setAutoCancel(true)
                         .setContentIntent(pendingIntent)
-                        .setVibrate(null);
+                        .setVibrate(null)
+                        .setSilent(true);
 
                 return notificationBuilderO.build();
             } else {
@@ -673,7 +677,8 @@ public final class ChatAdvancedNotificationBuilder {
                     .setGroup(groupKey)
                     .setGroupSummary(true)
                     .setAutoCancel(true)
-                    .setContentIntent(pendingIntent);
+                    .setContentIntent(pendingIntent)
+                    .setSilent(!beep);
 
             return notificationBuilder.build();
         }
@@ -1155,6 +1160,13 @@ public final class ChatAdvancedNotificationBuilder {
         boolean beep = request.getFlag();
         Timber.d("Should beep: %s", beep);
 
+        // Workaround to avoid incoming message notification flood when multiple are pending
+        if (System.currentTimeMillis() - latestNotificationTimestamp < 2000) {
+            Timber.d("Many notifications in a short time. Silent notification");
+            beep = false;
+        }
+        latestNotificationTimestamp = System.currentTimeMillis();
+
         List<Long> chatHandleList = request.getHandleList();
         if (chatHandleList == null) {
             return;
@@ -1210,6 +1222,13 @@ public final class ChatAdvancedNotificationBuilder {
 
         boolean beep = request.getFlag();
         Timber.d("Should beep: %s", beep);
+
+        // Workaround to avoid incoming message notification flood when multiple are pending
+        if (System.currentTimeMillis() - latestNotificationTimestamp < 2000) {
+            Timber.d("Many notifications in a short time. Silent notification");
+            beep = false;
+        }
+        latestNotificationTimestamp = System.currentTimeMillis();
 
         List<Long> chatHandleList = request.getHandleList();
         if (chatHandleList == null) {
