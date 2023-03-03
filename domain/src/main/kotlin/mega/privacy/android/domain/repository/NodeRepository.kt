@@ -123,7 +123,7 @@ interface NodeRepository {
     suspend fun getOfflineNodeInformation(nodeHandle: Long): OfflineNodeInformation?
 
     /**
-     * Get the [UserId] of the owner of this [FolderNode] if it's a inShare folder
+     * Get the [UserId] of the owner of the node with [nodeId] if it's a inShare node
      * @param nodeId [NodeId]
      * @param recursive  if true it checks the root of the node with [nodeId],
      * if false it only returns the owner if this [nodeId] represents the root of an in share folder node,

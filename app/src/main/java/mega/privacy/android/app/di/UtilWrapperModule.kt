@@ -10,6 +10,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
+import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
+import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.AvatarUtil
@@ -49,6 +51,9 @@ abstract class UtilWrapperModule {
 
     @Binds
     abstract fun bindPermissionUtilWrapper(implementation: PermissionUtilWrapperImpl): PermissionUtilWrapper
+
+    @Binds
+    abstract fun bindGetNodeLocation(implementation: DefaultGetNodeLocationInfo): GetNodeLocationInfo
 
     companion object {
 

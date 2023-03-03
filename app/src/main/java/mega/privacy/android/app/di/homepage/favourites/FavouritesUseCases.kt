@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
+import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.usecase.DefaultGetAllFavorites
 import mega.privacy.android.domain.usecase.DefaultGetFavouriteFolderInfo
@@ -24,7 +25,7 @@ import mega.privacy.android.domain.usecase.RemoveFavourites
  * Provide implementation for use cases that are regarding favourites feature.
  */
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class, ViewModelComponent::class)
 abstract class FavouritesUseCases {
 
     /**
