@@ -3,14 +3,10 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 
 /**
@@ -31,23 +27,6 @@ interface ChatRepository {
      * @return [ChatRoom] containing the updated data.
      */
     suspend fun getChatRoom(chatId: Long): ChatRoom?
-
-    /**
-     * Get a scheduled meeting given a chatId and a scheduled meeting id
-     *
-     * @param chatId  MegaChatHandle that identifies a chat room
-     * @param scheduledMeetingId MegaChatHandle that identifies a scheduled meeting
-     * @return The scheduled meeting.
-     */
-    suspend fun getScheduledMeeting(chatId: Long, scheduledMeetingId: Long): ChatScheduledMeeting?
-
-    /**
-     * Get a list of all scheduled meeting for a chatroom
-     *
-     * @param chatId MegaChatHandle that identifies a chat room
-     * @return List of scheduled meeting.
-     */
-    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
 
     /**
      * Update open invite setting.
@@ -86,45 +65,6 @@ interface ChatRepository {
      * @return [CombinedChatRoom] containing the updated data.
      */
     suspend fun getCombinedChatRoom(chatId: Long): CombinedChatRoom?
-
-    /**
-     * Get all scheduled meetings
-     *
-     * @return List of scheduled meetings
-     */
-    suspend fun getAllScheduledMeetings(): List<ChatScheduledMeeting>?
-
-    /**
-     * Get a list of all scheduled meeting occurrences for a chatroom
-     *
-     * @param chatId  MegaChatHandle that identifies a chat room
-     * @param count   Number of occurrences to retrieve
-     * @return The list of scheduled meetings occurrences.
-     */
-    suspend fun fetchScheduledMeetingOccurrencesByChat(
-        chatId: Long,
-        count: Int = 20,
-    ): List<ChatScheduledMeetingOccurr>
-
-    /**
-     * Get a list of all scheduled meeting occurrences for a chatroom
-     *
-     * @param chatId    MegaChatHandle that identifies a chat room
-     * @param since     Timestamp from which API will generate more occurrences
-     * @return The list of scheduled meetings occurrences.
-     */
-    suspend fun fetchScheduledMeetingOccurrencesByChat(
-        chatId: Long,
-        since: Long,
-    ): List<ChatScheduledMeetingOccurr>
-
-    /**
-     * Get next available scheduled meeting occurrence given the current time
-     *
-     * @param chatId    MegaChatHandle that identifies a chat room
-     * @return          ChatScheduledMeetingOccurr
-     */
-    suspend fun getNextScheduledMeetingOccurrence(chatId: Long): ChatScheduledMeetingOccurr?
 
     /**
      * Invite contacts to chat.
@@ -220,35 +160,14 @@ interface ChatRepository {
      * @param chatId    Chat Id.
      * @return          A flow of [ChatRoom]
      */
-    suspend fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
-
-    /**
-     * Monitor updates on scheduled meetings
-     *
-     * @return          A flow of [ChatScheduledMeeting]
-     */
-    suspend fun monitorScheduledMeetingUpdates(): Flow<ChatScheduledMeeting>
-
-    /**
-     * Monitor updates on scheduled meeting occurrences
-     *
-     * @return          A flow of ResultOccurrenceUpdate
-     */
-    suspend fun monitorScheduledMeetingOccurrencesUpdates(): Flow<ResultOccurrenceUpdate>
+    fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom>
 
     /**
      * Monitor updates on chat list item.
      *
      * @return A flow of [ChatListItem].
      */
-    suspend fun monitorChatListItemUpdates(): Flow<ChatListItem>
-
-    /**
-     * Monitor chat call updates
-     *
-     * @return A flow of [ChatCall]
-     */
-    suspend fun monitorChatCallUpdates(): Flow<ChatCall>
+    fun monitorChatListItemUpdates(): Flow<ChatListItem>
 
     /**
      * Returns whether notifications about a chat have to be generated.

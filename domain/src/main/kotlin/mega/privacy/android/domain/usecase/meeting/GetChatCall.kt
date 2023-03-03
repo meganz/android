@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.meeting
 
 import mega.privacy.android.domain.entity.chat.ChatCall
 

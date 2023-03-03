@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.Event
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.repository.ChatRepository
+import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser
@@ -34,7 +34,7 @@ internal class DefaultNotificationsRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
     private val userAlertsMapper: UserAlertMapper,
     private val eventMapper: EventMapper,
-    private val chatRepository: ChatRepository,
+    private val callRepository: CallRepository,
     private val localStorageGateway: MegaLocalStorageGateway,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : NotificationsRepository {
@@ -63,11 +63,13 @@ internal class DefaultNotificationsRepository @Inject constructor(
 
     override suspend fun getUserAlerts() = withContext(dispatcher) {
         megaApiGateway.getUserAlerts().map {
-            userAlertsMapper(it,
+            userAlertsMapper(
+                it,
                 ::provideContact,
                 ::provideScheduledMeeting,
                 ::provideSchedMeetingOccurrences,
-                megaApiGateway::getMegaNodeByHandle)
+                megaApiGateway::getMegaNodeByHandle
+            )
         }
     }
 
@@ -114,14 +116,14 @@ internal class DefaultNotificationsRepository @Inject constructor(
         chatId: Long,
         schedId: Long,
     ): ChatScheduledMeeting? = withContext(dispatcher) {
-        runCatching { chatRepository.getScheduledMeeting(chatId, schedId) }.getOrNull()
+        runCatching { callRepository.getScheduledMeeting(chatId, schedId) }.getOrNull()
     }
 
     private suspend fun provideSchedMeetingOccurrences(
         chatId: Long,
     ): List<ChatScheduledMeetingOccurr>? = withContext(dispatcher) {
         runCatching {
-            chatRepository.fetchScheduledMeetingOccurrencesByChat(chatId, 20)
+            callRepository.fetchScheduledMeetingOccurrencesByChat(chatId, 20)
         }.getOrNull()
     }
 

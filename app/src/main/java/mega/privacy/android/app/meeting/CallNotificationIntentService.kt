@@ -32,7 +32,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import java.lang.IllegalArgumentException
 
 /**
@@ -257,8 +257,10 @@ class CallNotificationIntentService : Service(),
             runCatching {
                 answerChatCall(chatId, false, enableAudio)
             }.onFailure { exception ->
-                Util.showSnackbar(app?.applicationContext,
-                    StringResourcesUtils.getString(R.string.call_error))
+                Util.showSnackbar(
+                    app?.applicationContext,
+                    StringResourcesUtils.getString(R.string.call_error)
+                )
                 Timber.e(exception)
                 coroutineScope?.cancel()
 
@@ -266,10 +268,12 @@ class CallNotificationIntentService : Service(),
                 val resultChatId = resultAnswerCall.chatHandle
                 if (resultChatId != null) {
                     Timber.d("Incoming call answered")
-                    openMeetingInProgress(this@CallNotificationIntentService,
+                    openMeetingInProgress(
+                        this@CallNotificationIntentService,
                         chatIdIncomingCall,
                         true,
-                        passcodeManagement)
+                        passcodeManagement
+                    )
                     clearIncomingCallNotification(callIdIncomingCall)
                     stopSelf()
                 }

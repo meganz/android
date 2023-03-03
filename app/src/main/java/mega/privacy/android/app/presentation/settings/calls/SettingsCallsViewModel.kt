@@ -12,8 +12,8 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.settings.calls.model.SettingsCallsState
 import mega.privacy.android.domain.entity.CallsSoundNotifications
-import mega.privacy.android.domain.usecase.GetCallsSoundNotifications
-import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 import javax.inject.Inject
 
 /**
@@ -26,8 +26,13 @@ class SettingsCallsViewModel @Inject constructor(
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingsCallsState())
-    val uiState: StateFlow<SettingsCallsState> = _uiState
 
+    /**
+     * Get Settings Calls state
+     *
+     * @return  SettingsCallsState
+     */
+    val uiState: StateFlow<SettingsCallsState> = _uiState
 
     init {
         viewModelScope.launch(ioDispatcher) {

@@ -18,7 +18,7 @@ import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetAccountDetails
-import mega.privacy.android.domain.usecase.GetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetSupportEmail
@@ -32,7 +32,7 @@ import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
-import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled

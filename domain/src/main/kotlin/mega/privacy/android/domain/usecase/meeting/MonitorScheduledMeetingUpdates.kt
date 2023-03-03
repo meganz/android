@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.meeting
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.chat.ChatRoom
@@ -14,5 +14,5 @@ fun interface MonitorScheduledMeetingUpdates {
      *
      * @return          Flow of [ChatRoom].
      */
-    suspend operator fun invoke(): Flow<ChatScheduledMeeting>
+    operator fun invoke(): Flow<ChatScheduledMeeting>
 }

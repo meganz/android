@@ -42,7 +42,7 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.usecase.CreateChatLink
-import mega.privacy.android.domain.usecase.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
@@ -53,7 +53,7 @@ import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
@@ -664,24 +664,16 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private fun openOrStartChatCall(chatCallId: Long) {
         cameraGateway.setFrontCamera()
         viewModelScope.launch {
-            runCatching {
-                openOrStartCall(chatCallId, video = false, audio = true)
-            }.onFailure { exception ->
-                Timber.e(exception)
-                showSnackBar(R.string.general_text_error)
-            }.onSuccess { call ->
-                call?.let {
-                    Timber.d("Call started")
-                    MegaApplication.isWaitingForCall = false
-                    CallUtil.addChecksForACall(it.chatId, false)
-                    if (it.isOutgoing) {
-                        chatManagement.setRequestSentCall(call.callId, true)
-                    }
-                    passcodeManagement.showPasscodeScreen = true
-                    getInstance().openCallService(chatCallId)
-
-                    openChatCall(it.chatId)
+            openOrStartCall(chatCallId, video = false, audio = true)?.let { call ->
+                Timber.d("Call started")
+                MegaApplication.isWaitingForCall = false
+                CallUtil.addChecksForACall(call.chatId, false)
+                if (call.isOutgoing) {
+                    chatManagement.setRequestSentCall(call.callId, true)
                 }
+                passcodeManagement.showPasscodeScreen = true
+                getInstance().openCallService(chatCallId)
+                openChatCall(call.chatId)
             }
         }
     }

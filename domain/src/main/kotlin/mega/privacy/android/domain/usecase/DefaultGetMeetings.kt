@@ -14,6 +14,7 @@ import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
+import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
 import javax.inject.Inject
@@ -23,6 +24,7 @@ import javax.inject.Inject
  */
 class DefaultGetMeetings @Inject constructor(
     private val chatRepository: ChatRepository,
+    private val callRepository: CallRepository,
     private val getMeetingsRepository: GetMeetingsRepository,
     private val meetingRoomMapper: MeetingRoomMapper,
 ) : GetMeetings {
@@ -101,7 +103,7 @@ class DefaultGetMeetings @Inject constructor(
             }
 
     private suspend fun MutableList<MeetingRoomItem>.monitorChatCalls(mutex: Mutex): Flow<MutableList<MeetingRoomItem>> =
-        chatRepository.monitorChatCallUpdates()
+        callRepository.monitorChatCallUpdates()
             .filter { any { meeting -> meeting.chatId == it.chatId } }
             .map { chatCall ->
                 apply {
@@ -161,7 +163,7 @@ class DefaultGetMeetings @Inject constructor(
             }
 
     private suspend fun MutableList<MeetingRoomItem>.monitorScheduledMeetings(mutex: Mutex): Flow<MutableList<MeetingRoomItem>> =
-        chatRepository.monitorScheduledMeetingUpdates()
+        callRepository.monitorScheduledMeetingUpdates()
             .filter { any { meeting -> meeting.chatId == it.chatId } }
             .map { scheduledMeeting ->
                 apply {
@@ -197,7 +199,7 @@ class DefaultGetMeetings @Inject constructor(
             }
 
     private suspend fun MeetingRoomItem.getScheduledMeetingItem(): MeetingRoomItem? =
-        chatRepository.getScheduledMeetingsByChat(chatId)?.firstOrNull()
+        callRepository.getScheduledMeetingsByChat(chatId)?.firstOrNull()
             ?.takeIf { !it.isCanceled }
             ?.let { schedMeeting ->
                 val isPending = isActive && schedMeeting.isPending()
@@ -208,7 +210,7 @@ class DefaultGetMeetings @Inject constructor(
                 var endTimestamp = schedMeeting.endDateTime
 
                 if (isPending && schedMeeting.rules != null) {
-                    runCatching { chatRepository.getNextScheduledMeetingOccurrence(chatId) }
+                    runCatching { callRepository.getNextScheduledMeetingOccurrence(chatId) }
                         .getOrNull()?.let { nextOccurrence ->
                             startTimestamp = nextOccurrence.startDateTime
                             endTimestamp = nextOccurrence.endDateTime

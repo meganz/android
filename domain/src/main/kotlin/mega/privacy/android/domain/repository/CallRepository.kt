@@ -3,6 +3,9 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
+import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 
 /**
  * The repository interface regarding Chat calls.
@@ -63,9 +66,79 @@ interface CallRepository {
     ): ChatRequest
 
     /**
+     * Get all scheduled meetings
+     *
+     * @return List of scheduled meetings
+     */
+    suspend fun getAllScheduledMeetings(): List<ChatScheduledMeeting>?
+
+    /**
+     * Get a scheduled meeting given a chatId and a scheduled meeting id
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param scheduledMeetingId MegaChatHandle that identifies a scheduled meeting
+     * @return The scheduled meeting.
+     */
+    suspend fun getScheduledMeeting(chatId: Long, scheduledMeetingId: Long): ChatScheduledMeeting?
+
+    /**
+     * Get a list of all scheduled meeting for a chatroom
+     *
+     * @param chatId MegaChatHandle that identifies a chat room
+     * @return List of scheduled meeting.
+     */
+    suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>?
+
+    /**
+     * Get a list of all scheduled meeting occurrences for a chatroom
+     *
+     * @param chatId  MegaChatHandle that identifies a chat room
+     * @param count   Number of occurrences to retrieve
+     * @return The list of scheduled meetings occurrences.
+     */
+    suspend fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        count: Int = 20,
+    ): List<ChatScheduledMeetingOccurr>
+
+    /**
+     * Get a list of all scheduled meeting occurrences for a chatroom
+     *
+     * @param chatId    MegaChatHandle that identifies a chat room
+     * @param since     Timestamp from which API will generate more occurrences
+     * @return The list of scheduled meetings occurrences.
+     */
+    suspend fun fetchScheduledMeetingOccurrencesByChat(
+        chatId: Long,
+        since: Long,
+    ): List<ChatScheduledMeetingOccurr>
+
+    /**
+     * Get next available scheduled meeting occurrence given the current time
+     *
+     * @param chatId    MegaChatHandle that identifies a chat room
+     * @return          ChatScheduledMeetingOccurr
+     */
+    suspend fun getNextScheduledMeetingOccurrence(chatId: Long): ChatScheduledMeetingOccurr?
+
+    /**
      * Monitor chat call updates
      *
      * @return A flow of [ChatCall]
      */
     fun monitorChatCallUpdates(): Flow<ChatCall>
+
+    /**
+     * Monitor updates on scheduled meetings
+     *
+     * @return          A flow of [ChatScheduledMeeting]
+     */
+    fun monitorScheduledMeetingUpdates(): Flow<ChatScheduledMeeting>
+
+    /**
+     * Monitor updates on scheduled meeting occurrences
+     *
+     * @return          A flow of ResultOccurrenceUpdate
+     */
+    fun monitorScheduledMeetingOccurrencesUpdates(): Flow<ResultOccurrenceUpdate>
 }

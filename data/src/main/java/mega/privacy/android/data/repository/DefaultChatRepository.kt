@@ -20,29 +20,22 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
-import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
-import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
-import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -56,10 +49,6 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
-import java.time.Instant
-import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
@@ -92,7 +81,6 @@ internal class DefaultChatRepository @Inject constructor(
     private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
     private val chatListItemMapper: ChatListItemMapper,
-    private val chatCallMapper: ChatCallMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val broadcastReceiverGateway: BroadcastReceiverGateway,
@@ -118,22 +106,6 @@ internal class DefaultChatRepository @Inject constructor(
     override suspend fun getChatRoom(chatId: Long): ChatRoom? =
         withContext(ioDispatcher) {
             megaChatApiGateway.getChatRoom(chatId)?.let(chatRoomMapper)
-        }
-
-    override suspend fun getScheduledMeeting(
-        chatId: Long,
-        scheduledMeetingId: Long,
-    ): ChatScheduledMeeting? =
-        withContext(ioDispatcher) {
-            megaChatApiGateway.getScheduledMeeting(chatId, scheduledMeetingId)
-                ?.let(chatScheduledMeetingMapper)
-        }
-
-    override suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>? =
-        withContext(ioDispatcher) {
-            megaChatApiGateway.getScheduledMeetingsByChat(chatId)
-                ?.filter { it.parentSchedId() == megaChatApiGateway.getChatInvalidHandle() }
-                ?.map(chatScheduledMeetingMapper)
         }
 
     override suspend fun setOpenInvite(chatId: Long): Boolean =
@@ -198,80 +170,6 @@ internal class DefaultChatRepository @Inject constructor(
             val chatRoom = megaChatApiGateway.getChatRoom(chatId) ?: return@withContext null
             val chatListItem = megaChatApiGateway.getChatListItem(chatId) ?: return@withContext null
             combinedChatRoomMapper(chatRoom, chatListItem)
-        }
-
-    override suspend fun getAllScheduledMeetings(): List<ChatScheduledMeeting>? =
-        withContext(ioDispatcher) {
-            megaChatApiGateway.getAllScheduledMeetings()?.map(chatScheduledMeetingMapper)
-        }
-
-    override suspend fun fetchScheduledMeetingOccurrencesByChat(
-        chatId: Long,
-        since: Long,
-    ): List<ChatScheduledMeetingOccurr> =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                megaChatApiGateway.fetchScheduledMeetingOccurrencesByChat(
-                    chatId,
-                    since,
-                    OptionalMegaChatRequestListenerInterface(
-                        onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
-                            if (error.errorCode == MegaChatError.ERROR_OK
-                                && (request.megaChatScheduledMeetingOccurrList?.size() ?: 0) > 0
-                            ) {
-                                val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
-                                request.megaChatScheduledMeetingOccurrList.apply {
-                                    for (i in 0 until size()) {
-                                        occurrences.add(chatScheduledMeetingOccurrMapper(at(i)))
-                                    }
-                                }
-                                continuation.resume(occurrences)
-                            } else {
-                                continuation.failWithError(error)
-                            }
-                        }
-                    )
-                )
-            }
-        }
-
-    override suspend fun fetchScheduledMeetingOccurrencesByChat(
-        chatId: Long,
-        count: Int,
-    ): List<ChatScheduledMeetingOccurr> =
-        withContext(ioDispatcher) {
-            val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
-            var lastTimeStamp = 0L
-            var fetch: Boolean
-
-            do {
-                val newOccurrences = fetchScheduledMeetingOccurrencesByChat(chatId, lastTimeStamp)
-                if (newOccurrences.isNotEmpty()) {
-                    occurrences.apply {
-                        addAll(newOccurrences)
-                        sortBy(ChatScheduledMeetingOccurr::startDateTime)
-                    }
-                    lastTimeStamp = newOccurrences.last().startDateTime!!
-                    fetch = occurrences.size < count
-                } else {
-                    fetch = false
-                }
-            } while (fetch)
-
-            occurrences.toList()
-        }
-
-    override suspend fun getNextScheduledMeetingOccurrence(chatId: Long): ChatScheduledMeetingOccurr? =
-        withContext(ioDispatcher) {
-            val now = Instant.now().atZone(ZoneOffset.UTC)
-            fetchScheduledMeetingOccurrencesByChat(
-                chatId,
-                now.minus(1L, ChronoUnit.HALF_DAYS).toEpochSecond()
-            ).firstOrNull { occurr ->
-                !occurr.isCancelled && occurr.parentSchedId == megaChatApiGateway.getChatInvalidHandle()
-                        && (occurr.startDateTime?.toZonedDateTime()?.isAfter(now) == true
-                        || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true)
-            }
         }
 
     override suspend fun inviteToChat(chatId: Long, contactsData: List<String>) =
@@ -414,41 +312,18 @@ internal class DefaultChatRepository @Inject constructor(
             }
         }
 
-    override suspend fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom> =
+    override fun monitorChatRoomUpdates(chatId: Long): Flow<ChatRoom> =
         megaChatApiGateway.getChatRoomUpdates(chatId)
             .filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
             .mapNotNull { it.chat }
             .map(chatRoomMapper)
             .flowOn(ioDispatcher)
 
-
-    override suspend fun monitorScheduledMeetingUpdates(): Flow<ChatScheduledMeeting> =
-        megaChatApiGateway.scheduledMeetingUpdates
-            .filterIsInstance<ScheduledMeetingUpdate.OnChatSchedMeetingUpdate>()
-            .mapNotNull { it.item }
-            .map(chatScheduledMeetingMapper)
-            .flowOn(ioDispatcher)
-
-
-    override suspend fun monitorScheduledMeetingOccurrencesUpdates(): Flow<ResultOccurrenceUpdate> =
-        megaChatApiGateway.scheduledMeetingUpdates
-            .filterIsInstance<ScheduledMeetingUpdate.OnSchedMeetingOccurrencesUpdate>()
-            .mapNotNull { ResultOccurrenceUpdate(it.chatId, it.append) }
-            .flowOn(ioDispatcher)
-
-
-    override suspend fun monitorChatListItemUpdates(): Flow<ChatListItem> =
+    override fun monitorChatListItemUpdates(): Flow<ChatListItem> =
         megaChatApiGateway.chatUpdates
             .filterIsInstance<ChatUpdate.OnChatListItemUpdate>()
             .mapNotNull { it.item }
             .map(chatListItemMapper)
-            .flowOn(ioDispatcher)
-
-    override suspend fun monitorChatCallUpdates(): Flow<ChatCall> =
-        megaChatApiGateway.chatCallUpdates
-            .filterIsInstance<ChatCallUpdate.OnChatCallUpdate>()
-            .mapNotNull { it.item }
-            .map { chatCallMapper(it) }
             .flowOn(ioDispatcher)
 
     override suspend fun isChatNotifiable(chatId: Long): Boolean =
@@ -540,7 +415,4 @@ internal class DefaultChatRepository @Inject constructor(
                 )
             }
         }
-
-    private fun Long.toZonedDateTime(): ZonedDateTime =
-        ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
 }

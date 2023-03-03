@@ -16,8 +16,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsViewModel
 import mega.privacy.android.domain.entity.CallsSoundNotifications
-import mega.privacy.android.domain.usecase.GetCallsSoundNotifications
-import mega.privacy.android.domain.usecase.SetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

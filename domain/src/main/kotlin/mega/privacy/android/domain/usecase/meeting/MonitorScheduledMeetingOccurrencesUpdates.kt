@@ -13,5 +13,5 @@ fun interface MonitorScheduledMeetingOccurrencesUpdates {
      *
      * @return          Flow of [ResultOccurrenceUpdate].
      */
-    suspend operator fun invoke(): Flow<ResultOccurrenceUpdate>
+    operator fun invoke(): Flow<ResultOccurrenceUpdate>
 }

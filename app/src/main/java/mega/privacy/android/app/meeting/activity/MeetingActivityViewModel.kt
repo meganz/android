@@ -54,7 +54,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
-import mega.privacy.android.domain.usecase.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import nz.mega.sdk.MegaApiJava
@@ -354,7 +354,8 @@ class MeetingActivityViewModel @Inject constructor(
                             } else {
                                 showDefaultAvatar()
                             }
-                        }))
+                        })
+                    )
                     else -> {
                         showDefaultAvatar()
                     }
@@ -716,10 +717,12 @@ class MeetingActivityViewModel @Inject constructor(
         listener: MegaChatRequestListenerInterface? = null,
     ) {
         currentChatId.value?.let {
-            meetingActivityRepository.changeParticipantPermissions(it,
+            meetingActivityRepository.changeParticipantPermissions(
+                it,
                 userHandle,
                 permission,
-                listener)
+                listener
+            )
         }
     }
 
@@ -812,7 +815,8 @@ class MeetingActivityViewModel @Inject constructor(
      * @param list MegaHandleList with the call ID
      * @return True, if the meeting is finished. False, if not.
      */
-    fun isMeetingEnded(list: List<Long>?): Boolean = list == null || list[0] == MEGACHAT_INVALID_HANDLE
+    fun isMeetingEnded(list: List<Long>?): Boolean =
+        list == null || list[0] == MEGACHAT_INVALID_HANDLE
 
     /**
      * Method to finish the [MeetingActivity]

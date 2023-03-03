@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.NormalEvent
+import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
 import nz.mega.sdk.MegaApiJava
@@ -60,7 +61,7 @@ class DefaultNotificationsRepositoryTest {
             )
         }
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
-    private val chatRepository = mock<ChatRepository>()
+    private val callRepository = mock<CallRepository>()
 
     @Before
     fun setUp() {
@@ -69,7 +70,7 @@ class DefaultNotificationsRepositoryTest {
             userAlertsMapper = userAlertsMapper,
             eventMapper = eventMapper,
             localStorageGateway = megaLocalStorageGateway,
-            chatRepository = chatRepository,
+            callRepository = callRepository,
             dispatcher = UnconfinedTestDispatcher(),
         )
     }

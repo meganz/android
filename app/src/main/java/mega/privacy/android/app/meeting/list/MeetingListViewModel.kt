@@ -166,29 +166,24 @@ class MeetingListViewModel @Inject constructor(
      * @param chatId    Chat Id.
      * @param schedId   Scheduled meeting Id.
      */
-    fun startSchedMeeting(chatId: Long, schedId: Long) {
+    fun startSchedMeeting(chatId: Long, schedId: Long) =
         viewModelScope.launch {
-            runCatching {
-                startChatCallNoRinging(
-                    chatId = chatId,
-                    schedId = schedId,
-                    enabledVideo = false,
-                    enabledAudio = false
-                )
-            }.onSuccess { result ->
-                result?.chatId?.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+            startChatCallNoRinging(
+                chatId = chatId,
+                schedId = schedId,
+                enabledVideo = false,
+                enabledAudio = true
+            )?.let { call ->
+                call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
                     ?.let { callChatId ->
-                        chatManagement.setSpeakerStatus(chatId, false)
-                        chatManagement.setRequestSentCall(callChatId, true)
+                        chatManagement.setSpeakerStatus(callChatId, false)
+                        chatManagement.setRequestSentCall(call.callId, true)
                         passcodeManagement.showPasscodeScreen = true
-                        MegaApplication.getInstance().openCallService(chatId)
+                        MegaApplication.getInstance().openCallService(callChatId)
                         state.update { it.copy(currentCallChatId = callChatId) }
                     }
-            }.onFailure { exception ->
-                Timber.e(exception)
             }
         }
-    }
 
     /**
      * Remove current chat call

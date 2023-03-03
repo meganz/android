@@ -21,7 +21,7 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.usecase.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -89,10 +89,12 @@ class ChatViewModel @Inject constructor(
     fun onCallTap(chatId: Long, video: Boolean, audio: Boolean) {
         if (chatApiGateway.getChatCall(chatId) != null) {
             Timber.d("There is a call, open it")
-            CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,
+            CallUtil.openMeetingInProgress(
+                MegaApplication.getInstance().applicationContext,
                 chatId,
                 true,
-                passcodeManagement)
+                passcodeManagement
+            )
             return
         }
 
@@ -120,10 +122,12 @@ class ChatViewModel @Inject constructor(
                         }
                     }
 
-                    CallUtil.openMeetingWithAudioOrVideo(MegaApplication.getInstance().applicationContext,
+                    CallUtil.openMeetingWithAudioOrVideo(
+                        MegaApplication.getInstance().applicationContext,
                         resultChatId,
                         audioEnable,
-                        videoEnable, passcodeManagement)
+                        videoEnable, passcodeManagement
+                    )
 
                 }
             }
@@ -200,10 +204,12 @@ class ChatViewModel @Inject constructor(
                         chatManagement.setRequestSentCall(call.callId, false)
                     }
 
-                    CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,
+                    CallUtil.openMeetingInProgress(
+                        MegaApplication.getInstance().applicationContext,
                         resultChatId,
                         true,
-                        passcodeManagement)
+                        passcodeManagement
+                    )
                 }
             }
         }
