@@ -3,15 +3,23 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiJava
+import org.junit.Before
 import org.junit.Test
 
 /**
  * SortOrder mapper test
  */
 class SortOrderMapperTest {
-    private val underTest = ::toSortOrder
+    private lateinit var underTest: SortOrderMapper
 
-    private val sortOrderMap = mapOf(MegaApiJava.ORDER_NONE to SortOrder.ORDER_NONE,
+    @Before
+    fun setUp() {
+        underTest = SortOrderMapperImpl()
+    }
+
+
+    private val sortOrderMap = mapOf(
+        MegaApiJava.ORDER_NONE to SortOrder.ORDER_NONE,
         MegaApiJava.ORDER_DEFAULT_ASC to SortOrder.ORDER_DEFAULT_ASC,
         MegaApiJava.ORDER_DEFAULT_DESC to SortOrder.ORDER_DEFAULT_DESC,
         MegaApiJava.ORDER_SIZE_ASC to SortOrder.ORDER_SIZE_ASC,
@@ -31,7 +39,8 @@ class SortOrderMapperTest {
         MegaApiJava.ORDER_LABEL_ASC to SortOrder.ORDER_LABEL_ASC,
         MegaApiJava.ORDER_LABEL_DESC to SortOrder.ORDER_LABEL_DESC,
         MegaApiJava.ORDER_FAV_ASC to SortOrder.ORDER_FAV_ASC,
-        MegaApiJava.ORDER_FAV_DESC to SortOrder.ORDER_FAV_DESC)
+        MegaApiJava.ORDER_FAV_DESC to SortOrder.ORDER_FAV_DESC
+    )
 
     @Test
     fun `test that mapper returns correct value when input is in the mapping range`() {

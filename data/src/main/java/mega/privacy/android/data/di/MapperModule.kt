@@ -57,6 +57,7 @@ import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.data.mapper.ScannedContactLinkResultMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderMapper
+import mega.privacy.android.data.mapper.SortOrderMapperImpl
 import mega.privacy.android.data.mapper.StartScreenMapper
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
@@ -145,7 +146,6 @@ import mega.privacy.android.data.mapper.toRecentActionBucket
 import mega.privacy.android.data.mapper.toRecentActionBucketList
 import mega.privacy.android.data.mapper.toScannedContactLinkResult
 import mega.privacy.android.data.mapper.toShareModel
-import mega.privacy.android.data.mapper.toSortOrder
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionOptionList
 import mega.privacy.android.data.mapper.toSubscriptionStatus
@@ -203,6 +203,11 @@ internal abstract class MapperModule {
     @Binds
     abstract fun bindCameraUploadsHandlesMapper(implementation: CameraUploadsHandlesMapperImpl): CameraUploadsHandlesMapper
 
+
+    @Binds
+    abstract fun bindSortOrderMapper(implementation: SortOrderMapperImpl): SortOrderMapper
+
+
     /**
      * Provides PasswordStrength Mapper
      */
@@ -220,6 +225,7 @@ internal abstract class MapperModule {
      */
     @Binds
     abstract fun bindHandleListMapper(implementation: HandleListMapperImpl): HandleListMapper
+
 
     companion object {
         /**
@@ -298,12 +304,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideEventMapper(): EventMapper = ::toEvent
-
-        /**
-         * Provide sort order mapper
-         */
-        @Provides
-        fun provideSortOrderMapper(): SortOrderMapper = ::toSortOrder
 
         /**
          * Provide sort order int mapper

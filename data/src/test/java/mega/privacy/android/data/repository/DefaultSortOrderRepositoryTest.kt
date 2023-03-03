@@ -43,6 +43,8 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get camera sort order invokes get camera sort order of gateway`() = runTest {
+        val order = MegaApiJava.ORDER_DEFAULT_ASC
+        whenever(megaLocalStorageGateway.getCameraSortOrder()).thenReturn(order)
         underTest.getCameraSortOrder()
         verify(megaLocalStorageGateway).getCameraSortOrder()
     }
@@ -65,6 +67,8 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get cloud sort order invokes get cloud sort order of gateway`() = runTest {
+        val order = MegaApiJava.ORDER_DEFAULT_DESC
+        whenever(megaLocalStorageGateway.getCloudSortOrder()).thenReturn(order)
         underTest.getCloudSortOrder()
         verify(megaLocalStorageGateway).getCloudSortOrder()
     }
@@ -87,6 +91,8 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get links sort order invokes get links sort order of gateway`() = runTest {
+        val order = MegaApiJava.ORDER_SIZE_ASC
+        whenever(megaLocalStorageGateway.getLinksSortOrder()).thenReturn(order)
         underTest.getLinksSortOrder()
         verify(megaLocalStorageGateway).getLinksSortOrder()
     }
@@ -109,6 +115,8 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get others sort order invokes get links sort order of gateway`() = runTest {
+        val order = MegaApiJava.ORDER_SIZE_DESC
+        whenever(megaLocalStorageGateway.getOthersSortOrder()).thenReturn(order)
         underTest.getOthersSortOrder()
         verify(megaLocalStorageGateway).getOthersSortOrder()
     }
@@ -131,6 +139,8 @@ class DefaultSortOrderRepositoryTest {
 
     @Test
     fun `test that get offline sort order invokes get offline sort order of gateway`() = runTest {
+        val order = MegaApiJava.ORDER_CREATION_ASC
+        whenever(megaLocalStorageGateway.getOfflineSortOrder()).thenReturn(order)
         underTest.getOfflineSortOrder()
         verify(megaLocalStorageGateway).getOfflineSortOrder()
     }
