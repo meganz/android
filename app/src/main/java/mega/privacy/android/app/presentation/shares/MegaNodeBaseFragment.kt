@@ -17,7 +17,7 @@ import android.widget.Toast
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -84,7 +84,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     /**
      * viewModel responsible for sorting the list
      */
-    protected val sortByHeaderViewModel by activityViewModels<SortByHeaderViewModel>()
+    protected val sortByHeaderViewModel by viewModels<SortByHeaderViewModel>()
 
     /**
      * Adapter holding the list of nodes

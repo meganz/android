@@ -17,6 +17,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
@@ -33,6 +34,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -250,6 +252,14 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                     adapter?.setUnverifiedOutgoingNodeHandles(it.unVerifiedOutgoingNodeHandles)
                     updateNodes(it.nodes)
                 }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
+            val isList = state.viewType == ViewType.LIST
+            if (isList != viewModel.isList) {
+                viewModel.setIsList(isList)
+                initAdapter()
             }
         }
     }

@@ -41,6 +41,13 @@ class OutgoingSharesViewModel @Inject constructor(
     /** public UI state */
     val state: StateFlow<OutgoingSharesState> = _state
 
+    /**
+     * Serves as the original View Type.
+     * When an update from MonitorViewType is received, this value is used to determine if the View Type changed & also updated
+     */
+    var isList = true
+        private set
+
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
 
@@ -73,6 +80,13 @@ class OutgoingSharesViewModel @Inject constructor(
      */
     fun refreshOutgoingSharesNode() = viewModelScope.launch {
         refreshNodes()?.let { setNodes(it) }
+    }
+
+    /**
+     * Set isList when update from MonitorViewType is received
+     */
+    fun setIsList(value: Boolean) {
+        isList = value
     }
 
     /**

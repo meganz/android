@@ -16,6 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.main.controllers.NodeController
@@ -35,6 +36,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDow
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -258,6 +260,14 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
                     adapter?.setUnverifiedIncomingNodeHandles(it.unVerifiedIncomingNodeHandles)
                     updateNodes(it.nodes)
                 }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
+            val isList = state.viewType == ViewType.LIST
+            if (isList != viewModel.isList) {
+                viewModel.setIsList(isList)
+                initAdapter()
             }
         }
     }
