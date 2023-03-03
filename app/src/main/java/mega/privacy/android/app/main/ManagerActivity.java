@@ -2455,6 +2455,8 @@ public class ManagerActivity extends TransfersManagementActivity
                     dialog.setArguments(bundle);
                     dialog.show(getSupportFragmentManager(), SecurityUpgradeDialogFragment.TAG);
 
+                    viewModel.setShouldAlertUserAboutSecurityUpgrade(false);
+
                     return Unit.INSTANCE;
                 });
             }
