@@ -22,6 +22,7 @@ import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contact.model.ContactInfoState
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
@@ -32,6 +33,8 @@ import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.RequestLastGreen
+import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import timber.log.Timber
 import javax.inject.Inject
@@ -62,6 +65,8 @@ class ContactInfoViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val areCredentialsVerified: AreCredentialsVerified,
     private val monitorContactUpdates: MonitorContactUpdates,
+    private val getUserOnlineStatusByHandle: GetUserOnlineStatusByHandle,
+    private val requestLastGreen: RequestLastGreen,
 ) : BaseRxViewModel() {
 
     /**
@@ -156,10 +161,12 @@ class ContactInfoViewModel @Inject constructor(
             _state.update { it.copy(isCallStarted = true) }
 
             Timber.d("There is a call, open it")
-            CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,
+            CallUtil.openMeetingInProgress(
+                MegaApplication.getInstance().applicationContext,
                 chatId,
                 true,
-                passcodeManagement)
+                passcodeManagement
+            )
             return
         }
 
@@ -189,12 +196,50 @@ class ContactInfoViewModel @Inject constructor(
                         }
                     }
 
-                    CallUtil.openMeetingWithAudioOrVideo(MegaApplication.getInstance().applicationContext,
+                    CallUtil.openMeetingWithAudioOrVideo(
+                        MegaApplication.getInstance().applicationContext,
                         resultChatId,
                         audioEnable,
                         videoEnable,
-                        passcodeManagement)
+                        passcodeManagement
+                    )
                 }
+            }
+        }
+    }
+
+    /**
+     * Gets user online status by user handle
+     * Requests for lastGreen
+     *
+     * @param handle is the user handle for selected user
+     */
+    fun getUserStatusAndRequestForLastGreen(handle: Long) = viewModelScope.launch {
+        runCatching { getUserOnlineStatusByHandle(handle) }.onSuccess { status ->
+            if (status.isAwayOrOffline()) {
+                requestLastGreen(handle)
+            }
+            _state.update {
+                it.copy(userStatus = status)
+            }
+        }
+    }
+
+    /**
+     * Method updates the last green status to contact info state
+     *
+     * @param userHandle user handle of the user
+     * @param lastGreen last green status
+     */
+    fun updateLastGreen(userHandle: Long, lastGreen: Int) = viewModelScope.launch {
+        runCatching {
+            getUserOnlineStatusByHandle(userHandle = userHandle)
+        }.onSuccess { status ->
+            _state.update {
+                it.copy(
+                    lastGreen = lastGreen,
+                    userStatus = status,
+                )
             }
         }
     }

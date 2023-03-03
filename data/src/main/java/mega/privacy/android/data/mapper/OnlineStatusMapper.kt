@@ -21,5 +21,5 @@ val userStatus = mapOf(
     MegaChatApi.STATUS_AWAY to UserStatus.Away,
     MegaChatApi.STATUS_ONLINE to UserStatus.Online,
     MegaChatApi.STATUS_BUSY to UserStatus.Busy,
-    MegaChatApi.STATUS_INVALID to UserStatus.Invalid
+    MegaChatApi.STATUS_INVALID to UserStatus.Invalid,
 )

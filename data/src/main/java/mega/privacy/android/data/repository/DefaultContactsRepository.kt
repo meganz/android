@@ -35,6 +35,7 @@ import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
+import mega.privacy.android.data.mapper.userStatus
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.model.MegaContactDB
@@ -43,6 +44,7 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -722,4 +724,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
     private fun Long.toBase64Handle(): String =
         megaApiGateway.userHandleToBase64(this)
+
+    override suspend fun getUserOnlineStatusByHandle(handle: Long) =
+        userStatus[megaChatApiGateway.getUserOnlineStatus(handle)] ?: UserStatus.Invalid
 }

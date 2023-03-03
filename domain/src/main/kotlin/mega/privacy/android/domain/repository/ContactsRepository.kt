@@ -7,6 +7,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.contacts.OnlineStatus
+import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserLastGreen
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -275,4 +276,11 @@ interface ContactsRepository {
      * @param handle user handle id
      */
     suspend fun getContactEmail(handle: Long): String
+
+    /**
+     * Get contact email and save to local database
+     *
+     * @param handle user handle id
+     */
+    suspend fun getUserOnlineStatusByHandle(handle: Long): UserStatus
 }

@@ -36,3 +36,9 @@ internal fun UserStatus.iconRes(isLightTheme: Boolean): Int =
             if (isLightTheme) R.drawable.ic_offline_light
             else R.drawable.ic_offline_dark_standard
     }
+
+internal fun UserStatus.isValid() =
+    this in arrayOf(UserStatus.Online, UserStatus.Away, UserStatus.Busy, UserStatus.Offline)
+
+internal fun UserStatus.isAwayOrOffline() =
+    this in arrayOf(UserStatus.Offline, UserStatus.Away)

@@ -12,6 +12,7 @@ import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetContactData
+import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -142,5 +143,9 @@ internal abstract class ContactsModule {
         @Provides
         fun provideContactItem(contactsRepository: ContactsRepository): GetContactItem =
             GetContactItem(contactsRepository::getContactItem)
+
+        @Provides
+        fun provideGetUserOnlineStatusByHandle(contactsRepository: ContactsRepository): GetUserOnlineStatusByHandle =
+            GetUserOnlineStatusByHandle(contactsRepository::getUserOnlineStatusByHandle)
     }
 }

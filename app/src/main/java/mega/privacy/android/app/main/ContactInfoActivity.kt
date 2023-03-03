@@ -92,6 +92,10 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.contact.model.ContactInfoState
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
+import mega.privacy.android.app.presentation.extensions.iconRes
+import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
+import mega.privacy.android.app.presentation.extensions.isValid
+import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
 import mega.privacy.android.app.usecase.data.CopyRequestResult
@@ -103,7 +107,6 @@ import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager.buildAvatarFile
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
-import mega.privacy.android.app.utils.ChatUtil.StatusIconLocation
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
@@ -115,9 +118,9 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.contacts.UserStatus
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatError
@@ -976,11 +979,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         nodeSaver.saveState(outState)
     }
 
-    private fun visibilityStateIcon() {
-        val userStatus = megaChatApi.getUserOnlineStatus((user ?: return).handle)
-        if (stateToolbar == AppBarStateChangeListener.State.EXPANDED
-            && (userStatus == MegaChatApi.STATUS_ONLINE || userStatus == MegaChatApi.STATUS_AWAY || userStatus == MegaChatApi.STATUS_BUSY || userStatus == MegaChatApi.STATUS_OFFLINE)
-        ) {
+    private fun visibilityStateIcon(userStatus: UserStatus) {
+        if (stateToolbar == AppBarStateChangeListener.State.EXPANDED && userStatus.isValid()) {
             collapsingAppBar.firstLineToolbar.apply {
                 maxLines = 2
                 setTrailingIcon(contactStateIcon, contactStateIconPaddingLeft)
@@ -1026,45 +1026,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         contentContactProperties.nicknameText.text =
             getFormattedStringOrDefault(R.string.edit_nickname)
         setDefaultAvatar()
-    }
-
-    private fun setContactPresenceStatus() {
-        Timber.d("setContactPresenceStatus")
-        val userStatus = megaChatApi.getUserOnlineStatus((user ?: return).handle)
-        contactStateIcon =
-            ChatUtil.getIconResourceIdByLocation(
-                this,
-                userStatus,
-                StatusIconLocation.STANDARD
-            )
-
-        // Reset as default value.
-        if (contactStateIcon == 0) {
-            contactStateIcon =
-                if (Util.isDarkMode(this)) R.drawable.ic_offline_dark_standard else R.drawable.ic_offline_light
-        }
-        val status = when (userStatus) {
-            MegaChatApi.STATUS_ONLINE -> Pair(
-                true,
-                getFormattedStringOrDefault(R.string.online_status)
-            )
-            MegaChatApi.STATUS_AWAY -> Pair(true, getFormattedStringOrDefault(R.string.away_status))
-            MegaChatApi.STATUS_BUSY -> Pair(true, getFormattedStringOrDefault(R.string.busy_status))
-            MegaChatApi.STATUS_OFFLINE -> Pair(
-                true,
-                getFormattedStringOrDefault(R.string.offline_status)
-            )
-            MegaChatApi.STATUS_INVALID -> Pair(false, null)
-            else -> Pair(false, null)
-        }
-        collapsingAppBar.secondLineToolbar.apply {
-            if (status.first) {
-                isVisible = true
-                text = status.second
-            } else isVisible = false
-        }
-        Timber.d("The user status is ${status.second ?: "Invalid($userStatus)"}")
-        visibilityStateIcon()
     }
 
     /**
@@ -1131,7 +1092,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                             )
                         )
                         setColorFilter(isDark = false)
-                        visibilityStateIcon()
+                        visibilityStateIcon(viewModel.state.value.userStatus)
                     } else if (stateToolbar == State.COLLAPSED) {
                         firstLineToolbar.setTextColor(
                             ContextCompat.getColor(
@@ -1146,7 +1107,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                             )
                         )
                         setColorFilter(isDark = true)
-                        visibilityStateIcon()
+                        visibilityStateIcon(viewModel.state.value.userStatus)
                     }
                 }
             })
@@ -1285,17 +1246,38 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         this.collectFlow(
             viewModel.state,
             Lifecycle.State.STARTED
-        ) { (error, isCallStarted, _, _, areCredentialsVerified): ContactInfoState ->
-            if (error != null) {
+        ) { contactInfoState: ContactInfoState ->
+            if (contactInfoState.error != null) {
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
                     getFormattedStringOrDefault(R.string.call_error),
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
-            } else if (java.lang.Boolean.TRUE == isCallStarted) {
+            } else if (contactInfoState.isCallStarted == true) {
                 enableCallLayouts(true)
             }
-            updateVerifyCredentialsLayout(areCredentialsVerified)
+            updateVerifyCredentialsLayout(contactInfoState.areCredentialsVerified)
+            updateUserStatusChanges(contactInfoState)
+        }
+    }
+
+    private fun updateUserStatusChanges(contactInfoState: ContactInfoState) {
+        contactStateIcon =
+            contactInfoState.userStatus.iconRes(isLightTheme = !Util.isDarkMode(this))
+        collapsingAppBar.secondLineToolbar.apply {
+            if (contactInfoState.userStatus.isValid()) {
+                isVisible = true
+                text = getFormattedStringOrDefault(contactInfoState.userStatus.text)
+            } else isVisible = false
+        }
+        visibilityStateIcon(contactInfoState.userStatus)
+        if (contactInfoState.userStatus.isAwayOrOffline()) {
+            val formattedDate = TimeUtils.lastGreenDate(this, contactInfoState.lastGreen)
+            collapsingAppBar.secondLineToolbar.apply {
+                isVisible = true
+                text = formattedDate
+                isMarqueeIsNecessary(this@ContactInfoActivity)
+            }
         }
     }
 
@@ -1553,26 +1535,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     override fun onResume() {
         super.onResume()
         checkScreenRotationToShowCall()
-        setContactPresenceStatus()
-        requestLastGreen(-1)
-    }
-
-    private fun requestLastGreen(state: Int) {
-        var userState = state
-        Timber.d("state: $state")
-        if (userState == -1) {
-            user?.let {
-                userState = megaChatApi.getUserOnlineStatus(it.handle)
-            }
-        }
-        if (userState != MegaChatApi.STATUS_ONLINE && userState != MegaChatApi.STATUS_BUSY && userState != MegaChatApi.STATUS_INVALID) {
-            Timber.d("Request last green for user")
-            user?.let {
-                megaChatApi.requestLastGreen(it.handle, megaChatRequestListenerInterface)
-            }
+        user?.let {
+            viewModel.getUserStatusAndRequestForLastGreen(it.handle)
         }
     }
-
 
     private fun sharedFolderClicked() {
         val sharedFolderLayout =
@@ -1848,23 +1814,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-
-    private fun onChatPresenceLastGreen(userHandle: Long, lastGreen: Int) {
-        if (userHandle == user?.handle) {
-            Timber.d("Update last green")
-            val state = megaChatApi.getUserOnlineStatus(userHandle)
-            if (state != MegaChatApi.STATUS_ONLINE && state != MegaChatApi.STATUS_BUSY && state != MegaChatApi.STATUS_INVALID) {
-                val formattedDate = TimeUtils.lastGreenDate(this, lastGreen)
-                collapsingAppBar.secondLineToolbar.apply {
-                    isVisible = true
-                    text = formattedDate
-                    isMarqueeIsNecessary(this@ContactInfoActivity)
-                }
-                Timber.d("Date last green: $formattedDate")
-            }
-        }
-    }
-
     private fun enableCallLayouts(enable: Boolean) {
         contentContactProperties.apply {
             chatVideoCallLayout.isEnabled = enable
@@ -1958,9 +1907,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ next: GetChatChangesUseCase.Result? ->
                 if (next is GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
-                    val status = next.status
-                    setContactPresenceStatus()
-                    requestLastGreen(status)
+                    user?.let {
+                        viewModel.getUserStatusAndRequestForLastGreen(it.handle)
+                    }
                 }
                 if (next is GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
                     val chatId = next.chatid
@@ -1973,7 +1922,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 if (next is GetChatChangesUseCase.Result.OnChatPresenceLastGreen) {
                     val userHandle = next.userHandle
                     val lastGreen = next.lastGreen
-                    onChatPresenceLastGreen(userHandle, lastGreen)
+                    viewModel.updateLastGreen(userHandle, lastGreen)
                 }
             }) { t: Throwable? -> Timber.e(t) }
         composite.add(chatSubscription)
