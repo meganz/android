@@ -4,9 +4,11 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import java.io.File
 
 /**
  * Represents the view state of the File info screen
+ * @param title title for this screen, usually node's name
  * @param oneOffViewEvent one-off events to be consumed by the view
  * @param jobInProgressState indicates if there are any job in progress that needs to be notified
  * @param historyVersions the num of history versions that this file contains, 0 if it's not a file or doesn't contain history versions
@@ -18,6 +20,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @param incomingSharesOwnerContactItem the info of the owner of this folder in case it's a folder from in shares
  */
 data class FileInfoViewState(
+    val title: String = "",
     val oneOffViewEvent: FileInfoOneOffViewEvent? = null,
     val jobInProgressState: FileInfoJobInProgressState? = FileInfoJobInProgressState.InitialLoading,
     val historyVersions: Int = 0,
@@ -41,9 +44,7 @@ data class FileInfoViewState(
     /**
      * to get the uri to use for the preview, it gets [previewUriString] and [thumbnailUriString] as fallback
      */
-    val actualPreviewUriString = (previewUriString ?: thumbnailUriString)?.let {
-        if (it.startsWith("/")) "file:$it" else it
-    }
+    val actualPreviewUriString = previewUriString ?: thumbnailUriString
 
     /**
      * computed utility field to get the folder's previous versions size string

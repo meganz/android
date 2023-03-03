@@ -20,6 +20,11 @@ sealed interface FileInfoOneOffViewEvent {
     object GeneralError : FileInfoOneOffViewEvent
 
     /**
+     * Node has been deleted, this screen has no more sense
+     */
+    object NodeDeleted : FileInfoOneOffViewEvent
+
+    /**
      * Data class to join all events related to finish moving or copying the node
      * to notify move or copy has finished, either successfully or not
      * @param jobFinished representing the finished job

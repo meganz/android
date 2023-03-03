@@ -9,6 +9,7 @@ import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
@@ -77,4 +78,7 @@ object TestWrapperModule {
 
     @Provides
     fun provideMegaNodeUtilWrapper(): MegaNodeUtilWrapper = mock()
+
+    @Provides
+    fun providesFileUtilWrapper(): FileUtilWrapper = mock()
 }

@@ -23,12 +23,6 @@ sealed class FileInfoJobInProgressState(
 ) {
 
     /**
-     * Flag to set jobs that are causing the info of the node no sense anymore, so closing the screen is needed
-     * TODO once everything is represented in view state, maybe we don't need to finish after moving the file and other jobs because the view will be fully updated automatically
-     */
-    open val needsToFinish: Boolean = true
-
-    /**
      * [String] to set a custom message if needed
      */
     open fun customErrorMessage(context: Context, exception: Throwable?): String? = null
@@ -45,9 +39,7 @@ sealed class FileInfoJobInProgressState(
         progressMessage = R.string.context_copying,
         successMessage = R.string.context_correctly_copied,
         failMessage = R.string.context_no_copied,
-    ) {
-        override val needsToFinish = false
-    }
+    )
 
     /**
      * The node is being moved to another folder
@@ -88,7 +80,6 @@ sealed class FileInfoJobInProgressState(
         successMessage = R.string.version_history_deleted,
         failMessage = R.string.version_history_deleted_erroneously
     ) {
-        override val needsToFinish = false
         override fun customErrorMessage(context: Context, exception: Throwable?) =
             (exception as? VersionsNotDeletedException)?.let {
                 val versionsDeleted = it.totalRequestedToDelete - it.totalNotDeleted

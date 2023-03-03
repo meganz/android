@@ -7,7 +7,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.runBlocking
@@ -19,6 +21,9 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
+import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -28,12 +33,15 @@ import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DefaultDeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
+import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
@@ -45,6 +53,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
@@ -55,6 +64,7 @@ import java.net.URI
 internal class FileInfoViewModelTest {
     private lateinit var underTest: FileInfoViewModel
 
+    private lateinit var fileUtilWrapper: FileUtilWrapper
     private lateinit var monitorStorageStateEvent: MonitorStorageStateEvent
     private lateinit var monitorConnectivity: MonitorConnectivity
     private lateinit var getFileHistoryNumVersions: GetFileHistoryNumVersions
@@ -72,8 +82,13 @@ internal class FileInfoViewModelTest {
     private lateinit var getFolderTreeInfo: GetFolderTreeInfo
     private lateinit var getNodeById: GetNodeById
     private lateinit var getContactItemFromInShareFolder: GetContactItemFromInShareFolder
+    private lateinit var monitorNodeUpdatesById: MonitorNodeUpdatesById
+    private lateinit var monitorChildrenUpdates: MonitorChildrenUpdates
+    private lateinit var megaNodeRepository: MegaNodeRepository
 
+    private lateinit var getNodeVersionsByHandle: GetNodeVersionsByHandle
     private lateinit var typedFileNode: TypedFileNode
+
     private lateinit var previewFile: File
 
 
@@ -93,6 +108,7 @@ internal class FileInfoViewModelTest {
     private fun initMocks() {
         monitorStorageStateEvent = mock()
         monitorConnectivity = mock()
+        fileUtilWrapper = mock()
         getFileHistoryNumVersions = mock()
         isNodeInInbox = mock()
         isNodeInRubbish = mock()
@@ -108,13 +124,22 @@ internal class FileInfoViewModelTest {
         getFolderTreeInfo = mock()
         getNodeById = mock()
         getContactItemFromInShareFolder = mock()
+        monitorNodeUpdatesById = mock()
+        monitorChildrenUpdates = mock()
+        megaNodeRepository = mock()
+        getNodeVersionsByHandle = mock()
 
-        typedFileNode = mock()
+        typedFileNode = mock {
+            on { name }.thenReturn("File name")
+            on { id }.thenReturn(nodeId)
+        }
         previewFile = mock()
     }
 
     private fun initUnderTestViewModel() {
         underTest = FileInfoViewModel(
+            tempMegaNodeRepository = megaNodeRepository,
+            fileUtilWrapper = fileUtilWrapper,
             monitorStorageStateEvent = monitorStorageStateEvent,
             monitorConnectivity = monitorConnectivity,
             getFileHistoryNumVersions = getFileHistoryNumVersions,
@@ -130,14 +155,16 @@ internal class FileInfoViewModelTest {
             getFolderTreeInfo = getFolderTreeInfo,
             getNodeById = getNodeById,
             getContactItemFromInShareFolder = getContactItemFromInShareFolder,
+            monitorNodeUpdatesById = monitorNodeUpdatesById,
+            monitorChildrenUpdates = monitorChildrenUpdates,
+            getNodeVersionsByHandle = getNodeVersionsByHandle,
         )
-        underTest.updateNode(node)
+        underTest.setNode(node.handle)
     }
 
     private suspend fun initDefaultMockBehaviour() {
         whenever(node.handle).thenReturn(NODE_HANDLE)
         whenever(typedFileNode.id).thenReturn(nodeId)
-        whenever(node.hasPreview()).thenReturn(true)
         whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(true))
         whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
         whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
@@ -145,6 +172,12 @@ internal class FileInfoViewModelTest {
         whenever(previewFile.exists()).thenReturn(true)
         whenever(previewFile.toURI()).thenReturn(URI.create(previewUri))
         whenever(getNodeById.invoke(nodeId)).thenReturn(typedFileNode)
+        whenever(megaNodeRepository.getNodeByHandle(node.handle)).thenReturn(node)
+        whenever(getNodeVersionsByHandle(nodeId)).thenReturn(null)
+        whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(emptyFlow())
+        whenever(monitorChildrenUpdates.invoke(nodeId)).thenReturn(emptyFlow())
+        whenever(fileUtilWrapper.getFileIfExists(null, thumbUri))
+            .thenReturn(File(null as File?, thumbUri))
     }
 
     @After
@@ -157,7 +190,7 @@ internal class FileInfoViewModelTest {
         runBlocking {
             for (n in 0..5) {
                 whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(n)
-                underTest.updateNode(node)
+                underTest.setNode(node.handle)
                 Truth.assertThat(underTest.uiState.value.historyVersions).isEqualTo(n)
             }
         }
@@ -167,9 +200,8 @@ internal class FileInfoViewModelTest {
         runBlocking {
             suspend fun verify(isNodeInInbox: Boolean) {
                 whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(isNodeInInbox)
-                underTest.updateNode(node)
+                underTest.setNode(node.handle)
                 Truth.assertThat(underTest.uiState.value.isNodeInInbox).isEqualTo(isNodeInInbox)
-                Truth.assertThat(underTest.isNodeInInbox()).isEqualTo(isNodeInInbox)
             }
             verify(true)
             verify(false)
@@ -180,7 +212,7 @@ internal class FileInfoViewModelTest {
         runTest {
             suspend fun verify(isNodeInRubbish: Boolean) {
                 whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(isNodeInRubbish)
-                underTest.updateNode(node)
+                underTest.setNode(node.handle)
                 underTest.uiState.test {
                     val state = awaitItem()
                     Truth.assertThat(state.isNodeInRubbish).isEqualTo(isNodeInRubbish)
@@ -195,7 +227,7 @@ internal class FileInfoViewModelTest {
         runBlocking {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(1)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
-            underTest.updateNode(node)
+            underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
@@ -204,7 +236,7 @@ internal class FileInfoViewModelTest {
         runBlocking {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(2)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
-            underTest.updateNode(node)
+            underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
@@ -213,7 +245,7 @@ internal class FileInfoViewModelTest {
         runBlocking {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(1)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(true)
-            underTest.updateNode(node)
+            underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
 
         }
@@ -223,7 +255,7 @@ internal class FileInfoViewModelTest {
         runBlocking {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
-            underTest.updateNode(node)
+            underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
 
         }
@@ -488,9 +520,10 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test preview is assigned when node is updated`() = runTest {
+        whenever(typedFileNode.hasPreview).thenReturn(true)
         whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
-        underTest.updateNode(node)
+        underTest.setNode(node.handle)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
             Truth.assertThat(state).isEqualTo(previewUri)
@@ -500,12 +533,12 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test thumbnail is assigned when node is updated and there are no preview`() = runTest {
-        whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(null)
+        whenever(typedFileNode.hasPreview).thenReturn(false)
         whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
-        underTest.updateNode(node)
+        underTest.setNode(node.handle)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
-            Truth.assertThat(state).isEqualTo(thumbUri)
+            Truth.assertThat(state).isEqualTo("file:$thumbUri")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -514,7 +547,8 @@ internal class FileInfoViewModelTest {
     fun `test preview has priority over thumbnail`() = runTest {
         whenever(getPreview.invoke(NODE_HANDLE)).thenReturn(previewFile)
         whenever(typedFileNode.thumbnailPath).thenReturn(thumbUri)
-        underTest.updateNode(node)
+        whenever(typedFileNode.hasPreview).thenReturn(true)
+        underTest.setNode(node.handle)
         underTest.uiState.mapNotNull { it.actualPreviewUriString }.test {
             val state = awaitItem()
             Truth.assertThat(state).isEqualTo(previewUri)
@@ -526,8 +560,21 @@ internal class FileInfoViewModelTest {
     fun `test getContactItemFromInShareFolder is invoked when the node is a Folder`() = runTest {
         val folderNode = mock<TypedFolderNode>()
         whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
-        underTest.updateNode(node)
+        underTest.setNode(node.handle)
         verify(getContactItemFromInShareFolder).invoke(folderNode)
+    }
+
+    @Test
+    fun `test monitorNodeUpdatesById updates owner`() = runTest {
+        val folderNode = mock<TypedFolderNode>()
+        whenever(folderNode.id).thenReturn(nodeId)
+        whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
+        whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(
+            flowOf(listOf(NodeChanges.Owner))
+        )
+        underTest.setNode(node.handle)
+        //check 2 invocations: first invocation when node is set, second one the update itself
+        verify(getContactItemFromInShareFolder, times(2)).invoke(folderNode)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -600,7 +647,7 @@ internal class FileInfoViewModelTest {
 
     private suspend fun mockDeleteSuccess() {
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
-        underTest.updateNode(node)
+        underTest.setNode(node.handle)
         whenever(deleteNodeByHandle.invoke(nodeId)).thenReturn(Unit)
     }
 
@@ -623,7 +670,7 @@ internal class FileInfoViewModelTest {
 
     private suspend fun mockDeleteFailure() {
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(true)
-        underTest.updateNode(node)
+        underTest.setNode(node.handle)
         whenever(deleteNodeByHandle.invoke(nodeId)).thenThrow(RuntimeException("fake exception"))
     }
 
@@ -670,7 +717,7 @@ internal class FileInfoViewModelTest {
         private const val PARENT_NODE_HANDLE = 12L
         private val nodeId = NodeId(NODE_HANDLE)
         private val parentId = NodeId(PARENT_NODE_HANDLE)
-        private const val thumbUri = "file:/thumb"
-        private const val previewUri = "file:/preview"
+        private const val thumbUri = "/thumb"
+        private const val previewUri = "/preview"
     }
 }

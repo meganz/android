@@ -58,7 +58,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
 import mega.privacy.android.app.databinding.ActivityFileInfoBinding
 import mega.privacy.android.app.databinding.DialogLinkBinding
 import mega.privacy.android.app.interfaces.ActionBackupListener
-import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.ShareListener
@@ -109,16 +108,10 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaEvent
-import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaSet
-import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
-import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -129,67 +122,13 @@ import javax.inject.Inject
  * @property passCodeFacade [PasscodeCheck] an injected component to enforce a Passcode security check
  */
 @AndroidEntryPoint
-class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
+class FileInfoActivity : BaseActivity(), SnackbarShower {
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
 
     private val viewModel: FileInfoViewModel by viewModels()
 
-    private val megaGlobalListener = object : MegaGlobalListenerInterface {
-        override fun onUsersUpdate(api: MegaApiJava?, users: java.util.ArrayList<MegaUser>?) {
-            Timber.d("onUsersUpdate")
-        }
-
-        override fun onUserAlertsUpdate(
-            api: MegaApiJava,
-            users: java.util.ArrayList<MegaUserAlert>,
-        ) {
-            Timber.d("onUserAlertsUpdate")
-        }
-
-        override fun onNodesUpdate(api: MegaApiJava, nodes: java.util.ArrayList<MegaNode>?) {
-            nodes?.find {
-                it.handle == viewModel.node.handle
-                        || it.parentHandle == viewModel.node.handle
-                        || it.handle == viewModel.node.parentHandle
-            }?.let {
-                viewModel.updateNode()
-            }
-            this@FileInfoActivity.onNodesUpdate(nodes)
-        }
-
-        override fun onReloadNeeded(api: MegaApiJava) {
-            Timber.d("onReloadNeeded")
-        }
-
-        override fun onAccountUpdate(api: MegaApiJava) {
-            Timber.d("onAccountUpdate")
-        }
-
-        override fun onContactRequestsUpdate(
-            api: MegaApiJava,
-            requests: java.util.ArrayList<MegaContactRequest>,
-        ) {
-            Timber.d("onContactRequestsUpdate")
-        }
-
-        override fun onEvent(api: MegaApiJava, event: MegaEvent) {
-            Timber.d("onEvent")
-        }
-
-        override fun onSetsUpdate(api: MegaApiJava, sets: java.util.ArrayList<MegaSet>) {
-            Timber.d("onSetsUpdate")
-        }
-
-        override fun onSetElementsUpdate(
-            api: MegaApiJava,
-            elements: java.util.ArrayList<MegaSetElement>,
-        ) {
-            Timber.d("onSetElementsUpdate")
-        }
-
-    }
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             retryConnectionsAndSignalPresence()
@@ -213,7 +152,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
     )
     private var fileBackupManager: FileBackupManager? = null
     private val nodeController: NodeController by lazy { NodeController(this) }
-    private var nodeVersions: ArrayList<MegaNode>? = null
     private val menuHelper by lazy {
         FileInfoToolbarHelper(
             context = this,
@@ -303,19 +241,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         showSnackbar(type, bindingContent.fileInfoContactListContainer, content, chatId)
     }
 
-    override fun finishRenameActionWithSuccess(newName: String) {
-        viewModel.updateNode(megaApi.getNodeByHandle((viewModel.node).handle) ?: return)
-        menuHelper.setNodeName(viewModel.node.name)
-    }
-
-    override fun actionConfirmed() {
-        //No update needed
-    }
-
-    override fun createFolder(folderName: String) {
-        //No action needed
-    }
-
     private inner class ActionBarCallBack : ActionMode.Callback {
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             Timber.d("onActionItemClicked")
@@ -399,7 +324,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 menu.findItem(R.id.cab_menu_unselect_all).isVisible = false
             }
             val changePermissionsMenuItem = menu.findItem(R.id.action_file_contact_list_permissions)
-            if (viewModel.isNodeInInbox()) {
+            if (viewModel.uiState.value.isNodeInInbox) {
                 // If the node came from Backups, hide the Change Permissions option from the Action Bar
                 changePermissionsMenuItem.isVisible = false
                 changePermissionsMenuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER)
@@ -437,17 +362,15 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             finish()
             return
         }
-        viewModel.updateNode(getNodeFromExtras() ?: run {
+        viewModel.tempInit(getNodeFromExtras() ?: run {
             finish()
             return
         })
-        nodeVersions = megaApi.getVersions(viewModel.node)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         initFileBackupManager()
         cC = ContactController(this)
         adapterType = intent.getIntExtra("adapterType", Constants.FILE_BROWSER_ADAPTER)
 
-        megaApi.addGlobalListener(megaGlobalListener)
         savedInstanceState?.apply {
             val handle = getLong(KEY_SELECTED_SHARE_HANDLE, MegaApiJava.INVALID_HANDLE)
             if (handle == MegaApiJava.INVALID_HANDLE) {
@@ -506,16 +429,16 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         updateAvailableOffline(!viewModel.node.isTakenDown && !viewState.isNodeInRubbish)
         updateIncomeShared(viewState.incomingSharesOwnerContactItem)
 
-        refreshProperties(viewState)
+        refreshProperties()
     }
 
-    private fun updateIncomeShared(incomeSharesOwnerContactItem: ContactItem?) {
-        bindingContent.filePropertiesOwnerLayout.isVisible = incomeSharesOwnerContactItem != null
-        incomeSharesOwnerContactItem?.let { contactItem ->
+    private fun updateIncomeShared(incomingSharesOwnerContactItem: ContactItem?) {
+        bindingContent.filePropertiesOwnerLayout.isVisible = incomingSharesOwnerContactItem != null
+        incomingSharesOwnerContactItem?.let { contactItem ->
             bindingContent.filePropertiesOwnerLabel.text = contactItem.contactData.alias
             bindingContent.filePropertiesOwnerInfo.text = contactItem.email
             bindingContent.filePropertiesOwnerStateIcon.setImageResource(
-                contactItem.status.iconRes(Util.isDarkMode(this))
+                contactItem.status.iconRes(isLightTheme = !Util.isDarkMode(this))
             )
 
             val defaultAvatar = BitmapDrawable(
@@ -595,6 +518,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
     private fun updateOptionsMenu(state: FileInfoViewState) {
         if (state.jobInProgressState == null) {
+            menuHelper.setNodeName(state.title)
             menuHelper.updateOptionsMenu(
                 node = viewModel.node,
                 isInInbox = state.isNodeInInbox,
@@ -617,6 +541,10 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                     this
                 )
             }
+            FileInfoOneOffViewEvent.NodeDeleted -> {
+                //the node has been deleted, this screen has no more sense
+                finish()
+            }
             is FileInfoOneOffViewEvent.GeneralError -> showSnackBar(R.string.general_error)
             is FileInfoOneOffViewEvent.CollisionDetected -> {
                 val list = ArrayList<NameCollision>()
@@ -627,9 +555,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 if (event.exception == null) {
                     showSnackBar(event.jobFinished.successMessage)
                     sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_FILTER_UPDATE_FULL_SCREEN))
-                    if (event.jobFinished.needsToFinish) {
-                        finish()
-                    }
                 } else {
                     Timber.e(event.exception)
                     if (!manageCopyMoveException(event.exception)) {
@@ -676,21 +601,18 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
 
     private fun getNodeFromExtras(): MegaNode? {
         val extras = intent.extras
-        if (extras != null) {
+        return if (extras != null) {
             from = extras.getInt("from")
             if (from == Constants.FROM_INCOMING_SHARES) {
                 firstIncomingLevel = extras.getBoolean(Constants.INTENT_EXTRA_KEY_FIRST_LEVEL)
             }
             val handleNode = extras.getLong("handle", -1)
             Timber.d("Handle of the selected node: %s", handleNode)
-            return megaApi.getNodeByHandle(handleNode) ?: run {
-                Timber.w("Node is NULL")
-                null
-            }
+            megaApi.getNodeByHandle(handleNode)
 
         } else {
             Timber.w("Extras is NULL")
-            return null
+            null
         }
     }
 
@@ -791,7 +713,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             } else {
                 filePropertiesCreatedLayout.isVisible = true
             }
-            menuHelper.setNodeName(viewModel.node.name)
             // If the Node belongs to Backups or has no versions, then hide
             // the Versions layout
             filePropertiesTextNumberVersions.setOnClickListener {
@@ -911,7 +832,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             R.id.cab_menu_file_info_copy -> copyLauncher.launch(longArrayOf(viewModel.node.handle))
             R.id.cab_menu_file_info_move -> moveLauncher.launch(longArrayOf(viewModel.node.handle))
             R.id.cab_menu_file_info_rename -> {
-                showRenameNodeDialog(this, viewModel.node, this, this)
+                showRenameNodeDialog(this, viewModel.node, this, null)
             }
             R.id.cab_menu_file_info_leave -> showConfirmationLeaveIncomingShare(
                 this,
@@ -1037,7 +958,7 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         selectContactForShareFolderLauncher.launch(viewModel.node)
     }
 
-    private fun refreshProperties(viewState: FileInfoViewState) {
+    private fun refreshProperties() {
         Timber.d("refreshProperties")
         if (!viewModel.node.isTakenDown && viewModel.node.isExported) {
             publicLink = true
@@ -1106,12 +1027,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
             } else {
                 bindingContent.filePropertiesInfoDataAdded.text = ""
                 bindingContent.filePropertiesInfoDataCreated.text = ""
-            }
-
-            // If the Node belongs to Backups or has no versions, then hide
-            // the Versions layout
-            if (!viewState.isNodeInInbox && megaApi.hasVersions(viewModel.node)) {
-                nodeVersions = megaApi.getVersions(viewModel.node)
             }
         } else if (viewModel.node.isFolder) {
             Timber.d("Node is FOLDER")
@@ -1358,223 +1273,11 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
         nodeSaver.handleRequestPermissionsResult(requestCode)
     }
 
-    private fun onNodesUpdate(nodes: ArrayList<MegaNode>?) {
-        Timber.d("onNodesUpdate")
-        var thisNode = false
-        var anyChild = false
-        var updateContentFolder = false
-        if (nodes == null) {
-            return
-        }
-        var n: MegaNode? = null
-        for (nodeToCheck in nodes) {
-            if (nodeToCheck.handle == viewModel.node.handle) {
-                thisNode = true
-                n = nodeToCheck
-                break
-            } else {
-                if (viewModel.node.isFolder) {
-                    var parent = megaApi.getNodeByHandle(nodeToCheck.parentHandle)
-                    while (parent != null) {
-                        if (parent.handle == viewModel.node.handle) {
-                            updateContentFolder = true
-                            break
-                        }
-                        parent = megaApi.getNodeByHandle(parent.parentHandle)
-                    }
-                } else {
-                    nodeVersions?.let { nodeVersions ->
-                        for (j in nodeVersions.indices) {
-                            if (nodeToCheck.handle == nodeVersions[j].handle) {
-                                if (!anyChild) {
-                                    anyChild = true
-                                    break
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (updateContentFolder) {
-            viewModel.updateNode()
-        }
-        if (!thisNode && !anyChild) {
-            Timber.d("Not related to this node")
-            return
-        }
-
-        //Check if the parent handle has changed
-        if (n != null) {
-            if (n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)) {
-                val oldParent = megaApi.getParentNode(viewModel.node)
-                val newParent = megaApi.getParentNode(n)
-                viewModel.updateNode(
-                    if (oldParent.handle == newParent.handle) {
-                        Timber.d("Parents match")
-                        if (newParent.isFile) {
-                            Timber.d("New version added")
-                            newParent
-                        } else {
-                            n
-                        }
-                    } else {
-                        n
-                    }
-                )
-                nodeVersions = if (megaApi.hasVersions(viewModel.node)) {
-                    megaApi.getVersions(viewModel.node)
-                } else {
-                    null
-                }
-            } else if (n.hasChanged(MegaNode.CHANGE_TYPE_REMOVED)) {
-                if (thisNode) {
-                    if (nodeVersions != null) {
-                        val nodeHandle = nodeVersions?.getOrNull(1)?.handle ?: -1
-                        if (megaApi.getNodeByHandle(nodeHandle) != null) {
-                            viewModel.updateNode(megaApi.getNodeByHandle(nodeHandle))
-                            nodeVersions = if (megaApi.hasVersions(viewModel.node)) {
-                                megaApi.getVersions(viewModel.node)
-                            } else {
-                                null
-                            }
-                        } else {
-                            finish()
-                        }
-                    } else {
-                        finish()
-                    }
-                } else if (anyChild) {
-                    nodeVersions = if (megaApi.hasVersions(n)) {
-                        megaApi.getVersions(n)
-                    } else {
-                        null
-                    }
-                }
-            } else {
-                viewModel.updateNode(n)
-                nodeVersions = if (megaApi.hasVersions(viewModel.node)) {
-                    megaApi.getVersions(viewModel.node)
-                } else {
-                    null
-                }
-            }
-        } else {
-            if (anyChild) {
-                nodeVersions = if (megaApi.hasVersions(viewModel.node)) {
-                    megaApi.getVersions(viewModel.node)
-                } else {
-                    null
-                }
-            }
-        }
-        invalidateOptionsMenu()
-        if (!viewModel.node.isTakenDown && viewModel.node.isExported) {
-            Timber.d("Node HAS public link")
-            publicLink = true
-            bindingContent.dividerLinkLayout.isVisible = true
-            bindingContent.filePropertiesLinkLayout.isVisible = true
-            bindingContent.filePropertiesCopyLayout.isVisible = true
-            bindingContent.filePropertiesLinkText.text = viewModel.node.publicLink
-        } else {
-            Timber.d("Node NOT public link")
-            publicLink = false
-            bindingContent.dividerLinkLayout.isVisible = false
-            bindingContent.filePropertiesLinkLayout.isVisible = false
-            bindingContent.filePropertiesCopyLayout.isVisible = false
-        }
-        if (viewModel.node.isFolder) {
-            setIconResource()
-            sl = megaApi.getOutShares(viewModel.node)
-            sl?.let { sl ->
-                if (sl.size == 0) {
-                    Timber.d("sl.size == 0")
-                    bindingContent.filePropertiesSharedLayout.isVisible = false
-                    bindingContent.dividerSharedLayout.isVisible = false
-
-                    //If I am the owner
-                    if (megaApi.checkAccessErrorExtended(
-                            viewModel.node,
-                            MegaShare.ACCESS_OWNER
-                        ).errorCode == MegaError.API_OK
-                    ) {
-                        binding.filePropertiesPermissionInfo.isVisible = false
-                    } else {
-
-                        //If I am not the owner
-                        owner = false
-                        binding.filePropertiesPermissionInfo.isVisible = true
-                        val accessLevel = megaApi.getAccess(viewModel.node)
-                        Timber.d("Node: %s", viewModel.node.handle)
-                        when (accessLevel) {
-                            MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> {
-                                binding.filePropertiesPermissionInfo.text =
-                                    getFormattedStringOrDefault(R.string.file_properties_shared_folder_full_access)
-                            }
-                            MegaShare.ACCESS_READ -> {
-                                binding.filePropertiesPermissionInfo.text =
-                                    getFormattedStringOrDefault(R.string.file_properties_shared_folder_read_only)
-                            }
-                            MegaShare.ACCESS_READWRITE -> {
-                                binding.filePropertiesPermissionInfo.text =
-                                    getFormattedStringOrDefault(R.string.file_properties_shared_folder_read_write)
-                            }
-                        }
-                    }
-                } else {
-                    bindingContent.filePropertiesSharedLayout.isVisible = true
-                    bindingContent.dividerSharedLayout.isVisible = true
-                    bindingContent.filePropertiesSharedInfoButton.text =
-                        getQuantityStringOrDefault(
-                            R.plurals.general_selection_num_contacts,
-                            sl.size, sl.size
-                        )
-                }
-            }
-        } else {
-            bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(viewModel.node.size)
-        }
-        if (viewModel.node.creationTime != 0L) {
-            try {
-                bindingContent.filePropertiesInfoDataAdded.text =
-                    DateUtils.getRelativeTimeSpanString(viewModel.node.creationTime * 1000)
-            } catch (ex: Exception) {
-                bindingContent.filePropertiesInfoDataAdded.text = ""
-            }
-            if (viewModel.node.modificationTime != 0L) {
-                try {
-                    bindingContent.filePropertiesInfoDataCreated.text =
-                        DateUtils.getRelativeTimeSpanString(
-                            viewModel.node.modificationTime * 1000
-                        )
-                } catch (ex: Exception) {
-                    bindingContent.filePropertiesInfoDataCreated.text = ""
-                }
-            } else {
-                try {
-                    bindingContent.filePropertiesInfoDataCreated.text =
-                        DateUtils.getRelativeTimeSpanString(
-                            viewModel.node.creationTime * 1000
-                        )
-                } catch (ex: Exception) {
-                    bindingContent.filePropertiesInfoDataCreated.text = ""
-                }
-            }
-        } else {
-            bindingContent.filePropertiesInfoDataAdded.text = ""
-            bindingContent.filePropertiesInfoDataCreated.text = ""
-        }
-
-        refresh()
-    }
-
-
     /**
      * Perform final cleaning when the activity is destroyed
      */
     override fun onDestroy() {
         super.onDestroy()
-        megaApi.removeGlobalListener(megaGlobalListener)
         unregisterReceiver(contactUpdateReceiver)
         unregisterReceiver(manageShareReceiver)
         nodeSaver.destroy()
@@ -1696,12 +1399,6 @@ class FileInfoActivity : BaseActivity(), ActionNodeCallback, SnackbarShower {
                 1
             ), viewModel.node, email
         )
-    }
-
-    private fun refresh() {
-        setContactList()
-        setMoreButtonText()
-        adapter.setShareList(listContacts)
     }
 
     private fun setContactList() {

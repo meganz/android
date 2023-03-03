@@ -19,6 +19,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
+import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
@@ -130,5 +131,11 @@ abstract class UtilWrapperModule {
             override fun getFirstLetter(name: String): String =
                 AvatarUtil.getFirstLetter(name)
         }
+
+        /**
+         * provide default implementation for FileUtilWrapper
+         */
+        @Provides
+        fun providesFileUtilWrapper() = object : FileUtilWrapper {}
     }
 }

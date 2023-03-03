@@ -4,15 +4,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
+import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges.Inshare
+import mega.privacy.android.domain.entity.node.NodeChanges.Name
+import mega.privacy.android.domain.entity.node.NodeChanges.Outshare
+import mega.privacy.android.domain.entity.node.NodeChanges.Owner
+import mega.privacy.android.domain.entity.node.NodeChanges.Parent
+import mega.privacy.android.domain.entity.node.NodeChanges.Public_link
+import mega.privacy.android.domain.entity.node.NodeChanges.Remove
+import mega.privacy.android.domain.entity.node.NodeChanges.Timestamp
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -22,24 +37,30 @@ import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
+import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
+import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
 
 /**
- * View Model class for [mega.privacy.android.app.presentation.fileinfo.FileInfoActivity]
+ * View Model class for [FileInfoActivity]
  */
 @HiltViewModel
 class FileInfoViewModel @Inject constructor(
+    private val tempMegaNodeRepository: MegaNodeRepository, //a temp use of MegaApiAndroid, just while migrating to use-cases only, to easily remove things from the activity
+    private val fileUtilWrapper: FileUtilWrapper,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
     private val monitorConnectivity: MonitorConnectivity,
     private val getFileHistoryNumVersions: GetFileHistoryNumVersions,
@@ -54,7 +75,10 @@ class FileInfoViewModel @Inject constructor(
     private val getPreview: GetPreview,
     private val getNodeById: GetNodeById,
     private val getFolderTreeInfo: GetFolderTreeInfo,
-    private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder
+    private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder,
+    private val monitorNodeUpdatesById: MonitorNodeUpdatesById,
+    private val monitorChildrenUpdates: MonitorChildrenUpdates,
+    private val getNodeVersionsByHandle: GetNodeVersionsByHandle,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -71,55 +95,58 @@ class FileInfoViewModel @Inject constructor(
         private set
 
     private lateinit var typedNode: TypedNode
+    private var versions: List<Node>? = null
+    private val monitoringJobs = ArrayList<Job?>()
+    private val monitoringMutex = Mutex()
+
+    /**
+     * This initial setup will be removed once MegaNode is not needed anymore in future tasks
+     */
+    @Deprecated(
+        message = "This initial setup will be removed once MegaNode is not needed",
+        replaceWith = ReplaceWith("setNode(handleNode: Long)")
+    )
+    fun tempInit(node: MegaNode) {
+        this.node = node
+        setNode(node.handle)
+    }
 
     /**
      * Sets the node and updates its state
      */
-    fun updateNode(node: MegaNode = this.node) {
-        this.node = node
+    fun setNode(handleNode: Long) {
+        Timber.d("FileInfoViewModel node set $handleNode")
         viewModelScope.launch {
-            _uiState.update { uiState ->
-                val clearProgressState =
-                    uiState.jobInProgressState == FileInfoJobInProgressState.InitialLoading
-                uiState.copy(
-                    historyVersions = getFileHistoryNumVersions(node.handle),
-                    isNodeInInbox = isNodeInInbox(node.handle),
-                    isNodeInRubbish = isNodeInRubbish(node.handle),
-                    jobInProgressState = if (clearProgressState) null else uiState.jobInProgressState,
+            runCatching {
+                typedNode = getNodeById(NodeId(handleNode))
+                node = tempMegaNodeRepository.getNodeByHandle(handleNode)
+                    ?: throw RuntimeException()
+            }.onFailure {
+                Timber.e("FileInfoViewModel node not found")
+                _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.NodeDeleted)
+                return@launch
+            }
+
+            if (typedNode is FileNode) {
+                val parent = getNodeById(typedNode.parentId)
+                if (parent is FileNode) {
+                    //we only want the latest version in this screen
+                    setNode(parent.id.longValue)
+                    return@launch
+                }
+                versions = getNodeVersionsByHandle(typedNode.id)
+            }
+            updateCurrentNodeStatus()
+            //monitor future changes of the node
+            monitoringMutex.withLock {
+                monitoringJobs.forEach { it?.cancel() }
+                monitoringJobs.clear()
+                monitoringJobs.addAll(
+                    listOf(
+                        monitorNodeUpdates(),
+                        monitorChildrenUpdates(),
+                    )
                 )
-            }
-            updateTypedNode()
-        }
-        updatePreview()
-    }
-
-    private fun updatePreview() {
-        viewModelScope.launch {
-            if (node.hasPreview() && _uiState.value.previewUriString == null) {
-                _uiState.update {
-                    it.copy(previewUriString = getPreview(typedNode.id.longValue)?.uriStringIfExists())
-                }
-            }
-        }
-    }
-
-    private suspend fun updateTypedNode() {
-        typedNode = getNodeById(NodeId(node.handle)).also { typedNode ->
-            _uiState.update { uiState ->
-                when (typedNode) {
-                    is TypedFolderNode -> {
-                        uiState.copy(
-                            folderTreeInfo = getFolderTreeInfo(typedNode),
-                            incomingSharesOwnerContactItem = getContactItemFromInShareFolder(typedNode)
-                        )
-                    }
-                    is TypedFileNode -> {
-                        uiState.copy(
-                            thumbnailUriString =
-                            (typedNode as? TypedFileNode)?.thumbnailPath,
-                        )
-                    }
-                }
             }
         }
     }
@@ -196,6 +223,130 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
+
+    /**
+     * Some events need to be consumed to don't be missed or fired more than once
+     */
+    fun consumeOneOffEvent(event: FileInfoOneOffViewEvent) {
+        if (_uiState.value.oneOffViewEvent == event) {
+            _uiState.updateEventAndClearProgress(null)
+        }
+    }
+
+    /**
+     * Get latest value of [StorageState]
+     */
+    fun getStorageState(): StorageState = monitorStorageStateEvent.getState()
+
+    private fun monitorNodeUpdates() =
+        viewModelScope.launch {
+            monitorNodeUpdatesById(typedNode.id).collect { changes ->
+                //node has been updated
+                Timber.d("FileInfoViewModel updated $changes")
+                val updateNode = changes.any { change ->
+                    when (change) {
+                        Remove -> {
+                            versions?.getOrNull(1)?.let { version ->
+                                //check the newest version if exists and set it as current
+                                setNode(version.id.longValue)
+                            } ?: run {
+                                //if there are no versions, just finish
+                                _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.NodeDeleted)
+                            }
+                        }
+                        Name -> updateTitle()
+                        Owner, Inshare -> updateOwner()
+                        Parent ->
+                            if (!_uiState.value.isNodeInRubbish && isNodeInRubbish(typedNode.id.longValue)) {
+                                //if the node is moved to rubbish bin, let's close the screen like when it's deleted
+                                _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.NodeDeleted)
+                            } else {
+                                // maybe it's moved, or a new version is created, etc. let's update all to be safe
+                                return@any true
+                            }
+                        Timestamp -> return@any true //will update only dates, for now update everything
+                        Outshare -> return@any true //will update only shared with, for now update everything
+                        Public_link -> return@any true //will update only public link, for now update everything
+                        else -> return@any false
+                    }
+                    return@any false
+                }
+                if (updateNode) {
+                    setNode(typedNode.id.longValue)
+                }
+            }
+        }
+
+    private fun monitorChildrenUpdates() =
+        viewModelScope.launch {
+            monitorChildrenUpdates(typedNode.id).collect {
+                //folder node content or file versions have been updated
+                updateFolderTreeInfo()
+                updateHistory()
+            }
+        }
+
+    private fun updateCurrentNodeStatus() {
+        updateState { uiState ->
+            uiState.copy(
+                title = typedNode.name,
+                isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
+                isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue),
+                jobInProgressState = null,
+                thumbnailUriString = (typedNode as? TypedFileNode)?.thumbnailPath
+                    ?.let {
+                        fileUtilWrapper.getFileIfExists(fileName = it)?.toURI()?.toString()
+                    },
+            ).also {
+                println("new state $it")
+            }
+        }
+        updateHistory()
+        updatePreview()
+        updateFolderTreeInfo()
+        updateOwner()
+    }
+
+    private fun updateHistory() {
+        if (typedNode is FileNode) {
+            updateState { it.copy(historyVersions = getFileHistoryNumVersions(typedNode.id.longValue)) }
+        }
+    }
+
+    private fun updatePreview() {
+        viewModelScope.launch {
+            if ((typedNode as? TypedFileNode)?.hasPreview == true && _uiState.value.previewUriString == null) {
+                _uiState.update {
+                    it.copy(previewUriString = getPreview(typedNode.id.longValue)?.uriStringIfExists())
+                }
+            }
+        }
+    }
+
+    private fun updateFolderTreeInfo() {
+        (typedNode as? TypedFolderNode)?.let { folder ->
+            updateState {
+                it.copy(folderTreeInfo = getFolderTreeInfo(folder))
+            }
+        }
+    }
+
+    private fun updateOwner() {
+        (typedNode as? TypedFolderNode)?.let { folder ->
+            updateState {
+                it.copy(incomingSharesOwnerContactItem = getContactItemFromInShareFolder(folder))
+            }
+        }
+    }
+
+    private fun updateTitle() {
+        updateState {
+            typedNode = getNodeById(NodeId(node.handle))
+            it.copy(title = typedNode.name)
+        }
+
+    }
+
     /**
      * Tries to move the node to the rubbish bin
      * It sets [FileInfoJobInProgressState.MovingToRubbish] while moving.
@@ -223,29 +374,10 @@ class FileInfoViewModel @Inject constructor(
     }
 
     /**
-     * Some events need to be consumed to don't be missed or fired more than once
-     */
-    fun consumeOneOffEvent(event: FileInfoOneOffViewEvent) {
-        if (_uiState.value.oneOffViewEvent == event) {
-            _uiState.updateEventAndClearProgress(null)
-        }
-    }
-
-    /**
-     * Get latest value of [StorageState]
-     */
-    fun getStorageState(): StorageState = monitorStorageStateEvent.getState()
-
-    /**
      * Is connected
      */
     private val isConnected: Boolean
         get() = monitorConnectivity().value
-
-    /**
-     * returns if the node is in the inbox or not
-     */
-    fun isNodeInInbox() = _uiState.value.isNodeInInbox
 
     /**
      * Performs a job setting [progressState] state while in progress
@@ -313,5 +445,12 @@ class FileInfoViewModel @Inject constructor(
             )
         }
 
-    private fun File?.uriStringIfExists() = this?.takeIf { it.exists() }?.toURI()?.toString()
+    private fun updateState(update: suspend (FileInfoViewState) -> FileInfoViewState) =
+        viewModelScope.launch {
+            _uiState.update {
+                update(it)
+            }
+        }
+
+    private fun File.uriStringIfExists() = this.takeIf { it.exists() }?.toURI()?.toString()
 }
