@@ -303,6 +303,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.setCameraUploadVideoQuality(quality)
     }
 
+    override suspend fun setUploadVideoSyncStatus(syncStatus: Int) {
+        dbHandler.updateVideoState(syncStatus)
+    }
+
     override suspend fun setConversionOnCharging(onCharging: Boolean) {
         dbHandler.setConversionOnCharging(onCharging)
     }

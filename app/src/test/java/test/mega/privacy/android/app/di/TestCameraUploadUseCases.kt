@@ -96,6 +96,8 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -374,4 +376,10 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetUploadVideoQuality() = mock<GetUploadVideoQuality>()
+
+    @Provides
+    fun provideSetUploadVideoQuality() = mock<SetUploadVideoQuality>()
+
+    @Provides
+    fun provideSetUploadVideoSyncStatus() = mock<SetUploadVideoSyncStatus>()
 }

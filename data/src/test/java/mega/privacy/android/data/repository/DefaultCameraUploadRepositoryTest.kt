@@ -108,16 +108,68 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload retrieves video quality for upload`() = runTest {
-        whenever(localStorageGateway.getUploadVideoQuality()).thenReturn("3")
-        assertThat(underTest.getUploadVideoQuality()).isEqualTo(VideoQuality.ORIGINAL)
+    fun `test that the current upload video quality in camera uploads is original quality`() =
+        testGetUploadVideoQuality(input = "3", expectedVideoQuality = VideoQuality.ORIGINAL)
+
+    @Test
+    fun `test that the current upload video quality in camera uploads is high quality`() =
+        testGetUploadVideoQuality(input = "2", expectedVideoQuality = VideoQuality.HIGH)
+
+    @Test
+    fun `test that the current upload video quality in camera uploads is medium quality`() =
+        testGetUploadVideoQuality(input = "1", expectedVideoQuality = VideoQuality.MEDIUM)
+
+    @Test
+    fun `test that the current upload video quality in camera uploads is low quality`() =
+        testGetUploadVideoQuality(input = "0", expectedVideoQuality = VideoQuality.LOW)
+
+    @Test
+    fun `test that the current upload video quality will return null`() =
+        testGetUploadVideoQuality(input = "5", expectedVideoQuality = null)
+
+    private fun testGetUploadVideoQuality(input: String, expectedVideoQuality: VideoQuality?) =
+        runTest {
+            whenever(localStorageGateway.getUploadVideoQuality()).thenReturn(input)
+            assertThat(underTest.getUploadVideoQuality()).isEqualTo(expectedVideoQuality)
+        }
+
+    @Test
+    fun `test that the videos uploaded through camera uploads will now retain their original resolutions`() =
+        testSetUploadVideoQuality(VideoQuality.ORIGINAL)
+
+    @Test
+    fun `test that the videos uploaded through camera uploads are now compressed in high quality`() =
+        testSetUploadVideoQuality(VideoQuality.HIGH)
+
+    @Test
+    fun `test that the videos uploaded through camera uploads are now compressed in medium quality`() =
+        testSetUploadVideoQuality(VideoQuality.MEDIUM)
+
+    @Test
+    fun `test that the videos uploaded through camera uploads are now compressed in low quality`() =
+        testSetUploadVideoQuality(VideoQuality.LOW)
+
+    private fun testSetUploadVideoQuality(videoQuality: VideoQuality) = runTest {
+        underTest.setUploadVideoQuality(videoQuality)
+
+        verify(localStorageGateway, times(1)).setUploadVideoQuality(videoQuality.value)
     }
 
     @Test
-    fun `test that the new video quality is set for camera uploads`() = runTest {
-        underTest.setUploadVideoQuality(VideoQuality.ORIGINAL)
+    fun `test that the videos to be uploaded by camera uploads are now subject for compression`() =
+        testSetUploadVideoSyncStatus(SyncStatus.STATUS_TO_COMPRESS)
 
-        verify(localStorageGateway, times(1)).setUploadVideoQuality(3)
+    @Test
+    fun `test that the videos to be uploaded by camera uploads are now queued for upload`() =
+        testSetUploadVideoSyncStatus(SyncStatus.STATUS_PENDING)
+
+    private fun testSetUploadVideoSyncStatus(syncStatus: SyncStatus) = runTest {
+        underTest.setUploadVideoSyncStatus(syncStatus)
+
+        verify(
+            localStorageGateway,
+            times(1)
+        ).setUploadVideoSyncStatus(syncStatus.value)
     }
 
     @Test

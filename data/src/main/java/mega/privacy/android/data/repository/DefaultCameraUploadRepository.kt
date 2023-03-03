@@ -290,6 +290,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.setUploadVideoQuality(videoQualityIntMapper(videoQuality))
         }
 
+    override suspend fun setUploadVideoSyncStatus(syncStatus: SyncStatus) =
+        withContext(ioDispatcher) {
+            localStorageGateway.setUploadVideoSyncStatus(syncStatusIntMapper(syncStatus))
+        }
+
     override suspend fun getKeepFileNames(): Boolean = withContext(ioDispatcher) {
         localStorageGateway.getKeepFileNames()
     }

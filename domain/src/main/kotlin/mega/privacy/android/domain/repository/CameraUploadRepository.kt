@@ -285,6 +285,13 @@ interface CameraUploadRepository {
     suspend fun setUploadVideoQuality(videoQuality: VideoQuality)
 
     /**
+     * Sets the new Video Sync Status
+     *
+     * @param syncStatus The new [SyncStatus]
+     */
+    suspend fun setUploadVideoSyncStatus(syncStatus: SyncStatus)
+
+    /**
      * Get keep file names preference
      *
      * @return keep file names preference
