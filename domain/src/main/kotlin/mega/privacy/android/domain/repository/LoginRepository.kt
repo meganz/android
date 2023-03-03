@@ -82,4 +82,18 @@ interface LoginRepository {
      * @return [LoginStatus].
      */
     fun login(email: String, password: String): Flow<LoginStatus>
+
+    /**
+     * Logs in with 2FA.
+     *
+     * @param email Account email.
+     * @param email Account password.
+     * @param pin   2FA pin.
+     * @return [LoginStatus].
+     */
+    fun multiFactorAuthLogin(
+        email: String,
+        password: String,
+        pin: String,
+    ): Flow<LoginStatus>
 }

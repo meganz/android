@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Rect
 import android.net.Uri
@@ -56,6 +55,7 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
+import mega.privacy.android.app.presentation.extensions.getErrorStringId
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
@@ -85,6 +85,12 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.exception.LoginBlockedAccount
+import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
+import mega.privacy.android.domain.exception.LoginRequireValidation
+import mega.privacy.android.domain.exception.LoginTooManyAttempts
+import mega.privacy.android.domain.exception.LoginUnknownStatus
+import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
@@ -193,24 +199,60 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         onQuerySignupLinkFinished().observe(viewLifecycleOwner, ::showQuerySignupLinkResult)
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
             with(uiState) {
-                if (disableLoginButton) disableLoginButton() else enableLoginButton()
-                if (is2FAScreenShown) show2FAScreen()
-                if (showAlertLoggedOut) (requireActivity() as LoginActivity).showAlertLoggedOut()
-                if (showLoginScreen) {
-                    confirmLogoutDialog?.dismiss()
-                    returnToLogin()
-                }
-                error?.let {
-                    //Map the error and show the snackbar
-                }
-                if (showFetchingNodesScreen) {
-                    if (uiState.is2FAEnabled) {
-                        binding.login2fa.isVisible = false
-                        (requireActivity() as LoginActivity).hideAB()
+                when {
+                    isLoginInProgress -> {
+                        showLoginInProgress()
                     }
-                    showLoggingInScreen()
-                    getInstance().checkEnabledCookies()
-                    megaApi.fetchNodes(this@LoginFragment)
+                    isLoginRequired -> {
+                        confirmLogoutDialog?.dismiss()
+                        returnToLogin()
+                    }
+                    isFetchingNodes -> {
+                        if (uiState.is2FAEnabled) {
+                            binding.login2fa.isVisible = false
+                            (requireActivity() as LoginActivity).hideAB()
+                        }
+                        showFetchingNodes()
+                        getInstance().checkEnabledCookies()
+                        megaApi.fetchNodes(this@LoginFragment)
+                    }
+                    is2FAErrorShown -> {
+                        binding.progressbarVerify2fa.isVisible = false
+                        show2FAError()
+                    }
+                    is2FARequired -> {
+                        show2FAScreen()
+                    }
+                }
+
+                if (isLocalLogoutInProgress) disableLoginButton() else enableLoginButton()
+
+                error?.let {
+                    when (error) {
+                        is LoginLoggedOutFromOtherLocation -> {
+                            (requireActivity() as LoginActivity).showAlertLoggedOut()
+                        }
+                        else -> {
+                            //It will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
+                            if (error is LoginBlockedAccount) return@let
+
+                            //Pending refactor: Map the error and just show the Snackbar.
+                            (requireActivity() as LoginActivity).showSnackbar(
+                                requireActivity().getString(
+                                    when (error) {
+                                        is LoginWrongEmailOrPassword -> R.string.error_incorrect_email_or_password
+                                        is LoginTooManyAttempts -> R.string.too_many_attempts_login
+                                        is LoginRequireValidation -> R.string.account_not_validated_login
+                                        is LoginUnknownStatus -> error.megaException.getErrorStringId()
+                                            ?: R.string.general_error
+                                        else -> R.string.general_error
+                                    }
+                                )
+                            )
+                        }
+                    }
+
+                    viewModel.setErrorShown()
                 }
             }
         }
@@ -474,7 +516,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 ACTION_FORCE_RELOAD_ACCOUNT -> {
                     viewModel.setIntentAction(ACTION_FORCE_RELOAD_ACCOUNT)
                     isLoggingIn = true
-                    showLoggingInScreen()
+                    showFetchingNodes()
                     return
                 }
             }
@@ -672,7 +714,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      * @param generatingKeys     True if it's generating keys, false otherwise.
      * @param activatingAccount  True if it's activating account, false otherwise.
      */
-    private fun showLoggingInScreen(
+    private fun showFetchingNodes(
         fetchingNodes: Boolean = true,
         queryingSignupLink: Boolean = false,
         generatingKeys: Boolean = false,
@@ -695,7 +737,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     /**
      * Shows the login screen.
      */
-    fun returnToLogin() {
+    private fun returnToLogin() {
         (requireActivity() as LoginActivity).hideAB()
         showLoginScreen()
     }
@@ -757,7 +799,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
     /**
      * Shows UI errors.
      */
-    private fun showShowError() = with(binding) {
+    private fun show2FAError() = with(binding) {
         viewModel.setWas2FAErrorShown()
         pin2faErrorLogin.isVisible = true
         confirmLogoutDialog?.dismiss()
@@ -801,14 +843,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             Timber.d("Login with factor login")
             progressbarVerify2fa.isVisible = true
             isLoggingIn = true
-            with(uiState) {
-                megaApi.multiFactorAuthLogin(
-                    accountSession?.email,
-                    password,
-                    twoFAPin,
-                    this@LoginFragment
-                )
-            }
+            viewModel.performLoginWith2FA(twoFAPin)
         }
     }
 
@@ -822,7 +857,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             return
         }
 
-        showLoggingInScreen()
+        showFetchingNodes()
         megaApi.fetchNodes(this@LoginFragment)
     }
 
@@ -835,7 +870,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             return
         }
 
-        showLoggingInScreen(fetchingNodes = false)
+        showFetchingNodes(fetchingNodes = false)
 
         if (!isLoggingIn) {
             isLoggingIn = true
@@ -844,7 +879,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 gSession,
                 ChatLogoutListener(requireActivity(), loggingSettings)
             )
-            viewModel.updateDisableLoginButton(true)
 
             megaApi.fastLogin(gSession, this)
 
@@ -870,7 +904,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             return
         }
 
-        showLoggingInScreen(fetchingNodes = false, generatingKeys = true)
+        showFetchingNodes(fetchingNodes = false, generatingKeys = true)
         Timber.d("Generating keys")
 
         onKeysGenerated()
@@ -895,7 +929,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             return
         }
 
-        showLoggingInScreen(fetchingNodes = false, generatingKeys = true)
+        showFetchingNodes(fetchingNodes = false, generatingKeys = true)
 
         val lastEmail = loginEmailText.text.toString().lowercase().trim { it <= ' ' }
         val lastPassword = loginPasswordText.text.toString()
@@ -933,16 +967,16 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         if (!isLoggingIn) {
             isLoggingIn = true
-
-            with(binding) {
-                loginLoggingInText.isVisible = true
-                loginFetchNodesText.isVisible = false
-                loginPrepareNodesText.isVisible = false
-                loginServersBusyText.isVisible = false
-            }
-
+            showLoginInProgress()
             viewModel.performLogin()
         }
+    }
+
+    private fun showLoginInProgress() = with(binding) {
+        loginLoggingInText.isVisible = true
+        loginFetchNodesText.isVisible = false
+        loginPrepareNodesText.isVisible = false
+        loginServersBusyText.isVisible = false
     }
 
     /**
@@ -1034,7 +1068,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             return
         }
 
-        showLoggingInScreen(fetchingNodes = false, queryingSignupLink = true)
+        showFetchingNodes(fetchingNodes = false, queryingSignupLink = true)
         Timber.d("querySignupLink")
         accountConfirmationLink?.let { viewModel.checkSignupLink(it) }
     }
@@ -1246,19 +1280,9 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         if (!isAdded) return
 
         Timber.d("onRequestStart: %s", request.requestString)
-        if (request.type == MegaRequest.TYPE_LOGIN) {
-            viewModel.updateDisableLoginButton(true)
-            viewModel.update2FAScreenShown()
-        }
-        if (request.type == MegaRequest.TYPE_FETCH_NODES) {
-            viewModel.updateIsFetchingNodes(true)
-            viewModel.updateDisableLoginButton(true)
-        }
     }
 
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, error: MegaError) {
-        viewModel.updateDisableLoginButton(false)
-
         timer?.let {
             it.cancel()
             binding.loginServersBusyText.isVisible = false
@@ -1284,7 +1308,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                     }
                     MegaError.API_EFAILED, MegaError.API_EEXPIRED -> {
                         binding.progressbarVerify2fa.isVisible = false
-                        showShowError()
+                        show2FAError()
                         return
                     }
                     else -> {
@@ -1331,7 +1355,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                         (requireActivity() as LoginActivity).hideAB()
                     }
 
-                    showLoggingInScreen()
+                    showFetchingNodes()
                 }
 
                 viewModel.saveCredentials()
@@ -1347,7 +1371,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                 Timber.d("Terminate login process when fetch nodes")
                 return
             }
-            viewModel.updateIsFetchingNodes(false)
             isLoggingIn = false
             if (error.errorCode == MegaError.API_OK) {
                 if (!isAdded) return
@@ -1606,29 +1629,17 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
      * Shows a confirmation dialog before cancelling the current in progress login.
      */
     private fun showConfirmLogoutDialog() {
-        val builder = MaterialAlertDialogBuilder(requireContext())
-        val dialogClickListener =
-            DialogInterface.OnClickListener { dialog: DialogInterface, which: Int ->
-                when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        backToLoginForm()
-                        viewModel.updatePressedBackWhileLogin(true)
-                        isLoggingIn = false
-                        viewModel.updateIsFetchingNodes(false)
-                        viewModel.updateIsAlreadyLoggedIn(true)
-                        viewModel.performLocalLogout()
-                    }
-                    DialogInterface.BUTTON_NEGATIVE -> dialog.dismiss()
-                }
-            }
-        val message = requireContext().getFormattedStringOrDefault(R.string.confirm_cancel_login)
-        confirmLogoutDialog = builder.setCancelable(true).setMessage(message).setPositiveButton(
-            requireContext().getFormattedStringOrDefault(R.string.general_positive_button),
-            dialogClickListener
-        )
-            .setNegativeButton(
-                requireContext().getFormattedStringOrDefault(R.string.general_negative_button),
-                dialogClickListener
+        confirmLogoutDialog = MaterialAlertDialogBuilder(requireContext())
+            .setCancelable(true)
+            .setMessage(requireContext().getString(R.string.confirm_cancel_login))
+            .setPositiveButton(
+                requireContext().getString(R.string.general_positive_button)
+            ) { _, _ ->
+                backToLoginForm()
+                viewModel.stopLogin()
+            }.setNegativeButton(
+                requireContext().getString(R.string.general_negative_button),
+                null
             ).show()
     }
 
@@ -1641,19 +1652,11 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
         if (Constants.ACTION_REFRESH == intentAction || Constants.ACTION_REFRESH_API_SERVER == intentAction) {
             return -1
         }
-        //login is in process
-        val onLoginPage = binding.loginLayout.isVisible
-        val on2faPage = binding.login2fa.isVisible
-        return if ((isLoggingIn || uiState.isFetchingNodes) && !onLoginPage && !on2faPage) {
+
+        return if (isLoggingIn || uiState.isFetchingNodes || uiState.is2FARequired) {
             showConfirmLogoutDialog()
             2
         } else {
-            if (on2faPage) {
-                Timber.d("Back from 2fa page")
-                showConfirmLogoutDialog()
-                return 2
-            }
-
             LoginActivity.isBackFromLoginPage = true
             (requireActivity() as LoginActivity).showFragment(Constants.TOUR_FRAGMENT)
             1

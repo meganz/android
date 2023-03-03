@@ -183,7 +183,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         if (item.itemId == android.R.id.home && visibleFragment == Constants.LOGIN_FRAGMENT
             && loginFragment?.isAdded == true
         ) {
-            loginFragment?.returnToLogin()
             onBackPressedDispatcher.onBackPressed()
         }
 
@@ -314,9 +313,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                 .setTitle(getFormattedStringOrDefault(R.string.title_alert_logged_out))
                 .setMessage(getFormattedStringOrDefault(R.string.error_server_expired_session))
                 .setPositiveButton(getFormattedStringOrDefault(R.string.general_ok), null)
-                .setOnDismissListener {
-                    viewModel.updateShowAlertLoggedOut()
-                }
                 .show()
         }
     }

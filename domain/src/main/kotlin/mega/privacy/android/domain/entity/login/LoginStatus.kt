@@ -19,9 +19,4 @@ enum class LoginStatus {
      * Login finished with success.
      */
     LoginSucceed,
-
-    /**
-     * Login requires 2FA.
-     */
-    LoginRequire2FA,
 }

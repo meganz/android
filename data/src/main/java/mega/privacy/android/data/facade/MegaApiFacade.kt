@@ -1009,4 +1009,11 @@ internal class MegaApiFacade @Inject constructor(
     override fun login(email: String, password: String, listener: MegaRequestListenerInterface) =
         megaApi.login(email, password, listener)
 
+    override fun multiFactorAuthLogin(
+        email: String,
+        password: String,
+        pin: String,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.multiFactorAuthLogin(email, password, pin, listener)
+
 }

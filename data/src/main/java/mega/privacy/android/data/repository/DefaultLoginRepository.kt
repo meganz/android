@@ -3,6 +3,8 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -21,10 +23,12 @@ import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedUnknownStatus
 import mega.privacy.android.domain.exception.LoginBlockedAccount
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
+import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginRequireValidation
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginUnknownStatus
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
+import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.LoginRepository
 import nz.mega.sdk.MegaChatApi
@@ -206,7 +210,7 @@ internal class DefaultLoginRepository @Inject constructor(
         }
     }
 
-    override fun login(email: String, password: String) =
+    private fun loginRequest(loginRequest: (OptionalMegaRequestListenerInterface) -> Unit) =
         callbackFlow {
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestStart = { trySend(LoginStatus.LoginStarted) },
@@ -215,43 +219,58 @@ internal class DefaultLoginRepository @Inject constructor(
                         MegaError.API_OK -> {
                             megaApiFolderGateway.accountAuth = megaApiGateway.accountAuth
                             trySend(LoginStatus.LoginSucceed)
+                            close()
                         }
                         MegaError.API_ESID -> {
                             Timber.w("Logged out from other location.")
-                            throw LoginLoggedOutFromOtherLocation()
+                            close(LoginLoggedOutFromOtherLocation())
+                        }
+                        MegaError.API_EFAILED, MegaError.API_EEXPIRED -> {
+                            Timber.w("Wrong 2FA code.")
+                            close(LoginWrongMultiFactorAuth())
                         }
                         MegaError.API_EMFAREQUIRED -> {
                             Timber.w("Require 2FA.")
-                            trySend(LoginStatus.LoginRequire2FA)
+                            close(LoginMultiFactorAuthRequired())
                         }
                         MegaError.API_ENOENT -> {
                             Timber.w("Wrong email or password")
-                            throw LoginWrongEmailOrPassword()
+                            close(LoginWrongEmailOrPassword())
                         }
                         MegaError.API_ETOOMANY -> {
                             Timber.w("Too many attempts")
-                            throw LoginTooManyAttempts()
+                            close(LoginTooManyAttempts())
                         }
                         MegaError.API_EINCOMPLETE -> {
                             Timber.w("Account not validated")
-                            throw LoginRequireValidation()
+                            close(LoginRequireValidation())
                         }
                         MegaError.API_EBLOCKED -> {
                             Timber.w("Blocked account")
-                            throw LoginBlockedAccount()
+                            close(LoginBlockedAccount())
                         }
                         else -> {
                             Timber.w("MegaRequest.TYPE_LOGIN error $error")
-                            throw LoginUnknownStatus(error.toException())
+                            close(LoginUnknownStatus(error.toException()))
                         }
                     }
-
-                    close()
                 }
             )
 
-            megaApiGateway.login(email, password, listener)
-
+            loginRequest.invoke(listener)
             awaitClose { megaApiGateway.removeRequestListener(listener) }
         }.flowOn(ioDispatcher)
+
+    override fun login(email: String, password: String) = flow {
+        emitAll(loginRequest { megaApiGateway.login(email, password, it) })
+    }
+
+
+    override fun multiFactorAuthLogin(
+        email: String,
+        password: String,
+        pin: String,
+    ) = flow {
+        emitAll(loginRequest { megaApiGateway.multiFactorAuthLogin(email, password, pin, it) })
+    }
 }

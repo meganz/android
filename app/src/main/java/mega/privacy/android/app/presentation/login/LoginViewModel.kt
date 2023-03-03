@@ -5,8 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -27,7 +25,8 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.LoginException
-import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
+import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
+import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.usecase.CancelTransfers
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.GetAccountCredentials
@@ -45,6 +44,7 @@ import mega.privacy.android.domain.usecase.login.ChatLogout
 import mega.privacy.android.domain.usecase.login.DisableChatApi
 import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.login.Login
+import mega.privacy.android.domain.usecase.login.LoginWith2FA
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import javax.inject.Inject
 
@@ -72,6 +72,7 @@ class LoginViewModel @Inject constructor(
     private val localLogout: LocalLogout,
     private val chatLogout: ChatLogout,
     private val login: Login,
+    private val loginWith2FA: LoginWith2FA,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -174,22 +175,31 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * Updates isFetchingNodes value in state.
+     * Stops logging in.
      */
-    fun updateIsFetchingNodes(isFetchingNodes: Boolean) {
+    fun stopLogin() {
+        MegaApplication.isLoggingIn = false
         _state.update {
             it.copy(
-                isFetchingNodes = isFetchingNodes,
-                showFetchingNodesScreen = isFetchingNodes
+                pressedBackWhileLogin = true,
+                isAlreadyLoggedIn = false,
+                isFetchingNodes = false,
+                is2FARequired = false,
+                is2FAEnabled = false,
+                was2FAErrorShown = false,
+                is2FAErrorShown = false,
+                isLoginInProgress = false,
+                isLocalLogoutInProgress = true,
+                isLoginRequired = true,
             )
         }
-    }
-
-    /**
-     * Updates isAlreadyLoggedIn value in state.
-     */
-    fun updateIsAlreadyLoggedIn(isAlreadyLoggedIn: Boolean) {
-        _state.update { it.copy(isAlreadyLoggedIn = isAlreadyLoggedIn) }
+        viewModelScope.launch {
+            localLogout(
+                DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi },
+                ClearPsa { PsaManager::stopChecking }
+            )
+            _state.update { it.copy(isLocalLogoutInProgress = false) }
+        }
     }
 
     /**
@@ -225,6 +235,13 @@ class LoginViewModel @Inject constructor(
      */
     fun updateIsRefreshApiServer(isRefreshApiServer: Boolean) {
         _state.update { it.copy(isRefreshApiServer = isRefreshApiServer) }
+    }
+
+    /**
+     * Updates error value in state as null.
+     */
+    fun setErrorShown() {
+        _state.update { it.copy(error = null) }
     }
 
     /**
@@ -268,34 +285,6 @@ class LoginViewModel @Inject constructor(
      */
     fun setTemporalCredentials(email: String?, password: String?) {
         _state.update { it.copy(temporalEmail = email, temporalPassword = password) }
-    }
-
-    /**
-     * Sets to false show alert logged out in state.
-     */
-    fun updateShowAlertLoggedOut() {
-        _state.update { it.copy(showAlertLoggedOut = false) }
-    }
-
-    /**
-     * Sets to false 2FA screen shown in state.
-     */
-    fun update2FAScreenShown() {
-        _state.update { it.copy(is2FAScreenShown = false) }
-    }
-
-    /**
-     * Sets to false fetching nodes screen shown in state.
-     */
-    fun updateShowFetchingNodesScreen() {
-        _state.update { it.copy(showFetchingNodesScreen = false) }
-    }
-
-    /**
-     * Updates value for disabling login button in state.
-     */
-    fun updateDisableLoginButton(disable: Boolean) {
-        _state.update { it.copy(disableLoginButton = disable) }
     }
 
     /**
@@ -381,16 +370,6 @@ class LoginViewModel @Inject constructor(
     fun launchCancelTransfers() = viewModelScope.launch { cancelTransfers() }
 
     /**
-     * Local logout.
-     */
-    fun performLocalLogout() = viewModelScope.launch {
-        localLogout(
-            DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi },
-            ClearPsa { PsaManager::stopChecking }
-        )
-    }
-
-    /**
      * ChatLogout.
      */
     fun performChatLogout() = viewModelScope.launch {
@@ -407,44 +386,92 @@ class LoginViewModel @Inject constructor(
                     accountSession?.email ?: return@launch,
                     password ?: return@launch,
                     DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
-                ).collectLatest { status ->
-                    when (status) {
-                        LoginStatus.LoginStarted -> {
-                            _state.update {
-                                it.copy(disableLoginButton = true, is2FAScreenShown = false)
-                            }
-                        }
-                        LoginStatus.LoginRequire2FA -> {
-                            _state.update { it.copy(is2FAEnabled = true, is2FAScreenShown = true) }
-                        }
-                        LoginStatus.LoginSucceed -> {
-                            _state.update {
-                                it.copy(showFetchingNodesScreen = true, is2FAScreenShown = false)
-                            }
-                            performFetchNodes()
-                        }
-                        else -> {
-                            //LoginStatus.LoginCannotStart no action required.
-                        }
-                    }
-
-                    if (status != LoginStatus.LoginStarted) {
-                        currentCoroutineContext().cancel()
-                    }
-                }
+                ).collectLatest { status -> status.checkStatus() }
             }.onFailure { exception ->
                 if (exception !is LoginException) return@onFailure
+                MegaApplication.isLoggingIn = false
 
-                _state.update { it.copy(showLoginScreen = true, disableLoginButton = false) }
-
-                when (exception) {
-                    is LoginLoggedOutFromOtherLocation -> {
-                        _state.update { it.copy(showAlertLoggedOut = true) }
+                if (exception is LoginMultiFactorAuthRequired) {
+                    _state.update {
+                        it.copy(
+                            isLoginInProgress = false,
+                            is2FAEnabled = true,
+                            isLoginRequired = false,
+                            is2FARequired = true
+                        )
                     }
-                    else -> {
-                        _state.update { it.copy(error = exception) }
-                    }
+                } else {
+                    exception.loginFailed()
                 }
+            }
+        }
+    }
+
+    /**
+     * Login with 2FA.
+     */
+    fun performLoginWith2FA(pin2FA: String) = viewModelScope.launch {
+        with(state.value) {
+            runCatching {
+                loginWith2FA(
+                    accountSession?.email ?: return@launch,
+                    password ?: return@launch,
+                    pin2FA,
+                    DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
+                ).collectLatest { status -> status.checkStatus() }
+            }.onFailure { exception ->
+                if (exception !is LoginException) return@onFailure
+                MegaApplication.isLoggingIn = false
+
+                if (exception is LoginWrongMultiFactorAuth) {
+                    _state.update {
+                        it.copy(
+                            isLoginInProgress = false,
+                            is2FARequired = true,
+                            is2FAErrorShown = true
+                        )
+                    }
+                } else {
+                    exception.loginFailed()
+                }
+            }
+        }
+    }
+
+    private fun LoginException.loginFailed() =
+        _state.update {
+            it.copy(
+                isLoginInProgress = false,
+                isLoginRequired = true,
+                is2FAEnabled = true,
+                is2FARequired = false,
+                error = this
+            )
+        }
+
+    private fun LoginStatus.checkStatus() {
+        when (this) {
+            LoginStatus.LoginStarted -> {
+                _state.update {
+                    it.copy(
+                        isLoginInProgress = true,
+                        is2FARequired = false
+                    )
+                }
+            }
+            LoginStatus.LoginSucceed -> {
+                _state.update {
+                    it.copy(
+                        isLoginInProgress = false,
+                        isFetchingNodes = true,
+                        is2FARequired = false,
+                        isAlreadyLoggedIn = true
+                    )
+                }
+                performFetchNodes()
+            }
+            else -> {
+                //LoginStatus.LoginCannotStart no action required.
             }
         }
     }

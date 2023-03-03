@@ -15,7 +15,7 @@ import mega.privacy.android.domain.exception.LoginException
  * @property isAlreadyLoggedIn       True if account credentials are not null, false otherwise.
  * @property pressedBackWhileLogin   True if pressed back while a login was in progress, false otherwise.
  * @property is2FAEnabled            True if should ask for 2FA, false otherwise.
- * @property is2FAScreenShown        True if 2FA screen is shown, false otherwise.
+ * @property is2FARequired           True if 2FA needs to be requested, false otherwise.
  * @property was2FAErrorShown        True if a pin was wrong already , false otherwise.
  * @property is2FAErrorShown         True if 2FA error is shown because of a wrong pin typed.
  * @property isPinLongClick          True if it is trying to paste 2FA pin with a long click on any of the pin fields.
@@ -29,11 +29,10 @@ import mega.privacy.android.domain.exception.LoginException
  * @property hasPreferences          True if has user preferences, false otherwise.
  * @property hasCUSetting            True if has CU setting, false otherwise.
  * @property isCUSettingEnabled      Ture if CU setting is enabled, false otherwise.
- * @property disableLoginButton      True if should disable login button, false otherwise.
- * @property showAlertLoggedOut      True if should show logged out alert, false otherwise.
- * @property showLoginScreen         True if should show login screen, false otherwise.
+ * @property isLocalLogoutInProgress True if local logout is in progress, false otherwise.
+ * @property isLoginRequired         True if should ask for login, false otherwise.
+ * @property isLoginInProgress       True if a login is in progress, false otherwise.
  * @property error                   [LoginException].
- * @property showFetchingNodesScreen True if should show fetching nodes screen after a success login, false otherwise.
  */
 data class LoginState(
     val isFirstFetchNodesUpdate: Boolean = true,
@@ -45,7 +44,7 @@ data class LoginState(
     val isAlreadyLoggedIn: Boolean = true,
     val pressedBackWhileLogin: Boolean = false,
     val is2FAEnabled: Boolean = false,
-    val is2FAScreenShown: Boolean = false,
+    val is2FARequired: Boolean = false,
     val was2FAErrorShown: Boolean = false,
     val is2FAErrorShown: Boolean = false,
     val isPinLongClick: Boolean = false,
@@ -59,11 +58,10 @@ data class LoginState(
     val hasPreferences: Boolean = false,
     val hasCUSetting: Boolean = false,
     val isCUSettingEnabled: Boolean = false,
-    val disableLoginButton: Boolean = false,
-    val showAlertLoggedOut: Boolean = false,
-    val showLoginScreen: Boolean = false,
+    val isLocalLogoutInProgress: Boolean = false,
+    val isLoginRequired: Boolean = false,
+    val isLoginInProgress: Boolean = false,
     val error: LoginException? = null,
-    val showFetchingNodesScreen: Boolean = false,
 ) {
     companion object {
 

@@ -16,6 +16,7 @@ import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedUnknownStatus
 import mega.privacy.android.domain.exception.LoginBlockedAccount
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
+import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginRequireValidation
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginUnknownStatus
@@ -169,93 +170,112 @@ class DefaultLoginRepositoryTest {
     @Test
     fun `test that login returns LoginRequire2FA if the request fails with API_EMFAREQUIRED`() =
         runTest {
-            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
-            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EMFAREQUIRED) }
+            whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EMFAREQUIRED) }
+                )
+            }
 
             underTest.login(email, password).test {
-                verify(megaApiGateway).login(any(), any(), listenerCaptor.capture())
-                val listener = listenerCaptor.firstValue
-                listener.onRequestFinish(mock(), mock(), error)
-                assertThat(awaitItem()).isEqualTo(LoginStatus.LoginRequire2FA)
-                cancelAndIgnoreRemainingEvents()
+                assertThat(awaitError()).isInstanceOf(LoginMultiFactorAuthRequired::class.java)
             }
         }
 
-    @Test(expected = LoginLoggedOutFromOtherLocation::class)
+    @Test
     fun `test that login returns LoggedOutFromOtherLocation if the request fails with API_ESID`() =
         runTest {
-            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
-            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_ESID) }
+            whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_ESID) }
+                )
+            }
 
             underTest.login(email, password).test {
-                verify(megaApiGateway).login(any(), any(), listenerCaptor.capture())
-                val listener = listenerCaptor.firstValue
-                listener.onRequestFinish(mock(), mock(), error)
+                assertThat(awaitError()).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
             }
         }
 
-    @Test(expected = LoginWrongEmailOrPassword::class)
+    @Test
     fun `test that login returns WrongEmailOrPassword if the request fails with API_ENOENT`() =
         runTest {
-            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
-            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_ENOENT) }
+            whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_ENOENT) }
+                )
+            }
 
             underTest.login(email, password).test {
-                verify(megaApiGateway).login(any(), any(), listenerCaptor.capture())
-                val listener = listenerCaptor.firstValue
-                listener.onRequestFinish(mock(), mock(), error)
+                assertThat(awaitError()).isInstanceOf(LoginWrongEmailOrPassword::class.java)
             }
         }
 
-    @Test(expected = LoginTooManyAttempts::class)
+    @Test
     fun `test that login returns TooManyAttempts if the request fails with API_ETOOMANY`() =
         runTest {
-            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
-            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_ETOOMANY) }
+            whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_ETOOMANY) }
+                )
+            }
 
             underTest.login(email, password).test {
-                verify(megaApiGateway).login(any(), any(), listenerCaptor.capture())
-                val listener = listenerCaptor.firstValue
-                listener.onRequestFinish(mock(), mock(), error)
+                assertThat(awaitError()).isInstanceOf(LoginTooManyAttempts::class.java)
             }
         }
 
-    @Test(expected = LoginRequireValidation::class)
+    @Test
     fun `test that login returns RequireValidation if the request fails with API_EINCOMPLETE`() =
         runTest {
-            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
-            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EINCOMPLETE) }
+            whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EINCOMPLETE) }
+                )
+            }
 
             underTest.login(email, password).test {
-                verify(megaApiGateway).login(any(), any(), listenerCaptor.capture())
-                val listener = listenerCaptor.firstValue
-                listener.onRequestFinish(mock(), mock(), error)
+                assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
             }
         }
 
-    @Test(expected = LoginBlockedAccount::class)
+    @Test
     fun `test that login returns BlockedAccount if the request fails with API_EBLOCKED`() =
         runTest {
-            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
-            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EBLOCKED) }
+            whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EBLOCKED) }
+                )
+            }
 
             underTest.login(email, password).test {
-                verify(megaApiGateway).login(any(), any(), listenerCaptor.capture())
-                val listener = listenerCaptor.firstValue
-                listener.onRequestFinish(mock(), mock(), error)
+                assertThat(awaitError()).isInstanceOf(LoginBlockedAccount::class.java)
             }
         }
 
-    @Test(expected = LoginUnknownStatus::class)
+    @Test
     fun `test that login returns Unknown if the request fails with non contemplated error`() =
         runTest {
-            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
-            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.LOCAL_ENOSPC) }
+            whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
+                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.LOCAL_ENOSPC) }
+                )
+            }
 
             underTest.login(email, password).test {
-                verify(megaApiGateway).login(any(), any(), listenerCaptor.capture())
-                val listener = listenerCaptor.firstValue
-                listener.onRequestFinish(mock(), mock(), error)
+                assertThat(awaitError()).isInstanceOf(LoginUnknownStatus::class.java)
             }
         }
 }
