@@ -2939,9 +2939,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             } else {
                 Timber.d("Not credentials")
                 Timber.d("Not credentials -> INTENT")
-                if (intent.action != null) {
+                if (intent?.action != null) {
                     Timber.d("Intent with ACTION: %s", intent.action)
-                    if (intent.action == Constants.ACTION_EXPORT_MASTER_KEY) {
+                    if (intent?.action == Constants.ACTION_EXPORT_MASTER_KEY) {
                         val exportIntent =
                             Intent(managerActivity, LoginActivity::class.java)
                         intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
@@ -2954,9 +2954,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
         }
-        Timber.d("Intent not null! %s", intent.action)
+        intent?.let {
+            Timber.d("Intent not null! %s", it.action)
+        }
         // Open folder from the intent
-        if (intent.hasExtra(Constants.EXTRA_OPEN_FOLDER)) {
+        if (intent?.hasExtra(Constants.EXTRA_OPEN_FOLDER) == true) {
             Timber.d("INTENT: EXTRA_OPEN_FOLDER")
             fileBrowserViewModel.setBrowserParentHandle(
                 intent.getLongExtra(
@@ -2967,7 +2969,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             intent.removeExtra(Constants.EXTRA_OPEN_FOLDER)
             intent = null
         }
-        if (intent.action != null) {
+        if (intent?.action != null) {
             Timber.d("Intent action")
             when (intent.action) {
                 Constants.ACTION_EXPLORE_ZIP -> {
