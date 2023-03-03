@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -34,6 +35,8 @@ internal class ChangePasswordViewModel @Inject constructor(
     private val getRootFolder: GetRootFolder,
     private val multiFactorAuthSetting: FetchMultiFactorAuthSetting,
 ) : ViewModel() {
+    private var mJob: Job? = null
+
     private val _uiState = MutableStateFlow(ChangePasswordUIState())
 
     /**
@@ -43,12 +46,21 @@ internal class ChangePasswordViewModel @Inject constructor(
      */
     val uiState = _uiState.asStateFlow()
 
-    private val linkToReset
-        get() = savedStateHandle.get<String>(ChangePasswordActivity.KEY_LINK_TO_RESET)
-
+    /**
+     * View action whether action is Reset Password or Change Password
+     */
     private val action
         get() = savedStateHandle.get<String>(ChangePasswordActivity.KEY_ACTION)
 
+    /**
+     * Reset password link if mode is reset password
+     */
+    private val linkToReset
+        get() = savedStateHandle.get<String>(ChangePasswordActivity.KEY_LINK_TO_RESET)
+
+    /**
+     * Master key to be passed if mode is reset password
+     */
     private val masterKey
         get() = savedStateHandle.get<String>(IntentConstants.EXTRA_MASTER_KEY)
 
@@ -150,21 +162,43 @@ internal class ChangePasswordViewModel @Inject constructor(
     /**
      * Action to check password strength level
      * @param password the new password that the user inputs
+     * @param invalidate invalidate error to default when checking password strength
      * will update the password UI based on the strength level
+     * previous jobs will not be evaluated when [password] value's changed
      */
-    fun checkPasswordStrength(password: String) {
-        viewModelScope.launch {
+    fun checkPasswordStrength(password: String, invalidate: Boolean = false) {
+        if (invalidate) {
+            uiState.value.passwordError?.let {
+                viewModelScope.launch {
+                    _uiState.update { it.copy(passwordError = null) }
+                }
+            }
+        }
+
+        mJob?.cancel()
+        mJob = viewModelScope.launch {
             _uiState.update {
-                it.copy(
-                    passwordStrength = if (password.length < 4) PasswordStrength.VERY_WEAK else getPasswordStrength(
-                        password
-                    ),
-                    isCurrentPassword = isCurrentPassword(password = password)
-                )
+                val isCurrentPassword =
+                    if (password.length > MIN_PASSWORD_CHAR) isCurrentPassword(password) else false
+                val passwordStrengthLevel =
+                    if (password.length > MIN_PASSWORD_CHAR) getPasswordStrength(password = password) else PasswordStrength.VERY_WEAK
+
+                if (password.isBlank()) {
+                    it.copy(passwordStrength = PasswordStrength.INVALID)
+                } else {
+                    it.copy(
+                        passwordStrength = passwordStrengthLevel,
+                        isCurrentPassword = isCurrentPassword
+                    )
+                }
             }
         }
     }
 
+    /**
+     * Method called once during view init, to check whether view
+     * is on either change password or reset password mode
+     */
     fun determineIfScreenIsResetPasswordMode() {
         if (action == Constants.ACTION_RESET_PASS_FROM_LINK || action == Constants.ACTION_RESET_PASS_FROM_PARK_ACCOUNT) {
             _uiState.update {
@@ -174,6 +208,73 @@ internal class ChangePasswordViewModel @Inject constructor(
                     isResetPasswordMode = true
                 )
             }
+        }
+    }
+
+    /**
+     * Resets confirm password text field error state to default null
+     */
+    fun validateConfirmPasswordToDefault() {
+        uiState.value.confirmPasswordError?.let {
+            viewModelScope.launch {
+                _uiState.update { it.copy(confirmPasswordError = null) }
+            }
+        }
+    }
+
+    /**
+     * Validate password and check for errors, will validate the error ui state
+     * @param password to check and validate
+     */
+    fun validatePassword(password: String) {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(passwordError = getPasswordError(password))
+            }
+        }
+    }
+
+    /**
+     * Validate all passwords and check for errors before saving
+     * @param password to check and validate
+     * @param confirmPassword to check and validate
+     */
+    fun validateAllPasswordOnSave(password: String, confirmPassword: String) {
+        viewModelScope.launch {
+            val passwordError =
+                getPasswordError(password).takeIf { uiState.value.isResetPasswordMode.not() }
+            val confirmPasswordError = getConfirmPasswordError(password, confirmPassword)
+
+            _uiState.update {
+                it.copy(
+                    isSaveValidationSuccessful = passwordError == null && confirmPasswordError == null,
+                    passwordError = passwordError,
+                    confirmPasswordError = confirmPasswordError
+                )
+            }
+        }
+    }
+
+    /**
+     * Check for errors in password field
+     */
+    private suspend fun getPasswordError(password: String): Int? {
+        return when {
+            password.isEmpty() -> R.string.error_enter_password
+            isCurrentPassword(password) -> R.string.error_same_password
+            getPasswordStrength(password) <= PasswordStrength.VERY_WEAK -> R.string.error_password
+            else -> null
+        }
+    }
+
+    /**
+     * Check for errors in confirm password field
+     */
+    private fun getConfirmPasswordError(password: String, confirmPassword: String): Int? {
+        return when {
+            confirmPassword.isBlank() -> R.string.error_enter_password
+            password != confirmPassword -> R.string.error_passwords_dont_match
+            else -> null
         }
     }
 
@@ -205,7 +306,24 @@ internal class ChangePasswordViewModel @Inject constructor(
         _uiState.update { it.copy(isPasswordReset = false, errorCode = null) }
     }
 
+    /**
+     * Reset state when alert message has been shown
+     */
     fun onAlertMessageShown() {
         _uiState.update { it.copy(isShowAlertMessage = false) }
+    }
+
+    /**
+     * Reset state when password validation is successful
+     */
+    fun onResetPasswordValidation() {
+        _uiState.update { it.copy(isSaveValidationSuccessful = false) }
+    }
+
+    companion object {
+        /**
+         * Minimum character count of a password to be saved
+         */
+        private const val MIN_PASSWORD_CHAR = 4
     }
 }

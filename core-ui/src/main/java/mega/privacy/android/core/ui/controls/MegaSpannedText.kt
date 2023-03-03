@@ -61,6 +61,7 @@ fun MegaSpannedText(
         textAlign = baseStyle.textAlign,
         color = baseStyle.color,
         textDecoration = baseStyle.textDecoration,
+        lineHeight = baseStyle.lineHeight
     )
 }
 

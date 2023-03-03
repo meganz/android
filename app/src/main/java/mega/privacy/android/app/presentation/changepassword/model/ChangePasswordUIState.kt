@@ -16,6 +16,9 @@ import mega.privacy.android.domain.entity.changepassword.PasswordStrength
  * @param isShowAlertMessage ui state to show alert dialog
  * @param passwordStrength password level strength to show password level animation
  * @param errorCode error code when navigating to other screen
+ * @param isSaveValidationSuccessful ui state when password validation is successful
+ * @param passwordError ui state to show password error
+ * @param confirmPasswordError ui state to show confirm password error
  * @param snackBarMessage ui state to show SnackBar message
  * @param loadingMessage ui state to show progress loading and its message
 
@@ -33,6 +36,9 @@ data class ChangePasswordUIState(
     val passwordStrength: PasswordStrength = PasswordStrength.INVALID,
     @Deprecated("Legacy screen still needs this as parameter during navigation")
     val errorCode: Int? = null,
+    val isSaveValidationSuccessful: Boolean = false,
+    @StringRes val passwordError: Int? = null,
+    @StringRes val confirmPasswordError: Int? = null,
     @StringRes val snackBarMessage: Int? = null,
     @StringRes val loadingMessage: Int? = null,
 )

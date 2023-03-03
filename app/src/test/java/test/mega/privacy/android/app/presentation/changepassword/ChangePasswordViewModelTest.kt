@@ -226,6 +226,34 @@ internal class ChangePasswordViewModelTest {
         }
 
     @Test
+    fun `test that when checking password strength and password is blank should return invisible state`() =
+        runTest {
+            val fakePassword = ""
+            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
+            whenever(isCurrentPassword(fakePassword)).thenReturn(true)
+
+            underTest.checkPasswordStrength(fakePassword)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.passwordStrength).isEqualTo(PasswordStrength.INVALID)
+            }
+        }
+
+    @Test
+    fun `test that when invalidate password is set to true when checking password strength should remove password error state`() =
+        runTest {
+            val fakePassword = "password"
+
+            underTest.checkPasswordStrength(fakePassword, true)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.passwordError).isNull()
+            }
+        }
+
+    @Test
     fun `test that when action is reset password and master key or reset link null should update isShowAlertMessage ui state`() =
         runTest {
             val fakeLink = "Link"
@@ -307,6 +335,129 @@ internal class ChangePasswordViewModelTest {
             assertThat(awaitItem().isShowAlertMessage).isFalse()
         }
     }
+
+    @Test
+    fun `test that when validate confirm password to default should reset confirm password error state to null`() =
+        runTest {
+            underTest.validateConfirmPasswordToDefault()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().confirmPasswordError).isNull()
+            }
+        }
+
+    @Test
+    fun `test that when validate password returns an error should return an error message to the ui state`() =
+        runTest {
+            val fakePassword = ""
+
+            underTest.validatePassword(fakePassword)
+
+            underTest.uiState.test {
+                assertThat(awaitItem().passwordError).isEqualTo(R.string.error_enter_password)
+            }
+        }
+
+    @Test
+    fun `test that when validate password on save and no errors detected should update successful validation to true`() =
+        runTest {
+            val fakePassword = "password"
+            val fakeConfirmPassword = "password"
+            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
+            whenever(isCurrentPassword(fakePassword)).thenReturn(false)
+
+            underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isSaveValidationSuccessful).isTrue()
+                assertThat(state.passwordError).isNull()
+                assertThat(state.confirmPasswordError).isNull()
+            }
+        }
+
+    @Test
+    fun `test that when validate password on save and password is current password should update successful validation to false and return an error message`() =
+        runTest {
+            val fakePassword = "password"
+            val fakeConfirmPassword = "password"
+            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
+            whenever(isCurrentPassword(fakePassword)).thenReturn(true)
+
+            underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isSaveValidationSuccessful).isFalse()
+                assertThat(state.passwordError).isEqualTo(R.string.error_same_password)
+                assertThat(state.confirmPasswordError).isNull()
+            }
+        }
+
+    @Test
+    fun `test that when validate password on save and password is very weak should update successful validation to false and return an error message`() =
+        runTest {
+            val fakePassword = "password"
+            val fakeConfirmPassword = "password"
+            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.VERY_WEAK)
+            whenever(isCurrentPassword(fakePassword)).thenReturn(false)
+
+            underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isSaveValidationSuccessful).isFalse()
+                assertThat(state.passwordError).isEqualTo(R.string.error_password)
+                assertThat(state.confirmPasswordError).isNull()
+            }
+        }
+
+    @Test
+    fun `test that when validate password on save and confirm password is blank should update successful validation to false and return an error message`() =
+        runTest {
+            val fakePassword = "password"
+            val fakeConfirmPassword = ""
+            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.STRONG)
+            whenever(isCurrentPassword(fakePassword)).thenReturn(false)
+
+            underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isSaveValidationSuccessful).isFalse()
+                assertThat(state.passwordError).isNull()
+                assertThat(state.confirmPasswordError).isEqualTo(R.string.error_enter_password)
+            }
+        }
+
+    @Test
+    fun `test that when validate password on save and confirm password is different from password should update successful validation to false and return an error message`() =
+        runTest {
+            val fakePassword = "password"
+            val fakeConfirmPassword = "password1237123891"
+            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.STRONG)
+            whenever(isCurrentPassword(fakePassword)).thenReturn(false)
+
+            underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
+
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isSaveValidationSuccessful).isFalse()
+                assertThat(state.passwordError).isNull()
+                assertThat(state.confirmPasswordError).isEqualTo(R.string.error_passwords_dont_match)
+            }
+        }
+
+    @Test
+    fun `test that when onResetPasswordValidation called, should reset state to default`() =
+        runTest {
+            underTest.onResetPasswordValidation()
+
+            underTest.uiState.test {
+                assertThat(awaitItem().isSaveValidationSuccessful).isFalse()
+            }
+        }
+
 
     private fun verifyChangePasswordUiState(
         isSuccessChangePassword: Boolean,
