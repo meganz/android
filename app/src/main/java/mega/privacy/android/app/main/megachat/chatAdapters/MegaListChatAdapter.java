@@ -802,14 +802,28 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
         notifyDataSetChanged();
     }
 
+    /**
+     * Check if it is an invalid position
+     *
+     * @param position Position in adapter
+     * @return True if it's an invalid position. False if it's a valid position.
+     */
+    private boolean isInvalidPosition(int position) {
+        return position == RecyclerView.NO_POSITION || position >= chats.size();
+    }
+
     @Override
     public void onClick(View v) {
         ViewHolderChatList holder = (ViewHolderChatList) v.getTag();
 
         switch (v.getId()) {
             case R.id.recent_chat_list_three_dots: {
-                int currentPosition = holder.getAdapterPosition();
+                int currentPosition = holder.getBindingAdapterPosition();
                 Timber.d("Current position: %s", currentPosition);
+                if (isInvalidPosition(currentPosition)) {
+                    break;
+                }
+
                 MegaChatListItem c = (MegaChatListItem) getItem(currentPosition);
                 if (context instanceof ManagerActivity) {
 
@@ -830,9 +844,11 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
             }
             case R.id.recent_chat_list_item_layout: {
                 Timber.d("Click layout!");
-                int currentPosition = holder.getAdapterPosition();
+                int currentPosition = holder.getBindingAdapterPosition();
                 Timber.d("Current position: %s", currentPosition);
-                MegaChatListItem c = (MegaChatListItem) getItem(currentPosition);
+                if (isInvalidPosition(currentPosition)) {
+                    break;
+                }
 
                 if (context instanceof ManagerActivity) {
                     ((RecentChatsFragment) fragment).itemClick(currentPosition);
@@ -858,7 +874,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
     public boolean onLongClick(View view) {
         Timber.d("OnLongCLick");
         ViewHolderChatList holder = (ViewHolderChatList) view.getTag();
-        int currentPosition = holder.getAdapterPosition();
+        int currentPosition = holder.getBindingAdapterPosition();
 
         if (context instanceof ManagerActivity || context instanceof ArchivedChatsActivity) {
             ((RecentChatsFragment) fragment).activateActionMode();
