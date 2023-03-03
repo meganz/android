@@ -218,20 +218,16 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
     }
 
-    fun selectPhoto(photo: Photo) = viewModelScope.launch {
+    fun selectPhoto(photo: Photo) {
         _state.update {
-            val selectedPhotoIds = withContext(defaultDispatcher) {
-                it.selectedPhotoIds + photo.id
-            }
+            val selectedPhotoIds = it.selectedPhotoIds + photo.id
             it.copy(selectedPhotoIds = selectedPhotoIds)
         }
     }
 
-    fun unselectPhoto(photo: Photo) = viewModelScope.launch {
+    fun unselectPhoto(photo: Photo) {
         _state.update {
-            val selectedPhotoIds = withContext(defaultDispatcher) {
-                it.selectedPhotoIds - photo.id
-            }
+            val selectedPhotoIds = it.selectedPhotoIds - photo.id
             it.copy(selectedPhotoIds = selectedPhotoIds)
         }
     }

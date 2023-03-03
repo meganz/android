@@ -150,7 +150,7 @@ class AlbumPhotosSelectionViewModelTest {
 
         underTest?.selectPhoto(image)
 
-        underTest?.state?.drop(1)?.test {
+        underTest?.state?.test {
             assertThat(awaitItem().selectedPhotoIds).isEqualTo(setOf(image.id))
         }
     }
