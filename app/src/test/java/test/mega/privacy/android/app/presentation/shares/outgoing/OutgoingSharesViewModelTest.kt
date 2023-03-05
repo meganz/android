@@ -14,10 +14,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel
-import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.Node
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
@@ -55,8 +52,7 @@ class OutgoingSharesViewModelTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
-        val shareData = ShareData("user", 8766L, 0, 987654678L, true, false)
-        onBlocking { invoke(any()) }.thenReturn(listOf(shareData))
+        onBlocking { invoke(any()) }.thenReturn(emptyList())
     }
 
     @Before
@@ -212,7 +208,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that is invalid handle is set to false when call set outgoing tree depth with valid handle`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(listOf())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
             underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
@@ -226,7 +222,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that is invalid handle is set to true when call set outgoing tree depth with invalid handle`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(listOf())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
             underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
@@ -242,7 +238,7 @@ class OutgoingSharesViewModelTest {
     @Test
     fun `test that is invalid handle is set to true when cannot retrieve node`() =
         runTest {
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(mock())
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(listOf())
             whenever(getNodeByHandle(any())).thenReturn(mock())
 
             underTest.state.map { it.isInvalidHandle }.distinctUntilChanged()
@@ -302,9 +298,9 @@ class OutgoingSharesViewModelTest {
         runTest {
             val node1 = mock<MegaNode>()
             val node2 = mock<MegaNode>()
-            val expected = listOf(node1, node2)
+            val expected = listOf(Pair(node1, null), Pair(node2, null))
 
-            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(expected)
+            whenever(getOutgoingSharesChildrenNode(any())).thenReturn(expected.map { it.first })
 
             underTest.state.map { it.nodes }.distinctUntilChanged()
                 .test {
@@ -319,9 +315,9 @@ class OutgoingSharesViewModelTest {
         runTest {
             val node1 = mock<MegaNode>()
             val node2 = mock<MegaNode>()
-            val expected = listOf(node1, node2)
+            val expected = listOf(Pair(node1, null), Pair(node2, null))
 
-            whenever(getOutgoingSharesChildrenNode(123456789L)).thenReturn(expected)
+            whenever(getOutgoingSharesChildrenNode(123456789L)).thenReturn(expected.map { it.first })
             whenever(getOutgoingSharesChildrenNode(987654321L)).thenReturn(null)
 
             underTest.state.map { it.nodes }.distinctUntilChanged()
@@ -379,9 +375,6 @@ class OutgoingSharesViewModelTest {
 
     @Test
     fun `test that refresh nodes is called when receiving a node update`() = runTest {
-        val node = mock<Node> {
-            on { this.id }.thenReturn(NodeId(987654321L))
-        }
         monitorNodeUpdates.emit(NodeUpdate(emptyMap()))
         // initialization call + receiving a node update call
         verify(
@@ -437,16 +430,4 @@ class OutgoingSharesViewModelTest {
                     assertThat(awaitItem()).isEqualTo(expected)
                 }
         }
-
-    @Test
-    fun `test that unverified outgoing shares are returned`() = runTest {
-        val node1 = mock<MegaNode>()
-        whenever(getNodeByHandle(any())).thenReturn(node1)
-        assertThat(getNodeByHandle(any())).isNotNull()
-        initViewModel()
-        underTest.state.map { it.unverifiedOutgoingShares }.distinctUntilChanged()
-            .test {
-                assertThat(awaitItem().size).isEqualTo(1)
-            }
-    }
 }

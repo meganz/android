@@ -33,6 +33,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -97,36 +98,36 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
-        val clickedNodeHandle = adapter?.getItem(position)?.handle
-        val shareData = viewModel.getUnVerifiedOutgoingNodeShare(clickedNodeHandle)
-        if (shareData != null) {
-            if (!shareData.isVerified && shareData.isPending) {
+        val node = state().nodes.getOrNull(actualPosition)?.first
+        val shareData = state().nodes.getOrNull(actualPosition)?.second
+        when {
+            shareData?.isPending == true -> {
                 showCanNotVerifyContact(shareData.user)
-            } else {
+            }
+            shareData?.isVerified == false -> {
                 openAuthenticityCredentials(shareData.user)
             }
-        } else {
-            when {
-                // select mode
-                adapter?.isMultipleSelect == true -> {
-                    adapter?.toggleSelection(position)
-                    val selectedNodes = adapter?.selectedNodes
-                    if ((selectedNodes?.size ?: 0) > 0)
-                        updateActionModeTitle()
-                }
+            // select mode
+            adapter?.isMultipleSelect == true -> {
+                adapter?.toggleSelection(position)
+                val selectedNodes = adapter?.selectedNodes
+                if ((selectedNodes?.size ?: 0) > 0)
+                    updateActionModeTitle()
+            }
 
-                // click on a folder
-                state().nodes[actualPosition].isFolder ->
-                    navigateToFolder(state().nodes[actualPosition])
+            // click on a folder
+            node?.isFolder == true ->
+                navigateToFolder(node)
 
-                // click on a file
-                else ->
+            // click on a file
+            else ->
+                node?.let {
                     openFile(
-                        state().nodes[actualPosition],
+                        it,
                         Constants.OUTGOING_SHARES_ADAPTER,
                         actualPosition
                     )
-            }
+                }
         }
     }
 
@@ -247,8 +248,6 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
                     visibilityFastScroller()
                     hideActionMode()
-                    adapter?.setUnverifiedOutgoingShareData(it.unverifiedOutgoingShares)
-                    adapter?.setUnverifiedOutgoingNodeHandles(it.unVerifiedOutgoingNodeHandles)
                     updateNodes(it.nodes)
                     setEmptyView(it.isInvalidHandle)
                 }
@@ -267,11 +266,12 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     /**
      * Update displayed nodes
      *
-     * @param nodes the list of nodes to display
+     * @param nodes the list of nodes to display with his shareData associated
      */
-    private fun updateNodes(nodes: List<MegaNode>) {
-        val mutableListNodes = ArrayList(nodes)
-        adapter?.setNodes(mutableListNodes)
+    private fun updateNodes(nodes: List<Pair<MegaNode, ShareData?>>) {
+        val mutableListNodes = nodes.map { it.first }
+        val mutableListShareData = nodes.map { it.second }
+        adapter?.setNodesWithShareData(mutableListNodes, mutableListShareData)
     }
 
     /**
@@ -282,7 +282,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             adapter = MegaNodeAdapter(
                 requireActivity(),
                 this,
-                state().nodes,
+                state().nodes.map { it.first },
                 state().outgoingHandle,
                 recyclerView,
                 Constants.OUTGOING_SHARES_ADAPTER,

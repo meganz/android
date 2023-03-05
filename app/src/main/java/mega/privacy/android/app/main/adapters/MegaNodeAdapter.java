@@ -44,6 +44,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
+import android.util.Pair;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -71,6 +72,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MimeTypeList;
@@ -88,6 +90,7 @@ import mega.privacy.android.app.main.ContactFileListFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;
@@ -121,6 +124,15 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     private List<MegaNode> nodes;
 
+    /**
+     * List of shareData associated to the List of MegaNode
+     * This list is used to carry additional information for incoming shares and outgoing shares
+     * Each ShareData element at a specific position is associated to the MegaNode element
+     * at the same position of the nodes attributes
+     * The element is null if the node associated is already verified
+     */
+    private List<ShareData> shareData;
+
     private Object fragment;
     private long parentHandle = -1;
     private DisplayMetrics outMetrics;
@@ -147,9 +159,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
     private SortByHeaderViewModel sortByViewModel;
     private final Set<Long> unverifiedIncomingNodeHandles = new HashSet<>();
-    private final Set<Long> unverifiedOutgoingNodeHandles = new HashSet<>();
-
-    private final List<ShareData> unverifiedOutGoingShareData = new ArrayList<>();
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 
@@ -648,6 +657,25 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     /**
+     * Set the nodes list and shareData list
+     * This function is used to populate the list of incoming and outgoing shares
+     *
+     * @param nodes the list of nodes, whether verified or unverified
+     * @param shareData the list of shares data associated to the node
+     */
+    public void setNodesWithShareData(List<MegaNode> nodes, List<ShareData> shareData) {
+        this.nodes = insertPlaceHolderNode(nodes);
+        // need to add extra elements to sharedata too, so that the element at a specific position
+        // corresponds exactly to the node in the nodes list
+        for (int i = 0; i < this.nodes.size() - shareData.size(); i ++) {
+            shareData.add(0, null);
+        }
+        this.shareData = shareData;
+        Timber.d("setNodes size: %s", this.nodes.size());
+        notifyDataSetChanged();
+    }
+
+    /**
      * Method to update an item when some contact information has changed.
      *
      * @param contactHandle Contact ID.
@@ -1095,7 +1123,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     boolean hasUnverifiedNodes = !unverifiedIncomingNodeHandles.isEmpty()
                             && unverifiedIncomingNodeHandles.contains(node.getHandle());
                     if (hasUnverifiedNodes) {
-                        showUnverifiedNodeUi(holder, true, node);
+                        showUnverifiedNodeUi(holder, true, node, null);
                     }
                     holder.permissionsIcon.setVisibility(View.VISIBLE);
                 } else {
@@ -1105,10 +1133,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else if (type == OUTGOING_SHARES_ADAPTER) {
                 //Show the number of contacts who shared the folder if more than one contact and name of contact if that is not the case
                 holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-                boolean hasUnverifiedNodes = !unverifiedOutgoingNodeHandles.isEmpty()
-                        && unverifiedOutgoingNodeHandles.contains(node.getHandle());
+                boolean hasUnverifiedNodes = shareData != null && shareData.get(position) != null;
                 if (hasUnverifiedNodes) {
-                    showUnverifiedNodeUi(holder, false, node);
+                    showUnverifiedNodeUi(holder, false, node, shareData.get(position));
                 }
             }
         } else {
@@ -1245,6 +1272,10 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
 
         final MegaNode n = getItem(currentPosition);
+        ShareData sd = null;
+        if (shareData != null) {
+            sd = shareData.get(currentPosition);
+        }
         if (n == null) {
             return;
         }
@@ -1254,7 +1285,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             case R.id.file_list_three_dots_layout:
             case R.id.file_grid_three_dots:
             case R.id.file_grid_three_dots_for_file: {
-                threeDotsClicked(currentPosition, n);
+                threeDotsClicked(currentPosition, n, sd);
                 break;
             }
             case R.id.file_list_item_layout:
@@ -1305,7 +1336,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
-    private void threeDotsClicked(int currentPosition, MegaNode n) {
+    private void threeDotsClicked(int currentPosition, MegaNode n, ShareData sd) {
         Timber.d("onClick: file_list_three_dots: %s", currentPosition);
         if (isOffline(context)) {
             return;
@@ -1342,7 +1373,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             } else if (type == CONTACT_SHARED_FOLDER_ADAPTER) {
                 ((ContactSharedFolderFragment) fragment).showOptionsPanel(n);
             } else {
-                ((ManagerActivity) context).showNodeOptionsPanel(n);
+                ((ManagerActivity) context).showNodeOptionsPanel(n, NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE, sd);
             }
         }
     }
@@ -1449,8 +1480,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private String getOutgoingSubtitle(String currentSubtitle, MegaNode node) {
         String subtitle = currentSubtitle;
 
-        ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-        if (sl != null && sl.size() != 0) {
+        // only count the outgoing shares that has been verified
+        List<MegaShare> sl = megaApi
+                .getOutShares(node)
+                .stream()
+                .filter(MegaShare::isVerified)
+                .collect(Collectors.toList());
+        if (sl.size() != 0) {
             if (sl.size() == 1 && sl.get(0).getUser() != null) {
                 subtitle = sl.get(0).getUser();
                 MegaContactDB contactDB = dbH.findContactByEmail(subtitle);
@@ -1531,28 +1567,13 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     /**
-     * Adds unverified outgoing nodes to Set
-     *
-     * @param handles - List of outgoing node handles
-     */
-    public void setUnverifiedOutgoingNodeHandles(List<Long> handles) {
-        unverifiedOutgoingNodeHandles.clear();
-        unverifiedOutgoingNodeHandles.addAll(handles);
-    }
-
-    public void setUnverifiedOutgoingShareData(List<ShareData> shareDataList) {
-        unverifiedOutGoingShareData.clear();
-        unverifiedOutGoingShareData.addAll(shareDataList);
-    }
-
-    /**
      * Function to show Unverified node UI items accordingly
      *
      * @param holder         [ViewHolderBrowserList]
      * @param isIncomingNode boolean to indicate if the node is incoming so that
      *                       "Undecrypted folder" is displayed instead of node name
      */
-    private void showUnverifiedNodeUi(ViewHolderBrowserList holder, Boolean isIncomingNode, MegaNode node) {
+    private void showUnverifiedNodeUi(ViewHolderBrowserList holder, Boolean isIncomingNode, MegaNode node, ShareData shareData) {
         if (isIncomingNode) {
             if(node.isNodeKeyDecrypted()) {
                 holder.textViewFileName.setText(node.getName());
@@ -1560,10 +1581,11 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.textViewFileName.setText(context.getString(R.string.shared_items_verify_credentials_undecrypted_folder));
             }
         } else {
-            for (int i = 0; i < unverifiedOutGoingShareData.size(); i++) {
-                if(unverifiedOutGoingShareData.get(i).getNodeHandle() == (node.getHandle()) && unverifiedOutGoingShareData.get(i).isPending()) {
-                    holder.textViewFileSize.setText(getOutgoingSubtitle(holder.textViewFileSize.getText().toString(), node));
-                }
+            MegaUser user = megaApi.getContact(shareData.getUser());
+            if (user != null) {
+                holder.textViewFileSize.setText(getMegaUserNameDB(user));
+            } else {
+                holder.textViewFileSize.setText(shareData.getUser());
             }
         }
         holder.textViewFileName.setTextColor(ContextCompat.getColor(context, R.color.red_600));

@@ -79,7 +79,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import kotlin.Pair;
 import kotlin.Unit;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
@@ -165,6 +167,8 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private int mMode;
 
     private MegaNode node = null;
+
+    private ShareData shareData = null;
     private NodeController nC;
 
     private TextView nodeInfo;
@@ -178,7 +182,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private MegaUser user;
 
     private IncomingSharesViewModel incomingSharesViewModel;
-    private OutgoingSharesViewModel outgoingSharesViewModel;
     private NodeOptionsBottomSheetViewModel nodeOptionsBottomSheetViewModel;
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
@@ -196,7 +199,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         super.onCreate(savedInstanceState);
         searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
         incomingSharesViewModel = new ViewModelProvider(requireActivity()).get(IncomingSharesViewModel.class);
-        outgoingSharesViewModel = new ViewModelProvider(requireActivity()).get(OutgoingSharesViewModel.class);
         nodeOptionsBottomSheetViewModel = new ViewModelProvider(this).get(NodeOptionsBottomSheetViewModel.class);
     }
 
@@ -215,6 +217,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         } else {
             if (requireActivity() instanceof ManagerActivity) {
                 node = ((ManagerActivity) requireActivity()).getSelectedNode();
+                shareData = ((ManagerActivity) requireActivity()).getSelectedShareData();
                 drawerItem = ((ManagerActivity) requireActivity()).getDrawerItem();
             }
         }
@@ -651,8 +654,10 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                     if (!isTakenDown && ((ManagerActivity) requireActivity()).getDeepBrowserTreeOutgoing() == FIRST_NAVIGATION_LEVEL
                             && ViewUtils.isVisible(optionClearShares)) {
                         //Show the number of contacts who shared the folder
-                        ArrayList<MegaShare> sl = megaApi.getOutShares(node);
-                        if (sl != null && sl.size() != 0) {
+                        List<MegaShare> sl =
+                                megaApi.getOutShares(node)
+                                .stream().filter(MegaShare::isVerified).collect(Collectors.toList());
+                        if (sl.size() != 0) {
                             nodeInfo.setText(getQuantityString(R.plurals.general_num_shared_with,
                                     sl.size(), sl.size()));
                         }
@@ -725,22 +730,18 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
             optionLabelCurrent.setVisibility(View.GONE);
         }
 
+        if(shareData != null) {
+            setUnverifiedOutgoingNodeUserName(shareData);
+            hideNodeActions(shareData);
+        }
+
         super.onViewCreated(view, savedInstanceState);
         if (nC.nodeComesFromIncoming(node)) {
             ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
                 if (mMode == SHARED_ITEMS_MODE
                         && isNodeUnverified(state.getUnVerifiedIncomingNodeHandles())) {
                     setUnverifiedNodeUserName(state.getUnverifiedIncomingShares());
-                    hideNodeActions();
-                }
-                return Unit.INSTANCE;
-            });
-        } else {
-            ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
-                if (mMode == SHARED_ITEMS_MODE
-                        && isNodeUnverified(state.getUnVerifiedOutgoingNodeHandles())) {
-                    setUnverifiedNodeUserName(state.getUnverifiedOutgoingShares());
-                    hideNodeActions();
+                    hideNodeActions(shareData);
                 }
                 return Unit.INSTANCE;
             });
@@ -908,6 +909,19 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
     }
 
+    /**
+     * Set the node info of the unverified node with the name of the contact
+     * @param shareData
+     */
+    private void setUnverifiedOutgoingNodeUserName(ShareData shareData) {
+        user = megaApi.getContact(shareData.getUser());
+        if (user != null) {
+            nodeInfo.setText(getMegaUserNameDB(user));
+        } else {
+            nodeInfo.setText(shareData.getUser());
+        }
+
+    }
     private void setUnverifiedNodeUserName(List<ShareData> shareDataList) {
         for (int j = 0; j < shareDataList.size(); j++) {
             ShareData mS = shareDataList.get(j);
@@ -923,17 +937,20 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
     }
 
-    private void hideNodeActions() {
+    private void hideNodeActions(ShareData shareData) {
+        contentView.findViewById(R.id.verify_user_option).setVisibility(View.VISIBLE);
         TextView optionVerifyUser = contentView.findViewById(R.id.verify_user_option);
-        optionVerifyUser.setText(StringResourcesUtils.getString(R.string.shared_items_bottom_sheet_menu_verify_user, getMegaUserNameDB(user)));
+        if (shareData!= null && !shareData.isVerified()) {
+            optionVerifyUser.setText(getString(R.string.shared_items_bottom_sheet_menu_verify_user, nodeInfo.getText()));
+        }
+        optionVerifyUser.setOnClickListener(this);
+
         TextView nodeName = contentView.findViewById(R.id.node_name_text);
         if (nC.nodeComesFromIncoming(node)) {
             nodeName.setText(getResources().getString(R.string.shared_items_verify_credentials_undecrypted_folder));
         } else {
             nodeName.setText(node.getName());
         }
-        optionVerifyUser.setVisibility(View.VISIBLE);
-        optionVerifyUser.setOnClickListener(this);
 
         contentView.findViewById(R.id.favorite_option).setVisibility(View.GONE);
         contentView.findViewById(R.id.rename_option).setVisibility(View.GONE);
@@ -944,7 +961,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         contentView.findViewById(R.id.copy_option).setVisibility(View.GONE);
         contentView.findViewById(R.id.rubbish_bin_option).setVisibility(View.GONE);
         contentView.findViewById(R.id.share_option).setVisibility(View.GONE);
-        contentView.findViewById(R.id.share_folder_option).setVisibility(View.GONE);
         contentView.findViewById(R.id.clear_share_option).setVisibility(View.GONE);
     }
 
@@ -1117,7 +1133,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
                 requireActivity().startActivityForResult(version, REQUEST_CODE_DELETE_VERSIONS_HISTORY);
                 break;
             case R.id.verify_user_option:
-                ShareData shareData = outgoingSharesViewModel.getUnVerifiedOutgoingNodeShare(node.getHandle());
                 if (shareData != null) {
                     if (!shareData.isVerified() && shareData.isPending()) {
                         showCanNotVerifyContact(shareData.getUser());

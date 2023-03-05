@@ -328,6 +328,7 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.Product
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
@@ -478,6 +479,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
     private var selectedTransfer: AndroidCompletedTransfer? = null
     var selectedNode: MegaNode? = null
+    var selectedShareData: ShareData? = null
     var selectedOfflineNode: MegaOffline? = null
 
     @JvmField
@@ -2356,7 +2358,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 ) { outgoingSharesState: OutgoingSharesState ->
                     outgoingFolderNames.clear()
                     for (i in outgoingSharesState.nodes.indices) {
-                        outgoingFolderNames.add(outgoingSharesState.nodes[i].name)
+                        outgoingFolderNames.add(outgoingSharesState.nodes[i].first.name)
                     }
                     val dialog: SecurityUpgradeDialogFragment =
                         SecurityUpgradeDialogFragment.newInstance()
@@ -2431,7 +2433,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             outgoingSharesViewModel.state,
             Lifecycle.State.STARTED
         ) { outgoingSharesState: OutgoingSharesState ->
-            addUnverifiedOutgoingCountBadge(outgoingSharesState.unverifiedOutgoingShares.size)
+            addUnverifiedOutgoingCountBadge(
+                outgoingSharesState.nodes.count { it.second != null },
+            )
         }
         this.collectFlow(
             viewModel.monitorFinishActivityEvent,
@@ -6810,10 +6814,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     fun showNodeOptionsPanel(
         node: MegaNode?,
         mode: Int = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
+        shareData: ShareData? = null,
     ) {
         Timber.d("showNodeOptionsPanel")
         if (node == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
         selectedNode = node
+        selectedShareData = shareData
         bottomSheetDialogFragment = NodeOptionsBottomSheetDialogFragment(mode)
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
