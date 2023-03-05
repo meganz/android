@@ -2427,7 +2427,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             incomingSharesViewModel.state,
             Lifecycle.State.STARTED
         ) { incomingSharesState: IncomingSharesState ->
-            addUnverifiedIncomingCountBadge(incomingSharesState.unverifiedIncomingShares.size)
+            addUnverifiedIncomingCountBadge(incomingSharesState.nodes.count { it.second != null })
         }
         this.collectFlow(
             outgoingSharesViewModel.state,

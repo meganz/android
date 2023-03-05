@@ -81,7 +81,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import kotlin.Pair;
 import kotlin.Unit;
 import mega.privacy.android.app.MegaOffline;
 import mega.privacy.android.app.MimeTypeList;
@@ -99,8 +98,6 @@ import mega.privacy.android.app.presentation.contact.authenticitycredendials.Aut
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.presentation.manager.model.SharesTab;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
-import mega.privacy.android.app.presentation.shares.incoming.IncomingSharesViewModel;
-import mega.privacy.android.app.presentation.shares.outgoing.OutgoingSharesViewModel;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MegaNodeUtil;
@@ -180,8 +177,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     private AlertDialog cannotOpenFileDialog;
 
     private MegaUser user;
-
-    private IncomingSharesViewModel incomingSharesViewModel;
     private NodeOptionsBottomSheetViewModel nodeOptionsBottomSheetViewModel;
 
     public NodeOptionsBottomSheetDialogFragment(int mode) {
@@ -198,7 +193,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         searchViewModel = new ViewModelProvider(requireActivity()).get(SearchViewModel.class);
-        incomingSharesViewModel = new ViewModelProvider(requireActivity()).get(IncomingSharesViewModel.class);
         nodeOptionsBottomSheetViewModel = new ViewModelProvider(this).get(NodeOptionsBottomSheetViewModel.class);
     }
 
@@ -736,16 +730,6 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         }
 
         super.onViewCreated(view, savedInstanceState);
-        if (nC.nodeComesFromIncoming(node)) {
-            ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), incomingSharesViewModel.getState(), Lifecycle.State.STARTED, state -> {
-                if (mMode == SHARED_ITEMS_MODE
-                        && isNodeUnverified(state.getUnVerifiedIncomingNodeHandles())) {
-                    setUnverifiedNodeUserName(state.getUnverifiedIncomingShares());
-                    hideNodeActions(shareData);
-                }
-                return Unit.INSTANCE;
-            });
-        }
 
         ViewExtensionsKt.collectFlow(getViewLifecycleOwner(), nodeOptionsBottomSheetViewModel.getState(), Lifecycle.State.STARTED, state -> {
             if (state.isOpenShareDialogSuccess() != null) {
@@ -963,11 +947,7 @@ public class NodeOptionsBottomSheetDialogFragment extends BaseBottomSheetDialogF
         contentView.findViewById(R.id.share_option).setVisibility(View.GONE);
         contentView.findViewById(R.id.clear_share_option).setVisibility(View.GONE);
     }
-
-    private boolean isNodeUnverified(List<Long> shareDataList) {
-        return shareDataList.contains(node.getHandle());
-    }
-
+    
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {

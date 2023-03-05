@@ -21,12 +21,10 @@ data class IncomingSharesState(
     val incomingHandle: Long = -1L,
     val incomingTreeDepth: Int = 0,
     val incomingParentHandle: Long? = null,
-    val nodes: List<MegaNode> = emptyList(),
+    val nodes: List<Pair<MegaNode, ShareData?>> = emptyList(),
     val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    val unverifiedIncomingShares: List<ShareData> = emptyList(),
-    val unVerifiedIncomingNodeHandles: List<Long> = emptyList(),
 ) {
 
     /**

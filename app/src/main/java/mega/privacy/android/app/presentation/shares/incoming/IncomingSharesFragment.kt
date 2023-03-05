@@ -35,6 +35,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.allHaveFullAccess
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaError
@@ -102,38 +103,44 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
-        if (state().unVerifiedIncomingNodeHandles.contains(state().nodes[actualPosition].handle)) {
-            Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
-                putExtra(Constants.IS_NODE_INCOMING,
-                    nodeController.nodeComesFromIncoming(state().nodes[actualPosition]))
-                putExtra(Constants.EMAIL,
-                    ContactUtil.getContactEmailDB(state().nodes[actualPosition].owner))
-                requireActivity().startActivity(this)
-            }
-        } else {
-            when {
-                // select mode
-                adapter?.isMultipleSelect == true -> {
-                    adapter?.toggleSelection(position)
-                    val selectedNodes = adapter?.selectedNodes
-                    if ((selectedNodes?.size ?: 0) > 0)
-                        updateActionModeTitle()
+        val node = state().nodes.getOrNull(actualPosition)?.first
+        val shareData = state().nodes.getOrNull(actualPosition)?.second
+        when {
+            shareData?.isVerified == false -> {
+                Intent(requireActivity(), AuthenticityCredentialsActivity::class.java).apply {
+                    putExtra(
+                        Constants.IS_NODE_INCOMING,
+                        nodeController.nodeComesFromIncoming(node)
+                    )
+                    putExtra(
+                        Constants.EMAIL,
+                        node?.let { ContactUtil.getContactEmailDB(it.owner) }
+                    )
+                    requireActivity().startActivity(this)
                 }
+            }
+            // select mode
+            adapter?.isMultipleSelect == true -> {
+                adapter?.toggleSelection(position)
+                val selectedNodes = adapter?.selectedNodes
+                if ((selectedNodes?.size ?: 0) > 0)
+                    updateActionModeTitle()
+            }
 
-                // click on a folder
-                state().nodes[actualPosition].isFolder ->
-                    navigateToFolder(state().nodes[actualPosition])
+            // click on a folder
+            node?.isFolder == true ->
+                navigateToFolder(node)
 
-                // click on a file
-                else ->
+            // click on a file
+            else ->
+                node?.let {
                     openFile(
-                        state().nodes[actualPosition],
+                        it,
                         Constants.INCOMING_SHARES_ADAPTER,
                         actualPosition
                     )
-            }
+                }
         }
-
     }
 
     override fun navigateToFolder(node: MegaNode) {
@@ -256,7 +263,6 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
                     visibilityFastScroller()
                     hideActionMode()
-                    adapter?.setUnverifiedIncomingNodeHandles(it.unVerifiedIncomingNodeHandles)
                     updateNodes(it.nodes)
                     setEmptyView(it.isInvalidHandle)
                 }
@@ -277,9 +283,10 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
      *
      * @param nodes the list of nodes to display
      */
-    private fun updateNodes(nodes: List<MegaNode>) {
-        val mutableListNodes = ArrayList(nodes)
-        adapter?.setNodes(mutableListNodes)
+    private fun updateNodes(nodes: List<Pair<MegaNode, ShareData?>>) {
+        val mutableListNodes = nodes.map { it.first }
+        val mutableListShareData = nodes.map { it.second }
+        adapter?.setNodesWithShareData(mutableListNodes, mutableListShareData)
     }
 
     /**
@@ -290,7 +297,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
             adapter = MegaNodeAdapter(
                 requireActivity(),
                 this,
-                state().nodes,
+                state().nodes.map { it.first },
                 state().incomingHandle,
                 recyclerView,
                 Constants.INCOMING_SHARES_ADAPTER,
@@ -323,7 +330,7 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
      * If user navigates from notification about new nodes added to shared folder select all nodes and scroll to the first node in the list
      */
     private fun selectNewlyAddedNodes() {
-        val positions = managerActivity?.getPositionsList(state().nodes)
+        val positions = managerActivity?.getPositionsList(state().nodes.map { it.first })
         if (!positions.isNullOrEmpty()) {
             val firstPosition = Collections.min(positions)
             activateActionMode()
