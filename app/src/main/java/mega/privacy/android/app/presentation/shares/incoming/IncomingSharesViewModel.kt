@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.AuthorizeNode
@@ -12,10 +13,12 @@ import mega.privacy.android.app.domain.usecase.GetIncomingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -24,6 +27,8 @@ import javax.inject.Inject
 
 /**
  * ViewModel associated to IncomingSharesFragment
+ *
+ * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares list
  */
 @HiltViewModel
 class IncomingSharesViewModel @Inject constructor(
@@ -34,6 +39,7 @@ class IncomingSharesViewModel @Inject constructor(
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getOthersSortOrder: GetOthersSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
+    monitorContactUpdates: MonitorContactUpdates,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
 ) : ViewModel() {
 
@@ -47,8 +53,9 @@ class IncomingSharesViewModel @Inject constructor(
     private val lastPositionStack: Stack<Int> = Stack<Int>()
 
     init {
+        refreshIncomingSharesNode()
+
         viewModelScope.launch {
-            refreshNodes()?.let { setNodes(it) }
             monitorNodeUpdates().collect { list ->
                 Timber.d("Received node update")
                 // If the current incoming handle is the node that was updated,
@@ -64,19 +71,15 @@ class IncomingSharesViewModel @Inject constructor(
                                 resetIncomingTreeDepth()
                             }
                     }
-                refreshNodes()?.let { setNodes(it) }
+                refreshIncomingSharesNode()
             }
         }
-
         viewModelScope.launch {
-            val unverifiedIncomingShares = getUnverifiedIncomingShares(_state.value.sortOrder)
-                .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
-            val handles = unverifiedIncomingShares.map { shareData -> shareData.nodeHandle }
-            val unverifiedIncomingNodes = handles.mapNotNull { handle -> getNodeByHandle(handle) }
-            _state.update {
-                it.copy(nodes = unverifiedIncomingNodes,
-                    unverifiedIncomingShares = unverifiedIncomingShares,
-                    unVerifiedIncomingNodeHandles = handles)
+            monitorContactUpdates().collectLatest { updates ->
+                Timber.d("Received contact update")
+                if (updates.changes.values.any { it.contains(UserChanges.AuthenticationInformation) }) {
+                    refreshIncomingSharesNode()
+                }
             }
         }
     }
@@ -186,7 +189,25 @@ class IncomingSharesViewModel @Inject constructor(
      */
     private suspend fun refreshNodes(handle: Long = _state.value.incomingHandle): List<MegaNode>? {
         Timber.d("refreshIncomingSharesNodes")
-        return getIncomingSharesChildrenNode(handle)
+        val unverifiedIncomingShares = getUnverifiedIncomingShares(_state.value.sortOrder)
+            .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
+        val handles = unverifiedIncomingShares.map { shareData -> shareData.nodeHandle }
+        _state.update {
+            it.copy(
+                unverifiedIncomingShares = unverifiedIncomingShares,
+                unVerifiedIncomingNodeHandles = handles
+            )
+        }
+
+        val unverifiedIncomingSharesNodes = handles.mapNotNull { getNodeByHandle(it) }
+        val incomingSharesNodes = getIncomingSharesChildrenNode(handle)
+        return if (
+            unverifiedIncomingSharesNodes.isNotEmpty() || incomingSharesNodes.isNullOrEmpty().not()
+        )
+            mutableListOf<MegaNode>().apply {
+                addAll(unverifiedIncomingSharesNodes)
+                incomingSharesNodes?.let { addAll(it) }
+            }.distinctBy { it.handle } else null
     }
 
     /**

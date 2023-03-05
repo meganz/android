@@ -7,6 +7,7 @@ import com.google.common.truth.Truth.assertThat
 import com.jraska.livedata.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -30,6 +31,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.usecase.CheckCameraUpload
@@ -60,6 +62,7 @@ class ManagerViewModelTest {
 
     private val monitorGlobalUpdates = mock<MonitorGlobalUpdates>()
     private val monitorNodeUpdates = FakeMonitorUpdates()
+    private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
     private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
     private val hasInboxChildren = mock<HasInboxChildren>()
     private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
@@ -121,6 +124,7 @@ class ManagerViewModelTest {
         underTest = ManagerViewModel(
             monitorNodeUpdates = monitorNodeUpdates,
             monitorGlobalUpdates = monitorGlobalUpdates,
+            monitorContactUpdates = { monitorContactUpdates },
             monitorContactRequestUpdates = monitorContactRequestUpdates,
             getNumUnreadUserAlerts = getNumUnreadUserAlerts,
             hasInboxChildren = hasInboxChildren,

@@ -557,6 +557,8 @@ public class ManagerActivity extends TransfersManagementActivity
     FloatingActionButton fabButton;
     FloatingActionButton fabMaskButton;
 
+    View pendingActionsBadge;
+
     MegaNode rootNode = null;
 
     NodeController nC;
@@ -2478,13 +2480,7 @@ public class ManagerActivity extends TransfersManagementActivity
             }
 
             // Update pending actions badge on bottom navigation menu
-            if (managerState.getPendingActionsCount() > 0) {
-                BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
-                View pendingActionsBadge = LayoutInflater.from(this).inflate(R.layout.bottom_pending_actions_badge, menuView, false);
-                sharedItemsView.addView(pendingActionsBadge);
-                TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.pending_actions_badge_text);
-                tvPendingActionsCount.setText(String.valueOf(managerState.getPendingActionsCount()));
-            }
+            updateUnverifiedSharesBadge(managerState.getPendingActionsCount());
             return Unit.INSTANCE;
         });
         ViewExtensionsKt.collectFlow(this, viewModel.getOnViewTypeChanged(), Lifecycle.State.STARTED, viewType -> {
@@ -2519,6 +2515,43 @@ public class ManagerActivity extends TransfersManagementActivity
             addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
             return Unit.INSTANCE;
         });
+    }
+
+    /**
+     *  Update the unverified shares badge count on the navigation bottom item view
+     *
+     *  This function ensure that the badge view is added again only if it has not been added previously
+     *
+     *  @param pendingActionsCount if > 0 add the badge view else remove it
+     */
+    private void updateUnverifiedSharesBadge(int pendingActionsCount) {
+        if (pendingActionsCount > 0) {
+            BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
+            if (sharedItemsView == null) return;
+
+            if (pendingActionsBadge != null) {
+                int index = sharedItemsView.indexOfChild(pendingActionsBadge);
+                if (index != -1) {
+                    sharedItemsView.removeViewAt(index);
+                }
+            } else {
+                pendingActionsBadge = LayoutInflater.from(this)
+                        .inflate(R.layout.bottom_pending_actions_badge, menuView, false);
+            }
+            sharedItemsView.addView(pendingActionsBadge);
+            TextView tvPendingActionsCount = pendingActionsBadge.findViewById(R.id.pending_actions_badge_text);
+            tvPendingActionsCount.setText(String.valueOf(pendingActionsCount));
+        } else {
+            if (pendingActionsBadge != null) {
+                BottomNavigationItemView sharedItemsView = (BottomNavigationItemView) menuView.getChildAt(4);
+                if (sharedItemsView == null) return;
+                int index = sharedItemsView.indexOfChild(pendingActionsBadge);
+                if (index != -1) {
+                    sharedItemsView.removeViewAt(index);
+                }
+
+            }
+        }
     }
 
     /**
@@ -10913,6 +10946,8 @@ public class ManagerActivity extends TransfersManagementActivity
         if (incomingSharesTab != null) {
             if (unverifiedNodesCount > 0) {
                 incomingSharesTab.getOrCreateBadge().setNumber(unverifiedNodesCount);
+            } else {
+                incomingSharesTab.removeBadge();
             }
         }
     }
@@ -10925,6 +10960,8 @@ public class ManagerActivity extends TransfersManagementActivity
         if (outgoingSharesTab != null) {
             if (unverifiedNodesCount > 0) {
                 outgoingSharesTab.getOrCreateBadge().setNumber(unverifiedNodesCount);
+            } else {
+                outgoingSharesTab.removeBadge();
             }
         }
     }
