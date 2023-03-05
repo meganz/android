@@ -2510,7 +2510,7 @@ public class ManagerActivity extends TransfersManagementActivity
         });
 
         ViewExtensionsKt.collectFlow(this, incomingSharesViewModel.getState(), Lifecycle.State.STARTED, incomingSharesState -> {
-            addUnverifiedIncomingCountBadge(incomingSharesState.getUnverifiedIncomingShares().size());
+            addUnverifiedIncomingCountBadge(incomingSharesState.getNodes().stream().filter(pair -> pair.getSecond() != null).collect(Collectors.toList()).size());
             return Unit.INSTANCE;
         });
 

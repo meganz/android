@@ -158,7 +158,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     private int adapterType;
 
     private SortByHeaderViewModel sortByViewModel;
-    private final Set<Long> unverifiedIncomingNodeHandles = new HashSet<>();
 
     public static class ViewHolderBrowser extends RecyclerView.ViewHolder {
 
@@ -1120,8 +1119,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     } else {
                         holder.permissionsIcon.setImageResource(R.drawable.ic_shared_read);
                     }
-                    boolean hasUnverifiedNodes = !unverifiedIncomingNodeHandles.isEmpty()
-                            && unverifiedIncomingNodeHandles.contains(node.getHandle());
+                    boolean hasUnverifiedNodes = shareData != null && shareData.get(position) != null;
                     if (hasUnverifiedNodes) {
                         showUnverifiedNodeUi(holder, true, node, null);
                     }
@@ -1554,16 +1552,6 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     @Override
     public void onCancelClicked() {
         unHandledItem = -1;
-    }
-
-    /**
-     * Adds unverified incoming nodes to Set
-     *
-     * @param handles - List of incoming node handles
-     */
-    public void setUnverifiedIncomingNodeHandles(List<Long> handles) {
-        unverifiedIncomingNodeHandles.clear();
-        unverifiedIncomingNodeHandles.addAll(handles);
     }
 
     /**
