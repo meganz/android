@@ -246,6 +246,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -411,6 +412,7 @@ import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity;
 import mega.privacy.android.data.model.MegaAttributes;
 import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.domain.entity.Product;
+import mega.privacy.android.domain.entity.ShareData;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.contacts.ContactRequest;
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus;
@@ -571,6 +573,7 @@ public class ManagerActivity extends TransfersManagementActivity
 
     private AndroidCompletedTransfer selectedTransfer;
     MegaNode selectedNode;
+    ShareData selectedShareData;
     MegaOffline selectedOfflineNode;
     MegaContactAdapter selectedUser;
     MegaContactRequest selectedRequest;
@@ -2449,7 +2452,7 @@ public class ManagerActivity extends TransfersManagementActivity
                 ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
                     outgoingFolderNames.clear();
                     for (int i = 0; i < outgoingSharesState.getNodes().size(); i++) {
-                        outgoingFolderNames.add(outgoingSharesState.getNodes().get(i).getName());
+                        outgoingFolderNames.add(outgoingSharesState.getNodes().get(i).getFirst().getName());
                     }
                     SecurityUpgradeDialogFragment dialog = SecurityUpgradeDialogFragment.Companion.newInstance();
                     Bundle bundle = new Bundle();
@@ -2512,7 +2515,7 @@ public class ManagerActivity extends TransfersManagementActivity
         });
 
         ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
-            addUnverifiedOutgoingCountBadge(outgoingSharesState.getUnverifiedOutgoingShares().size());
+            addUnverifiedOutgoingCountBadge(outgoingSharesState.getNodes().stream().filter(pair -> pair.getSecond() != null).collect(Collectors.toList()).size());
             return Unit.INSTANCE;
         });
     }
@@ -7182,15 +7185,20 @@ public class ManagerActivity extends TransfersManagementActivity
     }
 
     public void showNodeOptionsPanel(MegaNode node) {
-        showNodeOptionsPanel(node, NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE);
+        showNodeOptionsPanel(node, NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE, null);
     }
 
     public void showNodeOptionsPanel(MegaNode node, int mode) {
+        showNodeOptionsPanel(node, mode, null);
+    }
+
+    public void showNodeOptionsPanel(MegaNode node, int mode, ShareData shareData) {
         Timber.d("showNodeOptionsPanel");
 
         if (node == null || isBottomSheetDialogShown(bottomSheetDialogFragment)) return;
 
         selectedNode = node;
+        selectedShareData = shareData;
         bottomSheetDialogFragment = new NodeOptionsBottomSheetDialogFragment(mode);
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
@@ -9887,6 +9895,10 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public MegaNode getSelectedNode() {
         return selectedNode;
+    }
+
+    public ShareData getSelectedShareData() {
+        return selectedShareData;
     }
 
     public void setSelectedNode(MegaNode selectedNode) {

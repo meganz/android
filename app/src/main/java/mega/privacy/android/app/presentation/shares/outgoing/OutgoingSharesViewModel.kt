@@ -13,6 +13,7 @@ import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -74,7 +75,6 @@ class OutgoingSharesViewModel @Inject constructor(
      */
     fun refreshOutgoingSharesNode() = viewModelScope.launch {
         refreshNodes()?.let { setNodes(it) }
-        refreshUnverifiedOutgoingSharesNodes()
     }
 
     /**
@@ -164,7 +164,7 @@ class OutgoingSharesViewModel @Inject constructor(
      *
      * @param nodes the list of nodes to set
      */
-    private fun setNodes(nodes: List<MegaNode>) {
+    private fun setNodes(nodes: List<Pair<MegaNode, ShareData?>>) {
         _state.update { it.copy(nodes = nodes, isLoading = false) }
     }
 
@@ -172,27 +172,36 @@ class OutgoingSharesViewModel @Inject constructor(
      * Refresh the list of nodes from api
      *
      * @param handle
+     * @return a list of Pair<MegaNode, ShareData?>
+     *         ShareData is null if the MegaNode is already verified
+     *         A node that is shared among multiple users and not verified by them will produce
+     *         distinct elements
      */
-    private suspend fun refreshNodes(handle: Long = _state.value.outgoingHandle): List<MegaNode>? {
+    private suspend fun refreshNodes(handle: Long = _state.value.outgoingHandle): List<Pair<MegaNode, ShareData?>>? {
         Timber.d("refreshOutgoingSharesNodes")
-        return getOutgoingSharesChildrenNode(handle)
-    }
 
-    /**
-     * Refresh unverified outgoing shares
-     */
-    private suspend fun refreshUnverifiedOutgoingSharesNodes() {
-        val unverifiedOutgoingShares = getUnverifiedOutgoingShares(_state.value.sortOrder)
-            .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
-            .filter { shareData -> !shareData.isVerified }
-        val handles = unverifiedOutgoingShares
-            .map { shareData -> shareData.nodeHandle }
-        _state.update {
-            it.copy(
-                unverifiedOutgoingShares = unverifiedOutgoingShares,
-                unVerifiedOutgoingNodeHandles = handles
-            )
+        val unverifiedNodes = if (state.value.outgoingTreeDepth == 0) {
+            getUnverifiedOutgoingShares(_state.value.sortOrder)
+                .filter { shareData -> !isInvalidHandle(shareData.nodeHandle) }
+                .filter { shareData -> !shareData.isVerified }
+                .mapNotNull { shareData ->
+                    getNodeByHandle(shareData.nodeHandle)?.let {
+                        Pair(it, shareData)
+                    }
+                }
+        } else {
+            null
         }
+
+        val verifiedNodes: List<Pair<MegaNode, ShareData?>>? =
+            getOutgoingSharesChildrenNode(handle)?.map { Pair<MegaNode, ShareData?>(it, null) }
+
+        // Combine the list of unverified nodes and the list of verified nodes
+        // If one node is shared to multiple user,
+        // it will add distinct element for each user that did not verify
+        return unverifiedNodes?.takeIf { unverifiedNodes.isNotEmpty() }?.let { list1 ->
+            verifiedNodes?.let { list2 -> list1 + list2 } ?: list1
+        } ?: verifiedNodes
     }
 
     /**
@@ -207,11 +216,4 @@ class OutgoingSharesViewModel @Inject constructor(
             ?.let { getNodeByHandle(it) == null }
             ?: true
     }
-
-    /**
-     * Find if nodehandle is in unverifiedOutgoingShares list
-     */
-    fun getUnVerifiedOutgoingNodeShare(handle: Long?) =
-        state.value.unverifiedOutgoingShares.find { node -> node.nodeHandle == handle }
-
 }

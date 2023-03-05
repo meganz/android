@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.shares.outgoing.model
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 
 /**
  * Outgoing shares UI state
@@ -10,23 +11,19 @@ import nz.mega.sdk.MegaNode
  * @param outgoingHandle current outgoing shares handle
  * @param outgoingTreeDepth current outgoing tree depth
  * @param outgoingParentHandle parent handle of the current outgoing node
- * @param nodes current list of nodes
+ * @param nodes current list of nodes with his shareData associated if unverified or pending
  * @param isInvalidHandle true if handle is invalid
  * @param isLoading true if the nodes are loading
  * @param sortOrder current sort order
- * @param unverifiedOutgoingShares List of unverified outgoing [ShareData]
- * @param unVerifiedOutgoingNodeHandles List of Unverified outgoing node handles
  */
 data class OutgoingSharesState(
     val outgoingHandle: Long = -1L,
     val outgoingTreeDepth: Int = 0,
     val outgoingParentHandle: Long? = null,
-    val nodes: List<MegaNode> = emptyList(),
+    val nodes: List<Pair<MegaNode, ShareData?>> = emptyList(),
     val isInvalidHandle: Boolean = true,
     val isLoading: Boolean = false,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
-    val unverifiedOutgoingShares: List<ShareData> = emptyList(),
-    val unVerifiedOutgoingNodeHandles: List<Long> = emptyList(),
 ) {
 
     /**
