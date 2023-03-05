@@ -247,10 +247,10 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
                     visibilityFastScroller()
                     hideActionMode()
-                    setEmptyView(it.isInvalidHandle)
                     adapter?.setUnverifiedOutgoingShareData(it.unverifiedOutgoingShares)
                     adapter?.setUnverifiedOutgoingNodeHandles(it.unVerifiedOutgoingNodeHandles)
                     updateNodes(it.nodes)
+                    setEmptyView(it.isInvalidHandle)
                 }
             }
         }

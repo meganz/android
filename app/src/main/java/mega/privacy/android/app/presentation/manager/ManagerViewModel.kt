@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
@@ -56,6 +57,7 @@ import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
+import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
@@ -100,12 +102,14 @@ import javax.inject.Inject
  * @property monitorVerificationStatus
  *
  * @param monitorNodeUpdates
+ * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
  * @param monitorContactRequestUpdates
  * @param monitorFinishActivity
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
+    monitorContactUpdates: MonitorContactUpdates,
     private val monitorGlobalUpdates: MonitorGlobalUpdates,
     monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val getInboxNode: GetInboxNode,
@@ -207,6 +211,14 @@ class ManagerViewModel @Inject constructor(
                 checkItemForInbox(nodeList)
                 onReceiveNodeUpdate(true)
                 checkCameraUploadFolder(false, nodeList)
+                checkUnverifiedSharesCount()
+            }
+        }
+        viewModelScope.launch {
+            monitorContactUpdates().collectLatest { updates ->
+                if (updates.changes.values.any { it.contains(UserChanges.AuthenticationInformation) }) {
+                    checkUnverifiedSharesCount()
+                }
             }
         }
 
@@ -311,6 +323,17 @@ class ManagerViewModel @Inject constructor(
      */
     fun nodeUpdateHandled() {
         onReceiveNodeUpdate(false)
+    }
+
+    /**
+     *  Get the unverified shares count and set state
+     */
+    private suspend fun checkUnverifiedSharesCount() {
+        val sortOrder = getCloudSortOrder()
+        val unverifiedIncomingShares = getUnverifiedIncomingShares(sortOrder).size
+        val unverifiedOutgoingShares =
+            getUnverifiedOutgoingShares(sortOrder).filter { shareData -> !shareData.isVerified }.size
+        _state.update { it.copy(pendingActionsCount = unverifiedIncomingShares + unverifiedOutgoingShares) }
     }
 
     /**

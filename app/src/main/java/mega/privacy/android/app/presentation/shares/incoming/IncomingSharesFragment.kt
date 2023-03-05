@@ -256,9 +256,9 @@ class IncomingSharesFragment : MegaNodeBaseFragment() {
 
                     visibilityFastScroller()
                     hideActionMode()
-                    setEmptyView(it.isInvalidHandle)
                     adapter?.setUnverifiedIncomingNodeHandles(it.unVerifiedIncomingNodeHandles)
                     updateNodes(it.nodes)
+                    setEmptyView(it.isInvalidHandle)
                 }
             }
         }

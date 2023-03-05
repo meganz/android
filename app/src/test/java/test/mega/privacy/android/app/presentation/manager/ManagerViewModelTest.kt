@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.entity.verification.Verified
@@ -65,6 +66,7 @@ class ManagerViewModelTest {
 
     private val monitorGlobalUpdates = MutableStateFlow<GlobalUpdate>(GlobalUpdate.OnReloadNeeded)
     private val monitorNodeUpdates = MutableSharedFlow<NodeUpdate>()
+    private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
     private val getNumUnreadUserAlerts =
         mock<GetNumUnreadUserAlerts> { onBlocking { invoke() }.thenReturn(0) }
     private val hasInboxChildren =
@@ -148,6 +150,7 @@ class ManagerViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = ManagerViewModel(
             monitorNodeUpdates = { monitorNodeUpdates },
+            monitorContactUpdates = { monitorContactUpdates },
             monitorGlobalUpdates = { monitorGlobalUpdates },
             monitorContactRequestUpdates = { monitorContactRequestUpdates },
             getNumUnreadUserAlerts = getNumUnreadUserAlerts,

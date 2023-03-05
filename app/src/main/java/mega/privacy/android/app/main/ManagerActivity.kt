@@ -463,6 +463,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var addPhoneNumberLabel: TextView
     private lateinit var fabButton: FloatingActionButton
     private lateinit var fabMaskButton: FloatingActionButton
+    private var pendingActionsBadge: View? = null
 
     var rootNode: MegaNode? = null
     val nodeController: NodeController by lazy { NodeController(this) }
@@ -2387,15 +2388,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
 
             // Update pending actions badge on bottom navigation menu
-            if (managerState.pendingActionsCount > 0) {
-                val sharedItemsView = menuView.getChildAt(4) as BottomNavigationItemView
-                val pendingActionsBadge = LayoutInflater.from(this)
-                    .inflate(R.layout.bottom_pending_actions_badge, menuView, false)
-                sharedItemsView.addView(pendingActionsBadge)
-                val tvPendingActionsCount =
-                    pendingActionsBadge.findViewById<TextView>(R.id.pending_actions_badge_text)
-                tvPendingActionsCount.text = managerState.pendingActionsCount.toString()
-            }
+            updateUnverifiedSharesBadge(managerState.pendingActionsCount)
 
             //Show 2FA dialog to the user on Second Launch after sign up
             if (managerState.show2FADialog || isEnable2FADialogShown) {
@@ -2447,6 +2440,38 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.d("MonitorFinishActivity flow collected with Finish %s", finish)
             if (finish) {
                 finish()
+            }
+        }
+    }
+
+    /**
+     *  Update the unverified shares badge count on the navigation bottom item view
+     *
+     *  This function ensure that the badge view is added again only if it has not been added previously
+     *
+     *  @param pendingActionsCount if > 0 add the badge view else remove it
+     */
+    private fun updateUnverifiedSharesBadge(pendingActionsCount: Int) {
+        if (pendingActionsCount > 0) {
+            val sharedItemsView = menuView.getChildAt(4) as? BottomNavigationItemView ?: return
+            pendingActionsBadge?.let {
+                sharedItemsView.indexOfChild(pendingActionsBadge)
+                    .takeIf { it != -1 }
+                    ?.let { sharedItemsView.removeViewAt(it) }
+            } ?: run {
+                pendingActionsBadge = LayoutInflater.from(this)
+                    .inflate(R.layout.bottom_pending_actions_badge, menuView, false)
+            }
+            sharedItemsView.addView(pendingActionsBadge)
+            val tvPendingActionsCount =
+                pendingActionsBadge?.findViewById<TextView>(R.id.pending_actions_badge_text)
+            tvPendingActionsCount?.text = pendingActionsCount.toString()
+        } else {
+            pendingActionsBadge?.let {
+                val sharedItemsView = menuView.getChildAt(4) as? BottomNavigationItemView ?: return
+                sharedItemsView.indexOfChild(pendingActionsBadge)
+                    .takeIf { it != -1 }
+                    ?.let { sharedItemsView.removeViewAt(it) }
             }
         }
     }
@@ -10509,6 +10534,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (incomingSharesTab != null) {
             if (unverifiedNodesCount > 0) {
                 incomingSharesTab.orCreateBadge.number = unverifiedNodesCount
+            } else {
+                incomingSharesTab.removeBadge()
             }
         }
     }
@@ -10521,6 +10548,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (outgoingSharesTab != null) {
             if (unverifiedNodesCount > 0) {
                 outgoingSharesTab.orCreateBadge.number = unverifiedNodesCount
+            } else {
+                outgoingSharesTab.removeBadge()
             }
         }
     }
