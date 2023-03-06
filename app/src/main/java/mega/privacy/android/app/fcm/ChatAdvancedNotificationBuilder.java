@@ -1181,7 +1181,7 @@ public final class ChatAdvancedNotificationBuilder {
         //Order by last interaction
         chats.sort(Comparator.comparing(
                 MegaChatListItem::getLastTimestamp,
-                Comparator.naturalOrder()
+                Comparator.reverseOrder()
         ));
 
         //Check if the last chat notification is enabled
@@ -1244,7 +1244,7 @@ public final class ChatAdvancedNotificationBuilder {
         //Order by last interaction
         chats.sort(Comparator.comparing(
                 MegaChatListItem::getLastTimestamp,
-                Comparator.naturalOrder()
+                Comparator.reverseOrder()
         ));
 
         Timber.d("Generate chat notification for: %d chats", chats.size());
