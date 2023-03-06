@@ -66,6 +66,7 @@ class ManagerViewModelTest {
     private val getNumUnreadUserAlerts = mock<GetNumUnreadUserAlerts>()
     private val hasInboxChildren = mock<HasInboxChildren>()
     private val monitorContactRequestUpdates = mock<MonitorContactRequestUpdates>()
+    private val monitorSecurityUpgrade = MutableStateFlow(false)
     private val sendStatisticsMediaDiscovery = mock<SendStatisticsMediaDiscovery>()
     private val savedStateHandle = SavedStateHandle(mapOf())
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
@@ -148,6 +149,7 @@ class ManagerViewModelTest {
             getFeatureFlagValue = getFeatureFlagValue,
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
+            monitorSecurityUpgrade = { monitorSecurityUpgrade }
         )
     }
 

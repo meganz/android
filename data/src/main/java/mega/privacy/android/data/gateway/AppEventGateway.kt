@@ -20,6 +20,11 @@ internal interface AppEventGateway {
     suspend fun setSMSVerificationShown(isShown: Boolean)
 
     /**
+     * Set the status for account security upgrade
+     */
+    suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean)
+
+    /**
      * check whether SMS Verification Shown or not
      */
     suspend fun isSMSVerificationShown(): Boolean
@@ -50,6 +55,12 @@ internal interface AppEventGateway {
      *
      */
     fun monitorFailedTransfer(): Flow<Boolean>
+
+    /**
+     * Monitor transfer failed
+     *
+     */
+    fun monitorSecurityUpgrade(): Flow<Boolean>
 
     /**
      * Broadcast transfer failed

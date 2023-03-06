@@ -120,4 +120,18 @@ interface NodeRepository {
      * @return Offline node information if found
      */
     suspend fun getOfflineNodeInformation(nodeHandle: Long): OfflineNodeInformation?
+
+    /**
+     * Monitor update upgrade security events
+     *
+     * @return
+     */
+    fun monitorSecurityUpgrade(): Flow<Boolean>
+
+    /**
+     * Set upgrade security
+     *
+     * @param isSecurityUpgrade
+     */
+    suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean)
 }

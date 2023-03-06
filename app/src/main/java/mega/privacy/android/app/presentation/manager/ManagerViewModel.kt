@@ -59,8 +59,8 @@ import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.filenode.MonitorSecurityUpgrade
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
-import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -116,6 +116,7 @@ class ManagerViewModel @Inject constructor(
     private val getFeatureFlagValue: GetFeatureFlagValue,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
+    private val monitorSecurityUpgrade: MonitorSecurityUpgrade,
 ) : ViewModel() {
 
     /**
@@ -189,6 +190,13 @@ class ManagerViewModel @Inject constructor(
                 it.copy(pendingActionsCount = _state.value.pendingActionsCount + incomingShares)
             }
         }
+        viewModelScope.launch {
+            monitorSecurityUpgrade().collect {
+                if (it) {
+                    setShouldAlertUserAboutSecurityUpgrade(true)
+                }
+            }
+        }
 
         viewModelScope.launch {
             val outgoingShares =
@@ -222,13 +230,6 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { it.userAlerts?.toList() }
             .map { Event(it) }
             .asLiveData()
-
-
-    private val updateGlobalEvents: Flow<Event<MegaEvent>> = _updates
-        .filterIsInstance<GlobalUpdate.OnEvent>()
-        .mapNotNull { (event) ->
-            event?.let { Event(it) }
-        }
 
     private fun checkItemForInbox(updatedNodes: List<Node>) {
         //Verify is it is a new item to the inbox
@@ -455,19 +456,6 @@ class ManagerViewModel @Inject constructor(
      * Active subscription in local cache
      */
     val activeSubscription: MegaPurchase? get() = getActiveSubscription()
-
-    /**
-     * Check global events updates for [MegaEvent.EVENT_UPGRADE_SECURITY]
-     */
-    fun monitorGlobalEventUpgradeForUpgradeSecurity() {
-        viewModelScope.launch {
-            updateGlobalEvents.collect { megaEvent ->
-                if (megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
-                    setShouldAlertUserAboutSecurityUpgrade(true)
-                }
-            }
-        }
-    }
 
     /**
      * Set the security upgrade alert state

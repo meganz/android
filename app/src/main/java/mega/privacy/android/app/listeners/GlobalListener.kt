@@ -27,11 +27,11 @@ import mega.privacy.android.app.fcm.ContactsAdvancedNotificationBuilder
 import mega.privacy.android.app.fragments.settingsFragments.cookie.data.CookieType
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.globalmanagement.MegaChatNotificationHandler
-import mega.privacy.android.app.presentation.login.LoginActivity
-import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 import mega.privacy.android.app.middlelayer.reporter.PerformanceReporter
+import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.Constants
@@ -46,6 +46,7 @@ import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
+import mega.privacy.android.domain.usecase.filenode.SetSecurityUpgrade
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -74,6 +75,7 @@ class GlobalListener @Inject constructor(
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
     private val getNumberOfSubscription: GetNumberOfSubscription,
+    private val setSecurityUpgrade: SetSecurityUpgrade,
 ) : MegaGlobalListenerInterface {
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser?>?) {
@@ -95,8 +97,10 @@ class GlobalListener @Inject constructor(
             if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
                 //user has change CU attribute, need to update local ones
                 Timber.d("Get CameraUpload attribute when change on other client.")
-                api.getUserAttribute(MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER,
-                    GetCameraUploadAttributeListener(appContext))
+                api.getUserAttribute(
+                    MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER,
+                    GetCameraUploadAttributeListener(appContext)
+                )
                 return@forEach
             }
             if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS) && isMyChange) {
@@ -125,7 +129,8 @@ class GlobalListener @Inject constructor(
     private fun notifyNotificationCountChange(api: MegaApiJava) {
         val incomingContactRequests = api.incomingContactRequests
         LiveEventBus.get(Constants.EVENT_NOTIFICATION_COUNT_CHANGE, Int::class.java).post(
-            api.numUnreadUserAlerts + (incomingContactRequests?.size ?: 0))
+            api.numUnreadUserAlerts + (incomingContactRequests?.size ?: 0)
+        )
     }
 
     override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode?>?) {
@@ -169,23 +174,29 @@ class GlobalListener @Inject constructor(
                 val notificationBuilder: ContactsAdvancedNotificationBuilder =
                     ContactsAdvancedNotificationBuilder.newInstance(
                         appContext,
-                        megaApi)
+                        megaApi
+                    )
                 notificationBuilder.removeAllIncomingContactNotifications()
                 notificationBuilder.showIncomingContactRequestNotification()
-                Timber.d("IPC: %s cr.isOutgoing: %s cr.getStatus: %d",
+                Timber.d(
+                    "IPC: %s cr.isOutgoing: %s cr.getStatus: %d",
                     cr.sourceEmail,
                     cr.isOutgoing,
-                    cr.status)
+                    cr.status
+                )
             } else if (cr.status == MegaContactRequest.STATUS_ACCEPTED && cr.isOutgoing) {
                 val notificationBuilder: ContactsAdvancedNotificationBuilder =
                     ContactsAdvancedNotificationBuilder.newInstance(
                         appContext,
-                        megaApi)
+                        megaApi
+                    )
                 notificationBuilder.showAcceptanceContactRequestNotification(cr.targetEmail)
-                Timber.d("ACCEPT OPR: %s cr.isOutgoing: %s cr.getStatus: %d",
+                Timber.d(
+                    "ACCEPT OPR: %s cr.isOutgoing: %s cr.getStatus: %d",
                     cr.sourceEmail,
                     cr.isOutgoing,
-                    cr.status)
+                    cr.status
+                )
                 RatingHandlerImpl(appContext).showRatingBaseOnContacts()
             }
             if (cr.status == MegaContactRequest.STATUS_ACCEPTED) {
@@ -220,13 +231,18 @@ class GlobalListener @Inject constructor(
             }
             MegaEvent.EVENT_ACCOUNT_BLOCKED -> {
                 Timber.d("EVENT_ACCOUNT_BLOCKED: %s", event.number)
-                appContext.sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
-                    .putExtra(BroadcastConstants.EVENT_NUMBER, event.number)
-                    .putExtra(BroadcastConstants.EVENT_TEXT, event.text))
+                appContext.sendBroadcast(
+                    Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_EVENT_ACCOUNT_BLOCKED)
+                        .putExtra(BroadcastConstants.EVENT_NUMBER, event.number)
+                        .putExtra(BroadcastConstants.EVENT_TEXT, event.text)
+                )
             }
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()
             MegaEvent.EVENT_MISC_FLAGS_READY -> checkEnabledCookies()
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
+            MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {
+                setSecurityUpgrade(true)
+            }
         }
     }
 
@@ -242,8 +258,10 @@ class GlobalListener @Inject constructor(
     }
 
     private fun sendBroadcastUpdateAccountDetails() {
-        appContext.sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-            .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS))
+        appContext.sendBroadcast(
+            Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS)
+        )
     }
 
     private fun showSharedFolderNotification(n: MegaNode) {
@@ -260,22 +278,27 @@ class GlobalListener @Inject constructor(
             }
             val source =
                 "<b>" + n.name + "</b> " + appContext.getString(R.string.incoming_folder_notification) + " " + Util.toCDATA(
-                    name)
+                    name
+                )
             val notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY)
             val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID
             val intent: Intent = Intent(appContext, ManagerActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .setAction(Constants.ACTION_INCOMING_SHARED_FOLDER_NOTIFICATION)
-            val pendingIntent = PendingIntent.getActivity(appContext, 0, intent,
-                PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+            val pendingIntent = PendingIntent.getActivity(
+                appContext, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+            )
             val notificationTitle: String =
                 appContext.getString(if (n.hasChanged(MegaNode.CHANGE_TYPE_NEW)) R.string.title_incoming_folder_notification else R.string.context_permissions_changed)
             val notificationManager =
                 appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(notificationChannelId,
+                val channel = NotificationChannel(
+                    notificationChannelId,
                     Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_NAME,
-                    NotificationManager.IMPORTANCE_HIGH)
+                    NotificationManager.IMPORTANCE_HIGH
+                )
                 channel.setShowBadge(true)
                 notificationManager.createNotificationChannel(channel)
             }
@@ -293,8 +316,10 @@ class GlobalListener @Inject constructor(
                     .setColor(ContextCompat.getColor(appContext, R.color.red_600_red_300))
                     .setLargeIcon((d as BitmapDrawable).bitmap)
                     .setPriority(NotificationManager.IMPORTANCE_HIGH)
-            notificationManager.notify(Constants.NOTIFICATION_PUSH_CLOUD_DRIVE,
-                notificationBuilder.build())
+            notificationManager.notify(
+                Constants.NOTIFICATION_PUSH_CLOUD_DRIVE,
+                notificationBuilder.build()
+            )
         } catch (e: Exception) {
             Timber.e(e)
         }

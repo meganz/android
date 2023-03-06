@@ -12,6 +12,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -82,6 +83,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,
     private val nodeUpdateMapper: NodeUpdateMapper,
+    private val appEventGateway: AppEventGateway,
 ) : NodeRepository {
 
 
@@ -254,4 +256,11 @@ internal class NodeRepositoryImpl @Inject constructor(
             megaLocalStorageGateway.getOfflineInformation(nodeHandle)
                 ?.let { offlineNodeInformationMapper(it) }
         }
+
+    override fun monitorSecurityUpgrade(): Flow<Boolean> =
+        appEventGateway.monitorSecurityUpgrade()
+
+    override suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean) {
+        appEventGateway.setUpgradeSecurity(isSecurityUpgrade)
+    }
 }

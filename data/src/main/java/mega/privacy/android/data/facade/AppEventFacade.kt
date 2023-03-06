@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -24,6 +25,8 @@ internal class AppEventFacade @Inject constructor(
     private val _transferFailed = MutableSharedFlow<Boolean>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
+
+    private val updateUpgradeSecurityState = MutableStateFlow(false)
 
     override val monitorCameraUploadPauseState =
         _monitorCameraUploadPauseState.toSharedFlow(appScope)
@@ -48,6 +51,13 @@ internal class AppEventFacade @Inject constructor(
     override suspend fun broadcastLogout() = logout.emit(true)
 
     override fun monitorFailedTransfer(): Flow<Boolean> = _transferFailed.asSharedFlow()
+
+    override fun monitorSecurityUpgrade(): Flow<Boolean> =
+        updateUpgradeSecurityState.asStateFlow()
+
+    override suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean) {
+        updateUpgradeSecurityState.value = isSecurityUpgrade
+    }
 
     override suspend fun broadcastFailedTransfer(isFailed: Boolean) {
         _transferFailed.emit(isFailed)

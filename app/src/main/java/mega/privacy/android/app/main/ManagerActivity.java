@@ -845,8 +845,6 @@ public class ManagerActivity extends TransfersManagementActivity
 
     public MegaNode viewInFolderNode;
 
-    private ArrayList<String> outgoingFolderNames = new ArrayList<>();
-
     /**
      * Broadcast to update the completed transfers tab.
      */
@@ -1288,7 +1286,6 @@ public class ManagerActivity extends TransfersManagementActivity
         rubbishBinViewModel = new ViewModelProvider(this).get(RubbishBinViewModel.class);
         searchViewModel = new ViewModelProvider(this).get(SearchViewModel.class);
         userInfoViewModel = new ViewModelProvider(this).get(UserInfoViewModel.class);
-        viewModel.monitorGlobalEventUpgradeForUpgradeSecurity();
         viewModel.getUpdateUserAlerts().observe(this,
                 new EventObserver<>(userAlerts -> {
                     updateUserAlerts(userAlerts);
@@ -2449,21 +2446,10 @@ public class ManagerActivity extends TransfersManagementActivity
 
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, managerState -> {
             if (managerState.getShouldAlertUserAboutSecurityUpgrade()) {
-                ViewExtensionsKt.collectFlow(this, outgoingSharesViewModel.getState(), Lifecycle.State.STARTED, outgoingSharesState -> {
-                    outgoingFolderNames.clear();
-                    for (int i = 0; i < outgoingSharesState.getNodes().size(); i++) {
-                        outgoingFolderNames.add(outgoingSharesState.getNodes().get(i).getFirst().getName());
-                    }
                     SecurityUpgradeDialogFragment dialog = SecurityUpgradeDialogFragment.Companion.newInstance();
-                    Bundle bundle = new Bundle();
-                    bundle.putStringArrayList("nodeNames", outgoingFolderNames);
-                    dialog.setArguments(bundle);
                     dialog.show(getSupportFragmentManager(), SecurityUpgradeDialogFragment.TAG);
 
                     viewModel.setShouldAlertUserAboutSecurityUpgrade(false);
-
-                    return Unit.INSTANCE;
-                });
             }
 
             updateInboxSectionVisibility(managerState.getHasInboxChildren());

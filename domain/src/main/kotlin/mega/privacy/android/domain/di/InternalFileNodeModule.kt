@@ -9,6 +9,8 @@ import mega.privacy.android.domain.usecase.DefaultGetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
+import mega.privacy.android.domain.usecase.filenode.MonitorSecurityUpgrade
+import mega.privacy.android.domain.usecase.filenode.SetSecurityUpgrade
 
 /**
  * module to provide FileNode modules
@@ -37,5 +39,14 @@ abstract class InternalFileNodeModule {
         @Provides
         fun provideIsNodeInInbox(nodeRepository: NodeRepository): IsNodeInInbox =
             IsNodeInInbox(nodeRepository::isNodeInInbox)
+
+        @Provides
+        fun provideMonitorSecurityUpgrade(nodeRepository: NodeRepository): MonitorSecurityUpgrade =
+            MonitorSecurityUpgrade(nodeRepository::monitorSecurityUpgrade)
+
+        @Provides
+        fun provideSetSecurityUpgrade(nodeRepository: NodeRepository): SetSecurityUpgrade =
+            SetSecurityUpgrade(nodeRepository::setUpgradeSecurity)
+
     }
 }
