@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -79,6 +80,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorNodeUpdatesById: MonitorNodeUpdatesById,
     private val monitorChildrenUpdates: MonitorChildrenUpdates,
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle,
+    private val getNodeLocationInfo: GetNodeLocationInfo,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -305,6 +307,7 @@ class FileInfoViewModel @Inject constructor(
         updatePreview()
         updateFolderTreeInfo()
         updateOwner()
+        updateLocation()
     }
 
     private fun updateHistory() {
@@ -336,6 +339,12 @@ class FileInfoViewModel @Inject constructor(
             updateState {
                 it.copy(incomingSharesOwnerContactItem = getContactItemFromInShareFolder(folder))
             }
+        }
+    }
+
+    private fun updateLocation() {
+        updateState {
+            it.copy(nodeLocationInfo = getNodeLocationInfo(typedNode))
         }
     }
 

@@ -1,10 +1,10 @@
 package mega.privacy.android.app.presentation.fileinfo
 
+import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
-import java.io.File
 
 /**
  * Represents the view state of the File info screen
@@ -18,6 +18,7 @@ import java.io.File
  * @param thumbnailUriString the uri of the file containing the thumbnail, just as a fallback in case there's no [previewUriString]
  * @param folderTreeInfo the folder info if the node is a folder
  * @param incomingSharesOwnerContactItem the info of the owner of this folder in case it's a folder from in shares
+ * @param nodeLocationInfo the location info of the node
  */
 data class FileInfoViewState(
     val title: String = "",
@@ -30,6 +31,7 @@ data class FileInfoViewState(
     val thumbnailUriString: String? = null,
     val folderTreeInfo: FolderTreeInfo? = null,
     val incomingSharesOwnerContactItem: ContactItem? = null,
+    val nodeLocationInfo: LocationInfo? = null,
 ) {
     /**
      * determines if the file history versions should be shown

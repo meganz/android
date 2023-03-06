@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.fileinfo
+package test.mega.privacy.android.app.fileinfo
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
@@ -18,8 +18,12 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
+import mega.privacy.android.app.presentation.fileinfo.FileInfoJobInProgressState
+import mega.privacy.android.app.presentation.fileinfo.FileInfoOneOffViewEvent
+import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -38,8 +42,8 @@ import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
-import mega.privacy.android.domain.usecase.filenode.DefaultDeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
+import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
@@ -64,32 +68,33 @@ import java.net.URI
 internal class FileInfoViewModelTest {
     private lateinit var underTest: FileInfoViewModel
 
-    private lateinit var fileUtilWrapper: FileUtilWrapper
-    private lateinit var monitorStorageStateEvent: MonitorStorageStateEvent
-    private lateinit var monitorConnectivity: MonitorConnectivity
-    private lateinit var getFileHistoryNumVersions: GetFileHistoryNumVersions
-    private lateinit var isNodeInInbox: IsNodeInInbox
-    private lateinit var isNodeInRubbish: IsNodeInRubbish
-    private lateinit var checkNameCollision: CheckNameCollision
-    private lateinit var moveNodeByHandle: MoveNodeByHandle
-    private lateinit var moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle
-    private lateinit var copyNodeByHandle: CopyNodeByHandle
-    private lateinit var deleteNodeByHandle: DeleteNodeByHandle
-    private lateinit var deleteNodeVersionsByHandle: DefaultDeleteNodeVersionsByHandle
-    private lateinit var node: MegaNode
-    private lateinit var nameCollision: NameCollision
-    private lateinit var getPreview: GetPreview
-    private lateinit var getFolderTreeInfo: GetFolderTreeInfo
-    private lateinit var getNodeById: GetNodeById
-    private lateinit var getContactItemFromInShareFolder: GetContactItemFromInShareFolder
-    private lateinit var monitorNodeUpdatesById: MonitorNodeUpdatesById
-    private lateinit var monitorChildrenUpdates: MonitorChildrenUpdates
-    private lateinit var megaNodeRepository: MegaNodeRepository
+    private val fileUtilWrapper: FileUtilWrapper = mock()
+    private val monitorStorageStateEvent: MonitorStorageStateEvent = mock()
+    private val monitorConnectivity: MonitorConnectivity = mock()
+    private val getFileHistoryNumVersions: GetFileHistoryNumVersions = mock()
+    private val isNodeInInbox: IsNodeInInbox = mock()
+    private val isNodeInRubbish: IsNodeInRubbish = mock()
+    private val checkNameCollision: CheckNameCollision = mock()
+    private val moveNodeByHandle: MoveNodeByHandle = mock()
+    private val moveNodeToRubbishByHandle: MoveNodeToRubbishByHandle = mock()
+    private val copyNodeByHandle: CopyNodeByHandle = mock()
+    private val deleteNodeByHandle: DeleteNodeByHandle = mock()
+    private val deleteNodeVersionsByHandle: DeleteNodeVersionsByHandle = mock()
+    private val node: MegaNode = mock()
+    private val nameCollision: NameCollision = mock()
+    private val getPreview: GetPreview = mock()
+    private val getFolderTreeInfo: GetFolderTreeInfo = mock()
+    private val getNodeById: GetNodeById = mock()
+    private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder = mock()
+    private val monitorNodeUpdatesById: MonitorNodeUpdatesById = mock()
+    private val monitorChildrenUpdates: MonitorChildrenUpdates = mock()
+    private val megaNodeRepository: MegaNodeRepository = mock()
+    private val getNodeVersionsByHandle: GetNodeVersionsByHandle = mock()
+    private val getNodeLocationInfo: GetNodeLocationInfo = mock()
 
-    private lateinit var getNodeVersionsByHandle: GetNodeVersionsByHandle
-    private lateinit var typedFileNode: TypedFileNode
+    private val typedFileNode: TypedFileNode = mock()
 
-    private lateinit var previewFile: File
+    private val previewFile: File = mock()
 
 
     @get:Rule
@@ -98,42 +103,10 @@ internal class FileInfoViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        initMocks()
         runTest {
             initDefaultMockBehaviour()
         }
         initUnderTestViewModel()
-    }
-
-    private fun initMocks() {
-        monitorStorageStateEvent = mock()
-        monitorConnectivity = mock()
-        fileUtilWrapper = mock()
-        getFileHistoryNumVersions = mock()
-        isNodeInInbox = mock()
-        isNodeInRubbish = mock()
-        checkNameCollision = mock()
-        moveNodeByHandle = mock()
-        copyNodeByHandle = mock()
-        moveNodeToRubbishByHandle = mock()
-        deleteNodeByHandle = mock()
-        deleteNodeVersionsByHandle = mock()
-        node = mock()
-        nameCollision = mock()
-        getPreview = mock()
-        getFolderTreeInfo = mock()
-        getNodeById = mock()
-        getContactItemFromInShareFolder = mock()
-        monitorNodeUpdatesById = mock()
-        monitorChildrenUpdates = mock()
-        megaNodeRepository = mock()
-        getNodeVersionsByHandle = mock()
-
-        typedFileNode = mock {
-            on { name }.thenReturn("File name")
-            on { id }.thenReturn(nodeId)
-        }
-        previewFile = mock()
     }
 
     private fun initUnderTestViewModel() {
@@ -158,8 +131,8 @@ internal class FileInfoViewModelTest {
             monitorNodeUpdatesById = monitorNodeUpdatesById,
             monitorChildrenUpdates = monitorChildrenUpdates,
             getNodeVersionsByHandle = getNodeVersionsByHandle,
+            getNodeLocationInfo = getNodeLocationInfo,
         )
-        underTest.setNode(node.handle)
     }
 
     private suspend fun initDefaultMockBehaviour() {
@@ -178,6 +151,8 @@ internal class FileInfoViewModelTest {
         whenever(monitorChildrenUpdates.invoke(nodeId)).thenReturn(emptyFlow())
         whenever(fileUtilWrapper.getFileIfExists(null, thumbUri))
             .thenReturn(File(null as File?, thumbUri))
+        whenever(typedFileNode.name).thenReturn("File name")
+        whenever(typedFileNode.id).thenReturn(nodeId)
     }
 
     @After
@@ -283,6 +258,7 @@ internal class FileInfoViewModelTest {
     fun `test CollisionDetected event is launched when a collision is found while moving`() =
         runTest {
             mockCollisionMoving()
+            underTest.setNode(node.handle)
             underTest.moveNodeCheckingCollisions(parentId)
             testEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
         }
@@ -291,6 +267,7 @@ internal class FileInfoViewModelTest {
     fun `test CollisionDetected event is launched when a collision is found while copying`() =
         runTest {
             mockCollisionCopying()
+            underTest.setNode(node.handle)
             underTest.copyNodeCheckingCollisions(parentId)
             testEventIsOfType(FileInfoOneOffViewEvent.CollisionDetected::class.java)
         }
@@ -300,6 +277,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(checkNameCollision(nodeId, parentId, NameCollisionType.COPY))
                 .thenThrow(RuntimeException::class.java)
+            underTest.setNode(node.handle)
             underTest.copyNodeCheckingCollisions(parentId)
             testEventIsOfType(FileInfoOneOffViewEvent.GeneralError::class.java)
         }
@@ -308,6 +286,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMoving event is launched without exceptions when the move finished successfully`() =
         runTest {
             mockMoveSuccess()
+            underTest.setNode(node.handle)
             underTest.moveNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Moving::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -318,6 +297,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMoving event is launched with the proper exceptions when the move finished with an error`() =
         runTest {
             mockMoveFailure()
+            underTest.setNode(node.handle)
             underTest.moveNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Moving::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -328,6 +308,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMovingToRubbish event is launched without exceptions when the move finished successfully`() =
         runTest {
             mockMoveToRubbishSuccess()
+            underTest.setNode(node.handle)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.MovingToRubbish::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -338,6 +319,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedMovingToRubbish event is launched with the proper exceptions when the move finished with an error`() =
         runTest {
             mockMoveToRubbishFailure()
+            underTest.setNode(node.handle)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.MovingToRubbish::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -348,6 +330,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedDeleting event is launched without exceptions when the delete finished successfully`() =
         runTest {
             mockDeleteSuccess()
+            underTest.setNode(node.handle)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Deleting::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -358,6 +341,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedDeleting event is launched with the proper exceptions when the delete finished with an error`() =
         runTest {
             mockDeleteFailure()
+            underTest.setNode(node.handle)
             underTest.removeNode()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Deleting::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -368,6 +352,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedCopying event is launched without exceptions when the move finished successfully`() =
         runTest {
             mockCopySuccess()
+            underTest.setNode(node.handle)
             underTest.copyNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Copying::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -378,6 +363,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedCopying event is launched with the proper exceptions when the move finished with an error`() =
         runTest {
             mockCopyFailure()
+            underTest.setNode(node.handle)
             underTest.copyNodeCheckingCollisions(parentId)
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.Copying::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -388,6 +374,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedDeletingVersions event is launched without exceptions when the delete versions finished successfully`() =
         runTest {
             mockDeleteVersionsSuccess()
+            underTest.setNode(node.handle)
             underTest.deleteHistoryVersions()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
                 Truth.assertThat(it.exception).isNull()
@@ -398,6 +385,7 @@ internal class FileInfoViewModelTest {
     fun `test FinishedDeletingVersions event is launched with the proper exceptions when the delete versions finished with an error`() =
         runTest {
             mockDeleteVersionsFailure(null)
+            underTest.setNode(node.handle)
             underTest.deleteHistoryVersions()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -412,6 +400,7 @@ internal class FileInfoViewModelTest {
             val errors = 3
             val total = 5
             mockDeleteVersionsFailure(total, errors)
+            underTest.setNode(node.handle)
             underTest.deleteHistoryVersions()
             testNextEventIsOfTypeFinishedAndJobIsOfType(FileInfoJobInProgressState.DeletingVersions::class.java)?.also {
                 Truth.assertThat(it.exception).isNotNull()
@@ -427,6 +416,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while copying successfully, and unset at the end`() =
         runTest {
             mockCopySuccess()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileCopyingAndUnset()
         }
 
@@ -434,6 +424,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while copying with an error, and unset at the end`() =
         runTest {
             mockCopyFailure()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileCopyingAndUnset()
         }
 
@@ -441,6 +432,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while copying and Name conflict found, and unset at the end`() =
         runTest {
             mockCollisionCopying()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileCopyingAndUnset()
         }
 
@@ -448,6 +440,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving successfully, and unset at the end`() =
         runTest {
             mockMoveSuccess()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileMovingAndUnset()
         }
 
@@ -455,6 +448,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving with an error, and unset at the end`() =
         runTest {
             mockMoveFailure()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileMovingAndUnset()
         }
 
@@ -462,6 +456,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving and Name conflict found, and unset at the end`() =
         runTest {
             mockCollisionMoving()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileMovingAndUnset()
         }
 
@@ -469,6 +464,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving to rubbish successfully, and unset at the end`() =
         runTest {
             mockMoveToRubbishSuccess()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileMovingToRubbishBinAndUnset()
         }
 
@@ -476,6 +472,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while moving to rubbish with an error, and unset at the end`() =
         runTest {
             mockMoveToRubbishFailure()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileMovingToRubbishBinAndUnset()
         }
 
@@ -483,6 +480,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while deleting successfully, and unset at the end`() =
         runTest {
             mockDeleteSuccess()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileDeletingAndUnset()
         }
 
@@ -490,6 +488,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while deleting with an error, and unset at the end`() =
         runTest {
             mockDeleteSuccess()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileDeletingAndUnset()
         }
 
@@ -497,6 +496,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while deleting versions successfully, and unset at the end`() =
         runTest {
             mockDeleteVersionsSuccess()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileDeletingVersionsAndUnset()
         }
 
@@ -504,6 +504,7 @@ internal class FileInfoViewModelTest {
     fun `test FileInfoJobInProgressState is set while deleting versions with an error, and unset at the end`() =
         runTest {
             mockDeleteVersionsFailure()
+            underTest.setNode(node.handle)
             testProgressIsSetWhileDeletingVersionsAndUnset()
         }
 
@@ -575,6 +576,23 @@ internal class FileInfoViewModelTest {
         underTest.setNode(node.handle)
         //check 2 invocations: first invocation when node is set, second one the update itself
         verify(getContactItemFromInShareFolder, times(2)).invoke(folderNode)
+    }
+
+    @Test
+    fun `test getNodeLocationInfo fetches node location when its set`() = runTest {
+        underTest.setNode(node.handle)
+        verify(getNodeLocationInfo, times(1)).invoke(typedFileNode)
+    }
+
+    @Test
+    fun `test getNodeLocationInfo fetches node location when its parent is updated`() = runTest {
+        whenever(monitorNodeUpdatesById.invoke(nodeId))
+            .thenReturn(
+                flowOf(listOf(NodeChanges.Parent))
+            )
+            .thenReturn(emptyFlow())//second time we don't want to emmit another update
+        underTest.setNode(node.handle)
+        verify(getNodeLocationInfo, times(2)).invoke(typedFileNode)
     }
 
     @Suppress("UNCHECKED_CAST")

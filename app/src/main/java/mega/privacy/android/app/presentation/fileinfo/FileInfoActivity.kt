@@ -86,19 +86,19 @@ import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
+import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
+import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle
 import mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon
-import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLocationInfo
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
 import mega.privacy.android.app.utils.MegaNodeUtil.isEmptyFolder
 import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -428,8 +428,16 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         )
         updateAvailableOffline(!viewModel.node.isTakenDown && !viewState.isNodeInRubbish)
         updateIncomeShared(viewState.incomingSharesOwnerContactItem)
+        updateLocation(viewState.nodeLocationInfo)
 
         refreshProperties()
+    }
+
+    private fun updateLocation(locationInfo: LocationInfo?) {
+        with(bindingContent.filePropertiesInfoDataLocation) {
+            isVisible = locationInfo != null
+            text = locationInfo?.location
+        }
     }
 
     private fun updateIncomeShared(incomingSharesOwnerContactItem: ContactItem?) {
@@ -689,19 +697,11 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
 
             //setup adapter
             listView.adapter = adapter
-            //Location Layout
-            getNodeLocationInfo(
-                adapterType, from == Constants.FROM_INCOMING_SHARES,
-                viewModel.node.handle
-            )?.let { locationInfo ->
-                with(filePropertiesInfoDataLocation) {
-                    text = locationInfo.location
-                    setOnClickListener {
-                        handleLocationClick(this@FileInfoActivity, adapterType, locationInfo)
-                    }
+
+            filePropertiesInfoDataLocation.setOnClickListener {
+                viewModel.uiState.value.nodeLocationInfo?.let { locationInfo ->
+                    handleLocationClick(this@FileInfoActivity, adapterType, locationInfo)
                 }
-            } ?: run {
-                filePropertiesLocationLayout.isVisible = false
             }
 
             if (viewModel.node.isFolder) {
