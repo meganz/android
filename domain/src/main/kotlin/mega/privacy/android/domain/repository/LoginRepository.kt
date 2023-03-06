@@ -96,4 +96,17 @@ interface LoginRepository {
         password: String,
         pin: String,
     ): Flow<LoginStatus>
+
+    /**
+     * Refreshes URLs and establish fresh connections.
+     */
+    suspend fun refreshMegaChatUrl()
+
+    /**
+     * Performs a fast login given a session.
+     *
+     * @param session Required account session.
+     * @return Flow of [LoginStatus].
+     */
+    fun fastLoginFlow(session: String): Flow<LoginStatus>
 }

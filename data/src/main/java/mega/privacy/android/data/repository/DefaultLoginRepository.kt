@@ -3,8 +3,6 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -261,16 +259,20 @@ internal class DefaultLoginRepository @Inject constructor(
             awaitClose { megaApiGateway.removeRequestListener(listener) }
         }.flowOn(ioDispatcher)
 
-    override fun login(email: String, password: String) = flow {
-        emitAll(loginRequest { megaApiGateway.login(email, password, it) })
-    }
+    override fun login(email: String, password: String) =
+        loginRequest { megaApiGateway.login(email, password, it) }
 
 
     override fun multiFactorAuthLogin(
         email: String,
         password: String,
         pin: String,
-    ) = flow {
-        emitAll(loginRequest { megaApiGateway.multiFactorAuthLogin(email, password, pin, it) })
+    ) = loginRequest { megaApiGateway.multiFactorAuthLogin(email, password, pin, it) }
+
+    override suspend fun refreshMegaChatUrl() = withContext(ioDispatcher) {
+        megaChatApiGateway.refreshUrl()
     }
+
+    override fun fastLoginFlow(session: String) =
+        loginRequest { megaApiGateway.fastLogin(session, it) }
 }

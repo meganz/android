@@ -49,7 +49,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.FragmentLoginBinding
-import mega.privacy.android.app.listeners.ChatLogoutListener
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileLinkActivity
@@ -67,7 +66,6 @@ import mega.privacy.android.app.upgradeAccount.ChooseAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.ChangeApiServerUtil.showChangeApiServerDialog
-import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
@@ -874,18 +872,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
 
         if (!isLoggingIn) {
             isLoggingIn = true
-            val gSession = uiState.accountSession?.session
-            ChatUtil.initMegaChatApi(
-                gSession,
-                ChatLogoutListener(requireActivity(), loggingSettings)
-            )
-
-            megaApi.fastLogin(gSession, this)
-
-            if (requireActivity().intent?.action == Constants.ACTION_REFRESH_API_SERVER) {
-                Timber.d("megaChatApi.refreshUrl()")
-                megaChatApi.refreshUrl()
-            }
+            viewModel.performFastLogin(requireActivity().intent?.action == Constants.ACTION_REFRESH_API_SERVER)
         } else {
             viewModel.setIntentAction(ACTION_OPEN_APP)
             Timber.w("Another login is processing")
@@ -1288,84 +1275,7 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
             binding.loginServersBusyText.isVisible = false
         }
         Timber.d("onRequestFinish: %s,error code: %d", request.requestString, error.errorCode)
-        if (request.type == MegaRequest.TYPE_LOGIN) {
-            //cancel login process by press back.
-            if (!isLoggingIn) {
-                Timber.w("Terminate login process when login")
-                return
-            }
-            if (error.errorCode != MegaError.API_OK) {
-                isLoggingIn = false
-                confirmLogoutDialog?.dismiss()
-                val errorMessage: String
-                when (error.errorCode) {
-                    MegaError.API_ESID -> {
-                        Timber.w(
-                            "MegaError.API_ESID %s",
-                            requireContext().getFormattedStringOrDefault(R.string.error_server_expired_session)
-                        )
-                        (requireActivity() as LoginActivity).showAlertLoggedOut()
-                    }
-                    MegaError.API_EFAILED, MegaError.API_EEXPIRED -> {
-                        binding.progressbarVerify2fa.isVisible = false
-                        show2FAError()
-                        return
-                    }
-                    else -> {
-                        errorMessage = when (error.errorCode) {
-                            MegaError.API_ENOENT -> {
-                                requireContext().getFormattedStringOrDefault(R.string.error_incorrect_email_or_password)
-                            }
-                            MegaError.API_ETOOMANY -> {
-                                requireContext().getFormattedStringOrDefault(R.string.too_many_attempts_login)
-                            }
-                            MegaError.API_EINCOMPLETE -> {
-                                requireContext().getFormattedStringOrDefault(R.string.account_not_validated_login)
-                            }
-                            MegaError.API_EACCESS -> {
-                                error.errorString
-                            }
-                            MegaError.API_EBLOCKED -> {
-                                //It will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
-                                Timber.w("Suspended account - Reason: %s", request.number)
-                                return
-                            }
-                            else -> {
-                                error.errorString
-                            }
-                        }
-                        Timber.e("LOGIN_ERROR: %d %s", error.errorCode, error.errorString)
-                        viewModel.performChatLogout()
-                        if (errorMessage.isNotEmpty()) {
-                            if (!uiState.pressedBackWhileLogin) {
-                                (requireActivity() as LoginActivity).showSnackbar(errorMessage)
-                            }
-                        }
-                        viewModel.initChatSettings()
-                    }
-                }
-                returnToLogin()
-            } else {
-                Timber.d("Logged in. Setting account auth token for folder links.")
-                megaApiFolder.accountAuth = megaApi.accountAuth
-
-                with(binding) {
-                    if (uiState.is2FAEnabled) {
-                        login2fa.isVisible = false
-                        (requireActivity() as LoginActivity).hideAB()
-                    }
-
-                    showFetchingNodes()
-                }
-
-                viewModel.saveCredentials()
-                Timber.d("Logged in with session")
-                megaApi.fetchNodes(this)
-
-                // Get cookies settings after login.
-                getInstance().checkEnabledCookies()
-            }
-        } else if (request.type == MegaRequest.TYPE_FETCH_NODES) {
+        if (request.type == MegaRequest.TYPE_FETCH_NODES) {
             //cancel login process by press back.
             if (!isLoggingIn) {
                 Timber.d("Terminate login process when fetch nodes")

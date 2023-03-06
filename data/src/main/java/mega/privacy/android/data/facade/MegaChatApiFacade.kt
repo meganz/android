@@ -401,4 +401,6 @@ internal class MegaChatApiFacade @Inject constructor(
         archive: Boolean,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.archiveChat(chatId, archive, listener)
+
+    override suspend fun refreshUrl() = chatApi.refreshUrl()
 }

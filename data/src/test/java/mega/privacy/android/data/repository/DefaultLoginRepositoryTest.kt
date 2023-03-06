@@ -21,6 +21,7 @@ import mega.privacy.android.domain.exception.LoginRequireValidation
 import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginUnknownStatus
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
+import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
 import org.junit.Before
@@ -43,6 +44,8 @@ class DefaultLoginRepositoryTest {
 
     private val email = "test@email.com"
     private val password = "testPassword"
+    private val pin2F = "123456"
+    private val session = "k251rn435k"
 
     @Before
     fun setUp() {
@@ -168,7 +171,7 @@ class DefaultLoginRepositoryTest {
     }
 
     @Test
-    fun `test that login returns LoginRequire2FA if the request fails with API_EMFAREQUIRED`() =
+    fun `test that login returns LoginMultiFactorAuthRequired if the request fails with API_EMFAREQUIRED`() =
         runTest {
             whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
                 (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
@@ -184,7 +187,7 @@ class DefaultLoginRepositoryTest {
         }
 
     @Test
-    fun `test that login returns LoggedOutFromOtherLocation if the request fails with API_ESID`() =
+    fun `test that login returns LoginLoggedOutFromOtherLocation if the request fails with API_ESID`() =
         runTest {
             whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
                 (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
@@ -200,7 +203,7 @@ class DefaultLoginRepositoryTest {
         }
 
     @Test
-    fun `test that login returns WrongEmailOrPassword if the request fails with API_ENOENT`() =
+    fun `test that login returns LoginWrongEmailOrPassword if the request fails with API_ENOENT`() =
         runTest {
             whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
                 (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
@@ -216,7 +219,7 @@ class DefaultLoginRepositoryTest {
         }
 
     @Test
-    fun `test that login returns TooManyAttempts if the request fails with API_ETOOMANY`() =
+    fun `test that login returns LoginTooManyAttempts if the request fails with API_ETOOMANY`() =
         runTest {
             whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
                 (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
@@ -232,7 +235,7 @@ class DefaultLoginRepositoryTest {
         }
 
     @Test
-    fun `test that login returns RequireValidation if the request fails with API_EINCOMPLETE`() =
+    fun `test that login returns LoginRequireValidation if the request fails with API_EINCOMPLETE`() =
         runTest {
             whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
                 (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
@@ -248,7 +251,7 @@ class DefaultLoginRepositoryTest {
         }
 
     @Test
-    fun `test that login returns BlockedAccount if the request fails with API_EBLOCKED`() =
+    fun `test that login returns LoginBlockedAccount if the request fails with API_EBLOCKED`() =
         runTest {
             whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
                 (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
@@ -264,7 +267,7 @@ class DefaultLoginRepositoryTest {
         }
 
     @Test
-    fun `test that login returns Unknown if the request fails with non contemplated error`() =
+    fun `test that login returns LoginUnknownStatus if the request fails with non contemplated error`() =
         runTest {
             whenever(megaApiGateway.login(any(), any(), any())).thenAnswer {
                 (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
@@ -278,4 +281,230 @@ class DefaultLoginRepositoryTest {
                 assertThat(awaitError()).isInstanceOf(LoginUnknownStatus::class.java)
             }
         }
+
+    @Test
+    fun `test that login with 2FA returns LoginStarted if the request starts`() = runTest {
+        val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+
+        underTest.multiFactorAuthLogin(email, password, pin2F).test {
+            verify(megaApiGateway)
+                .multiFactorAuthLogin(any(), any(), any(), listenerCaptor.capture())
+            val listener = listenerCaptor.firstValue
+            listener.onRequestStart(mock(), mock())
+            assertThat(awaitItem()).isEqualTo(LoginStatus.LoginStarted)
+        }
+    }
+
+    @Test
+    fun `test that login with 2FA returns LoginSucceed if the request finishes with success`() =
+        runTest {
+            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+
+            underTest.multiFactorAuthLogin(email, password, pin2F).test {
+                verify(megaApiGateway)
+                    .multiFactorAuthLogin(any(), any(), any(), listenerCaptor.capture())
+                val listener = listenerCaptor.firstValue
+                listener.onRequestFinish(mock(), mock(), error)
+                val value = verify(megaApiGateway).accountAuth
+                verify(megaApiFolderGateway).accountAuth = value
+                assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that login with 2FA returns LoginWrongMultiFactorAuth if the request fails with API_EFAILED`() =
+        runTest {
+            whenever(megaApiGateway.multiFactorAuthLogin(any(), any(), any(), any())).thenAnswer {
+                (it.arguments[3] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EFAILED) }
+                )
+            }
+
+            underTest.multiFactorAuthLogin(email, password, pin2F).test {
+                assertThat(awaitError()).isInstanceOf(LoginWrongMultiFactorAuth::class.java)
+            }
+        }
+
+    @Test
+    fun `test that login with 2FA returns LoginWrongMultiFactorAuth if the request fails with API_EEXPIRED`() =
+        runTest {
+            whenever(megaApiGateway.multiFactorAuthLogin(any(), any(), any(), any())).thenAnswer {
+                (it.arguments[3] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EEXPIRED) }
+                )
+            }
+
+            underTest.multiFactorAuthLogin(email, password, pin2F).test {
+                assertThat(awaitError()).isInstanceOf(LoginWrongMultiFactorAuth::class.java)
+            }
+        }
+
+    @Test
+    fun `test that login with 2FA returns LoginLoggedOutFromOtherLocation if the request fails with API_ESID`() =
+        runTest {
+            whenever(megaApiGateway.multiFactorAuthLogin(any(), any(), any(), any())).thenAnswer {
+                (it.arguments[3] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_ESID) }
+                )
+            }
+
+            underTest.multiFactorAuthLogin(email, password, pin2F).test {
+                assertThat(awaitError()).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
+            }
+        }
+
+    @Test
+    fun `test that login with 2FA returns LoginTooManyAttempts if the request fails with API_ETOOMANY`() =
+        runTest {
+            whenever(megaApiGateway.multiFactorAuthLogin(any(), any(), any(), any())).thenAnswer {
+                (it.arguments[3] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_ETOOMANY) }
+                )
+            }
+
+            underTest.multiFactorAuthLogin(email, password, pin2F).test {
+                assertThat(awaitError()).isInstanceOf(LoginTooManyAttempts::class.java)
+            }
+        }
+
+    @Test
+    fun `test that login with 2FA returns LoginRequireValidation if the request fails with API_EINCOMPLETE`() =
+        runTest {
+            whenever(megaApiGateway.multiFactorAuthLogin(any(), any(), any(), any())).thenAnswer {
+                (it.arguments[3] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EINCOMPLETE) }
+                )
+            }
+
+            underTest.multiFactorAuthLogin(email, password, pin2F).test {
+                assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
+            }
+        }
+
+    @Test
+    fun `test that login with 2FA returns LoginBlockedAccount if the request fails with API_EBLOCKED`() =
+        runTest {
+            whenever(megaApiGateway.multiFactorAuthLogin(any(), any(), any(), any())).thenAnswer {
+                (it.arguments[3] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EBLOCKED) }
+                )
+            }
+
+            underTest.multiFactorAuthLogin(email, password, pin2F).test {
+                assertThat(awaitError()).isInstanceOf(LoginBlockedAccount::class.java)
+            }
+        }
+
+    @Test
+    fun `test that login with 2FA returns LoginUnknownStatus if the request fails with non contemplated error`() =
+        runTest {
+            whenever(megaApiGateway.multiFactorAuthLogin(any(), any(), any(), any())).thenAnswer {
+                (it.arguments[3] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.LOCAL_ENOSPC) }
+                )
+            }
+
+            underTest.multiFactorAuthLogin(email, password, pin2F).test {
+                assertThat(awaitError()).isInstanceOf(LoginUnknownStatus::class.java)
+            }
+        }
+
+    @Test
+    fun `test that fast login flow returns LoginStarted if the request starts`() = runTest {
+        val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+
+        underTest.fastLoginFlow(session).test {
+            verify(megaApiGateway).fastLogin(any(), listenerCaptor.capture())
+            val listener = listenerCaptor.firstValue
+            listener.onRequestStart(mock(), mock())
+            assertThat(awaitItem()).isEqualTo(LoginStatus.LoginStarted)
+        }
+    }
+
+    @Test
+    fun `test that fast login flow returns LoginSucceed if the request finishes with success`() =
+        runTest {
+            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+
+            underTest.fastLoginFlow(session).test {
+                verify(megaApiGateway).fastLogin(any(), listenerCaptor.capture())
+                val listener = listenerCaptor.firstValue
+                listener.onRequestFinish(mock(), mock(), error)
+                val value = verify(megaApiGateway).accountAuth
+                verify(megaApiFolderGateway).accountAuth = value
+                assertThat(awaitItem()).isEqualTo(LoginStatus.LoginSucceed)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that fast login flow returns LoginLoggedOutFromOtherLocation if the request fails with API_ESID`() =
+        runTest {
+            whenever(megaApiGateway.fastLogin(any(), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_ESID) }
+                )
+            }
+
+            underTest.fastLoginFlow(session).test {
+                assertThat(awaitError()).isInstanceOf(LoginLoggedOutFromOtherLocation::class.java)
+            }
+        }
+
+    @Test
+    fun `test that fast login flow returns LoginBlockedAccount if the request fails with API_EBLOCKED`() =
+        runTest {
+            whenever(megaApiGateway.fastLogin(any(), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EBLOCKED) }
+                )
+            }
+
+            underTest.fastLoginFlow(session).test {
+                assertThat(awaitError()).isInstanceOf(LoginBlockedAccount::class.java)
+            }
+        }
+
+    @Test
+    fun `test that fast login flow returns LoginUnknownStatus if the request fails with non contemplated error`() =
+        runTest {
+            whenever(megaApiGateway.fastLogin(any(), any())).thenAnswer {
+                (it.arguments[1] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.LOCAL_ENOSPC) }
+                )
+            }
+
+            underTest.fastLoginFlow(session).test {
+                assertThat(awaitError()).isInstanceOf(LoginUnknownStatus::class.java)
+            }
+        }
+
+    @Test
+    fun `test that refresh MegaChat url invokes chat api`() = runTest {
+        underTest.refreshMegaChatUrl()
+        verify(megaChatApiGateway).refreshUrl()
+    }
 }

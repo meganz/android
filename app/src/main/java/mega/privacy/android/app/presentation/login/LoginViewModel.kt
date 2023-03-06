@@ -42,6 +42,7 @@ import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.login.ChatLogout
 import mega.privacy.android.domain.usecase.login.DisableChatApi
+import mega.privacy.android.domain.usecase.login.FastLogin
 import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.login.Login
 import mega.privacy.android.domain.usecase.login.LoginWith2FA
@@ -73,6 +74,7 @@ class LoginViewModel @Inject constructor(
     private val chatLogout: ChatLogout,
     private val login: Login,
     private val loginWith2FA: LoginWith2FA,
+    private val fastLogin: FastLogin,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -432,18 +434,35 @@ class LoginViewModel @Inject constructor(
                         )
                     }
                 } else {
-                    exception.loginFailed()
+                    exception.loginFailed(true)
                 }
             }
         }
     }
 
-    private fun LoginException.loginFailed() =
+    /**
+     * Fast login.
+     */
+    fun performFastLogin(refreshChatUrl: Boolean) = viewModelScope.launch {
+        runCatching {
+            fastLogin(
+                state.value.accountSession?.session ?: return@launch,
+                refreshChatUrl,
+                DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
+            ).collectLatest { status -> status.checkStatus() }
+        }.onFailure { exception ->
+            if (exception !is LoginException) return@onFailure
+            MegaApplication.isLoggingIn = false
+            exception.loginFailed()
+        }
+    }
+
+    private fun LoginException.loginFailed(is2FARequest: Boolean = false) =
         _state.update {
             it.copy(
                 isLoginInProgress = false,
                 isLoginRequired = true,
-                is2FAEnabled = true,
+                is2FAEnabled = is2FARequest,
                 is2FARequired = false,
                 error = this
             )

@@ -15,9 +15,11 @@ import mega.privacy.android.domain.usecase.login.BroadcastLogout
 import mega.privacy.android.domain.usecase.login.ChatLogout
 import mega.privacy.android.domain.usecase.login.DefaultBackgroundFastLogin
 import mega.privacy.android.domain.usecase.login.DefaultChatLogout
+import mega.privacy.android.domain.usecase.login.DefaultFastLogin
 import mega.privacy.android.domain.usecase.login.DefaultLocalLogout
 import mega.privacy.android.domain.usecase.login.DefaultLogin
 import mega.privacy.android.domain.usecase.login.DefaultLoginWith2FA
+import mega.privacy.android.domain.usecase.login.FastLogin
 import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.login.Login
@@ -58,6 +60,12 @@ internal abstract class InternalLoginModule {
      */
     @Binds
     abstract fun bindLoginWith2FA(useCase: DefaultLoginWith2FA): LoginWith2FA
+
+    /**
+     * Provides [FastLogin]
+     */
+    @Binds
+    abstract fun bindFastLogin(useCase: DefaultFastLogin): FastLogin
 
     companion object {
 
