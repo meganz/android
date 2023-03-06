@@ -714,7 +714,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private var versionsRemoved = 0
     private var errorVersionRemove = 0
     var viewInFolderNode: MegaNode? = null
-    private val outgoingFolderNames = ArrayList<String>()
 
     /**
      * Broadcast to update the completed transfers tab.
@@ -1581,7 +1580,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun registerViewModelObservers() {
-        viewModel.monitorGlobalEventUpgradeForUpgradeSecurity()
         viewModel.updateUserAlerts.observe(this,
             EventObserver {
                 updateUserAlerts()
@@ -2410,30 +2408,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             viewModel.state,
             Lifecycle.State.STARTED
         ) { managerState: ManagerState ->
+            if (managerState.shouldAlertUserAboutSecurityUpgrade) {
+                SecurityUpgradeDialogFragment.newInstance()
+                    .show(supportFragmentManager, SecurityUpgradeDialogFragment.TAG)
+                viewModel.setShouldAlertUserAboutSecurityUpgrade(false);
+            }
             enabledFeatures = managerState.enabledFlags
             if (enabledFeatures?.contains(AppFeatures.MonitorPhoneNumber) == true) {
                 canVerifyPhoneNumber = managerState.canVerifyPhoneNumber
                 if (!canVerifyPhoneNumber) {
                     hideAddPhoneNumberButton()
-                }
-            }
-            if (managerState.shouldAlertUserAboutSecurityUpgrade) {
-                this.collectFlow(
-                    outgoingSharesViewModel.state,
-                    Lifecycle.State.STARTED
-                ) { outgoingSharesState: OutgoingSharesState ->
-                    outgoingFolderNames.clear()
-                    for (i in outgoingSharesState.nodes.indices) {
-                        outgoingFolderNames.add(outgoingSharesState.nodes[i].first.name)
-                    }
-                    val dialog: SecurityUpgradeDialogFragment =
-                        SecurityUpgradeDialogFragment.newInstance()
-                    val bundle = Bundle()
-                    bundle.putStringArrayList("nodeNames", outgoingFolderNames)
-                    dialog.arguments = bundle
-                    dialog.show(supportFragmentManager, SecurityUpgradeDialogFragment.TAG)
-
-                    viewModel.setShouldAlertUserAboutSecurityUpgrade(false);
                 }
             }
             updateInboxSectionVisibility(managerState.hasInboxChildren)

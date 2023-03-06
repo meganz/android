@@ -5,6 +5,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -55,6 +56,7 @@ class NodeRepositoryImplTest {
     private val streamingGateway: StreamingGateway = mock()
     private val nodeUpdateMapper: NodeUpdateMapper = mock()
     private val folderNode: FolderNode = mock()
+    private val appEventGateway: AppEventGateway = mock()
 
     @Before
     fun setup() {
@@ -75,7 +77,8 @@ class NodeRepositoryImplTest {
             fileGateway = fileGateway,
             chatFilesFolderUserAttributeMapper = chatFilesFolderUserAttributeMapper,
             streamingGateway = streamingGateway,
-            nodeUpdateMapper = nodeUpdateMapper
+            nodeUpdateMapper = nodeUpdateMapper,
+            appEventGateway = appEventGateway,
         )
     }
 

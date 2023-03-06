@@ -129,4 +129,18 @@ interface NodeRepository {
      * if false it only returns the owner if this [nodeId] represents the root of an in share folder node,
      */
     suspend fun getOwnerIdFromInShare(nodeId: NodeId, recursive: Boolean): UserId?
+
+    /**
+     * Monitor update upgrade security events
+     *
+     * @return
+     */
+    fun monitorSecurityUpgrade(): Flow<Boolean>
+
+    /**
+     * Set upgrade security
+     *
+     * @param isSecurityUpgrade
+     */
+    suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean)
 }

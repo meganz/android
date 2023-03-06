@@ -67,6 +67,7 @@ class ManagerViewModelTest {
     private val monitorGlobalUpdates = MutableStateFlow<GlobalUpdate>(GlobalUpdate.OnReloadNeeded)
     private val monitorNodeUpdates = MutableSharedFlow<NodeUpdate>()
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
+    private val monitorSecurityUpgrade = MutableStateFlow(false)
     private val getNumUnreadUserAlerts =
         mock<GetNumUnreadUserAlerts> { onBlocking { invoke() }.thenReturn(0) }
     private val hasInboxChildren =
@@ -177,7 +178,8 @@ class ManagerViewModelTest {
             monitorFinishActivity = { monitorFinishActivity },
             monitorVerificationStatus = { monitorVerificationStatus },
             check2FADialog = check2FADialog,
-            setLatestTargetPath = setLatestTargetPath
+            setLatestTargetPath = setLatestTargetPath,
+            monitorSecurityUpgrade = { monitorSecurityUpgrade }
         )
     }
 

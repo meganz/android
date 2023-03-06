@@ -65,9 +65,10 @@ import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.Check2FADialog
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.filenode.MonitorSecurityUpgrade
+import mega.privacy.android.domain.usecase.filenode.SetSecurityUpgrade
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
-import nz.mega.sdk.MegaEvent
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -137,6 +138,7 @@ class ManagerViewModel @Inject constructor(
     private val check2FADialog: Check2FADialog,
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val setLatestTargetPath: SetLatestTargetPath,
+    private val monitorSecurityUpgrade: MonitorSecurityUpgrade,
 ) : ViewModel() {
 
     /**
@@ -221,7 +223,13 @@ class ManagerViewModel @Inject constructor(
                 }
             }
         }
-
+        viewModelScope.launch {
+            monitorSecurityUpgrade().collect {
+                if (it) {
+                    setShouldAlertUserAboutSecurityUpgrade(true)
+                }
+            }
+        }
     }
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
@@ -254,13 +262,6 @@ class ManagerViewModel @Inject constructor(
             .mapNotNull { it.userAlerts?.toList() }
             .map { Event(it) }
             .asLiveData()
-
-
-    private val updateGlobalEvents: Flow<Event<MegaEvent>> = _updates
-        .filterIsInstance<GlobalUpdate.OnEvent>()
-        .mapNotNull { (event) ->
-            event?.let { Event(it) }
-        }
 
     private fun checkItemForInbox(updatedNodes: List<Node>) {
         //Verify is it is a new item to the inbox
@@ -497,19 +498,6 @@ class ManagerViewModel @Inject constructor(
      * Active subscription in local cache
      */
     val activeSubscription: MegaPurchase? get() = getActiveSubscription()
-
-    /**
-     * Check global events updates for [MegaEvent.EVENT_UPGRADE_SECURITY]
-     */
-    fun monitorGlobalEventUpgradeForUpgradeSecurity() {
-        viewModelScope.launch {
-            updateGlobalEvents.collect { megaEvent ->
-                if (megaEvent.peekContent().type == MegaEvent.EVENT_UPGRADE_SECURITY) {
-                    setShouldAlertUserAboutSecurityUpgrade(true)
-                }
-            }
-        }
-    }
 
     /**
      * Set last used path of copy/move as target path for next copy/move

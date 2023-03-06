@@ -16,6 +16,8 @@ import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
+import mega.privacy.android.domain.usecase.filenode.MonitorSecurityUpgrade
+import mega.privacy.android.domain.usecase.filenode.SetSecurityUpgrade
 
 /**
  * module to provide FileNode modules
@@ -69,5 +71,13 @@ abstract class InternalNodeModule {
         @Provides
         fun provideGetNodeVersionsByHandle(nodeRepository: NodeRepository): GetNodeVersionsByHandle =
             GetNodeVersionsByHandle(nodeRepository::getNodeHistoryVersions)
+
+        @Provides
+        fun provideMonitorSecurityUpgrade(nodeRepository: NodeRepository): MonitorSecurityUpgrade =
+            MonitorSecurityUpgrade(nodeRepository::monitorSecurityUpgrade)
+
+        @Provides
+        fun provideSetSecurityUpgrade(nodeRepository: NodeRepository): SetSecurityUpgrade =
+            SetSecurityUpgrade(nodeRepository::setUpgradeSecurity)
     }
 }
