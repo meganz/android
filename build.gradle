@@ -112,7 +112,7 @@ ext {
     logbackVersion = '2.0.0'
     materialVersion = '1.3.0'
     mockitoKotlinVersion = '4.0.0'
-    mockitoVersion = '3.3.3'
+    mockitoVersion = '5.1.1'
     preferenceVersion ='1.2.0'
     recyclerViewVersion = '1.3.0-beta02'
     roboletricVersion = '4.7.3'
