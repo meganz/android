@@ -9473,7 +9473,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     val deepBrowserTreeLinks: Int
         get() = this.linksState().linksTreeDepth
     var tabItemShares: SharesTab
-        get() = viewPagerShares.currentItem.takeUnless { it == 0 }
+        get() = viewPagerShares.currentItem.takeUnless { it == -1 }
             ?.let { SharesTab.fromPosition(it) } ?: SharesTab.NONE
         set(index) {
             viewPagerShares.currentItem = index.position
