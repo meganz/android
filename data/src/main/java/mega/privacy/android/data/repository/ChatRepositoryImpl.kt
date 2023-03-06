@@ -71,7 +71,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property ioDispatcher                       [CoroutineDispatcher]
  * @property broadcastReceiverGateway           [BroadcastReceiverGateway]
  */
-internal class DefaultChatRepository @Inject constructor(
+internal class ChatRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val megaApiGateway: MegaApiGateway,
     private val chatRequestMapper: ChatRequestMapper,

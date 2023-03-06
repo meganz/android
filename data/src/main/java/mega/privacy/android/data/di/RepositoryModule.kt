@@ -12,7 +12,7 @@ import mega.privacy.android.data.repository.DefaultBillingRepository
 import mega.privacy.android.data.repository.CallRepositoryImpl
 import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
-import mega.privacy.android.data.repository.DefaultChatRepository
+import mega.privacy.android.data.repository.ChatRepositoryImpl
 import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
@@ -129,7 +129,7 @@ internal abstract class RepositoryModule {
     abstract fun bindSortOrderRepository(repository: DefaultSortOrderRepository): SortOrderRepository
 
     @Binds
-    abstract fun bindChatRepository(repository: DefaultChatRepository): ChatRepository
+    abstract fun bindChatRepository(repository: ChatRepositoryImpl): ChatRepository
 
     @Binds
     abstract fun bindPushesRepository(repository: DefaultPushesRepository): PushesRepository

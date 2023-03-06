@@ -9,18 +9,16 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.FileSystemRepository
-import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.ArchiveChat
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
 import mega.privacy.android.domain.usecase.DefaultGetMeetings
 import mega.privacy.android.domain.usecase.DefaultMeetingRoomMapper
-import mega.privacy.android.domain.usecase.meeting.DefaultOpenOrStartCall
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetMeetings
+import mega.privacy.android.domain.usecase.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
@@ -28,8 +26,6 @@ import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MeetingRoomMapper
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -38,11 +34,16 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.DefaultOpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.DefaultStartChatCallNoRinging
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
+import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
@@ -107,6 +108,13 @@ abstract class ChatModule {
         @Provides
         fun provideGetScheduledMeetingByChat(callRepository: CallRepository): GetScheduledMeetingByChat =
             GetScheduledMeetingByChat(callRepository::getScheduledMeetingsByChat)
+
+        /**
+         * Provides the Use Case [GetScheduledMeeting]
+         */
+        @Provides
+        fun provideGetScheduledMeeting(callRepository: CallRepository): GetScheduledMeeting =
+            GetScheduledMeeting(callRepository::getScheduledMeeting)
 
         /**
          * Provides the Use Case [FetchScheduledMeetingOccurrencesByChat]

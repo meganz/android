@@ -23,9 +23,10 @@ import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.NormalEvent
-import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.NotificationsRepository
+import mega.privacy.android.domain.usecase.GetScheduledMeeting
+import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaEvent
@@ -61,7 +62,8 @@ class DefaultNotificationsRepositoryTest {
             )
         }
     private val megaLocalStorageGateway = mock<MegaLocalStorageGateway>()
-    private val callRepository = mock<CallRepository>()
+    private val fetchSchedOccurrencesByChatUseCase = mock<FetchNumberOfScheduledMeetingOccurrencesByChat>()
+    private val getScheduledMeetingUseCase = mock<GetScheduledMeeting>()
 
     @Before
     fun setUp() {
@@ -70,7 +72,8 @@ class DefaultNotificationsRepositoryTest {
             userAlertsMapper = userAlertsMapper,
             eventMapper = eventMapper,
             localStorageGateway = megaLocalStorageGateway,
-            callRepository = callRepository,
+            fetchSchedOccurrencesByChatUseCase = fetchSchedOccurrencesByChatUseCase,
+            getScheduledMeetingUseCase = getScheduledMeetingUseCase,
             dispatcher = UnconfinedTestDispatcher(),
         )
     }
