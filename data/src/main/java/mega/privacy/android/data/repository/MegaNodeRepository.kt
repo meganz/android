@@ -314,6 +314,14 @@ interface MegaNodeRepository {
         order: SortOrder,
     ): List<MegaNode>
 
+
+    /**
+     * Get a list with the active and pending outbound sharings for a MegaNode
+     * @param nodeId the [NodeId] of the node to get the outbound sharings
+     * @return a list of [MegaShare] of the outbound sharings of the node
+     */
+    suspend fun getOutShares(nodeId: NodeId): List<MegaShare>?
+
     /**
      * Provides searched nodes from Link from query
      * @param query String to be searched

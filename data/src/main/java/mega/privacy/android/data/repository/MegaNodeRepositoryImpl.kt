@@ -34,6 +34,7 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaShare
 import javax.inject.Inject
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.suspendCoroutine
@@ -76,7 +77,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     private val fileGateway: FileGateway,
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper,
     private val streamingGateway: StreamingGateway,
-    private val getLinksSortOrder: GetLinksSortOrder
+    private val getLinksSortOrder: GetLinksSortOrder,
 ) : MegaNodeRepository {
 
     override suspend fun copyNode(
@@ -354,7 +355,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
     override suspend fun searchInShares(
         query: String,
         megaCancelToken: MegaCancelToken,
-        order: SortOrder
+        order: SortOrder,
     ): List<MegaNode> {
         return withContext(ioDispatcher) {
             return@withContext if (query.isEmpty()) {
@@ -397,6 +398,13 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getOutShares(nodeId: NodeId): List<MegaShare>? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->
+                megaApiGateway.getOutShares(node)
+            }
+        }
+
     override suspend fun searchLinkShares(
         query: String,
         megaCancelToken: MegaCancelToken,
@@ -424,7 +432,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         parentNode: MegaNode,
         query: String,
         order: SortOrder,
-        megaCancelToken: MegaCancelToken
+        megaCancelToken: MegaCancelToken,
     ): List<MegaNode> {
         return withContext(ioDispatcher) {
             return@withContext megaApiGateway.search(

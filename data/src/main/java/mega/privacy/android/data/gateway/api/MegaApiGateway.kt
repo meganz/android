@@ -1072,6 +1072,14 @@ interface MegaApiGateway {
     suspend fun getOutShares(order: Int): List<MegaShare>
 
     /**
+     * Get a list with the active and pending outbound sharings for a MegaNode
+     *
+     * @param megaNode the node to fetch
+     * @return List of MegaShare objects
+     */
+    suspend fun getOutShares(megaNode: MegaNode): List<MegaShare>
+
+    /**
      * Returns the rubbish node of the account.
      *
      * @return Rubbish node of the account.
