@@ -1062,11 +1062,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink)
         outState.putBoolean(KEY_IS_FAB_EXPANDED, isFabExpanded)
         photosFragment?.let {
-            supportFragmentManager.putFragment(
-                outState,
-                FragmentTag.PHOTOS.tag,
-                it
-            )
+            if (photosFragment?.isAdded == true) {
+                supportFragmentManager.putFragment(
+                    outState,
+                    FragmentTag.PHOTOS.tag,
+                    it
+                )
+            }
         }
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
