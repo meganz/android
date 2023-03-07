@@ -9,6 +9,8 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 fun interface GetContactItemFromInShareFolder {
     /**
      * Returns the [ContactItem] of the owner of this folder if it's a inShare Folder, null otherwise
+     * @param folderNode the folder we want to fetch
+     * @param skipCache if true a new fetch will be done to get contact information, if false it may return a cached info
      */
-    suspend operator fun invoke(folderNode: TypedFolderNode): ContactItem?
+    suspend operator fun invoke(folderNode: TypedFolderNode, skipCache: Boolean): ContactItem?
 }

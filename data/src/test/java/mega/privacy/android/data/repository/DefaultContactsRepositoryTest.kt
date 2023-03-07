@@ -828,7 +828,7 @@ class DefaultContactsRepositoryTest {
     }
 
     @Test
-    fun `test getContactItem returns updated info, not from cache`() = runTest {
+    fun `test getContactItem returns updated info, not from cache if skip is true`() = runTest {
         val megaUser = mock<MegaUser> {
             on { handle }.thenReturn(userHandle)
             on { email }.thenReturn(userEmail)
@@ -850,7 +850,7 @@ class DefaultContactsRepositoryTest {
             )
         }
 
-        val result = underTest.getContactItem(UserId(userHandle))
+        val result = underTest.getContactItem(UserId(userHandle), true)
 
         assertEquals(expected, result)
         verify(megaApiGateway, atLeast(1)).getUserAlias(anyLong(), any())

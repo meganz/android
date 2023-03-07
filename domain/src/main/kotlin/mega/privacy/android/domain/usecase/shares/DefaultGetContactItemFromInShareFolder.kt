@@ -13,8 +13,8 @@ class DefaultGetContactItemFromInShareFolder @Inject constructor(
     private val getContactItem: GetContactItem,
     private val nodeRepository: NodeRepository,
 ) : GetContactItemFromInShareFolder {
-    override suspend fun invoke(folderNode: TypedFolderNode): ContactItem? =
+    override suspend fun invoke(folderNode: TypedFolderNode, skipCache: Boolean): ContactItem? =
         nodeRepository.getOwnerIdFromInShare(folderNode.id, false)?.let { userId ->
-            getContactItem(userId)
+            getContactItem(userId, skipCache)
         }
 }

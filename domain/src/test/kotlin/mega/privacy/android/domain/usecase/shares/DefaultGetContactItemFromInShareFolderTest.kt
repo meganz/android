@@ -26,22 +26,14 @@ class DefaultGetContactItemFromInShareFolderTest {
         on { id }.thenReturn(nodeId)
     }
 
-    private val contactItem = ContactItem(
-        handle = 2L,
-        email = "email",
-        contactData = ContactData("name", "alias", "avatar"),
-        defaultAvatarColor = "color",
-        visibility = UserVisibility.Unknown,
-        timestamp = 0L,
-        areCredentialsVerified = true,
-        status = UserStatus.Online,
-        lastSeen = null
-    )
+    private val contactItem = mock<ContactItem>()
+    private val cachedContactItem = mock<ContactItem>()
     private val nodeRepository = mock<NodeRepository> {
         onBlocking { getOwnerIdFromInShare(nodeId, false) }.thenReturn(userId)
     }
     private val getContactItem = mock<GetContactItem> {
-        onBlocking { invoke(userId) }.thenReturn(contactItem)
+        onBlocking { invoke(userId, true) }.thenReturn(contactItem)
+        onBlocking { invoke(userId, false) }.thenReturn(cachedContactItem)
     }
 
 
@@ -54,9 +46,16 @@ class DefaultGetContactItemFromInShareFolderTest {
     }
 
     @Test
-    fun `test DefaultGetContactItemFromInShareFolder returns correct info from getContactItem userCase`() =
+    fun `test DefaultGetContactItemFromInShareFolder returns fetched info from getContactItem use case if skip cache is true`() =
         runTest {
-            val actual = underTest(node)
+            val actual = underTest(node,true)
             Truth.assertThat(actual).isSameInstanceAs(contactItem)
+        }
+
+    @Test
+    fun `test DefaultGetContactItemFromInShareFolder returns cached info from getContactItem use case if skip cache is false`() =
+        runTest {
+            val actual = underTest(node,false)
+            Truth.assertThat(actual).isSameInstanceAs(cachedContactItem)
         }
 }

@@ -562,7 +562,7 @@ internal class FileInfoViewModelTest {
         val folderNode = mock<TypedFolderNode>()
         whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
         underTest.setNode(node.handle)
-        verify(getContactItemFromInShareFolder).invoke(folderNode)
+        verify(getContactItemFromInShareFolder).invoke(folderNode, true)
     }
 
     @Test
@@ -575,7 +575,7 @@ internal class FileInfoViewModelTest {
         )
         underTest.setNode(node.handle)
         //check 2 invocations: first invocation when node is set, second one the update itself
-        verify(getContactItemFromInShareFolder, times(2)).invoke(folderNode)
+        verify(getContactItemFromInShareFolder, times(2)).invoke(folderNode, true)
     }
 
     @Test

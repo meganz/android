@@ -78,8 +78,10 @@ interface ContactsRepository {
 
     /**
      * Gets the ContactItem for a given [UserId]
+     * @param userId of the user we want to fetch
+     * @param skipCache if true a new fetch will be done, if false it may return a cached info
      */
-    suspend fun getContactItem(userId: UserId): ContactItem?
+    suspend fun getContactItem(userId: UserId, skipCache: Boolean): ContactItem?
 
     /**
      * Updates the contact list with the received contact updates.

@@ -199,11 +199,11 @@ internal class DefaultContactsRepository @Inject constructor(
             contactDataMapper(fullName, alias, avatarUri)
         }
 
-    override suspend fun getContactItem(userId: UserId): ContactItem? =
+    override suspend fun getContactItem(userId: UserId, skipCache: Boolean): ContactItem? =
         withContext(ioDispatcher) {
             val email = getUserEmail(userId.id)
             megaApiGateway.getContact(email)?.let {
-                getContactItem(it, true)
+                getContactItem(it, skipCache)
             }
         }
 

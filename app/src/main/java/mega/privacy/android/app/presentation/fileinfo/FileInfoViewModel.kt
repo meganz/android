@@ -337,7 +337,9 @@ class FileInfoViewModel @Inject constructor(
     private fun updateOwner() {
         (typedNode as? TypedFolderNode)?.let { folder ->
             updateState {
-                it.copy(incomingSharesOwnerContactItem = getContactItemFromInShareFolder(folder))
+                it.copy(
+                    incomingSharesOwnerContactItem = getContactItemFromInShareFolder(folderNode = folder, skipCache = true)
+                )
             }
         }
     }
