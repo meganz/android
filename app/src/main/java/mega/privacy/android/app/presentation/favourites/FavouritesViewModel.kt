@@ -254,7 +254,7 @@ class FavouritesViewModel @Inject constructor(
      * @param order
      */
     fun onOrderChange(sortOrder: SortOrder) {
-        order.update { mapOrder(sortOrder) }
+        if (this::order.isInitialized) order.update { mapOrder(sortOrder) }
     }
 
 }
