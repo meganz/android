@@ -23,6 +23,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.adapters.RotatableAdapter;
 import mega.privacy.android.app.main.managerSections.RotatableFragment;
 import mega.privacy.android.data.database.DatabaseHandler;
+import mega.privacy.android.data.mapper.SortOrderIntMapper;
 import mega.privacy.android.data.model.MegaPreferences;
 import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiAndroid;
@@ -38,6 +39,9 @@ public class ContactFileBaseFragment extends RotatableFragment {
 
     @Inject
     DatabaseHandler dbH;
+
+    @Inject
+    SortOrderIntMapper sortOrderIntMapper;
 
     protected MegaApiAndroid megaApi;
     protected ActionBar aB;

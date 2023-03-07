@@ -86,7 +86,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
-import mega.privacy.android.data.mapper.sortOrderToInt
+import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -128,6 +128,12 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
      */
     @Inject
     lateinit var cookieDialogHandler: CookieDialogHandler
+
+    /**
+     * SortOrderIntMapper
+     */
+    @Inject
+    lateinit var sortOrderIntMapper: SortOrderIntMapper
 
     /**
      * Selected node
@@ -231,7 +237,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     supportActionBar?.title = parentNode.name
                     invalidateOptionsMenu()
                     parentHandle = parentNode.handle
-                    nodes = megaApiFolder.getChildren(parentNode, sortOrderToInt(orderGetChildren))
+                    nodes =
+                        megaApiFolder.getChildren(parentNode, sortOrderIntMapper(orderGetChildren))
                     adapterList?.setNodes(ArrayList(nodes))
                     var lastVisiblePosition = 0
 
@@ -272,7 +279,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     supportActionBar?.title = parentNode.name
                     invalidateOptionsMenu()
                     parentHandle = parentNode.handle
-                    nodes = megaApiFolder.getChildren(parentNode, sortOrderToInt(orderGetChildren))
+                    nodes = megaApiFolder.getChildren(parentNode, sortOrderIntMapper(orderGetChildren))
                     it.setNodes(ArrayList(nodes))
                     var lastVisiblePosition = 0
 
@@ -1185,7 +1192,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
 
                 parentHandle = node.handle
                 adapterList.parentHandle = parentHandle
-                nodes = megaApiFolder.getChildren(node, sortOrderToInt(orderGetChildren))
+                nodes = megaApiFolder.getChildren(node, sortOrderIntMapper(orderGetChildren))
                 adapterList.setNodes(ArrayList(nodes))
                 recyclerView.scrollToPosition(0)
 

@@ -12,8 +12,8 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapperImpl
 import mega.privacy.android.data.mapper.VideoMapper
-import mega.privacy.android.data.mapper.sortOrderToInt
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.GifFileTypeInfo
@@ -49,7 +49,7 @@ class DefaultPhotosRepositoryTest {
     private val imageMapper: ImageMapper = ::createImage
     private val videoMapper: VideoMapper = ::createVideo
     private val fileTypeInfoMapper: FileTypeInfoMapper = ::mapFileTypeInfo
-    private val sortOrderIntMapper: SortOrderIntMapper = ::sortOrderToInt
+    private val sortOrderIntMapper: SortOrderIntMapper = mock<SortOrderIntMapperImpl>()
 
     @Before
     fun setUp() {

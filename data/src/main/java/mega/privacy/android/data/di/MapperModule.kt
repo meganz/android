@@ -100,7 +100,7 @@ import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
 import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.HandleListMapperImpl
-import mega.privacy.android.data.mapper.sortOrderToInt
+import mega.privacy.android.data.mapper.SortOrderIntMapperImpl
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
@@ -207,6 +207,8 @@ internal abstract class MapperModule {
     @Binds
     abstract fun bindSortOrderMapper(implementation: SortOrderMapperImpl): SortOrderMapper
 
+    @Binds
+    abstract fun bindSortOrderIntMapper(implementation: SortOrderIntMapperImpl): SortOrderIntMapper
 
     /**
      * Provides PasswordStrength Mapper
@@ -305,11 +307,6 @@ internal abstract class MapperModule {
         @Provides
         fun provideEventMapper(): EventMapper = ::toEvent
 
-        /**
-         * Provide sort order int mapper
-         */
-        @Provides
-        fun provideSortOrderIntMapper(): SortOrderIntMapper = ::sortOrderToInt
 
         /**
          * Provide media store file type mapper

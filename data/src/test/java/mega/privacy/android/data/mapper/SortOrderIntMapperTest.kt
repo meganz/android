@@ -3,15 +3,22 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiJava
+import org.junit.Before
 import org.junit.Test
 
 /**
  * SortOrder Int mapper test
  */
 class SortOrderIntMapperTest {
-    private val underTest = ::sortOrderToInt
+    private lateinit var underTest: SortOrderIntMapper
 
-    private val sortOrderIntMap = mapOf(SortOrder.ORDER_NONE to MegaApiJava.ORDER_NONE,
+    @Before
+    fun setUp() {
+        underTest = SortOrderIntMapperImpl()
+    }
+
+    private val sortOrderIntMap = mapOf(
+        SortOrder.ORDER_NONE to MegaApiJava.ORDER_NONE,
         SortOrder.ORDER_DEFAULT_ASC to MegaApiJava.ORDER_DEFAULT_ASC,
         SortOrder.ORDER_DEFAULT_DESC to MegaApiJava.ORDER_DEFAULT_DESC,
         SortOrder.ORDER_SIZE_ASC to MegaApiJava.ORDER_SIZE_ASC,

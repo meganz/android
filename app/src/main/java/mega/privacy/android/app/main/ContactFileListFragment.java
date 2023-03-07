@@ -72,7 +72,6 @@ import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
-import mega.privacy.android.data.mapper.SortOrderIntMapperKt;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -317,7 +316,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
             parentHandle = ((ContactFileListActivity) context).getParentHandle();
             if (parentHandle != -1) {
                 MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
-                contactNodes = megaApi.getChildren(parentNode, SortOrderIntMapperKt.sortOrderToInt(orderGetChildren));
+                contactNodes = megaApi.getChildren(parentNode, sortOrderIntMapper.invoke(orderGetChildren));
                 ((ContactFileListActivity) context).setTitleActionBar(parentNode.getName());
             } else {
                 contactNodes = megaApi.getInShares(contact);
@@ -418,7 +417,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
             this.parentHandle = parentHandle;
             ((ContactFileListActivity) context).setParentHandle(parentHandle);
             adapter.setParentHandle(parentHandle);
-            setNodes(megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), SortOrderIntMapperKt.sortOrderToInt(orderGetChildren)));
+            setNodes(megaApi.getChildren(megaApi.getNodeByHandle(parentHandle), sortOrderIntMapper.invoke(orderGetChildren)));
         }
     }
 
