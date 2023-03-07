@@ -1359,7 +1359,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     || this is FileManagementPreferencesActivity && myAccountInfo.isUpgradeFromSettings() -> {
                 purchaseType = type
                 activeSubscriptionSku = activeSubscription?.sku
-                showQueryPurchasesResult(activeSubscription)
+                if (!handlePurchased(type)) {
+                    showQueryPurchasesResult(activeSubscription)
+                }
             }
         }
     }
@@ -1548,6 +1550,13 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     protected fun launchForeignNodeError() {
         showForeignStorageOverQuotaWarningDialog(this)
     }
+
+    /**
+     * Handle purchased
+     *
+     * @return true if handled and skip default behavior otherwise false
+     */
+    protected open fun handlePurchased(purchaseType: PurchaseType): Boolean = false
 
     companion object {
         private const val EXPIRED_BUSINESS_ALERT_SHOWN = "EXPIRED_BUSINESS_ALERT_SHOWN"
