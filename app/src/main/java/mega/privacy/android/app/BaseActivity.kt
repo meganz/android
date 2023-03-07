@@ -921,7 +921,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     show()
                 }
                 MESSAGE_SNACKBAR_TYPE -> {
-                    setAction(R.string.action_see, SnackbarNavigateOption(view.context, idChat))
+                    setAction(R.string.action_see, SnackbarNavigateOption(context = view.context, idChat = idChat))
                     show()
                 }
                 NOT_SPACE_SNACKBAR_TYPE -> {
