@@ -21,6 +21,7 @@ import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
+import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
@@ -37,14 +38,12 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.contracts.ExperimentalContracts
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@ExperimentalContracts
 class ChatRepositoryImplTest {
 
-    private lateinit var underTest: ChatRepositoryImpl
+    private lateinit var underTest: ChatRepository
 
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val megaApiGateway = mock<MegaApiGateway>()

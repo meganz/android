@@ -4,28 +4,26 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import mega.privacy.android.data.gateway.api.MegaApiGateway
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
-import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
+import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import javax.inject.Inject
 
 /**
  * Default implementation of [GetMeetingsRepository]
  *
- * @property megaChatApiGateway                 [MegaChatApiGateway]
- * @property megaApiGateway                     [MegaApiGateway]
+ * @property accountRepository
+ * @property avatarRepository
+ * @property getUserFirstName
+ * @property chatParticipantsRepository
  */
 internal class DefaultGetMeetingsRepository @Inject constructor(
-    private val megaChatApiGateway: MegaChatApiGateway,
-    private val megaApiGateway: MegaApiGateway,
-    private val contactsRepository: ContactsRepository,
     private val accountRepository: AccountRepository,
     private val avatarRepository: AvatarRepository,
+    private val getUserFirstName: GetUserFirstName,
     private val chatParticipantsRepository: ChatParticipantsRepository,
 ) : GetMeetingsRepository {
 
@@ -118,16 +116,10 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
     }
 
     private suspend fun getUserFirstCharacter(userHandle: Long): Char? =
-        runCatching { contactsRepository.getUserFirstName(userHandle) }
-            .fold(
-                onSuccess = { name -> name.first() },
-                onFailure = { null }
-            )
+        runCatching { getUserFirstName(userHandle, skipCache = false, shouldNotify = false) }
+            .getOrNull()?.firstOrNull()
 
     private suspend fun getAvatarPath(userHandle: Long): String? =
         runCatching { avatarRepository.getAvatarFile(userHandle) }
-            .fold(
-                onSuccess = { file -> file?.absolutePath },
-                onFailure = { null }
-            )
+            .getOrNull()?.absolutePath
 }

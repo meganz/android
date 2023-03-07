@@ -20,9 +20,9 @@ import mega.privacy.android.domain.repository.GetMeetingsRepository
 import javax.inject.Inject
 
 /**
- * Default get meetings use case implementation.
+ * Get meetings use case implementation.
  */
-class DefaultGetMeetings @Inject constructor(
+class GetMeetingsImpl @Inject constructor(
     private val chatRepository: ChatRepository,
     private val callRepository: CallRepository,
     private val getMeetingsRepository: GetMeetingsRepository,
@@ -60,7 +60,7 @@ class DefaultGetMeetings @Inject constructor(
     private suspend fun MutableList<MeetingRoomItem>.updateFields(mutex: Mutex): Flow<MutableList<MeetingRoomItem>> =
         getMeetingsRepository.getUpdatedMeetingItems(this, mutex)
 
-    private suspend fun MutableList<MeetingRoomItem>.addScheduledMeetings(mutex: Mutex): Flow<MutableList<MeetingRoomItem>> =
+    private fun MutableList<MeetingRoomItem>.addScheduledMeetings(mutex: Mutex): Flow<MutableList<MeetingRoomItem>> =
         flow {
             toList().forEach { item ->
                 item.getScheduledMeetingItem()?.let { updatedItem ->
@@ -214,7 +214,7 @@ class DefaultGetMeetings @Inject constructor(
                         .getOrNull()?.let { nextOccurrence ->
                             startTimestamp = nextOccurrence.startDateTime
                             endTimestamp = nextOccurrence.endDateTime
-                        } ?: return null
+                        }
                 }
 
                 copy(

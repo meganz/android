@@ -13,7 +13,7 @@ import mega.privacy.android.domain.usecase.ArchiveChat
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
-import mega.privacy.android.domain.usecase.DefaultGetMeetings
+import mega.privacy.android.domain.usecase.GetMeetingsImpl
 import mega.privacy.android.domain.usecase.DefaultMeetingRoomMapper
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
@@ -67,7 +67,7 @@ abstract class ChatModule {
      * Get chat meetings
      */
     @Binds
-    abstract fun bindGetMeetings(useCase: DefaultGetMeetings): GetMeetings
+    abstract fun bindGetMeetings(useCase: GetMeetingsImpl): GetMeetings
 
     /**
      * Meeting item room mapper
