@@ -7,7 +7,6 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMetadataRetriever
 import android.media.MediaMuxer
-import android.os.StatFs
 import android.view.Surface
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.ensureActive
@@ -16,6 +15,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.suspendCancellableCoroutine
 import mega.privacy.android.data.compression.video.InputSurface
 import mega.privacy.android.data.compression.video.OutputSurface
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.domain.entity.VideoAttachment
 import mega.privacy.android.domain.entity.VideoCompressionState
@@ -31,7 +31,8 @@ import kotlin.math.roundToInt
 /**
  * Implementation of [VideoCompressorGateway]
  */
-internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGateway {
+internal class VideoCompressionFacade @Inject constructor(private val fileGateway: FileGateway) :
+    VideoCompressorGateway {
 
     private val config = VideoCompressionConfig()
 
@@ -74,7 +75,16 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
                     } ?: 0
                     runCatching {
                         attachment?.let {
-                            if (hasEnoughStorage(it.originalPath)) {
+                            outputRoot?.run {
+                                if (fileGateway.hasEnoughStorage(
+                                        rootPath = this,
+                                        File(it.originalPath)
+                                    )
+                                ) {
+                                    send(VideoCompressionState.InsufficientStorage)
+                                    return@let
+                                }
+                            } ?: run {
                                 send(VideoCompressionState.InsufficientStorage)
                                 return@let
                             }
@@ -111,18 +121,6 @@ internal class VideoCompressionFacade @Inject constructor() : VideoCompressorGat
         send(VideoCompressionState.Finished)
         awaitClose { config.isRunning = false }
     }.cancellable()
-
-
-    private fun hasEnoughStorage(path: String): Boolean {
-        val size = File(path).length()
-        val availableFreeSpace = try {
-            StatFs(config.outputRoot).availableBytes.toDouble()
-        } catch (exception: Exception) {
-            Timber.e("Exception When Retrieving Free Space: $exception")
-            Double.MAX_VALUE
-        }
-        return size > availableFreeSpace
-    }
 
     override fun addItems(videoAttachments: List<VideoAttachment>) {
         config.queue.addAll(videoAttachments)

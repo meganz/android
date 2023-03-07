@@ -217,7 +217,7 @@ class FileFacade @Inject constructor(
             Timber.e("Source File doesn't exist")
             throw FileNotFoundException()
         }
-        val hasEnoughSpace = checkIfEnoughStorageAvailable(rootPath, srcFile)
+        val hasEnoughSpace = hasEnoughStorage(rootPath, srcFile)
         if (!hasEnoughSpace) {
             Timber.e("Not Enough Storage")
             throw NotEnoughStorageException()
@@ -231,7 +231,7 @@ class FileFacade @Inject constructor(
         }
     }
 
-    override suspend fun checkIfEnoughStorageAvailable(rootPath: String, file: File) =
+    override suspend fun hasEnoughStorage(rootPath: String, file: File) =
         runCatching { StatFs(rootPath).availableBytes >= file.length() }.onFailure { Timber.e(it) }
             .getOrDefault(false)
 

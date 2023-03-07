@@ -1,8 +1,10 @@
 package mega.privacy.android.data.repository
 
 import android.net.Uri
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
@@ -24,6 +26,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
+import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -506,6 +509,39 @@ class DefaultCameraUploadRepositoryTest {
             whenever(fileAttributeGateway.getPhotoGPSCoordinates("")).thenReturn(result)
             val actual = underTest.getPhotoGPSCoordinates("")
             assertThat(actual).isEqualTo(result)
+        }
+    }
+
+    @Test
+    fun `test that starting video compression emit events in order`() {
+        val list = listOf(25, 50, 57, 100)
+        val flow = flow {
+            list.forEach {
+                emit(VideoCompressionState.Progress(it, 1, 2, ""))
+            }
+            emit(
+                VideoCompressionState.FinishedCompression(
+                    "",
+                    true,
+                    1
+                )
+            )
+            emit(VideoCompressionState.Finished)
+        }
+        runTest {
+            whenever(videoCompressorGateway.start()).thenReturn(flow)
+            underTest.compressVideos("",VideoQuality.ORIGINAL, emptyList()).test {
+                list.forEach {
+                    val item = awaitItem()
+                    assertThat(item.javaClass).isEqualTo(VideoCompressionState.Progress::class.java)
+                    assertThat((item as VideoCompressionState.Progress).progress).isEqualTo(it)
+                }
+                val finishedCompressionItem = awaitItem()
+                assertThat(finishedCompressionItem.javaClass).isEqualTo(VideoCompressionState.FinishedCompression::class.java)
+                val finished = awaitItem()
+                assertThat(finished.javaClass).isEqualTo(VideoCompressionState.Finished::class.java)
+                cancelAndConsumeRemainingEvents()
+            }
         }
     }
 }
