@@ -15,7 +15,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.changepassword.extensions.getStrengthTextAttribute
+import mega.privacy.android.app.presentation.changepassword.extensions.toStrengthAttribute
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.presentation.changepassword.view.ChangePasswordView
 import mega.privacy.android.app.presentation.changepassword.view.Constants
@@ -58,7 +58,6 @@ class ChangePasswordComposeViewTest {
         composeTestRule.setContent {
             ChangePasswordView(
                 uiState = uiState,
-                onBackPressed = {},
                 onSnackBarShown = {},
                 onPasswordTextChanged = {},
                 onConfirmPasswordTextChanged = {},
@@ -69,7 +68,7 @@ class ChangePasswordComposeViewTest {
                 onValidateOnSave = { _, _ -> },
                 onResetValidationState = {},
                 onAfterPasswordChanged = {},
-                onAfterPasswordReset = {},
+                onAfterPasswordReset = { _, _ -> },
                 onPromptedMultiFactorAuth = {},
                 onFinishActivity = {},
                 onShowAlert = {}
@@ -208,7 +207,7 @@ class ChangePasswordComposeViewTest {
     }
 
     @Test
-    fun `test that when password strength is not invisible and has error but is current password should not show password strength bar`() {
+    fun `test that when password strength is not invisible and has error but is current password should show password strength bar`() {
         setComposeContent(
             ChangePasswordUIState(
                 passwordStrength = PasswordStrength.MEDIUM,
@@ -243,7 +242,7 @@ class ChangePasswordComposeViewTest {
     }
 
     @Test
-    fun `test that when click change password button and not connected to network should show snackbar`() {
+    fun `test that when click change password button and not connected to network should show snackbar with no connection message`() {
         setComposeContent(ChangePasswordUIState(isConnectedToNetwork = false))
 
         composeTestRule.onNodeWithTag(CHANGE_PASSWORD_BUTTON_TEST_TAG).performClick()
@@ -254,7 +253,7 @@ class ChangePasswordComposeViewTest {
     }
 
     @Test
-    fun `test that when click change password button and tnc not checked should show snackbar`() {
+    fun `test that when click change password button and tnc not checked should show snackbar with tnc error message`() {
         setComposeContent(ChangePasswordUIState(isConnectedToNetwork = true))
 
         composeTestRule.onNodeWithTag(CHANGE_PASSWORD_BUTTON_TEST_TAG).performClick()
@@ -317,7 +316,7 @@ class ChangePasswordComposeViewTest {
     private fun verifyBarStrength(strength: PasswordStrength, color: Color, isDark: Boolean) {
         composeTestRule.setContent {
             AndroidTheme(isDark = isDark) {
-                PasswordStrengthBar(strengthAttribute = strength.getStrengthTextAttribute())
+                PasswordStrengthBar(strengthAttribute = strength.toStrengthAttribute())
             }
         }
 

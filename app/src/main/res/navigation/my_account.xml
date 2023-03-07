@@ -61,8 +61,7 @@
 
     <activity
         android:id="@+id/change_password"
-        android:name="mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity"
-        tools:layout="@layout/activity_change_password"/>
+        android:name="mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity" />
 
     <activity
         android:id="@+id/upgrade"

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.changepassword.view
 
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -64,7 +65,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.changepassword.extensions.getStrengthTextAttribute
+import mega.privacy.android.app.presentation.changepassword.extensions.toStrengthAttribute
 import mega.privacy.android.app.presentation.changepassword.model.ChangePasswordUIState
 import mega.privacy.android.app.presentation.changepassword.model.PasswordStrengthAttribute
 import mega.privacy.android.app.presentation.changepassword.view.Constants.CHANGE_PASSWORD_BUTTON_TEST_TAG
@@ -154,10 +155,9 @@ internal object Constants {
 @Composable
 fun ChangePasswordView(
     uiState: ChangePasswordUIState,
-    onBackPressed: () -> Unit,
     onSnackBarShown: () -> Unit,
     onPasswordTextChanged: (String) -> Unit,
-    onConfirmPasswordTextChanged: (String) -> Unit,
+    onConfirmPasswordTextChanged: () -> Unit,
     onTnCLinkClickListener: () -> Unit,
     onTriggerChangePassword: (String) -> Unit,
     onTriggerResetPassword: (String) -> Unit,
@@ -165,16 +165,17 @@ fun ChangePasswordView(
     onValidateOnSave: (String, String) -> Unit,
     onResetValidationState: () -> Unit,
     onAfterPasswordChanged: () -> Unit,
-    onAfterPasswordReset: () -> Unit,
+    onAfterPasswordReset: (isLoggedIn: Boolean, errorCode: Int?) -> Unit,
     onPromptedMultiFactorAuth: (String) -> Unit,
     onFinishActivity: () -> Unit,
     onShowAlert: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val snackBarHostState = remember { SnackbarHostState() }
-    val strengthAttribute = uiState.passwordStrength.getStrengthTextAttribute()
+    val strengthAttribute = uiState.passwordStrength.toStrengthAttribute()
     val title =
         if (uiState.isResetPasswordMode) R.string.title_enter_new_password else R.string.my_account_change_password
+    val onBackPressedDispatcherOwner = LocalOnBackPressedDispatcherOwner.current
 
     Scaffold(
         scaffoldState = rememberScaffoldState(),
@@ -182,7 +183,9 @@ fun ChangePasswordView(
             SimpleTopAppBar(
                 titleId = title,
                 elevation = scrollState.value > 0,
-                onBackPressed = onBackPressed
+                onBackPressed = {
+                    onBackPressedDispatcherOwner?.onBackPressedDispatcher?.onBackPressed()
+                }
             )
         },
         snackbarHost = {
@@ -235,7 +238,7 @@ fun ChangePasswordView(
 
         LaunchedEffect(uiState.isPasswordReset) {
             if (uiState.isPasswordReset) {
-                onAfterPasswordReset()
+                onAfterPasswordReset(uiState.isUserLoggedIn, uiState.errorCode)
             }
         }
 
@@ -287,7 +290,7 @@ fun ChangePasswordView(
                 isShowPassword = isShowConfirmPasswordChar,
                 onValueChange = { value, isAutofill ->
                     confirmPasswordText = value
-                    onConfirmPasswordTextChanged(value)
+                    onConfirmPasswordTextChanged()
                     if (isAutofill) passwordText = value
                 },
                 onClickShowPassword = { isShowConfirmPasswordChar = !isShowConfirmPasswordChar },

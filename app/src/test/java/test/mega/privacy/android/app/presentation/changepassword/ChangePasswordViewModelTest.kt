@@ -245,7 +245,7 @@ internal class ChangePasswordViewModelTest {
         runTest {
             val fakePassword = "password"
 
-            underTest.checkPasswordStrength(fakePassword, true)
+            underTest.checkPasswordStrength(fakePassword)
 
             underTest.uiState.test {
                 val state = awaitItem()

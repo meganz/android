@@ -12,7 +12,7 @@ import mega.privacy.android.core.ui.theme.extensions.yellow600_300
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 
 @Composable
-internal fun PasswordStrength.getStrengthTextAttribute(): PasswordStrengthAttribute {
+internal fun PasswordStrength.toStrengthAttribute(): PasswordStrengthAttribute {
     return when (this) {
         PasswordStrength.VERY_WEAK -> PasswordStrengthAttribute(
             strength = PasswordStrength.VERY_WEAK.value,

@@ -162,21 +162,16 @@ internal class ChangePasswordViewModel @Inject constructor(
     /**
      * Action to check password strength level
      * @param password the new password that the user inputs
-     * @param invalidate invalidate error to default when checking password strength
      * will update the password UI based on the strength level
      * previous jobs will not be evaluated when [password] value's changed
      */
-    fun checkPasswordStrength(password: String, invalidate: Boolean = false) {
-        if (invalidate) {
-            uiState.value.passwordError?.let {
-                viewModelScope.launch {
-                    _uiState.update { it.copy(passwordError = null) }
-                }
-            }
-        }
-
+    fun checkPasswordStrength(password: String) {
         mJob?.cancel()
         mJob = viewModelScope.launch {
+            if (uiState.value.passwordError != null) {
+                _uiState.update { it.copy(passwordError = null) }
+            }
+
             _uiState.update {
                 val isCurrentPassword =
                     if (password.length > MIN_PASSWORD_CHAR) isCurrentPassword(password) else false
