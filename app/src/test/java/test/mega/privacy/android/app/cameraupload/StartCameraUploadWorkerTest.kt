@@ -65,20 +65,16 @@ class StartCameraUploadWorkerTest {
             ),
             TestWrapperModule.permissionUtilWrapper,
             TestWrapperModule.jobUtilWrapper,
-            TestWrapperModule.cameraUploadsServiceWrapper
         )
     }
 
     @Test
-    fun `test that camera upload worker is started successfully if the read external permission is granted, the user is not over quota and the camera upload service is not yet started`() {
+    fun `test that camera upload worker is started successfully if the read external permission is granted, the user is not over quota`() {
 
         whenever(
             TestWrapperModule.permissionUtilWrapper.hasPermissions(anyVararg())
         ).thenReturn(true)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
-        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
-            false
-        )
         val result = worker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
     }
@@ -89,9 +85,6 @@ class StartCameraUploadWorkerTest {
             TestWrapperModule.permissionUtilWrapper.hasPermissions(anyVararg())
         ).thenReturn(false)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
-        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
-            false
-        )
         val result = worker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
@@ -102,22 +95,6 @@ class StartCameraUploadWorkerTest {
             TestWrapperModule.permissionUtilWrapper.hasPermissions(anyVararg())
         ).thenReturn(true)
         whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(true)
-        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
-            false
-        )
-        val result = worker.doWork()
-        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
-    }
-
-    @Test
-    fun `test that the camera upload worker fails to start if the camera upload service is already running`() {
-        whenever(
-            TestWrapperModule.permissionUtilWrapper.hasPermissions(anyVararg())
-        ).thenReturn(true)
-        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
-        whenever(TestWrapperModule.cameraUploadsServiceWrapper.isServiceRunning()).thenReturn(
-            true
-        )
         val result = worker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }

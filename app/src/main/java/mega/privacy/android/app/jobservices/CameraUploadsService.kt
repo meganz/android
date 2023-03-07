@@ -169,13 +169,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
          * Camera Uploads Cache Folder
          */
         private const val CU_CACHE_FOLDER = "cu"
-
-        /**
-         * Is Camera Upload running now
-         */
-        @Volatile
-        var isServiceRunning = false
-            private set
     }
 
     /**
@@ -657,7 +650,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     override fun onDestroy() {
         Timber.d("Service destroys.")
         super.onDestroy()
-        isServiceRunning = false
         receiver?.let { unregisterReceiver(it) }
 
         stopActiveHeartbeat()
@@ -693,7 +685,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         Timber.d("Starting CameraUpload service (flags: %d, startId: %d)", flags, startId)
-        isServiceRunning = true
         startForegroundNotification()
         initService()
 

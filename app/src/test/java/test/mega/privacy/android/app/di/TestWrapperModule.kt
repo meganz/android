@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.UtilWrapperModule
-import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
@@ -31,7 +30,6 @@ object TestWrapperModule {
     val getFullPathWrapper = mock<GetFullPathFileWrapper>()
     val getDocumentFileWrapper = mock<GetDocumentFileWrapper>()
     val cameraUploadSyncManagerWrapper = mock<CameraUploadSyncManagerWrapper>()
-    val cameraUploadsServiceWrapper = mock<CameraUploadsServiceWrapper>()
     val jobUtilWrapper = mock<JobUtilWrapper>()
     val permissionUtilWrapper = mock<PermissionUtilWrapper>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
@@ -51,10 +49,6 @@ object TestWrapperModule {
     @Provides
     fun provideCameraUploadSyncManagerWrapper(): CameraUploadSyncManagerWrapper =
         cameraUploadSyncManagerWrapper
-
-    @Provides
-    fun provideCameraUploadsServiceWrapper(): CameraUploadsServiceWrapper =
-        cameraUploadsServiceWrapper
 
     @Provides
     fun provideJobUtilWrapper(): JobUtilWrapper = jobUtilWrapper

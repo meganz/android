@@ -27,7 +27,6 @@ class StartCameraUploadWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     private val permissionUtilWrapper: PermissionUtilWrapper,
     private val jobUtilWrapper: JobUtilWrapper,
-    private val cameraUploadsServiceWrapper: CameraUploadsServiceWrapper,
 ) :
     Worker(appContext, workerParams) {
 
@@ -50,8 +49,8 @@ class StartCameraUploadWorker @AssistedInject constructor(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                 )
             }
-            Timber.d("isOverQuota: $isOverQuota, hasMediaPermissions: $hasMediaPermissions, isRunning: ${cameraUploadsServiceWrapper.isServiceRunning()}")
-            if (!cameraUploadsServiceWrapper.isServiceRunning() && !isOverQuota && hasMediaPermissions) {
+            Timber.d("isOverQuota: $isOverQuota, hasMediaPermissions: $hasMediaPermissions")
+            if (!isOverQuota && hasMediaPermissions) {
                 val newIntent = Intent(appContext, CameraUploadsService::class.java)
                 ContextCompat.startForegroundService(appContext, newIntent)
                 Result.success()

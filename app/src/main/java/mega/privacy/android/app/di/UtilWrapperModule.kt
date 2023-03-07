@@ -12,7 +12,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
-import mega.privacy.android.app.jobservices.CameraUploadsServiceWrapper
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.FileUtil
@@ -87,10 +86,6 @@ abstract class UtilWrapperModule {
         @Provides
         fun provideCameraUploadSyncManagerWrapper(): CameraUploadSyncManagerWrapper =
             object : CameraUploadSyncManagerWrapper {}
-
-        @Provides
-        fun provideCameraUploadsServiceWrapper(): CameraUploadsServiceWrapper =
-            object : CameraUploadsServiceWrapper {}
 
         @Provides
         fun provideJobUtilWrapper(): JobUtilWrapper =
