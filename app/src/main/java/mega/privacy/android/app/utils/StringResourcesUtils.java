@@ -50,6 +50,7 @@ import java.util.Locale;
 
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
+import mega.privacy.android.domain.exception.MegaException;
 import nz.mega.sdk.MegaChatError;
 import nz.mega.sdk.MegaError;
 import timber.log.Timber;
@@ -80,7 +81,9 @@ public class StringResourcesUtils {
      *
      * @param resId The resource identifier of the desired string.
      * @return The desired string.
+     * @deprecated Use {@link android.content.Context#getString(int)} instead.
      */
+    @Deprecated
     public static String getString(int resId) {
 
         MegaApplication app = MegaApplication.getInstance();
@@ -103,7 +106,9 @@ public class StringResourcesUtils {
      * @param resId      The resource identifier of the desired string.
      * @param formatArgs The format arguments that will be used for substitution.
      * @return The desired string.
+     * @deprecated Use {@link android.content.Context#getString(int, Object...)} instead.
      */
+    @Deprecated
     public static String getString(int resId, Object... formatArgs) {
 
         MegaApplication app = MegaApplication.getInstance();
@@ -126,7 +131,9 @@ public class StringResourcesUtils {
      * @param resId    The resource identifier of the desired string
      * @param quantity The number used to get the correct string for the current language's plural rules.
      * @return The desired string.
+     * @deprecated Use {@link android.content.res.Resources#getQuantityString(int, int)} instead.
      */
+    @Deprecated
     public static String getQuantityString(int resId, int quantity) {
 
         MegaApplication app = MegaApplication.getInstance();
@@ -151,7 +158,9 @@ public class StringResourcesUtils {
      * @param quantity   The number used to get the correct string for the current language's plural rules.
      * @param formatArgs The format arguments that will be used for substitution.
      * @return The desired string.
+     * @deprecated Use {@link android.content.res.Resources#getQuantityString(int, int, Object...)} instead.
      */
+    @Deprecated
     public static String getQuantityString(int resId, int quantity, Object... formatArgs) {
 
         MegaApplication app = MegaApplication.getInstance();
@@ -171,7 +180,10 @@ public class StringResourcesUtils {
      *
      * @param error MegaError received in the request
      * @return The translated string
+     * @deprecated Use {@link  mega.privacy.android.app.presentation.extensions.MegaExceptionKt#getErrorStringId(MegaException)}
+     * and {@link android.content.Context#getString(int, Object...)} instead.
      */
+    @Deprecated
     public static String getTranslatedErrorString(MegaError error) {
         MegaApplication app = MegaApplication.getInstance();
         if (app == null) {
@@ -186,7 +198,10 @@ public class StringResourcesUtils {
      *
      * @param errorCode MegaChat error code
      * @return The translated string
+     * @deprecated Use {@link  mega.privacy.android.app.presentation.extensions.MegaExceptionKt#getErrorStringId(MegaException)}
+     * and {@link android.content.Context#getString(int, Object...)} instead.
      */
+    @Deprecated
     public static String getTranslatedErrorString(int errorCode, String errorString) {
         switch (errorCode) {
             case API_OK:
@@ -286,7 +301,10 @@ public class StringResourcesUtils {
      *
      * @param error MegaChatError received in the request
      * @return The translated string
+     * @deprecated Use {@link  mega.privacy.android.app.presentation.extensions.MegaExceptionKt#getChatErrorStringId(MegaException)} (MegaException)}
+     * and {@link android.content.Context#getString(int, Object...)} instead.
      */
+    @Deprecated
     public static String getTranslatedErrorString(MegaChatError error) {
         MegaApplication app = MegaApplication.getInstance();
         if (app == null) {
@@ -301,7 +319,10 @@ public class StringResourcesUtils {
      *
      * @param errorCode MegaChat error code
      * @return The translated string
+     * @deprecated Use {@link  mega.privacy.android.app.presentation.extensions.MegaExceptionKt#getChatErrorStringId(MegaException)} (MegaException)}
+     * and {@link android.content.Context#getString(int, Object...)} instead.
      */
+    @Deprecated
     public static String getTranslatedChatErrorString(int errorCode) {
         switch (errorCode) {
             case ERROR_OK:

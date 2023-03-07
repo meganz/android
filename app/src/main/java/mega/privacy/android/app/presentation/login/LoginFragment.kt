@@ -242,7 +242,6 @@ class LoginFragment : Fragment(), MegaRequestListenerInterface {
                                         is LoginTooManyAttempts -> R.string.too_many_attempts_login
                                         is LoginRequireValidation -> R.string.account_not_validated_login
                                         is LoginUnknownStatus -> error.megaException.getErrorStringId()
-                                            ?: R.string.general_error
                                         else -> R.string.general_error
                                     }
                                 )

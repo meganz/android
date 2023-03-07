@@ -10,9 +10,13 @@ import java.util.Locale
 /**
  * Get formatted string or default
  *
- * @param resId of the formatted sting
+ * @param resId of the formatted string
  * @param formatArgs Format arguments for the string
  */
+@Deprecated(
+    message = "This has been deprecated in favour of getString",
+    replaceWith = ReplaceWith(expression = "android.content.Context#getString(int, Object...)")
+)
 fun Context.getFormattedStringOrDefault(@StringRes resId: Int, vararg formatArgs: Any?) =
     runCatching {
         getString(resId, *formatArgs)
@@ -29,12 +33,24 @@ private fun Context.getEnglishResources(): Resources {
     return createConfigurationContext(configuration).resources
 }
 
+/**
+ * Get formatted quantity string or default
+ *
+ * @param resId of the plural.
+ * @param formatArgs Format arguments for the string
+ */
+@Deprecated(
+    message = "This has been deprecated in favour of getQuantityString",
+    replaceWith = ReplaceWith(expression = "android.content.res.Resources#getQuantityString(int, int, Object...)")
+)
 fun Context.getQuantityStringOrDefault(resId: Int, quantity: Int, vararg formatArgs: Any?): String {
     return runCatching {
         resources.getQuantityString(resId, quantity, *formatArgs)
     }.getOrElse { exception ->
-        Timber.w(exception,
-            "Error getting a translated and formatted string with quantity modifier.")
+        Timber.w(
+            exception,
+            "Error getting a translated and formatted string with quantity modifier."
+        )
         getEnglishResources().getQuantityString(resId, quantity, *formatArgs).also {
             Timber.i("Using the original English string: $it")
         }

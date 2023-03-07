@@ -2,14 +2,15 @@ package mega.privacy.android.app.presentation.extensions
 
 import mega.privacy.android.app.R
 import mega.privacy.android.domain.exception.MegaException
+import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaError
 
 /**
  * Gets the identifier of the translated error string from errorCode.
  *
- * @return The translated string if any.
+ * @return The translated string id.
  */
-internal fun MegaException.getErrorStringId(): Int? =
+internal fun MegaException.getErrorStringId(): Int =
     when (errorCode) {
         MegaError.API_OK -> R.string.api_ok
         MegaError.API_EINTERNAL -> R.string.api_einternal
@@ -21,7 +22,7 @@ internal fun MegaException.getErrorStringId(): Int? =
             when (errorString) {
                 "Terms of Service breached" -> R.string.api_etoomany_ec_download
                 "Too many concurrent connections or transfers" -> R.string.api_etoomay
-                else -> null
+                else -> R.string.payment_egeneric_api_error_unknown
             }
         MegaError.API_ERANGE -> R.string.api_erange
         MegaError.API_EEXPIRED -> R.string.api_eexpired
@@ -30,7 +31,7 @@ internal fun MegaException.getErrorStringId(): Int? =
             when (errorString) {
                 "Upload produces recursivity" -> R.string.api_ecircular_ec_upload
                 "Circular linkage detected" -> R.string.api_ecircular
-                else -> null
+                else -> R.string.payment_egeneric_api_error_unknown
             }
         MegaError.API_EACCESS -> R.string.api_eaccess
         MegaError.API_EEXIST -> R.string.api_eexist
@@ -41,7 +42,7 @@ internal fun MegaException.getErrorStringId(): Int? =
             if (errorString == "Not accessible due to ToS/AUP violation" || errorString == "Blocked") {
                 R.string.error_download_takendown_file
             } else {
-                null
+                R.string.payment_egeneric_api_error_unknown
             }
         MegaError.API_EOVERQUOTA -> R.string.api_eoverquota
         MegaError.API_ETEMPUNAVAIL -> R.string.api_etempunavail
@@ -66,4 +67,21 @@ internal fun MegaException.getErrorStringId(): Int? =
             } else {
                 R.string.payment_egeneric_api_error_unknown
             }
+    }
+
+/**
+ * Gets the identifier of the translated error string from chat errorCode.
+ *
+ * @return The translated string id.
+ */
+internal fun MegaException.getChatErrorStringId(): Int =
+    when (errorCode) {
+        MegaChatError.ERROR_OK -> R.string.error_ok
+        MegaChatError.ERROR_ARGS -> R.string.error_args
+        MegaChatError.ERROR_ACCESS -> R.string.error_access
+        MegaChatError.ERROR_NOENT -> R.string.error_noent
+        MegaChatError.ERROR_EXIST -> R.string.error_exist
+        MegaChatError.ERROR_TOOMANY -> R.string.error_toomany
+        MegaChatError.ERROR_UNKNOWN -> R.string.error_unknown
+        else -> R.string.error_unknown
     }
