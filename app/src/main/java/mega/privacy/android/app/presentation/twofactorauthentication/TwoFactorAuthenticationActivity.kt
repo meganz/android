@@ -820,6 +820,21 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
     private fun observeUIState() {
         this.collectFlow(viewModel.uiState) { state ->
             handleEnableMultiFactorAuthState(state)
+            handleIsMasterKeyExported(state)
+        }
+    }
+
+    private fun handleIsMasterKeyExported(state: TwoFactorAuthenticationUIState) {
+        with(state) {
+            if (isMasterKeyExported) {
+                with(binding) {
+                    scrollContainer2fa.isVisible = false
+                    scrollContainerVerify.isVisible = false
+                    container2faEnabled.isVisible = true
+                    buttonDismissRk.isVisible = dismissRecoveryKey
+                    rkSaved = dismissRecoveryKey
+                }
+            }
         }
     }
 
@@ -830,13 +845,13 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                     AuthenticationState.AuthenticationPassed -> {
                         confirm2FAIsShown = false
                         isEnabled2FA = true
-                        megaApi.isMasterKeyExported(this@TwoFactorAuthenticationActivity)
                     }
                     AuthenticationState.AuthenticationFailed -> {
                         showError()
                     }
                     else -> {
                         showSnackbar(getString(R.string.error_enable_2fa))
+
                     }
                 }
             }
@@ -878,44 +893,9 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                     showSnackbar(getString(R.string.qr_seed_text_error))
                 }
             }
-            MegaRequest.TYPE_MULTI_FACTOR_AUTH_SET -> {
-                Timber.d("TYPE_MULTI_FACTOR_AUTH_SET: ${e.errorCode}")
-                if (request.flag && e.errorCode == MegaError.API_OK) {
-                    Timber.d("Pin correct: Two-Factor Authentication enabled")
-                    confirm2FAIsShown = false
-                    isEnabled2FA = true
-                    megaApi.isMasterKeyExported(this)
-                } else if (e.errorCode == MegaError.API_EFAILED) {
-                    Timber.w("Pin not correct: ${request.password}")
-                    if (request.flag) {
-                        showError()
-                    }
-                } else {
-                    Timber.e("An error ocurred trying to enable Two-Factor Authentication")
-                    showSnackbar(getString(R.string.error_enable_2fa))
-                }
-            }
             MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK -> {
                 if (e.errorCode == MegaError.API_OK) {
                     Timber.d("TYPE_MULTI_FACTOR_AUTH_CHECK: ${request.flag}")
-                }
-            }
-            MegaRequest.TYPE_GET_ATTR_USER -> {
-                if (request.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER) {
-                    Timber.d("TYPE_GET_ATTR_USER")
-                    if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_ENOENT) {
-                        Timber.d("TYPE_GET_ATTR_USER API_OK")
-                        with(binding) {
-                            scrollContainer2fa.visibility = View.GONE
-                            scrollContainerVerify.visibility = View.GONE
-                            container2faEnabled.visibility = View.VISIBLE
-                        }
-                        binding.buttonDismissRk.isVisible =
-                            e.errorCode == MegaError.API_OK && request.access == 1
-                        rkSaved = binding.buttonDismissRk.isVisible
-                    } else {
-                        Timber.e("TYPE_GET_ATTR_USER error: ${e.errorString}")
-                    }
                 }
             }
         }

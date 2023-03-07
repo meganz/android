@@ -13,6 +13,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.failWithException
 import mega.privacy.android.data.extensions.getRequestListener
+import mega.privacy.android.data.extensions.hasParam
 import mega.privacy.android.data.extensions.isTypeWithParam
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -462,10 +463,16 @@ internal class DefaultSettingsRepository @Inject constructor(
 
     private fun onIsMasterKeyExportedRequestFinished(continuation: Continuation<Boolean>) =
         { request: MegaRequest, error: MegaError ->
-            if (error.errorCode == MegaError.API_OK
-                || error.errorCode == MegaError.API_ENOENT
+            if (request.hasParam(MegaApiJava.USER_ATTR_PWD_REMINDER)
+                && (error.errorCode == MegaError.API_OK || error.errorCode == MegaError.API_ENOENT)
             ) {
-                continuation.resumeWith(Result.success(request.access == 1))
-            } else continuation.failWithError(error)
+                continuation.resumeWith(
+                    Result.success(
+                        error.errorCode == MegaError.API_OK && request.access == 1
+                    )
+                )
+            } else {
+                continuation.failWithError(error)
+            }
         }
 }

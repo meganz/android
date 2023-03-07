@@ -11,6 +11,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.model.Authe
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
+import mega.privacy.android.domain.usecase.IsMasterKeyExported
 import javax.inject.Inject
 
 /**
@@ -19,10 +20,28 @@ import javax.inject.Inject
 @HiltViewModel
 class TwoFactorAuthenticationViewModel @Inject constructor(
     private val enableMultiFactorAuth: EnableMultiFactorAuth,
+    private val isMasterKeyExported: IsMasterKeyExported,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TwoFactorAuthenticationUIState())
     val uiState = _uiState.asStateFlow()
+
+
+    /**
+     * Get IsMasterKeyExported status after user successfully enabled 2FA
+     */
+    fun getMasterKeyStatus() {
+        viewModelScope.launch {
+            runCatching { isMasterKeyExported() }.let { result ->
+                _uiState.update {
+                    it.copy(
+                        isMasterKeyExported = result.isSuccess,
+                        dismissRecoveryKey = result.getOrNull() ?: false
+                    )
+                }
+            }
+        }
+    }
 
     /**
      * Triggers multi factor authentication validation for the user
@@ -42,8 +61,10 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
                     it.copy(
                         isPinSubmitted = true,
                         authenticationState = AuthenticationState.AuthenticationPassed,
+                        dismissRecoveryKey = true
                     )
                 }
+                getMasterKeyStatus()
             }.onFailure { e ->
                 _uiState.update {
                     it.copy(

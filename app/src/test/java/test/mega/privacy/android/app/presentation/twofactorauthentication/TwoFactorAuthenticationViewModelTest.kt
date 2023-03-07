@@ -14,6 +14,7 @@ import mega.privacy.android.app.presentation.twofactorauthentication.model.Authe
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
+import mega.privacy.android.domain.usecase.IsMasterKeyExported
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -26,12 +27,13 @@ import kotlin.random.Random
 internal class TwoFactorAuthenticationViewModelTest {
     private lateinit var underTest: TwoFactorAuthenticationViewModel
     private val enableMultiFactorAuth = mock<EnableMultiFactorAuth>()
+    private val isMasterKeyExported = mock<IsMasterKeyExported>()
 
     @Before
     fun setup() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
 
-        underTest = TwoFactorAuthenticationViewModel(enableMultiFactorAuth)
+        underTest = TwoFactorAuthenticationViewModel(enableMultiFactorAuth, isMasterKeyExported)
     }
 
     @After
@@ -83,6 +85,56 @@ internal class TwoFactorAuthenticationViewModelTest {
             underTest.uiState.test {
                 val state = awaitItem()
                 assertThat(state.authenticationState).isEqualTo(AuthenticationState.AuthenticationError)
+            }
+        }
+
+    @Test
+    fun `test that when getting master key status is successful then isMasterKeyExported should be true`() =
+        runTest {
+            whenever(isMasterKeyExported()).thenReturn(true)
+            underTest.getMasterKeyStatus()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isMasterKeyExported).isEqualTo(true)
+            }
+        }
+
+    @Test
+    fun `test that when getting master key status returns error then isMasterKeyExported should be false`() =
+        runTest {
+            val fakeErrorCode = Random.nextInt()
+            whenever(isMasterKeyExported()).thenAnswer {
+                throw MegaException(
+                    errorCode = fakeErrorCode,
+                    errorString = ""
+                )
+            }
+            underTest.getMasterKeyStatus()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isMasterKeyExported).isEqualTo(false)
+            }
+        }
+
+    @Test
+    fun `test that when isMasterKeyExported is successful AND request access equals 1 then dismissRecoveryKey state should be true`() =
+        runTest {
+            whenever(isMasterKeyExported()).thenReturn(true)
+            underTest.getMasterKeyStatus()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.dismissRecoveryKey).isEqualTo(true)
+            }
+        }
+
+    @Test
+    fun `test that when isMasterKeyExported is successful AND request access NOT equals 1 then dismissRecoveryKey state should be false`() =
+        runTest {
+            whenever(isMasterKeyExported()).thenReturn(false)
+            underTest.getMasterKeyStatus()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.dismissRecoveryKey).isEqualTo(false)
             }
         }
 }
