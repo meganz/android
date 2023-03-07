@@ -1,27 +1,29 @@
 package mega.privacy.android.app.presentation.smsVerification
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.verification.SMSVerificationViewModel
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
-import mega.privacy.android.domain.entity.achievement.MegaAchievement
+import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
+import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
 import mega.privacy.android.domain.usecase.Logout
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
+import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -44,6 +46,8 @@ class SMSVerificationViewModelTest {
     private val sendSMSVerificationCode: SendSMSVerificationCode = mock()
     private val areAccountAchievementsEnabled: AreAccountAchievementsEnabled = mock()
     private val getAccountAchievements: GetAccountAchievements = mock()
+    private val smsVerificationTextMapper: SMSVerificationTextMapper = mock()
+    private val smsVerificationTextErrorMapper: SmsVerificationTextErrorMapper = mock()
     private val stringUtilWrapper: StringUtilWrapper = mock()
     private val savedState: SavedStateHandle = mock()
 
@@ -52,21 +56,24 @@ class SMSVerificationViewModelTest {
     private val countryName = "B"
     private val dialCode = "+1"
 
-    @get:Rule
-    var instantExecutorRule = InstantTaskExecutorRule()
-
     @Before
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Dispatchers.setMain(StandardTestDispatcher())
         initViewModel()
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     private fun initViewModel() {
         runBlocking {
-            whenever(getCountryCallingCodes()).thenReturn(countryCallingCodes)
+            whenever(smsVerificationTextMapper(any())).thenReturn(getInitialState())
             whenever(savedState.get<String>(COUNTRY_CODE)).thenReturn(countryCode)
             whenever(savedState.get<String>(COUNTRY_NAME)).thenReturn(countryName)
             whenever(savedState.get<String>(DIAL_CODE)).thenReturn(dialCode)
+            whenever(getCountryCallingCodes()).thenReturn(countryCallingCodes)
         }
         underTest = SMSVerificationViewModel(
             setSMSVerificationShown = setSMSVerificationShown,
@@ -77,6 +84,8 @@ class SMSVerificationViewModelTest {
             getAccountAchievements = getAccountAchievements,
             stringUtilWrapper = stringUtilWrapper,
             savedState = savedState,
+            smsVerificationTextMapper = smsVerificationTextMapper,
+            smsVerificationTextErrorMapper = smsVerificationTextErrorMapper,
         )
     }
 
@@ -105,7 +114,6 @@ class SMSVerificationViewModelTest {
             assertThat(actual.isAchievementsEnabled).isEqualTo(expected.isAchievementsEnabled)
             assertThat(actual.bonusStorageSMS).isEqualTo(expected.bonusStorageSMS)
         }
-
     }
 
     @Test
@@ -121,15 +129,15 @@ class SMSVerificationViewModelTest {
 
     @Test
     fun `test that state is updated if set is user locked is called with false`() = runTest {
-        val bonusStorage = "10"
+        val bonusStorage = "10 GB"
+        val expected =
+            getInitialState().copy(isUserLocked = false, bonusStorageSMS = bonusStorage)
+        whenever(smsVerificationTextMapper(any())).thenReturn(expected)
         whenever(areAccountAchievementsEnabled()).thenReturn(true)
-        whenever(getAccountAchievements.invoke(any(), any())).thenReturn(mock<MegaAchievement>())
+        whenever(getAccountAchievements(any(), any())).thenReturn(mock())
         whenever(stringUtilWrapper.getSizeString(any())).thenReturn(bonusStorage)
-        underTest.uiState.test {
-            underTest.setIsUserLocked(false)
-            val expected =
-                getInitialState().copy(isUserLocked = false, bonusStorageSMS = bonusStorage)
-            awaitItem()
+        underTest.setIsUserLocked(false)
+        underTest.uiState.drop(1).test {
             val actual = awaitItem()
             assertThat(actual.isUserLocked).isEqualTo(expected.isUserLocked)
             assertThat(actual.bonusStorageSMS).isEqualTo(expected.bonusStorageSMS)

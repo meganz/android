@@ -59,7 +59,28 @@ data class SMSVerificationUIState(
     val bonusStorageSMS: String? = null,
 
     /**
-     * current event
+     * info text
      */
-    val event: SMSVerificationUIEvent = SMSVerificationUIEvent.Success,
-)
+    val infoText: String = "",
+
+    /**
+     * header text
+     */
+    val headerText: String = "",
+
+    /**
+     * country code text
+     */
+    val countryCodeText: String = "",
+
+    /**
+     * country code text
+     */
+    val phoneNumberErrorText: String = "",
+) {
+    /**
+     *  is selected country code valid or not
+     */
+    val isCountryCodeValid =
+        selectedCountryCode.isNotEmpty() && selectedDialCode.isNotEmpty() && selectedCountryName.isNotEmpty()
+}

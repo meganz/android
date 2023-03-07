@@ -5,6 +5,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapper
+import mega.privacy.android.app.presentation.verification.model.mapper.SMSVerificationTextMapperImpl
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapper
 import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerificationTextErrorMapperImpl
 import mega.privacy.android.domain.repository.AccountRepository
@@ -37,6 +39,12 @@ abstract class SMSVerificationModule {
 
     @Binds
     abstract fun bindMonitorVerificationStatus(implementation: DefaultMonitorVerificationStatus): MonitorVerificationStatus
+
+    /**
+     * bind [SMSVerificationTextMapper]
+     */
+    @Binds
+    abstract fun bindSMSVerificationTextMapper(implementation: SMSVerificationTextMapperImpl): SMSVerificationTextMapper
 
     companion object {
         /**
