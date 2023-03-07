@@ -83,6 +83,7 @@
                 android:layout_gravity="start|bottom"
                 android:layout_marginStart="72dp"
                 android:layout_marginBottom="5dp"
+                android:visibility="gone"
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary.Variant2" />
 
             <androidx.appcompat.widget.Toolbar

@@ -5,6 +5,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import nz.mega.sdk.MegaShare
 
 /**
  * Represents the view state of the File info screen
@@ -18,6 +19,8 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
  * @param thumbnailUriString the uri of the file containing the thumbnail, just as a fallback in case there's no [previewUriString]
  * @param folderTreeInfo the folder info if the node is a folder
  * @param incomingSharesOwnerContactItem the info of the owner of this folder in case it's a folder from in shares
+ * @param isShareContactExpanded outShares are shown if is set to true
+ * @param outShares shares in case of a node shared with others as outShare
  * @param nodeLocationInfo the location info of the node
  */
 data class FileInfoViewState(
@@ -31,6 +34,8 @@ data class FileInfoViewState(
     val thumbnailUriString: String? = null,
     val folderTreeInfo: FolderTreeInfo? = null,
     val incomingSharesOwnerContactItem: ContactItem? = null,
+    val isShareContactExpanded: Boolean = false,
+    val outShares: List<MegaShare> = emptyList(),
     val nodeLocationInfo: LocationInfo? = null,
 ) {
     /**
@@ -81,5 +86,34 @@ data class FileInfoViewState(
         folderTreeInfo?.let {
             Util.getSizeString(it.totalCurrentSizeInBytes + it.sizeOfPreviousVersionsInBytes)
         } //file size should be also returned
+    }
+
+    /**
+     * the limited amount of outshares to be shown
+     */
+    val outSharesCoerceMax by lazy {
+        outShares.takeIf { it.size <= MAX_NUMBER_OF_CONTACTS_IN_LIST }
+            ?: (outShares.take(MAX_NUMBER_OF_CONTACTS_IN_LIST))
+    }
+
+    /**
+     * true in case [outSharesCoerceMax] are not representing all the outShares
+     */
+    val thereAreMoreOutShares = outShares.size > MAX_NUMBER_OF_CONTACTS_IN_LIST
+
+    /**
+     * the amount of outShares that are not represented by [outSharesCoerceMax]
+     */
+    val extraOutShares = (outShares.size - MAX_NUMBER_OF_CONTACTS_IN_LIST).coerceAtLeast(0)
+
+    /**
+     * label for the owner of this node in case it's an incoming shared node
+     */
+    val ownerLabel = incomingSharesOwnerContactItem?.contactData?.alias
+        ?: incomingSharesOwnerContactItem?.contactData?.fullName
+        ?: incomingSharesOwnerContactItem?.email
+
+    companion object {
+        internal const val MAX_NUMBER_OF_CONTACTS_IN_LIST = 5
     }
 }

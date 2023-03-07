@@ -13,6 +13,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
+import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
@@ -40,6 +42,7 @@ import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
@@ -79,7 +82,9 @@ class FileInfoViewModel @Inject constructor(
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder,
     private val monitorNodeUpdatesById: MonitorNodeUpdatesById,
     private val monitorChildrenUpdates: MonitorChildrenUpdates,
+    private val monitorContactUpdates: MonitorContactUpdates,
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle,
+    private val getOutShares: GetOutShares,
     private val getNodeLocationInfo: GetNodeLocationInfo,
 ) : ViewModel() {
 
@@ -147,6 +152,7 @@ class FileInfoViewModel @Inject constructor(
                     listOf(
                         monitorNodeUpdates(),
                         monitorChildrenUpdates(),
+                        monitorSharesContactUpdates(),
                     )
                 )
             }
@@ -240,6 +246,13 @@ class FileInfoViewModel @Inject constructor(
      */
     fun getStorageState(): StorageState = monitorStorageStateEvent.getState()
 
+    /**
+     * change the state of isShareContactExpanded
+     */
+    fun expandOutSharesClick() {
+        updateState { it.copy(isShareContactExpanded = !it.isShareContactExpanded) }
+    }
+
     private fun monitorNodeUpdates() =
         viewModelScope.launch {
             monitorNodeUpdatesById(typedNode.id).collect { changes ->
@@ -267,7 +280,7 @@ class FileInfoViewModel @Inject constructor(
                                 return@any true
                             }
                         Timestamp -> return@any true //will update only dates, for now update everything
-                        Outshare -> return@any true //will update only shared with, for now update everything
+                        Outshare -> updateOutShares()
                         Public_link -> return@any true //will update only public link, for now update everything
                         else -> return@any false
                     }
@@ -288,6 +301,33 @@ class FileInfoViewModel @Inject constructor(
             }
         }
 
+    private fun monitorSharesContactUpdates() =
+        viewModelScope.launch {
+            monitorContactUpdates().collect { userUpdate ->
+                Timber.d("FileInfoViewModel monitorOutSharesContactUpdates ${userUpdate.changes}")
+                val relevantChanges = listOf(
+                    UserChanges.Alias,
+                    UserChanges.Email,
+                    UserChanges.Firstname,
+                    UserChanges.Lastname,
+                    UserChanges.LastInteractionTimestamp
+                )
+                //only monitor relevant changes for this screen
+                if (userUpdate.changes.values.flatten().any(relevantChanges::contains)) {
+                    if (_uiState.value.outSharesCoerceMax.isEmpty().not()) {
+                        //a possible change in outShares contacts, let's update
+                        updateOutShares()
+                    }
+                    _uiState.value.incomingSharesOwnerContactItem?.handle?.let { userId ->
+                        if (userUpdate.changes.keys.any { it.id == userId }) {
+                            // update in owner contact, let's update
+                            updateOwner()
+                        }
+                    }
+                }
+            }
+        }
+
     private fun updateCurrentNodeStatus() {
         updateState { uiState ->
             uiState.copy(
@@ -299,6 +339,10 @@ class FileInfoViewModel @Inject constructor(
                     ?.let {
                         fileUtilWrapper.getFileIfExists(fileName = it)?.toURI()?.toString()
                     },
+                incomingSharesOwnerContactItem = (typedNode as? TypedFolderNode)?.let {
+                    //a first cached fast version
+                    getContactItemFromInShareFolder(folderNode = it, skipCache = false)
+                },
             ).also {
                 println("new state $it")
             }
@@ -307,6 +351,7 @@ class FileInfoViewModel @Inject constructor(
         updatePreview()
         updateFolderTreeInfo()
         updateOwner()
+        updateOutShares()
         updateLocation()
     }
 
@@ -338,7 +383,10 @@ class FileInfoViewModel @Inject constructor(
         (typedNode as? TypedFolderNode)?.let { folder ->
             updateState {
                 it.copy(
-                    incomingSharesOwnerContactItem = getContactItemFromInShareFolder(folderNode = folder, skipCache = true)
+                    incomingSharesOwnerContactItem = getContactItemFromInShareFolder(
+                        folderNode = folder,
+                        skipCache = true
+                    )
                 )
             }
         }
@@ -356,6 +404,10 @@ class FileInfoViewModel @Inject constructor(
             it.copy(title = typedNode.name)
         }
 
+    }
+
+    private fun updateOutShares() = updateState {
+        it.copy(outShares = getOutShares(typedNode.id) ?: emptyList())
     }
 
     /**

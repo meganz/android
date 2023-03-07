@@ -86,6 +86,7 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textAppearance="?attr/textAppearanceSubtitle1"
+                        tools:text="Example user name"
                         app:emojiSize="14sp" />
 
                     <TextView
@@ -102,7 +103,6 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginLeft="6dp"
                         android:background="@null"
-                        android:visibility="gone"
                         tools:src="@drawable/ic_offline_light" />
 
                 </LinearLayout>

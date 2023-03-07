@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
+import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.fileinfo.FileInfoJobInProgressState
@@ -31,6 +32,9 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
@@ -39,6 +43,7 @@ import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
@@ -50,6 +55,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -88,9 +94,11 @@ internal class FileInfoViewModelTest {
     private val getContactItemFromInShareFolder: GetContactItemFromInShareFolder = mock()
     private val monitorNodeUpdatesById: MonitorNodeUpdatesById = mock()
     private val monitorChildrenUpdates: MonitorChildrenUpdates = mock()
+    private val monitorContactUpdates: MonitorContactUpdates = mock()
     private val megaNodeRepository: MegaNodeRepository = mock()
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle = mock()
     private val getNodeLocationInfo: GetNodeLocationInfo = mock()
+    private val getOutShares: GetOutShares = mock()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -130,8 +138,10 @@ internal class FileInfoViewModelTest {
             getContactItemFromInShareFolder = getContactItemFromInShareFolder,
             monitorNodeUpdatesById = monitorNodeUpdatesById,
             monitorChildrenUpdates = monitorChildrenUpdates,
+            monitorContactUpdates = monitorContactUpdates,
             getNodeVersionsByHandle = getNodeVersionsByHandle,
             getNodeLocationInfo = getNodeLocationInfo,
+            getOutShares = getOutShares,
         )
     }
 
@@ -149,6 +159,7 @@ internal class FileInfoViewModelTest {
         whenever(getNodeVersionsByHandle(nodeId)).thenReturn(null)
         whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(emptyFlow())
         whenever(monitorChildrenUpdates.invoke(nodeId)).thenReturn(emptyFlow())
+        whenever(monitorContactUpdates.invoke()).thenReturn(emptyFlow())
         whenever(fileUtilWrapper.getFileIfExists(null, thumbUri))
             .thenReturn(File(null as File?, thumbUri))
         whenever(typedFileNode.name).thenReturn("File name")
@@ -560,8 +571,12 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test getContactItemFromInShareFolder is invoked when the node is a Folder`() = runTest {
         val folderNode = mock<TypedFolderNode>()
+        whenever(folderNode.id).thenReturn(nodeId)
         whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
         underTest.setNode(node.handle)
+        //first quick fetch
+        verify(getContactItemFromInShareFolder).invoke(folderNode, false)
+        //second not cached slow fetch
         verify(getContactItemFromInShareFolder).invoke(folderNode, true)
     }
 
@@ -590,10 +605,47 @@ internal class FileInfoViewModelTest {
             .thenReturn(
                 flowOf(listOf(NodeChanges.Parent))
             )
-            .thenReturn(emptyFlow())//second time we don't want to emmit another update
+            .thenReturn(emptyFlow()) //second time we don't want to emit another update to avoid a circular call in this test
         underTest.setNode(node.handle)
         verify(getNodeLocationInfo, times(2)).invoke(typedFileNode)
     }
+
+    @Test
+    fun `test getOutShares is fetched when node is set`() = runTest {
+        underTest.setNode(node.handle)
+        verify(getOutShares, times(1)).invoke(nodeId)
+    }
+
+    @Test
+    fun `test getOutShares result is set on uiState`() = runTest {
+        val expected = mock<List<MegaShare>>()
+        whenever(getOutShares.invoke(nodeId)).thenReturn(expected)
+        underTest.setNode(node.handle)
+        Truth.assertThat(underTest.uiState.value.outShares).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test getOutShares is fetched when out shares update is received`() = runTest {
+        whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(
+            flowOf(listOf(NodeChanges.Outshare))
+        )
+        underTest.setNode(node.handle)
+        verify(getOutShares, times(2)).invoke(nodeId)
+    }
+
+    @Test
+    fun `test getOutShares is fetched when contacts update is received and there are out shares`() =
+        runTest {
+            val outShares = mock<List<MegaShare>>()
+            whenever(getOutShares.invoke(nodeId)).thenReturn(outShares)
+            val updateChanges = mapOf(Pair(UserId(1L), listOf(UserChanges.Alias)))
+            val update = mock<UserUpdate> {
+                on { changes }.thenReturn(updateChanges)
+            }
+            whenever(monitorContactUpdates.invoke()).thenReturn(flowOf(update))
+            underTest.setNode(node.handle)
+            verify(getOutShares, times(2)).invoke(nodeId)
+        }
 
     @Suppress("UNCHECKED_CAST")
     private suspend fun <T : FileInfoOneOffViewEvent> testEventIsOfType(
