@@ -13,7 +13,9 @@ import mega.privacy.android.domain.entity.ChatRoomLastMessage
 import mega.privacy.android.domain.entity.chat.ChatListItemChanges
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
@@ -57,6 +59,32 @@ class GetMeetingsImpl @Inject constructor(
         sortMeetings(mutex)
     }
 
+    /**
+     * Check the scheduled meeting status
+     *
+     * @param chatId    Chat Id.
+     * @return [ScheduledMeetingStatus]
+     */
+    private suspend fun checkScheduledMeetingStatus(chatId: Long): ScheduledMeetingStatus {
+        var scheduledMeetingStatus = ScheduledMeetingStatus.NotStarted
+        callRepository.getChatCall(chatId)?.let { call ->
+            when (call.status) {
+                ChatCallStatus.UserNoPresent -> {
+                    scheduledMeetingStatus = ScheduledMeetingStatus.NotJoined
+                }
+                ChatCallStatus.Connecting,
+                ChatCallStatus.Joining,
+                ChatCallStatus.InProgress,
+                -> {
+                    scheduledMeetingStatus = ScheduledMeetingStatus.Joined
+                }
+                else -> {}
+            }
+        }
+
+        return scheduledMeetingStatus
+    }
+
     private suspend fun MutableList<MeetingRoomItem>.updateFields(mutex: Mutex): Flow<MutableList<MeetingRoomItem>> =
         getMeetingsRepository.getUpdatedMeetingItems(this, mutex)
 
@@ -75,6 +103,7 @@ class GetMeetingsImpl @Inject constructor(
                                 isRecurringWeekly = updatedItem.isRecurringWeekly,
                                 isRecurringMonthly = updatedItem.isRecurringMonthly,
                                 isPending = updatedItem.isPending,
+                                scheduledMeetingStatus = checkScheduledMeetingStatus(updatedItem.chatId)
                             )
                             set(newIndex, newUpdatedItem)
                             emit(this@addScheduledMeetings)
@@ -114,7 +143,8 @@ class GetMeetingsImpl @Inject constructor(
                     val updatedItem = currentItem.copy(
                         highlight = chatRoom.unreadCount > 0 || chatRoom.isCallInProgress
                                 || chatRoom.lastMessageType == ChatRoomLastMessage.CallStarted,
-                        lastTimestamp = chatRoom.lastTimestamp
+                        lastTimestamp = chatRoom.lastTimestamp,
+                        scheduledMeetingStatus = checkScheduledMeetingStatus(currentItem.chatId)
                     )
 
                     if (currentItem != updatedItem) {
@@ -189,6 +219,7 @@ class GetMeetingsImpl @Inject constructor(
                                     isRecurringWeekly = updatedItem.isRecurringWeekly,
                                     isRecurringMonthly = updatedItem.isRecurringMonthly,
                                     isPending = updatedItem.isPending,
+                                    scheduledMeetingStatus = updatedItem.scheduledMeetingStatus
                                 )
                                 set(newIndex, newUpdatedItem)
                             }
@@ -225,6 +256,7 @@ class GetMeetingsImpl @Inject constructor(
                     isRecurringWeekly = isRecurringWeekly,
                     isRecurringMonthly = isRecurringMonthly,
                     isPending = isPending,
+                    scheduledMeetingStatus = checkScheduledMeetingStatus(schedMeeting.chatId)
                 )
             }
 

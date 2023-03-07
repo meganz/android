@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
+
 /**
  * Meeting room item
  *
@@ -30,6 +32,7 @@ package mega.privacy.android.domain.entity.chat
  * @property scheduledStartTimestamp
  * @property scheduledEndTimestamp
  * @property scheduledTimestampFormatted
+ * @property scheduledMeetingStatus
  */
 data class MeetingRoomItem constructor(
     val chatId: Long,
@@ -58,7 +61,8 @@ data class MeetingRoomItem constructor(
     val isPending: Boolean = false,
     val scheduledStartTimestamp: Long? = null,
     val scheduledEndTimestamp: Long? = null,
-    val scheduledTimestampFormatted: String? = null
+    val scheduledTimestampFormatted: String? = null,
+    val scheduledMeetingStatus: ScheduledMeetingStatus = ScheduledMeetingStatus.NotStarted,
 ) {
 
     fun isSingleMeeting(): Boolean =

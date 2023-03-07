@@ -22,14 +22,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.CallUtil.clearIncomingCallNotification
 import mega.privacy.android.app.utils.CallUtil.openMeetingInProgress
 import mega.privacy.android.app.utils.CallUtil.openMeetingRinging
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
@@ -46,6 +44,7 @@ import java.lang.IllegalArgumentException
  * @property megaApi                    [MegaApiAndroid]
  * @property megaChatApi                [MegaApiAndroid]
  * @property app                        [MegaApplication]
+ * @property megaChatApiGateway         [MegaChatApiGateway]
  */
 @AndroidEntryPoint
 class CallNotificationIntentService : Service(),
@@ -73,6 +72,9 @@ class CallNotificationIntentService : Service(),
 
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
+
+    @Inject
+    lateinit var megaChatApiGateway: MegaChatApiGateway
 
     var app: MegaApplication? = null
 
@@ -236,13 +238,7 @@ class CallNotificationIntentService : Service(),
      * @param chatId Chat ID
      */
     private fun answerCall(chatId: Long) {
-        var enableAudio: Boolean = isTraditionalCall
-        if (enableAudio) {
-            enableAudio =
-                hasPermissions(this@CallNotificationIntentService, Manifest.permission.RECORD_AUDIO)
-        }
-
-        if (!enableAudio) {
+        if (!hasPermissions(this@CallNotificationIntentService, Manifest.permission.RECORD_AUDIO)) {
             openMeetingRinging(
                 this@CallNotificationIntentService,
                 chatIdIncomingCall,
@@ -254,30 +250,22 @@ class CallNotificationIntentService : Service(),
         }
 
         coroutineScope?.launch {
-            runCatching {
-                answerChatCall(chatId, false, enableAudio)
-            }.onFailure { exception ->
-                Util.showSnackbar(
-                    app?.applicationContext,
-                    StringResourcesUtils.getString(R.string.call_error)
-                )
-                Timber.e(exception)
-                coroutineScope?.cancel()
-
-            }.onSuccess { resultAnswerCall ->
-                val resultChatId = resultAnswerCall.chatHandle
-                if (resultChatId != null) {
-                    Timber.d("Incoming call answered")
-                    openMeetingInProgress(
-                        this@CallNotificationIntentService,
-                        chatIdIncomingCall,
-                        true,
-                        passcodeManagement
-                    )
-                    clearIncomingCallNotification(callIdIncomingCall)
-                    stopSelf()
-                }
-
+            answerChatCall(
+                chatId = chatId,
+                video = false,
+                audio = isTraditionalCall
+            )?.let { call ->
+                call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                    ?.let { callChatId ->
+                        openMeetingInProgress(
+                            this@CallNotificationIntentService,
+                            chatIdIncomingCall,
+                            true,
+                            passcodeManagement
+                        )
+                        clearIncomingCallNotification(callChatId)
+                        stopSelf()
+                    }
                 coroutineScope?.cancel()
             }
         }

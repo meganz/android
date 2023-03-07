@@ -19,11 +19,13 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
+import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestampMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
 import mega.privacy.android.app.presentation.meeting.model.MeetingListState
 import mega.privacy.android.app.usecase.meeting.GetLastMessageUseCase
+import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -32,6 +34,7 @@ import mega.privacy.android.domain.usecase.ArchiveChat
 import mega.privacy.android.domain.usecase.GetMeetings
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
 import timber.log.Timber
 import javax.inject.Inject
@@ -39,15 +42,20 @@ import javax.inject.Inject
 /**
  * Meeting list view model
  *
- * @property archiveChatUseCase
- * @property leaveChatUseCase
- * @property signalChatPresenceUseCase
- * @property getMeetingsUseCase
- * @property getLastMessageUseCase
- * @property meetingLastTimestampMapper
- * @property scheduledMeetingTimestampMapper
- * @property startChatCallNoRinging
- * @property deviceGateway
+ * @property archiveChatUseCase                 [ArchiveChat]
+ * @property leaveChatUseCase                   [LeaveChat]
+ * @property signalChatPresenceUseCase          [SignalChatPresenceActivity]
+ * @property getMeetingsUseCase                 [GetMeetings]
+ * @property getLastMessageUseCase              [GetLastMessageUseCase]
+ * @property meetingLastTimestampMapper         [MeetingLastTimestampMapper]
+ * @property scheduledMeetingTimestampMapper    [ScheduledMeetingTimestampMapper]
+ * @property startChatCallNoRinging             [StartChatCallNoRinging]
+ * @property answerChatCall                     [AnswerChatCall]
+ * @property deviceGateway                      [DeviceGateway]
+ * @property chatManagement                     [ChatManagement]
+ * @property passcodeManagement                 [PasscodeManagement]
+ * @property megaChatApiGateway                 [MegaChatApiGateway]
+ * @property rtcAudioManagerGateway             [RTCAudioManagerGateway]
  */
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
@@ -60,10 +68,12 @@ class MeetingListViewModel @Inject constructor(
     private val meetingLastTimestampMapper: MeetingLastTimestampMapper,
     private val scheduledMeetingTimestampMapper: ScheduledMeetingTimestampMapper,
     private val startChatCallNoRinging: StartChatCallNoRinging,
+    private val answerChatCall: AnswerChatCall,
     private val deviceGateway: DeviceGateway,
     private val chatManagement: ChatManagement,
     private val passcodeManagement: PasscodeManagement,
     private val megaChatApiGateway: MegaChatApiGateway,
+    private val rtcAudioManagerGateway: RTCAudioManagerGateway,
 ) : ViewModel() {
 
     companion object {
@@ -159,6 +169,32 @@ class MeetingListViewModel @Inject constructor(
         searchQueryState.update { query }
         signalChatPresence()
     }
+
+    /**
+     * Join scheduled meeting call
+     *
+     * @param chatId    Chat Id.
+     */
+    fun joinSchedMeeting(chatId: Long) =
+        viewModelScope.launch {
+            answerChatCall(
+                chatId = chatId,
+                video = false,
+                audio = true
+            )?.let { call ->
+                call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                    ?.let { callChatId ->
+                        chatManagement.removeJoiningCallChatId(chatId)
+                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
+                        chatManagement.setSpeakerStatus(callChatId, call.hasLocalVideo)
+                        chatManagement.setRequestSentCall(call.callId, true)
+                        CallUtil.clearIncomingCallNotification(call.callId)
+                        passcodeManagement.showPasscodeScreen = true
+                        MegaApplication.getInstance().openCallService(callChatId)
+                        state.update { it.copy(currentCallChatId = callChatId) }
+                    }
+            }
+        }
 
     /**
      * Start scheduled meeting call

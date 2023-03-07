@@ -386,7 +386,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Request resent</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request successfully sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">Request sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contact removed</string>
     <!-- error message -->
@@ -402,54 +402,54 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Error. Folder not created</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Renamed successfully</string>
+    <string name="context_correctly_renamed">Renamed</string>
     <!-- error message -->
     <string name="context_no_renamed">Error. Not renamed</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copied successfully</string>
+    <string name="context_correctly_copied">Copied</string>
     <!-- error message -->
     <string name="context_no_copied">Error. Not copied</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Please choose a destination folder</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Moved successfully</string>
+    <string name="context_correctly_moved">Moved</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="one">Moved %d item</item>
         <item quantity="other">Moved %d items</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d items were not moved successfully</string>
+    <string name="number_incorrectly_moved">%d items weren’t moved</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Moved to the Rubbish bin successfully</string>
+    <string name="context_correctly_moved_to_rubbish">Moved to Rubbish bin</string>
     <!-- error message -->
     <string name="context_no_moved">Error. Not moved</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Shared successfully</string>
+    <string name="context_correctly_shared">Shared</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Error. %d shares were not completed</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Error. Share failed to remove</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Deleted successfully</string>
+    <string name="context_correctly_removed">Deleted</string>
     <!-- error message -->
     <string name="context_no_removed">Error. Deletion failed</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d items removed successfully from MEGA</string>
+    <string name="number_correctly_removed">%d items removed from MEGA</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d items are not removed successfully</string>
+    <string name="number_no_removed">%d items weren’t removed</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d folders left successfully.</string>
+    <string name="number_correctly_leaved">%d folders left</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">Share left</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d folders were not left successfully</string>
+    <string name="number_no_leaved">%d folders weren’t left</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d items copied successfully</string>
+    <string name="number_correctly_copied">%d items copied</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d items were not copied</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Rubbish bin emptied successfully</string>
+    <string name="rubbish_bin_emptied">Rubbish bin emptied</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">An error occurred. The Rubbish bin has not been emptied</string>
     <!-- dialog cancel subscriptions -->
@@ -516,7 +516,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">There is no payment method set for this plan currently. Please select one.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Link copied to clipboard</string>
+    <string name="file_properties_get_link">Copied link to clipboard</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Please log out before creating the account</string>
     <!-- menu item -->
@@ -622,7 +622,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">Wrong code. Please try again or resend.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Your phone number has been verified successfully</string>
+    <string name="verify_account_successfully">Your phone number has been verified</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>Internal storage</item>
@@ -956,7 +956,7 @@
         <item quantity="other">%d invites sent</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d invite requests successfully sent but %2$d requests were not sent.</string>
+    <string name="number_no_invite_contact_request">%1$d invite requests sent but %2$d requests weren’t sent.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Me)</string>
     <!-- button -->
@@ -1013,7 +1013,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">Chat history has been cleared</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">An error has occurred. The chat history has not been successfully cleared</string>
+    <string name="clear_history_error">An error has occurred. The chat history hasn’t been cleared</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Add participants</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1083,9 +1083,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">The participant is already included in this group chat</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d participants were successfully invited</string>
+    <string name="number_correctly_add_participant">%d participants were invited</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d participants were successfully invited but %2$d participants were not invited.</string>
+    <string name="number_no_add_participant_request">%1$d participants were invited but %2$d participants were not invited.</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] joined the group chat by invitation from [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1127,7 +1127,7 @@
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chat error</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">The chat could not be opened successfully</string>
+    <string name="chat_error_open_message">Chat couldn’t be opened</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contact</item>
@@ -1359,7 +1359,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">An error occurred when changing the name</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Your name has been successfully updated</string>
+    <string name="success_changing_user_attributes">Your name has been updated</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Participant added</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1596,11 +1596,11 @@
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA users who scan your QR code will be automatically added to your contact list.</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Link copied to clipboard</string>
+    <string name="qrcode_link_copied">Copied link to clipboard</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">QR code successfully reset</string>
+    <string name="qrcode_reset_successfully">QR code reset</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">QR code successfully deleted</string>
+    <string name="qrcode_delete_successfully">QR code deleted</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">QR code not reset due to an error. Please try again.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1618,7 +1618,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">An error occurred while trying to download the QR file. Perhaps the file does not exist. Please try again later.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">The QR Code has been downloaded successfully to %s</string>
+    <string name="success_download_qr">The QR Code has been downloaded to %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Invite not sent</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1782,8 +1782,8 @@
     <string name="messages_forwarded_success">Messages forwarded</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Error. %1$d message not successfully forwarded</item>
-        <item quantity="other">Error. %1$d messages not successfully forwarded</item>
+        <item quantity="one">Error. %1$d message not forwarded</item>
+        <item quantity="other">Error. %1$d messages not forwarded</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1872,7 +1872,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Print</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">The Recovery key has been successfully saved</string>
+    <string name="save_MK_confirmation">Recovery key has been saved</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(pending)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -2038,11 +2038,11 @@
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
     <string name="success_archive_chat">%s was archived</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Error. %s was not archived</string>
+    <string name="error_archive_chat">Error. %s wasn\’t archived. Try again.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
     <string name="success_unarchive_chat">%s was unarchived</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Error. %s can’t be unarchived</string>
+    <string name="error_unarchive_chat">Error. %s wasn\’t unarchived. Try again.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Inactive chat</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2079,7 +2079,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">You are about to delete the version histories of all files. Any file version shared to you from a contact will need to be deleted by them.\n\nPlease note that the current files will not be deleted.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">File versions successfully deleted</string>
+    <string name="success_delete_versions">File versions deleted</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">An error occurred while trying to delete all previous versions of your files, please try again later.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2406,7 +2406,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Before you can generate a link for this chat, you need to set a description:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Chat link copied to clipboard</string>
+    <string name="chat_link_copied_clipboard">Copied link to clipboard</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]From[/A] %s / [A]month[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2550,7 +2550,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">The content was not sent to %d chats</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">New group chat created successfully</string>
+    <string name="new_group_chat_created">New group chat created</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">Preparing files</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2567,8 +2567,8 @@
     <string name="version_history_deleted_erroneously">Previous versions not deleted.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">%d version deleted successfully</item>
-        <item quantity="other">%d versions deleted successfully</item>
+        <item quantity="one">%d version deleted</item>
+        <item quantity="other">%d versions deleted</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2662,9 +2662,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">No chat link available.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Chat link deleted successfully.</string>
+    <string name="chat_link_deleted">Chat link deleted</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Version restored successfully.</string>
+    <string name="version_restored">Version restored</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Tap and hold to record</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2827,7 +2827,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">You do not have the correct permissions to amend this file. Would you like to create a new file?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Version was created as a new file successfully.</string>
+    <string name="version_as_new_file_created">Version was created as a new file</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">on %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2908,7 +2908,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Leaving&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Your phone number has been removed successfully.</string>
+    <string name="remove_phone_number_success">Phone number removed</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Failed to remove your phone number.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3249,23 +3249,23 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to the Rubbish bin successfully</item>
-        <item quantity="other">%d items moved to the Rubbish bin successfully</item>
+        <item quantity="one">1 item moved to Rubbish bin</item>
+        <item quantity="other">%d items moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item was not moved to the Rubbish bin successfully</item>
-        <item quantity="other">%d items were not moved to the Rubbish bin successfully</item>
+        <item quantity="one">1 item wasn’t moved to the Rubbish bin</item>
+        <item quantity="other">%d items weren’t moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item restored successfully</item>
-        <item quantity="other">%d items restored successfully</item>
+        <item quantity="one">1 item restored</item>
+        <item quantity="other">%d items restored</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item was not restored successfully</item>
-        <item quantity="other">%d items were not restored successfully</item>
+        <item quantity="one">1 item wasn’t restored</item>
+        <item quantity="other">%d items weren’t restored</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Change anyway</string>
@@ -3317,8 +3317,8 @@
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Link copied to clipboard</item>
-        <item quantity="other">Links copied to clipboard</item>
+        <item quantity="one">Copied link to clipboard</item>
+        <item quantity="other">Copied links to clipboard</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3414,7 +3414,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">You are the new host</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Copied meeting link.</string>
+    <string name="copied_meeting_link">Copied link to clipboard</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Tap to join current meeting.</string>
     <!-- Title of fifth tour screen -->
@@ -3492,7 +3492,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">You have already invited %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invite sent successfully. See sent requests.</string>
+    <string name="contact_invited">Invite sent. See Sent requests.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File available Offline</string>
     <!-- Message when file removed from offline. -->
@@ -3648,9 +3648,9 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$s and %2$s joined</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s left</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s left the call</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left the call</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">%1$s and 1 other joined</item>
@@ -3658,8 +3658,8 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left</item>
-        <item quantity="other">%1$s and %2$d others left</item>
+        <item quantity="one">%1$s and 1 other left the call</item>
+        <item quantity="other">%1$s and %2$d others left the call</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Delete permanently</string>
@@ -4181,13 +4181,13 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s, and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
-        <item quantity="other">%1$s, and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="one">%1$s and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s, and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s, and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="one">%1$s and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
@@ -4611,18 +4611,20 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">Sat</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">Sun</string>
-    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
-    <string name="meetings_list_start_scheduled_meeting_option">Start</string>
     <!-- Album selection dialog title -->
     <string name="photos_album_selection_dialog_title">Cannot select more</string>
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
     <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">Start</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_camelcase_ok">Ok</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
     <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
     <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">Join</string>
 </resources>

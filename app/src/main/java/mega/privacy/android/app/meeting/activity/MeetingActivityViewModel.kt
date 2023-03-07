@@ -755,35 +755,22 @@ class MeetingActivityViewModel @Inject constructor(
             cameraGateway.setFrontCamera()
 
             viewModelScope.launch {
-                runCatching {
-                    answerChatCall(chatId, enableVideo, enableAudio)
-                }.onFailure { exception ->
+                answerChatCall(
+                    chatId = chatId,
+                    video = enableVideo,
+                    audio = enableAudio
+                ).let { call ->
                     chatManagement.removeJoiningCallChatId(chatId)
                     rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                    megaChatApiGateway.getChatCall(chatId)?.let { call ->
+                    if (call == null) {
+                        _finishMeetingActivity.value = true
+                    } else {
+                        chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
+                        chatManagement.setRequestSentCall(call.callId, false)
                         CallUtil.clearIncomingCallNotification(call.callId)
-                    }
 
-                    _finishMeetingActivity.value = true
-                    Timber.e(exception)
-                }.onSuccess { resultAnswerCall ->
-                    chatManagement.removeJoiningCallChatId(chatId)
-
-                    resultAnswerCall.chatHandle?.let { chatId ->
-                        val videoEnable = resultAnswerCall.flag
-                        val paramType = resultAnswerCall.paramType
-                        val audioEnable: Boolean = paramType == ChatRequestParamType.Video
-
-                        chatManagement.setSpeakerStatus(chatId, videoEnable)
-                        rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-
-                        megaChatApiGateway.getChatCall(chatId)?.let { call ->
-                            chatManagement.setRequestSentCall(call.callId, false)
-                            CallUtil.clearIncomingCallNotification(call.callId)
-                        }
-
-
-                        result.value = AnswerCallResult(chatId, videoEnable, audioEnable)
+                        result.value =
+                            AnswerCallResult(chatId, call.hasLocalVideo, call.hasLocalAudio)
                     }
                 }
             }

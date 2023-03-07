@@ -30,6 +30,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.setImageRequestFromFilePath
 import mega.privacy.android.app.utils.view.TextDrawable
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 
 /**
@@ -148,14 +149,48 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             dismissAllowingStateLoss()
         }
 
-        binding.btnStartSchedMeeting.isVisible = room.isScheduledMeeting() && room.isActive
-        binding.dividerStartSchedMeeting.isVisible = binding.btnStartSchedMeeting.isVisible
+        binding.btnStartOrJoinSchedMeeting.isVisible =
+            room.isActive &&
+                    room.isScheduledMeeting() &&
+                    room.isPending &&
+                    room.scheduledMeetingStatus != ScheduledMeetingStatus.Joined
+        binding.dividerStartOrJoinSchedMeeting.isVisible =
+            binding.btnStartOrJoinSchedMeeting.isVisible
 
-        binding.btnStartSchedMeeting.setOnClickListener {
-            room.schedId?.let { schedId ->
-                viewModel.startSchedMeeting(room.chatId, schedId)
-                dismissAllowingStateLoss()
+        when (room.scheduledMeetingStatus) {
+            ScheduledMeetingStatus.NotStarted -> {
+                binding.btnStartOrJoinSchedMeeting.setText(R.string.meetings_list_start_scheduled_meeting_option)
+                binding.btnStartOrJoinSchedMeeting.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    R.drawable.start_sched_icon,
+                    0,
+                    0,
+                    0
+                )
             }
+            ScheduledMeetingStatus.NotJoined -> {
+                binding.btnStartOrJoinSchedMeeting.setText(R.string.meetings_list_join_scheduled_meeting_option)
+                binding.btnStartOrJoinSchedMeeting.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    R.drawable.join_sched_icon,
+                    0,
+                    0,
+                    0
+                )
+            }
+            else -> {}
+        }
+
+        binding.btnStartOrJoinSchedMeeting.setOnClickListener {
+            room.schedId?.let { schedId ->
+                when (room.scheduledMeetingStatus) {
+                    ScheduledMeetingStatus.NotStarted -> viewModel.startSchedMeeting(
+                        room.chatId,
+                        schedId
+                    )
+                    ScheduledMeetingStatus.NotJoined -> viewModel.joinSchedMeeting(room.chatId)
+                    else -> {}
+                }
+            }
+            dismissAllowingStateLoss()
         }
 
         binding.btnInfo.setOnClickListener {

@@ -177,36 +177,24 @@ class ChatViewModel @Inject constructor(
         chatManagement.addJoiningCallChatId(chatId)
 
         viewModelScope.launch {
-            runCatching {
-                answerChatCall(chatId, video, audio)
-            }.onFailure { exception ->
-                _state.update { it.copy(error = R.string.call_error) }
-
+            answerChatCall(
+                chatId = chatId,
+                video = video,
+                audio = audio
+            ).let { call ->
                 chatManagement.removeJoiningCallChatId(chatId)
                 rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                chatApiGateway.getChatCall(chatId)?.let { call ->
-                    CallUtil.clearIncomingCallNotification(call.callId)
-                }
-                Timber.e(exception)
-            }.onSuccess { resultAnswerCall ->
-                val resultChatId = resultAnswerCall.chatHandle
-                if (resultChatId != null) {
-                    val videoEnable = resultAnswerCall.flag
-
+                if (call == null) {
+                    _state.update { it.copy(error = R.string.call_error) }
+                } else {
                     _state.update { it.copy(isCallAnswered = true) }
-
-                    chatManagement.removeJoiningCallChatId(chatId)
-                    rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                    chatManagement.setSpeakerStatus(chatId, videoEnable)
-
-                    chatApiGateway.getChatCall(chatId)?.let { call ->
-                        CallUtil.clearIncomingCallNotification(call.callId)
-                        chatManagement.setRequestSentCall(call.callId, false)
-                    }
+                    chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
+                    chatManagement.setRequestSentCall(call.callId, false)
+                    CallUtil.clearIncomingCallNotification(call.callId)
 
                     CallUtil.openMeetingInProgress(
                         MegaApplication.getInstance().applicationContext,
-                        resultChatId,
+                        call.chatId,
                         true,
                         passcodeManagement
                     )

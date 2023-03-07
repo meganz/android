@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.usecase.meeting
 
-import mega.privacy.android.domain.entity.ChatRequest
+import mega.privacy.android.domain.entity.chat.ChatCall
 
 /**
- * Use case for answers call in a chat
+ * Use case for answer call
  */
 fun interface AnswerChatCall {
 
@@ -11,13 +11,13 @@ fun interface AnswerChatCall {
      * Invoke.
      *
      * @param chatId  The chat id.
-     * @param enabledVideo True for audio-video call, false for audio call
-     * @param enabledAudio True for answering a call with audio (mute disabled)
-     * @return The chat conversation handle.
+     * @param video True for audio-video call, false for audio call
+     * @param audio True for answering a call with audio (mute disabled)
+     * @return [ChatCall]
      */
     suspend operator fun invoke(
         chatId: Long,
-        enabledVideo: Boolean,
-        enabledAudio: Boolean,
-    ): ChatRequest
+        video: Boolean,
+        audio: Boolean,
+    ): ChatCall?
 }

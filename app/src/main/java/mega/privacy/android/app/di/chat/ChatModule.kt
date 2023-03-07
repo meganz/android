@@ -35,6 +35,7 @@ import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.DefaultAnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.DefaultOpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.DefaultStartChatCallNoRinging
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
@@ -86,6 +87,12 @@ abstract class ChatModule {
      */
     @Binds
     abstract fun bindStartChatCallNoRinging(useCase: DefaultStartChatCallNoRinging): StartChatCallNoRinging
+
+    /**
+     * Answer call
+     */
+    @Binds
+    abstract fun bindAnswerChatCall(useCase: DefaultAnswerChatCall): AnswerChatCall
 
     companion object {
         /**
@@ -143,13 +150,6 @@ abstract class ChatModule {
         @Provides
         fun provideSetOpenInvite(chatRepository: ChatRepository): SetOpenInvite =
             SetOpenInvite(chatRepository::setOpenInvite)
-
-        /**
-         * Provides the Use Case [AnswerChatCall]
-         */
-        @Provides
-        fun provideAnswerChatCall(callRepository: CallRepository): AnswerChatCall =
-            AnswerChatCall(callRepository::answerChatCall)
 
         /**
          * Provides the Use Case [InviteToChat]
