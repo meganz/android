@@ -36,6 +36,8 @@ import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
+import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectory
+import mega.privacy.android.domain.usecase.DeleteCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
@@ -47,7 +49,6 @@ import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
@@ -92,6 +93,7 @@ import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
@@ -376,6 +378,14 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetUploadVideoQuality() = mock<GetUploadVideoQuality>()
+
+    @Provides
+    fun provideDeleteCameraUploadTemporaryRootDirectory() =
+        mock<DeleteCameraUploadTemporaryRootDirectory>()
+
+    @Provides
+    fun provideCreateCameraUploadTemporaryRootDirectory() =
+        mock<CreateCameraUploadTemporaryRootDirectory>()
 
     @Provides
     fun provideSetUploadVideoQuality() = mock<SetUploadVideoQuality>()

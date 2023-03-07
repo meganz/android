@@ -164,4 +164,7 @@ internal class CacheFolderFacade @Inject constructor(
             Timber.e("Exception deleting private cache", e)
         }
     }
+
+    override val cacheDir: File
+        get() = context.cacheDir
 }

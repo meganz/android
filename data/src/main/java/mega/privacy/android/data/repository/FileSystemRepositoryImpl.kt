@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.cache.Cache
@@ -38,8 +39,8 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.FileSystemRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
-import java.io.File
 import nz.mega.sdk.MegaRequest
+import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
@@ -248,4 +249,17 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     override suspend fun deleteFile(file: File) = withContext(ioDispatcher) {
         fileGateway.deleteFile(file)
     }
+
+    override suspend fun createDirectory(path: String) =
+        withContext(ioDispatcher) {
+            fileGateway.createDirectory(path)
+        }
+
+    override suspend fun deleteDirectory(path: String) =
+        withContext(ioDispatcher + NonCancellable) {
+            fileGateway.deleteDirectory(path)
+        }
+
+    override val cacheDir: File
+        get() = cacheFolderGateway.cacheDir
 }

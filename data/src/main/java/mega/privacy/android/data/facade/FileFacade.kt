@@ -244,6 +244,19 @@ class FileFacade @Inject constructor(
         }
     }
 
+    override suspend fun createDirectory(path: String) = run {
+        val directory = File(path)
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+        directory
+    }
+
+    override suspend fun deleteDirectory(path: String) = run {
+        val directory = File(path)
+        directory.deleteRecursively()
+    }
+
     private companion object {
         const val DOWNLOAD_DIR = "MEGA Downloads"
         const val OFFLINE_DIR = "MEGA Offline"

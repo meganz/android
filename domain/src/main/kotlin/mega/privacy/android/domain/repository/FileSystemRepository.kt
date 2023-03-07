@@ -99,4 +99,23 @@ interface FileSystemRepository {
      * @return [Boolean]
      */
     suspend fun deleteFile(file: File): Boolean
+
+    /**
+     * create directory on a specified path
+     * @param path
+     * @return [Boolean]
+     */
+    suspend fun createDirectory(path: String): File
+
+    /**
+     * remove directory recursively
+     * @param path
+     * @return [Boolean]
+     */
+    suspend fun deleteDirectory(path: String): Boolean
+
+    /**
+     * Returns cache directory of the app
+     */
+    val cacheDir: File
 }

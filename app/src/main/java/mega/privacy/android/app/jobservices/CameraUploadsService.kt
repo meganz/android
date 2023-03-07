@@ -1,5 +1,6 @@
 package mega.privacy.android.app.jobservices
 
+import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -90,6 +91,8 @@ import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
+import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectory
+import mega.privacy.android.domain.usecase.DeleteCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
@@ -97,7 +100,6 @@ import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
@@ -121,6 +123,7 @@ import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -535,6 +538,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     lateinit var disableMediaUploadSettings: DisableMediaUploadSettings
 
     /**
+     * Create camera upload temporary root directory
+     */
+    @Inject
+    lateinit var createCameraUploadTemporaryRootDirectory: CreateCameraUploadTemporaryRootDirectory
+
+    /**
+     * Delete camera upload temporary root directory
+     */
+    @Inject
+    lateinit var deleteCameraUploadTemporaryRootDirectory: DeleteCameraUploadTemporaryRootDirectory
+
+    /**
      * Coroutine Scope for camera upload work
      */
     private var coroutineScope: CoroutineScope? = null
@@ -571,7 +586,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      * This folder is created at the beginning of the CU process
      * and deleted at the end of the process
      */
-    private var tempRoot: String? = null
+    private lateinit var tempRoot: String
 
     /**
      * Count of total files uploaded
@@ -1117,7 +1132,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                 // Make sure to re schedule the job
                 JobUtil.scheduleCameraUploadJob(this)
                 endService()
-                FileUtil.purgeDirectory(tempRoot?.let { File(it) })
+                deleteCameraUploadTemporaryRootDirectory()
             }
         } else {
             Timber.d("Start to upload %d files.", finalList.size)
@@ -1565,13 +1580,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         createDefaultNotificationPendingIntent()
 
         coroutineScope?.launch {
-            tempRoot = "${File(cacheDir, CU_CACHE_FOLDER).absolutePath}${File.separator}"
-            val root = tempRoot?.let { File(it) }
-            if (root?.exists() == false) {
-                root.mkdirs()
+            runCatching { createTempRootFolder() }.onFailure {
+                Timber.w("Root path doesn't exist")
+                endService(aborted = true)
             }
             clearSyncRecords()
         }
+    }
+
+    private suspend fun createTempRootFolder() {
+        tempRoot = createCameraUploadTemporaryRootDirectory()
     }
 
     /**
@@ -1790,7 +1808,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                 // delete database record
                 deleteSyncRecord(path, isSecondary)
                 // delete temp files
-                if (tempRoot?.let { path.startsWith(it) } == true) {
+                if (path.startsWith(tempRoot)) {
                     val temp = File(path)
                     if (temp.exists()) {
                         temp.delete()
@@ -1870,8 +1888,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             if (shouldStartVideoCompression(totalVideoSize)) {
                 videoCompressionJob = coroutineScope?.launch {
                     Timber.d("Starting compressor")
-                    tempRoot?.let { root ->
-                        compressVideos(root, fullList).collect {
+                    runCatching {
+                        compressVideos(tempRoot, fullList).collect {
                             ensureActive()
                             when (it) {
                                 is VideoCompressionState.Failed -> {
@@ -1907,8 +1925,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                                 }
                             }
                         }
-                    } ?: run {
-                        Timber.w("Root path doesn't exist")
+                        videoCompressionJob?.cancel()
+                        videoCompressionJob = null
+                    }.onFailure {
+                        Timber.d("Video Compression Callback Exception $it")
                         endService(aborted = true)
                     }
                 }
@@ -1920,6 +1940,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         }
     }
 
+    @SuppressLint("StringFormatInvalid")
     private suspend fun showVideoCompressionErrorNotification() {
         val intent = Intent(this, ManagerActivity::class.java)
         intent.action = Constants.ACTION_SHOW_SETTINGS
@@ -1969,7 +1990,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     private fun onCompressUpdateProgress(
         progress: Int,
         currentFileIndex: Int,
-        totalCount: Int
+        totalCount: Int,
     ) {
         val message = getString(R.string.message_compress_video, "$progress%")
         val subText = getString(
@@ -2003,16 +2024,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                 val stat = StatFs(tempRoot)
                 val availableFreeSpace = stat.availableBytes.toDouble()
                 if (availableFreeSpace > srcFile.length()) {
-                    Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
-                    val newPath = record.newPath
-                    val temp = newPath?.let { File(it) }
                     setSyncRecordPendingByPath(localPath, isSecondary)
-                    if (newPath != null && tempRoot?.let { newPath.startsWith(it) } == true && temp != null && temp.exists()) {
-                        temp.delete()
+                    Timber.d("Can not compress but got enough disk space, so should be un-supported format issue")
+                    record.newPath?.let { newPath ->
+                        if (newPath.startsWith(tempRoot)) {
+                            File(newPath).takeIf { it.exists() }?.delete()
+                        }
                     }
-                } else {
-                    // record will remain in DB and will be re-compressed next launch
                 }
+                // record will remain in DB and will be re-compressed next launch
             } catch (ex: Exception) {
                 Timber.e(ex)
             }
@@ -2029,8 +2049,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      */
     private suspend fun onCompressFinished() {
         Timber.d("Video Compression Finished")
-        videoCompressionJob?.cancel()
-        videoCompressionJob = null
         Timber.d("Preparing to upload compressed video.")
         val compressedList = getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)
         if (compressedList.isNotEmpty()) {

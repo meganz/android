@@ -94,4 +94,9 @@ interface CacheFolderGateway {
      * Removes app data.
      */
     suspend fun clearAppData()
+
+    /**
+     * Returns cache directory of the app
+     */
+    val cacheDir: File
 }
