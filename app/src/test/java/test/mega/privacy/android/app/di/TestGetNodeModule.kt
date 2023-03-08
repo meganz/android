@@ -7,9 +7,9 @@ import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.CopyNode
+import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.OpenShareDialog
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
@@ -51,7 +51,7 @@ object TestGetNodeModule {
     }
 
     @Provides
-    fun provideOpenShareDialog() = mock<OpenShareDialog>()
+    fun provideOpenShareDialog() = mock<CreateShareKey>()
 
     @Provides
     fun provideUpgradeSecurity() = mock<UpgradeSecurity>()

@@ -33,7 +33,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getInt
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.recentactions.model.RecentActionItemType
 import mega.privacy.android.app.utils.Constants

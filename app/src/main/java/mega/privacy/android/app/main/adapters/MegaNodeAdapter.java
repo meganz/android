@@ -44,7 +44,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
-import android.util.Pair;
 import android.util.SparseBooleanArray;
 import android.util.TypedValue;
 import android.view.Display;
@@ -69,9 +68,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import mega.privacy.android.app.MegaApplication;
@@ -90,7 +87,7 @@ import mega.privacy.android.app.main.ContactFileListFragment;
 import mega.privacy.android.app.main.DrawerItem;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment;
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment;
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment;
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.inbox.InboxFragment;

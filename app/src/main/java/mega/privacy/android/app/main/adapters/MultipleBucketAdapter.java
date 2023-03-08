@@ -1,6 +1,6 @@
 package mega.privacy.android.app.main.adapters;
 
-import static mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
+import static mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment.RECENTS_MODE;
 import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.FileUtil.isAudioOrVideo;

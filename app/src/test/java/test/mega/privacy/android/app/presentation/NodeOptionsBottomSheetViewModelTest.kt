@@ -7,9 +7,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.OpenShareDialog
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetViewModel
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetViewModel
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -21,12 +21,12 @@ class NodeOptionsBottomSheetViewModelTest {
 
     private lateinit var underTest: NodeOptionsBottomSheetViewModel
     private val getNodeByHandle = mock<GetNodeByHandle>()
-    private val openShareDialog = mock<OpenShareDialog>()
+    private val createShareKey = mock<CreateShareKey>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = NodeOptionsBottomSheetViewModel(openShareDialog, getNodeByHandle)
+        underTest = NodeOptionsBottomSheetViewModel(createShareKey, getNodeByHandle)
     }
 
     @Test
@@ -34,7 +34,7 @@ class NodeOptionsBottomSheetViewModelTest {
         underTest.state.test {
             val initial = awaitItem()
             Truth.assertThat(initial.currentNodeHandle).isEqualTo(-1L)
-            Truth.assertThat(initial.isOpenShareDialogSuccess).isEqualTo(null)
+            Truth.assertThat(initial.isCreateShareKeySuccess).isEqualTo(null)
         }
     }
 
@@ -43,7 +43,7 @@ class NodeOptionsBottomSheetViewModelTest {
         underTest.callOpenShareDialog(3829183L)
         underTest.state.runCatching {
             this.test {
-                awaitItem().isOpenShareDialogSuccess?.let { assertTrue(it) }
+                awaitItem().isCreateShareKeySuccess?.let { assertTrue(it) }
             }
         }
     }
@@ -53,7 +53,7 @@ class NodeOptionsBottomSheetViewModelTest {
         underTest.callOpenShareDialog(-1)
         underTest.state.runCatching {
             this.test {
-                awaitItem().isOpenShareDialogSuccess?.let { assertFalse(it) }
+                awaitItem().isCreateShareKeySuccess?.let { assertFalse(it) }
             }
         }
     }

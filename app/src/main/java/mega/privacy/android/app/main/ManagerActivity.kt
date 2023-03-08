@@ -178,7 +178,6 @@ import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ManageTransferBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.OfflineOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.SortByBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment
@@ -189,6 +188,7 @@ import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel

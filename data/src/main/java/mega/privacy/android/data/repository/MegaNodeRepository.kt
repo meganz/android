@@ -352,7 +352,7 @@ interface MegaNodeRepository {
      * Creates a new share key for the node if there is no share key already created.
      * @param megaNode : [MegaNode] object which needs to be shared
      */
-    suspend fun openShareDialog(megaNode: MegaNode)
+    suspend fun createShareKey(megaNode: MegaNode)
 
     /**
      * Update cryptographic security

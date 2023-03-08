@@ -1,4 +1,4 @@
-package mega.privacy.android.app.modalbottomsheet
+package mega.privacy.android.app.presentation.bottomsheet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.OpenShareDialog
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeOptionsBottomSheetState
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -18,7 +19,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class NodeOptionsBottomSheetViewModel @Inject constructor(
-    private val openShareDialog: OpenShareDialog,
+    private val createShareKey: CreateShareKey,
     private val getNodeByHandle: GetNodeByHandle,
 ) : ViewModel() {
 
@@ -43,17 +44,17 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
             viewModelScope.launch {
                 if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
                     getNodeByHandle(nodeHandle)?.let { megaNode ->
-                        openShareDialog(megaNode)
+                        createShareKey(megaNode)
                     }
                 }
             }
         }.onSuccess {
             _state.update {
-                it.copy(isOpenShareDialogSuccess = true)
+                it.copy(isCreateShareKeySuccess = true)
             }
         }.onFailure {
             _state.update {
-                it.copy(isOpenShareDialogSuccess = false)
+                it.copy(isCreateShareKeySuccess = false)
             }
         }
     }
@@ -64,7 +65,7 @@ class NodeOptionsBottomSheetViewModel @Inject constructor(
     fun resetIsOpenShareDialogSuccess() {
         viewModelScope.launch {
             _state.update {
-                it.copy(isOpenShareDialogSuccess = null)
+                it.copy(isCreateShareKeySuccess = null)
             }
         }
     }

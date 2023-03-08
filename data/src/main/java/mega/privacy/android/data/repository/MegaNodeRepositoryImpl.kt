@@ -342,7 +342,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun openShareDialog(megaNode: MegaNode) = withContext(ioDispatcher) {
+    override suspend fun createShareKey(megaNode: MegaNode) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener { return@getRequestListener }
             megaApiGateway.openShareDialog(megaNode, listener)

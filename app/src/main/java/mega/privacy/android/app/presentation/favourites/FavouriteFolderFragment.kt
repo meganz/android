@@ -20,7 +20,7 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentFavouriteFolderBinding
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.favourites.adapter.FavouritesAdapter
 import mega.privacy.android.app.presentation.favourites.adapter.SelectAnimator
 import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper

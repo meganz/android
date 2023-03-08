@@ -5,7 +5,7 @@ import nz.mega.sdk.MegaNode
 /**
  * OpenShareDialog use case. This gets called when user shares a node using bottom sheet dialog
  */
-fun interface OpenShareDialog {
+fun interface CreateShareKey {
 
     /**
      * Invoke

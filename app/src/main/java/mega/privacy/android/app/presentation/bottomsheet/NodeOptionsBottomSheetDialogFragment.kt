@@ -1,4 +1,4 @@
-package mega.privacy.android.app.modalbottomsheet
+package mega.privacy.android.app.presentation.bottomsheet
 
 import android.annotation.SuppressLint
 import android.content.DialogInterface
@@ -33,8 +33,10 @@ import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.VersionsFileActivity
 import mega.privacy.android.app.main.controllers.NodeController
+import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeOptionsBottomSheetState
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
