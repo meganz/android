@@ -530,19 +530,6 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".receivers.CameraEventReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.android.camera.NEW_PICTURE" />
-                <action android:name="android.hardware.action.NEW_PICTURE" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="image/*" />
-            </intent-filter>
-        </receiver>
-        <receiver
             android:name=".receivers.ChargeEventReceiver"
             android:enabled="true"
             android:exported="false">

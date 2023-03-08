@@ -95,6 +95,7 @@ class DefaultCameraUploadRepositoryTest {
             videoAttachmentMapper = ::toVideoAttachment,
             uploadOptionMapper = mock(),
             uploadOptionIntMapper = mock(),
+            context = mock()
         )
     }
 

@@ -525,4 +525,10 @@ interface CameraUploadRepository {
         quality: VideoQuality,
         records: List<SyncRecord>,
     ): Flow<VideoCompressionState>
+
+    /**
+     * Listen to new media
+     *
+     */
+    suspend fun listenToNewMedia()
 }

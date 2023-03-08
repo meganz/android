@@ -24,7 +24,7 @@ import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
-import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus

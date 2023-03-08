@@ -1,5 +1,7 @@
 package mega.privacy.android.data.repository
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -25,6 +27,7 @@ import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
+import mega.privacy.android.data.worker.NewMediaWorker
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncRecord
@@ -85,6 +88,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val videoAttachmentMapper: VideoAttachmentMapper,
     private val uploadOptionMapper: UploadOptionMapper,
     private val uploadOptionIntMapper: UploadOptionIntMapper,
+    @ApplicationContext private val context: Context
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -563,5 +567,13 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             addItems(videoAttachmentMapper(records))
         }
         return videoCompressorGateway.start().flowOn(ioDispatcher)
+    }
+
+    override suspend fun listenToNewMedia() {
+        withContext(ioDispatcher) {
+            if (isSyncEnabled()) {
+                NewMediaWorker.scheduleWork(context, false)
+            }
+        }
     }
 }

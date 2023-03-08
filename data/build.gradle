@@ -89,6 +89,9 @@ dependencies {
 
     implementation "com.facebook.fresco:fresco:$frescoVersion"
 
+    implementation "androidx.work:work-runtime-ktx:$workVersion"
+    implementation "androidx.hilt:hilt-work:$hiltAndroidXCompilerVersion"
+
     // Testing dependencies
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
     androidTestImplementation "com.google.truth:truth:$truthVersion"

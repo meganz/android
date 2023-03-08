@@ -1,7 +1,6 @@
-package mega.privacy.android.app.utils.wrapper
+package mega.privacy.android.data.wrapper
 
 import android.content.Context
-import mega.privacy.android.app.utils.JobUtil
 
 /**
  * The interface for wrapping static [mega.privacy.android.app.utils.JobUtil] methods.
@@ -13,7 +12,7 @@ interface JobUtilWrapper {
      *
      * @return Whether the account is Over quota
      */
-    fun isOverQuota(): Boolean = JobUtil.isOverQuota
+    fun isOverQuota(): Boolean
 
     /**
      * Wrapper method that calls [JobUtil.fireCameraUploadJob]
@@ -22,30 +21,26 @@ interface JobUtilWrapper {
      *
      * @return an Integer value
      */
-    fun fireCameraUploadJob(context: Context): Int =
-        JobUtil.fireCameraUploadJob(context)
+    fun fireCameraUploadJob(context: Context): Int
 
     /**
      * Wrapper method that calls [JobUtil.fireStopCameraUploadJob]
      *
      * @param context [Context]
      */
-    fun fireStopCameraUploadJob(context: Context) =
-        JobUtil.fireStopCameraUploadJob(context)
+    fun fireStopCameraUploadJob(context: Context)
 
     /**
      * Wrapper method that calls [JobUtil.fireRestartCameraUploadJob]
      *
      * @param context [Context]
      */
-    fun fireRestartCameraUploadJob(context: Context) =
-        JobUtil.fireRestartCameraUploadJob(context)
+    fun fireRestartCameraUploadJob(context: Context)
 
     /**
      * Wrapper method that calls [JobUtil.stopCameraUploadSyncHeartbeatWorkers]
      *
      * @param context [Context]
      */
-    fun stopCameraUploadSyncHeartbeatWorkers(context: Context) =
-        JobUtil.stopCameraUploadSyncHeartbeatWorkers(context)
+    fun stopCameraUploadSyncHeartbeatWorkers(context: Context)
 }

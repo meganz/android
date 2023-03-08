@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import org.junit.Before
@@ -19,12 +20,14 @@ class DefaultEnablePhotosCameraUploadTest {
 
     private val settingsRepository = mock<SettingsRepository>()
     private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
+    private val cameraUploadRepository = mock<CameraUploadRepository>()
 
     @Before
     fun setUp() {
         underTest = DefaultEnablePhotosCameraUpload(
             settingsRepository = settingsRepository,
             setUploadVideoQuality = setUploadVideoQuality,
+            cameraUploadRepository = cameraUploadRepository,
         )
     }
 
@@ -44,7 +47,7 @@ class DefaultEnablePhotosCameraUploadTest {
             conversionChargingOnSize = expectedConversionChargingOnSize,
         )
 
-        val inOrder = inOrder(settingsRepository, setUploadVideoQuality)
+        val inOrder = inOrder(settingsRepository, setUploadVideoQuality, cameraUploadRepository)
 
         inOrder.verify(settingsRepository).setCameraUploadLocalPath(expectedPath)
         inOrder.verify(settingsRepository).setCamSyncWifi(!expectedEnableCellularSync)
@@ -54,6 +57,7 @@ class DefaultEnablePhotosCameraUploadTest {
         inOrder.verify(settingsRepository).setConversionOnCharging(true)
         inOrder.verify(settingsRepository).setChargingOnSize(expectedConversionChargingOnSize)
         inOrder.verify(settingsRepository).setEnableCameraUpload(true)
+        inOrder.verify(cameraUploadRepository).listenToNewMedia()
 
         inOrder.verifyNoMoreInteractions()
 

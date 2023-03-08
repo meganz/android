@@ -15,6 +15,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
@@ -25,7 +26,7 @@ import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
-import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
@@ -89,7 +90,21 @@ abstract class UtilWrapperModule {
 
         @Provides
         fun provideJobUtilWrapper(): JobUtilWrapper =
-            object : JobUtilWrapper {}
+            object : JobUtilWrapper {
+                override fun isOverQuota(): Boolean = JobUtil.isOverQuota
+
+                override fun fireCameraUploadJob(context: Context): Int =
+                    JobUtil.fireCameraUploadJob(context)
+
+                override fun fireStopCameraUploadJob(context: Context) =
+                    JobUtil.fireStopCameraUploadJob(context)
+
+                override fun fireRestartCameraUploadJob(context: Context) =
+                    JobUtil.fireRestartCameraUploadJob(context)
+
+                override fun stopCameraUploadSyncHeartbeatWorkers(context: Context) =
+                    JobUtil.stopCameraUploadSyncHeartbeatWorkers(context)
+            }
 
         @Provides
         fun provideFetchNodeWrapper(megaApiGateway: MegaApiGateway): FetchNodeWrapper =

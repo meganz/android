@@ -322,8 +322,6 @@ dependencies {
         implementation files('../sdk/src/main/jni/megachat/webrtc/libwebrtc.jar')
     }
 
-    // Java
-    implementation "androidx.work:work-runtime:$workVersion"
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$workVersion"
     // Java Code Coverage

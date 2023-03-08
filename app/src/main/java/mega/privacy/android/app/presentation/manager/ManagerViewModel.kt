@@ -65,8 +65,8 @@ import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.Check2FADialog
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.filenode.MonitorSecurityUpgrade
-import mega.privacy.android.domain.usecase.filenode.SetSecurityUpgrade
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaNode
@@ -139,6 +139,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val setLatestTargetPath: SetLatestTargetPath,
     private val monitorSecurityUpgrade: MonitorSecurityUpgrade,
+    private val listenToNewMedia: ListenToNewMedia,
 ) : ViewModel() {
 
     /**
@@ -229,6 +230,9 @@ class ManagerViewModel @Inject constructor(
                     setShouldAlertUserAboutSecurityUpgrade(true)
                 }
             }
+        }
+        viewModelScope.launch {
+            listenToNewMedia()
         }
     }
 

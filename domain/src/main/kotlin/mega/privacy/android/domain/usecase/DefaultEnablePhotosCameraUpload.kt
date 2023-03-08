@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import javax.inject.Inject
@@ -14,6 +15,7 @@ import javax.inject.Inject
 class DefaultEnablePhotosCameraUpload @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val setUploadVideoQuality: SetUploadVideoQuality,
+    private val cameraUploadRepository: CameraUploadRepository,
 ) : EnablePhotosCameraUpload {
 
     override suspend fun invoke(
@@ -34,5 +36,6 @@ class DefaultEnablePhotosCameraUpload @Inject constructor(
             // After target and local folder setup, then enable CU.
             setEnableCameraUpload(true)
         }
+        cameraUploadRepository.listenToNewMedia()
     }
 }

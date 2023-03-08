@@ -47,8 +47,8 @@ import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
-import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -157,6 +157,7 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
@@ -596,6 +597,14 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideSetUploadVideoSyncStatus(cameraUploadRepository: CameraUploadRepository): SetUploadVideoSyncStatus =
             SetUploadVideoSyncStatus(cameraUploadRepository::setUploadVideoSyncStatus)
+
+        /**
+         * Provide listener new photo
+         *
+         */
+        @Provides
+        fun provideListenToNewMedia(repository: CameraUploadRepository): ListenToNewMedia =
+            ListenToNewMedia(repository::listenToNewMedia)
     }
 
     /**

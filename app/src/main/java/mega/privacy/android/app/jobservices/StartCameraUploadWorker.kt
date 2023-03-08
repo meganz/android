@@ -11,7 +11,7 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
-import mega.privacy.android.app.utils.wrapper.JobUtilWrapper
+import mega.privacy.android.data.wrapper.JobUtilWrapper
 import timber.log.Timber
 
 /**

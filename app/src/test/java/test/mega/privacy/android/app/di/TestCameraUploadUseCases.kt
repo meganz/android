@@ -96,6 +96,7 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
@@ -392,4 +393,7 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideSetUploadVideoSyncStatus() = mock<SetUploadVideoSyncStatus>()
+
+    @Provides
+    fun provideListenToNewMedia() = mock<ListenToNewMedia>()
 }

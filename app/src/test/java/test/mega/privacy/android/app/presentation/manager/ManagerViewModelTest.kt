@@ -179,7 +179,8 @@ class ManagerViewModelTest {
             monitorVerificationStatus = { monitorVerificationStatus },
             check2FADialog = check2FADialog,
             setLatestTargetPath = setLatestTargetPath,
-            monitorSecurityUpgrade = { monitorSecurityUpgrade }
+            monitorSecurityUpgrade = { monitorSecurityUpgrade },
+            listenToNewMedia = mock()
         )
     }
 
