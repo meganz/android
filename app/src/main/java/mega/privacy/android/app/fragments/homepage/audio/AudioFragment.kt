@@ -34,8 +34,8 @@ import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.CLOUD_DRIVE_MODE
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.SEARCH_MODE
 import mega.privacy.android.app.utils.Constants.AUDIO_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.AUDIO_SEARCH_ADAPTER
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
@@ -55,7 +55,6 @@ import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.FileUtil.setStreamingIntentParams
 import mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
@@ -232,7 +231,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
                 it.hideKeyboardSearch()  // Make the snack bar visible to the user
                 it.showSnackbar(
                     SNACKBAR_TYPE,
-                    StringResourcesUtils.getString(R.string.error_server_connection_problem),
+                    getString(R.string.error_server_connection_problem),
                     MEGACHAT_INVALID_HANDLE
                 )
             }
@@ -363,7 +362,7 @@ class AudioFragment : Fragment(), HomepageSearchable {
             paramsSetSuccessfully = false
             showSnackbar(
                 activity, SNACKBAR_TYPE,
-                StringResourcesUtils.getString(R.string.intent_not_available),
+                getString(R.string.intent_not_available),
                 MEGACHAT_INVALID_HANDLE
             )
         }
@@ -374,10 +373,18 @@ class AudioFragment : Fragment(), HomepageSearchable {
             Timber.w("itemClick:noAvailableIntent")
             showSnackbar(
                 activity, SNACKBAR_TYPE,
-                StringResourcesUtils.getString(R.string.intent_not_available),
+                getString(R.string.intent_not_available),
                 MEGACHAT_INVALID_HANDLE
             )
-            callManager { it.saveNodesToDevice(listOf(node), true, false, false, false) }
+            callManager {
+                it.saveNodesToDevice(
+                    nodes = listOf(node),
+                    highPriority = true,
+                    isFolderLink = false,
+                    fromMediaViewer = false,
+                    fromChat = false
+                )
+            }
         }
     }
 

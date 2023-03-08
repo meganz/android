@@ -39,8 +39,8 @@ import mega.privacy.android.app.fragments.homepage.disableRecyclerViewAnimator
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.CLOUD_DRIVE_MODE
-import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.SEARCH_MODE
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.CLOUD_DRIVE_MODE
+import mega.privacy.android.app.modalbottomsheet.NodeOptionsBottomSheetDialogFragment.Companion.SEARCH_MODE
 import mega.privacy.android.app.modalbottomsheet.UploadBottomSheetDialogFragment.Companion.DOCUMENTS_UPLOAD
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_BROWSE_ADAPTER
 import mega.privacy.android.app.utils.Constants.DOCUMENTS_SEARCH_ADAPTER
@@ -55,7 +55,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
 import mega.privacy.android.app.utils.callManager
@@ -250,7 +249,7 @@ class DocumentsFragment : Fragment(), HomepageSearchable {
                 it.hideKeyboardSearch()  // Make the snack bar visible to the user
                 it.showSnackbar(
                     SNACKBAR_TYPE,
-                    StringResourcesUtils.getString(R.string.error_server_connection_problem),
+                    getString(R.string.error_server_connection_problem),
                     MEGACHAT_INVALID_HANDLE
                 )
             }
