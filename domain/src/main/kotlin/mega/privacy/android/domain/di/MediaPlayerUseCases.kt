@@ -16,9 +16,9 @@ import mega.privacy.android.domain.usecase.DefaultGetAudioNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.DefaultGetAudiosByParentHandleFromMegaApiFolder
 import mega.privacy.android.domain.usecase.DefaultGetNodesByHandles
 import mega.privacy.android.domain.usecase.DefaultGetTicker
-import mega.privacy.android.domain.usecase.DefaultGetVideoNodesByParentHandle
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodes
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesByEmail
+import mega.privacy.android.domain.usecase.DefaultGetVideoNodesByParentHandle
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromInShares
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.DefaultGetVideoNodesFromPublicLinks
@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.GetAudioNodesFromInShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.GetAudiosByParentHandleFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandle
 import mega.privacy.android.domain.usecase.GetInboxNode
 import mega.privacy.android.domain.usecase.GetLocalFilePath
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApi
@@ -43,19 +44,19 @@ import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetRootNode
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetRubbishNode
+import mega.privacy.android.domain.usecase.GetSubtitleFileInfoList
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetTicker
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
 import mega.privacy.android.domain.usecase.GetUserNameByEmail
-import mega.privacy.android.domain.usecase.GetVideoNodesByParentHandle
 import mega.privacy.android.domain.usecase.GetVideoNodes
 import mega.privacy.android.domain.usecase.GetVideoNodesByEmail
+import mega.privacy.android.domain.usecase.GetVideoNodesByParentHandle
 import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.GetVideosByParentHandleFromMegaApiFolder
-import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandle
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerSetMaxBufferSize
 import mega.privacy.android.domain.usecase.MegaApiFolderHttpServerStart
@@ -372,5 +373,12 @@ abstract class MediaPlayerUseCases {
         @Provides
         fun provideHttpServerGetLocalLink(mediaPlayerRepository: MediaPlayerRepository): GetFileUrlByNodeHandle =
             GetFileUrlByNodeHandle(mediaPlayerRepository::getFileUrlByNodeHandle)
+
+        /**
+         * Provide implementation for [GetSubtitleFileInfoList]
+         */
+        @Provides
+        fun provideGetSubtitleFileInfoList(mediaPlayerRepository: MediaPlayerRepository): GetSubtitleFileInfoList =
+            GetSubtitleFileInfoList(mediaPlayerRepository::getSubtitleFileInfoList)
     }
 }

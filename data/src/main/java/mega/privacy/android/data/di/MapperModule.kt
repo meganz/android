@@ -100,6 +100,8 @@ import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
 import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.HandleListMapperImpl
+import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
+import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapperImpl
 import mega.privacy.android.data.mapper.SortOrderIntMapperImpl
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
@@ -228,6 +230,11 @@ internal abstract class MapperModule {
     @Binds
     abstract fun bindHandleListMapper(implementation: HandleListMapperImpl): HandleListMapper
 
+    /**
+     * Provide Subtitle file info mapper
+     */
+    @Binds
+    abstract fun bindSubtitleFileInfoMapper(implementation: SubtitleFileInfoMapperImpl): SubtitleFileInfoMapper
 
     companion object {
         /**
@@ -385,11 +392,7 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
-            getMimeType(
-                extension,
-                MimeTypeMap.getSingleton()
-                ::getMimeTypeFromExtension
-            )
+            getMimeType(extension, MimeTypeMap.getSingleton()::getMimeTypeFromExtension)
         }
 
 
@@ -404,8 +407,7 @@ internal abstract class MapperModule {
          * Provide user account mapper
          */
         @Provides
-        fun provideUserAccountMapper(): UserAccountMapper =
-            ::UserAccount
+        fun provideUserAccountMapper(): UserAccountMapper = ::UserAccount
 
         /**
          * Provide local pricing mapper
@@ -628,8 +630,7 @@ internal abstract class MapperModule {
          * Provide account level detail mapper
          */
         @Provides
-        fun provideAccountLevelDetailMapper(): AccountLevelDetailMapper =
-            ::toAccountLevelDetail
+        fun provideAccountLevelDetailMapper(): AccountLevelDetailMapper = ::toAccountLevelDetail
 
         /**
          * Provide file duration mapper

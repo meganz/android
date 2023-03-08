@@ -681,7 +681,11 @@ internal class MegaApiFacade @Inject constructor(
     override fun createSetElement(sid: Long, node: Long, listener: MegaRequestListenerInterface) =
         megaApi.createSetElement(sid, node, "", listener)
 
-    override suspend fun removeSetElement(sid: Long, eid: Long, listener: MegaRequestListenerInterface) =
+    override suspend fun removeSetElement(
+        sid: Long,
+        eid: Long,
+        listener: MegaRequestListenerInterface,
+    ) =
         megaApi.removeSetElement(sid, eid, listener)
 
     override suspend fun getSets(): MegaSetList = megaApi.sets
@@ -1019,4 +1023,5 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.multiFactorAuthLogin(email, password, pin, listener)
 
+    override suspend fun getNodePath(node: MegaNode): String? = megaApi.getNodePath(node)
 }

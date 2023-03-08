@@ -1956,4 +1956,12 @@ interface MegaApiGateway {
         pin: String,
         listener: MegaRequestListenerInterface,
     )
+
+    /**
+     * Get the path of a MegaNode
+     *
+     * @param node MegaNode for which the path will be returned
+     * @return The path of the node
+     */
+    suspend fun getNodePath(node: MegaNode): String?
 }

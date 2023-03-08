@@ -16,6 +16,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
@@ -47,6 +48,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val getFolderType = mock<GetFolderType>()
     private val sortOrderIntMapper = mock<SortOrderIntMapper>()
     private val appPreferencesGateway = mock<AppPreferencesGateway>()
+    private val subtitleFileInfoMapper = mock<SubtitleFileInfoMapper>()
 
     private val expectedHandle = 100L
     private val expectedParentHandle = 999L
@@ -91,7 +93,8 @@ class DefaultMediaPlayerRepositoryTest {
             fileGateway = fileGateway,
             sortOrderIntMapper = sortOrderIntMapper,
             appPreferencesGateway = appPreferencesGateway,
-            ioDispatcher = UnconfinedTestDispatcher()
+            ioDispatcher = UnconfinedTestDispatcher(),
+            subtitleFileInfoMapper = subtitleFileInfoMapper,
         )
     }
 
@@ -254,6 +257,25 @@ class DefaultMediaPlayerRepositoryTest {
             val actual = underTest.monitorPlaybackTimes().firstOrNull()
 
             assertThat(actual?.containsKey(expectedDeleteMediaId)).isFalse()
+        }
+
+    @Test
+    fun `test that searchSubtitleFileInfoList return the empty list`() =
+        runTest {
+            val expectedName = "SubtitleTestName.srt"
+            val expectedUrl = "subtitleUrl.com"
+            val expectedMegaNode = mock<MegaNode> {
+                on { name }.thenReturn(expectedName)
+            }
+            whenever(megaApi.httpServerGetLocalLink(expectedMegaNode)).thenReturn(expectedUrl)
+            whenever(megaApi.search(any(),
+                any(),
+                any(),
+                any())).thenReturn(listOf(expectedMegaNode))
+
+            val actual = underTest.getSubtitleFileInfoList(".srt")
+
+            assertThat(actual).isEmpty()
         }
 
     private fun createMegaNode(isFolder: Boolean) = mock<MegaNode> {

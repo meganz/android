@@ -3,6 +3,7 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.MegaException
@@ -346,4 +347,12 @@ interface MediaPlayerRepository {
      * @return local link
      */
     suspend fun getFileUrlByNodeHandle(handle: Long): String?
+
+    /**
+     * Get subtitle file info list
+     *
+     * @param fileSuffix subtitle suffix
+     * @return [SubtitleFileInfo] list
+     */
+    suspend fun getSubtitleFileInfoList(fileSuffix: String): List<SubtitleFileInfo>
 }

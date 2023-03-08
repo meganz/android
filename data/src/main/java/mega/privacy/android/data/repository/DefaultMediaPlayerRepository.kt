@@ -19,6 +19,7 @@ import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.model.MimeTypeList
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
@@ -28,6 +29,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_AUDIO
 import nz.mega.sdk.MegaApiJava.FILE_TYPE_VIDEO
+import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_DESC
 import nz.mega.sdk.MegaApiJava.SEARCH_TARGET_ROOTNODE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -50,6 +52,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val appPreferencesGateway: AppPreferencesGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val subtitleFileInfoMapper: SubtitleFileInfoMapper,
 ) : MediaPlayerRepository {
 
     private val playbackInfoMap = mutableMapOf<Long, PlaybackInformation>()
@@ -465,6 +468,24 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     override suspend fun getFileUrlByNodeHandle(handle: Long): String? =
         megaApi.getMegaNodeByHandle(handle)?.let { node ->
             megaApi.httpServerGetLocalLink(node)
+        }
+
+    override suspend fun getSubtitleFileInfoList(fileSuffix: String) =
+        withContext(ioDispatcher) {
+            megaApi.getRootNode()?.let { rootNode ->
+                megaApi.search(
+                    parent = rootNode,
+                    query = fileSuffix,
+                    megaCancelToken = MegaCancelToken.createInstance(),
+                    order = ORDER_DEFAULT_DESC
+                )
+            }?.map { megaNode ->
+                subtitleFileInfoMapper(
+                    name = megaNode.name,
+                    url = megaApi.httpServerGetLocalLink(megaNode),
+                    path = megaApi.getNodePath(megaNode)
+                )
+            } ?: emptyList()
         }
 
     private fun filterByNodeName(isAudio: Boolean, name: String): Boolean =
