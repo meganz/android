@@ -704,6 +704,24 @@
         <item name="android:paddingBottom">9dp</item>
     </style>
 
+    <style name="ScheduledMeetingBanner">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:background">@drawable/background_scheduled_meeting_banner</item>
+        <item name="android:elevation">2dp</item>
+        <item name="android:ellipsize">middle</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/white_black</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+    </style>
+
     <style name="Widget.Mega.TimeBar" parent="ExoStyledControls.TimeBar">
         <item name="bar_height">2dp</item>
         <item name="buffered_color">@color/grey_300_grey_600</item>

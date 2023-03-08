@@ -4627,4 +4627,8 @@
     <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Join</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">Start meeting</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">Join meeting</string>
 </resources>

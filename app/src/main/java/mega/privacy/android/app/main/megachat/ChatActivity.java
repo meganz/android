@@ -38,6 +38,8 @@ import static mega.privacy.android.app.main.megachat.MapsActivity.LONGITUDE;
 import static mega.privacy.android.app.main.megachat.MapsActivity.MSG_ID;
 import static mega.privacy.android.app.main.megachat.MapsActivity.SNAPSHOT;
 import static mega.privacy.android.app.main.megachat.MapsActivity.getAddresses;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_ACTION_IN;
+import static mega.privacy.android.app.meeting.activity.MeetingActivity.MEETING_CHAT_ID;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown;
 import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith;
 import static mega.privacy.android.app.providers.FileProviderActivity.FROM_MEGA_APP;
@@ -367,6 +369,7 @@ import mega.privacy.android.app.main.listeners.ChatLinkInfoListener;
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaChatAdapter;
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService;
+import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment;
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway;
 import mega.privacy.android.app.meeting.listeners.HangChatCallListener;
@@ -412,6 +415,7 @@ import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
 import mega.privacy.android.domain.entity.chat.FileGalleryItem;
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus;
 import mega.privacy.android.domain.usecase.GetPushToken;
 import nz.mega.documentscanner.DocumentScannerActivity;
 import nz.mega.sdk.MegaApiAndroid;
@@ -677,6 +681,7 @@ public class ChatActivity extends PasscodeActivity
     private RelativeLayout callInProgressLayout;
     private long chatIdBanner;
     private TextView callInProgressText;
+    private TextView startOrJoinMeetingBanner;
     private Chronometer callInProgressChrono;
     private boolean startVideo = false;
 
@@ -1009,6 +1014,7 @@ public class ChatActivity extends PasscodeActivity
             }
 
             idChat = request.getChatHandle();
+            viewModel.setChatId(idChat);
 
             composite.clear();
             checkChatChanges();
@@ -1102,7 +1108,7 @@ public class ChatActivity extends PasscodeActivity
         }
 
         callInProgressLayout.setEnabled(false);
-        viewModel.onAnswerCall(chatId, enableVideo, enableAudio, speaker);
+        viewModel.onAnswerCall(chatId, enableVideo, enableAudio);
     }
 
     /**
@@ -1767,6 +1773,10 @@ public class ChatActivity extends PasscodeActivity
         returnCallOnHoldButton.setOnClickListener(this);
         returnCallOnHoldButton.setVisibility(View.GONE);
 
+        startOrJoinMeetingBanner = findViewById(R.id.start_or_join_meeting_banner);
+        startOrJoinMeetingBanner.setVisibility(View.GONE);
+        startOrJoinMeetingBanner.setOnClickListener(this);
+
         /*Recording views*/
         recordingLayout = findViewById(R.id.recording_layout);
         recordingChrono = findViewById(R.id.recording_time);
@@ -2055,6 +2065,31 @@ public class ChatActivity extends PasscodeActivity
             } else if (chatState.isCallAnswered()) {
                 callInProgressLayout.setEnabled(true);
             }
+
+            ScheduledMeetingStatus schedMeetStatus = chatState.getScheduledMeetingStatus();
+            if (schedMeetStatus != null && (schedMeetStatus == ScheduledMeetingStatus.NotStarted ||
+                    schedMeetStatus == ScheduledMeetingStatus.NotJoined)) {
+
+                startOrJoinMeetingBanner.setText(schedMeetStatus == ScheduledMeetingStatus.NotStarted ?
+                        R.string.meetings_chat_room_start_scheduled_meeting_option :
+                        R.string.meetings_chat_room_join_scheduled_meeting_option);
+                startOrJoinMeetingBanner.setVisibility(View.VISIBLE);
+                callInProgressLayout.setVisibility(View.GONE);
+            } else {
+                startOrJoinMeetingBanner.setVisibility(View.GONE);
+            }
+
+            if (chatState.getCurrentCallChatId() != MEGACHAT_INVALID_HANDLE) {
+                viewModel.removeCurrentCall();
+                Intent intentMeeting = new Intent(chatActivity, MeetingActivity.class);
+                intentMeeting.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intentMeeting.setAction(MEETING_ACTION_IN);
+                intentMeeting.putExtra(MEETING_CHAT_ID, chatState.getCurrentCallChatId());
+                intentMeeting.putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, true);
+                intentMeeting.putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, false);
+                startActivity(intentMeeting);
+            }
+
             return Unit.INSTANCE;
         });
         ViewExtensionsKt.collectFlow(this, viewModel.getMonitorConnectivityEvent(), Lifecycle.State.STARTED, isConnected -> {
@@ -2091,6 +2126,7 @@ public class ChatActivity extends PasscodeActivity
                     if (idChat != newIdChat && newIdChat != MEGACHAT_INVALID_HANDLE) {
                         megaChatApi.closeChatRoom(idChat, this);
                         idChat = newIdChat;
+                        viewModel.setChatId(idChat);
                     }
 
                     composite.clear();
@@ -4552,6 +4588,10 @@ public class ChatActivity extends PasscodeActivity
                     megaChatApi.autojoinPublicChat(idChat, this);
                 }
 
+                break;
+
+            case R.id.start_or_join_meeting_banner:
+                viewModel.startOrJoinSchedMeeting();
                 break;
 
         }
@@ -9189,7 +9229,8 @@ public class ChatActivity extends PasscodeActivity
 
         chatIdBanner = call.getChatid();
 
-        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE) {
+        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE &&
+                startOrJoinMeetingBanner.getVisibility() != View.VISIBLE) {
             callInProgressLayout.setAlpha(1);
             callInProgressLayout.setVisibility(View.VISIBLE);
             callInProgressLayout.setOnClickListener(this);

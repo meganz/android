@@ -378,6 +378,13 @@
                 android:layout_height="48dp"
                 android:layout_below="@id/toolbar_chat"/>
 
+            <include
+                layout="@layout/item_start_or_join_scheduled_meeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/toolbar_chat"/>
+
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

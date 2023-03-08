@@ -226,10 +226,6 @@ class RecurringMeetingInfoViewModel @Inject constructor(
     private fun isMainScheduledMeeting(scheduledMeet: ChatScheduledMeeting): Boolean =
         scheduledMeet.parentSchedId == megaChatApiGateway.getChatInvalidHandle()
 
-
-    /**
-     * Get scheduled meeting updates
-     */
     /**
      * Get scheduled meeting updates
      */
