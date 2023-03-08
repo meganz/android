@@ -671,4 +671,16 @@ interface MegaLocalStorageGateway {
      * Clear MegaContacts.
      */
     suspend fun clearMegaContacts()
+
+    /**
+     * Load offline nodes
+     *
+     * @param path
+     * @param searchQuery
+     * @return List of [OfflineInformation]
+     */
+    suspend fun loadOfflineNodes(
+        path: String,
+        searchQuery: String?
+    ): List<OfflineInformation>
 }
