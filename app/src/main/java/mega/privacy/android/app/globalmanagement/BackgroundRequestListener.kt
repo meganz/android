@@ -7,7 +7,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.listeners.GetCameraUploadAttributeListener
 import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FETCH_NODES_FINISHED
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -22,7 +21,6 @@ import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -161,11 +159,6 @@ class BackgroundRequestListener @Inject constructor(
             if (dbH.myChatFilesFolderHandle == INVALID_HANDLE) {
                 megaApi.getMyChatFilesFolder(listener)
             }
-
-            //Ask for MU and CU folder when App in init state
-            Timber.d("Get CameraUpload attribute on fetch nodes.")
-            megaApi.getUserAttribute(USER_ATTR_CAMERA_UPLOADS_FOLDER,
-                GetCameraUploadAttributeListener(application))
 
             // Init CU sync data after login successfully
             CUBackupInitializeChecker(megaApi).initCuSync()

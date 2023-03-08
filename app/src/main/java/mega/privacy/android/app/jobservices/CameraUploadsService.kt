@@ -915,12 +915,14 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
 
     private suspend fun handleAttributeHandles(handles: Pair<Long, Long>) {
         handles.first.let { primary ->
-            if (!resetCameraUploadTimelines(primary, false)) {
+            if (!isNodeInRubbishOrDeleted(primary)) {
+                resetCameraUploadTimelines(primary, false)
                 setPrimarySyncHandle(primary)
             }
         }
         handles.second.let { secondary ->
-            if (!resetCameraUploadTimelines(secondary, true)) {
+            if (!isNodeInRubbishOrDeleted(secondary)) {
+                resetCameraUploadTimelines(secondary, true)
                 setSecondarySyncHandle(secondary)
             }
         }
@@ -1700,44 +1702,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             return
         }
         Timber.w("No notification to cancel")
-    }
-
-    /**
-     * Callback when getting Primary folder handle from Primary attributes completes.
-     *
-     * @param handle      Primary folder handle stored in Primary attributes.
-     * @param shouldStart If should start worker for camera upload.
-     */
-    fun onGetPrimaryFolderAttribute(handle: Long, shouldStart: Boolean) {
-        coroutineScope?.launch {
-            Timber.d("Current Handle: $handle, Should Start Camera Uploads Worker: $shouldStart")
-            val primarySyncHandle = getPrimarySyncHandle()
-            Timber.d("Primary Sync Handle: $primarySyncHandle")
-            if (primarySyncHandle != handle) {
-                Timber.w("Current and Primary Sync Handles are not equal. Set Primary Sync Handle to Current Handle $handle")
-                setPrimarySyncHandle(handle)
-            }
-            if (shouldStart) {
-                Timber.d("On Get Primary - Start Coroutine")
-                startWorker()
-            }
-        }
-    }
-
-    /**
-     * Callback when getting MU folder handle from CU attributes completes.
-     *
-     * @param handle    MU folder handle stored in CU attributes.
-     */
-    fun onGetSecondaryFolderAttribute(handle: Long) {
-        coroutineScope?.launch {
-            if (getSecondarySyncHandle() != handle) {
-                setSecondarySyncHandle(handle)
-            }
-            // Start upload now - unlike in onGetPrimaryFolderAttribute where it needs to wait for getting Media Uploads folder handle to complete
-            Timber.d("On Get Secondary - Start Coroutine")
-            startWorker()
-        }
     }
 
     private suspend fun transferFinished(transfer: MegaTransfer, e: MegaError) {

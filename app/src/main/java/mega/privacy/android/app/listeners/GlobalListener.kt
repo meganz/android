@@ -94,15 +94,6 @@ class GlobalListener @Inject constructor(
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER) && isMyChange) {
                 api.getMyChatFilesFolder(GetAttrUserListener(appContext, true))
             }
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_CAMERA_UPLOADS_FOLDER) && isMyChange) {
-                //user has change CU attribute, need to update local ones
-                Timber.d("Get CameraUpload attribute when change on other client.")
-                api.getUserAttribute(
-                    MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER,
-                    GetCameraUploadAttributeListener(appContext)
-                )
-                return@forEach
-            }
             if (user.hasChanged(MegaUser.CHANGE_TYPE_RICH_PREVIEWS) && isMyChange) {
                 api.shouldShowRichLinkWarning(GetAttrUserListener(appContext))
                 api.isRichPreviewsEnabled(GetAttrUserListener(appContext))
