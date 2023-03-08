@@ -26,6 +26,8 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.setSe
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryFolderTargetNode
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryFolderTargetNode
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.FileUtil
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
@@ -48,7 +50,9 @@ import mega.privacy.android.domain.entity.VideoQuality
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
+import java.io.File
 import java.util.Collections
+import java.util.Locale
 
 /**
  * Sqlite implementation of database handler
@@ -4493,6 +4497,121 @@ class SqliteDatabaseHandler(
             Timber.e(e, "Exception opening or managing DB cursor")
         }
         return null
+    }
+
+    override suspend fun getOfflineInformationList(
+        nodePath: String,
+        searchQuery: String?,
+    ): List<OfflineInformation> {
+        return if (searchQuery != null && searchQuery.isNotEmpty()) {
+            searchOfflineInformationByQuery(nodePath, searchQuery)
+        } else {
+            searchOfflineInformationByPath(nodePath)
+        }
+    }
+
+    /**
+     * Search [OfflineInformation] by path
+     *
+     * @param nodePath
+     * @return list of [OfflineInformation]
+     */
+    private fun searchOfflineInformationByPath(nodePath: String): List<OfflineInformation> {
+        val offlineInformationList = mutableListOf<OfflineInformation>()
+        //Get the foreign key of the node
+        val selectQuery =
+            "SELECT * FROM $TABLE_OFFLINE WHERE $KEY_OFF_PATH = '${encrypt(nodePath)}'"
+        try {
+            db.rawQuery(selectQuery, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    do {
+                        val id = cursor.getString(0).toInt()
+                        val handle = decrypt(cursor.getString(1))
+                        val path = decrypt(cursor.getString(2))
+                        val name = decrypt(cursor.getString(3))
+                        val parent = cursor.getInt(4)
+                        val type = decrypt(cursor.getString(5))
+                        val incoming = cursor.getInt(6)
+                        val handleIncoming = decrypt(cursor.getString(7))
+                        offlineInformationList.add(
+                            OfflineInformation(
+                                id,
+                                handle.toString(),
+                                path.toString(),
+                                name.toString(),
+                                parent,
+                                type,
+                                incoming,
+                                handleIncoming.toString()
+                            )
+                        )
+                    } while (cursor.moveToNext())
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Exception opening or managing DB cursor")
+        }
+        return offlineInformationList
+    }
+
+    /**
+     * Search [OfflineInformation] by query
+     *
+     * @param path
+     * @param searchQuery
+     * @return list of [OfflineInformation]
+     */
+    private fun searchOfflineInformationByQuery(
+        path: String,
+        searchQuery: String,
+    ): List<OfflineInformation> {
+        val offlineInformationList = mutableListOf<OfflineInformation>()
+        val nodes = findByPath(path)
+        for (node in nodes) {
+            if (node.isFolder) {
+                offlineInformationList.addAll(
+                    searchOfflineInformationByQuery(
+                        getChildPath(node),
+                        searchQuery
+                    )
+                )
+            }
+
+            if (node.name.lowercase(Locale.ROOT).contains(searchQuery.lowercase(Locale.ROOT)) &&
+                FileUtil.isFileAvailable(
+                    OfflineUtils.getOfflineFile(
+                        MegaApplication.getInstance(),
+                        node
+                    )
+                )
+            ) {
+                offlineInformationList.add(
+                    OfflineInformation(
+                        node.id,
+                        node.handle,
+                        node.path,
+                        node.name,
+                        node.parentId,
+                        node.type,
+                        node.origin,
+                        node.handleIncoming
+                    )
+                )
+            }
+        }
+        return offlineInformationList
+    }
+
+    /**
+     * Get  path of the node
+     * @param offline : [MegaOffline]
+     */
+    private fun getChildPath(offline: MegaOffline): String {
+        return if (offline.path.endsWith(File.separator)) {
+            offline.path + offline.name + File.separator
+        } else {
+            offline.path + File.separator + offline.name + File.separator
+        }
     }
 
     /**

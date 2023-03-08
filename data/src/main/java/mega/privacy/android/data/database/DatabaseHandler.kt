@@ -309,4 +309,17 @@ interface DatabaseHandler {
      * @return Offline information if available
      */
     suspend fun getOfflineInformation(handle: Long): OfflineInformation?
+
+    /**
+     * Get list of [OfflineInformation]
+     *
+     * @param nodePath
+     * @param searchQuery
+     *
+     * @return List of [OfflineInformation]
+     */
+    suspend fun getOfflineInformationList(
+        nodePath: String,
+        searchQuery: String?
+    ): List<OfflineInformation>
 }
