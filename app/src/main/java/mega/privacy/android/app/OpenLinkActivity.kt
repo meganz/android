@@ -1,8 +1,12 @@
 package mega.privacy.android.app
 
+import android.content.ComponentName
 import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,6 +64,7 @@ import mega.privacy.android.app.utils.Constants.LINK_IS_FOR_MEETING
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.MEGA_BLOG_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.MEGA_DROP_LINK_REGEXS
+import mega.privacy.android.app.utils.Constants.MEGA_FILE_REQUEST_LINK_REGEXES
 import mega.privacy.android.app.utils.Constants.MEGA_REGEXS
 import mega.privacy.android.app.utils.Constants.NEW_MESSAGE_CHAT_LINK_REGEXS
 import mega.privacy.android.app.utils.Constants.OPENED_FROM_CHAT
@@ -164,7 +169,12 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             //MEGA DROP link
             matchRegexs(url, MEGA_DROP_LINK_REGEXS) -> {
                 Timber.d("Open MEGA drop link")
-                openWebLink(url)
+                openWebLinkInBrowser(url)
+            }
+            //MEGA File Request
+            matchRegexs(url, MEGA_FILE_REQUEST_LINK_REGEXES) -> {
+                Timber.d("Open MEGA file request link")
+                openWebLinkInBrowser(url)
             }
             // File link
             matchRegexs(url, FILE_LINK_REGEXS) -> {
@@ -503,6 +513,49 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             )
             finish()
         }
+
+    private fun openWebLinkInBrowser(url: String?) = url?.let {
+        val intent = Intent(ACTION_VIEW).apply { data = Uri.parse(url) }
+
+        // On Android 12+ devices, Intent.createChooser cannot properly show browser list.
+        // So workaround here: get list of browsers and insert into initial list of
+        // chooser.
+        val initialBrowserList = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val browserActivities = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                packageManager.queryIntentActivities(
+                    intent,
+                    PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_ALL.toLong())
+                )
+            } else {
+                packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+            }
+            browserActivities
+                .filterNot { it.activityInfo.packageName.contains(packageName) }
+                .map {
+                    Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                        `package` = it.activityInfo.packageName
+                    }
+                }.takeIf { it.isNotEmpty() }
+        } else {
+            null
+        }
+
+        val chooserIntent = Intent.createChooser(intent, null).apply {
+            putExtra(
+                Intent.EXTRA_EXCLUDE_COMPONENTS,
+                arrayOf(
+                    ComponentName(this@OpenLinkActivity, OpenLinkActivity::class.java)
+                )
+            )
+
+            initialBrowserList?.let {
+                putExtra(Intent.EXTRA_INITIAL_INTENTS, it.toTypedArray())
+            }
+        }
+        startActivity(chooserIntent)
+        finish()
+
+    }
 
     override fun onRequestStart(p0: MegaApiJava?, p1: MegaRequest?) {
         Timber.d("onRequestStart")

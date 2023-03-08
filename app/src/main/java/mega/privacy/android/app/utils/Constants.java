@@ -787,6 +787,11 @@ public class Constants {
             "^https://mega\\.nz/.*megadrop/.+$"
     };
 
+    public static final String[] MEGA_FILE_REQUEST_LINK_REGEXES = {
+            "^https://mega\\.co\\.nz/.*filerequest/.+$",
+            "^https://mega\\.nz/.*filerequest/.+$"
+    };
+
     public static final String[] MEGA_BLOG_LINK_REGEXS = {
             "^https://mega\\.co\\.nz/.*#blog",
             "^https://mega\\.nz/.*#blog",
