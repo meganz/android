@@ -126,7 +126,7 @@ internal class CallRepositoryImpl @Inject constructor(
 
     override suspend fun getAllScheduledMeetings(): List<ChatScheduledMeeting>? =
         withContext(dispatcher) {
-            megaChatApiGateway.getAllScheduledMeetings()?.map(chatScheduledMeetingMapper)
+            megaChatApiGateway.getAllScheduledMeetings()?.map { chatScheduledMeetingMapper(it) }
         }
 
     override suspend fun getScheduledMeeting(
@@ -135,14 +135,14 @@ internal class CallRepositoryImpl @Inject constructor(
     ): ChatScheduledMeeting? =
         withContext(dispatcher) {
             megaChatApiGateway.getScheduledMeeting(chatId, scheduledMeetingId)
-                ?.let(chatScheduledMeetingMapper)
+                ?.let { chatScheduledMeetingMapper(it) }
         }
 
     override suspend fun getScheduledMeetingsByChat(chatId: Long): List<ChatScheduledMeeting>? =
         withContext(dispatcher) {
             megaChatApiGateway.getScheduledMeetingsByChat(chatId)
                 ?.filter { it.parentSchedId() == megaChatApiGateway.getChatInvalidHandle() }
-                ?.map(chatScheduledMeetingMapper)
+                ?.map { chatScheduledMeetingMapper(it) }
         }
 
     override suspend fun fetchScheduledMeetingOccurrencesByChat(
@@ -225,7 +225,7 @@ internal class CallRepositoryImpl @Inject constructor(
         megaChatApiGateway.scheduledMeetingUpdates
             .filterIsInstance<ScheduledMeetingUpdate.OnChatSchedMeetingUpdate>()
             .mapNotNull { it.item }
-            .map(chatScheduledMeetingMapper)
+            .map { chatScheduledMeetingMapper(it) }
             .flowOn(dispatcher)
 
 

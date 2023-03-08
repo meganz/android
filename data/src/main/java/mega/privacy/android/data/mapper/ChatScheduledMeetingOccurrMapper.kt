@@ -4,20 +4,9 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import nz.mega.sdk.MegaChatScheduledMeetingOccurr
 
 /**
- * Mapper to convert [MegaChatScheduledMeetingOccurr] to [ChatScheduledMeetingOccurr]
+ * Chat scheduled meeting occurr mapper
  */
-typealias ChatScheduledMeetingOccurrMapper = (@JvmSuppressWildcards MegaChatScheduledMeetingOccurr) -> @JvmSuppressWildcards ChatScheduledMeetingOccurr
+internal fun interface ChatScheduledMeetingOccurrMapper {
 
-internal fun toChatScheduledMeetingOccur(megaChatScheduledMeetingOccurr: MegaChatScheduledMeetingOccurr): ChatScheduledMeetingOccurr =
-    ChatScheduledMeetingOccurr(
-        megaChatScheduledMeetingOccurr.schedId(),
-        megaChatScheduledMeetingOccurr.parentSchedId(),
-        megaChatScheduledMeetingOccurr.isCancelled(),
-        megaChatScheduledMeetingOccurr.timezone(),
-        megaChatScheduledMeetingOccurr.startDateTime(),
-        megaChatScheduledMeetingOccurr.endDateTime(),
-        megaChatScheduledMeetingOccurr.overrides(),
-    )
-
-private fun MegaChatScheduledMeetingOccurr.isCancelled(): Boolean =
-    cancelled() != null && cancelled() > 0
+    operator fun invoke(megaChatScheduledMeetingOccurr: MegaChatScheduledMeetingOccurr): ChatScheduledMeetingOccurr
+}

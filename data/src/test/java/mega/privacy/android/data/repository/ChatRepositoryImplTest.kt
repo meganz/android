@@ -16,8 +16,6 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
-import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
-import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -51,8 +49,6 @@ class ChatRepositoryImplTest {
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val chatRoomMapper = mock<ChatRoomMapper>()
     private val combinedChatRoomMapper = mock<CombinedChatRoomMapper>()
-    private val chatScheduledMeetingMapper = mock<ChatScheduledMeetingMapper>()
-    private val chatScheduledMeetingOccurrMapper = mock<ChatScheduledMeetingOccurrMapper>()
     private val chatListItemMapper = mock<ChatListItemMapper>()
     private val sharingScope = mock<CoroutineScope>()
     private val broadcastReceiverGateway = mock<BroadcastReceiverGateway>()
@@ -81,8 +77,6 @@ class ChatRepositoryImplTest {
             localStorageGateway = localStorageGateway,
             chatRoomMapper = chatRoomMapper,
             combinedChatRoomMapper = combinedChatRoomMapper,
-            chatScheduledMeetingMapper = chatScheduledMeetingMapper,
-            chatScheduledMeetingOccurrMapper = chatScheduledMeetingOccurrMapper,
             chatListItemMapper = chatListItemMapper,
             sharingScope = sharingScope,
             ioDispatcher = testDispatcher,

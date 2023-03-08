@@ -23,8 +23,6 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
-import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
-import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatSettings
@@ -64,8 +62,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property localStorageGateway                [MegaLocalStorageGateway]
  * @property chatRoomMapper                     [ChatRoomMapper]
  * @property combinedChatRoomMapper             [CombinedChatRoomMapper]
- * @property chatScheduledMeetingMapper         [ChatScheduledMeetingMapper]
- * @property chatScheduledMeetingOccurrMapper   [ChatScheduledMeetingOccurrMapper]
  * @property chatListItemMapper                 [ChatListItemMapper]
  * @property sharingScope                       [CoroutineScope]
  * @property ioDispatcher                       [CoroutineDispatcher]
@@ -78,8 +74,6 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val chatRoomMapper: ChatRoomMapper,
     private val combinedChatRoomMapper: CombinedChatRoomMapper,
-    private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
-    private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
     private val chatListItemMapper: ChatListItemMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

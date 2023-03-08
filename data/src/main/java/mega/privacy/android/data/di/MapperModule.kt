@@ -20,8 +20,11 @@ import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
+import mega.privacy.android.data.mapper.ChatScheduledMeetingMapperImpl
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
+import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapperImpl
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
+import mega.privacy.android.data.mapper.CombinedChatRoomMapperImpl
 import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
@@ -31,6 +34,8 @@ import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
+import mega.privacy.android.data.mapper.HandleListMapper
+import mega.privacy.android.data.mapper.HandleListMapperImpl
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
@@ -56,6 +61,7 @@ import mega.privacy.android.data.mapper.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.data.mapper.ScannedContactLinkResultMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.SortOrderIntMapperImpl
 import mega.privacy.android.data.mapper.SortOrderMapper
 import mega.privacy.android.data.mapper.SortOrderMapperImpl
 import mega.privacy.android.data.mapper.StartScreenMapper
@@ -96,13 +102,10 @@ import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
-import mega.privacy.android.data.mapper.meeting.ChatCallMapper
-import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
-import mega.privacy.android.data.mapper.HandleListMapper
-import mega.privacy.android.data.mapper.HandleListMapperImpl
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapperImpl
-import mega.privacy.android.data.mapper.SortOrderIntMapperImpl
+import mega.privacy.android.data.mapper.meeting.ChatCallMapper
+import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
@@ -117,9 +120,6 @@ import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
 import mega.privacy.android.data.mapper.toChatListItem
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toChatRoom
-import mega.privacy.android.data.mapper.toChatScheduledMeeting
-import mega.privacy.android.data.mapper.toChatScheduledMeetingOccur
-import mega.privacy.android.data.mapper.toCombinedChatRoom
 import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
@@ -235,6 +235,15 @@ internal abstract class MapperModule {
      */
     @Binds
     abstract fun bindSubtitleFileInfoMapper(implementation: SubtitleFileInfoMapperImpl): SubtitleFileInfoMapper
+
+    @Binds
+    abstract fun bindChatScheduledMeetingOccurrMapper(implementation: ChatScheduledMeetingOccurrMapperImpl): ChatScheduledMeetingOccurrMapper
+
+    @Binds
+    abstract fun bindChatScheduledMeetingMapper(implementation: ChatScheduledMeetingMapperImpl): ChatScheduledMeetingMapper
+
+    @Binds
+    abstract fun bindCombinedChatRoomMapper(implementation: CombinedChatRoomMapperImpl): CombinedChatRoomMapper
 
     companion object {
         /**
@@ -511,12 +520,6 @@ internal abstract class MapperModule {
         fun provideChatRoomMapper(): ChatRoomMapper = ::toChatRoom
 
         /**
-         * Provide combined chat room mapper
-         */
-        @Provides
-        fun provideCombinedChatRoomMapper(): CombinedChatRoomMapper = ::toCombinedChatRoom
-
-        /**
          * Provide [MyAccountCredentialsMapper] mapper
          */
         @Provides
@@ -528,20 +531,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideContactCredentialsMapper(): ContactCredentialsMapper = ::toContactCredentials
-
-        /**
-         * Provide chat scheduled meeting mapper
-         */
-        @Provides
-        fun provideChatScheduledMeetingMapper(): ChatScheduledMeetingMapper =
-            ::toChatScheduledMeeting
-
-        /**
-         * Provide chat scheduled meeting occurr mapper
-         */
-        @Provides
-        fun provideChatScheduledMeetingOccurrMapper(): ChatScheduledMeetingOccurrMapper =
-            ::toChatScheduledMeetingOccur
 
         @Provides
         fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
