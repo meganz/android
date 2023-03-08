@@ -4,8 +4,6 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorag
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_LEAVE_SHARE;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_SEND_RUBBISH;
 import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 
 import android.content.Context;
@@ -36,7 +34,7 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
     int errorBusiness = 0;
     int errorExist = 0;
     int max_items = 0;
-    int actionListener = -1;
+    int actionListener;
     String message;
 
     @Override
@@ -84,17 +82,17 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                         int success_items = max_items - error;
                         if (error > 0 && (success_items > 0)) {
                             if (error == 1) {
-                                message = getQuantityString(R.plurals.nodes_correctly_and_node_incorrectly_moved_to_rubbish, success_items, success_items);
+                                message = context.getResources().getQuantityString(R.plurals.nodes_correctly_and_node_incorrectly_moved_to_rubbish, success_items, success_items);
                             } else if (success_items == 1) {
-                                message = getQuantityString(R.plurals.node_correctly_and_nodes_incorrectly_moved_to_rubbish, error, error);
+                                message = context.getResources().getQuantityString(R.plurals.node_correctly_and_nodes_incorrectly_moved_to_rubbish, error, error);
                             } else {
-                                message = getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items)
-                                        + ". " + getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);
+                                message = context.getResources().getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items)
+                                        + ". " + context.getResources().getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);
                             }
                         } else if (error > 0) {
-                            message = getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);
+                            message = context.getResources().getQuantityString(R.plurals.number_incorrectly_moved_to_rubbish, error, error);
                         } else {
-                            message = getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items);
+                            message = context.getResources().getQuantityString(R.plurals.number_correctly_moved_to_rubbish, success_items, success_items);
                         }
                     }
                     break;
@@ -136,16 +134,24 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                     if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
                         Timber.d("Invite contact request finished");
                         if (errorExist > 0) {
-                            message = getString(R.string.number_existing_invite_contact_request, errorExist);
+                            message = context.getResources().getString(R.string.number_existing_invite_contact_request, errorExist);
                             int success = max_items - error;
 
                             if (success > 0) {
-                                message += "\n" + getQuantityString(R.plurals.number_correctly_invite_contact_request, success, success);
+                                message += "\n" + context.getResources().getQuantityString(R.plurals.number_correctly_invite_contact_request, success, success);
                             }
                         } else if (error > 0) {
-                            message = getString(R.string.number_no_invite_contact_request, max_items - error, error);
+                            String requestsSent = context.getResources().getQuantityString(
+                                    R.plurals.contact_snackbar_invite_contact_requests_sent,
+                                    max_items - error,
+                                    max_items - error);
+                            String requestsNotSent = context.getResources().getQuantityString(
+                                    R.plurals.contact_snackbar_invite_contact_requests_not_sent,
+                                    error,
+                                    error);
+                            message = requestsSent.concat(requestsNotSent);
                         } else {
-                            message = getQuantityString(R.plurals.number_correctly_invite_contact_request, max_items, max_items);
+                            message = context.getResources().getQuantityString(R.plurals.number_correctly_invite_contact_request, max_items, max_items);
                         }
                     }
                     break;

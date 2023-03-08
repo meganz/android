@@ -955,6 +955,19 @@
         <item quantity="one">%d invite sent</item>
         <item quantity="other">%d invites sent</item>
     </plurals>
+
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="one">1 invite request successfully sent&#160;</item>
+        <item quantity="other">%1$d invite requests successfully sent&#160;</item>
+    </plurals>
+
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="one">however, 1 request wasn\'t sent.</item>
+        <item quantity="other">however, %1$d requests weren\'t sent.</item>
+    </plurals>
+
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d invite requests sent but %2$d requests weren’t sent.</string>
     <!-- Word next to own user’s message in chat screen -->

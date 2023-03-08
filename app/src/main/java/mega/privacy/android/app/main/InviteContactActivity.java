@@ -1150,7 +1150,16 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                 } else {
                     if (numberNotSent > 0) {
                         if (!fromAchievement) {
-                            showSnackbar(getString(R.string.number_no_invite_contact_request, numberSent, numberNotSent));
+                            String requestsSent = getResources().getQuantityString(
+                                    R.plurals.contact_snackbar_invite_contact_requests_sent,
+                                    numberSent,
+                                    numberSent);
+                            String requestsNotSent = getResources().getQuantityString(
+                                    R.plurals.contact_snackbar_invite_contact_requests_not_sent,
+                                    numberNotSent,
+                                    numberNotSent);
+                            String errorMessage = requestsSent.concat(requestsNotSent);
+                            showSnackbar(errorMessage);
                         }
                     } else {
                         if (!fromAchievement) {
