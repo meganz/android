@@ -57,6 +57,12 @@ class FileBrowserViewModel @Inject constructor(
     private val lastPositionStack = Stack<Int>()
     private val handleStack = Stack<Long>()
 
+    /**
+     * Serves as the original View Type.
+     * When an update from MonitorViewType is received, this value is used to determine if the View Type changed
+     */
+    var originalIsList = true
+
     init {
         monitorMediaDiscovery()
         monitorFileBrowserChildrenNodes()

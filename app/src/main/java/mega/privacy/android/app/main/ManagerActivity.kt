@@ -129,7 +129,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANG
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_VIEW_MODE
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase
@@ -2209,8 +2208,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun registerEventBusObservers() {
-        LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java)
-            .observe(this) { isList: Boolean -> updateViews(isList) }
         if (!isFeatureEnabled(AppFeatures.MonitorPhoneNumber)) {
             LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
                 .observeForever(refreshAddPhoneNumberButtonObserver)
@@ -3457,7 +3454,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    private fun refreshFragment(fragmentTag: String) {
+    fun refreshFragment(fragmentTag: String) {
         supportFragmentManager.findFragmentByTag(fragmentTag)?.let {
             Timber.d("Fragment %s refreshing", fragmentTag)
             supportFragmentManager.beginTransaction().detach(it).commitNowAllowingStateLoss()
@@ -5356,9 +5353,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     /**
-     * Updates the views of different Fragments
+     * When [isList] receives an update through the Flow [ManagerViewModel.onViewTypeChanged], refresh
+     * all Dashboard Fragments, so that the new View Type will be reflected
      */
-    private fun updateViews(isList: Boolean) {
+    private fun refreshDashboardFragments() {
         dbH.setPreferredViewList(isList)
         //Refresh Cloud Fragment
         refreshFragment(FragmentTag.CLOUD_DRIVE.tag)

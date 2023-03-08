@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -90,6 +91,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -154,9 +156,6 @@ class FileBrowserFragment : RotatableFragment() {
     private var fileBackupManager: FileBackupManager? = null
 
     private var mediaDiscoveryViewSettings = MediaDiscoveryViewSettings.INITIAL.ordinal
-
-    private val isList: Boolean
-        get() = (requireActivity() as ManagerActivity).isList
 
     override fun activateActionMode() {
         Timber.d("activateActionMode")
@@ -483,13 +482,13 @@ class FileBrowserFragment : RotatableFragment() {
                 fileBrowserViewModel.getSafeBrowserParentHandle(),
                 recyclerView,
                 Constants.FILE_BROWSER_ADAPTER,
-                if (isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
+                if (fileBrowserViewModel.originalIsList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
                 sortByHeaderViewModel
             )
         }
         (activity as? ManagerActivity)?.setToolbarTitle()
         (activity as? ManagerActivity)?.supportInvalidateOptionsMenu()
-        val view = if (isList) {
+        val view = if (fileBrowserViewModel.originalIsList) {
             Timber.d("isList")
             _browserListBinding = FragmentFilebrowserlistBinding.inflate(inflater, container, false)
             recyclerView = browserListBinding.fileListViewBrowser
@@ -631,6 +630,26 @@ class FileBrowserFragment : RotatableFragment() {
             recyclerView,
             Constants.VIEWER_FROM_FILE_BROWSER
         )
+
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
+            handleNewViewType(state.viewType)
+        }
+    }
+
+    /**
+     * Updates the View Type of this Fragment
+     *
+     * @param viewType The new View Type
+     */
+    private fun handleNewViewType(viewType: ViewType) {
+        val isList = viewType == ViewType.LIST
+        if ((isList && _browserListBinding == null) || (!isList && _browserGridBinding == null)) {
+            if (isList != fileBrowserViewModel.originalIsList) {
+                // Only refresh the Fragment when the View Type changes
+                fileBrowserViewModel.originalIsList = isList
+                (activity as? ManagerActivity)?.refreshFragment(tag.orEmpty())
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -980,7 +999,7 @@ class FileBrowserFragment : RotatableFragment() {
                             showMediaDiscovery()
                         } else {
                             val lastFirstVisiblePosition =
-                                if (isList) {
+                                if (fileBrowserViewModel.originalIsList) {
                                     mLayoutManager.findFirstCompletelyVisibleItemPosition()
                                 } else {
                                     val pos =
@@ -1230,7 +1249,7 @@ class FileBrowserFragment : RotatableFragment() {
                     val lastVisiblePosition = fileBrowserViewModel.popLastPositionStack()
                     Timber.d("Scroll to $lastVisiblePosition position")
                     if (lastVisiblePosition >= 0) {
-                        if (isList) {
+                        if (fileBrowserViewModel.originalIsList) {
                             mLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                         } else {
                             gridLayoutManager?.scrollToPositionWithOffset(lastVisiblePosition, 0)
@@ -1250,7 +1269,7 @@ class FileBrowserFragment : RotatableFragment() {
      * Scrolls list to 1st item/position
      */
     fun scrollToFirstPosition() {
-        if (isList) {
+        if (fileBrowserViewModel.originalIsList) {
             mLayoutManager.scrollToPositionWithOffset(0, 0)
         } else {
             gridLayoutManager?.scrollToPositionWithOffset(0, 0)
