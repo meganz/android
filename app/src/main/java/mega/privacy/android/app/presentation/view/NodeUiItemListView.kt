@@ -198,6 +198,10 @@ private fun ListViewItem(
  * @param onLongClick onLongItemClick
  * @param onItemClicked itemClick
  * @param onMenuClick three dots click
+ * @param isListView current view type
+ * @param onChangeViewTypeClick changeViewType Click
+ * @param onSortOrderClick change sort order click
+ * @param sortOrder current sort name
 */
  */
 @Composable
@@ -208,8 +212,21 @@ fun ListView(
     onMenuClick: () -> Unit,
     onItemClicked: (Long) -> Unit,
     onLongClick: (Long) -> Unit,
+    sortOrder: String,
+    isListView: Boolean,
+    onSortOrderClick: () -> Unit,
+    onChangeViewTypeClick: () -> Unit,
 ) {
     LazyColumn {
+        item {
+            HeaderViewItem(
+                modifier = modifier,
+                onSortOrderClick = onSortOrderClick,
+                onChangeViewTypeClick = onChangeViewTypeClick,
+                sortOrder = sortOrder,
+                isListView = isListView
+            )
+        }
         items(nodeUIItem.size) {
             ListViewItem(
                 modifier = modifier,

@@ -46,6 +46,10 @@ class ListViewTest {
                 onItemClicked = {},
                 onMenuClick = {},
                 onLongClick = {},
+                onSortOrderClick = {},
+                onChangeViewTypeClick = {},
+                isListView = false,
+                sortOrder = "Any Name"
             )
         }
         composeTestRule.run {
@@ -75,6 +79,10 @@ class ListViewTest {
                 onItemClicked = {},
                 onMenuClick = {},
                 onLongClick = {},
+                onSortOrderClick = {},
+                onChangeViewTypeClick = {},
+                isListView = false,
+                sortOrder = "Any Name"
             )
         }
         composeTestRule.run {
@@ -105,6 +113,10 @@ class ListViewTest {
                 onItemClicked = {},
                 onMenuClick = {},
                 onLongClick = {},
+                onSortOrderClick = {},
+                onChangeViewTypeClick = {},
+                isListView = false,
+                sortOrder = "Any Name"
             )
         }
         composeTestRule.run {
@@ -138,6 +150,10 @@ class ListViewTest {
                     onItemClicked = {},
                     onMenuClick = {},
                     onLongClick = {},
+                    onSortOrderClick = {},
+                    onChangeViewTypeClick = {},
+                    isListView = false,
+                    sortOrder = "Any Name"
                 )
             }
             composeTestRule.run {
@@ -167,6 +183,10 @@ class ListViewTest {
                 onItemClicked = {},
                 onMenuClick = {},
                 onLongClick = {},
+                onSortOrderClick = {},
+                onChangeViewTypeClick = {},
+                isListView = false,
+                sortOrder = "Any Name"
             )
         }
         composeTestRule.run {
