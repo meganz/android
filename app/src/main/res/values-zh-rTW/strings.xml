@@ -225,7 +225,7 @@
     <!-- title of the screen where the camera images are uploaded, and name of the folder where camera images are uploaded -->
     <string name="section_photo_sync">相機上傳</string>
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
-    <string name="tab_incoming_shares">傳入的</string>
+    <string name="tab_incoming_shares">傳入</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
     <string name="tab_outgoing_shares">傳出</string>
     <!-- Capital letters. Files with link. The title of a tab -->
@@ -301,7 +301,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">檢視傳輸</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb"></string>
+    <string name="error_file_size_greater_than_4gb">大多數的裝置無法下載大於4&#160;GB的檔案。怹的下載可能會失敗。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">你的裝置上沒有任何應用程式可以執行這個檔案</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -377,7 +377,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">重新發送邀請</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">邀請已成功發送給%s。可在已發送邀請分頁中檢視。</string>
+    <string name="context_contact_request_sent">邀請已發送給%s。請在已發送請求分頁中查看。</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">聯絡人已移除</string>
     <!-- error message -->
@@ -393,53 +393,53 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">發生錯誤。資料夾未建立</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">重新命名成功</string>
+    <string name="context_correctly_renamed">已重新命名</string>
     <!-- error message -->
     <string name="context_no_renamed">錯誤。未重新命名</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">複製成功</string>
+    <string name="context_correctly_copied">已複製</string>
     <!-- error message -->
     <string name="context_no_copied">錯誤。未複製</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">請選擇目的地資料夾</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">移動成功</string>
+    <string name="context_correctly_moved">已移動</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="other">移動了%d個項目</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">未成功移動%d個項目至垃圾筒</string>
+    <string name="number_incorrectly_moved">未移動%d個項目</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">已成功移至垃圾筒</string>
+    <string name="context_correctly_moved_to_rubbish">已移到垃圾筒</string>
     <!-- error message -->
     <string name="context_no_moved">錯誤。未移動</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">已成功共享</string>
+    <string name="context_correctly_shared">共享</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">發生錯誤。尚未完成%d個共享</string>
     <!-- error message -->
     <string name="context_no_removed_shared">發生錯誤，移除共享失敗</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">移除成功</string>
+    <string name="context_correctly_removed">刪除</string>
     <!-- error message -->
     <string name="context_no_removed">錯誤。移除失敗</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">已成功從MEGA移除%d個項目</string>
+    <string name="number_correctly_removed">已從MEGA移除%d個項目</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">未能成功移除%d個項目</string>
+    <string name="number_no_removed">未移除%d個項目</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">已成功留下%d資料夾。</string>
+    <string name="number_correctly_leaved">留下%d個資料夾</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">已離開該共享</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">未成功保留%d個資料夾</string>
+    <string name="number_no_leaved">未留下%d個資料夾</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">已成功複製%d個項目</string>
+    <string name="number_correctly_copied">已複製%d個項目</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">未能複製%d個項目</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">已成功清空垃圾筒</string>
+    <string name="rubbish_bin_emptied">垃圾筒已清空</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">發生錯誤。垃圾筒尚未清空</string>
     <!-- dialog cancel subscriptions -->
@@ -505,7 +505,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">目前沒有為此方案設定付款方式。請選擇一項。</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">此連結已被複製到剪貼簿</string>
+    <string name="file_properties_get_link">已複製連結到剪貼簿</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">建立新帳戶之前請先登出</string>
     <!-- menu item -->
@@ -611,7 +611,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">驗證碼錯誤。請重試或重新傳送。</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">您的手機號碼已成功驗證</string>
+    <string name="verify_account_successfully">您的手機號碼已通過驗證</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>內部儲存</item>
@@ -750,11 +750,11 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">免費帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1"></string>
+    <string name="my_account_pro1">Pro&#160;I帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2"></string>
+    <string name="my_account_pro2">Pro&#160;II帳戶</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3"></string>
+    <string name="my_account_pro3">Pro&#160;III帳戶</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro&#160;Lite帳戶</string>
     <!--  -->
@@ -816,7 +816,7 @@
     <!-- Title of the dialog to park an account -->
     <string name="park_account_dialog_title">停用帳戶</string>
     <!-- Button to park an account -->
-    <string name="park_account_button">停用</string>
+    <string name="park_account_button">封存</string>
     <!-- Text shown in the last alert dialog to park an account -->
     <string name="park_account_text_last_step">這是封存您帳戶的最後一步，請輸入您的新密碼。您的資料將保留至少60天。如果您之後想起您已封存帳戶的密碼，請聯繫 support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
@@ -940,7 +940,7 @@
         <item quantity="other">已發送%d個邀請</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">成功發送%1$d個聯絡人邀請，但有%2$d個聯絡人邀請未被發出。</string>
+    <string name="number_no_invite_contact_request">已發送%1$d個邀請，但%2$d個邀請未發送。</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s（我）</string>
     <!-- button -->
@@ -994,7 +994,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">對話紀錄已清空</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">發生錯誤。對話記錄未成功清除</string>
+    <string name="clear_history_error">發生錯誤。對話記錄未被清除</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">新增與會者</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1064,9 +1064,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">此與會者已經在此對話群組中</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">已成功邀請%d個與會者</string>
+    <string name="number_correctly_add_participant">已邀請%d個與會者</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">已成功邀請%1$d位與會者，但%2$d位未成功受邀。</string>
+    <string name="number_no_add_participant_request">已邀請%1$d個與會者，但%2$d個未邀請。</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A]已受[C]%2$s[/C][B]邀請加入對話群組[/B]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1103,12 +1103,12 @@
     <string name="non_format_change_title_messages">%1$s已將此對話群組更名為“%2$s”</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s離開了對話群組</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
-    <string name="messages_copied_clipboard">已複製至剪貼簿</string>
+    <!-- Success alert when the user copies one message to the clipboard -->
+    <string name="messages_copied_clipboard">已複製到剪貼簿</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">開啟對話時發生錯誤</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">該對話無法正常開啟</string>
+    <string name="chat_error_open_message">無法打開對話</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d個聯絡人</item>
@@ -1302,7 +1302,7 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="other">連結刪除成功。</item>
+        <item quantity="other">連結已移除</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">聯絡人已附加</string>
@@ -1325,7 +1325,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">更改名稱時發生錯誤</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">已成功更新您的名字</string>
+    <string name="success_changing_user_attributes">已更新您的名稱</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">已新增與會者</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1559,11 +1559,11 @@
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">掃描您二維條碼的MEGA用戶將會自動加入至您的聯絡人列表。</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">連結已複製到剪貼簿</string>
+    <string name="qrcode_link_copied">已複製連結到剪貼簿</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">二維條碼已成功重設</string>
+    <string name="qrcode_reset_successfully">重置二維條碼</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">二維條碼已成功刪除</string>
+    <string name="qrcode_delete_successfully">已刪除二維條碼</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">由於發生錯誤，二維條碼沒有重設成功。請再試一次。</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1581,7 +1581,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">嘗試下載QR檔案時發生錯誤，也許是因為檔案不存在，請稍後再試。</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">二維條碼已成功下載到%s</string>
+    <string name="success_download_qr">二維條碼已下載到%s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">邀請未發送</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1598,8 +1598,6 @@
     <string name="button_copy_link">複製連結</string>
     <!-- Create QR code -->
     <string name="button_create_qr">建立二維條碼</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">二維條碼成功建立</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">使用您裝置的相機對齊二維條碼進行掃描</string>
     <!-- positive button on dialog to view a contact -->
@@ -1669,7 +1667,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">檔案載入中</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte"></string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1679,7 +1677,7 @@
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte"></string>
+    <string name="label_file_speed_byte">%s&#160;B/秒</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%s&#160;KB/秒</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -1743,7 +1741,7 @@
     <string name="messages_forwarded_success">轉發的訊息</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="other">發生錯誤。 %1$d則訊息未能成功轉發</item>
+        <item quantity="other">發生錯誤。%1$d則訊息未轉發</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1828,7 +1826,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">列印</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">還原金鑰已成功儲存</string>
+    <string name="save_MK_confirmation">已儲存還原金鑰</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">（等待）</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1890,7 +1888,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">下次登入您的帳戶時，系統會要求您輸入身份驗證程式提供的6位數字代碼。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled"></string>
+    <string name="recommendation_2fa_enabled">請將您的<b>還原金鑰</b>儲存在一個安全地方，以避免您無法存取您的應用程式或是您想要停用雙重驗證時遇到問題。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">無效的二維條碼</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -1978,29 +1976,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">此操作無法完成，因為它會超出您目前的儲存限制。您要升級自己的帳戶嗎？</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">已封存的對話</string>
+    <string name="archived_chats_title_section">已封存</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">封存對話（%d）</string>
+    <string name="archived_chats_show_option">已封存（%d）</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">封存對話</string>
+    <string name="archive_chat_option">封存</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">取消封存對話</string>
+    <string name="unarchive_chat_option">未封存</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">封存</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">未封存</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">已封存%s個對話。</string>
+    <string name="success_archive_chat">%s已封存</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">發生錯誤。未封存%s個對話。</string>
+    <string name="error_archive_chat">發生錯誤。%s未封存。請重試。</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">%s個對話未封存。</string>
+    <string name="success_unarchive_chat">%s已解封存</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">發生錯誤。未能封存%s個對話。</string>
+    <string name="error_unarchive_chat">發生錯誤。%s未解封存。請重試。</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">沒有進行中的對話</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">封存的對話</string>
+    <string name="archived_chat">已封存</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">點擊即可加入通話</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2032,7 +2030,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">您即將刪除所有檔案的歷史版本。由聯絡人共享給您的任何檔案版本只有對方能刪除。\n\n請注意，當前這個檔案不會被刪除。</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">已成功刪除檔案版本</string>
+    <string name="success_delete_versions">已刪除檔案版本</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">嘗試刪除所有過去的檔案版本時發生錯誤，請於稍後重試。</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2350,7 +2348,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">在您產出對話連結之前，您需要先設定說明：</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">對話連結已複製至剪貼簿</string>
+    <string name="chat_link_copied_clipboard">已複製連結到剪貼簿</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]自[/A] %s / [A]月[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2486,7 +2484,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">此內容未被傳送至%d個對話中</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">新群組對話已成功建立</string>
+    <string name="new_group_chat_created">已建立群組對話</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">正在準備檔案</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2503,7 +2501,7 @@
     <string name="version_history_deleted_erroneously">以前的版本未刪除。</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="other">成功刪除%d個版本</item>
+        <item quantity="other">已刪除%d個版本</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2596,9 +2594,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">沒有可用的對話連結。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">已成功刪除對話連結。</string>
+    <string name="chat_link_deleted">已刪除對話連結</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">版本已成功還原。</string>
+    <string name="version_restored">已還原版本</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">長按即可錄音</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2756,7 +2754,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">您沒有修改這個檔案的正確權限。您要建立一個新檔案嗎？</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">已成功的以此版本建立新檔案。</string>
+    <string name="version_as_new_file_created">該版本已以新檔案建立</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">於%1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2834,7 +2832,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">正在離開⋯</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">您的手機號碼已成功移除。</string>
+    <string name="remove_phone_number_success">已移除手機號碼</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">無法移除您的手機號碼。</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -2978,13 +2976,13 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">複製密碼</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">金鑰已複製到剪貼簿。</string>
+    <string name="key_copied_clipboard">金鑰已複製到剪貼簿</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">密碼已複製到剪貼簿。</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">連結和金鑰已成功發送。</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">連結和密碼已成功發送。</string>
+    <string name="password_copied_clipboard">密碼已複製到剪貼簿</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
+    <string name="link_and_key_sent">已發送連結和金鑰</string>
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
+    <string name="link_and_password_sent">已發送連結和密碼</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">升級至Pro方案</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3161,19 +3159,19 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="other">%d個項目已成功移至垃圾筒</item>
+        <item quantity="other">%d個項目已移到垃圾筒</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="other">%d個項目未成功移至垃圾筒</item>
+        <item quantity="other">%d個項目未移到垃圾筒</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="other">%d個項目已還原成功</item>
+        <item quantity="other">已恢復%d個項目</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="other">%d個項目未還原成功</item>
+        <item quantity="other">未恢復%d個項目</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">仍要變更</string>
@@ -3219,11 +3217,11 @@
     <string name="action_copy_all">複製全部</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="other">連結發送成功。</item>
+        <item quantity="other">連結已發送</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="other">連結已複製至剪貼簿。</item>
+        <item quantity="other">已複製連結到剪貼簿</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3318,7 +3316,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">您是新的主持人</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">複製會議連結。</string>
+    <string name="copied_meeting_link">已複製連結到剪貼簿</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">點擊加入當前會議。</string>
     <!-- Title of fifth tour screen -->
@@ -3396,7 +3394,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">您已邀請過%1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">邀請發送成功。查看已發送的邀請。</string>
+    <string name="contact_invited">已發送邀請。查看已發送請求。</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">檔案可離線存取</string>
     <!-- Message when file removed from offline. -->
@@ -3430,7 +3428,7 @@
     <!-- If users want to delete the root backup folder, all backups underneath it are disabled. Warning dialog will show to confirm -->
     <string name="backup_remove_root_folder">您正在刪除您的備份資料夾。這將刪除您設定的所有備份。你確定要這麼做嗎？</string>
     <!-- The title of warning dialog for single folder deleting -->
-    <string name="backup_remove_folder_title">移動“%1s”至垃圾筒</string>
+    <string name="backup_remove_folder_title">移動「%1s」到垃圾筒</string>
     <!-- The confirm information of warning dialog for deleting -->
     <string name="backup_disable_confirm">停用備份</string>
     <!-- The confirm information of warning dialog for deleting -->
@@ -3552,16 +3550,16 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$s和%2$s已加入</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s已離開</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s已離開通話</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s和%2$s已離開</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s和%2$s離開通話</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="other">%1$s和其他%2$d人已加入</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="other">%1$s和其他%2$d人已離開</item>
+        <item quantity="other">%1$s和其他%2$d個人離開通話</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">永久刪除</string>
@@ -3658,19 +3656,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">無法重新連線</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte"></string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte"></string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte"></string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte"></string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte"></string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte"></string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte"></string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">通話將於%s後結束</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3858,17 +3856,17 @@
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
     <string name="upgrade_account_successful_pro_lite_monthly">感謝您訂閱Pro Lite月方案</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly"></string>
+    <string name="upgrade_account_successful_pro_lite_yearly">感謝您訂閱Pro&#160;Lite年方案</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly"></string>
+    <string name="upgrade_account_successful_pro_1_monthly">感謝您訂閱Pro&#160;I月方案</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly"></string>
+    <string name="upgrade_account_successful_pro_1_yearly">感謝您訂閱Pro&#160;I年方案</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly"></string>
+    <string name="upgrade_account_successful_pro_2_monthly">感謝您訂閱Pro&#160;II月方案</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly"></string>
+    <string name="upgrade_account_successful_pro_2_yearly">感謝您訂閱Pro&#160;II年方案</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly"></string>
+    <string name="upgrade_account_successful_pro_3_monthly">感謝您訂閱Pro&#160;III月方案</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">感謝您訂閱Pro&#160;III年方案</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -3901,29 +3899,11 @@
     <string name="photos_create_album_error_message_systems_album">不允許使用此相簿名稱。請輸入不同的名稱。</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">已存在相同名稱相簿。請輸入不同的名稱。</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">新相簿（%d）</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">新增項目到「%s」</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
         <item quantity="other">已新增%1$d個項目到「%2$s」</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">付款資訊</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">Pro會員方案即將到期</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">已收到您%1$s方案的付款。</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">您%1$s方案的付款沒有成功。</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="other">您的Pro會員方案將在%1$d內到期。</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="other">您的Pro會員方案已在%1$d天前到期。</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[B]空[/B][A]相簿[/A]</string>
@@ -3952,7 +3932,7 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">知道此連結的任何人都可以加入會議並檢視會議對話。</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">連結已複製到剪貼簿</string>
+    <string name="scheduled_meetings_meeting_link_copied">已複製連結到剪貼簿</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="other">已刪除%d個相簿</item>
@@ -4443,4 +4423,24 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">星期六</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">星期日</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">無法選擇更多。</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">您一次最多只能新增150個項目到相簿。</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">無法驗證聯絡人</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">您無法驗證%s，因為他們不在您的聯絡人列表中。請先等待他們接受您的邀啨。</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">開始</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">Ok</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">根據我們的[A]移除指導政策[/A]，此檔案已被刪除。</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">根據我們的[A]移除指導政策[/A]，此資料夾已被刪除。</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">加入</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">開始會議</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">加入會議</string>
 </resources>

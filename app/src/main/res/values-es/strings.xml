@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">No se ha detectado ningún dispositivo de almacenamiento externo</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">Cerrar&#160;la&#160;sesión</string>
+    <string name="action_logout">Cerrar&#160;la sesión</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">Subir</string>
     <!-- Menu item -->
@@ -245,7 +245,7 @@
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Carpeta vacía</string>
     <!-- Title of the fragment Choose Account -->
-    <string name="choose_account_fragment">ELEGIR CUENTA</string>
+    <string name="choose_account_fragment">Elegir cuenta</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
     <string name="file_properties_available_offline">Disponible sin conexión</string>
     <!-- category in sort by action -->
@@ -281,7 +281,7 @@
     <!-- Error message -->
     <string name="error_not_enough_free_space">No hay suficiente espacio libre en tu dispositivo</string>
     <!-- Alert Dialog to get link -->
-    <string name="option_decryption_key">Clave de cifrado</string>
+    <string name="option_decryption_key">Clave de descifrado</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="download_preparing_files">Preparando archivos</string>
     <!-- Message when many downloads start. Plural more than 1 file. Placeholder is for include the number of downloads in runtime. -->
@@ -395,7 +395,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Invitación reenviada</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Solicitud enviada correctamente a %s. Ver Solicitudes enviadas.</string>
+    <string name="context_contact_request_sent">Solicitud enviada a %s. Ver Solicitudes enviadas.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contacto borrado</string>
     <!-- error message -->
@@ -411,17 +411,17 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Error. No se ha podido crear la carpeta</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Renombrado correctamente</string>
+    <string name="context_correctly_renamed">Renombrado</string>
     <!-- error message -->
     <string name="context_no_renamed">Error. No se ha podido renombrar</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copiado correctamente</string>
+    <string name="context_correctly_copied">Copiado</string>
     <!-- error message -->
     <string name="context_no_copied">Error. No se ha podido copiar</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Elige una carpeta de destino</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Movido correctamente</string>
+    <string name="context_correctly_moved">Movido</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="one">Se ha movido %d elemento</item>
@@ -431,35 +431,35 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">No se han podido mover %d elementos</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Movido a la Papelera correctamente</string>
+    <string name="context_correctly_moved_to_rubbish">Movido a la Papelera</string>
     <!-- error message -->
     <string name="context_no_moved">Error. No se ha podido mover</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Compartido correctamente</string>
+    <string name="context_correctly_shared">Compartido</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Error. No se han podido completar %d comparticiones</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Error. No se ha podido eliminar la compartición</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Eliminado de MEGA</string>
+    <string name="context_correctly_removed">Eliminado</string>
     <!-- error message -->
     <string name="context_no_removed">Error. No se ha podido eliminar de MEGA</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">Se han borrado %d archivos de MEGA</string>
+    <string name="number_correctly_removed">%d elementos eliminados de MEGA</string>
     <!-- error message when moving a node -->
     <string name="number_no_removed">No se han podido eliminar %d elementos</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">Se han abandonado %d carpetas.</string>
+    <string name="number_correctly_leaved">Se han abandonado %d carpetas</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">Carpeta abandonada</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d carpetas no han sido abandonadas correctamente</string>
+    <string name="number_no_leaved">No se han podido abandonar %d carpetas</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">Se han copiado %d elementos</string>
+    <string name="number_correctly_copied">%d elementos copiados</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">No se han podido copiar %d elementos</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">La Papelera se ha vaciado correctamente</string>
+    <string name="rubbish_bin_emptied">La Papelera se ha vaciado</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">Se ha producido un error. No se ha podido vaciar la Papelera</string>
     <!-- dialog cancel subscriptions -->
@@ -487,11 +487,11 @@
     <!-- Menu option to add a contact to your contact list. -->
     <string name="menu_add_contact">Añadir contacto</string>
     <!-- Title of the alert to introduce the decryption key -->
-    <string name="alert_decryption_key">Clave de cifrado</string>
+    <string name="alert_decryption_key">Clave de descifrado</string>
     <!-- Message of the alert to introduce the decryption key -->
-    <string name="message_decryption_key">Introduce la clave de cifrado para el enlace</string>
+    <string name="message_decryption_key">Introduce la clave de descifrado para el enlace</string>
     <!-- error message shown on the decryption key dialog if the key typed in was wrong -->
-    <string name="invalid_decryption_key">La clave de cifrado no es válida</string>
+    <string name="invalid_decryption_key">La clave de descifrado no es válida</string>
     <!-- upload to. Then choose an Audio file -->
     <string name="upload_to_audio">Audio</string>
     <!-- Title of the button in the contact info screen to start a video call -->
@@ -527,7 +527,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">No hay ningún método de pago asociado. Por favor, selecciona uno.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">El enlace se ha copiado al portapapeles</string>
+    <string name="file_properties_get_link">Enlace copiado al portapapeles</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Cierra sesión antes de crear la cuenta</string>
     <!-- menu item -->
@@ -938,7 +938,7 @@
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
     <string name="file_link_unavaible_delete_account">La cuenta asociada a este enlace ha sido cerrada debido a múltiples infracciones de nuestros Términos de servicio.</string>
     <!-- Error message shown after login into a folder link with an invalid decryption key -->
-    <string name="general_error_invalid_decryption_key">La clave proporcionada no es válida.</string>
+    <string name="general_error_invalid_decryption_key">La clave de descifrado proporcionada no es válida.</string>
     <!-- Item of the navigation title for the chat section -->
     <string name="section_chat">Chat</string>
     <!-- Confirmation button of the dialog to archive a chat -->
@@ -1141,8 +1141,8 @@
     <string name="non_format_change_title_messages">%1$s ha cambiado el nombre del grupo a “%2$s”</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s ha abandonado el chat de grupo</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
-    <string name="messages_copied_clipboard">Copiado en el portapapeles</string>
+    <!-- Success alert when the user copies one message to the clipboard -->
+    <string name="messages_copied_clipboard">Copiado al portapapeles</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Error del chat</string>
     <!-- Message of the error dialog when opening a chat -->
@@ -1368,9 +1368,9 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="one">Enlace eliminado.</item>
-        <item quantity="many">Enlaces eliminados.</item>
-        <item quantity="other">Enlaces eliminados.</item>
+        <item quantity="one">Enlace eliminado</item>
+        <item quantity="many">Enlaces eliminados</item>
+        <item quantity="other">Enlaces eliminados</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Contactos adjuntos</string>
@@ -1635,7 +1635,7 @@
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">Enlace copiado al portapapeles</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">El código QR se ha restablecido</string>
+    <string name="qrcode_reset_successfully">Código QR restablecido</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
     <string name="qrcode_delete_successfully">El código QR se ha eliminado</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
@@ -1655,7 +1655,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">Se ha producido un error. No se ha podido descargar el archivo del QR. Es posible que el archivo no exista. Inténtalo de nuevo más tarde.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">El código QR se ha descargado en el %s</string>
+    <string name="success_download_qr">El código QR se ha descargado en %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Invitación no enviada</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1672,8 +1672,6 @@
     <string name="button_copy_link">Copiar enlace</string>
     <!-- Create QR code -->
     <string name="button_create_qr">Crear código QR</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">Código QR creado</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">Alinea el código QR para escanearlo con la cámara de tu dispositivo</string>
     <!-- positive button on dialog to view a contact -->
@@ -1745,13 +1743,13 @@
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_kilo_byte">%s KB</string>
+    <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_mega_byte">%s&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_tera_byte">%s TB</string>
+    <string name="label_file_size_tera_byte">%s&#160;TB</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_byte">%s&#160;B/s</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
@@ -1984,7 +1982,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La próxima vez que inicies sesión en tu cuenta, tendrás que introducir un código de 6 dígitos proporcionado por tu aplicación de autenticación.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled"></string>
+    <string name="recommendation_2fa_enabled">Guarda tu <b>Clave de recuperación</b>en un lugar seguro en caso de que pierdas el acceso a tu aplicación o quieras desactivar la autenticación de dos factores.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Código no valido</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2074,29 +2072,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Esta acción no se puede completar ya que te llevaría por encima de tu límite de almacenamiento actual. ¿Quieres ampliar tu cuenta?</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">Chats archivados</string>
+    <string name="archived_chats_title_section">Archivado</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Chats archivados (%d)</string>
+    <string name="archived_chats_show_option">Archivados (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Archivar chat</string>
+    <string name="archive_chat_option">Archivar</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Restaurar chat</string>
+    <string name="unarchive_chat_option">Restaurar</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archivar</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Restaurar</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">%s chat ha sido archivado.</string>
+    <string name="success_archive_chat">%s ha sido archivado.</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">No se ha podido archivar %s chat.</string>
+    <string name="error_archive_chat">Error. No se ha podido archivar %s, inténtalo de nuevo.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">%s chat ha sido restaurado.</string>
+    <string name="success_unarchive_chat">%s ha sido restaurado</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">No se ha podido restaurar %s chat.</string>
+    <string name="error_unarchive_chat">Error. %s no se ha podido restaurar, inténtalo de nuevo.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Chat inactivo</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">Chat archivado</string>
+    <string name="archived_chat">Archivado</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Toca para unirte a la llamada</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2130,7 +2128,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">Estás a punto de eliminar el historial de versiones de todos los archivos. Las versiones compartidas contigo por otros contactos las tendrán que borrar ellos.\n\nTen en cuenta que los archivos actuales no serán eliminados.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">Las versiones de los archivos han sido eliminadas</string>
+    <string name="success_delete_versions">Versiones anteriores eliminadas</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">Se ha producido un error. No se han podido eliminar las versiones anteriores de tus archivos, inténtalo más tarde.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2466,7 +2464,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Para generar un enlace del chat, tienes que añadir una descripción primero:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Enlace del chat copiado al portapapeles</string>
+    <string name="chat_link_copied_clipboard">Enlace copiado al portapapeles</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Desde[/A] %s / [A]mes[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2635,9 +2633,9 @@
     <string name="version_history_deleted_erroneously">No se han podido eliminar las versiones anteriores.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">Se ha eliminado %d versión</item>
-        <item quantity="many">Se han eliminado %d de versiones</item>
-        <item quantity="other">Se han eliminado %d versiones</item>
+        <item quantity="one">%d versión eliminada</item>
+        <item quantity="many">%d de versiones eliminadas</item>
+        <item quantity="other">%d versiones eliminadas</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2732,9 +2730,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Link de chat no disponible.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Enlace del chat eliminado correctamente.</string>
+    <string name="chat_link_deleted">Enlace del chat eliminado</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Versión restaurada.</string>
+    <string name="version_restored">Versión restaurada</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Mantén presionado para grabar</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2902,7 +2900,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">No tienes los permisos necesarios para modificar este archivo. ¿Te gustaría crear un nuevo archivo?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">La versión se ha creado como un nuevo archivo.</string>
+    <string name="version_as_new_file_created">La versión se ha creado como un nuevo archivo</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">el %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2986,7 +2984,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Saliendo&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Tu número de teléfono se ha eliminado.</string>
+    <string name="remove_phone_number_success">Número de teléfono eliminado</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">No se ha podido eliminar el número de teléfono.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3130,9 +3128,9 @@
     <!-- Error shown to inform the priority change of a transfer failed. Please don’t remove the place holder, it’s to set the name of the transfer. Example: The priority change of the transfer “video.mp4” failed. -->
     <string name="change_of_transfer_priority_failed">No se ha podido cambiar la prioridad de la transferencia “%1$s”</string>
     <!-- Title option to send separated the link and decryption key -->
-    <string name="option_send_decryption_key_separately">Envíar la clave de cifrado por separado</string>
+    <string name="option_send_decryption_key_separately">Envíar la clave de descifrado por separado</string>
     <!-- Explanation option to send separated the link and decryption key -->
-    <string name="explanation_send_decryption_key_separately">Exportar enlace y clave de cifrado por separado.</string>
+    <string name="explanation_send_decryption_key_separately">Exportar enlace y clave de descifrado por separado.</string>
     <!-- Label option indicating if it is pressed, an explanation will be shown with more details -->
     <string name="learn_more_option">Más info</string>
     <!-- Label key referring to a link decryption key -->
@@ -3144,13 +3142,13 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Copiar contraseña</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Clave copiada al portapapeles.</string>
+    <string name="key_copied_clipboard">Clave copiada al portapapeles</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Contraseña copiada al portapapeles.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Enlace y clave enviados correctamente.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">Enlace y contraseña enviados correctamente.</string>
+    <string name="password_copied_clipboard">Contraseña copiada al portapapeles</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
+    <string name="link_and_key_sent">Enlace y clave enviados</string>
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
+    <string name="link_and_password_sent">Enlace y contraseña enviados</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Ampliar cuenta a Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3341,26 +3339,26 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 elemento enviado a la Papelera correctamente</item>
-        <item quantity="many">%d de elementos enviados a la Papelera correctamente</item>
-        <item quantity="other">%d elementos enviados a la Papelera correctamente</item>
+        <item quantity="one">1 elemento movido a la Papelera</item>
+        <item quantity="many">%d de elementos movidos a la Papelera</item>
+        <item quantity="other">%d elementos movidos a la Papelera</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">No se ha podido enviar 1 elemento a la Papelera</item>
-        <item quantity="many">No se han podido enviar %d elementos a la Papelera</item>
-        <item quantity="other">No se han podido enviar %d elementos a la Papelera</item>
+        <item quantity="one">No se ha podido mover 1 elemento a la Papelera</item>
+        <item quantity="many">No se han podido mover %d elementos a la Papelera</item>
+        <item quantity="other">No se han podido mover %d elementos a la Papelera</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
         <item quantity="one">Se ha restaurado 1 elemento</item>
-        <item quantity="many">Se han restaurado %d elementos</item>
+        <item quantity="many">Se han restaurado %d de elementos</item>
         <item quantity="other">Se han restaurado %d elementos</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
         <item quantity="one">No se ha podido restaurar 1 elemento</item>
-        <item quantity="many">No se han podido restaurar %d elementos</item>
+        <item quantity="many">No se han podido restaurar %d de elementos</item>
         <item quantity="other">No se han podido restaurar %d elementos</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
@@ -3370,9 +3368,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s&#160;%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s PB</string>
+    <string name="label_file_size_peta_byte">%1$s&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s EB</string>
+    <string name="label_file_size_exa_byte">%1$s&#160;EB</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">Añadir tu número de teléfono</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3404,20 +3402,20 @@
     <!-- Section name for the “Groups” section. Preferably one word. -->
     <string name="section_groups">Grupos</string>
     <!-- Text informing links management is only available for single items. -->
-    <string name="warning_get_links">Opciones como “Enviar clave de cifrado por separado”, “Establecer fecha de caducidad” o “Establecer contraseña” solo están disponible al seleccionar un solo elemento.</string>
+    <string name="warning_get_links">Opciones como “Enviar clave de descifrado por separado”, “Establecer fecha de caducidad” o “Establecer contraseña” solo están disponible al seleccionar un solo elemento.</string>
     <!-- Action which allows to copy all the links showed in the list. -->
     <string name="action_copy_all">Copiar todo</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Enlace enviado correctamente.</item>
-        <item quantity="many">Enlaces enviados correctamente.</item>
-        <item quantity="other">Enlaces enviados correctamente.</item>
+        <item quantity="one">Enlace enviado</item>
+        <item quantity="many">Enlaces enviados</item>
+        <item quantity="other">Enlaces enviados</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Enlace copiado al portapapeles.</item>
-        <item quantity="many">Enlaces copiados al portapapeles.</item>
-        <item quantity="other">Enlaces copiados al portapapeles.</item>
+        <item quantity="one">Enlace copiado al portapapeles</item>
+        <item quantity="many">Enlaces copiados al portapapeles</item>
+        <item quantity="other">Enlaces copiados al portapapeles</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3514,7 +3512,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Eres el nuevo anfitrión</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Enlace de reunión copiado.</string>
+    <string name="copied_meeting_link">Enlace copiado al portapapeles</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Toca para unirte a la reunión.</string>
     <!-- Title of fifth tour screen -->
@@ -3748,9 +3746,9 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$s y %2$s se han unido</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s ha abandonado</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s ha abandonado la llamada</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s y %2$s han abandonado</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s y %2$s han abandonado la llamada</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">%1$s y otro más se han unido</item>
@@ -3759,9 +3757,9 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s y otro más han abandonado</item>
-        <item quantity="many">%1$s y otros %2$d han abandonado</item>
-        <item quantity="other">%1$s y otros %2$d han abandonado</item>
+        <item quantity="one">%1$s y 1 más han abandonado la llamada</item>
+        <item quantity="many">%1$s y otros %2$d han abandonado la llamada</item>
+        <item quantity="other">%1$s y otros %2$d han abandonado la llamada</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Eliminar permanentemente</string>
@@ -3918,7 +3916,7 @@
     <!-- Filter option on Photos/Timeline -->
     <string name="photos_action_filter">Filtro</string>
     <!-- Filter option to show only photos and videos from Camera Uploads folder -->
-    <string name="photos_filter_camera_uploads"></string>
+    <string name="photos_filter_camera_uploads">Subidas de la cámara</string>
     <!-- Title of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
     <string name="dialog_cannot_open_file_title">El archivo no se puede abrir</string>
     <!-- Text of the dialog shown when the user tries to open a file not supported by app and it is not downloaded yet. -->
@@ -4109,34 +4107,13 @@
     <string name="photos_create_album_error_message_systems_album">Este nombre no está permitido. Introduce un nombre diferente.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Ya existe un álbum con este nombre. Introduce un nombre diferente.</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Nuevo álbum (%d)</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">Añadir elementos a “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %1$d item to “%2$s“</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">Información de pago</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">Tu plan Pro caducará en breve</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">Tu pago para el plan %1$s ha sido recibido.</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">Tu pago para el plan %1$s no se ha completado.</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="one">Tu plan Pro caducará en 1 día.</item>
-        <item quantity="many">Tu plan Pro caducará en %1$d días.</item>
-        <item quantity="other">Tu plan Pro caducará en %1$d días.</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="one">Tu plan Pro ha caducado hace 1 día</item>
-        <item quantity="many">Tu plan Pro ha caducado hace %1$d días</item>
-        <item quantity="other">Tu plan Pro ha caducado hace %1$d días</item>
+        <item quantity="one">Se ha añadido %1$d elemento a “%2$s”</item>
+        <item quantity="many">Se han añadido %1$d elementos a “%2$s”</item>
+        <item quantity="other">Se han añadido %1$d elementos a “%2$s”</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]Álbum[/A] [B]vacío[/B]</string>
@@ -4222,8 +4199,9 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">No permitir</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="one">Se ha eliminado %1$d elemento de “%2$s”</item>
+        <item quantity="many">Se han eliminado %1$d elementos de “%2$s”</item>
+        <item quantity="other">Se han eliminado %1$d elementos de “%2$s”</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">Reunión única</string>
@@ -4240,7 +4218,7 @@
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s ha cancelado[/A][B] la reunión programada para:[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%sha actualizado[/A][B] el nombre de la reunión de “%s” a [/B]“[A]%s[/A]”</string>
     <!-- User Alert notification for scheduled meeting date change -->
     <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s ha actualizado[/A][B] la fecha de la reunión[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
@@ -4321,9 +4299,9 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s, y %2$s cada semana desde el [A]%4$s[/A] de [B]%5$s a %6$s[/B]</item>
-        <item quantity="many">%1$s, y %2$s cada %3$d semanas desde el [A]%4$s[/A] de [B]%5$s a %6$s[/B]</item>
-        <item quantity="other">%1$s, y %2$s cada %3$d semanas desde el [A]%4$s[/A] de [B]%5$s a %6$s[/B]</item>
+        <item quantity="one">%1$s y %2$s cada semana desde el [A]%4$s[/A] de [B]%5$s a %6$s[/B]</item>
+        <item quantity="many">%1$s y %2$s cada %3$d semanas desde el [A]%4$s[/A] de [B]%5$s a %6$s[/B]</item>
+        <item quantity="other">%1$s y %2$s cada %3$d semanas desde el [A]%4$s[/A] de [B]%5$s a %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
@@ -4821,4 +4799,24 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">sab</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">dom</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">No se puede verificar el contacto</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">No se puede verificar %s porque no está en tu lista de contactos. Espera a que acepte tu invitación primero.</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">Empezar</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">Aceptar</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">Únete</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">Empezar reunión</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">Unirse a la reunión</string>
 </resources>

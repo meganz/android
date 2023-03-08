@@ -242,7 +242,7 @@
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Lege Map</string>
     <!-- Title of the fragment Choose Account -->
-    <string name="choose_account_fragment">KIES ACCOUNT</string>
+    <string name="choose_account_fragment">Kies account</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
     <string name="file_properties_available_offline">Offline beschikbaar</string>
     <!-- category in sort by action -->
@@ -386,7 +386,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Verzoek opnieuw verzonden</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Verzoek succesvol verzonden naar %s. Weergeven in Verzonden verzoeken tabblad.</string>
+    <string name="context_contact_request_sent">Verzoek verzonden naar %s. Weergeven in Verstuurde verzoeken tabblad.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contact verwijderd</string>
     <!-- error message -->
@@ -402,54 +402,54 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Fout. Map niet gecreëerd</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Succesvol hernoemd</string>
+    <string name="context_correctly_renamed">Hernoemd</string>
     <!-- error message -->
     <string name="context_no_renamed">Foutmelding. Niet hernoemd</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Succesvol gekopieerd</string>
+    <string name="context_correctly_copied">Gekopieerd</string>
     <!-- error message -->
     <string name="context_no_copied">Foutmelding. Niet gekopieerd</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Kies een bestemmingsmap</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Succesvol verplaatst</string>
+    <string name="context_correctly_moved">Verplaatst</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="one">Verplaatst %d item</item>
         <item quantity="other">Verplaatst %d items</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d items waren niet succesvol verplaatst</string>
+    <string name="number_incorrectly_moved">%d items waren niet verplaatst</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Succesvol verplaatst naar de Prullenbak</string>
+    <string name="context_correctly_moved_to_rubbish">Verplaatst naar Prullenbak</string>
     <!-- error message -->
     <string name="context_no_moved">Foutmelding. Niet verplaatst</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Succesvol gedeeld</string>
+    <string name="context_correctly_shared">Gedeeld</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Fout. %d delingen waren niet voltooid</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Fout. Deling is mislukt te verwijderen</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Succesvol verwijderd</string>
+    <string name="context_correctly_removed">Verwijderd</string>
     <!-- error message -->
     <string name="context_no_removed">Foutmelding. Verwijdering mislukt</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d items succesvol verwijderd uit MEGA</string>
+    <string name="number_correctly_removed">%d items verwijderd van MEGA</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d items zijn niet succesvol verwijderd</string>
+    <string name="number_no_removed">%d items waren niet verplaatst</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d mappen succesvol verlaten.</string>
+    <string name="number_correctly_leaved">%d mappen verlaten</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">Deling is verlaten</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d mappen waren niet succesvol verlaten</string>
+    <string name="number_no_leaved">%d mappen waren niet verlaten</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d items succesvol gekopieerd</string>
+    <string name="number_correctly_copied">%d items gekopieerd</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d items waren niet gekopieerd</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Prullenbak is succesvol geleegd</string>
+    <string name="rubbish_bin_emptied">Prullenbak leeggemaakt</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">Er is een fout opgetreden. De Prullenbak is niet geleegd</string>
     <!-- dialog cancel subscriptions -->
@@ -516,7 +516,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">Er is momenteel geen betalingsmethode ingesteld voor dit plan. Selecteer er één alstublieft.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">De link is gekopieerd naar het klembord</string>
+    <string name="file_properties_get_link">Link gekopieerd naar klembord</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Log uit voordat u een account aanmaakt</string>
     <!-- menu item -->
@@ -622,7 +622,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">Onjuiste code. Probeer nogmaals of verstuur opnieuw.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Uw telefoonnummer is succesvol geverifieerd</string>
+    <string name="verify_account_successfully">Uw telefoonnummer is geverifieerd</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>Interne opslag</item>
@@ -956,7 +956,7 @@
         <item quantity="other">%d uitnodigingen verstuurd</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d uitnodiging verzoeken succesvol verzonden maar %2$d verzoeken waren niet verstuurd.</string>
+    <string name="number_no_invite_contact_request">%1$d uitnodigingsverzoek verstuurd maar %2$d verzoeken waren niet verstuurd.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Ik)</string>
     <!-- button -->
@@ -1013,7 +1013,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">Gespreksgeschiedenis is gewist</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">Een fout heeft opgetreden. De chat geschiedenis is niet succesvol gewist</string>
+    <string name="clear_history_error">Een fout heeft opgetreden. De chatgeschiedenis was niet gewist</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Deelnemers toevoegen</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1083,9 +1083,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">De deelnemer is al opgenomen in dit groepsgesprek</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d deelnemers werden succesvol uitgenodigd</string>
+    <string name="number_correctly_add_participant">%d deelnemers waren uitgenodigd</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d deelnemers werden succesvol uitgenodigd maar %2$d deelnemers werden niet uitgenodigd.</string>
+    <string name="number_no_add_participant_request">%1$d deelnemers waren uitgenodigd maar %2$d deelnemers waren niet uitgenodigd.</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B]heeft zich aangesloten bij de groepsoproep door uitnodiging van[/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1122,12 +1122,12 @@
     <string name="non_format_change_title_messages">%1$s wijzigt de groepsgesprek naam naar “%2$s”</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s heeft de groep chat verlaten</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
-    <string name="messages_copied_clipboard">Gekopieerd naar het klembord</string>
+    <!-- Success alert when the user copies one message to the clipboard -->
+    <string name="messages_copied_clipboard">Gekopieerd naar klembord</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Gespreksfout</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Het gesprek kon niet correct geopend worden</string>
+    <string name="chat_error_open_message">Chat kon niet geopend worden</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contact</item>
@@ -1335,8 +1335,8 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="one">Link succesvol verwijderd.</item>
-        <item quantity="other">Links succesvol verwijderd.</item>
+        <item quantity="one">Link verwijderd</item>
+        <item quantity="other">Links verwijderd</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Contacts bijgevoegd</string>
@@ -1359,7 +1359,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">Een fout was opgetreden bij het wijzigen van de naam</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Uw naam was succesvol bijgewerkt</string>
+    <string name="success_changing_user_attributes">Uw naam was bijgewerkt</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Deelnemer toegevoegd</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1596,11 +1596,11 @@
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">MEGA gebruikers die uw QR-code scannen, worden automatisch toegevoegd aan uw lijst met contactpersonen.</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Link gekopieerd naar het klembord</string>
+    <string name="qrcode_link_copied">Link gekopieerd naar klembord</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">QR-code is succesvol gereset</string>
+    <string name="qrcode_reset_successfully">QR-code opnieuw instellen</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">QR-code is succesvol verwijderd</string>
+    <string name="qrcode_delete_successfully">QR code verwijderd</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">QR-code niet gereset vanwege een fout. Probeer het opnieuw.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1618,7 +1618,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">Er is een fout opgetreden bij het downloaden van het QR bestand. Misschien bestaat het bestand niet. Probeer het later opnieuw.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">De QR-code was succesvol gedownload naar %s</string>
+    <string name="success_download_qr">De QR Code werd gedownload naar %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Uitnodiging niet verzonden</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1635,8 +1635,6 @@
     <string name="button_copy_link">Link kopiëren</string>
     <!-- Create QR code -->
     <string name="button_create_qr">QR-code Creëren</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">QR-code succesvol gecreeerd</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">Zet de QR-code klaar om het te scannen met de camera van uw apparaat</string>
     <!-- positive button on dialog to view a contact -->
@@ -1784,8 +1782,8 @@
     <string name="messages_forwarded_success">Berichten doorgestuurd</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Fout. %1$d bericht niet succesvol doorgestuurd</item>
-        <item quantity="other">Fout. %1$d berichten niet succesvol doorgestuurd</item>
+        <item quantity="one">Fout. %1$d bericht niet doorverstuurd</item>
+        <item quantity="other">Fout. %1$d berichten niet doorversrtuurd</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1874,7 +1872,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Printen</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">De Herstelsleutel was succesvol opgeslagen</string>
+    <string name="save_MK_confirmation">Herstelsleutel was opgeslagen</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(In behandeling)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -2026,29 +2024,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Deze actie kon niet voltooid worden omdat het u over de huidige opslag limiet brengt. Wilt u uw account upgraden?</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">Gearchiveerde gesprekken</string>
+    <string name="archived_chats_title_section">Gearchiveerd</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Opgeslagen gesprekken (%d)</string>
+    <string name="archived_chats_show_option">Gearchiveerd (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Gesprek archiveren</string>
+    <string name="archive_chat_option">Archiveren</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Gesprek uit het archief halen</string>
+    <string name="unarchive_chat_option">Dearchiveren</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archiveren</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Dearchiveren</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">%s gesprek was opgeslagen.</string>
+    <string name="success_archive_chat">%s was gearchiveerd</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Fout. %s was niet gearchiveerd.</string>
+    <string name="error_archive_chat">Fout. %s was niet gearchiveerd. Probeer nogmaals.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">%s gesprek uit het archief gehaald.</string>
+    <string name="success_unarchive_chat">%s was uit het archief gehaald</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Fout. %s was niet in staat om het gesprek te dearchiveren</string>
+    <string name="error_unarchive_chat">Fout. %s was niet uit het archief gehaald. Probeer nogmaals.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Inactief gesprek</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">Gearchiveerd gesprek</string>
+    <string name="archived_chat">Gearchiveerd</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Tik om aan te sluiten bij de oproep</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2081,7 +2079,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">U staat op het punt de versie geschiedenis van alle bestanden te verwijderen. Alle bestanden die gedeeld zijn van jou naar een contact moeten door hun verwijderd worden.\n\nHou er rekening mee dat de huidige versies niet verwijderd worden.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">Bestandsversies succesvol verwijderd</string>
+    <string name="success_delete_versions">Bestandsversies verwijderd</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">Een fout heeft opgetreden bij het verwijderen van alle vorige versies van uw bestanden, probeer later nogmaals.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2408,7 +2406,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Voordat u een link kunt genereren voor dit gesprek, moet u een omschrijving instellen:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Gesprekslink gekopieerd naar het klembord</string>
+    <string name="chat_link_copied_clipboard">Gekopieerd naar klembord</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Van[/A] %s / [A]maand[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2552,7 +2550,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">De inhoud was niet verzonden naar %d gesprekken</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">Nieuwe groep gesprek succesvol gecreëerd</string>
+    <string name="new_group_chat_created">Nieuw groepsgesprek gecreëerd</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">Bestanden voorbereiden</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2569,8 +2567,8 @@
     <string name="version_history_deleted_erroneously">Vorige versies waren niet verwijderd.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">%d versie succesvol verwijderd</item>
-        <item quantity="other">%d versies succesvol verwijderd</item>
+        <item quantity="one">%d versie verwijderd</item>
+        <item quantity="other">%d versies verwijderd</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2664,9 +2662,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Geen gesprekslink beschikbaar.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Gesprek link succesvol verwijderd.</string>
+    <string name="chat_link_deleted">Chatlink verwijderd</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Versie succesvol hersteld.</string>
+    <string name="version_restored">Versie hersteld</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Tik en vasthouden om op te nemen</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2829,7 +2827,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">U heeft niet de juiste toestemmingen om dit bestand te wijzigen. Wilt u een nieuw bestand creëren?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Versie is succesvol aangemaakt als een nieuw bestand.</string>
+    <string name="version_as_new_file_created">Versie was gecreëerd als nieuw bestand</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">op %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2910,7 +2908,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Verlaten&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Uw telefoonnummer is succesvol gereset.</string>
+    <string name="remove_phone_number_success">Telefoonnummer verwijderd</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Mislukt om uw telefoonnummer te verwijderen.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3061,13 +3059,13 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Wachtwoord kopiëren</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Sleutel gekopieerd naar het klembord.</string>
+    <string name="key_copied_clipboard">Sleutel gekopieerd naar klembord</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Wachtwoord gekopieerd naar het klembord.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Link en sleutel succesvol verzonden.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">Link en wachtwoord succesvol verzonden.</string>
+    <string name="password_copied_clipboard">Wachtwoord gekopieerd naar klembord</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
+    <string name="link_and_key_sent">Link en sleutel verzonden</string>
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
+    <string name="link_and_password_sent">Link en wachtwoord verstuurd</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Upgraden naar Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3251,23 +3249,23 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item succesvol verplaatst naar de Prullenbak</item>
-        <item quantity="other">%d items succesvol verplaatst naar de Prullenbak</item>
+        <item quantity="one">1 item verplaatst naar Prullenbak</item>
+        <item quantity="other">%d items verplaatst naar Prullenbak</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item was niet succesvol verplaatst naar de Prullenbak</item>
-        <item quantity="other">%d items waren niet succesvol verplaatst naar de Prullenbak</item>
+        <item quantity="one">1 item was niet verplaatst naar de Prullenbak</item>
+        <item quantity="other">%d items waren niet verplaatst naar de Prullenbak</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item succesvol hersteld</item>
-        <item quantity="other">%d item succesvol hersteld</item>
+        <item quantity="one">1 item hersteld</item>
+        <item quantity="other">%d items hersteld</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item was niet succesvol hersteld</item>
-        <item quantity="other">%d items waren niet succesvol hersteld</item>
+        <item quantity="one">1 item was niet hersteld</item>
+        <item quantity="other">%d items waren niet hersteld</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Toch wijzigen</string>
@@ -3314,13 +3312,13 @@
     <string name="action_copy_all">Alles kopiëren</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link succesvol verzonden.</item>
-        <item quantity="other">Links succesvol verzonden.</item>
+        <item quantity="one">Link verstuurd</item>
+        <item quantity="other">Links verstuurd</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Link gekopieerd naar het klembord.</item>
-        <item quantity="other">Links gekopieerd naar het klembord.</item>
+        <item quantity="one">Link gekopieerd naar klembord</item>
+        <item quantity="other">Links gekopieerd naar klembord</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3416,7 +3414,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">U bent de nieuwe gastvrouw/gastheer</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Gekopieerde vergaderingslink.</string>
+    <string name="copied_meeting_link">Gekopieerd naar klembord</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Tik om aan te sluiten tot de huidige vergadering.</string>
     <!-- Title of fifth tour screen -->
@@ -3494,7 +3492,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">U heeft %1$s al uitgenodigd</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Uitnodiging succesvol verzonden. Zie verzonden verzoeken.</string>
+    <string name="contact_invited">Uitnodiging verstuurd. Zie verstuurde verzoeken.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Bestand Offline beschikbaar</string>
     <!-- Message when file removed from offline. -->
@@ -3650,9 +3648,9 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$sen%2$s zijn aangesloten</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$sheeft de oproep verlaten</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s heeft de oproep verlaten</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$sen %2$s hebben de oproep verlaten</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s en %2$s hebben de oproep verlaten</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">%1$s en 1 ander zijn aangesloten</item>
@@ -3661,7 +3659,7 @@
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
         <item quantity="one">%1$s en 1 ander hebben de oproep verlaten</item>
-        <item quantity="other">%1$sen %2$danderen hebben de oproep verlaten</item>
+        <item quantity="other">%1$s en %2$d anderen hebben de oproep verlaten</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Permanent verwijderen</string>
@@ -3758,19 +3756,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Kan niet opnieuw verbinden</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte"></string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte"></string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte"></string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte"></string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte"></string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte"></string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte"></string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Oproep eindigt over %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3962,17 +3960,17 @@
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
     <string name="upgrade_account_successful_pro_lite_monthly">Bedankt voor uw Pro Lite maandelijkse abonnement</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly"></string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Bedankt voor uw Pro&#160;Lite jaarlijkse abonnement</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly"></string>
+    <string name="upgrade_account_successful_pro_1_monthly">Bedankt voor uw Pro&#160;I maandelijkse abonnement</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly"></string>
+    <string name="upgrade_account_successful_pro_1_yearly">Bedankt voor uw Pro&#160;I jaarlijkse abonnement</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly"></string>
+    <string name="upgrade_account_successful_pro_2_monthly">Bedankt voor uw Pro&#160;II maandelijkse abonnement</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly"></string>
+    <string name="upgrade_account_successful_pro_2_yearly">Bedankt voor uw Pro&#160;II jaarlijkse abonnement</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly"></string>
+    <string name="upgrade_account_successful_pro_3_monthly">Bedankt voor uw Pro&#160;III maandelijkse abonnement</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Bedankt voor uw Pro&#160;III jaarlijkse abonnement</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -4005,32 +4003,12 @@
     <string name="photos_create_album_error_message_systems_album">Deze album naam is niet toegestaan. Voer een andere naam in.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Een album met deze naam bestaat al. Voer een andere naam in.</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Nieuw album (%d)</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">Voeg items toe naar “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
         <item quantity="one">%1$d Items naar “%2$s” toegevoegd</item>
         <item quantity="other">%1$d Items naar “%2$s” toegevoegd</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">Betalingsinformatie</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">Pro-lidmaatschap abonnement verloopt binnenkort</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">Uw betaling voor het %1$s abonnement is ontvangen.</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">Uw betaling voor het %1$s abonnement is onsuccesvol.</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="one">Uw Pro-lidmaatschap abonnement verloopt over 1 dag.</item>
-        <item quantity="other">Uw Pro-lidmaatschap abonnement verloopt over %1$d dagen.</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="one">Uw Pro lidmaatschap abonnement verliep 1 dag geleden</item>
-        <item quantity="other">Uw Pro lidmaatschap abonnement verliep %1$d dagen geleden.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[B]Leeg[/B] [A]album[/A]</string>
@@ -4059,7 +4037,7 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">Iedereen met deze link kan aansluiten in de vergadering en het vergadergesprek weergeven.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">Link gekopieerd naar klembord</string>
+    <string name="scheduled_meetings_meeting_link_copied">Gekopieerd naar klembord</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="one">“%s” album is verwijderd</item>
@@ -4188,9 +4166,9 @@
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A]van[B]%2$stot%3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Elke dag van kracht [A]%1$s[/A]van[B]%2$stot %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Elke dag van kracht op[A]%1$s[/A]van[B]%2$stot %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Elke dag van kracht[A]%1$s tot en met %2$s[/A] van [B]%3$s tot %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Elke dag van kracht op[A]%1$s tot en met %2$s[/A] van [B]%3$s tot %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="one">%1$selke week van kracht [A]%3$s tot en met %4$s[/A] van [B]%5$s tot %6$s[/B]</item>
@@ -4203,13 +4181,13 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s, en %2$s elke week van kracht [A]%4$s tot en met %5$s[/A] van[B]%6$s tot %7$s[/B]</item>
-        <item quantity="other">%1$s, en %2$s elke %3$d weken van kracht [A]%4$s tot en met %5$s[/A] van[B]%6$s tot%7$s[/B]</item>
+        <item quantity="one">%1$s, en %2$s elke week van kracht op [A]%4$s tot en met %5$s[/A] van[B]%6$s tot %7$s[/B]</item>
+        <item quantity="other">%1$s, en %2$s elke %3$d weken van kracht op[A]%4$s tot en met %5$s[/A] van[B]%6$s tot%7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s, en %2$s elke week van kracht [A]%4$s [/A] van[B]%5$s tot %6$s[/B]</item>
-        <item quantity="other">%1$s, en %2$s elke %3$d weken van kracht [A]%4$s[/A] van[B]%5$s tot %6$s[/B]</item>
+        <item quantity="one">%1$s, en %2$s elke week van kracht op[A]%4$s [/A] van[B]%5$s tot %6$s[/B]</item>
+        <item quantity="other">%1$s, en %2$s elke %3$d weken van kracht op [A]%4$s[/A] van[B]%5$s tot %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
@@ -4633,4 +4611,24 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">Za</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">Zo</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Kan contact niet verifiëren</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">U kunt %s niet verifiëren omdat ze niet in u contactenlijst staan. Wacht tot ze eerst uw uitnodiging accepteren.</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">Starten</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">OK</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">Aansluiten</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">Begin vergadering</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">Vergadering aansluiten</string>
 </resources>

@@ -248,7 +248,7 @@
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Папка пуста</string>
     <!-- Title of the fragment Choose Account -->
-    <string name="choose_account_fragment">ВЫБЕРИТЕ АККАУНТ</string>
+    <string name="choose_account_fragment">Выберите аккаунт</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
     <string name="file_properties_available_offline">Доступно локально</string>
     <!-- category in sort by action -->
@@ -325,7 +325,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Просмотр передач</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb"></string>
+    <string name="error_file_size_greater_than_4gb">Большинство устройств не может скачивать файлы больше 4&#160;ГБ. Возможно, скачивание не удастся.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">На вашем устройстве нет приложений для открытия этого файла</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -404,7 +404,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Запрос отправлен повторно</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Запрос успешно отправлен пользователю %s. Его можно посмотреть на вкладке «Отправленные запросы».</string>
+    <string name="context_contact_request_sent">Запрос отправлен пользователю %s. Его можно посмотреть на вкладке «Отправленные запросы».</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Контакт удалён</string>
     <!-- error message -->
@@ -420,17 +420,17 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Ошибка. Папка не создана</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Переименовано успешно</string>
+    <string name="context_correctly_renamed">Переименовано</string>
     <!-- error message -->
     <string name="context_no_renamed">Ошибка. Не перемещено</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Скопировано корректно</string>
+    <string name="context_correctly_copied">Скопировано</string>
     <!-- error message -->
     <string name="context_no_copied">Ошибка. Не скопировано</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Выберите папку назначения</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Перемещено успешно</string>
+    <string name="context_correctly_moved">Перемещено</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="one">Перемещён %d элемент</item>
@@ -439,33 +439,33 @@
         <item quantity="other">Перемещено %d элемента</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">Элементы не были перемещены (%d)</string>
+    <string name="number_incorrectly_moved">Элементы не перемещены (%d)</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Успешно перемещено в Корзину</string>
+    <string name="context_correctly_moved_to_rubbish">Перемещено в Корзину</string>
     <!-- error message -->
     <string name="context_no_moved">Ошибка. Не перемещено</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Общий доступ предоставлен успешно</string>
+    <string name="context_correctly_shared">Общие</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Ошибка. Доступ не был открыт (%d)</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Ошибка. Не удалось удалить</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Успешно удалено</string>
+    <string name="context_correctly_removed">Удаленный</string>
     <!-- error message -->
     <string name="context_no_removed">Ошибка. Не удалено</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">Успешно удалено элементов: %d</string>
+    <string name="number_correctly_removed">Элементы удалены из MEGA (%d)</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">Элементы не перемещены (%d)</string>
+    <string name="number_no_removed">Элементы не удалены (%d)</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">Папки оставлены(%d).</string>
+    <string name="number_correctly_leaved">Папки оставлены (%d)</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">Покинут общий элемент</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">Папки не были закрыты (%d)</string>
+    <string name="number_no_leaved">Папки не были оставлены (%d)</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">Элементы успешно скопированы (%d)</string>
+    <string name="number_correctly_copied">Элементы скопированы (%d)</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">Элементы не скопированы (%d)</string>
     <!-- success message when emptying the RB -->
@@ -644,7 +644,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">Неправильный код. Пожалуйста, попробуйте ещё раз или отправьте повторно.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Ваш номер телефона был успешно подтверждён</string>
+    <string name="verify_account_successfully">Ваш номер телефона подтверждён</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>Внутреннее хранилище</item>
@@ -786,11 +786,11 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Бесплатный аккаунт</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1"></string>
+    <string name="my_account_pro1">Аккаунт Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2"></string>
+    <string name="my_account_pro2">Аккаунт Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3"></string>
+    <string name="my_account_pro3">Аккаунт Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Аккаунт Pro&#160;Lite</string>
     <!--  -->
@@ -988,7 +988,7 @@
         <item quantity="other">Отправлено %d приглашения</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">Часть приглашений отправлена успешно (%1$d), но некоторые не были отправлены (%2$d).</string>
+    <string name="number_no_invite_contact_request">Часть приглашений отправлена (%1$d), но некоторые не были отправлены (%2$d).</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Я)</string>
     <!-- button -->
@@ -1121,7 +1121,7 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">Участник уже состоит в этом групповом чате</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">Были успешно приглашены участники (%d)</string>
+    <string name="number_correctly_add_participant">Были приглашены участники (%d)</string>
     <!-- error message when inviting multiple contacts to a group chat -->
     <string name="number_no_add_participant_request">Были приглашены участники (%1$d), но некоторых (%2$d) не удалось пригласить.</string>
     <!-- chat message when a participant was added to a group chat -->
@@ -1160,12 +1160,12 @@
     <string name="non_format_change_title_messages">%1$s изменил название группового чата на «%2$s»</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s покинул чат</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
-    <string name="messages_copied_clipboard">Скопировано в буфер обмена</string>
+    <!-- Success alert when the user copies one message to the clipboard -->
+    <string name="messages_copied_clipboard">Скопировано в буфер обмено</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Ошибка</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Не удалось открыть чат</string>
+    <string name="chat_error_open_message">Не удаётся открыть чат</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d контакт</item>
@@ -1401,10 +1401,10 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="one">Ссылка успешно удалена.</item>
-        <item quantity="few">Ссылки успешно удалены.</item>
-        <item quantity="many">Ссылки успешно удалены.</item>
-        <item quantity="other">Ссылки успешно удалены.</item>
+        <item quantity="one">Ссылка удалена</item>
+        <item quantity="few">Ссылки удалены</item>
+        <item quantity="many">Ссылки удалены</item>
+        <item quantity="other">Ссылки удалены</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Прикреплённые контакты</string>
@@ -1427,7 +1427,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">Ошибка при изменении имени</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Ваше имя успешно изменено</string>
+    <string name="success_changing_user_attributes">Ваше имя изменено</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Участник добавлен</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1672,9 +1672,9 @@
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">Ссылка скопирована в буфер обмена</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">QR-код успешно сброшен</string>
+    <string name="qrcode_reset_successfully">QR-код перезагружен</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">QR-код успешно удалён</string>
+    <string name="qrcode_delete_successfully">QR-код удалён</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">QR-код не был сброшен из-за ошибки. Попробуйте ещё раз.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1692,7 +1692,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">При попытке скачать QR-файл произошла ошибка. Возможно, файл не существует. Пожалуйста, повторите попытку позже.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">QR-код успешно скачан в %s</string>
+    <string name="success_download_qr">QR-код скачан в %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Приглашение не отправлено</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1709,8 +1709,6 @@
     <string name="button_copy_link">Копировать ссылку</string>
     <!-- Create QR code -->
     <string name="button_create_qr">Создать QR-код</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">QR-код успешно просканирован</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">Наведите камеру на QR-код для сканирования</string>
     <!-- positive button on dialog to view a contact -->
@@ -1780,25 +1778,25 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Загрузка файлов</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte"></string>
+    <string name="label_file_size_byte">%s&#160;Б</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;КБ</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte"></string>
+    <string name="label_file_size_mega_byte">%s&#160;МБ</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_giga_byte">%s&#160;ГБ</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s&#160;ТБ</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte"></string>
+    <string name="label_file_speed_byte">%s&#160;Б/с</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%s&#160;KБ/с</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte"></string>
+    <string name="label_file_speed_mega_byte">%s&#160;МБ/с</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte"></string>
+    <string name="label_file_speed_giga_byte">%s&#160;ГБ/с</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte"></string>
+    <string name="label_file_speed_tera_byte">%s&#160;ТБ/с</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">МБ</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -1866,10 +1864,10 @@
     <string name="messages_forwarded_success">Сообщения пересланы</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Ошибка. %1$d сообщение не было успешно отправлено</item>
-        <item quantity="few">Ошибка. %1$d сообщения не были успешно отправлены</item>
-        <item quantity="many">Ошибка. %1$d сообщений не было успешно отправлено</item>
-        <item quantity="other">Ошибка. %1$d сообщения не было успешно отправлено</item>
+        <item quantity="one">Ошибка. %1$d сообщение не было отправлено</item>
+        <item quantity="few">Ошибка. %1$d сообщения не было отправлено</item>
+        <item quantity="many">Ошибка. %1$d сообщений не было отправлено</item>
+        <item quantity="other">Ошибка. %1$d сообщения не было отправлено</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1966,7 +1964,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Печать</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Ключ восстановления успешно сохранён</string>
+    <string name="save_MK_confirmation">Ключ восстановления сохранён</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(В ожидании)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -2031,7 +2029,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">При следующем входе в аккаунт система запросит 6-значный код из приложения-аутентификатора.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled"></string>
+    <string name="recommendation_2fa_enabled">Пожалуйста, сохраните <b>ключ восстановления</b> в надёжном месте, чтобы избежать проблем, если вы потеряете доступ к своему приложению или захотите отключить двухфакторную аутентификацию.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Недействительный код</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2122,29 +2120,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Это действие нельзя выполнить, так как оно превысит текущий лимит хранения. Хотите улучшить аккаунт?</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">Архивные чаты</string>
+    <string name="archived_chats_title_section">Архивировано</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Архивированные чаты (%d)</string>
+    <string name="archived_chats_show_option">Архивировано (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Архивировать чат</string>
+    <string name="archive_chat_option">Архивировать</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Разархивировать чат</string>
+    <string name="unarchive_chat_option">Разархивировать</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Архивировать</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Разархивировать</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">Чат «%s» архивирован.</string>
+    <string name="success_archive_chat">«%s» архивирован</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Ошибка. Чат «%s» не архивирован.</string>
+    <string name="error_archive_chat">Ошибка. «%s» не архивирован. Попробуйте ещё раз.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">Чат «%s» разархивирован.</string>
+    <string name="success_unarchive_chat">«%s» разархивирован</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Ошибка. Чат «%s» не может быть разархивирован.</string>
+    <string name="error_unarchive_chat">Ошибка. «%s» не разархивирован. Попробуйте ещё раз.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Неактивный чат</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">Архивный чат</string>
+    <string name="archived_chat">Архивировано</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Коснитесь, чтобы присоединиться</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2524,7 +2522,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Перед тем как создать ссылку на этот чат, вам нужно добавить описание:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Ссылка на чат скопирована в буфер обмена</string>
+    <string name="chat_link_copied_clipboard">Ссылка скопирована в буфер обмена</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]От[/A] %s/[A]мес.[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2684,7 +2682,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">Контент не был отправлен в чаты (%d)</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">Новый групповой чат успешно создан</string>
+    <string name="new_group_chat_created">Новый групповой чат создан</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">Подготовка файлов</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2701,10 +2699,10 @@
     <string name="version_history_deleted_erroneously">Прошлые версии не удалены.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">%d версия успешно удалена</item>
-        <item quantity="few">%d версии успешно удалены</item>
-        <item quantity="many">%d версий успешно удалено</item>
-        <item quantity="other">%d версии успешно удалено</item>
+        <item quantity="one">%d версия удалена</item>
+        <item quantity="few">%d версии удалено</item>
+        <item quantity="many">%d версий удалено</item>
+        <item quantity="other">%d версии удалено</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2800,9 +2798,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Нет доступной ссылки на чат.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Ссылка на чат успешно удалена.</string>
+    <string name="chat_link_deleted">Ссылка на чат удалена</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Версия успешно восстановлена.</string>
+    <string name="version_restored">Версия восстановлена</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Нажмите и удерживайте для записи</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2975,7 +2973,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">У вас нет необходимых прав для изменения этого файла. Хотите создать новый файл?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Версия была успешно создана как новый файл.</string>
+    <string name="version_as_new_file_created">Версия была успешно как новый файл</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">%1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -3062,7 +3060,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Выход&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Номер телефона успешно удалён.</string>
+    <string name="remove_phone_number_success">Номер телефона удалён</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Не удалось удалить номер телефона.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3227,13 +3225,13 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Копировать пароль</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Ключ скопирован в буфер обмена.</string>
+    <string name="key_copied_clipboard">Ключ скопирован в буфер обмена</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Пароль скопирован в буфер обмена.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Ссылка и ключ успешно отправлены.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">Ссылка и пароль успешно отправлены.</string>
+    <string name="password_copied_clipboard">Пароль скопирован в буфер обмена</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
+    <string name="link_and_key_sent">Ссылка и ключ отправлены</string>
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
+    <string name="link_and_password_sent">Ссылка и пароль отправлены</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Улучшение до Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3431,31 +3429,31 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 элемент успешно перемещён в Корзину</item>
-        <item quantity="few">%d элемента успешно перемещено в Корзину</item>
-        <item quantity="many">%d элементов успешно перемещено в Корзину</item>
-        <item quantity="other">%d элемента успешно перемещено в Корзину</item>
+        <item quantity="one">1 элемент перемещён в Корзину</item>
+        <item quantity="few">%d элемента перемещены в Корзину</item>
+        <item quantity="many">%d элементов перемещено в Корзину</item>
+        <item quantity="other">%d элемента перемещено в Корзину</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 элемент не был перемещён в Корзину</item>
-        <item quantity="few">%d элемента не были перемещены в Корзину</item>
-        <item quantity="many">%d элементов не были перемещены в Корзину</item>
-        <item quantity="other">%d элемента не были перемещены в Корзину</item>
+        <item quantity="one">1 элемент не перемещён в Корзину</item>
+        <item quantity="few">%d элемента не перемещены в Корзину</item>
+        <item quantity="many">%d элементов не перемещено в Корзину</item>
+        <item quantity="other">%d элемента не перемещено в Корзину</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 элемент успешно восстановлен</item>
-        <item quantity="few">%d элемента успешно восстановлено</item>
-        <item quantity="many">%d элементов успешно восстановлено</item>
-        <item quantity="other">%d элемента успешно восстановлено</item>
+        <item quantity="one">1 элемент восстановлен</item>
+        <item quantity="few">%d элемента восстановлено</item>
+        <item quantity="many">%d элементов восстановлено</item>
+        <item quantity="other">%d элемента восстановлено</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 элемент не был восстановлен</item>
-        <item quantity="few">%d элемента не было восстановлено</item>
-        <item quantity="many">%d элементов не было восстановлено</item>
-        <item quantity="other">%d элемента не было восстановлено</item>
+        <item quantity="one">1 элемент не был удалён</item>
+        <item quantity="few">%d элемента не было удалено</item>
+        <item quantity="many">%d элементов не было удалено</item>
+        <item quantity="other">%d элемента не было удалено</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Всё равно изменить</string>
@@ -3504,17 +3502,17 @@
     <string name="action_copy_all">Копировать все</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Ссылка успешно отправлена.</item>
-        <item quantity="few">Ссылки успешно отправлены.</item>
-        <item quantity="many">Ссылки успешно отправлены.</item>
-        <item quantity="other">Ссылки успешно отправлены.</item>
+        <item quantity="one">Ссылка отправлена</item>
+        <item quantity="few">Ссылки отправлены</item>
+        <item quantity="many">Ссылки отправлены</item>
+        <item quantity="other">Ссылки отправлены</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Ссылка скопирована в буфер обмена.</item>
-        <item quantity="few">Ссылки скопированы в буфер обмена.</item>
-        <item quantity="many">Ссылки скопированы в буфер обмена.</item>
-        <item quantity="other">Ссылки скопированы в буфер обмена.</item>
+        <item quantity="one">Ссылка скопирована в буфер обмена</item>
+        <item quantity="few">Ссылки скопированы в буфер обмена</item>
+        <item quantity="many">Ссылки скопированы в буфер обмена</item>
+        <item quantity="other">Ссылки скопированы в буфер обмена</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3612,7 +3610,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Вы новый организатор</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Ссылка на встречу скопирована.</string>
+    <string name="copied_meeting_link">Ссылка скопирована в буфер обмена</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Присоединиться к текущей встрече.</string>
     <!-- Title of fifth tour screen -->
@@ -3690,7 +3688,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Вы уже пригласили %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Приглашение успешно отправлено. Смотрите отправленные запросы.</string>
+    <string name="contact_invited">Приглашение отправлено. Смотрите отправленные запросы.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Файл доступен локально</string>
     <!-- Message when file removed from offline. -->
@@ -3846,9 +3844,9 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$s и %2$s присоединились</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s вышел</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s отключился</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s и %2$s вышли</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s и %2$s покинули звонок</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">%1$s и ещё 1 присоединились</item>
@@ -3858,10 +3856,10 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s и ещё 1 вышли</item>
-        <item quantity="few">%1$s и ещё %2$d вышли</item>
-        <item quantity="many">%1$s и ещё %2$d вышли</item>
-        <item quantity="other">%1$s и ещё %2$d вышли</item>
+        <item quantity="one">%1$s и ещё 1 покинули звонок</item>
+        <item quantity="few">%1$s и ещё %2$d покинули звонок</item>
+        <item quantity="many">%1$s и ещё %2$d покинули звонок</item>
+        <item quantity="other">%1$s и ещё %2$d покинули звонок</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Удалить безвозвратно</string>
@@ -3958,19 +3956,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Не удалось восстановить подключение</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte"></string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;Б</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte"></string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;КБ</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte"></string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;МБ</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte"></string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;ГБ</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte"></string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;ТБ</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte"></string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;ПБ</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte"></string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;ЭБ</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Звонок завершится через %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -4170,17 +4168,17 @@
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
     <string name="upgrade_account_successful_pro_lite_monthly">Спасибо за вашу месячную подписку Pro Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly"></string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Спасибо за вашу годовую подписку Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly"></string>
+    <string name="upgrade_account_successful_pro_1_monthly">Спасибо за вашу месячную подписку Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly"></string>
+    <string name="upgrade_account_successful_pro_1_yearly">Спасибо за вашу годовую подписку Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly"></string>
+    <string name="upgrade_account_successful_pro_2_monthly">Спасибо за вашу месячную подписку Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly"></string>
+    <string name="upgrade_account_successful_pro_2_yearly">Спасибо за вашу годовую подписку Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly"></string>
+    <string name="upgrade_account_successful_pro_3_monthly">Спасибо за вашу месячную подписку Pro&#160;III</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Спасибо за вашу годовую подписку Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -4213,36 +4211,14 @@
     <string name="photos_create_album_error_message_systems_album">Недопустимое название альбома. Введите другое название.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Альбом с таким названием уже существует. Введите другое название.</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Новый альбом (%d)</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">Добавление элементов в «%s»</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %1$d item to “%2$s“</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">Платёжная информация</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">Pro-подписка скоро истекает</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">Ваша оплата плана %1$s получена.</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">Ваша оплата плана %1$s не удалась.</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="one">Ваша Pro-подписка истекает через 1 день.</item>
-        <item quantity="few">Ваша Pro-подписка истекает через %1$d дня.</item>
-        <item quantity="many">Ваша Pro-подписка истекает через %1$d дней.</item>
-        <item quantity="other">Ваша Pro-подписка истекает через %1$d дня.</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="one">Ваша Pro-подписка истекла 1 день назад.</item>
-        <item quantity="few">Ваша Pro-подписка истекла %1$d дня назад.</item>
-        <item quantity="many">Ваша Pro-подписка истекла %1$d дней назад.</item>
-        <item quantity="other">Ваша Pro-подписка истекла %1$d дня назад.</item>
+        <item quantity="one">%1$d элемент добавлен в «%2$s»</item>
+        <item quantity="few">%1$d элемента добавлено в «%2$s»</item>
+        <item quantity="many">%1$d элементов добавлено в «%2$s»</item>
+        <item quantity="other">%1$d элемента добавлено в «%2$s»</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]Альбом[/A][B]пуст[/B]</string>
@@ -4332,8 +4308,10 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Не разрешать</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="one">Из «%2$s» удалён %1$d элемент</item>
+        <item quantity="few">Из «%2$s» удалено %1$d элемента</item>
+        <item quantity="many">Из «%2$s» удалено %1$d элементов</item>
+        <item quantity="other">Из «%2$s» удалено %1$d элемента</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">Разовая встреча</string>
@@ -4350,7 +4328,7 @@
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s отменил[/A][B] встречу, запланированную на:[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s изменил[/A][B] название встречи с «%s» на [/B]«[A]%s[/A]»</string>
     <!-- User Alert notification for scheduled meeting date change -->
     <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s изменил[/A][B] дату встречи[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
@@ -4358,7 +4336,7 @@
     <!-- User Alert notification for scheduled meeting description change -->
     <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s изменил[/A][B] описание встречи[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the details of the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s изменил[/A][B] подробности встречи, назначенной на:[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">Доступ запрещён</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
@@ -4386,7 +4364,7 @@
     <!-- User Alert notification for scheduled recurring meeting description change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s изменил[/A][B] описание повторяющейся встречи[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s updated[/A][B] the details of the recurring meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s изменил[/A][B] подробности повторяющейся встречи, назначенной на:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s изменил[/A][B] повторение на:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
@@ -5009,4 +4987,24 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">сб</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">вс</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">Нельзя выбрать больше</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">За один раз вы можете добавить в альбом до 150 элементов.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Не удаётся подтвердить контакт</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Вы не можете подтвердить %s, так как его нет в вашем списке контактов. Подождите, пока он сначала примет приглашение.</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">Начать</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">Ok</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">Этот файл был изъят в соответствии с нашей [A]Политикой изъятия контента[/A].</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">Эта папка был изъята в соответствии с нашей [A]Политикой изъятия контента[/A].</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">Войти</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">Начать встречу</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">Присоединиться к встрече</string>
 </resources>

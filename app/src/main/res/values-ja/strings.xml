@@ -65,7 +65,7 @@
     <!-- when no external card exists -->
     <string name="no_external_SD_card_detected">外部ストレージが検出されませんでした</string>
     <!-- Button where the user can sign off or logout -->
-    <string name="action_logout">ログアウト</string>
+    <string name="action_logout">ログ&#160;アウト</string>
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="action_add">アップロード</string>
     <!-- Menu item -->
@@ -127,7 +127,7 @@
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">現在のログインプロセスをキャンセルしてもよろしいですか？</string>
     <!-- Login button -->
-    <string name="login_text">ログイン</string>
+    <string name="login_text">ログ&#160;イン</string>
     <!-- email label -->
     <string name="email_text">メール</string>
     <!-- password label -->
@@ -301,7 +301,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">転送を表示</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb"></string>
+    <string name="error_file_size_greater_than_4gb">ほとんどの端末は4&#160;GBを超えるファイルをダウンロードできません。あなたのダウンロードはおそらく失敗するでしょう。</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">端末上にこのファイルを実行できるアプリがありません</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -377,7 +377,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">要求を再送信しました</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">要求が%sさんに正常に送信されました。送信済み要求タブで表示します。</string>
+    <string name="context_contact_request_sent">要求が%sさんに送信されました。「送信済み要求」タブで表示します。</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">連絡先を削除しました</string>
     <!-- error message -->
@@ -393,53 +393,53 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">エラー。フォルダが作成されていません</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">名前の変更に成功しました</string>
+    <string name="context_correctly_renamed">名前を変更しました</string>
     <!-- error message -->
     <string name="context_no_renamed">エラー。名前が変更されていません</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">正常にコピーされました</string>
+    <string name="context_correctly_copied">コピーしました</string>
     <!-- error message -->
     <string name="context_no_copied">エラー。コピーされていません</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">目的のフォルダを選択してください</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">正常に移動しました</string>
+    <string name="context_correctly_moved">移動しました</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="other">%d項目移動しました</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d項目が正常に送信されませんでした</string>
+    <string name="number_incorrectly_moved">%d個の項目は移動されませんでした</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">ごみ箱に正常に移動しました</string>
+    <string name="context_correctly_moved_to_rubbish">ごみ箱に移動しました</string>
     <!-- error message -->
     <string name="context_no_moved">エラー。移動されませんでした</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">正常に共有されました</string>
+    <string name="context_correctly_shared">共有済み</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">エラー。%d件の共有は完了しませんでした</string>
     <!-- error message -->
     <string name="context_no_removed_shared">エラー。共有を削除できませんでした</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">正常に削除されました</string>
+    <string name="context_correctly_removed">削除済み</string>
     <!-- error message -->
     <string name="context_no_removed">エラー。削除に失敗しました</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d個の項目がMEGAから正常に削除されました</string>
+    <string name="number_correctly_removed">MEGAから%d個の項目が削除されました</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d項目が正常に削除されませんでした</string>
+    <string name="number_no_removed">%d個の項目は削除されませんでした</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d個のフォルダが正常に残りました。</string>
+    <string name="number_correctly_leaved">%d個のフォルダから離れました</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">共有が残りました</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d個のフォルダはうまく残りませんでした</string>
+    <string name="number_no_leaved">%d個のフォルダから離れませんでした</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d項目が正常にコピーされました</string>
+    <string name="number_correctly_copied">%d個の項目をコピーしました</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d項目がコピーされませんでした</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">ごみ箱が正常に空になりました</string>
+    <string name="rubbish_bin_emptied">ごみ箱を空にしました</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">エラーが発生しました。ごみ箱は空になっていません</string>
     <!-- dialog cancel subscriptions -->
@@ -505,7 +505,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">現在、このプランにはお支払い方法が設定されておりません。1つ選択してください。</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">リンクがクリップボードにコピーされました</string>
+    <string name="file_properties_get_link">リンクをクリップボードにコピーしました</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">アカウントを作成する前にログアウトしてください</string>
     <!-- menu item -->
@@ -611,7 +611,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">不正なコードです。もう一度やり直すか、再送信してください。</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">お使いの電話番号が正常に検証されました</string>
+    <string name="verify_account_successfully">あなたの電話番号が認証されました</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>内部ストレージ</item>
@@ -750,13 +750,13 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">無料アカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1"></string>
+    <string name="my_account_pro1">Pro&#160;I アカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2"></string>
+    <string name="my_account_pro2">Pro&#160;II アカウント</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3"></string>
+    <string name="my_account_pro3">Pro&#160;III アカウント</string>
     <!-- Type of account info added to the feedback email sent to support -->
-    <string name="my_account_prolite_feedback_email">Pro&#160;Liteアカウント</string>
+    <string name="my_account_prolite_feedback_email">Pro &#160;Liteアカウント</string>
     <!--  -->
     <string name="backup_title">回復キーをバックアップ</string>
     <!-- Subtitle of the screen to backup the master key -->
@@ -940,7 +940,7 @@
         <item quantity="other">%d個の招待状が送信されました</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d件の招待要求は正常に送信されましたが、%2$d件の要求は送信されませんでした。</string>
+    <string name="number_no_invite_contact_request">%1$d件の招待要求は送信されましたが、%2$d件の要求は送信されませんでした。</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (私)</string>
     <!-- button -->
@@ -994,7 +994,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">チャット履歴がクリアされました</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">エラーが発生しました。チャット履歴が正常にクリアされませんでした</string>
+    <string name="clear_history_error">エラーが発生しました。チャット履歴がクリアされませんでした</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">参加者を追加</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1064,9 +1064,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">この参加者は既にこのグループチャットに含まれています</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d人の参加者が正しく招待されました</string>
+    <string name="number_correctly_add_participant">%d人の参加者が招待されました</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d人の参加者は正常に招待されましたが、%2$d人の参加者は招待されませんでした。</string>
+    <string name="number_no_add_participant_request">%1$d人の参加者は招待されましたが、%2$d人の参加者は招待されませんでした。</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B]さんは[/B][C]%2$s[/C]さんからの招待によってグループチャットに参加しました</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1103,12 +1103,12 @@
     <string name="non_format_change_title_messages">%1$sさんはグループチャット名を「%2$s」に変更しました</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$sさんはグループチャットから離れました</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
-    <string name="messages_copied_clipboard">クリップボードにコピーされました</string>
+    <!-- Success alert when the user copies one message to the clipboard -->
+    <string name="messages_copied_clipboard">クリップボードにコピーしました</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">チャットエラー！</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">チャットを正しく開くことができませんでした</string>
+    <string name="chat_error_open_message">チャットを開けませんでした</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d件の連絡先</item>
@@ -1302,7 +1302,7 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="other">リンクを削除しました。</item>
+        <item quantity="other">リンクが削除されました</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">添付された連絡先</string>
@@ -1325,7 +1325,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">名前の変更時にエラーが発生しました</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">あなたの名前は正しく更新されました</string>
+    <string name="success_changing_user_attributes">あなたの名前は更新されました</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">参加者が追加されました</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1559,11 +1559,11 @@
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">あなたのQRコードをスキャンするMEGAユーザー様は自動的にあなたの連絡先リストに追加されます。</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">リンクがクリップボードにコピーされました</string>
+    <string name="qrcode_link_copied">リンクをクリップボードにコピーしました</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">QRコードが正常にリセットされました</string>
+    <string name="qrcode_reset_successfully">QRコードリセット</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">QRコードが正常に削除されました</string>
+    <string name="qrcode_delete_successfully">QRコードを削除しました</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">エラーによりQRコードはリセットされません。もう一度やり直してください。</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1581,7 +1581,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">QRファイルのダウンロード試行中にエラーが発生しました。ファイルが存在しない可能性があります。後でもう一度お試しください。</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">QRコードが%sに正常にダウンロードされました</string>
+    <string name="success_download_qr">QRコードが%sにダウンロードされました</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">招待状は未送信です</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1598,8 +1598,6 @@
     <string name="button_copy_link">リンクをコピー</string>
     <!-- Create QR code -->
     <string name="button_create_qr">QRコードを作成</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">QRコードが正常に作成されました</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">QRコードを整列させて、端末のカメラでスキャンします</string>
     <!-- positive button on dialog to view a contact -->
@@ -1669,7 +1667,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">ファイルを読み込んでいます</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte"></string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1685,7 +1683,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte"></string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
@@ -1743,7 +1741,7 @@
     <string name="messages_forwarded_success">メッセージが転送されました</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="other">エラー。%1$d件のメッセージが正常に転送されませんでした</item>
+        <item quantity="other">エラー。%1$d件のメッセージが転送されませんでした</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1828,7 +1826,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">印刷</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">回復キーは正常に保存されました</string>
+    <string name="save_MK_confirmation">回復キーが保存されました</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">（保留中）</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1890,7 +1888,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">次回アカウントにログインすると、オーセンティケータアプリで提供される6桁のコードを入力するよう求められます。</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled"></string>
+    <string name="recommendation_2fa_enabled">アプリへのアクセスができなくなったり、二要素認証を無効にしたい場合の問題を回避するために、<b>回復キー</b>安全な場所に保存してください。</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">コードが無効です</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -1978,29 +1976,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">この操作は、現在のストレージ容量上限を超えてしまうため、完了できません。アカウントをアップグレードしますか？</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">圧縮されたチャット</string>
+    <string name="archived_chats_title_section">アーカイブ済み</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">アーカイブされたチャット（%d）</string>
+    <string name="archived_chats_show_option">アーカイブ済み（%d）</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">チャットをアーカイブ</string>
+    <string name="archive_chat_option">アーカイブ</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">チャットのアーカイブを解除</string>
+    <string name="unarchive_chat_option">アーカイブを解除</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">アーカイブ</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">アーカイブを解除</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">%sチャットがアーカイブされました。</string>
+    <string name="success_archive_chat">%sはアーカイブされました</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">エラー。%sチャットがアーカイブされませんでした。</string>
+    <string name="error_archive_chat">エラー。%sはアーカイブされませんでした。もう一度お試しください。</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">%sチャットがアーカイブされませんでした。</string>
+    <string name="success_unarchive_chat">%sはアーカイブ解除されました</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">エラー。%sチャットがアーカイブできませんでした。</string>
+    <string name="error_unarchive_chat">エラー。%sはアーカイブ解除されませんでした。もう一度お試しください。</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">非アクティブなチャット</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">アーカイブされたチャット</string>
+    <string name="archived_chat">アーカイブ済み</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">通話に参加するにはタップします</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2032,7 +2030,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">すべてのファイルのバージョン履歴を削除しようとしています。連絡先があなたと共有しているファイルバージョンはいずれも、連絡先が削除する必要があります。\n\n現在のファイルは削除されませんのでご注意ください。</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">ファイルバージョンが正常に削除されました</string>
+    <string name="success_delete_versions">ファイルバージョンが削除されました</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">あなたのファイルの古いバージョンをすべて削除しようとしている間にエラーが発生しました。しばらくしてからもう一度お試しください。</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2350,7 +2348,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">このチャット用のリンクを作成する前に、説明を設定する必要があります：</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">チャットリンクをクリップボードにコピーしました</string>
+    <string name="chat_link_copied_clipboard">リンクをクリップボードにコピーしました</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A][/A] %sから/[A]月[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2486,7 +2484,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">コンテンツが%dチャットに送信されませんでした</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">新規グループチャットが作成されました</string>
+    <string name="new_group_chat_created">新しいグループチャットが作成されました</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">ファイルを準備中</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2503,7 +2501,7 @@
     <string name="version_history_deleted_erroneously">以前のバージョンは削除されませんでした。</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="other">%dバージョンが正常に削除されました</item>
+        <item quantity="other">%d個のバージョンが削除されました</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2592,13 +2590,13 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">連絡先を招待し、MEGAの暗号化チャットで安全にチャットを始めましょう。</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message">こんにちは！　私とMEGAでセキュアな会話をして、20&#160;GBの無料クラウドストレージを獲得しましょう。%1$s</string>
+    <string name="invite_contacts_to_start_chat_text_message">こんにちは！私とMEGAでセキュアな会話をして、20&#160;GBの無料クラウドストレージを獲得しましょう。%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">利用できるチャットリンクはありません。</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">チャットリンクは正常に削除されました。</string>
+    <string name="chat_link_deleted">チャットリンクが削除されました</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">バージョンは正常に復元されました。</string>
+    <string name="version_restored">バージョンが復元されました</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">長押しで録音</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2756,7 +2754,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">このファイルを修正するための正しい権限がありません。新しいファイルを作成したいですか？</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">バージョンは新しいファイルとして正常に作成されました。</string>
+    <string name="version_as_new_file_created">バージョンは新しいファイルとして作成されました</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">%1$sに</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2834,7 +2832,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">退席中&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">お使いの電話番号が正常に削除されました。</string>
+    <string name="remove_phone_number_success">電話番号が削除されました</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">電話番号の削除に失敗しました。</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -2978,13 +2976,13 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">パスワードをコピー</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">キーがクリップボードにコピーされました。</string>
+    <string name="key_copied_clipboard">キーがクリップボードにコピーされました</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">パスワードがクリップボードにコピーされました。</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">リンクとキーが正常に送信されました。</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">リンクとパスワードが正常に送信されました。</string>
+    <string name="password_copied_clipboard">パスワードがクリップボードにコピーされました</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
+    <string name="link_and_key_sent">リンクとキーが送信されました</string>
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
+    <string name="link_and_password_sent">リンクとパスワードが送信されました</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Proにアップグレード</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3161,19 +3159,19 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="other">%d個の項目がごみ箱に正常に移動しました</item>
+        <item quantity="other">%d個の項目をゴミ箱に移動しました</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="other">%d個の項目がごみ箱に正常に移動されませんでした</item>
+        <item quantity="other">%d個の項目はごみ箱に移動されませんでした</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="other">%d個の項目が正常に復元されました</item>
+        <item quantity="other">%d個の項目が復元されました</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="other">%d個の項目が正常に復元されませんでした</item>
+        <item quantity="other">%d個の項目は復元されませんでした</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">とにかく変更する</string>
@@ -3219,11 +3217,11 @@
     <string name="action_copy_all">すべてコピー</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="other">リンクが正常に送信されました。</item>
+        <item quantity="other">リンクが送信されました</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="other">リンクがクリップボードにコピーされました。</item>
+        <item quantity="other">リンクをクリップボードにコピーしました</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3318,7 +3316,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">あなたは新しい主催者です</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">ミーティングのリンクをコピーしました。</string>
+    <string name="copied_meeting_link">リンクをクリップボードにコピーしました</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">タップして現在の会議に参加します。</string>
     <!-- Title of fifth tour screen -->
@@ -3334,7 +3332,7 @@
     <!-- the content of join without account on left meeting page-->
     <string name="left_meeting_join_content">世界最大の安全なクラウドストレージとコラボレーションプラットフォームにご参加ください。</string>
     <!-- the bonus title of join without account on left meeting page-->
-    <string name="left_meeting_bonus_title">20&#160;GBを無料で入手</string>
+    <string name="left_meeting_bonus_title">20 &#160;GBを無料で入手</string>
     <!-- the bonus content of join without account on left meeting page-->
     <string name="left_meeting_bonus_content">今すぐ登録して、高度なコラボレーション機能を無料でお楽しみください。</string>
     <!-- Content of ongoing call for MaterialAlertDialog-->
@@ -3396,7 +3394,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">すでに%1$sさんを招待しています</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">招待状の送信に成功しました。送信済み要求をご確認ください。</string>
+    <string name="contact_invited">招待状を送信しました。送信済み要求をご確認ください。</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">オフラインで利用できるファイル</string>
     <!-- Message when file removed from offline. -->
@@ -3552,16 +3550,16 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$sさんと%2$sさんが参加しました</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$sさんが抜けました</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$sさんが通話から抜けました</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$sさんと%2$sさんが抜けました</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$sさんと%2$sさんが通話から抜けました</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="other">%1$sさんとその他%2$d人の方々が参加しました</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="other">%1$sさんとその他%2$d人の方々が抜けました</item>
+        <item quantity="other">%1$sさんとその他%2$d人の方々が通話から抜けました</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">恒久的に削除</string>
@@ -3658,19 +3656,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">再接続できません</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte"></string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte"></string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte"></string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte"></string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte"></string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte"></string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte"></string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">通話は%sに終了します</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3856,19 +3854,19 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">ミーティングをスケジュール</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">Pro Liteの月間サブスクリプションをご利用いただきありがとうございます</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Pro &#160;Liteの月間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly"></string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Pro&#160;Liteの年間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly"></string>
+    <string name="upgrade_account_successful_pro_1_monthly">Pro&#160;Iの月間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly"></string>
+    <string name="upgrade_account_successful_pro_1_yearly">Pro&#160;Iの年間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly"></string>
+    <string name="upgrade_account_successful_pro_2_monthly">Pro&#160;IIの月間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly"></string>
+    <string name="upgrade_account_successful_pro_2_yearly">Pro&#160;IIの年間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly"></string>
+    <string name="upgrade_account_successful_pro_3_monthly">Pro&#160;IIIの月間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Pro&#160;IIIの年間サブスクリプションをご利用いただきありがとうございます</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -3901,30 +3899,11 @@
     <string name="photos_create_album_error_message_systems_album">このアルバム名は使用できません。別の名前を入力してください。</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">この名前のアルバムはすでに存在します。別の名前を入力してください。</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">新しいアルバム（%d）</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">項目を「%s」に追加</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %1$d item to “%2$s“</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">お支払い情報</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">Proメンバーシッププランが間もなく失効いたします</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">%1$sプランのお支払いをお受けいたしました。</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">%1$sプランのお支払いに失敗しました。</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="other">お客様のProメンバーシッププランは%1$d日後に失効いたします。</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="other">お客様のProメンバーシッププランは%1$d日前に失効いたしました。</item>
+        <item quantity="other">%1$d項目を「%2$s」に追加しました</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]アルバム[/A]が[B]空[/B]です</string>
@@ -4002,8 +3981,7 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">許可しない</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="other">「%1$d」から%2$s個の項目を削除しました</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">一回限りのミーティング</string>
@@ -4020,7 +3998,7 @@
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="notification_subtitle_scheduled_meeting_canceled">[B]以下に予定されたミーティングを[/B][A]%sさんがキャンセルしました[/A]：</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%sさんがミーティング名を「%s」から[/B]「[A]%s[/A]」に更新しました[/A][B]</string>
     <!-- User Alert notification for scheduled meeting date change -->
     <string name="notification_subtitle_scheduled_meeting_updated_date">[B]ミーティングの日付を[/B][A]%sさんが更新しました[/A]</string>
     <!-- User Alert notification for scheduled meeting time change -->
@@ -4445,4 +4423,24 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">土</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">日</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">これ以上選択できません</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">一度に最大150個のアイテムのみをアルバムに追加できます。</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">連絡先を認証できません</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">連絡先リストにないため、%sを認証できません。相手側が最初にあなたの招待を受け入れるのを待ちます。</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">開始</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">OK</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">このファイルは、当社の[A]削除ガイダンスポリシー[/A]に従って削除されました。</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">このフォルダは、当社の[A]削除ガイダンスポリシー[/A]に従って削除されました。</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">参加する</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">ミーティング開始</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">ミーティングに参加</string>
 </resources>

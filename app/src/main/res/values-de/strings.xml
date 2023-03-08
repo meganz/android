@@ -242,7 +242,7 @@
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Keine Dateien im Ordner</string>
     <!-- Title of the fragment Choose Account -->
-    <string name="choose_account_fragment">ACCOUNT WÄHLEN</string>
+    <string name="choose_account_fragment">Account wählen</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
     <string name="file_properties_available_offline">Offline verfügbar</string>
     <!-- category in sort by action -->
@@ -309,7 +309,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Transferübersicht</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb"></string>
+    <string name="error_file_size_greater_than_4gb">Die meisten Geräte haben Probleme mit Dateien größer als 4&#160;GB. Ihr Download wird vermutlich fehlschlagen.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Für diesen Dateityp existiert keine geeignete App</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -386,7 +386,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Anfrage erneut gesendet</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Anfrage erfolgreich an %s gesendet. Ihre Anfragen finden Sie auf dem Tab Gesendete Anfragen.</string>
+    <string name="context_contact_request_sent">Anfrage gesendet an %s. Ihre Anfragen finden Sie auf dem Tab Gesendete Anfragen.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Kontakt gelöscht</string>
     <!-- error message -->
@@ -402,54 +402,54 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Fehler. Ordner nicht erstellt</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Umbenennung erfolgreich</string>
+    <string name="context_correctly_renamed">Umbenannt</string>
     <!-- error message -->
     <string name="context_no_renamed">Fehler. Nicht umbenannt</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Kopieren erfolgreich</string>
+    <string name="context_correctly_copied">Kopiert</string>
     <!-- error message -->
     <string name="context_no_copied">Fehler. Nicht kopiert</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Bitte wählen Sie einen Zielordner</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Verschieben erfolgreich</string>
+    <string name="context_correctly_moved">Verschoben</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="one">%d Element verschoben</item>
         <item quantity="other">%d Elemente verschoben</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d Elemente konnten nicht verschoben werden</string>
+    <string name="number_incorrectly_moved">%d Elemente wurden nicht verschoben</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">In den Papierkorb verschoben</string>
     <!-- error message -->
     <string name="context_no_moved">Fehler. Nicht verschoben</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Freigabe erfolgreich</string>
+    <string name="context_correctly_shared">Freigegeben</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Fehler. %d Ordnerfreigaben konnten nicht erstellt werden.</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Fehler. Freigabe konnte nicht entfernt werden.</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Löschen erfolgreich</string>
+    <string name="context_correctly_removed">Gelöscht</string>
     <!-- error message -->
     <string name="context_no_removed">Fehler. Nicht von MEGA gelöscht</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d Dateien und Ordner entfernt</string>
+    <string name="number_correctly_removed">%d Elemente aus MEGA entfernt</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d Elemente konnten nicht entfernt werden</string>
+    <string name="number_no_removed">%d Elemente wurden nicht entfernt</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d Ordnerfreigaben erfolgreich verlassen.</string>
+    <string name="number_correctly_leaved">%d Ordner verlassen</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">Ordnerfreigabe verlassen</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d Ordnerfreigaben konnten nicht storniert werden</string>
+    <string name="number_no_leaved">%d Ordner nicht verlassen</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d Elemente wurden erfolgreich kopiert</string>
+    <string name="number_correctly_copied">%d Elemente kopiert</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d Elemente wurden nicht kopiert</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Der Papierkorb wurde erfolgreich geleert</string>
+    <string name="rubbish_bin_emptied">Papierkorb geleert</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">Ein Fehler ist aufgetreten. Der Papierkorb wurde nicht geleert</string>
     <!-- dialog cancel subscriptions -->
@@ -516,7 +516,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">Für diesen Tarif ist derzeit keine Zahlungsmethode hinterlegt. Bitte treffen Sie eine Auswahl.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Der Link wurde in Ihre Zwischenablage kopiert</string>
+    <string name="file_properties_get_link">Link in Zwischenablage kopiert</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Bitte loggen Sie sich aus, bevor Sie einen Account erstellen</string>
     <!-- menu item -->
@@ -762,11 +762,11 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Gratisaccount</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1"></string>
+    <string name="my_account_pro1">Pro&#160;I-Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2"></string>
+    <string name="my_account_pro2">Pro&#160;II-Account</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3"></string>
+    <string name="my_account_pro3">Pro&#160;III-Account</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Pro&#160;Lite-Account</string>
     <!--  -->
@@ -1013,7 +1013,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">Der Chatverlauf wurde gelöscht</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">Ein Fehler ist aufgetreten. Der Chatverlauf konnte nicht gelöscht werden</string>
+    <string name="clear_history_error">Ein Fehler ist aufgetreten. Der Chatverlauf wurde nicht gelöscht</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Teilnehmer hinzufügen</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1122,7 +1122,7 @@
     <string name="non_format_change_title_messages">%1$s hat den Gruppenchat in „%2$s“ umbenannt</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s hat den Gruppenchat verlassen</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
+    <!-- Success alert when the user copies one message to the clipboard -->
     <string name="messages_copied_clipboard">In die Zwischenablage kopiert</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chatfehler</string>
@@ -1335,8 +1335,8 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="one">Link erfolgreich entfernt.</item>
-        <item quantity="other">Links erfolgreich entfernt.</item>
+        <item quantity="one">Der Link wurde entfernt</item>
+        <item quantity="other">Die Links wurden entfernt</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Kontakte angehängt</string>
@@ -1359,7 +1359,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">Fehler bei der Aktualisierung Ihres Namens</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Ihr Name wurde erfolgreich aktualisiert</string>
+    <string name="success_changing_user_attributes">Ihr Name wurde aktualisiert</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Teilnehmer hinzugefügt</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1596,7 +1596,7 @@
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Benutzer, die Ihre QR-Code scannen, werden Ihrer Kontaktliste automatisch hinzugefügt.</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Der Link wurde in die Zwischenablage kopiert</string>
+    <string name="qrcode_link_copied">Link in Zwischenablage kopiert</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
     <string name="qrcode_reset_successfully">QR-Code zurückgesetzt</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
@@ -1618,7 +1618,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">Es ist ein Fehler beim Herunterladen der QR-Datei aufgetreten. Die Datei existiert möglicherweise nicht.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">Der QR-Code wurde erfolgreich in %s heruntergeladen</string>
+    <string name="success_download_qr">Der QR-Code wurde nach %s heruntergeladen</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Einladung nicht versandt</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1635,8 +1635,6 @@
     <string name="button_copy_link">Link kopieren</string>
     <!-- Create QR code -->
     <string name="button_create_qr">QR-Code erzeugen</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">QR-Code erfolgreich erzeugt</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">Richten Sie Ihre Kamera auf den QR-Code</string>
     <!-- positive button on dialog to view a contact -->
@@ -1706,7 +1704,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Dateien werden geladen</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte"></string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1722,7 +1720,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte"></string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
@@ -1874,7 +1872,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Drucken</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Der Rettungsschlüssel wurde erfolgreich gespeichert</string>
+    <string name="save_MK_confirmation">Der Rettungsschlüssel wurde gespeichert</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Wartezustand)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1937,7 +1935,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Beim nächsten Login werden Sie nach einem sechsstelligen Code gefragt, den Sie von Ihrer Authentifizierungs-App erhalten.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled"></string>
+    <string name="recommendation_2fa_enabled">Bitte speichern Sie Ihren <b>Rettungsschlüssel</b> an einem sicheren Ort, um Probleme zu vermeiden, falls Sie nicht mehr auf Ihre App zugreifen können oder wenn Sie die Zwei-Faktor-Authentifizierung deaktivieren möchten.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Code ungültig</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2026,29 +2024,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Sie haben hierfür nicht genügend freien Speicherplatz. Möchten Sie auf Pro wechseln?</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">Archivierte Chats</string>
+    <string name="archived_chats_title_section">Archiviert</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Archivierte Chats (%d)</string>
+    <string name="archived_chats_show_option">Archiviert (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Chat archivieren</string>
+    <string name="archive_chat_option">Archivieren</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Chat dearchivieren</string>
+    <string name="unarchive_chat_option">Dearchivieren</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archivieren</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Dearchivieren</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">Der Chat %s wurde archiviert.</string>
+    <string name="success_archive_chat">%s wurde archiviert</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Fehler. Der Chat %s war nicht archiviert.</string>
+    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">Der Chat %s wurde wiederhergestellt.</string>
+    <string name="success_unarchive_chat">%s wurde wiederhergestellt</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Fehler. Der Chat %s konnte nicht wiederhergestellt werden.</string>
+    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Inaktiver Chat</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">Archivierter Chat</string>
+    <string name="archived_chat">Archiviert</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Konferenz beitreten</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2081,7 +2079,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">Sie löschen die Versionshistorie aller Dateien. Dateiversionen in Ordnerfreigaben eines Kontakts müssen durch diesen gelöscht werden.\n\nBitte beachten Sie: Die aktuelle Version jeder Datei bleibt erhalten.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">Dateiversionen erfolgreich gelöscht</string>
+    <string name="success_delete_versions">Dateiversionen gelöscht</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">Die alten Versionen Ihrer Dateien konnten nicht gelöscht werden, bitte versuchen Sie es später noch einmal.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2408,7 +2406,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Geben Sie vor der Erstellung des Chatlinks zunächst eine Beschreibung des Chats ein:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Chatlink in die Zwischenablage kopiert</string>
+    <string name="chat_link_copied_clipboard">Link in Zwischenablage kopiert</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Ab[/A] %s pro [A]Monat[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2664,9 +2662,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Kein Chatlink verfügbar.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Chatlink erfolgreich gelöscht.</string>
+    <string name="chat_link_deleted">Chatlink gelöscht</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Die Version wurde wiederhergestellt.</string>
+    <string name="version_restored">Version wiederhergestellt</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Zum Aufnehmen antippen und halten</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2829,7 +2827,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">Sie haben nicht die erforderlichen Rechte, um diese Datei zu ändern. Möchten Sie eine neue Datei erstellen?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Neue Dateiversion erfolgreich erstellt.</string>
+    <string name="version_as_new_file_created">Version wurde als neue Datei gespeichert</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">am %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2910,7 +2908,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Verlassen&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Ihre Mobilnummer wurde erfolgreich entfernt.</string>
+    <string name="remove_phone_number_success">Telefonnummer entfernt</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Ihre Telefonnummer konnte nicht entfernt werden.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3061,13 +3059,13 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Passwort kopieren</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Schlüssel in die Zwischenablage kopiert.</string>
+    <string name="key_copied_clipboard">Schlüssel in Zwischenablage kopiert</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Passwort in die Zwischenablage kopiert.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Link und Schlüssel erfolgreich versandt.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">Link und Passwort erfolgreich versandt.</string>
+    <string name="password_copied_clipboard">Passwort in Zwischenablage kopiert</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
+    <string name="link_and_key_sent">Link und Schlüssel versandt</string>
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
+    <string name="link_and_password_sent">Link und Passwort versandt</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Auf Pro umsteigen</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3256,7 +3254,7 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">Ein Elemente konnte nicht in den Papierkorb verschoben werden</item>
+        <item quantity="one">Ein Element konnte nicht in den Papierkorb verschoben werden</item>
         <item quantity="other">%d Elemente konnten nicht in den Papierkorb verschoben werden</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
@@ -3266,7 +3264,7 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">Ein Element konnte nicht wiederhergestellt werden</item>
+        <item quantity="one">1 Element konnte nicht wiederhergestellt werden</item>
         <item quantity="other">%d Elemente konnten nicht wiederhergestellt werden</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
@@ -3314,13 +3312,13 @@
     <string name="action_copy_all">Alle kopieren</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link erfolgreich versendet.</item>
-        <item quantity="other">Links erfolgreich versendet.</item>
+        <item quantity="one">Link gesendet</item>
+        <item quantity="other">Links gesendet</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Link in die Zwischenablage kopiert.</item>
-        <item quantity="other">Links wurden in die Zwischenablage kopiert.</item>
+        <item quantity="one">Link in Zwischenablage kopiert</item>
+        <item quantity="other">Links in Zwischenablage kopiert</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3416,7 +3414,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Sie sind der neue Gastgeber</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Meetinglink kopiert.</string>
+    <string name="copied_meeting_link">Link in Zwischenablage kopiert</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Antippen, um dem laufenden Meeting beizutreten.</string>
     <!-- Title of fifth tour screen -->
@@ -3494,7 +3492,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Sie haben %1$s bereits eingeladen</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Einladung erfolgreich versandt. Siehe Gesendete Anfragen.</string>
+    <string name="contact_invited">Einladung versandt. Siehe Gesendete Anfragen.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Datei offline verfügbar</string>
     <!-- Message when file removed from offline. -->
@@ -3650,9 +3648,9 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$s und %2$s sind beigetreten</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s hat aufgelegt</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s hat die Konferenz verlassen</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s und %2$s haben aufgelegt</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s und %2$s haben die Konferenz verlassen</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">%1$s und 1 weitere Person sind beigetreten</item>
@@ -3660,8 +3658,8 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s und 1 weitere Person haben aufgelegt</item>
-        <item quantity="other">%1$s und %2$d weitere Personen haben aufgelegt</item>
+        <item quantity="one">%1$s und eine weitere Person haben die Konferenz verlassen</item>
+        <item quantity="other">%1$s und %2$d weitere Personen haben die Konferenz verlassen</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Endgültig löschen</string>
@@ -3758,19 +3756,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Verbindung kann nicht wiederhergestellt werden</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte"></string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte"></string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte"></string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte"></string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte"></string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte"></string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte"></string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Die Konferenz wird nach %s beendet</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3962,17 +3960,17 @@
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
     <string name="upgrade_account_successful_pro_lite_monthly">Vielen Dank – Sie haben jetzt ein Monatsabonnement für Pro Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly"></string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Vielen Dank – Sie haben jetzt ein Jahresabonnement für Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly"></string>
+    <string name="upgrade_account_successful_pro_1_monthly">Vielen Dank – Sie haben jetzt ein Monatsabonnement für Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly"></string>
+    <string name="upgrade_account_successful_pro_1_yearly">Vielen Dank – Sie haben jetzt ein Jahresabonnement für Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly"></string>
+    <string name="upgrade_account_successful_pro_2_monthly">Vielen Dank – Sie haben jetzt ein Monatsabonnement für Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly"></string>
+    <string name="upgrade_account_successful_pro_2_yearly">Vielen Dank – Sie haben jetzt ein Jahresabonnement für Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly"></string>
+    <string name="upgrade_account_successful_pro_3_monthly">Vielen Dank – Sie haben jetzt ein Monatsabonnement für Pro&#160;III</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Vielen Dank – Sie haben jetzt ein Jahresabonnement für Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -4005,32 +4003,12 @@
     <string name="photos_create_album_error_message_systems_album">Dieser Albumname ist nicht zulässig. Bitte geben Sie einen anderen Namen ein.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Ein Album mit diesem Namen existiert bereits. Bitte geben Sie einen anderen Namen ein.</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Neues Album (%d)</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">Elemente zu „%s“ hinzufügen</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %1$d item to “%2$s“</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">Informationen zur Zahlung</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">Ihr Pro-Abonnement läuft bald ab</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">Wir haben Ihre Zahlung für das %1$s-Abonnement erhalten.</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">Ihre Zahlung für das %1$s-Abonnement ist fehlgeschlagen.</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="one">Ihr Pro-Abonnement läuft in einem Tag ab.</item>
-        <item quantity="other">Ihr Pro-Abonnement läuft in %1$d Tagen ab.</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="one">Ihr Pro-Abonnement ist vor einem Tag abgelaufen.</item>
-        <item quantity="other">Ihr Pro-Abonnement ist vor %1$d Tagen abgelaufen.</item>
+        <item quantity="one">%1$d Element wurde zu „%2$s“ hinzugefügt</item>
+        <item quantity="other">%1$d Elemente wurden zu „%2$s“ hinzugefügt</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]Das Album ist [/A][B]leer[/B]</string>
@@ -4112,8 +4090,8 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Nicht gewähren</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="one">%1$d Element wurde aus „%2$s“ entfernt</item>
+        <item quantity="other">%1$d Elemente wurden aus „%2$s“ entfernt</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">Einmaliges Meeting</string>
@@ -4130,7 +4108,7 @@
     <!-- User Alert notification for canceled scheduled meeting -->
     <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s [/A][B]hat das Meeting für das folgende Datum abgesagt:[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s [/A][B]hat den Meetingnamen von „%s“ in [/B]„[A]%s[/A]“ geändert</string>
     <!-- User Alert notification for scheduled meeting date change -->
     <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s [/A][B]hat das Datum des Meetings geändert[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
@@ -4138,7 +4116,7 @@
     <!-- User Alert notification for scheduled meeting description change -->
     <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s [/A][B]hat die Meetingbeschreibung geändert[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the details of the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s [/A][B]hat die Details des Meetings für das folgende Datum geändert:[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">Zugriff verweigert</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
@@ -4166,7 +4144,7 @@
     <!-- User Alert notification for scheduled recurring meeting description change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s [/A][B]hat die Beschreibung des wiederkehrenden Meetings geändert[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s updated[/A][B] the details of the recurring meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s [/A][B]hat die Details des wiederkehrenden Meetings mit den folgenden Terminen geändert:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s [/A][B]hat einen Termin wie folgt geändert:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
@@ -4633,4 +4611,24 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">Sa</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">So</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Kontakt kann nicht verifiziert werden</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Sie können %s nicht verifizieren, da diese Person nicht in Ihrer Kontaktliste steht. Warten Sie, bis Ihre Einladung angenommen wird.</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">Start</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">OK</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">Beitreten</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">Meeting starten</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">Meeting beitreten</string>
 </resources>

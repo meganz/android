@@ -245,7 +245,7 @@
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Cartella vuota</string>
     <!-- Title of the fragment Choose Account -->
-    <string name="choose_account_fragment">SCEGLI ACCOUNT</string>
+    <string name="choose_account_fragment">Scegli account</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
     <string name="file_properties_available_offline">Disponibile offline</string>
     <!-- category in sort by action -->
@@ -317,7 +317,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Vedi trasferimenti</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb"></string>
+    <string name="error_file_size_greater_than_4gb">La maggior parte dei dispositivi non possono scaricare file più grandi di 4&#160;GB. Il tuo download probabilmente fallirà.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Non c’è nessuna applicazione disponibile per eseguire il file sul tuo dispositivo</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -395,7 +395,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Richiesta inviata nuovamente</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Richiesta inviata con successo a %s. Vedi nella sezione Richieste inviate.</string>
+    <string name="context_contact_request_sent">Richiesta inviata a %s. Visualizzala nella sezione Richieste inviate.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Contatto cancellato</string>
     <!-- error message -->
@@ -411,17 +411,17 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Errore. Cartella non creata</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Rinominato con successo</string>
+    <string name="context_correctly_renamed">Rinominato</string>
     <!-- error message -->
     <string name="context_no_renamed">Errore. Rinominazione fallita</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copiato con successo</string>
+    <string name="context_correctly_copied">Copiato</string>
     <!-- error message -->
     <string name="context_no_copied">Errore. Copia fallita</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Per favore, scegli una cartella di destinazione</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Spostato con successo</string>
+    <string name="context_correctly_moved">Spostato</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="one">%d oggetto spostato</item>
@@ -429,37 +429,37 @@
         <item quantity="other">%d oggetti spostati</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d oggetti non sono stati spostati con successo</string>
+    <string name="number_incorrectly_moved">%d oggetti non sono stati spostati</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Spostamento nel Cestino avvenuto con successo</string>
+    <string name="context_correctly_moved_to_rubbish">Spostato nel Cestino</string>
     <!-- error message -->
     <string name="context_no_moved">Errore. Spostamento fallito</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Condiviso con successo</string>
+    <string name="context_correctly_shared">Condiviso</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Errore. %d condivisioni non sono state completate</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Errore. Condivisione non rimossa</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Eliminato con successo</string>
+    <string name="context_correctly_removed">Eliminato</string>
     <!-- error message -->
     <string name="context_no_removed">Errore. Cancellazione fallita</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d oggetti rimossi con successo da MEGA</string>
+    <string name="number_correctly_removed">%d oggetti rimossi da MEGA</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d oggetti non sono stati rimossi con successo</string>
+    <string name="number_no_removed">%d oggetti non sono stati rimossi</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d cartelle lasciate con successo.</string>
+    <string name="number_correctly_leaved">%d cartelle abbandonate</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">Condivisione abbandonata</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d cartelle non sono state lasciate con successo</string>
+    <string name="number_no_leaved">%d cartelle non sono state abbandonate</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d oggetti copiati con successo</string>
+    <string name="number_correctly_copied">%d oggetti copiati</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d oggetti non sono stati copiati</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Cestino pulito con successo</string>
+    <string name="rubbish_bin_emptied">Cestino svuotato</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">C\’è stato un errore. Il Cestino non è stato svuotato</string>
     <!-- dialog cancel subscriptions -->
@@ -527,7 +527,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">Non c\’è un metodo di pagamento impostato al momento per questo piano. Per favore, selezionane uno.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Il link è stato copiato negli appunti</string>
+    <string name="file_properties_get_link">Link copiato negli appunti</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Per favore, effettua il logout prima di creare l’account</string>
     <!-- menu item -->
@@ -633,7 +633,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">Codice errato. Per favore, ritenta o chiedi che ti venga mandato nuovamente.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Il tuo numero di telefono è stato verificato con successo</string>
+    <string name="verify_account_successfully">Il tuo numero di telefono è stato verificato</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>Spazio di archiviazione interno</item>
@@ -774,11 +774,11 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Account gratuito</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1"></string>
+    <string name="my_account_pro1">Account Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2"></string>
+    <string name="my_account_pro2">Account Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3"></string>
+    <string name="my_account_pro3">Account Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Account Pro&#160;Lite</string>
     <!--  -->
@@ -796,7 +796,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">Salva</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">Recovery key copied to clipboard. Save it to a safe place where you can easily access later.</string>
+    <string name="copy_MK_confirmation">Chiave di recupero copiata negli appunti. Salvala in un luogo sicuro a cui puoi accedere facilmente.</string>
     <!-- Button to change the password -->
     <string name="change_pass">Cambia</string>
     <!-- Positive button to perform a general action -->
@@ -972,7 +972,7 @@
         <item quantity="other">%d inviti spediti</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d richieste di invito inviate con successo ma %2$d richieste non sono state inviate.</string>
+    <string name="number_no_invite_contact_request">%1$d richieste inviate ma %2$d richieste non sono state inviate.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Io)</string>
     <!-- button -->
@@ -1032,7 +1032,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">La cronologia della chat è stata pulita</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">È stato riscontrato un errore. La cronologia della chat non è stata pulita con successo</string>
+    <string name="clear_history_error">Un errore è stato riscontrato. La cronologia della chat non è stata eliminata</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Aggiungi partecipanti</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1102,9 +1102,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">Il partecipante è già incluso in questa chat di gruppo</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d partecipanti sono stati invitati con successo</string>
+    <string name="number_correctly_add_participant">%d partecipanti invitati</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d partecipanti sono stati invitati con successo ma %2$d partecipanti non sono stati invitati.</string>
+    <string name="number_no_add_participant_request">%1$d partecipanti sono stati invitati ma %2$d non sono stati invitati.</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] si è unito alla chat di gruppo sotto invito di [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1141,12 +1141,12 @@
     <string name="non_format_change_title_messages">%1$s ha cambiato il nome di questa chat di gruppo in “%2$s”</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s ha abbandonato la chat di gruppo</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
+    <!-- Success alert when the user copies one message to the clipboard -->
     <string name="messages_copied_clipboard">Copiato negli appunti</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Errore della chat</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Non è stato possibile aprire la chat con successo</string>
+    <string name="chat_error_open_message">Impossibile aprire la chat</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="one">%1$d contatto</item>
@@ -1368,9 +1368,9 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="one">Link rimosso con successo.</item>
-        <item quantity="many">Link rimossi con successo.</item>
-        <item quantity="other">Link rimossi con successo.</item>
+        <item quantity="one">Link rimosso</item>
+        <item quantity="many">Link rimossi</item>
+        <item quantity="other">Link rimossi</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Contatti allegati</string>
@@ -1393,7 +1393,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">Un errore è avvenuto durante la modifica del nome</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Il tuo nome è stato aggiornato con successo</string>
+    <string name="success_changing_user_attributes">Il tuo nome è stato aggiornato</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Partecipante aggiunto</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1633,11 +1633,11 @@
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Gli utenti MEGA che scansioneranno il codice QR saranno aggiunti automaticamente alla lista dei tuoi contatti.</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Il link è stato copiato negli appunti</string>
+    <string name="qrcode_link_copied">Link copiato negli appunti</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">Il codice QR è stato resettato con successo</string>
+    <string name="qrcode_reset_successfully">QR code resettato</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">Il codice QR è stato eliminato con successo</string>
+    <string name="qrcode_delete_successfully">QR code eliminato</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">Il codice QR non è stato resettato a causa di un errore. Per favore, riprova.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1655,7 +1655,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">Un errore è stato riscontrato durante il download del file QR. Forse il file non esiste. Per favore, riprova più tardi.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">Il codice QR è stato scaricato con successo su %s</string>
+    <string name="success_download_qr">Il QR code è stato scaricato in %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Invito non spedito</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1672,8 +1672,6 @@
     <string name="button_copy_link">Copia link</string>
     <!-- Create QR code -->
     <string name="button_create_qr">Crea il codice QR</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">Il codice QR è stato creato con successo</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">Inquadra il codice QR fa scansionare con la fotocamera del tuo dispositivo</string>
     <!-- positive button on dialog to view a contact -->
@@ -1743,7 +1741,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Caricamento dei file</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte"></string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1759,7 +1757,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte"></string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
@@ -1825,9 +1823,9 @@
     <string name="messages_forwarded_success">Messaggio inoltrato</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Errore. %1$d messaggio non inoltrato con successo</item>
-        <item quantity="many">Errore. %1$d messaggi non inoltrati con successo</item>
-        <item quantity="other">Errore. %1$d messaggi non inoltrati con successo</item>
+        <item quantity="one">Errore. %1$d messaggio non inoltrato</item>
+        <item quantity="many">Errore. %1$d di messaggi non inoltrati</item>
+        <item quantity="other">Errore. %1$d messaggi non inoltrati</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1920,7 +1918,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Stampa</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">La Chiave di recupero è stata salvata con successo</string>
+    <string name="save_MK_confirmation">La chiave di recupero è stata salvata</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(In attesa)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1984,7 +1982,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">La prossima volta che effettuerai l’accesso al tuo account ti verrà chiesto di inserire il codice di 6 cifre che ti è stato fornito dall\’app di autenticazione.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled"></string>
+    <string name="recommendation_2fa_enabled">Per favore, salva la tua <b>Chiave di recupero</b> in un luogo sicuro, per evitare problemi nel caso in cui tu perda l\’accesso alla tua app, o se vuoi disattivare l\’Autenticazione a due fattori.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Codice non valido</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2074,29 +2072,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Questa azione non può essere completata in quanto ti porterebbe oltre il tuo limite corrente di spazio di archiviazione. Vuoi fare l’upgrade a PRO?</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">Chat archiviate</string>
+    <string name="archived_chats_title_section">Archiviate</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Chat archiviate (%d)</string>
+    <string name="archived_chats_show_option">Archiviata (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Sposta chat nell\’archivio</string>
+    <string name="archive_chat_option">Archivia</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Togli chat dall\’archivio</string>
+    <string name="unarchive_chat_option">Togli dall’archivio</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Archivia</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Togli dall’archivio</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">La chat %s è stata archiviata.</string>
+    <string name="success_archive_chat">%s è stata archiviata</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Errore. La chat %s non è stata archiviata.</string>
+    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">La chat %s è stata tolta dall’archivio.</string>
+    <string name="success_unarchive_chat">%s è stata estratta dall\’archivio</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Errore. La chat %s non è stata tolta dall’archivio.</string>
+    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Chat inattiva</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">Chat archiviata</string>
+    <string name="archived_chat">Archiviate</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Tocca per unirti alla chiamata</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2130,7 +2128,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">Stai per eliminare la storia delle versioni di tutti i file. Qualsiasi versione di un file condiviso con te da un contatto dovrà essere eliminato da quel contatto.\n\nPer favore, nota che i file correnti non saranno eliminati.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">Le versioni dei file sono state eliminate con successo</string>
+    <string name="success_delete_versions">Le versioni precedenti dei file sono state eliminate</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">Un errore è stato riscontrato mentre venivano eliminate le vecchie versioni dei tuoi file, ti preghiamo di riprovare più tardi.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2466,7 +2464,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Prima di generare un link per questa chat, devi impostare una descrizione:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Link della chat copiato negli appunti</string>
+    <string name="chat_link_copied_clipboard">Link copiato negli appunti</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Da[/A] %s / [A]mese[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2618,7 +2616,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">L’oggetto non è stato inviato a %d chat</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">Nuova chat di gruppo creata con successo</string>
+    <string name="new_group_chat_created">Nuova chat di gruppo creata</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">In corso</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2635,9 +2633,9 @@
     <string name="version_history_deleted_erroneously">Versioni precedenti non eliminate.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">%d versione eliminata con successo</item>
-        <item quantity="many">%d versioni eliminate con successo</item>
-        <item quantity="other">%d versioni eliminate con successo</item>
+        <item quantity="one">%d versione eliminata</item>
+        <item quantity="many">%d di versioni eliminate</item>
+        <item quantity="other">%d versioni eliminate</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2732,9 +2730,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Nessun link della chat disponibile.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Link della chat eliminato con successo.</string>
+    <string name="chat_link_deleted">Link della chat eliminato</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Versione ripristinata con successo.</string>
+    <string name="version_restored">Versione ripristinata</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Tocca e tieni premuto per registrare</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2902,7 +2900,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">Non hai i permessi per correggere questo file. Vuoi creare un nuovo file?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Da questa versione è stato creato un nuovo file con successo.</string>
+    <string name="version_as_new_file_created">La versione è stata ripristinata come nuovo file</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">il %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2986,7 +2984,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Abbandono in corso&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Il tuo numero di telefono è stato rimosso con successo.</string>
+    <string name="remove_phone_number_success">Numero di telefono rimosso</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Rimozione del tuo numero di telefono fallita.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3144,13 +3142,13 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Copia password</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Chiave copiata negli appunti.</string>
+    <string name="key_copied_clipboard">Chiave copiata negli appunti</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Password copiata negli appunti.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Link e chiave inviati con successo.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">Link e password inviati con successo.</string>
+    <string name="password_copied_clipboard">Password copiata negli appunti</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
+    <string name="link_and_key_sent">Link e chiave inviati</string>
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
+    <string name="link_and_password_sent">Link e password inviati</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Aggiorna a Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3341,27 +3339,27 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 oggetto spostato nel Cestino con successo</item>
-        <item quantity="many">%d oggetti spostati nel Cestino con successo</item>
-        <item quantity="other">%d oggetti spostati nel Cestino con successo</item>
+        <item quantity="one">1 oggetto spostato nel Cestino</item>
+        <item quantity="many">%d di oggetti spostati nel Cestino</item>
+        <item quantity="other">%d oggetti spostati nel Cestino</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 oggetto non spostato nel Cestino con successo</item>
-        <item quantity="many">%d oggetti non spostati nel Cestino con successo</item>
-        <item quantity="other">%d oggetti non spostati nel Cestino con successo</item>
+        <item quantity="one">1 oggetto non è stato spostato nel Cestino</item>
+        <item quantity="many">%d di oggetti non sono stati spostati nel Cestino</item>
+        <item quantity="other">%d oggetti non sono stati spostati nel Cestino</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 oggetto ripristinato con successo</item>
-        <item quantity="many">%d oggetti ripristinati con successo</item>
-        <item quantity="other">%d oggetti ripristinati con successo</item>
+        <item quantity="one">1 oggetto ripristinato</item>
+        <item quantity="many">%d di oggetti ripristinati</item>
+        <item quantity="other">%d oggetti ripristinati</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 oggetto non ripristinato con successo</item>
-        <item quantity="many">%d oggetti non ripristinati con successo</item>
-        <item quantity="other">%d oggetti non ripristinati con successo</item>
+        <item quantity="one">1 oggetto non è stato ripristinato</item>
+        <item quantity="many">%d di oggetti non sono stati ripristinati</item>
+        <item quantity="other">%d oggetti non sono stati ripristinati</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Cambia lo stesso</string>
@@ -3409,15 +3407,15 @@
     <string name="action_copy_all">Copia tutto</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link inviato con successo.</item>
-        <item quantity="many">Link inviati con successo.</item>
-        <item quantity="other">Link inviati con successo.</item>
+        <item quantity="one">Link inviato</item>
+        <item quantity="many">Link inviati</item>
+        <item quantity="other">Link inviati</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Link copiato negli appunti.</item>
-        <item quantity="many">Link copiati negli appunti.</item>
-        <item quantity="other">Link copiati negli appunti.</item>
+        <item quantity="one">Link copiato negli appunti</item>
+        <item quantity="many">Link copiati negli appunti</item>
+        <item quantity="other">Link copiati negli appunti</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3514,7 +3512,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Da ora sei host</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Link del meeting copiato.</string>
+    <string name="copied_meeting_link">Link copiato negli appunti</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Tocca per unirti al meeting corrente.</string>
     <!-- Title of fifth tour screen -->
@@ -3592,7 +3590,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Hai già invitato %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invito spedito con successo. Dai un\’occhiata agli inviti spediti.</string>
+    <string name="contact_invited">Richiesta inviata. Vedi le Richieste inviate.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File disponibile offline</string>
     <!-- Message when file removed from offline. -->
@@ -3748,9 +3746,9 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$s e %2$s sono in chiamata</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s non è più in chiamata</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s ha abbandonato la chiamata</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s e %2$s non sono più in chiamata</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s e %2$s hanno lasciato la chiamata</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">%1$s e 1 altro utente sono in chiamata</item>
@@ -3759,9 +3757,9 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s e 1 altro utente non sono più in chiamata</item>
-        <item quantity="many">%1$s e altri %2$d utenti non sono più in chiamata</item>
-        <item quantity="other">%1$s e altri %2$d utenti non sono più in chiamata</item>
+        <item quantity="one">%1$s e 1 altro hanno lasciato la chiamata</item>
+        <item quantity="many">%1$s e altri %2$d utenti hanno lasciato la chiamata</item>
+        <item quantity="other">%1$s e altri %2$d utenti hanno lasciato la chiamata</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Elimina permanentemente</string>
@@ -3858,19 +3856,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Riconnessione fallita</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte"></string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte"></string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte"></string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte"></string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte"></string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte"></string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte"></string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">La chiamata terminerà tra %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -4064,19 +4062,19 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">Programma meeting</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly"></string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Grazie per il tuo abbonamento mensile Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly"></string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Grazie per il tuo abbonamento annuale Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly"></string>
+    <string name="upgrade_account_successful_pro_1_monthly">Grazie per il tuo abbonamento mensile Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly"></string>
+    <string name="upgrade_account_successful_pro_1_yearly">Grazie per il tuo abbonamento annuale Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly"></string>
+    <string name="upgrade_account_successful_pro_2_monthly">Grazie per il tuo abbonamento mensile Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly"></string>
+    <string name="upgrade_account_successful_pro_2_yearly">Grazie per il tuo abbonamento annuale Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly"></string>
+    <string name="upgrade_account_successful_pro_3_monthly">Grazie per il tuo abbonamento mensile Pro&#160;III</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Grazie per il tuo abbonamento annuale Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -4109,34 +4107,13 @@
     <string name="photos_create_album_error_message_systems_album">Il nome di questo album non è permesso. Inserisci un nome diverso.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Un album con questo nome già esiste. Inserisci un nome differente.</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Nuovo album (%d)</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">Aggiungi oggetti a “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %1$d item to “%2$s“</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">Informazioni di pagamento</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">L\’abbonamento del piano Pro è in scadenza</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">Il tuo pagamento per il piano %1$s è stato ricevuto.</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">Il tuo pagamento per il piano %1$s non è andato a buon fine.</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="one">L\’abbonamento del tuo piano Pro scadrà tra 1 giorno.</item>
-        <item quantity="many">L\’abbonamento del tuo piano Pro scadrà tra %1$d di giorni.</item>
-        <item quantity="other">L\’abbonamento del tuo piano Pro scadrà tra %1$d giorni.</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="one">L\’abbonamento del tuo piano Pro è scaduto 1 giorno fa.</item>
-        <item quantity="many">L\’abbonamento del tuo piano Pro è scaduto %1$d di giorni fa.</item>
-        <item quantity="other">L\’abbonamento del tuo piano Pro è scaduto %1$d giorni fa.</item>
+        <item quantity="one">%1$d oggetto aggiunto a “%2$s”</item>
+        <item quantity="many">%1$d di oggetti aggiunti a “%2$s”</item>
+        <item quantity="other">%1$d oggetti aggiunti a “%2$s”</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]Album[/A] [B]vuoto[/B]</string>
@@ -4222,8 +4199,9 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Non permettere</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="one">%1$d oggetto rimosso da “%2$s”</item>
+        <item quantity="many">%1$d di oggetti rimossi da “%2$s”</item>
+        <item quantity="other">%1$d oggetti rimossi da “%2$s”</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">Meeting singolo</string>
@@ -4236,230 +4214,262 @@
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Riavvia</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
-    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]invited you to a meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]ti ha invitato ad un meeting programmato per:[/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s cancelled[/A][B] the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s ha annullato[/A][B] il meeting programmato per:[/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s ha aggiornato[/A][B] il nome del meeting da “%s” a [/B]“[A]%s[/A]”</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s updated[/A][B] the meeting date[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s ha aggiornato[/A][B] la data del meeting[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s updated[/A][B] the meeting time[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s ha aggiornato[/A][B] l\’orario del meeting[/B]</string>
     <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s updated[/A][B] the meeting description[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s ha aggiornato[/A][B] la descrizione del meeting[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the details of the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s ha aggiornato[/A][B] i dettagli del meeting programmato per:[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">Accesso negato</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
+    <string name="dialog_content_media_permissions_denied">Hai negato l\’accesso all\’archivio del tuo dispositivo e ai media a MEGA. Se desideri continuare a condividere, dai a MEGA questo permesso.</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
-    <string name="dialog_positive_button_allow_permission">Allow permission</string>
+    <string name="dialog_positive_button_allow_permission">Dai permesso</string>
     <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
-    <string name="dialog_negative_button_do_not_allow">Don’t allow</string>
+    <string name="dialog_negative_button_do_not_allow">Nega il permesso</string>
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">Ricorrenze</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
-    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">Occurs daily</string>
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">Ogni giorno</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
-    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">Occurs weekly</string>
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">Ogni settimana</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
-    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">Occurs monthly</string>
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">Ogni mese</string>
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
     <string name="meetings_recurring_meeting_info_see_more_occurrences_button">Vedi di più</string>
     <!-- Label for scheduled monthly meetings -->
-    <string name="meetings_list_scheduled_meeting_monthly_label">%s monthly</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%s ogni mese</string>
     <!-- Label for scheduled daily meetings -->
-    <string name="meetings_list_scheduled_meeting_daily_label">%s daily</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%s ogni giorno</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]invited you to a recurring meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]ti ha invitato ad un meeting ricorrente programmato per:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s updated[/A][B] the recurring meeting description[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s ha aggiornato[/A][B] la descrizione del meeting ricorrente[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s updated[/A][B] the details of the recurring meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s ha aggiornato[/A][B] i dettagli del meeting ricorrente programmato per:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s updated[/A][B] an occurrence to:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s ha aggiornato[/A][B] un evento di:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s updated[/A][B] the recurring meeting time[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s ha aggiornato[/A][B] l\’orario del meeting ricorrente[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting frequency change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s ha annullato[/A][B] il meeting e tutti gli eventi relativi[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s cancelled[/A][B] the occurrence scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s ha annullato[/A][B] l\’evento programmato per:[/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_message">Il link non è stato generato dall\’account con cui hai attualmente effettuato l\’accesso. Effettua il login con l\’account relativo a questo link per verificare l\’indirizzo email.</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Impossibile aggiornare l\’indirizzo email</string>
     <!-- Select album cover -->
     <string name="photos_album_select_cover">Seleziona copertina dell\’album</string>
     <!-- Album cover updated -->
-    <string name="photos_album_cover_updated">Album cover updated</string>
+    <string name="photos_album_cover_updated">Copertina dell\’album aggiornata</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
-    <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] dalle [B]%2$s alle %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Everyday effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Ogni giorno a partire dal [A]%1$s[/A] dalle [B]%2$s alle %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Everyday effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Ogni giorno a partire dal [A]%1$s fino al %2$s[/A] dalle [B]%3$s alle %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
-        <item quantity="one">%1$s every week effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s every %2$d weeks effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="one">%1$s ogni settimana a partire dal [A]%3$s fino al %4$s[/A] dalle [B]%5$s alle %6$s[/B]</item>
+        <item quantity="many">%1$s ogni %2$d di settimane a partire dal [A]%3$s fino al %4$s[/A] dalle [B]%5$s alle %6$s[/B]</item>
+        <item quantity="other">%1$s ogni %2$d settimane a partire dal [A]%3$s fino al %4$s[/A] dalle [B]%5$s alle %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting without ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever">
-        <item quantity="one">%1$s every week effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">%1$s every %2$d weeks effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">%1$s ogni settimana a partire dal [A]%3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">%1$s ogni %2$d di settimane a partire dal [A]%3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">%1$s ogni %2$d settimane a partire dal [A]%3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s, and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
-        <item quantity="other">%1$s, and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="one">%1$s e %2$s ogni settimana a partire dal [A]%4$s fino al %5$s[/A] dalle [B]%6$s alle %7$s[/B]</item>
+        <item quantity="many">%1$s e %2$s ogni %3$d di settimane a partire dal [A]%4$s fino al %5$s[/A] dalle [B]%6$s alle %7$s[/B]</item>
+        <item quantity="other">%1$s e %2$s ogni %3$d settimane a partire dal [A]%4$s fino al %5$s[/A] dalle [B]%6$s alle %7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s, and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s, and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="one">%1$s e %2$s ogni settimana a partire dal [A]%4$s[/A] dalle [B]%5$s alle %6$s[/B]</item>
+        <item quantity="many">%1$s e %2$s ogni %3$d di settimane a partire dal [A]%4$s[/A] dalle [B]%5$s alle %6$s[/B]</item>
+        <item quantity="other">%1$s e %2$s ogni %3$d settimane a partire dal [A]%4$s[/A] dalle [B]%5$s alle %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
-        <item quantity="one">Day %1$d of every month effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">Day %1$d of every %2$d months effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="one">Il giorno %1$d di ogni mese a partire dal [A]%3$s fino al %4$s[/A] dalle [B]%5$s alle %6$s[/B]</item>
+        <item quantity="many">Il giorno %1$d di ogni %2$d di mesi a partire dal [A]%3$s fino al %4$s[/A] dalle [B]%5$s alle %6$s[/B]</item>
+        <item quantity="other">Il giorno %1$d di ogni %2$d mesi a partire dal [A]%3$s fino al %4$s[/A] dalle [B]%5$s alle %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting without ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_forever">
-        <item quantity="one">Day %1$d of every month effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Day %1$d of every %2$d months effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il giorno %1$d di ogni mese a partire dal [A]%3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il giorno %1$d di ogni %2$d di mesi a partire dal [A]%3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il giorno %1$d di ogni %2$d mesi a partire dal [A]%3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_first">
-        <item quantity="one">First Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il primo lunedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il primo lunedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il primo lunedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_first">
-        <item quantity="one">First Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il primo lunedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il primo lunedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il primo lunedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_second">
-        <item quantity="one">Second Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il secondo lunedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il secondo lunedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il secondo lunedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_second">
-        <item quantity="one">Second Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il secondo lunedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il secondo lunedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il secondo lunedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_third">
-        <item quantity="one">Third Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il terzo lunedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il terzo lunedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il terzo lunedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_third">
-        <item quantity="one">Third Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il terzo lunedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il terzo lunedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il terzo lunedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fourth">
-        <item quantity="one">Fourth Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quarto lunedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quarto lunedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quarto lunedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fourth">
-        <item quantity="one">Fourth Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quarto lunedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quarto lunedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quarto lunedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fifth">
-        <item quantity="one">Fifth Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quinto lunedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quinto lunedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quinto lunedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fifth">
-        <item quantity="one">Fifth Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quinto lunedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quinto lunedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quinto lunedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_first">
-        <item quantity="one">First Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il primo martedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il primo martedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il primo martedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_first">
-        <item quantity="one">First Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il primo martedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il primo martedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il primo martedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_second">
-        <item quantity="one">Second Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il secondo martedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il secondo martedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il secondo martedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_second">
-        <item quantity="one">Second Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il secondo martedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il secondo martedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il secondo martedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_third">
-        <item quantity="one">Third Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il terzo martedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il terzo martedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il terzo martedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_third">
-        <item quantity="one">Third Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il terzo martedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il terzo martedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il terzo martedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fourth">
-        <item quantity="one">Fourth Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quarto martedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quarto martedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quarto martedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fourth">
-        <item quantity="one">Fourth Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quarto martedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quarto martedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quarto martedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fifth">
-        <item quantity="one">Fifth Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quinto martedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quinto martedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quinto martedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fifth">
-        <item quantity="one">Fifth Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quinto martedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quinto martedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quinto martedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_first">
-        <item quantity="one">First Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il primo mercoledì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il primo mercoledì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il primo mercoledì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_first">
-        <item quantity="one">First Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il primo mercoledì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il primo mercoledì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il primo mercoledì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_second">
-        <item quantity="one">Second Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il secondo mercoledì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il secondo mercoledì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il secondo mercoledì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_second">
-        <item quantity="one">Second Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il secondo mercoledì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il secondo mercoledì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il secondo mercoledì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_third">
-        <item quantity="one">Third Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il terzo mercoledì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il terzo mercoledì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il terzo mercoledì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_third">
-        <item quantity="one">Third Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il terzo mercoledì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il terzo mercoledì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il terzo mercoledì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fourth">
@@ -4713,8 +4723,9 @@
     </plurals>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="one">[File non decriptato]</item>
+        <item quantity="many">[File non decriptati]</item>
+        <item quantity="other">[File non decriptati]</item>
     </plurals>
     <!-- In app notification description text representing the meeting repeats every Monday. This text is used at the start of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_start_mon">Lun</string>
@@ -4744,4 +4755,24 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">sab</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">dom</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">Inizia</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">Ok</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">Unisciti</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">Inizia il meeting</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">Unisciti al meeting</string>
 </resources>

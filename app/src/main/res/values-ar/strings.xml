@@ -341,7 +341,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">عرض عمليات تراسل المعطيات</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb"></string>
+    <string name="error_file_size_greater_than_4gb">لا يمكن لمعظم الأجهزة تنزيل ملفات أكبر من 4&#160;غيغابايت. تنزيلك ربما يفشل.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">ليس هناك أي التطبيق متاح لتنفيذ هذا الملف على جهازك</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -422,7 +422,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">تم إعادة إرسال الطلب</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">تم إرسال الطلب بنجاح إلى %s. عرض في صفحة الطلبات المرسلة.</string>
+    <string name="context_contact_request_sent">Request sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">تم حذف جهة الاتصال</string>
     <!-- error message -->
@@ -438,17 +438,17 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">خطأ، لم يتم إنشاء المجلد</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">تم إعادة التسمية بنجاح</string>
+    <string name="context_correctly_renamed">Renamed</string>
     <!-- error message -->
     <string name="context_no_renamed">خطأ. لم يتم إعادة التسمية</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">تم النسخ بنجاح</string>
+    <string name="context_correctly_copied">Copied</string>
     <!-- error message -->
     <string name="context_no_copied">خطأ. لم يتم النسخ</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">الرجاء اختيار وجهة المجلد</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">تم النقل بنجاح</string>
+    <string name="context_correctly_moved">Moved</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="zero">تم نقل %d عنصر</item>
@@ -459,37 +459,37 @@
         <item quantity="other">تم نقل %d عنصر</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d عناصر لم يتم نقلها بنجاح</string>
+    <string name="number_incorrectly_moved">%d items weren’t moved</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">تم النقل لسلة المحذوفات بنجاح</string>
+    <string name="context_correctly_moved_to_rubbish">Moved to Rubbish bin</string>
     <!-- error message -->
     <string name="context_no_moved">خطأ. لم يتم النقل</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">تمت المشاركة بنجاح</string>
+    <string name="context_correctly_shared">مشاركة</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">خطأ. %d مشاركات لم تكتمل.</string>
     <!-- error message -->
     <string name="context_no_removed_shared">خطأ. فشل في إزالة المشاركة</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">تم الحذف بنجاح من MEGA</string>
+    <string name="context_correctly_removed">المحذوف</string>
     <!-- error message -->
     <string name="context_no_removed">خطأ. لم يتم إزالتها من MEGA</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d عناصر تم إزالتها بنجاح من MEGA</string>
+    <string name="number_correctly_removed">%d items removed from MEGA</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d عناصر لم يتم إزالتها بنجاح</string>
+    <string name="number_no_removed">%d items weren’t removed</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d مجلدات تمت مغادرتها بنجاح.</string>
+    <string name="number_correctly_leaved">%d folders left</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">تم مغادرة المشاركة</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">لم يتم مغادرة %d مجلدات بنجاح</string>
+    <string name="number_no_leaved">%d folders weren’t left</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d عناصر تم نسخها بنجاح</string>
+    <string name="number_correctly_copied">%d items copied</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d عناصر لم يتم نسخها</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">تم إفراغ سلة المحذوفات بنجاح</string>
+    <string name="rubbish_bin_emptied">Rubbish bin emptied</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">حدث خطأ. لم يتم إفراغ سلة المحذوفات</string>
     <!-- dialog cancel subscriptions -->
@@ -560,7 +560,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">لا توجد طريقة دفع محددة لهذه الباقة حاليًا. يرجى اختيار واحدة.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">تم نسخ الرابط إلى الحافظة</string>
+    <string name="file_properties_get_link">تم النسخ الى حافظة النصوص</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">يرجى تسجيل الخروج قبل إنشاء الحساب</string>
     <!-- menu item -->
@@ -666,7 +666,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">رمز خاطئ. يرجى المحاولة مرة أخرى أو إعادة الإرسال.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">تم التحقق من رقم هاتفك بنجاح</string>
+    <string name="verify_account_successfully">Your phone number has been verified</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>ذاكرة داخلية</item>
@@ -810,11 +810,11 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">حساب مجاني</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1"></string>
+    <string name="my_account_pro1">حساب برو Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2"></string>
+    <string name="my_account_pro2">حساب برو Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3"></string>
+    <string name="my_account_pro3">حساب برو Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">حساب برو لايت Pro&#160;Lite</string>
     <!--  -->
@@ -1020,7 +1020,7 @@
         <item quantity="other">تم ارسال %d دعوة</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d طلبات دعوة أرسلت بنجاح ولكن  %2$d طلبات دعوة لم ترسل.</string>
+    <string name="number_no_invite_contact_request">%1$d invite requests sent but %2$d requests weren’t sent.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (أنا)</string>
     <!-- button -->
@@ -1089,7 +1089,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">تم مسح سجل المحادثة</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">حدث خطأ. لم يتم مسح سجل المحادثة بنجاح</string>
+    <string name="clear_history_error">An error has occurred. The chat history hasn’t been cleared</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">إضافة مشاركين</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1159,9 +1159,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">المشارك موجود بالفعل في المجموعة</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">تمت دعوة %d مشاركين بنجاح</string>
+    <string name="number_correctly_add_participant">%d participants were invited</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">تمت دعوة %1$d مشاركين بنجاح ولكن لم تتم دعوة  %2$d مشاركين.</string>
+    <string name="number_no_add_participant_request">%1$d participants were invited but %2$d participants were not invited.</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] انضم للمجموعة عبر دعوة من [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1198,12 +1198,12 @@
     <string name="non_format_change_title_messages">%1$s غير اسم المجموعة إلى “%2$s”</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">غادر %1$s مجموعة المحادثة</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
-    <string name="messages_copied_clipboard">تم النسخ إلى الحافظة</string>
+    <!-- Success alert when the user copies one message to the clipboard -->
+    <string name="messages_copied_clipboard">تم النسخ الى حافظة النصوص</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">خطأ في المحادثة</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">تعذر فتح المحادثة بنجاح</string>
+    <string name="chat_error_open_message">Chat couldn’t be opened</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="zero">%1$d جهة اتصال</item>
@@ -1467,12 +1467,12 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="zero">تمت إزالة الرابط بنجاح.</item>
-        <item quantity="one">تمت إزالة الرابط بنجاح.</item>
-        <item quantity="two">تمت إزالة الروابط بنجاح.</item>
-        <item quantity="few">تمت إزالة الروابط بنجاح.</item>
-        <item quantity="many">تمت إزالة الروابط بنجاح.</item>
-        <item quantity="other">تمت إزالة الروابط بنجاح.</item>
+        <item quantity="zero">تمت إزالة الرابط</item>
+        <item quantity="one">تمت إزالة الرابط</item>
+        <item quantity="two">تمت إزالة الروابط</item>
+        <item quantity="few">تمت إزالة الروابط</item>
+        <item quantity="many">تمت إزالة الروابط</item>
+        <item quantity="other">تمت إزالة الروابط</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">جهات اتصال مرفقة</string>
@@ -1495,7 +1495,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">حدث خطأ أثناء تغيير الاسم</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">تم تحديث اسمك بنجاح</string>
+    <string name="success_changing_user_attributes">Your name has been updated</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">تم إضافة مشارك</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1744,11 +1744,11 @@
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">مستخدمو ميغا MEGA الذين يقومون بمسح رمز الاستجابة السريعة QR الخاص بك، سيتم إضافتهم إلى قائمة الاتصال الخاصة بك تلقائياً.</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">تم نسخ الرابط الى الحافظة</string>
+    <string name="qrcode_link_copied">تم النسخ الى حافظة النصوص</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">تم إعادة تعيين رمز الاستجابة السريعة QR بنجاح</string>
+    <string name="qrcode_reset_successfully">QR code reset</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">تم حذف رمز الاستجابة السريعة QR بنجاح</string>
+    <string name="qrcode_delete_successfully">QR code deleted</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">لم يتم إعادة تعيين رمز الاستجابة السريعة QR لحدوث خطأ. يرجى المحاولة مرة أخرى.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1766,7 +1766,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">حدث خطأ أثناء محاولة تنزيل ملف رمز الاستجابة السريعة QR. ربما الملف غير موجود. الرجاء المحاولة في وقت لاحق.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">تم تنزيل ملف رمز الاستجابة السريعة QR بنجاح الى %s</string>
+    <string name="success_download_qr">The QR Code has been downloaded to %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">لم يتم إرسال الدعوة</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1783,8 +1783,6 @@
     <string name="button_copy_link">نسخ الرابط</string>
     <!-- Create QR code -->
     <string name="button_create_qr">إنشاء رمز الاستجابة السريعة QR</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">تم إنشاء رمز الاستجابة السريعة QR بنجاح</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">قم بمحاذاة رمز الاستجابة السريعة QR لمسحه ضوئيًا باستخدام كاميرا جهازك</string>
     <!-- positive button on dialog to view a contact -->
@@ -1854,25 +1852,25 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">تحميل الملفات</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte"></string>
+    <string name="label_file_size_byte">%s&#160;بايت</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s كيلوبايت</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_mega_byte"></string>
+    <string name="label_file_size_mega_byte">%s&#160;ميغابايت</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_giga_byte"></string>
+    <string name="label_file_size_giga_byte">%s&#160;غيغابايت</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_tera_byte">%s تيرابايت</string>
     <!-- Speed in bytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_byte"></string>
+    <string name="label_file_speed_byte">%s&#160;بايت بالثانية</string>
     <!-- Speed in kilobytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_kilo_byte">%s&#160;1كيلو بايت بالثانية</string>
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_mega_byte"></string>
+    <string name="label_file_speed_mega_byte">%s&#160;ميغا بايت بالثانية</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte"></string>
+    <string name="label_file_speed_giga_byte">%s&#160;غيغا بايت بالثانية</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_tera_byte"></string>
+    <string name="label_file_speed_tera_byte">%s&#160;تيرا بايت بالثانية</string>
     <!-- Size in megabytes. -->
     <string name="label_mega_byte">ميغابايب</string>
     <!-- Number of versions of a file shown on the screen info of the file, version items -->
@@ -1948,12 +1946,8 @@
     <string name="messages_forwarded_success">تمت إعادة توجيه الرسائل</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="zero">خطأ. فشل إعادة توجيه %1$d رسالة</item>
-        <item quantity="one">خطأ. فشل إعادة توجيه %1$d رسالة</item>
-        <item quantity="two">خطأ. فشل إعادة توجيه %1$d رسالتين</item>
-        <item quantity="few">خطأ. فشل إعادة توجيه %1$d رسائل</item>
-        <item quantity="many">خطأ. فشل إعادة توجيه %1$d رسالة</item>
-        <item quantity="other">خطأ. فشل إعادة توجيه %1$d رسالة</item>
+        <item quantity="one">Error. %1$d message not forwarded</item>
+        <item quantity="other">Error. %1$d messages not forwarded</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -2058,7 +2052,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">اطبع</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">تم حفظ مفتاح الاستعادة بنجاح</string>
+    <string name="save_MK_confirmation">Recovery key has been saved</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(قيد الانتظار)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -2125,7 +2119,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">في المرة القادمة التي تسجل فيها الدخول الى حسابك سيطلب منك إدخال رمز من 6 أرقام ستزود به من تطبيق المصادقة الخاص بك.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled"></string>
+    <string name="recommendation_2fa_enabled">يرجى حفظ <b>مفتاح الاستعادة</b> الخاص بك في مكان آمن ، لتجنب المشاكل في حالة فقد الوصول إلى التطبيق الخاص بك، أو إذا كنت ترغب في تعطيل المصادقة المزدوجة.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">الرمز غير صالح</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -2218,29 +2212,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">لا يمكن إتمام العملية لأنها ستؤدي الى تجاوز مساحة التخزين المتاحة لك. هل تريد ترقية حسابك؟</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">أرشفة المحادثة</string>
+    <string name="archived_chats_title_section">تمت الارشفة</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">(%d) محادثات مأرشفة</string>
+    <string name="archived_chats_show_option">Archived (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">أرشفة المحادثة</string>
+    <string name="archive_chat_option">الأرشيف</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">إعادة المحادثة من الارشيف</string>
+    <string name="unarchive_chat_option">اعادة من الارشفة</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">الأرشيف</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">اعادة من الارشفة</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">تم أرشفة %s محادثة.</string>
+    <string name="success_archive_chat">%s was archived</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">حدث خطأ. فشل أرشفة المحادثة %s</string>
+    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">تم إعادة المحادثة %s من الأرشيف.</string>
+    <string name="success_unarchive_chat">%s was unarchived</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">خطأ. فشل عملية استرجاع المحادثة %s من الأرشيف.</string>
+    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">المحادثات الغير نشطة</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">أرشيف المحادثات</string>
+    <string name="archived_chat">تمت الارشفة</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">انقر للانضمام الى المكالمة</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2277,7 +2271,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">انت بصدد حذف كل النسخ المعدلة لكل الملفات. أي نسخة معدلة لملف مشارك معك من جهة اتصال يجب ان يحذف من قبله. \n\nيرجى الملاحظة انه لن يتم حذف النسخ الحالية للملفات.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">تم حذف نسخ الملف بنجاح</string>
+    <string name="success_delete_versions">File versions deleted</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">حدث خطأ خلال عملية حذف النسخ المعدلة القديمة للملفات. يرجى إعادة المحاولة.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2640,7 +2634,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">قبل أن تتمكن من إنشاء رابط لهذه المحادثة، تحتاج إلى تعيين وصف:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">تم نسخ رابط المحادثة إلى الحافظة</string>
+    <string name="chat_link_copied_clipboard">تم النسخ الى حافظة النصوص</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]من[/A] %s / [A]شهر[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2816,7 +2810,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">لم يتم ارسال المحتوى إلى %d محادثات</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">تم إنشاء محادثة جماعية جديدة بنجاح</string>
+    <string name="new_group_chat_created">New group chat created</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">جاري تحضير الملفات</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2833,12 +2827,8 @@
     <string name="version_history_deleted_erroneously">لم يتم حذف النسخ السابقة.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="zero">تم حذف %d نسخة بنجاح</item>
-        <item quantity="one">تم حذف %d نسخة بنجاح</item>
-        <item quantity="two">تم حذف %d نسختين بنجاح</item>
-        <item quantity="few">تم حذف %d نسخ بنجاح</item>
-        <item quantity="many">تم حذف %d نسخة بنجاح</item>
-        <item quantity="other">تم حذف %d نسخة بنجاح</item>
+        <item quantity="one">%d version deleted</item>
+        <item quantity="other">%d versions deleted</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2932,13 +2922,13 @@
     <!-- Text shown when an account doesn’t have any contact added and it’s trying to start a new chat conversation -->
     <string name="invite_contacts_to_start_chat">ادع جهات الاتصال وابدأ المحادثة بأمان باستخدام المحادثة المشفرة من ميغا MEGA.</string>
     <!-- Text sent to recipients to invite to be contact. Placeholder: contact link url. -->
-    <string name="invite_contacts_to_start_chat_text_message"></string>
+    <string name="invite_contacts_to_start_chat_text_message">أهلا. قم بإجراء محادثات آمنة على ميغا MEGA معي واحصل على 20&#160;غيغابايت من التخزين السحابي المجاني.%1$s</string>
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">لا يوجد رابط محادثة متاح.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">تم حذف رابط المحادثة بنجاح.</string>
+    <string name="chat_link_deleted">Chat link deleted</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">تم استعادة النسخة بنجاح.</string>
+    <string name="version_restored">Version restored</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">انقر مع الاستمرار للتسجيل</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -3121,7 +3111,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">ليس لديك الأذونات الصحيحة لتعديل هذا الملف. هل ترغب في إنشاء ملف جديد؟</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">تم إنشاء النسخة كملف جديد بنجاح.</string>
+    <string name="version_as_new_file_created">Version was created as a new file</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">في %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -3214,7 +3204,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">جاري المغادرة&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">تمت إزالة رقم هاتفك بنجاح.</string>
+    <string name="remove_phone_number_success">Phone number removed</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">فشل في إزالة رقم هاتفك.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3393,13 +3383,13 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">انسخ كلمة المرور</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">تم نسخ المفتاح إلى الحافظة.</string>
+    <string name="key_copied_clipboard">تم نسخ المفتاح إلى الحافظة</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">تم نسخ كلمة المرور إلى الحافظة.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">تم إرسال الرابط والمفتاح بنجاح.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">تم إرسال الرابط وكلمة المرور بنجاح.</string>
+    <string name="password_copied_clipboard">تم نسخ كلمة المرور إلى الحافظة</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
+    <string name="link_and_key_sent">Link and key sent</string>
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
+    <string name="link_and_password_sent">Link and password sent</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">قم بالترقية إلى برو Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3611,39 +3601,23 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="zero">تم نقل %d عنصر إلى سلة المحذوفات بنجاح</item>
-        <item quantity="one">تم نقل 1 عنصر إلى سلة المحذوفات بنجاح</item>
-        <item quantity="two">تم نقل %d عنصرين إلى سلة المحذوفات بنجاح</item>
-        <item quantity="few">تم نقل %d عناصر إلى سلة المحذوفات بنجاح</item>
-        <item quantity="many">تم نقل %d عنصراً إلى سلة المحذوفات بنجاح</item>
-        <item quantity="other">تم نقل %d عنصر إلى سلة المحذوفات بنجاح</item>
+        <item quantity="one">1 item moved to Rubbish bin</item>
+        <item quantity="other">%d items moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="zero">لم يتم نقل %d عنصر إلى سلة المحذوفات بنجاح</item>
-        <item quantity="one">لم يتم نقل 1 عنصر إلى سلة المحذوفات بنجاح</item>
-        <item quantity="two">لم يتم نقل %d عنصرين إلى سلة المحذوفات بنجاح</item>
-        <item quantity="few">لم يتم نقل %d عناصر إلى سلة المحذوفات بنجاح</item>
-        <item quantity="many">لم يتم نقل %dعنصراً إلى سلة المحذوفات بنجاح</item>
-        <item quantity="other">لم يتم نقل %d عنصر إلى سلة المحذوفات بنجاح</item>
+        <item quantity="one">1 item wasn’t moved to the Rubbish bin</item>
+        <item quantity="other">%d items weren’t moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="zero">تم استرجاع %d عنصر بنجاح</item>
-        <item quantity="one">تم استرجاع 1 عنصر بنجاح</item>
-        <item quantity="two">تم استرجاع %d عنصرين بنجاح</item>
-        <item quantity="few">تم استرجاع %d عناصر بنجاح</item>
-        <item quantity="many">تم استرجاع %d عنصراً بنجاح</item>
-        <item quantity="other">تم استرجاع %d عنصر بنجاح</item>
+        <item quantity="one">1 item restored</item>
+        <item quantity="other">%d items restored</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="zero">لم يتم استرجاع %d عنصر بنجاح</item>
-        <item quantity="one">لم يتم استرجاع 1 عنصر بنجاح</item>
-        <item quantity="two">لم يتم استرجاع %d عنصرين بنجاح</item>
-        <item quantity="few">لم يتم استرجاع %d عناصر بنجاح</item>
-        <item quantity="many">لم يتم استرجاع %d عنصراً بنجاح</item>
-        <item quantity="other">لم يتم استرجاع %d عنصر بنجاح</item>
+        <item quantity="one">1 item wasn’t restored</item>
+        <item quantity="other">%d items weren’t restored</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">تغيير على أي حال</string>
@@ -3652,9 +3626,9 @@
     <!-- String to show the transfer quota and the used space in My Account section -->
     <string name="used_storage_transfer_percentage">%1$s%%</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_peta_byte">%1$s بيتابايت PB</string>
+    <string name="label_file_size_peta_byte">%1$s بيتابايت PB&#160;</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_exa_byte">%1$s اكسابايت EB</string>
+    <string name="label_file_size_exa_byte">%1$s اكسابايت EB&#160;</string>
     <!-- Title of Add phone number option in My account section -->
     <string name="add_phone_label">اضف رقم هاتفك</string>
     <!-- Text of the option Backup Recovery Key in My account section -->
@@ -3694,21 +3668,13 @@
     <string name="action_copy_all">نسخ الكل</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="zero">تم إرسال رابط بنجاح.</item>
-        <item quantity="one">تم إرسال رابط بنجاح.</item>
-        <item quantity="two">تم إرسال رابطين بنجاح.</item>
-        <item quantity="few">تم إرسال روابط بنجاح.</item>
-        <item quantity="many">تم إرسال رابطاً بنجاح.</item>
-        <item quantity="other">تم إرسال رابط بنجاح.</item>
+        <item quantity="one">Link sent</item>
+        <item quantity="other">Links sent</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="zero">تم نسخ رابط إلى الحافظة.</item>
-        <item quantity="one">تم نسخ رابط إلى الحافظة.</item>
-        <item quantity="two">تم نسخ رابطين إلى الحافظة.</item>
-        <item quantity="few">تم نسخ روابط إلى الحافظة.</item>
-        <item quantity="many">تم نسخ رابطاً إلى الحافظة.</item>
-        <item quantity="other">تم نسخ رابط إلى الحافظة.</item>
+        <item quantity="one">Copied link to clipboard</item>
+        <item quantity="other">Copied links to clipboard</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3808,7 +3774,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">أنت المُضيف الجديد للمكالمة</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">رابط الاجتماع الذي تم نسخه.</string>
+    <string name="copied_meeting_link">تم النسخ الى حافظة النصوص</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">انقر للانضمام إلى الاجتماع الحالي.</string>
     <!-- Title of fifth tour screen -->
@@ -3886,7 +3852,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">لقد قمت بالفعل بدعوة %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">تم إرسال الدعوة بنجاح. انظر إلى الطلبات المرسلة.</string>
+    <string name="contact_invited">Invite sent. See Sent requests.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">الملف متاح بدون اتصال</string>
     <!-- Message when file removed from offline. -->
@@ -4042,9 +4008,9 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$s و %2$s انضما</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s غادر</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s غادر المكالمة</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s و%2$s غادرا</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left the call</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="zero">انضم %1$s و %2$d آخر</item>
@@ -4056,12 +4022,8 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="zero">غادر %1$s و %2$d آخر</item>
-        <item quantity="one">غادر %1$s و 1 آخر</item>
-        <item quantity="two">غادر %1$s و %2$d آخران</item>
-        <item quantity="few">غادر %1$s و %2$d آخرون</item>
-        <item quantity="many">غادر %1$s و %2$d آخرون</item>
-        <item quantity="other">غادر %1$s و %2$d آخرون</item>
+        <item quantity="one">%1$s and 1 other left the call</item>
+        <item quantity="other">%1$s and %2$d others left the call</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">حذف بشكل دائم</string>
@@ -4158,19 +4120,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">غير قادر على إعادة الاتصال</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte"></string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;بايت</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte"></string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;كيلوبايت</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte"></string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;ميغابايت</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte"></string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;غيغابايت</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte"></string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;تيرابايت</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte"></string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;بيتابايت</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte"></string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;إكسابايت</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">ستنتهي المكالمة خلال %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -4376,19 +4338,19 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">جدول اجتماع</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly"></string>
+    <string name="upgrade_account_successful_pro_lite_monthly">شكراً لاشتراكك الشهري في برو لايت Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly"></string>
+    <string name="upgrade_account_successful_pro_lite_yearly">شكراً لاشتراكك السنوي في برو لايت Pro&#160;Lite</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly"></string>
+    <string name="upgrade_account_successful_pro_1_monthly">شكراً لاشتراكك الشهري في برو Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly"></string>
+    <string name="upgrade_account_successful_pro_1_yearly">شكراً لاشتراكك السنوي في برو Pro&#160;I</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly"></string>
+    <string name="upgrade_account_successful_pro_2_monthly">شكراً لاشتراكك الشهري في برو Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly"></string>
+    <string name="upgrade_account_successful_pro_2_yearly">شكراً لاشتراكك السنوي في برو Pro&#160;II</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly"></string>
+    <string name="upgrade_account_successful_pro_3_monthly">شكراً لاشتراكك الشهري في برو Pro&#160;III</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">شكراً لاشتراكك السنوي في برو Pro&#160;III</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -4421,40 +4383,12 @@
     <string name="photos_create_album_error_message_systems_album">اسم هذا الألبوم غير مسموح به. أدخل اسمًا مختلفًا.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">يوجد بالفعل ألبوم بهذا الاسم. أدخل اسمًا مختلفًا.</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">ألبوم جديد (%d)</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">إضافة عناصر إلى ”%s“</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
         <item quantity="one">Added %1$d item to “%2$s“</item>
         <item quantity="other">Added %1$d items to “%2$s”</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">معلومات الدفع</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">ستنتهي صلاحية اشتراك برو Pro الخاص بك قريباً</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">تم استلام دفعتك لقاء باقة %1$s.</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">لم تنجح دفعتك لباقة %1$s.</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="zero">ستنتهي صلاحية اشتراك برو Pro الخاص بك خلال %1$d يوم.</item>
-        <item quantity="one">ستنتهي صلاحية اشتراك برو Pro الخاص بك خلال 1 يوم.</item>
-        <item quantity="two">ستنتهي صلاحية اشتراك برو Pro الخاص بك خلال %1$d يومين.</item>
-        <item quantity="few">ستنتهي صلاحية اشتراك برو Pro الخاص بك خلال %1$d أيام.</item>
-        <item quantity="many">ستنتهي صلاحية اشتراك برو Pro الخاص بك خلال %1$d يوماً.</item>
-        <item quantity="other">ستنتهي صلاحية اشتراك برو Pro الخاص بك خلال %1$d يوم.</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="zero">انتهت صلاحية اشتراك باقة برو Pro الخاصة بك منذ %1$d يوم.</item>
-        <item quantity="one">انتهت صلاحية اشتراك باقة برو Pro الخاصة بك منذ 1 يوم.</item>
-        <item quantity="two">انتهت صلاحية اشتراك باقة برو Pro الخاصة بك منذ %1$d يومين.</item>
-        <item quantity="few">انتهت صلاحية اشتراك باقة برو Pro الخاصة بك منذ %1$d أيام.</item>
-        <item quantity="many">انتهت صلاحية اشتراك باقة برو Pro الخاصة بك منذ %1$d يوماً.</item>
-        <item quantity="other">انتهت صلاحية اشتراك باقة برو Pro الخاصة بك منذ %1$d يوم.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]ألبوم[/A] [B]فارغ[/B]</string>
@@ -4483,7 +4417,7 @@
     <!-- Title of the share meeting link bottom panel in scheduled meeting info -->
     <string name="scheduled_meetings_share_meeting_link_panel_title">يمكن لأي شخص لديه هذا الرابط الانضمام إلى الاجتماع و الاطلاع على محادثة الاجتماع.</string>
     <!-- Success alert when the user copy a meeting link to the clipboard in scheduled meeting info -->
-    <string name="scheduled_meetings_meeting_link_copied">تم النسخ الى الحافظة</string>
+    <string name="scheduled_meetings_meeting_link_copied">تم النسخ الى حافظة النصوص</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="zero">تم حذف %d ألبوم</item>
@@ -4590,11 +4524,11 @@
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">Occurrences</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
-    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">Occurs daily</string>
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">يتكرر يومياً</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
-    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">Occurs weekly</string>
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">يتكرر أسبوعياً</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
-    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">Occurs monthly</string>
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">يتكرر شهرياً</string>
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
     <string name="meetings_recurring_meeting_info_see_more_occurrences_button">شاهد المزيد</string>
     <!-- Label for scheduled monthly meetings -->
@@ -4628,9 +4562,9 @@
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Everyday effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Every day effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Everyday effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Every day effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="one">%1$s every week effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
@@ -4643,13 +4577,13 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s, and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
-        <item quantity="other">%1$s, and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="one">%1$s and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s, and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s, and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="one">%1$s and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
@@ -5081,4 +5015,24 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">السبت</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">الأحد</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">بدء</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">موافق</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">الانضمام</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">ابدأ الاجتماع</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">أنضم إلى الاجتماع</string>
 </resources>

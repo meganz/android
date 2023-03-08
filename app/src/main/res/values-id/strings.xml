@@ -239,7 +239,7 @@
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Folder Kosong</string>
     <!-- Title of the fragment Choose Account -->
-    <string name="choose_account_fragment">PILIH AKUN</string>
+    <string name="choose_account_fragment">Pilih akun</string>
     <!-- The file are available “offline” (without a network Wi-Fi mobile data connection) -->
     <string name="file_properties_available_offline">Tersedia tanpa Internet</string>
     <!-- category in sort by action -->
@@ -301,7 +301,7 @@
     <!-- Hint how to cancel the download -->
     <string name="download_touch_to_show">Lihat pemindahan</string>
     <!-- Warning message -->
-    <string name="error_file_size_greater_than_4gb"></string>
+    <string name="error_file_size_greater_than_4gb">Sebagian besar perangkat tidak bisa mengunduh file lebih besar dari 4&#160;GB. Unduhan Anda mungkin akan gagal.</string>
     <!-- message when trying to open a downloaded file but there isn’t any app that open that file. Example: a user downloads a pdf but doesn’t have any app to read a pdf -->
     <string name="intent_not_available">Tidak ada app tersedia untuk mengeksekusi file ini pada perangkat anda</string>
     <!-- Message when trying to open a location message but there isn’t any app that open that location. -->
@@ -377,7 +377,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Permintaan terkirim kembali</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Permintaan berhasil dikirim ke %s. Lihat di tab permintaan Terkirim.</string>
+    <string name="context_contact_request_sent">Request sent to %s. View in Sent requests tab.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Kontak telah dihapus</string>
     <!-- error message -->
@@ -393,53 +393,53 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Terjadi Kesalahan. Folder tidak terbuat</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Berhasil ubah nama</string>
+    <string name="context_correctly_renamed">Renamed</string>
     <!-- error message -->
     <string name="context_no_renamed">Terjadi kesalahan. Belum ubah nama</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Berhasil disalin</string>
+    <string name="context_correctly_copied">Copied</string>
     <!-- error message -->
     <string name="context_no_copied">Terjadi kesalahan. Belum tersalin</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Silahkan pilih folder tujuan</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Berhasil dipindahkan</string>
+    <string name="context_correctly_moved">Moved</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="other">Memindahkan %d barang</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d item tidak berhasil dipindahkan</string>
+    <string name="number_incorrectly_moved">%d items weren’t moved</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Berhasil dipindahkan ke Sampah</string>
+    <string name="context_correctly_moved_to_rubbish">Moved to Rubbish bin</string>
     <!-- error message -->
     <string name="context_no_moved">Terjadi kesalahan. Belum dipindahkan</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Berhasil dibagikan</string>
+    <string name="context_correctly_shared">Berbagi</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Terjadi kesalahan. %d berbagi belum diselesaikan</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Terjadi kesalahan. Gagal menghilangkan berbagi</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Berhasil dihapus</string>
+    <string name="context_correctly_removed">Terhapus</string>
     <!-- error message -->
     <string name="context_no_removed">Terjadi kesalahan. Hapus gagal</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d item berhasil dihapus dari MEGA</string>
+    <string name="number_correctly_removed">%d items removed from MEGA</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d item tidak berhasil dihapus</string>
+    <string name="number_no_removed">%d items weren’t removed</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d berhasil meninggalkan folder.</string>
+    <string name="number_correctly_leaved">%d folders left</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">Berbagi ditinggalkan</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d folder tidak berhasil ditinggalkan</string>
+    <string name="number_no_leaved">%d folders weren’t left</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d item berhasil disalin</string>
+    <string name="number_correctly_copied">%d items copied</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d item belum disalin</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Sampah telah berhasil dikosongkan</string>
+    <string name="rubbish_bin_emptied">Rubbish bin emptied</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">Terjadi kesalahan. Tempat Sampah belum dikosongkan</string>
     <!-- dialog cancel subscriptions -->
@@ -505,7 +505,7 @@
     <!-- choose the payment method option when no method is available -->
     <string name="no_available_payment_method">Tidak ada metode pembayaran yang ditetapkan untuk paket ini saat ini. Silahkan pilih satu.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
-    <string name="file_properties_get_link">Link telah disalin ke clipboard</string>
+    <string name="file_properties_get_link">Tautan disalin ke papan klip</string>
     <!-- alert when clicking a newsignup link being logged -->
     <string name="log_out_warning">Tolong keluar sebelum membuat akun</string>
     <!-- menu item -->
@@ -611,7 +611,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">Salah kode. Silakan coba lagi atau kirim ulang.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Nomor telepon anda telah berhasil diverifikasi</string>
+    <string name="verify_account_successfully">Your phone number has been verified</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>Penyimpanan internal</item>
@@ -750,11 +750,11 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Akun gratis</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1"></string>
+    <string name="my_account_pro1">Akun Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2"></string>
+    <string name="my_account_pro2">Akun Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro3"></string>
+    <string name="my_account_pro3">Akun Pro&#160;III</string>
     <!-- Type of account info added to the feedback email sent to support -->
     <string name="my_account_prolite_feedback_email">Akun Pro Lite</string>
     <!--  -->
@@ -940,7 +940,7 @@
         <item quantity="other">%d undangan terkirim</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d permintaan undangan berhasil dikirim namun %2$d permintaan tidak terkirim.</string>
+    <string name="number_no_invite_contact_request">%1$d invite requests sent but %2$d requests weren’t sent.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Saya)</string>
     <!-- button -->
@@ -994,7 +994,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">Riwayat obrolan telah dihapus</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">Sebuah kesalahan telah terjadi. Riwayat obrolan belum berhasil dihapus</string>
+    <string name="clear_history_error">An error has occurred. The chat history hasn’t been cleared</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Tambahkan peserta</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1064,9 +1064,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">Peserta sudah masuk dalam obrolan grup ini</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d peserta berhasil diundang</string>
+    <string name="number_correctly_add_participant">%d participants were invited</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d peserta berhasil diundang namun %2$d peserta tidak diundang.</string>
+    <string name="number_no_add_participant_request">%1$d participants were invited but %2$d participants were not invited.</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] bergabung dengan obrolan grup melalui undangan dari [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1103,12 +1103,12 @@
     <string name="non_format_change_title_messages">%1$s mengubah nama obrolan grup menjadi “%2$s”</string>
     <!-- chat message when a participant left a group chat -->
     <string name="non_format_message_participant_left_group_chat">%1$s meninggalkan obrolan grup</string>
-    <!-- success alert when the user copy some messages to the clipboard -->
-    <string name="messages_copied_clipboard">Disalin ke clipboard</string>
+    <!-- Success alert when the user copies one message to the clipboard -->
+    <string name="messages_copied_clipboard">Tersalin ke papan klip</string>
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chat Error</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Obrolan tidak dapat dibuka dengan sukses</string>
+    <string name="chat_error_open_message">Chat couldn’t be opened</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d kontak</item>
@@ -1302,7 +1302,7 @@
     </plurals>
     <!-- Message when some public links were removed successfully. Plural. -->
     <plurals name="context_link_removal_success">
-        <item quantity="other">Tautan berhasil dihapus.</item>
+        <item quantity="other">Tautan dihapus</item>
     </plurals>
     <!-- title of the screen to see the details of several contact attachments -->
     <string name="activity_title_contacts_attached">Kontak terlampir</string>
@@ -1325,7 +1325,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">Terjadi kesalahan saat mengganti namanya</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Nama anda telah berhasil diperbarui</string>
+    <string name="success_changing_user_attributes">Your name has been updated</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Peserta ditambahkan</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1559,11 +1559,11 @@
     <!-- Subtitle of QR code settings auto-accept -->
     <string name="setting_subtitle_qrcode_autoccept">Kontak yang memindai Kode QR anda akan secara otomatis ditambahkan ke daftar kontak anda.</string>
     <!-- Text shown when it has been copied the QR code link -->
-    <string name="qrcode_link_copied">Link disalin ke papan klip</string>
+    <string name="qrcode_link_copied">Tautan disalin ke papan klip</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">Kode QR berhasil disetel ulang</string>
+    <string name="qrcode_reset_successfully">QR code reset</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">Kode QR berhasil dihapus</string>
+    <string name="qrcode_delete_successfully">QR code deleted</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">Kode QR tidak diatur ulang karena kesalahan. Tolong, coba lagi.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1581,7 +1581,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">Terjadi kesalahan saat mencoba mengunduh file QR. Mungkin file itu tidak ada. Silakan, coba lagi nanti.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">Kode QR telah berhasil diunduh ke %s</string>
+    <string name="success_download_qr">The QR Code has been downloaded to %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Undangan tidak terkirim</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1598,8 +1598,6 @@
     <string name="button_copy_link">Salin tautan</string>
     <!-- Create QR code -->
     <string name="button_create_qr">Buat kode QR</string>
-    <!-- Text shown when it has been created the QR code successfully -->
-    <string name="qrcode_create_successfully">Kode QR berhasil dibuat</string>
     <!-- Text shown in QR code scan fragment to help and guide the user in the action -->
     <string name="qrcode_scan_help">Sejajarkan kode QR untuk memindainya dengan kamera perangkat anda</string>
     <!-- positive button on dialog to view a contact -->
@@ -1669,7 +1667,7 @@
     <!-- In a chat conversation when you try to send device’s images but images are still loading -->
     <string name="file_storage_loading">Memuat file</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="label_file_size_byte"></string>
+    <string name="label_file_size_byte">%s&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
     <string name="label_file_size_kilo_byte">%s&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
@@ -1685,7 +1683,7 @@
     <!-- Speed in megabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_mega_byte">%s&#160;MB/s</string>
     <!-- Speed in gigabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
-    <string name="label_file_speed_giga_byte"></string>
+    <string name="label_file_speed_giga_byte">%s&#160;GB/s</string>
     <!-- Speed in terabytes. The placeholder is for the speed value, please adjust the position based on linguistics -->
     <string name="label_file_speed_tera_byte">%s&#160;TB/s</string>
     <!-- Size in megabytes. -->
@@ -1743,7 +1741,8 @@
     <string name="messages_forwarded_success">Pesan diteruskan</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="other">Kesalahan. %1$d pesan tidak berhasil diteruskan</item>
+        <item quantity="one">Error. %1$d message not forwarded</item>
+        <item quantity="other">Error. %1$d messages not forwarded</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1828,7 +1827,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Cetak</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Kunci pemulihan telah berhasil disimpan</string>
+    <string name="save_MK_confirmation">Recovery key has been saved</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Tertunda)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1890,7 +1889,7 @@
     <!-- Description of the screen shown when the user enabled correctly Two-Factor Authentication -->
     <string name="description_2fa_enabled">Lain kali anda masuk ke akun anda, anda akan diminta memasukkan kode 6-digit  yang disediakan oleh aplikasi otentikasi anda.</string>
     <!-- Recommendation displayed after enable Two-Factor Authentication -->
-    <string name="recommendation_2fa_enabled"></string>
+    <string name="recommendation_2fa_enabled">Tolong simpan<b>Kunci pemulihan</b> anda di lokasi yang aman, untuk menghindari masalah jika anda kehilangan akses ke aplikasi anda, atau jika anda ingin menonaktifkan otentikasi dua faktor.</string>
     <!-- Error shown when a user tries to enable Two-Factor Authentication and introduce an invalid code -->
     <string name="pin_error_2fa">Kode salah</string>
     <!-- Title of screen Lost authenticator decive -->
@@ -1978,29 +1977,29 @@
     <!-- Pre overquota error dialog when trying to copy or import a file -->
     <string name="pre_overquota_alert_text">Tindakan ini tidak dapat diselesaikan karena akan membawa anda melebihi batas penyimpanan anda saat ini. Apakah anda ingin meningkatkan akun anda?</string>
     <!-- Title of the section Archived chats -->
-    <string name="archived_chats_title_section">Obrolan yang diarsipkan</string>
+    <string name="archived_chats_title_section">Diarsipkan</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Obrolan yang diarsipkan (%d)</string>
+    <string name="archived_chats_show_option">Archived (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
-    <string name="archive_chat_option">Arsipkan obrolan</string>
+    <string name="archive_chat_option">Arsipkan</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
-    <string name="unarchive_chat_option">Batalkan pengarsipan obrolan</string>
+    <string name="unarchive_chat_option">Batalkan pengarsipan</string>
     <!-- Confirmation button of the dialog to archive a chat -->
     <string name="general_archive">Arsipkan</string>
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Batalkan pengarsipan</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">Obrolan %s diarsipkan.</string>
+    <string name="success_archive_chat">%s was archived</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Kesalahan. Obrolan %s tidak diarsipkan.</string>
+    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">Obrolan %s tidak diarsipkan.</string>
+    <string name="success_unarchive_chat">%s was unarchived</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Kesalahan. Obrolan %s tidak dapat dibatalkan pengarsipannya.</string>
+    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Obrolan tidak aktif</string>
     <!-- Subtitle of chat screen when the chat is archived -->
-    <string name="archived_chat">Chat yang diarsipkan</string>
+    <string name="archived_chat">Diarsipkan</string>
     <!-- Title of the layout to join a group call from the chat screen -->
     <string name="join_call_layout">Ketuk untuk bergabung dengan panggilan</string>
     <!-- Label shown when the user wants to add contacts into his MEGA account -->
@@ -2032,7 +2031,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">Anda akan menghapus riwayat versi semua file. Versi file apa pun yang dibagikan kepada anda dari kontak harus dihapus oleh mereka.\n\nHarap dicatat bahwa file saat ini tidak akan dihapus.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">Versi file berhasil dihapus</string>
+    <string name="success_delete_versions">File versions deleted</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">Terjadi kesalahan saat mencoba menghapus semua versi lama file anda, silakan coba lagi nanti.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2350,7 +2349,7 @@
     <!-- Error when the user tries to get a public chat link for a chat with the default title -->
     <string name="message_error_set_title_get_link">Sebelum anda dapat membuat tautan untuk obrolan ini, anda perlu menetapkan deskripsi:</string>
     <!-- success alert when the user copy a chat link to the clipboard -->
-    <string name="chat_link_copied_clipboard">Tautan obrolan disalin ke papan klip</string>
+    <string name="chat_link_copied_clipboard">Tautan disalin ke papan klip</string>
     <!-- Label to show the price of each plan in the upgrade account section -->
     <string name="type_month">[A]Dari[/A] %s / [A]bulan[/A] *</string>
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
@@ -2486,7 +2485,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">Konten tidak dikirim ke %d obrolan</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">Obrolan grup baru berhasil dibuat</string>
+    <string name="new_group_chat_created">New group chat created</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">Mempersiapkan file</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2503,7 +2502,8 @@
     <string name="version_history_deleted_erroneously">Versi lama tidak dihapus.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="other">%d versi berhasil dihapus</item>
+        <item quantity="one">%d version deleted</item>
+        <item quantity="other">%d versions deleted</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2596,9 +2596,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Tautan obrolan tidak tersedia.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Tautan obrolan berhasil dihapus.</string>
+    <string name="chat_link_deleted">Chat link deleted</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Versi berhasil dipulihkan.</string>
+    <string name="version_restored">Version restored</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Ketuk dan tahan untuk merekam</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2756,7 +2756,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">Anda tidak memiliki izin yang benar untuk mengubah file ini. Apakah anda ingin membuat file baru?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Versi berhasil dibuat sebagai file baru.</string>
+    <string name="version_as_new_file_created">Version was created as a new file</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">pada %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2834,7 +2834,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Keluar&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Nomor telepon anda telah berhasil dihapus.</string>
+    <string name="remove_phone_number_success">Phone number removed</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Gagal menghapus nomor telepon anda.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -2978,13 +2978,13 @@
     <!-- Button which action is copy the password of a link -->
     <string name="button_copy_password">Salin kata sandi</string>
     <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="key_copied_clipboard">Kunci disalin ke clipboard.</string>
+    <string name="key_copied_clipboard">Kunci Disalin ke Papan Klip</string>
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
-    <string name="password_copied_clipboard">Sandi disalin ke clipboard.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_key_sent">Tautan dan kunci berhasil dikirim.</string>
-    <!-- Confirmation shown informing a key link it’s copied to the clipboard -->
-    <string name="link_and_password_sent">Tautan dan kata sandi berhasil dikirim.</string>
+    <string name="password_copied_clipboard">Sandi Disalin ke Papan Klip</string>
+    <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
+    <string name="link_and_key_sent">Link and key sent</string>
+    <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
+    <string name="link_and_password_sent">Link and password sent</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Tingkatkan ke Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3161,19 +3161,23 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="other">%d barang berhasil dipindahkan ke Tempat Sampah</item>
+        <item quantity="one">1 item moved to Rubbish bin</item>
+        <item quantity="other">%d items moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="other">%d barang tidak berhasil dipindahkan ke Tempat Sampah</item>
+        <item quantity="one">1 item wasn’t moved to the Rubbish bin</item>
+        <item quantity="other">%d items weren’t moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="other">%d barang berhasil dipulihkan</item>
+        <item quantity="one">1 item restored</item>
+        <item quantity="other">%d items restored</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="other">%d barang tidak berhasil dipulihkan</item>
+        <item quantity="one">1 item wasn’t restored</item>
+        <item quantity="other">%d items weren’t restored</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Tetap ganti</string>
@@ -3219,11 +3223,13 @@
     <string name="action_copy_all">Salin semua</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="other">Tautan berhasil dikirim.</item>
+        <item quantity="one">Link sent</item>
+        <item quantity="other">Links sent</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="other">Tautan disalin ke papan klip.</item>
+        <item quantity="one">Copied link to clipboard</item>
+        <item quantity="other">Copied links to clipboard</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3318,7 +3324,7 @@
     <!-- the content of snack bar when the user be the new moderator-->
     <string name="be_new_moderator">Anda adalah tuan rumah baru</string>
     <!-- the content of snack bar when copied meeting link-->
-    <string name="copied_meeting_link">Tautan pertemuan disalin.</string>
+    <string name="copied_meeting_link">Tautan disalin ke papan klip</string>
     <!-- Title of the layout to join a meeting from the chat screen. -->
     <string name="join_meeting_layout_in_group_call">Ketuk untuk bergabung dengan rapat saat ini.</string>
     <!-- Title of fifth tour screen -->
@@ -3396,7 +3402,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Anda sudah mengundang %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Undangan berhasil dikirim. Lihat permintaan terkirim.</string>
+    <string name="contact_invited">Invite sent. See Sent requests.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File tersedia Offline</string>
     <!-- Message when file removed from offline. -->
@@ -3552,16 +3558,17 @@
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant joined. The second placeholder is the name of the second participant joined -->
     <string name="meeting_call_screen_two_participants_joined_call">%1$s dan %2$s bergabung</string>
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
-    <string name="meeting_call_screen_one_participant_left_call">%1$s pergi</string>
+    <string name="meeting_call_screen_one_participant_left_call">%1$s meninggalkan panggilan</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s dan %2$s pergi</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left the call</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="other">%1$s dan %2$d lainnya bergabung</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="other">%1$s dan %2$d lainnya pergi</item>
+        <item quantity="one">%1$s and 1 other left the call</item>
+        <item quantity="other">%1$s and %2$d others left the call</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Hapus secara permanen</string>
@@ -3658,19 +3665,19 @@
     <!-- Message shown in a chat room when a call is ended because the connection has been lost and could not be reconnected -->
     <string name="calls_chat_screen_unable_to_reconnect_the_call">Tidak dapat menyambung kembali</string>
     <!-- Size in bytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_byte"></string>
+    <string name="account_achievements_storage_quota_byte">[A]%1$s[/A]&#160;B</string>
     <!-- Size in kilobytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_kilo_byte"></string>
+    <string name="account_achievements_storage_quota_kilo_byte">[A]%1$s[/A]&#160;KB</string>
     <!-- Size in megabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_mega_byte"></string>
+    <string name="account_achievements_storage_quota_mega_byte">[A]%1$s[/A]&#160;MB</string>
     <!-- Size in gigabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_giga_byte"></string>
+    <string name="account_achievements_storage_quota_giga_byte">[A]%1$s[/A]&#160;GB</string>
     <!-- Size in terabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_tera_byte"></string>
+    <string name="account_achievements_storage_quota_tera_byte">[A]%1$s[/A]&#160;TB</string>
     <!-- Size in petabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_peta_byte"></string>
+    <string name="account_achievements_storage_quota_peta_byte">[A]%1$s[/A]&#160;PB</string>
     <!-- Size in exabytes. The placeholder is for the size value, please adjust the position based on linguistics -->
-    <string name="account_achievements_storage_quota_exa_byte"></string>
+    <string name="account_achievements_storage_quota_exa_byte">[A]%1$s[/A]&#160;EB</string>
     <!-- Label to indicate the time remaining for the call to end automatically. The placeholder is to include the count down timer -->
     <string name="calls_call_screen_count_down_timer_to_end_call">Panggilan akan berakhir di %s</string>
     <!-- Title of the dialog that indicates that you are alone in the call, displayed on the call screen -->
@@ -3856,19 +3863,19 @@
     <!-- Label that schedule a meeting -->
     <string name="chat_schedule_meeting">Jadwalkan pertemuan</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly"></string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Terima kasih untuk langganan bulanan Pro&#160;Lite anda</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly"></string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Terima kasih untuk langganan tahunan Pro&#160;Lite anda</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly"></string>
+    <string name="upgrade_account_successful_pro_1_monthly">Terima kasih untuk langganan bulanan Pro&#160;I anda</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly"></string>
+    <string name="upgrade_account_successful_pro_1_yearly">Terima kasih untuk langganan tahunan Pro&#160;I anda</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly"></string>
+    <string name="upgrade_account_successful_pro_2_monthly">Terima kasih untuk langganan bulanan Pro&#160;II anda</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly"></string>
+    <string name="upgrade_account_successful_pro_2_yearly">Terima kasih untuk langganan tahunan Pro&#160;II anda</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly"></string>
+    <string name="upgrade_account_successful_pro_3_monthly">Terima kasih untuk langganan bulanan Pro&#160;III anda</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Terima kasih untuk langganan tahunan Pro&#160;III anda</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -3901,30 +3908,12 @@
     <string name="photos_create_album_error_message_systems_album">Nama album ini tidak diizinkan. Masukkan nama yang berbeda.</string>
     <!-- Error message for creating an album with a duplicate name -->
     <string name="photos_create_album_error_message_duplicate">Album dengan nama ini sudah ada. Masukkan nama yang berbeda.</string>
-    <!-- Error message for creating an album with a duplicate name -->
-    <string name="photos_album_creation_dialog_input_placeholder_more_than_one">Album baru (%d)</string>
     <!-- Title of album photos selection screen -->
     <string name="photos_album_selection_title">Tambahkan item ke “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
         <item quantity="one">Added %1$d item to “%2$s“</item>
         <item quantity="other">Added %1$d items to “%2$s”</item>
-    </plurals>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_payment_title">Info pembayaran</string>
-    <!-- Title of a notification related to payments -->
-    <string name="notifications_pro_expiring_title">Membership Pro akan habis dalam waktu dekat</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was successfully received. The %1$s indicates the name of the Pro plan they paid for e.g. Lite, Pro I, etc. -->
-    <string name="notifications_pro_payment_received">Pembayaran anda untuk paket %1$s telah diterima.</string>
-    <!-- Text of a notification telling the user that their Pro plan payment was unsuccessful. The %1$s indicates the name of the Pro plan they were trying to pay for e.g. Lite, Pro I, etc." -->
-    <string name="notifications_pro_payment_failed">Pembayaran anda untuk paket %1$s tidak berhasil.</string>
-    <!-- Text of a notification about an expiring pro plan -->
-    <plurals name="notifications_expiring_pro_plan_text">
-        <item quantity="other">Paket keanggotaan Pro anda akan kedaluwarsa dalam %1$d hari.</item>
-    </plurals>
-    <!-- Text of a notification about an expired pro plan -->
-    <plurals name="notifications_expired_pro_plan_text">
-        <item quantity="other">Paket keanggotaan Pro anda kedaluwarsa %1$d hari lalu.</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]Album[/A] [B]kosong[/B]</string>
@@ -4040,11 +4029,11 @@
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
     <string name="meetings_list_recurring_meeting_occurrences_option">Occurrences</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
-    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">Occurs daily</string>
+    <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">Terjadi harian</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
-    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">Occurs weekly</string>
+    <string name="meetings_recurring_meeting_info_occurs_weekly_subtitle">Terjadi mingguan</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs monthly -->
-    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">Occurs monthly</string>
+    <string name="meetings_recurring_meeting_info_occurs_monthly_subtitle">Terjadi bulanan</string>
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
     <string name="meetings_recurring_meeting_info_see_more_occurrences_button">Lihat lebih banyak</string>
     <!-- Label for scheduled monthly meetings -->
@@ -4078,9 +4067,9 @@
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Everyday effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Every day effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Everyday effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Every day effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="one">%1$s every week effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
@@ -4093,13 +4082,13 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s, and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
-        <item quantity="other">%1$s, and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="one">%1$s and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s, and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s, and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="one">%1$s and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
@@ -4522,4 +4511,24 @@
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">Sab</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">Min</string>
+    <!-- Album selection dialog title -->
+    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <!-- Album selection dialog body -->
+    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <!-- Option of a scheduled meeting in meeting list to start the meeting -->
+    <string name="meetings_list_start_scheduled_meeting_option">Mulai</string>
+    <!-- Answer for confirmation dialog. -->
+    <string name="general_camelcase_ok">Ok</string>
+    <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
+    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <!-- Option of a scheduled meeting in meeting list to join the meeting -->
+    <string name="meetings_list_join_scheduled_meeting_option">Gabung</string>
+    <!-- Option of a scheduled meeting in chat room to start the meeting -->
+    <string name="meetings_chat_room_start_scheduled_meeting_option">Mulai pertemuan</string>
+    <!-- Option of a scheduled meeting in chat room to join the meeting -->
+    <string name="meetings_chat_room_join_scheduled_meeting_option">Gabung rapat</string>
 </resources>
