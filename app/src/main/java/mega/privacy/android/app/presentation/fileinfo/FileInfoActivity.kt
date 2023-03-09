@@ -58,6 +58,7 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.namecollision.data.NameCollision
+import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.security.PasscodeCheck
@@ -391,9 +392,8 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     }
 
     private fun updateIncomeShared(viewState: FileInfoViewState) {
-        bindingContent.filePropertiesOwnerLayout.isVisible =
-            viewState.incomingSharesOwnerContactItem != null
-        viewState.incomingSharesOwnerContactItem?.let { contactItem ->
+        bindingContent.filePropertiesOwnerLayout.isVisible = viewState.isIncomingSharedNode
+        viewState.inShareOwnerContactItem?.let { contactItem ->
             bindingContent.filePropertiesOwnerLabel.text = viewState.ownerLabel
             bindingContent.filePropertiesOwnerInfo.text = contactItem.email
             bindingContent.filePropertiesOwnerStateIcon.setImageResource(
@@ -415,22 +415,11 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 null,
             )
 
-            binding.filePropertiesPermissionInfo.isVisible = true
-            val accessLevel = megaApi.getAccess(viewModel.node)
-            Timber.d("Node: %s", viewModel.node.handle)
-            when (accessLevel) {
-                MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> {
-                    binding.filePropertiesPermissionInfo.text =
-                        getString(R.string.file_properties_shared_folder_full_access)
-                }
-                MegaShare.ACCESS_READ -> {
-                    binding.filePropertiesPermissionInfo.text =
-                        getString(R.string.file_properties_shared_folder_read_only)
-                }
-                MegaShare.ACCESS_READWRITE -> {
-                    binding.filePropertiesPermissionInfo.text =
-                        getString(R.string.file_properties_shared_folder_read_write)
-                }
+            viewState.accessPermission.description()?.let {
+                binding.filePropertiesPermissionInfo.setText(it)
+                binding.filePropertiesPermissionInfo.isVisible = true
+            } ?: run {
+                binding.filePropertiesPermissionInfo.isVisible = false
             }
         }
     }
@@ -502,7 +491,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 isInRubbish = state.isNodeInRubbish,
                 fromIncomingShares = from == Constants.FROM_INCOMING_SHARES,
                 firstIncomingLevel = firstIncomingLevel,
-                nodeAccess = megaApi.getAccess(viewModel.node),
+                nodeAccess = state.accessPermission,
             )
         } else {
             menuHelper.disableMenu()
@@ -1070,7 +1059,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             bindingContent.filePropertiesSwitch.isChecked = !isChecked
             return
         }
-        if (viewModel.uiState.value.incomingSharesOwnerContactItem == null) {
+        if (!viewModel.uiState.value.isIncomingSharedNode) {
             Timber.d("Owner: me")
             if (!isChecked) {
                 Timber.d("isChecked")

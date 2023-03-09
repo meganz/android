@@ -18,12 +18,11 @@ import androidx.core.widget.NestedScrollView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.google.android.material.appbar.AppBarLayout
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaShare
 import kotlin.math.abs
 
 /**
@@ -139,7 +138,7 @@ internal class FileInfoToolbarHelper(
         downloadMenuItem = menu.findItem(R.id.cab_menu_file_info_download)
         shareMenuItem = menu.findItem(R.id.cab_menu_file_info_share_folder)
         getLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_get_link)
-        getLinkMenuItem?.title = context.getQuantityStringOrDefault(R.plurals.get_links, 1)
+        getLinkMenuItem?.title = context.resources.getQuantityString(R.plurals.get_links, 1)
         editLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_edit_link)
         removeLinkMenuItem = menu.findItem(R.id.cab_menu_file_info_remove_link)
         renameMenuItem = menu.findItem(R.id.cab_menu_file_info_rename)
@@ -158,7 +157,7 @@ internal class FileInfoToolbarHelper(
         isInInbox: Boolean,
         fromIncomingShares: Boolean,
         firstIncomingLevel: Boolean,
-        nodeAccess: Int,
+        nodeAccess: AccessPermission?,
     ) {
         allMenuItems.forEach {
             it?.isVisible = false
@@ -247,7 +246,7 @@ internal class FileInfoToolbarHelper(
         isInRubbish: Boolean,
         fromIncomingShares: Boolean,
         firstIncomingLevel: Boolean,
-        nodeAccess: Int,
+        nodeAccess: AccessPermission?,
     ) {
         if (isInRubbish) {
             deleteMenuItem?.isVisible = true
@@ -314,7 +313,7 @@ internal class FileInfoToolbarHelper(
         node: MegaNode,
         fromIncomingShares: Boolean,
         firstIncomingLevel: Boolean,
-        nodeAccess: Int,
+        nodeAccess: AccessPermission?,
     ) {
         if (!node.isTakenDown && !node.isFolder) {
             sendToChatMenuItem?.isVisible = true
@@ -329,11 +328,19 @@ internal class FileInfoToolbarHelper(
                 copyMenuItem?.isVisible = true
             }
             when (nodeAccess) {
-                MegaShare.ACCESS_OWNER, MegaShare.ACCESS_FULL -> {
+                AccessPermission.OWNER, AccessPermission.FULL -> {
                     rubbishMenuItem?.isVisible = !firstIncomingLevel
                     renameMenuItem?.isVisible = true
                 }
-                MegaShare.ACCESS_READ -> copyMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+                AccessPermission.READ -> {
+                    copyMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+                    renameMenuItem?.isVisible = false
+                    rubbishMenuItem?.isVisible = false
+                }
+                else -> {
+                    renameMenuItem?.isVisible = false
+                    rubbishMenuItem?.isVisible = false
+                }
             }
         } else {
             if (!node.isTakenDown) {

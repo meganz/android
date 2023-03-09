@@ -34,6 +34,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
@@ -53,6 +54,7 @@ import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -86,6 +88,7 @@ class FileInfoViewModel @Inject constructor(
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle,
     private val getOutShares: GetOutShares,
     private val getNodeLocationInfo: GetNodeLocationInfo,
+    private val getNodeAccessPermission: GetNodeAccessPermission,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -270,7 +273,8 @@ class FileInfoViewModel @Inject constructor(
                             }
                         }
                         Name -> updateTitle()
-                        Owner, Inshare -> updateOwner()
+                        Owner -> updateOwner()
+                        Inshare -> updateAccessPermission()
                         Parent ->
                             if (!_uiState.value.isNodeInRubbish && isNodeInRubbish(typedNode.id.longValue)) {
                                 //if the node is moved to rubbish bin, let's close the screen like when it's deleted
@@ -318,7 +322,7 @@ class FileInfoViewModel @Inject constructor(
                         //a possible change in outShares contacts, let's update
                         updateOutShares()
                     }
-                    _uiState.value.incomingSharesOwnerContactItem?.handle?.let { userId ->
+                    _uiState.value.inShareOwnerContactItem?.handle?.let { userId ->
                         if (userUpdate.changes.keys.any { it.id == userId }) {
                             // update in owner contact, let's update
                             updateOwner()
@@ -330,6 +334,10 @@ class FileInfoViewModel @Inject constructor(
 
     private fun updateCurrentNodeStatus() {
         updateState { uiState ->
+            val inShareOwnerContactItem = (typedNode as? TypedFolderNode)?.let {
+                //a first cached fast version, later we'll ask for a fresh ContactItem
+                getContactItemFromInShareFolder(folderNode = it, skipCache = false)
+            }
             uiState.copy(
                 title = typedNode.name,
                 isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
@@ -339,13 +347,9 @@ class FileInfoViewModel @Inject constructor(
                     ?.let {
                         fileUtilWrapper.getFileIfExists(fileName = it)?.toURI()?.toString()
                     },
-                incomingSharesOwnerContactItem = (typedNode as? TypedFolderNode)?.let {
-                    //a first cached fast version
-                    getContactItemFromInShareFolder(folderNode = it, skipCache = false)
-                },
-            ).also {
-                println("new state $it")
-            }
+                inShareOwnerContactItem = inShareOwnerContactItem,
+                accessPermission = getNodeAccessPermission(typedNode.id) ?: AccessPermission.UNKNOWN
+            )
         }
         updateHistory()
         updatePreview()
@@ -379,17 +383,21 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
-    private fun updateOwner() {
-        (typedNode as? TypedFolderNode)?.let { folder ->
-            updateState {
-                it.copy(
-                    incomingSharesOwnerContactItem = getContactItemFromInShareFolder(
-                        folderNode = folder,
-                        skipCache = true
-                    )
+    private fun updateOwner() = (typedNode as? TypedFolderNode)?.let { folder ->
+        updateState {
+            it.copy(
+                inShareOwnerContactItem = getContactItemFromInShareFolder(
+                    folderNode = folder,
+                    skipCache = true
                 )
-            }
+            )
         }
+    }
+
+    private fun updateAccessPermission() = updateState { viewState ->
+        viewState.copy(
+            accessPermission = getNodeAccessPermission(typedNode.id) ?: AccessPermission.UNKNOWN
+        )
     }
 
     private fun updateLocation() {
