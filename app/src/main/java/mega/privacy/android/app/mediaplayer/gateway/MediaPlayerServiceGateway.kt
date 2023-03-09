@@ -158,4 +158,21 @@ interface MediaPlayerServiceGateway {
      * Cancel playback position dialog before build sources
      */
     fun cancelPlaybackPositionDialogBeforeBuildSources()
+
+    /**
+     * Add subtitle for video
+     *
+     * @param subtitleFileUrl the subtitle file link
+     */
+    fun addSubtitle(subtitleFileUrl: String)
+
+    /**
+     * For show subtitle after the subtitle file has been set
+     */
+    fun showSubtitle()
+
+    /**
+     * For hide subtitle after the subtitle file has been set
+     */
+    fun hideSubtitle()
 }

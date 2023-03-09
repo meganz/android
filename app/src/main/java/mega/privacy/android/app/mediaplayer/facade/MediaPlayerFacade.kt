@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.google.android.exoplayer2.C
@@ -20,9 +21,11 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.util.EventLogger
+import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ALL
 import com.google.android.exoplayer2.util.RepeatModeUtil.REPEAT_TOGGLE_MODE_ONE
 import com.google.android.exoplayer2.video.VideoSize
+import com.google.common.collect.ImmutableList
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.MediaMegaPlayer
@@ -49,6 +52,7 @@ class MediaPlayerFacade @Inject constructor(
 
     private lateinit var exoPlayer: ExoPlayer
     private lateinit var player: MediaMegaPlayer
+    private lateinit var trackSelector: DefaultTrackSelector
     private var playerNotificationManager: PlayerNotificationManager? = null
     private var notificationDismissed = false
 
@@ -59,7 +63,7 @@ class MediaPlayerFacade @Inject constructor(
         nameChangeCallback: (title: String?, artist: String?, album: String?) -> Unit,
         mediaPlayerCallback: MediaPlayerCallback,
     ) {
-        val trackSelector = DefaultTrackSelector(context)
+        trackSelector = DefaultTrackSelector(context)
         val renderersFactory = DefaultRenderersFactory(context).setExtensionRendererMode(
             DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)
         exoPlayer = ExoPlayer.Builder(context, renderersFactory)
@@ -309,6 +313,40 @@ class MediaPlayerFacade @Inject constructor(
             }
             showController()
         }
+    }
+
+    override fun addSubtitle(subtitleFileUrl: String) {
+        val videoUri: Uri? = player.currentMediaItem?.localConfiguration?.uri
+        val mediaId = player.currentMediaItem?.mediaId
+        val uri = Uri.parse(subtitleFileUrl)
+        if (videoUri != null && mediaId != null && uri != null) {
+            val subtitle = MediaItem.SubtitleConfiguration.Builder(uri)
+                .setMimeType(MimeTypes.APPLICATION_SUBRIP)
+                .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                .build()
+            val mediaItem = MediaItem.Builder()
+                .setUri(videoUri)
+                .setMediaId(mediaId)
+                .setSubtitleConfigurations(ImmutableList.of(subtitle))
+                .build()
+            val oldPosition = player.currentPosition
+            // Stop player to set new media item that has subtitle
+            playerStop()
+            // Set new media item and start play video from the stop location
+            player.setMediaItem(mediaItem, oldPosition)
+            player.prepare()
+            player.play()
+        }
+    }
+
+    override fun showSubtitle() {
+        trackSelector.parameters = DefaultTrackSelector.Parameters.Builder(context)
+            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false).build()
+    }
+
+    override fun hideSubtitle() {
+        trackSelector.parameters = DefaultTrackSelector.Parameters.Builder(context)
+            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true).build()
     }
 
     companion object {

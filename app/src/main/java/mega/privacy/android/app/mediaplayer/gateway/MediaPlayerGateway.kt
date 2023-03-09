@@ -207,4 +207,21 @@ interface MediaPlayerGateway {
         isAudioPlayer: Boolean = true,
         showShuffleButton: Boolean? = null,
     )
+
+    /**
+     * Add subtitle for video
+     *
+     * @param subtitleFileUrl the subtitle file link
+     */
+    fun addSubtitle(subtitleFileUrl: String)
+
+    /**
+     * For show subtitle after the subtitle file has been set
+     */
+    fun showSubtitle()
+
+    /**
+     * For hide subtitle after the subtitle file has been set
+     */
+    fun hideSubtitle()
 }
