@@ -39,6 +39,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.qualifier.IoDispatcher
