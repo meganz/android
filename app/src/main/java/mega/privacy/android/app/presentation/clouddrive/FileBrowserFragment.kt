@@ -443,25 +443,7 @@ class FileBrowserFragment : RotatableFragment() {
         if (!isAdded) {
             return null
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                fileBrowserViewModel.state.collect {
-                    hideMultipleSelect()
-                    setNodes(it.nodes.toMutableList())
-                    recyclerView?.invalidate()
-                }
-            }
-        }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
-                    EventObserver { showSortByPanel() }
-                )
-            }
-        }
 
-        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)
-            .observe(this) { showMediaDiscovery(true) }
         Timber.d("Fragment ADDED")
         if (aB == null) {
             aB = (activity as? AppCompatActivity)?.supportActionBar
@@ -613,18 +595,15 @@ class FileBrowserFragment : RotatableFragment() {
             animateNode(fileBrowserViewModel.state.value.nodes)
         }
 
-        fileBrowserViewModel.state.flowWithLifecycle(
-            viewLifecycleOwner.lifecycle,
-            Lifecycle.State.RESUMED
-        ).onEach {
-            mediaDiscoveryViewSettings = it.mediaDiscoveryViewSettings
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupObservers()
+    }
+
+    private fun setupObservers() {
         observeDragSupportEvents(
             viewLifecycleOwner,
             recyclerView,
@@ -634,6 +613,33 @@ class FileBrowserFragment : RotatableFragment() {
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
             handleNewViewType(state.viewType)
         }
+
+        fileBrowserViewModel.state.flowWithLifecycle(
+            viewLifecycleOwner.lifecycle,
+            Lifecycle.State.RESUMED
+        ).onEach {
+            mediaDiscoveryViewSettings = it.mediaDiscoveryViewSettings
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                fileBrowserViewModel.state.collect {
+                    hideMultipleSelect()
+                    setNodes(it.nodes.toMutableList())
+                    recyclerView?.invalidate()
+                }
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
+                    EventObserver { showSortByPanel() }
+                )
+            }
+        }
+
+        LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)
+            .observe(this) { showMediaDiscovery(true) }
     }
 
     /**
