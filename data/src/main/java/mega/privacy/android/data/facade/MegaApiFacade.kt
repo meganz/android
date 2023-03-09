@@ -1024,4 +1024,7 @@ internal class MegaApiFacade @Inject constructor(
     ) = megaApi.multiFactorAuthLogin(email, password, pin, listener)
 
     override suspend fun getNodePath(node: MegaNode): String? = megaApi.getNodePath(node)
+
+    override fun getAccess(megaNode: MegaNode) =
+        megaApi.getAccess(megaNode)
 }

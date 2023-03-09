@@ -1964,4 +1964,28 @@ interface MegaApiGateway {
      * @return The path of the node
      */
     suspend fun getNodePath(node: MegaNode): String?
+
+    /**
+     * Returns the access level of the sharing
+     *
+     * Possible return values are:
+     * - ACCESS_UNKNOWN = -1
+     * It means that the access level is unknown
+     *
+     * - ACCESS_READ = 0
+     * The user can read the folder only
+     *
+     * - ACCESS_READWRITE = 1
+     * The user can read and write the folder
+     *
+     * - ACCESS_FULL = 2
+     * The user has full permissions over the folder
+     *
+     * - ACCESS_OWNER = 3
+     * The user is the owner of the folder
+     *
+     * @param megaNode [MegaNode]
+     * @return The access level of the sharing
+     */
+    fun getAccess(megaNode: MegaNode): Int
 }

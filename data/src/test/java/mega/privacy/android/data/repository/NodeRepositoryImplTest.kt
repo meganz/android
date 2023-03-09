@@ -21,24 +21,29 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.shares.AccessPermission
+import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaShare.ACCESS_READ
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NodeRepositoryImplTest {
 
-    private lateinit var underTest: NodeRepositoryImpl
+    private lateinit var underTest: NodeRepository
     private val context: Context = mock()
     private val megaApiGateway: MegaApiGateway = mock()
     private val megaApiFolderGateway: MegaApiFolderGateway = mock()
@@ -57,6 +62,7 @@ class NodeRepositoryImplTest {
     private val nodeUpdateMapper: NodeUpdateMapper = mock()
     private val folderNode: FolderNode = mock()
     private val appEventGateway: AppEventGateway = mock()
+    private val accessPermissionMapper: AccessPermissionMapper = mock()
 
     @Before
     fun setup() {
@@ -79,6 +85,7 @@ class NodeRepositoryImplTest {
             streamingGateway = streamingGateway,
             nodeUpdateMapper = nodeUpdateMapper,
             appEventGateway = appEventGateway,
+            accessPermissionMapper = accessPermissionMapper,
         )
     }
 
@@ -106,6 +113,16 @@ class NodeRepositoryImplTest {
             val result = underTest.getFolderTreeInfo(folderNode)
             assertThat(result).isEqualTo(folderInfo)
         }
+
+    @Test
+    fun `test access is fetched from mega api gateway`() = runTest {
+        val node = mock<MegaNode>()
+        whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(node)
+        whenever(megaApiGateway.getAccess(node)).thenReturn(ACCESS_READ)
+        whenever(accessPermissionMapper.invoke(ACCESS_READ)).thenReturn(AccessPermission.READ)
+        underTest.getNodeAccessPermission(nodeId)
+        verify(megaApiGateway, times(1)).getAccess(node)
+    }
 
     private suspend fun mockFolderInfoResponse() {
         val fileNode: MegaNode = mock()

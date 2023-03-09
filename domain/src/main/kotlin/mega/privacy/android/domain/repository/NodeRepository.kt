@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserId
 
 /**
@@ -129,6 +130,13 @@ interface NodeRepository {
      * if false it only returns the owner if this [nodeId] represents the root of an in share folder node,
      */
     suspend fun getOwnerIdFromInShare(nodeId: NodeId, recursive: Boolean): UserId?
+
+    /**
+     * Get the access level of the node
+     * @param nodeId [NodeId]
+     * @return the [AccessPermission] enum value for this node
+     */
+    suspend fun getNodeAccessPermission(nodeId: NodeId): AccessPermission?
 
     /**
      * Monitor update upgrade security events
