@@ -22,6 +22,8 @@ import nz.mega.sdk.MegaShare
  * @param isShareContactExpanded outShares are shown if is set to true
  * @param outShares shares in case of a node shared with others as outShare
  * @param nodeLocationInfo the location info of the node
+ * @param isAvailableOffline true if the file is available offline
+ * @param isAvailableOfflineEnabled true if offline availability can be changed, false if not
  * @param inShareOwnerContactItem the [ContactItem] of the owner
  * @param accessPermission the [AccessPermission] the user has to this node
  */
@@ -38,6 +40,8 @@ data class FileInfoViewState(
     val isShareContactExpanded: Boolean = false,
     val outShares: List<MegaShare> = emptyList(),
     val nodeLocationInfo: LocationInfo? = null,
+    val isAvailableOffline: Boolean = false,
+    val isAvailableOfflineEnabled: Boolean = false,
     val inShareOwnerContactItem: ContactItem? = null,
     val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
 ) {

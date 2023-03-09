@@ -9,6 +9,7 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaShare
+import nz.mega.sdk.MegaUser
 
 /**
  * MegaNode repository
@@ -97,6 +98,13 @@ interface MegaNodeRepository {
      * @return A node corresponding to the Inbox node, null if cannot be retrieved
      */
     suspend fun getInboxNode(): MegaNode?
+
+    /**
+     * check whether the node is in inbox or not
+     *
+     * @return Boolean
+     */
+    suspend fun isNodeInInbox(megaNode: MegaNode): Boolean
 
     /**
      * Get the rubbish root node
@@ -224,6 +232,14 @@ interface MegaNodeRepository {
      * @return List of MegaNode that other users are sharing with this account
      */
     suspend fun getIncomingSharesNode(order: SortOrder): List<MegaNode>
+
+    /**
+     * Get the owner of this node or null if is not an incoming shared node
+     * @param node that is being shared
+     * @param recursive if true root node of [node] will be checked, if false the [node] itself will be checked
+     * @return the owner of this node or null if is not an incoming shared node
+     */
+    suspend fun getUserFromInShare(node: MegaNode, recursive: Boolean): MegaUser?
 
     /**
      * Authorize and return a MegaNode can be downloaded with any instance of MegaApi

@@ -213,6 +213,10 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         megaApiGateway.getInboxNode()
     }
 
+    override suspend fun isNodeInInbox(megaNode: MegaNode) = withContext(ioDispatcher) {
+        megaApiGateway.isInInbox(megaNode)
+    }
+
     override suspend fun getRubbishBinNode(): MegaNode? = withContext(ioDispatcher) {
         megaApiGateway.getRubbishBinNode()
     }
@@ -304,6 +308,10 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             megaApiGateway.getIncomingSharesNode(sortOrderIntMapper(order))
         }
 
+    override suspend fun getUserFromInShare(node: MegaNode, recursive: Boolean) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getUserFromInShare(node, recursive)
+        }
 
     override suspend fun authorizeNode(handle: Long): MegaNode? = withContext(ioDispatcher) {
         megaApiFolderGateway.authorizeNode(handle)

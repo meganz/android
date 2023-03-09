@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.fileinfo
 
+import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth
@@ -19,6 +20,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
+import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -28,6 +30,9 @@ import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -40,6 +45,7 @@ import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
+import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
@@ -69,8 +75,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.lang.ref.WeakReference
 import java.net.URI
 
 @ExperimentalCoroutinesApi
@@ -103,11 +111,14 @@ internal class FileInfoViewModelTest {
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle = mock()
     private val getNodeLocationInfo: GetNodeLocationInfo = mock()
     private val getOutShares: GetOutShares = mock()
+    private val isAvailableOffline: IsAvailableOffline = mock()
+    private val setNodeAvailableOffline: SetNodeAvailableOffline = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
 
     private val typedFileNode: TypedFileNode = mock()
 
     private val previewFile: File = mock()
+    private val activity = WeakReference(mock<Activity>())
 
 
     @get:Rule
@@ -147,6 +158,8 @@ internal class FileInfoViewModelTest {
             getNodeVersionsByHandle = getNodeVersionsByHandle,
             getNodeLocationInfo = getNodeLocationInfo,
             getOutShares = getOutShares,
+            isAvailableOffline = isAvailableOffline,
+            setNodeAvailableOffline = setNodeAvailableOffline,
             getNodeAccessPermission = getNodeAccessPermission,
         )
     }
@@ -174,6 +187,7 @@ internal class FileInfoViewModelTest {
         whenever(getPreview.invoke(anyLong())).thenReturn(null)
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
         whenever(typedFileNode.hasPreview).thenReturn(false)
+        whenever(isAvailableOffline.invoke(any())).thenReturn(true)
     }
 
     @After
@@ -684,6 +698,45 @@ internal class FileInfoViewModelTest {
             underTest.setNode(node.handle)
             verify(getOutShares, times(2)).invoke(nodeId)
         }
+
+    @Test
+    fun `test isAvailableOffline result is set on uiState`() = runTest {
+        val expected = true
+        whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(expected)
+        underTest.setNode(node.handle)
+        Truth.assertThat(underTest.uiState.value.isAvailableOffline).isEqualTo(expected)
+    }
+
+    @Test
+    fun `test availableOfflineChanged changes ui state accordingly`() = runTest {
+        mockMonitorStorageStateEvent(StorageState.Green)
+        val expected = true
+        whenever(isAvailableOffline.invoke(any())).thenReturn(false)
+        underTest.setNode(node.handle)
+        underTest.availableOfflineChanged(expected, activity)
+        underTest.uiState.mapNotNull { it.isAvailableOffline }.test {
+            Truth.assertThat(awaitItem()).isEqualTo(expected)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(setNodeAvailableOffline, times(1)).invoke(nodeId, expected, activity)
+    }
+
+    @Test
+    fun `test availableOfflineChanged does nothing if getState()`() = runTest {
+        mockMonitorStorageStateEvent(StorageState.PayWall)
+        whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(false)
+        underTest.setNode(node.handle)
+        underTest.availableOfflineChanged(true, activity)
+        verifyNoInteractions(setNodeAvailableOffline)
+    }
+
+    private fun mockMonitorStorageStateEvent(state: StorageState) {
+        val storageStateEvent = StorageStateEvent(
+            1L, "", 1L, "", EventType.Storage,
+            state,
+        )
+        whenever(monitorStorageStateEvent.invoke()).thenReturn(MutableStateFlow(storageStateEvent))
+    }
 
     @Suppress("UNCHECKED_CAST")
     private suspend fun <T : FileInfoOneOffViewEvent> testEventIsOfType(

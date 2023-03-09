@@ -1056,10 +1056,10 @@ interface MegaApiGateway {
     suspend fun getInShares(user: MegaUser): List<MegaNode>
 
     /**
-     * Get the owner of this inShare node
+     * Get the owner of this node or null if is not an incoming shared node
      * @param node that is being shared
      * @param recursive if true root node of [node] will be checked, if false the [node] itself will be checked
-     * @return the owner of this shared folder
+     * @return the owner of this node or null if is not an incoming shared node
      */
     suspend fun getUserFromInShare(node: MegaNode, recursive: Boolean): MegaUser?
 

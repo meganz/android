@@ -1,8 +1,9 @@
 package mega.privacy.android.app.presentation.fileinfo
 
 import android.content.Context
+import androidx.annotation.StringRes
+import mega.privacy.android.app.R
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 
 /**
  * Represents events in the File info screen
@@ -25,6 +26,23 @@ sealed interface FileInfoOneOffViewEvent {
     object NodeDeleted : FileInfoOneOffViewEvent
 
     /**
+     * Over disk quota has been reached
+     */
+    object OverDiskQuota : FileInfoOneOffViewEvent
+
+    /**
+     * A message should be shown
+     * @param message the [StringRes] of the message to be shown
+     */
+    sealed class Message(@StringRes val message: Int) : FileInfoOneOffViewEvent {
+
+        /**
+         * Offline file has been removed
+         */
+        object RemovedOffline : Message(R.string.file_removed_offline)
+    }
+
+    /**
      * Data class to join all events related to finish moving or copying the node
      * to notify move or copy has finished, either successfully or not
      * @param jobFinished representing the finished job
@@ -40,7 +58,7 @@ sealed interface FileInfoOneOffViewEvent {
         fun failMessage(context: Context) =
             jobFinished.customErrorMessage(context, exception)
                 ?: jobFinished.failMessage?.let {
-                    context.getFormattedStringOrDefault(it)
+                    context.getString(it)
                 }
 
     }
