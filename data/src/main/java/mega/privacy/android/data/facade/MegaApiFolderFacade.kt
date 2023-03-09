@@ -64,4 +64,16 @@ internal class MegaApiFolderFacade @Inject constructor(
 
     override fun removeRequestListener(listener: MegaRequestListenerInterface) =
         megaApiFolder.removeRequestListener(listener)
+
+    override suspend fun getNumChildFolders(node: MegaNode): Int =
+        megaApiFolder.getNumChildFolders(node)
+
+    override suspend fun getNumChildFiles(node: MegaNode): Int =
+        megaApiFolder.getNumChildFiles(node)
+
+    override suspend fun getChildrenByNode(parentNode: MegaNode, order: Int?): List<MegaNode> =
+        if (order == null)
+            megaApiFolder.getChildren(parentNode)
+        else
+            megaApiFolder.getChildren(parentNode, order)
 }
