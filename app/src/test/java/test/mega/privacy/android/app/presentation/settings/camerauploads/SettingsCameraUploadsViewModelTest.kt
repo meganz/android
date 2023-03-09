@@ -13,6 +13,8 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
@@ -27,8 +29,11 @@ import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -36,6 +41,7 @@ import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 /**
@@ -52,6 +58,7 @@ class SettingsCameraUploadsViewModelTest {
     private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
     private val getUploadOption = mock<GetUploadOption>()
+    private val getUploadVideoQuality = mock<GetUploadVideoQuality>()
     private val isCameraUploadByWifi = mock<IsCameraUploadByWifi>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
     private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
@@ -60,6 +67,8 @@ class SettingsCameraUploadsViewModelTest {
     private val setCameraUploadsByWifi = mock<SetCameraUploadsByWifi>()
     private val setLocationTagsEnabled = mock<SetLocationTagsEnabled>()
     private val setUploadOption = mock<SetUploadOption>()
+    private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
+    private val setUploadVideoSyncStatus = mock<SetUploadVideoSyncStatus>()
 
     @Before
     fun setUp() {
@@ -82,6 +91,7 @@ class SettingsCameraUploadsViewModelTest {
             disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
             disableMediaUploadSettings = disableMediaUploadSettings,
             getUploadOption = getUploadOption,
+            getUploadVideoQuality = getUploadVideoQuality,
             isCameraUploadByWifi = isCameraUploadByWifi,
             monitorConnectivity = mock(),
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
@@ -91,6 +101,8 @@ class SettingsCameraUploadsViewModelTest {
             setCameraUploadsByWifi = setCameraUploadsByWifi,
             setLocationTagsEnabled = setLocationTagsEnabled,
             setUploadOption = setUploadOption,
+            setUploadVideoQuality = setUploadVideoQuality,
+            setUploadVideoSyncStatus = setUploadVideoSyncStatus,
         )
     }
 
@@ -110,6 +122,7 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.shouldShowNotificationPermissionRationale).isFalse()
             assertThat(state.uploadConnectionType).isNull()
             assertThat(state.uploadOption).isNull()
+            assertThat(state.videoQuality).isNull()
         }
     }
 
@@ -298,6 +311,65 @@ class SettingsCameraUploadsViewModelTest {
         underTest.state.test {
             assertThat(awaitItem().uploadOption).isEqualTo(uploadOption)
         }
+    }
+
+    @Test
+    fun `test that the value of videoQuality is LOW when calling changeUploadVideoQuality`() =
+        testUploadVideoQuality(value = 0, expectedVideoQuality = VideoQuality.LOW)
+
+    @Test
+    fun `test that the value of videoQuality is MEDIUM when calling changeUploadVideoQuality`() =
+        testUploadVideoQuality(value = 1, expectedVideoQuality = VideoQuality.MEDIUM)
+
+    @Test
+    fun `test that the value of videoQuality is HIGH when calling changeUploadVideoQuality`() =
+        testUploadVideoQuality(value = 2, expectedVideoQuality = VideoQuality.HIGH)
+
+    @Test
+    fun `test that the value of videoQuality is ORIGINAL when calling changeUploadVideoQuality`() =
+        testUploadVideoQuality(value = 3, expectedVideoQuality = VideoQuality.ORIGINAL)
+
+    @Test
+    fun `test that the value of videoQuality is not updated if its integer equivalent is invalid`() =
+        runTest {
+            setupUnderTest()
+
+            underTest.changeUploadVideoQuality(4)
+            verifyNoInteractions(setUploadVideoQuality, getUploadVideoQuality)
+        }
+
+    private fun testUploadVideoQuality(value: Int, expectedVideoQuality: VideoQuality) = runTest {
+        setupUnderTest()
+
+        whenever(getUploadVideoQuality()).thenReturn(expectedVideoQuality)
+
+        underTest.changeUploadVideoQuality(value)
+        underTest.state.test {
+            assertThat(awaitItem().videoQuality).isEqualTo(expectedVideoQuality)
+        }
+    }
+
+    @Test
+    fun `test that the video sync status is set to STATUS_TO_COMPRESS if the videoQuality is LOW`() =
+        testUploadSyncStatus(value = 0, expectedVideoSyncStatus = SyncStatus.STATUS_TO_COMPRESS)
+
+    @Test
+    fun `test that the video sync status is set to STATUS_TO_COMPRESS if the videoQuality is MEDIUM`() =
+        testUploadSyncStatus(value = 1, expectedVideoSyncStatus = SyncStatus.STATUS_TO_COMPRESS)
+
+    @Test
+    fun `test that the video sync status is set to STATUS_TO_COMPRESS if the videoQuality is HIGH`() =
+        testUploadSyncStatus(value = 2, expectedVideoSyncStatus = SyncStatus.STATUS_TO_COMPRESS)
+
+    @Test
+    fun `test that the video sync status is set to STATUS_PENDING if the videoQuality is ORIGINAL`() =
+        testUploadSyncStatus(value = 3, expectedVideoSyncStatus = SyncStatus.STATUS_PENDING)
+
+    private fun testUploadSyncStatus(value: Int, expectedVideoSyncStatus: SyncStatus) = runTest {
+        setupUnderTest()
+
+        underTest.changeUploadVideoQuality(value)
+        verify(setUploadVideoSyncStatus, times(1)).invoke(expectedVideoSyncStatus)
     }
 
     @Test
