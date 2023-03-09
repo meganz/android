@@ -228,6 +228,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun isChargingRequiredForVideoCompression(): Boolean =
         dbHandler.preferences?.conversionOnCharging?.toBoolean() ?: true
 
+    override suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean) {
+        dbHandler.setConversionOnCharging(chargingRequired)
+    }
+
     override suspend fun updateSyncRecordStatusByLocalPath(
         syncStatusType: Int,
         localPath: String?,
@@ -306,10 +310,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun setUploadVideoSyncStatus(syncStatus: Int) {
         dbHandler.updateVideoState(syncStatus)
-    }
-
-    override suspend fun setConversionOnCharging(onCharging: Boolean) {
-        dbHandler.setConversionOnCharging(onCharging)
     }
 
     override suspend fun setChargingOnSize(size: Int) {

@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import org.junit.Before
 import org.junit.Test
@@ -20,6 +21,8 @@ class DefaultEnablePhotosCameraUploadTest {
 
     private val settingsRepository = mock<SettingsRepository>()
     private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
+    private val setChargingRequiredForVideoCompression =
+        mock<SetChargingRequiredForVideoCompression>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
 
     @Before
@@ -27,6 +30,7 @@ class DefaultEnablePhotosCameraUploadTest {
         underTest = DefaultEnablePhotosCameraUpload(
             settingsRepository = settingsRepository,
             setUploadVideoQuality = setUploadVideoQuality,
+            setChargingRequiredForVideoCompression = setChargingRequiredForVideoCompression,
             cameraUploadRepository = cameraUploadRepository,
         )
     }
@@ -47,19 +51,23 @@ class DefaultEnablePhotosCameraUploadTest {
             conversionChargingOnSize = expectedConversionChargingOnSize,
         )
 
-        val inOrder = inOrder(settingsRepository, setUploadVideoQuality, cameraUploadRepository)
+        val inOrder = inOrder(
+            settingsRepository,
+            setUploadVideoQuality,
+            setChargingRequiredForVideoCompression,
+            cameraUploadRepository
+        )
 
         inOrder.verify(settingsRepository).setCameraUploadLocalPath(expectedPath)
         inOrder.verify(settingsRepository).setCamSyncWifi(!expectedEnableCellularSync)
         inOrder.verify(settingsRepository).setCameraUploadFileType(expectedSyncVideo)
         inOrder.verify(settingsRepository).setCameraFolderExternalSDCard(false)
         inOrder.verify(setUploadVideoQuality).invoke(expectedVideoQuality)
-        inOrder.verify(settingsRepository).setConversionOnCharging(true)
+        inOrder.verify(setChargingRequiredForVideoCompression).invoke(true)
         inOrder.verify(settingsRepository).setChargingOnSize(expectedConversionChargingOnSize)
         inOrder.verify(settingsRepository).setEnableCameraUpload(true)
         inOrder.verify(cameraUploadRepository).listenToNewMedia()
 
         inOrder.verifyNoMoreInteractions()
-
     }
 }
