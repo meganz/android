@@ -29,12 +29,14 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import mega.privacy.android.domain.usecase.ArchiveChat
 import mega.privacy.android.domain.usecase.GetMeetings
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
 import timber.log.Timber
 import javax.inject.Inject
@@ -50,6 +52,7 @@ import javax.inject.Inject
  * @property meetingLastTimestampMapper         [MeetingLastTimestampMapper]
  * @property scheduledMeetingTimestampMapper    [ScheduledMeetingTimestampMapper]
  * @property startChatCallNoRinging             [StartChatCallNoRinging]
+ * @property openOrStartCall                    [OpenOrStartCall]
  * @property answerChatCall                     [AnswerChatCall]
  * @property deviceGateway                      [DeviceGateway]
  * @property chatManagement                     [ChatManagement]
@@ -68,6 +71,7 @@ class MeetingListViewModel @Inject constructor(
     private val meetingLastTimestampMapper: MeetingLastTimestampMapper,
     private val scheduledMeetingTimestampMapper: ScheduledMeetingTimestampMapper,
     private val startChatCallNoRinging: StartChatCallNoRinging,
+    private val openOrStartCall: OpenOrStartCall,
     private val answerChatCall: AnswerChatCall,
     private val deviceGateway: DeviceGateway,
     private val chatManagement: ChatManagement,
@@ -175,26 +179,24 @@ class MeetingListViewModel @Inject constructor(
      *
      * @param chatId    Chat Id.
      */
-    fun joinSchedMeeting(chatId: Long) =
+    fun joinSchedMeeting(chatId: Long) {
         viewModelScope.launch {
+            Timber.d("Answer meeting")
             answerChatCall(
                 chatId = chatId,
                 video = false,
                 audio = true
             )?.let { call ->
                 call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
-                    ?.let { callChatId ->
+                    ?.let {
                         chatManagement.removeJoiningCallChatId(chatId)
                         rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
-                        chatManagement.setSpeakerStatus(callChatId, call.hasLocalVideo)
-                        chatManagement.setRequestSentCall(call.callId, true)
                         CallUtil.clearIncomingCallNotification(call.callId)
-                        passcodeManagement.showPasscodeScreen = true
-                        MegaApplication.getInstance().openCallService(callChatId)
-                        state.update { it.copy(currentCallChatId = callChatId) }
+                        openCurrentCall(call)
                     }
             }
         }
+    }
 
     /**
      * Start scheduled meeting call
@@ -202,24 +204,49 @@ class MeetingListViewModel @Inject constructor(
      * @param chatId    Chat Id.
      * @param schedId   Scheduled meeting Id.
      */
-    fun startSchedMeeting(chatId: Long, schedId: Long) =
+    fun startSchedMeeting(chatId: Long, schedId: Long?) {
         viewModelScope.launch {
-            startChatCallNoRinging(
-                chatId = chatId,
-                schedId = schedId,
-                enabledVideo = false,
-                enabledAudio = true
-            )?.let { call ->
-                call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
-                    ?.let { callChatId ->
-                        chatManagement.setSpeakerStatus(callChatId, false)
-                        chatManagement.setRequestSentCall(call.callId, true)
-                        passcodeManagement.showPasscodeScreen = true
-                        MegaApplication.getInstance().openCallService(callChatId)
-                        state.update { it.copy(currentCallChatId = callChatId) }
-                    }
+            if (schedId == null || schedId == megaChatApiGateway.getChatInvalidHandle()) {
+                Timber.d("Start meeting")
+                openOrStartCall(
+                    chatId = chatId,
+                    video = false,
+                    audio = true
+                )?.let { call ->
+                    call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                        ?.let {
+                            openCurrentCall(call)
+                        }
+                }
+            } else {
+                Timber.d("Start scheduled meeting")
+                startChatCallNoRinging(
+                    chatId = chatId,
+                    schedId = schedId,
+                    enabledVideo = false,
+                    enabledAudio = true
+                )?.let { call ->
+                    call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                        ?.let {
+                            openCurrentCall(call)
+                        }
+                }
             }
         }
+    }
+
+    /**
+     * Open current call
+     *
+     * @param call  [ChatCall]
+     */
+    private fun openCurrentCall(call: ChatCall) {
+        chatManagement.setSpeakerStatus(call.chatId, false)
+        chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
+        passcodeManagement.showPasscodeScreen = true
+        MegaApplication.getInstance().openCallService(call.chatId)
+        state.update { it.copy(currentCallChatId = call.chatId) }
+    }
 
     /**
      * Remove current chat call

@@ -1,11 +1,14 @@
 package mega.privacy.android.app.utils.permission
 
 import android.Manifest.permission.ACCESS_MEDIA_LOCATION
+import android.Manifest.permission.BLUETOOTH_CONNECT
+import android.Manifest.permission.CAMERA
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_AUDIO
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
+import android.Manifest.permission.RECORD_AUDIO
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.app.Activity
 import android.content.Context
@@ -13,6 +16,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -186,6 +190,30 @@ object PermissionUtils {
     fun getNotificationsPermission() = POST_NOTIFICATIONS
 
     /**
+     * Get RECORD_AUDIO
+     *
+     * @return RECORD_AUDIO
+     */
+    @JvmStatic
+    fun getRecordAudioPermission() = RECORD_AUDIO
+
+    /**
+     * Get CAMERA
+     *
+     * @return CAMERA
+     */
+    @JvmStatic
+    fun getCameraPermission() = CAMERA
+
+    /**
+     * Gets BLUETOOTH_CONNECT
+     *
+     * @return BLUETOOTH_CONNECT
+     */
+    @RequiresApi(31)
+    fun getBluetoothConnectPermission() = BLUETOOTH_CONNECT
+
+    /**
      * Checks if should ask for notifications permission.
      *
      * @param activity Required Activity for the checks and launch intent.
@@ -206,6 +234,44 @@ object PermissionUtils {
             }
         }
     }
+
+    /**
+     * Checks if the required permissions for a call are granted.
+     *
+     * @param activity Required Activity for the checks.
+     * @return True, if permissions are granted. False, if not.
+     */
+    @JvmStatic
+    fun checkCallPermissions(activity: Activity): Boolean =
+        hasPermissions(activity, *getListCallPermissionsByVersion())
+
+    /**
+     * Ask for call permissions.
+     *
+     * @param request
+     */
+    @JvmStatic
+    fun requestCallPermissions(request: ActivityResultLauncher<Array<String>>) =
+        request.launch(getListCallPermissionsByVersion())
+
+    /**
+     * Get list of call permissions by version
+     *
+     * @return List of required permissions
+     */
+    private fun getListCallPermissionsByVersion() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
+                getBluetoothConnectPermission(),
+                getCameraPermission(),
+                getRecordAudioPermission()
+            )
+        } else {
+            arrayOf(
+                getCameraPermission(),
+                getRecordAudioPermission(),
+            )
+        }
 
     /**
      * Displays the Notification Permission Rationale
