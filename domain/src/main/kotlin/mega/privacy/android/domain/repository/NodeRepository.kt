@@ -143,4 +143,16 @@ interface NodeRepository {
      * @param isSecurityUpgrade
      */
     suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean)
+
+    /**
+     * Load offline nodes
+     *
+     * @param path         Node path
+     * @param searchQuery  search query for database
+     * @return List of [OfflineNodeInformation]
+     */
+    suspend fun loadOfflineNodes(
+        path: String,
+        searchQuery: String?,
+    ): List<OfflineNodeInformation>
 }

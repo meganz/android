@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
+import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.SynchronisationException
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -249,5 +250,18 @@ internal class NodeRepositoryImpl @Inject constructor(
 
     override suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean) {
         appEventGateway.setUpgradeSecurity(isSecurityUpgrade)
+    }
+
+    override suspend fun loadOfflineNodes(
+        path: String,
+        searchQuery: String?,
+    ): List<OfflineNodeInformation> {
+        val offlineNodeInformationList = mutableListOf<OfflineNodeInformation>()
+        withContext(ioDispatcher) {
+            megaLocalStorageGateway.loadOfflineNodes(path, searchQuery).forEach {
+                offlineNodeInformationList.add(offlineNodeInformationMapper(it))
+            }
+        }
+        return offlineNodeInformationList
     }
 }

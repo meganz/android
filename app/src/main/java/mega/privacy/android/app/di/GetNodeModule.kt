@@ -14,8 +14,10 @@ import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
+import mega.privacy.android.domain.usecase.LoadOfflineNodes
 import mega.privacy.android.domain.usecase.UpgradeSecurity
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandleChangingName
@@ -185,5 +187,13 @@ abstract class GetNodeModule {
         @Provides
         fun provideUpgradeSecurity(megaNodeRepository: MegaNodeRepository): UpgradeSecurity =
             UpgradeSecurity(megaNodeRepository::upgradeSecurity)
+
+        /**
+         * Provides [LoadOfflineNodes] implementation
+         *@return [LoadOfflineNodes]
+         */
+        @Provides
+        fun provideLoadOfflineNodes(nodeRepository: NodeRepository): LoadOfflineNodes =
+            LoadOfflineNodes(nodeRepository::loadOfflineNodes)
     }
 }
