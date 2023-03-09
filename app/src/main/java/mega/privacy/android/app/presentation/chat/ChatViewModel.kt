@@ -22,7 +22,6 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isPast
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
@@ -34,6 +33,7 @@ import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
 import timber.log.Timber
@@ -69,6 +69,7 @@ class ChatViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val startChatCallNoRinging: StartChatCallNoRinging,
+    private val openOrStartCall: OpenOrStartCall,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCall: GetChatCall,
@@ -101,57 +102,24 @@ class ChatViewModel @Inject constructor(
         get() = monitorConnectivity().value
 
     /**
-     * Starts a call.
+     * Call button clicked
      *
-     * @param chatId The chat id.
      * @param video True, video on. False, video off.
-     * @param audio True, audio on. False, video off.
      */
-    fun onCallTap(chatId: Long, video: Boolean, audio: Boolean) {
-        if (chatApiGateway.getChatCall(chatId) != null) {
-            Timber.d("There is a call, open it")
-            CallUtil.openMeetingInProgress(
-                getInstance().applicationContext,
-                chatId,
-                true,
-                passcodeManagement
-            )
-            return
-        }
-
+    fun onCallTap(video: Boolean) {
         MegaApplication.isWaitingForCall = false
-
         cameraGateway.setFrontCamera()
 
-        viewModelScope.launch {
-            runCatching {
-                startChatCall(chatId, video, audio)
-            }.onFailure { exception ->
-                Timber.e(exception)
-            }.onSuccess { resultStartCall ->
-                val resultChatId = resultStartCall.chatHandle
-                if (resultChatId != null) {
-                    val videoEnable = resultStartCall.flag
-                    val paramType = resultStartCall.paramType
-                    val audioEnable: Boolean = paramType == ChatRequestParamType.Video
-
-                    CallUtil.addChecksForACall(resultChatId, videoEnable)
-
-                    chatApiGateway.getChatCall(resultChatId)?.let { call ->
-                        if (call.isOutgoing) {
-                            chatManagement.setRequestSentCall(call.callId, true)
-                        }
-                    }
-
-                    CallUtil.openMeetingWithAudioOrVideo(
-                        getInstance().applicationContext,
-                        resultChatId,
-                        audioEnable,
-                        videoEnable, passcodeManagement
-                    )
-
-                }
-            }
+        when {
+            _state.value.schedId == null || _state.value.schedId == megaChatApiGateway.getChatInvalidHandle() -> startCall(
+                video = video
+            )
+            _state.value.scheduledMeetingStatus == ScheduledMeetingStatus.NotStarted -> startSchedMeeting()
+            _state.value.scheduledMeetingStatus == ScheduledMeetingStatus.NotJoined -> answerCall(
+                _state.value.chatId,
+                video = false,
+                audio = true
+            )
         }
     }
 
@@ -273,17 +241,19 @@ class ChatViewModel @Inject constructor(
         }
 
     /**
-     * Start or join scheduled meeting
+     * Start call
+     *
+     * @param video True, video on. False, video off.
      */
-    fun startOrJoinSchedMeeting() {
-        when (_state.value.scheduledMeetingStatus) {
-            ScheduledMeetingStatus.NotStarted -> startSchedMeeting()
-            ScheduledMeetingStatus.NotJoined -> answerCall(
-                _state.value.chatId,
-                video = false,
-                audio = true
-            )
-            else -> {}
+    private fun startCall(video: Boolean) = viewModelScope.launch {
+        Timber.d("Start call")
+        openOrStartCall(
+            chatId = _state.value.chatId, video = video, audio = true
+        )?.let { call ->
+            call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }?.let {
+                Timber.d("Call started")
+                openCurrentCall(call = call)
+            }
         }
     }
 
@@ -293,17 +263,20 @@ class ChatViewModel @Inject constructor(
     private fun startSchedMeeting() =
         viewModelScope.launch {
             _state.value.schedId?.let { schedId ->
-                startChatCallNoRinging(
-                    chatId = _state.value.chatId,
-                    schedId = schedId,
-                    enabledVideo = false,
-                    enabledAudio = true
-                )?.let { call ->
-                    call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
-                        ?.let {
-                            Timber.d("Meeting started")
-                            openCurrentCall(call, true)
-                        }
+                if (schedId != megaChatApiGateway.getChatInvalidHandle()) {
+                    Timber.d("Start scheduled meeting")
+                    startChatCallNoRinging(
+                        chatId = _state.value.chatId,
+                        schedId = schedId,
+                        enabledVideo = false,
+                        enabledAudio = true
+                    )?.let { call ->
+                        call.chatId.takeIf { it != megaChatApiGateway.getChatInvalidHandle() }
+                            ?.let {
+                                Timber.d("Meeting started")
+                                openCurrentCall(call = call)
+                            }
+                    }
                 }
             }
         }
@@ -312,21 +285,32 @@ class ChatViewModel @Inject constructor(
      * Open current call
      *
      * @param call  [ChatCall]
-     * @param isRequestSent True, if it's request sent. False, if not.
      */
-    private fun openCurrentCall(call: ChatCall, isRequestSent: Boolean) {
+    private fun openCurrentCall(call: ChatCall) {
         chatManagement.setSpeakerStatus(call.chatId, call.hasLocalVideo)
-        chatManagement.setRequestSentCall(call.callId, isRequestSent)
+        chatManagement.setRequestSentCall(call.callId, call.isOutgoing)
         passcodeManagement.showPasscodeScreen = true
         getInstance().openCallService(call.chatId)
-        _state.update { it.copy(currentCallChatId = call.chatId) }
+        _state.update {
+            it.copy(
+                currentCallChatId = call.chatId,
+                currentCallAudioStatus = call.hasLocalAudio,
+                currentCallVideoStatus = call.hasLocalVideo
+            )
+        }
     }
 
     /**
      * Remove current chat call
      */
     fun removeCurrentCall() {
-        _state.update { it.copy(currentCallChatId = -1L) }
+        _state.update {
+            it.copy(
+                currentCallChatId = megaChatApiGateway.getChatInvalidHandle(),
+                currentCallVideoStatus = false,
+                currentCallAudioStatus = false
+            )
+        }
     }
 
     /**
@@ -341,6 +325,7 @@ class ChatViewModel @Inject constructor(
         chatManagement.addJoiningCallChatId(chatId)
 
         viewModelScope.launch {
+            Timber.d("Answer call")
             answerChatCall(
                 chatId = chatId,
                 video = video,
@@ -349,7 +334,7 @@ class ChatViewModel @Inject constructor(
                 chatManagement.removeJoiningCallChatId(chatId)
                 rtcAudioManagerGateway.removeRTCAudioManagerRingIn()
                 CallUtil.clearIncomingCallNotification(call.callId)
-                openCurrentCall(call, false)
+                openCurrentCall(call)
                 _state.update { it.copy(isCallAnswered = true) }
             }
         }

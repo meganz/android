@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -27,6 +29,8 @@ import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivit
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.permission.PermissionUtils.checkCallPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestCallPermissions
 import mega.privacy.android.app.utils.setImageRequestFromFilePath
 import mega.privacy.android.app.utils.view.TextDrawable
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
@@ -56,6 +60,8 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         ContextCompat.getColor(requireContext(), R.color.grey_012_white_012)
     }
 
+    private var currentMeeting: MeetingRoomItem? = null
+
     private lateinit var binding: BottomSheetMeetingDetailBinding
 
     private val chatId by lazy {
@@ -63,6 +69,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private val viewModel by viewModels<MeetingListViewModel>({ requireParentFragment() })
+    private lateinit var permissionsRequest: ActivityResultLauncher<Array<String>>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,8 +85,33 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             @SuppressLint("RestrictedApi")
             height = dpToPx(requireContext(), 71).toInt()
         }
+        permissionsRequest = getCallPermissionsRequest()
+
         return binding.root
     }
+
+    /**
+     * Get call permissions request
+     */
+    private fun getCallPermissionsRequest() =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (checkCallPermissions(requireActivity())) {
+                currentMeeting?.let { room ->
+                    when (room.scheduledMeetingStatus) {
+                        ScheduledMeetingStatus.NotStarted -> viewModel.startSchedMeeting(
+                            room.chatId,
+                            room.schedId
+                        )
+                        ScheduledMeetingStatus.NotJoined -> viewModel.joinSchedMeeting(
+                            room.chatId
+                        )
+                        else -> {}
+                    }
+                }
+
+                dismissAllowingStateLoss()
+            }
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -92,6 +124,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun showMeeting(room: MeetingRoomItem?) {
         requireNotNull(room) { "Meeting not found" }
+        currentMeeting = room
 
         binding.header.txtTitle.text = room.title
         binding.header.txtTimestamp.setText(
@@ -106,7 +139,8 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             binding.header.groupThumbnails.isVisible = false
             binding.header.imgThumbnail.isVisible = false
         } else {
-            val firstUserPlaceholder = getImagePlaceholder(room.firstUserChar.toString(), room.firstUserColor)
+            val firstUserPlaceholder =
+                getImagePlaceholder(room.firstUserChar.toString(), room.firstUserColor)
             if (room.isSingleMeeting()) {
                 binding.header.imgThumbnail.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
@@ -116,7 +150,8 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.header.groupThumbnails.isVisible = false
                 binding.header.imgThumbnail.isVisible = true
             } else {
-                val lastUserPlaceholder = getImagePlaceholder(room.lastUserChar.toString(), room.lastUserColor)
+                val lastUserPlaceholder =
+                    getImagePlaceholder(room.lastUserChar.toString(), room.lastUserColor)
                 binding.header.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
                     ScalingUtils.ScaleType.FIT_CENTER
@@ -132,7 +167,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
         }
 
-        binding.btnCancel.isVisible = room.isPending
+        binding.btnCancel.isVisible = false // Disabled until feature implementation
         binding.dividerArchive.isVisible = binding.btnCancel.isVisible
 
         binding.btnRecurringMeeting.isVisible = room.isRecurring()
@@ -151,8 +186,6 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.btnStartOrJoinSchedMeeting.isVisible =
             room.isActive &&
-                    room.isScheduledMeeting() &&
-                    room.isPending &&
                     room.scheduledMeetingStatus != ScheduledMeetingStatus.Joined
         binding.dividerStartOrJoinSchedMeeting.isVisible =
             binding.btnStartOrJoinSchedMeeting.isVisible
@@ -180,17 +213,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.btnStartOrJoinSchedMeeting.setOnClickListener {
-            room.schedId?.let { schedId ->
-                when (room.scheduledMeetingStatus) {
-                    ScheduledMeetingStatus.NotStarted -> viewModel.startSchedMeeting(
-                        room.chatId,
-                        schedId
-                    )
-                    ScheduledMeetingStatus.NotJoined -> viewModel.joinSchedMeeting(room.chatId)
-                    else -> {}
-                }
-            }
-            dismissAllowingStateLoss()
+            requestCallPermissions(permissionsRequest)
         }
 
         binding.btnInfo.setOnClickListener {
@@ -211,16 +234,20 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         if (room.isMuted) {
             binding.btnMute.setText(R.string.general_unmute)
-            binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_unmute,
+            binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.ic_unmute,
                 0,
                 0,
-                0)
+                0
+            )
         } else {
             binding.btnMute.setText(R.string.general_mute)
-            binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_mute,
+            binding.btnMute.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.ic_mute,
                 0,
                 0,
-                0)
+                0
+            )
         }
         binding.btnMute.setOnClickListener {
             if (room.isMuted) {
@@ -228,7 +255,8 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     .controlMuteNotificationsOfAChat(
                         requireContext(),
                         Constants.NOTIFICATIONS_ENABLED,
-                        chatId)
+                        chatId
+                    )
             } else {
                 ChatUtil.createMuteNotificationsAlertDialogOfAChat(requireActivity(), chatId)
             }

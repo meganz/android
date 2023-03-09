@@ -15,15 +15,20 @@ class DefaultStartChatCallNoRinging @Inject constructor(
         schedId: Long,
         enabledVideo: Boolean,
         enabledAudio: Boolean,
-    ): ChatCall? = runCatching {
-        callRepository.startCallNoRinging(
-            chatId,
-            schedId,
-            enabledVideo,
-            enabledAudio
+    ): ChatCall? {
+        if (chatId == -1L)
+            return null
+
+        return runCatching {
+            callRepository.startCallNoRinging(
+                chatId,
+                schedId,
+                enabledVideo,
+                enabledAudio
+            )
+        }.fold(
+            onSuccess = { request -> callRepository.getChatCall(request.chatHandle) },
+            onFailure = { null }
         )
-    }.fold(
-        onSuccess = { request -> callRepository.getChatCall(request.chatHandle) },
-        onFailure = { null }
-    )
+    }
 }

@@ -13,6 +13,8 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * @property currentCallChatId          Chat id of the call.
  * @property scheduledMeetingStatus     [ScheduledMeetingStatus]
  * @property schedIsPending             True, if scheduled meeting is pending. False, if not.
+ * @property currentCallAudioStatus     True, if audio is on. False, if audio is off.
+ * @property currentCallVideoStatus     True, if video is on. False, if video is off.
  */
 data class ChatState(
     val chatId: Long = -1L,
@@ -23,4 +25,6 @@ data class ChatState(
     val currentCallChatId: Long = -1L,
     val scheduledMeetingStatus: ScheduledMeetingStatus? = null,
     val schedIsPending: Boolean = false,
+    val currentCallAudioStatus: Boolean = false,
+    val currentCallVideoStatus: Boolean = false,
 )
