@@ -106,6 +106,8 @@ import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapperImpl
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
+import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
+import mega.privacy.android.data.mapper.shares.AccessPermissionMapperImpl
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
@@ -211,6 +213,12 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindSortOrderIntMapper(implementation: SortOrderIntMapperImpl): SortOrderIntMapper
+
+    /**
+     * Provides AccessPermissionMapper Mapper
+     */
+    @Binds
+    abstract fun bindAccessPermissionMapper(implementation: AccessPermissionMapperImpl): AccessPermissionMapper
 
     /**
      * Provides PasswordStrength Mapper

@@ -607,6 +607,18 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         setPlayWhenReady(false)
     }
 
+    override fun addSubtitle(subtitleFileUrl: String) {
+        mediaPlayerGateway.addSubtitle(subtitleFileUrl)
+    }
+
+    override fun showSubtitle() {
+        mediaPlayerGateway.showSubtitle()
+    }
+
+    override fun hideSubtitle() {
+        mediaPlayerGateway.hideSubtitle()
+    }
+
     /**
      * Update dialog shon state and video play type
      *

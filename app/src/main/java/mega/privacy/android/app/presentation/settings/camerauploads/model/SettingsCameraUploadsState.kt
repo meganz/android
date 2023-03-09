@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.settings.camerauploads.model
 
 import androidx.annotation.StringRes
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 
 /**
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
  * @property shouldShowNotificationPermissionRationale Checks whether the Notification Permission Rationale should be shown or not
  * @property uploadConnectionType Determines the connection type for uploading content in Camera Uploads
  * @property uploadOption Determines what content should be uploaded
+ * @property videoQuality Determines the Video Quality of videos to be uploaded
  */
 data class SettingsCameraUploadsState(
     @StringRes val accessMediaLocationRationaleText: Int? = null,
@@ -28,4 +30,5 @@ data class SettingsCameraUploadsState(
     val shouldShowNotificationPermissionRationale: Boolean = false,
     val uploadConnectionType: UploadConnectionType? = null,
     val uploadOption: UploadOption? = null,
+    val videoQuality: VideoQuality? = null,
 )

@@ -19,6 +19,8 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.domain.entity.SyncStatus
+import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
@@ -33,8 +35,11 @@ import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import javax.inject.Inject
 
 /**
@@ -46,6 +51,7 @@ import javax.inject.Inject
  * @property disableCameraUploadsInDatabase Disable Camera Uploads by manipulating values in the database
  * @property disableMediaUploadSettings Disable Media Uploads by manipulating a certain value in the database
  * @property getUploadOption Retrieves the upload option of Camera Uploads
+ * @property getUploadVideoQuality Retrieves the Video Quality of Videos to be uploaded
  * @property isCameraUploadByWifi Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property monitorConnectivity Monitor the device online status
  * @property resetCameraUploadTimeStamps Reset the Primary and Secondary Timestamps
@@ -55,6 +61,8 @@ import javax.inject.Inject
  * @property setCameraUploadsByWifi Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setLocationTagsEnabled Sets whether Location Tags should be embedded in each Photo to be uploaded or not
  * @property setUploadOption Sets the new upload option of Camera Uploads
+ * @property setUploadVideoQuality Sets the new Video Quality of Videos to be uploaded
+ * @property setUploadVideoSyncStatus Sets the new Sync Status of Videos to be uploaded
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
@@ -64,6 +72,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
     private val getUploadOption: GetUploadOption,
+    private val getUploadVideoQuality: GetUploadVideoQuality,
     private val isCameraUploadByWifi: IsCameraUploadByWifi,
     private val monitorConnectivity: MonitorConnectivity,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
@@ -73,6 +82,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setCameraUploadsByWifi: SetCameraUploadsByWifi,
     private val setLocationTagsEnabled: SetLocationTagsEnabled,
     private val setUploadOption: SetUploadOption,
+    private val setUploadVideoQuality: SetUploadVideoQuality,
+    private val setUploadVideoSyncStatus: SetUploadVideoSyncStatus,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -293,6 +304,26 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * Change the Video Quality for videos to be uploaded. The Video Sync Status will also
+     * be updated depending on the new Video Quality selected
+     *
+     * @param value The new Video Quality, represented as an Integer from the list
+     */
+    fun changeUploadVideoQuality(value: Int) = viewModelScope.launch {
+        VideoQuality.values().find { it.value == value }?.let { videoQuality ->
+            setUploadVideoQuality(videoQuality)
+            setUploadVideoSyncStatus(
+                if (videoQuality == VideoQuality.ORIGINAL) {
+                    SyncStatus.STATUS_PENDING
+                } else {
+                    SyncStatus.STATUS_TO_COMPRESS
+                }
+            )
+            refreshUploadVideoQuality()
+        }
+    }
+
+    /**
      * When [SettingsCameraUploadsViewModel] is instantiated, initialize the UI Elements
      */
     private fun initializeSettings() = viewModelScope.launch {
@@ -301,6 +332,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
                 areLocationTagsIncluded = areLocationTagsEnabled(),
                 uploadConnectionType = getUploadConnectionType(),
                 uploadOption = getUploadOption(),
+                videoQuality = getUploadVideoQuality(),
             )
         }
     }
@@ -325,6 +357,13 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     private suspend fun refreshLocationTags() =
         _state.update { it.copy(areLocationTagsIncluded = areLocationTagsEnabled()) }
+
+    /**
+     * Updates the value of [SettingsCameraUploadsState.videoQuality] whenever a new upload
+     * Video Quality has been set
+     */
+    private suspend fun refreshUploadVideoQuality() =
+        _state.update { it.copy(videoQuality = getUploadVideoQuality()) }
 
     /**
      * Retrieves the current Upload Connection Type

@@ -1,16 +1,20 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import javax.inject.Inject
 
 /**
- * Get is charging required
+ * Default implementation of [IsChargingRequired]
  *
+ * @property cameraUploadRepository [CameraUploadRepository]
+ * @property isChargingRequiredForVideoCompression [IsChargingRequiredForVideoCompression]
  */
 class DefaultIsChargingRequired @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
+    private val isChargingRequiredForVideoCompression: IsChargingRequiredForVideoCompression,
 ) : IsChargingRequired {
 
     override suspend fun invoke(queueSize: Long) =
-        cameraUploadRepository.convertOnCharging() && queueSize > cameraUploadRepository.getChargingOnSize()
+        isChargingRequiredForVideoCompression() && queueSize > cameraUploadRepository.getChargingOnSize()
 }

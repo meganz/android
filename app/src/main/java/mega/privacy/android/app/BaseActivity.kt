@@ -93,10 +93,6 @@ import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
-import mega.privacy.android.app.utils.Constants.PRO_I
-import mega.privacy.android.app.utils.Constants.PRO_II
-import mega.privacy.android.app.utils.Constants.PRO_III
-import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.Constants.REMOVED_BUSINESS_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.Constants.RESUME_TRANSFERS_TYPE
 import mega.privacy.android.app.utils.Constants.SENT_REQUESTS_TYPE
@@ -1443,8 +1439,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         val image: Int
                         val activeSubscriptionSku = activeSubscription?.sku.orEmpty()
 
-                        when (activeSubscription?.level) {
-                            PRO_I -> {
+                        when (activeSubscription?.sku) {
+                            Skus.SKU_PRO_I_MONTH, Skus.SKU_PRO_I_YEAR -> {
                                 account = R.string.pro1_account
                                 image = R.drawable.ic_pro_i_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
@@ -1452,7 +1448,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                     else R.string.upgrade_account_successful_pro_1_monthly
                                 )
                             }
-                            PRO_II -> {
+                            Skus.SKU_PRO_II_MONTH, Skus.SKU_PRO_II_YEAR -> {
                                 account = R.string.pro2_account
                                 image = R.drawable.ic_pro_ii_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
@@ -1460,7 +1456,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                     else R.string.upgrade_account_successful_pro_2_monthly
                                 )
                             }
-                            PRO_III -> {
+                            Skus.SKU_PRO_III_MONTH, Skus.SKU_PRO_III_YEAR -> {
                                 account = R.string.pro3_account
                                 image = R.drawable.ic_pro_iii_big_crest
                                 purchaseMessage.text = StringResourcesUtils.getString(
@@ -1468,7 +1464,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                     else R.string.upgrade_account_successful_pro_3_monthly
                                 )
                             }
-                            PRO_LITE -> {
+                            Skus.SKU_PRO_LITE_MONTH, Skus.SKU_PRO_LITE_YEAR -> {
                                 account = R.string.prolite_account
                                 color = R.color.orange_400_orange_300
                                 image = R.drawable.ic_lite_big_crest

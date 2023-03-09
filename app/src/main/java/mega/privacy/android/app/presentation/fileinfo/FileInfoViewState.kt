@@ -5,6 +5,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import nz.mega.sdk.MegaShare
 
 /**
@@ -18,10 +19,11 @@ import nz.mega.sdk.MegaShare
  * @param previewUriString the uri of the file containing the preview
  * @param thumbnailUriString the uri of the file containing the thumbnail, just as a fallback in case there's no [previewUriString]
  * @param folderTreeInfo the folder info if the node is a folder
- * @param incomingSharesOwnerContactItem the info of the owner of this folder in case it's a folder from in shares
  * @param isShareContactExpanded outShares are shown if is set to true
  * @param outShares shares in case of a node shared with others as outShare
  * @param nodeLocationInfo the location info of the node
+ * @param inShareOwnerContactItem the [ContactItem] of the owner
+ * @param accessPermission the [AccessPermission] the user has to this node
  */
 data class FileInfoViewState(
     val title: String = "",
@@ -33,10 +35,11 @@ data class FileInfoViewState(
     val previewUriString: String? = null,
     val thumbnailUriString: String? = null,
     val folderTreeInfo: FolderTreeInfo? = null,
-    val incomingSharesOwnerContactItem: ContactItem? = null,
     val isShareContactExpanded: Boolean = false,
     val outShares: List<MegaShare> = emptyList(),
     val nodeLocationInfo: LocationInfo? = null,
+    val inShareOwnerContactItem: ContactItem? = null,
+    val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
 ) {
     /**
      * determines if the file history versions should be shown
@@ -107,11 +110,18 @@ data class FileInfoViewState(
     val extraOutShares = (outShares.size - MAX_NUMBER_OF_CONTACTS_IN_LIST).coerceAtLeast(0)
 
     /**
+     * true if this node is an incoming shared root node
+     */
+    val isIncomingSharedNode = inShareOwnerContactItem != null
+
+    /**
      * label for the owner of this node in case it's an incoming shared node
      */
-    val ownerLabel = incomingSharesOwnerContactItem?.contactData?.alias
-        ?: incomingSharesOwnerContactItem?.contactData?.fullName
-        ?: incomingSharesOwnerContactItem?.email
+    val ownerLabel by lazy {
+        inShareOwnerContactItem?.contactData?.alias
+            ?: inShareOwnerContactItem?.contactData?.fullName
+            ?: inShareOwnerContactItem?.email
+    }
 
     companion object {
         internal const val MAX_NUMBER_OF_CONTACTS_IN_LIST = 5

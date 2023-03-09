@@ -225,8 +225,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getChargingOnSizeString(): String =
         dbHandler.preferences?.chargingOnSize ?: DEFAULT_CONVENTION_QUEUE_SIZE.toString()
 
-    override suspend fun convertOnCharging(): Boolean =
-        doPreferencesExist() && dbHandler.preferences?.conversionOnCharging.toBoolean()
+    override suspend fun isChargingRequiredForVideoCompression(): Boolean =
+        dbHandler.preferences?.conversionOnCharging?.toBoolean() ?: true
 
     override suspend fun updateSyncRecordStatusByLocalPath(
         syncStatusType: Int,

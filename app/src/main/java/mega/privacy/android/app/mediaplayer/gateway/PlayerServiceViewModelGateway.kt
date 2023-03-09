@@ -8,6 +8,7 @@ import mega.privacy.android.app.mediaplayer.model.MediaPlaySources
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.playlist.PlaylistItem
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import java.io.File
 
 /**
@@ -363,4 +364,20 @@ interface PlayerServiceViewModelGateway {
      * then invoke the callback and the playback position history is parameter
      */
     suspend fun monitorPlaybackTimes(mediaId: Long?, seekToPosition: (positionInMs: Long?) -> Unit)
+
+    /**
+     * Get the subtitle file info that is same name as playing media item
+     *
+     * @param fileSuffix the subtitle file suffix
+     * @return SubtitleFileInfo
+     */
+    suspend fun getMatchedSubtitleFileInfoForPlayingItem(fileSuffix: String): SubtitleFileInfo?
+
+    /**
+     * Get all [SubtitleFileInfo] list
+     *
+     * @param fileSuffix the subtitle file suffix
+     * @return all subtitle file info list
+     */
+    suspend fun getSubtitleFileInfoList(fileSuffix: String): List<SubtitleFileInfo>
 }

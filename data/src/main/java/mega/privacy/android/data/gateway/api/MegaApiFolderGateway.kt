@@ -124,4 +124,26 @@ interface MegaApiFolderGateway {
      * @param listener MegaRequestListener to remove
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)
+
+    /**
+     * Get child folder number of current folder
+     * @param node current folder node
+     * @return child folder number
+     */
+    suspend fun getNumChildFolders(node: MegaNode): Int
+
+    /**
+     * Get child files number of current folder
+     * @param node current folder node
+     * @return child files number
+     */
+    suspend fun getNumChildFiles(node: MegaNode): Int
+
+    /**
+     * Get children nodes by node
+     * @param parentNode parent node
+     * @param order order for the returned list, if null the default order is applied
+     * @return children nodes list
+     */
+    suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
 }

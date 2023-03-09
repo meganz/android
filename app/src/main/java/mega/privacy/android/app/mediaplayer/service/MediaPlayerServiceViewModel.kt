@@ -86,13 +86,13 @@ import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.MegaNodeUtil.isInRootLinksLevel
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFolderName
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.ApplicationScope
@@ -117,6 +117,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetRootNode
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetRubbishNode
+import mega.privacy.android.domain.usecase.GetSubtitleFileInfoList
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
@@ -206,6 +207,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getNodesByHandles: GetNodesByHandles,
     private val getFingerprint: GetFingerprint,
     private val fileDurationMapper: FileDurationMapper,
+    private val getSubtitleFileInfoListUseCase: GetSubtitleFileInfoList,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -368,13 +370,13 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         buildPlaylistFromOfflineNodes(intent, firstPlayHandle)
                     }
                     AUDIO_BROWSE_ADAPTER -> {
-                        playlistTitle.postValue(getString(R.string.upload_to_audio))
+                        playlistTitle.postValue(context.getString(R.string.upload_to_audio))
                         buildPlaySourcesByTypedNodes(type = type,
                             typedNodes = getAudioNodes(getSortOrderFromIntent(intent)),
                             firstPlayHandle = firstPlayHandle)
                     }
                     VIDEO_BROWSE_ADAPTER -> {
-                        playlistTitle.postValue(getString(R.string.sortby_type_video_first))
+                        playlistTitle.postValue(context.getString(R.string.sortby_type_video_first))
                         buildPlaySourcesByTypedNodes(type = type,
                             typedNodes = getVideoNodes(getSortOrderFromIntent(intent)),
                             firstPlayHandle = firstPlayHandle)
@@ -396,7 +398,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         val order = getSortOrderFromIntent(intent)
 
                         if (isInRootLinksLevel(type, parentHandle)) {
-                            playlistTitle.postValue(getString(R.string.tab_links_shares))
+                            playlistTitle.postValue(context.getString(R.string.tab_links_shares))
                             buildPlaySourcesByTypedNodes(type = type,
                                 typedNodes = if (isAudioPlayer) {
                                     getAudioNodesFromPublicLinks(order)
@@ -408,7 +410,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         }
 
                         if (type == INCOMING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                            playlistTitle.postValue(getString(R.string.tab_incoming_shares))
+                            playlistTitle.postValue(context.getString(R.string.tab_incoming_shares))
                             buildPlaySourcesByTypedNodes(type = type,
                                 typedNodes =
                                 if (isAudioPlayer) {
@@ -421,7 +423,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         }
 
                         if (type == OUTGOING_SHARES_ADAPTER && parentHandle == INVALID_HANDLE) {
-                            playlistTitle.postValue(getString(R.string.tab_outgoing_shares))
+                            playlistTitle.postValue(context.getString(R.string.tab_outgoing_shares))
                             buildPlaySourcesByTypedNodes(type = type,
                                 typedNodes = if (isAudioPlayer) {
                                     getAudioNodesFromOutShares(lastHandle = INVALID_HANDLE,
@@ -443,7 +445,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                         getVideoNodesByEmail(email)
                                     }?.let { nodes ->
                                         getUserNameByEmail(email)?.let {
-                                            getString(R.string.title_incoming_shares_with_explorer)
+                                            context.getString(R.string.title_incoming_shares_with_explorer)
                                                 .let { sharesTitle ->
                                                     playlistTitle.postValue("$sharesTitle $it")
                                                 }
@@ -466,7 +468,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             getParentNodeByHandle(parentHandle)
                         }?.let { parent ->
                             if (parentHandle == INVALID_HANDLE) {
-                                getString(
+                                context.getString(
                                     when (type) {
                                         RUBBISH_BIN_ADAPTER -> R.string.section_rubbish_bin
                                         INBOX_ADAPTER -> R.string.home_side_menu_backups_title
@@ -492,7 +494,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         }
                     }
                     RECENTS_ADAPTER, RECENTS_BUCKET_ADAPTER -> {
-                        playlistTitle.postValue(getString(R.string.section_recents))
+                        playlistTitle.postValue(context.getString(R.string.section_recents))
                         intent.getLongArrayExtra(NODE_HANDLES)?.let { handles ->
                             buildPlaylistFromHandles(type = type,
                                 handles = handles.toList(),
@@ -529,8 +531,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     ZIP_ADAPTER -> {
                         intent.getStringExtra(INTENT_EXTRA_KEY_OFFLINE_PATH_DIRECTORY)
                             ?.let { zipPath ->
-                                playlistTitle.postValue(File(zipPath).parentFile?.name
-                                    ?: "")
+                                playlistTitle.postValue(File(zipPath).parentFile?.name ?: "")
                                 File(zipPath).parentFile?.listFiles()?.let { files ->
                                     buildPlaySourcesByFiles(files = files.asList(),
                                         firstPlayHandle = firstPlayHandle)
@@ -577,10 +578,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                 TYPE_PLAYING,
                 node?.size ?: INVALID_SIZE,
                 duration,
-            )
-                .let { playlistItem ->
-                    playlistItems.add(playlistItem)
-                }
+            ).let { playlistItem ->
+                playlistItems.add(playlistItem)
+            }
 
             recreateAndUpdatePlaylistItems()
 
@@ -726,10 +726,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     TYPE_NEXT,
                     typedNode.size,
                     duration,
-                )
-                    .let { playlistItem ->
-                        playlistItems.add(playlistItem)
-                    }
+                ).let { playlistItem ->
+                    playlistItems.add(playlistItem)
+                }
 
                 if (thumbnail != null && !thumbnail.exists()) {
                     nodesWithoutThumbnail.add(Pair(typedNode.id.longValue, thumbnail))
@@ -1278,7 +1277,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                     if (item.nodeHandle == handle) {
                         nodeNameUpdate.postValue(newName)
                         item.updateNodeName(newName)
-                    } else item
+                    } else {
+                        item
+                    }
                 }
             )
         }
@@ -1298,7 +1299,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
         preferences.edit()
             .putBoolean(KEY_AUDIO_BACKGROUND_PLAY_ENABLED, backgroundPlayEnabled)
             .apply()
-
         return backgroundPlayEnabled
     }
 
@@ -1400,6 +1400,20 @@ class MediaPlayerServiceViewModel @Inject constructor(
             isBuildPlaySources = false)
 
     override fun isActionMode() = actionMode.value
+
+    override suspend fun getMatchedSubtitleFileInfoForPlayingItem(fileSuffix: String): SubtitleFileInfo? =
+        getSubtitleFileInfoListUseCase(fileSuffix).firstOrNull { subtitleFileInfo ->
+            val subtitleName = subtitleFileInfo.name.let { name ->
+                name.substring(0, name.lastIndexOf("."))
+            }
+            val mediaItemName = playlistItems[playingPosition].nodeName.let { name ->
+                name.substring(0, name.lastIndexOf("."))
+            }
+            subtitleName == mediaItemName
+        }
+
+    override suspend fun getSubtitleFileInfoList(fileSuffix: String): List<SubtitleFileInfo> =
+        getSubtitleFileInfoListUseCase(fileSuffix)
 
     private fun initPlayerSourceChanged() {
         if (playSourceChanged.isEmpty()) {

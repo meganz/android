@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
@@ -54,6 +55,7 @@ import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
+import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.After
@@ -61,7 +63,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -99,6 +103,7 @@ internal class FileInfoViewModelTest {
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle = mock()
     private val getNodeLocationInfo: GetNodeLocationInfo = mock()
     private val getOutShares: GetOutShares = mock()
+    private val getNodeAccessPermission: GetNodeAccessPermission = mock()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -142,6 +147,7 @@ internal class FileInfoViewModelTest {
             getNodeVersionsByHandle = getNodeVersionsByHandle,
             getNodeLocationInfo = getNodeLocationInfo,
             getOutShares = getOutShares,
+            getNodeAccessPermission = getNodeAccessPermission,
         )
     }
 
@@ -164,6 +170,10 @@ internal class FileInfoViewModelTest {
             .thenReturn(File(null as File?, thumbUri))
         whenever(typedFileNode.name).thenReturn("File name")
         whenever(typedFileNode.id).thenReturn(nodeId)
+        whenever(getNodeAccessPermission.invoke(nodeId)).thenReturn(AccessPermission.READ)
+        whenever(getPreview.invoke(anyLong())).thenReturn(null)
+        whenever(typedFileNode.thumbnailPath).thenReturn(null)
+        whenever(typedFileNode.hasPreview).thenReturn(false)
     }
 
     @After
@@ -570,9 +580,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test getContactItemFromInShareFolder is invoked when the node is a Folder`() = runTest {
-        val folderNode = mock<TypedFolderNode>()
-        whenever(folderNode.id).thenReturn(nodeId)
-        whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
+        val folderNode = mockFolder()
         underTest.setNode(node.handle)
         //first quick fetch
         verify(getContactItemFromInShareFolder).invoke(folderNode, false)
@@ -582,16 +590,46 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test monitorNodeUpdatesById updates owner`() = runTest {
-        val folderNode = mock<TypedFolderNode>()
-        whenever(folderNode.id).thenReturn(nodeId)
-        whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
-        whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(
+        val folderNode = mockFolder()
+        whenever(monitorNodeUpdatesById.invoke(folderNode.id)).thenReturn(
             flowOf(listOf(NodeChanges.Owner))
         )
         underTest.setNode(node.handle)
         //check 2 invocations: first invocation when node is set, second one the update itself
         verify(getContactItemFromInShareFolder, times(2)).invoke(folderNode, true)
     }
+
+    @Test
+    fun `test getNodeAccessPermission is fetched if getContactItemFromInShareFolder returns ContactItem`() =
+        runTest {
+            val expected = AccessPermission.FULL
+            val folderNode = mockFolder()
+            whenever(getContactItemFromInShareFolder.invoke(folderNode, false)).thenReturn(mock())
+            whenever(getNodeAccessPermission.invoke(folderNode.id)).thenReturn(expected)
+            underTest.setNode(folderNode.id.longValue)
+            Truth.assertThat(underTest.uiState.value.accessPermission)
+                .isEqualTo(expected)
+            verify(getNodeAccessPermission, times(1)).invoke(nodeId)
+        }
+
+    @Test
+    fun `test getNodeAccessPermission is fetched again if monitorNodeUpdatesById updates In share`() =
+        runTest {
+            val expectedFirst = AccessPermission.FULL
+            val expectedChanged = AccessPermission.READ
+            val folderNode = mockFolder()
+            whenever(getContactItemFromInShareFolder.invoke(folderNode, false)).thenReturn(mock())
+            whenever(getNodeAccessPermission.invoke(nodeId))
+                .thenReturn(expectedFirst)
+                .thenReturn(expectedChanged)
+            whenever(monitorNodeUpdatesById.invoke(nodeId)).thenReturn(
+                flowOf(listOf(NodeChanges.Inshare))
+            )
+            underTest.setNode(node.handle)
+            Truth.assertThat(underTest.uiState.value.accessPermission)
+                .isEqualTo(expectedChanged)
+            verify(getNodeAccessPermission, times(2)).invoke(nodeId)
+        }
 
     @Test
     fun `test getNodeLocationInfo fetches node location when its set`() = runTest {
@@ -780,6 +818,15 @@ internal class FileInfoViewModelTest {
             Truth.assertThat(awaitItem()).isNull()
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    private suspend fun mockFolder() = mock<TypedFolderNode> {
+        on { id }.thenReturn(nodeId)
+        on { name }.thenReturn("Folder name")
+    }.also { folderNode ->
+        whenever(getNodeById.invoke(nodeId)).thenReturn(folderNode)
+        whenever(getFolderTreeInfo.invoke(folderNode)).thenReturn(mock())
+        whenever(getContactItemFromInShareFolder.invoke(any(), any())).thenReturn(mock())
     }
 
     companion object {
