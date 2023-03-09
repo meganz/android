@@ -157,6 +157,7 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
@@ -599,12 +600,26 @@ abstract class CameraUploadUseCases {
             SetUploadVideoSyncStatus(cameraUploadRepository::setUploadVideoSyncStatus)
 
         /**
-         * Provide listener new photo
+         * Provides the [ListenToNewMedia] implementation
          *
+         * @param repository [CameraUploadRepository]
+         *
+         * @return [ListenToNewMedia]
          */
         @Provides
         fun provideListenToNewMedia(repository: CameraUploadRepository): ListenToNewMedia =
             ListenToNewMedia(repository::listenToNewMedia)
+
+        /**
+         * Provides the [IsChargingRequiredForVideoCompression] implementation
+         *
+         * @param repository [CameraUploadRepository]
+         *
+         * @return [IsChargingRequiredForVideoCompression]
+         */
+        @Provides
+        fun provideIsChargingRequiredForVideoCompression(repository: CameraUploadRepository): IsChargingRequiredForVideoCompression =
+            IsChargingRequiredForVideoCompression(repository::isChargingRequiredForVideoCompression)
     }
 
     /**

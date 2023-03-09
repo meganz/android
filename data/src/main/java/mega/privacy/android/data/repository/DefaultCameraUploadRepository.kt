@@ -379,8 +379,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.getChargingOnSizeString().toInt()
     }
 
-    override suspend fun convertOnCharging() = withContext(ioDispatcher) {
-        localStorageGateway.convertOnCharging()
+    override suspend fun isChargingRequiredForVideoCompression() = withContext(ioDispatcher) {
+        localStorageGateway.isChargingRequiredForVideoCompression()
     }
 
     override suspend fun updateSyncRecordStatusByLocalPath(

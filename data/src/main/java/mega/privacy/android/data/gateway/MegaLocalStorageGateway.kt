@@ -347,9 +347,12 @@ interface MegaLocalStorageGateway {
     suspend fun getChargingOnSizeString(): String
 
     /**
-     * Convert on charging or not
+     * Checks whether compressing videos require the device to be charged or not
+     *
+     * @return true if the device needs to be charged to compress videos, and false if otherwise
+     * It will return true by default, if the value does not exist in the Database
      */
-    suspend fun convertOnCharging(): Boolean
+    suspend fun isChargingRequiredForVideoCompression(): Boolean
 
     /**
      * Update sync record status by local path
@@ -681,6 +684,6 @@ interface MegaLocalStorageGateway {
      */
     suspend fun loadOfflineNodes(
         path: String,
-        searchQuery: String?
+        searchQuery: String?,
     ): List<OfflineInformation>
 }

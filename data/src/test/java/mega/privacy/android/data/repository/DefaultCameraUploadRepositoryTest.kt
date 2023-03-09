@@ -336,9 +336,18 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload retrieves convert on charging setting`() = runTest {
-        whenever(localStorageGateway.convertOnCharging()).thenReturn(false)
-        assertThat(underTest.convertOnCharging()).isEqualTo(false)
+    fun `test that the device needs to be charged when compressing videos`() =
+        testIsChargingRequiredForVideoCompression(true)
+
+    @Test
+    fun `test that the device does not need to be charged when compressing videos`() =
+        testIsChargingRequiredForVideoCompression(false)
+
+    private fun testIsChargingRequiredForVideoCompression(expectedResult: Boolean) = runTest {
+        whenever(localStorageGateway.isChargingRequiredForVideoCompression()).thenReturn(
+            expectedResult
+        )
+        assertThat(underTest.isChargingRequiredForVideoCompression()).isEqualTo(expectedResult)
     }
 
     @Test
@@ -531,7 +540,7 @@ class DefaultCameraUploadRepositoryTest {
         }
         runTest {
             whenever(videoCompressorGateway.start()).thenReturn(flow)
-            underTest.compressVideos("",VideoQuality.ORIGINAL, emptyList()).test {
+            underTest.compressVideos("", VideoQuality.ORIGINAL, emptyList()).test {
                 list.forEach {
                     val item = awaitItem()
                     assertThat(item.javaClass).isEqualTo(VideoCompressionState.Progress::class.java)

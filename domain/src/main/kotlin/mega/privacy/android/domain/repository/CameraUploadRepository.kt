@@ -353,11 +353,11 @@ interface CameraUploadRepository {
     suspend fun resetTotalUploads()
 
     /**
-     * Convert on charging
+     * Checks whether compressing videos require the device to be charged or not
      *
-     * @return true if conversion on charging
+     * @return true if the device needs to be charged to compress videos, and false if otherwise
      */
-    suspend fun convertOnCharging(): Boolean
+    suspend fun isChargingRequiredForVideoCompression(): Boolean
 
     /**
      * Get charging on size string
