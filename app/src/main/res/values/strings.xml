@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -513,8 +513,6 @@
     <string name="my_account_change_password_newPassword1">New password</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Confirm new password</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">There is no payment method set for this plan currently. Please select one.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Copied link to clipboard</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -815,10 +813,6 @@
     <string name="invalid_string">Incorrect</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Invalid input</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Invalid email address</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Please check the email address and try again.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Password reset</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -955,19 +949,6 @@
         <item quantity="one">%d invite sent</item>
         <item quantity="other">%d invites sent</item>
     </plurals>
-
-    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
-    <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">1 invite request successfully sent&#160;</item>
-        <item quantity="other">%1$d invite requests successfully sent&#160;</item>
-    </plurals>
-
-    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
-    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
-        <item quantity="one">however, 1 request wasn\'t sent.</item>
-        <item quantity="other">however, %1$d requests weren\'t sent.</item>
-    </plurals>
-
     <!-- error message when reinviting multiple contacts -->
     <string name="number_no_invite_contact_request">%1$d invite requests sent but %2$d requests weren’t sent.</string>
     <!-- Word next to own user’s message in chat screen -->
@@ -2868,8 +2849,6 @@
     <string name="label_storage_over_quota">Storage quota exceeded</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Get more transfer quota</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">The folder does not exist.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">The file cannot be found in your Cloud drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -4628,7 +4607,9 @@
     <string name="photos_album_selection_dialog_title">Cannot select more</string>
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Start</string>
@@ -4644,4 +4625,34 @@
     <string name="meetings_chat_room_start_scheduled_meeting_option">Start meeting</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">Join meeting</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="one">1 invite request successfully sent&#160;</item>
+        <item quantity="other">%1$d invite requests successfully sent&#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="one">however, 1 request wasn’t sent.</item>
+        <item quantity="other">however, %1$d requests weren’t sent.</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="one">Copied 1 item</item>
+        <item quantity="other">Copied %1$d items</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="one">Couldn’t copy 1 item</item>
+        <item quantity="other">Couldn’t copy %1$d items</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="one">Copied 1 item,&#160;</item>
+        <item quantity="other">Copied %1$d items,&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="one">couldn’t copy 1 item</item>
+        <item quantity="other">couldn’t copy %1$d items</item>
+    </plurals>
 </resources>

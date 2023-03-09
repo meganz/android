@@ -3,17 +3,24 @@ package mega.privacy.android.app.usecase
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
+import mega.privacy.android.app.usecase.data.CopyRequestData
 import mega.privacy.android.app.usecase.data.CopyRequestResult
-import mega.privacy.android.app.usecase.exception.*
+import mega.privacy.android.app.usecase.data.CopyRequestResult.CopyRequestResultFactory
+import mega.privacy.android.app.usecase.exception.ForeignNodeException
+import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
+import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import nz.mega.sdk.*
-import nz.mega.sdk.MegaError.*
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaError.API_EOVERQUOTA
+import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -31,9 +38,9 @@ class CopyNodeUseCase @Inject constructor(
     private val megaChatApi: MegaChatApiAndroid,
     private val getNodeUseCase: GetNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
-    private val getChatMessageUseCase: GetChatMessageUseCase
+    private val getChatMessageUseCase: GetChatMessageUseCase,
+    private val copyRequestResultFactory: CopyRequestResultFactory,
 ) {
-
     /**
      * Copies a node.
      *
@@ -108,7 +115,7 @@ class CopyNodeUseCase @Inject constructor(
      */
     fun copy(
         collisionResult: NameCollisionResult,
-        rename: Boolean
+        rename: Boolean,
     ): Single<CopyRequestResult> =
         Single.create { emitter ->
             val node = if (collisionResult.nameCollision is NameCollision.Import) {
@@ -164,9 +171,11 @@ class CopyNodeUseCase @Inject constructor(
                             emitter.isDisposed -> return@blockingSubscribeBy
                             error.shouldEmmitError() -> emitter.onError(error)
                             else -> emitter.onSuccess(
-                                CopyRequestResult(
-                                    count = 1,
-                                    errorCount = 1
+                                copyRequestResultFactory.create(
+                                    CopyRequestData(
+                                        count = 1,
+                                        errorCount = 1
+                                    )
                                 )
                             )
                         }
@@ -175,9 +184,11 @@ class CopyNodeUseCase @Inject constructor(
                         when {
                             emitter.isDisposed -> return@blockingSubscribeBy
                             else -> emitter.onSuccess(
-                                CopyRequestResult(
-                                    count = 1,
-                                    errorCount = 0
+                                copyRequestResultFactory.create(
+                                    CopyRequestData(
+                                        count = 1,
+                                        errorCount = 0
+                                    )
                                 ).apply { resetAccountDetailsIfNeeded() }
                             )
                         }
@@ -194,7 +205,7 @@ class CopyNodeUseCase @Inject constructor(
      */
     fun copy(
         collisions: List<NameCollisionResult>,
-        rename: Boolean
+        rename: Boolean,
     ): Single<CopyRequestResult> =
         Single.create { emitter ->
             var errorCount = 0
@@ -213,9 +224,11 @@ class CopyNodeUseCase @Inject constructor(
             when {
                 emitter.isDisposed -> return@create
                 else -> emitter.onSuccess(
-                    CopyRequestResult(
-                        count = collisions.size,
-                        errorCount = errorCount
+                    copyRequestResultFactory.create(
+                        CopyRequestData(
+                            count = collisions.size,
+                            errorCount = errorCount
+                        )
                     ).apply { resetAccountDetailsIfNeeded() }
                 )
             }
@@ -259,9 +272,11 @@ class CopyNodeUseCase @Inject constructor(
             when {
                 emitter.isDisposed -> return@create
                 else -> emitter.onSuccess(
-                    CopyRequestResult(
-                        handles.size,
-                        errorCount
+                    copyRequestResultFactory.create(
+                        CopyRequestData(
+                            handles.size,
+                            errorCount
+                        )
                     ).apply { resetAccountDetailsIfNeeded() }
                 )
             }
@@ -299,9 +314,11 @@ class CopyNodeUseCase @Inject constructor(
             when {
                 emitter.isDisposed -> return@create
                 else -> emitter.onSuccess(
-                    CopyRequestResult(
-                        nodes.size,
-                        errorCount
+                    copyRequestResultFactory.create(
+                        CopyRequestData(
+                            nodes.size,
+                            errorCount
+                        )
                     ).apply { resetAccountDetailsIfNeeded() }
                 )
             }
