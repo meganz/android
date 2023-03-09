@@ -1,6 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
-<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
-    android:src="@drawable/ic_player_repeat_one"
-    android:tint="@color/teal_300_teal_200" />
-    <!-- Seems resolving themed attr from ExoPlayer library has some issue,
+<!-- Seems resolving themed attr from ExoPlayer library has some issue,
      which cause crash on some device, so let's use color here. -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+android:width="24dp"
+android:height="24dp"
+android:tint="@color/teal_300_teal_200"
+android:viewportWidth="24"
+android:viewportHeight="24">
+<path
+    android:pathData="M11.707,1.293C11.317,0.902 10.683,0.902 10.293,1.293C9.902,1.683 9.902,2.317 10.293,2.707L11.586,4H9C4.582,4 1,7.582 1,12C1,15.193 2.87,17.947 5.571,19.23C6.07,19.467 6.666,19.254 6.903,18.756C7.14,18.257 6.928,17.66 6.429,17.423C4.4,16.459 3,14.392 3,12C3,8.686 5.686,6 9,6H11.586L10.293,7.293C9.902,7.683 9.902,8.317 10.293,8.707C10.683,9.098 11.317,9.098 11.707,8.707L14.707,5.707C15.098,5.317 15.098,4.683 14.707,4.293L11.707,1.293Z"
+    android:fillColor="#000000"/>
+<path
+    android:pathData="M15,20C19.418,20 23,16.418 23,12C23,11.448 22.552,11 22,11C21.448,11 21,11.448 21,12C21,15.314 18.314,18 15,18H12.414L13.707,16.707C14.098,16.317 14.098,15.683 13.707,15.293C13.317,14.902 12.683,14.902 12.293,15.293L9.293,18.293C8.902,18.683 8.902,19.317 9.293,19.707L12.293,22.707C12.683,23.098 13.317,23.098 13.707,22.707C14.098,22.317 14.098,21.683 13.707,21.293L12.414,20H15Z"
+    android:fillColor="#000000"/>
+<path
+    android:pathData="M20.5,9C22.433,9 24,7.433 24,5.5C24,3.567 22.433,2 20.5,2C18.567,2 17,3.567 17,5.5C17,7.433 18.567,9 20.5,9ZM20,4.5V7.5H21V3.5H19.5V4.5H20Z"
+    android:fillColor="#000000"
+    android:fillType="evenOdd"/>
+</vector>
