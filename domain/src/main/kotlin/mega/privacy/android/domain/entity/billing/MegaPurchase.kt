@@ -32,7 +32,7 @@ data class MegaPurchase(
      * product level
      */
     val level: Int = when (sku) {
-        Skus.SKU_PRO_LITE_MONTH, Skus.SKU_PRO_LITE_YEAR -> 4
+        Skus.SKU_PRO_LITE_MONTH, Skus.SKU_PRO_LITE_YEAR -> 0
         Skus.SKU_PRO_I_MONTH, Skus.SKU_PRO_I_YEAR -> 1
         Skus.SKU_PRO_II_MONTH, Skus.SKU_PRO_II_YEAR -> 2
         Skus.SKU_PRO_III_MONTH, Skus.SKU_PRO_III_YEAR -> 3
