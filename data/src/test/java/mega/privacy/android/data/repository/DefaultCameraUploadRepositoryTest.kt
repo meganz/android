@@ -5,8 +5,10 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -56,6 +58,7 @@ class DefaultCameraUploadRepositoryTest {
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
     private val cameraUploadsHandlesMapper = mock<CameraUploadsHandlesMapper>()
     private val videoCompressorGateway = mock<VideoCompressorGateway>()
+    private val appEventGateway = mock<AppEventGateway>()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -86,7 +89,7 @@ class DefaultCameraUploadRepositoryTest {
             mediaStoreFileTypeUriMapper = mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper = cameraUploadsHandlesMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
-            appEventGateway = mock(),
+            appEventGateway = appEventGateway,
             broadcastReceiverGateway = mock(),
             videoQualityIntMapper = ::videoQualityToInt,
             videoQualityMapper = ::toVideoQuality,
@@ -543,6 +546,32 @@ class DefaultCameraUploadRepositoryTest {
                 assertThat(finished.javaClass).isEqualTo(VideoCompressionState.Finished::class.java)
                 cancelAndConsumeRemainingEvents()
             }
+        }
+    }
+
+    @Test
+    fun `test that broadcasting camera upload progress call event gateway camera upload progress with appropriate value`() {
+        runTest {
+            val expected = Pair(50, 25)
+            underTest.broadcastCameraUploadProgress(
+                progress = expected.first,
+                pending = expected.second
+            )
+            verify(appEventGateway).broadcastCameraUploadProgress(
+                progress = expected.first,
+                pending = expected.second
+            )
+        }
+    }
+
+    @Test
+    fun `test that monitor camera upload progress returns the result of event gateway monitor camera upload progress`() {
+        runTest {
+            val progress1 = Pair(50, 25)
+            val progress2 = Pair(51, 24)
+            val expected = flowOf(progress1, progress2)
+            whenever(appEventGateway.monitorCameraUploadProgress).thenReturn(expected)
+            assertThat(underTest.monitorCameraUploadProgress()).isEqualTo(expected)
         }
     }
 }

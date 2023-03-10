@@ -36,6 +36,17 @@ class AppEventFacadeTest {
     }
 
     @Test
+    fun `test that broadcast camera upload progress fires an event`() = runTest {
+        val expected = Pair(50, 25)
+        underTest.monitorCameraUploadProgress.test {
+            underTest.broadcastCameraUploadProgress(expected.first, expected.second)
+
+            val actual = awaitItem()
+            assertThat(actual).isEqualTo(actual)
+        }
+    }
+
+    @Test
     fun `test that set SMS Verification Shown set the correct state`() = runTest {
         underTest.setSMSVerificationShown(true)
         assertThat(underTest.isSMSVerificationShown()).isTrue()

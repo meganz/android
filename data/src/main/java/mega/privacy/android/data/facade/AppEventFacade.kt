@@ -20,6 +20,7 @@ internal class AppEventFacade @Inject constructor(
 ) : AppEventGateway {
 
     private val _monitorCameraUploadPauseState = MutableSharedFlow<Boolean>()
+    private val _monitorCameraUploadProgress = MutableSharedFlow<Pair<Int, Int>>()
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
     private val logout = MutableSharedFlow<Boolean>()
     private val _transferFailed = MutableSharedFlow<Boolean>()
@@ -32,8 +33,15 @@ internal class AppEventFacade @Inject constructor(
     override val monitorCameraUploadPauseState =
         _monitorCameraUploadPauseState.toSharedFlow(appScope)
 
+    override val monitorCameraUploadProgress =
+        _monitorCameraUploadProgress.toSharedFlow(appScope)
+
     override suspend fun broadcastUploadPauseState() =
         _monitorCameraUploadPauseState.emit(true)
+
+    override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) {
+        _monitorCameraUploadProgress.emit(Pair(progress, pending))
+    }
 
     override suspend fun setSMSVerificationShown(isShown: Boolean) {
         _isSMSVerificationShownState.value = isShown
