@@ -63,7 +63,7 @@ class PushMessageWorkerTest {
         context = ApplicationProvider.getApplicationContext()
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
-        workDatabase = WorkDatabase.create(context, workExecutor.backgroundExecutor, true)
+        workDatabase = WorkDatabase.create(context, workExecutor.serialTaskExecutor, true)
 
         underTest = PushMessageWorker(
             context = context,
@@ -72,6 +72,7 @@ class PushMessageWorkerTest {
                 workDataOf(),
                 emptyList(),
                 WorkerParameters.RuntimeExtras(),
+                1,
                 1,
                 executor,
                 workExecutor,
@@ -85,6 +86,7 @@ class PushMessageWorkerTest {
                     }
 
                     override fun stopForeground(workSpecId: String) {}
+                    override fun isEnqueuedInForeground(workSpecId: String): Boolean = true
                 }, workExecutor)
             ),
             backgroundFastLogin = backgroundFastLogin,

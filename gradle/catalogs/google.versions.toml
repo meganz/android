@@ -1,0 +1,48 @@
+[versions]
+accompanist = "0.24.13-rc"
+accompanist-systemui = "0.23.1"
+autovalue = "1.9"
+exoplayer = "2.18.4"
+firebase = "31.1.1"
+flexbox = "2.0.1"
+gson = "2.8.6"
+hilt = "2.42"
+material = "1.8.0"
+maps-utils = "0.5"
+play-core = "1.10.3"
+play-core-ktx = "1.8.1"
+protobuff = "3.15.3"
+services-location = "21.0.1"
+services-maps = "18.1.0"
+zxing = "3.4.0"
+
+[libraries]
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
+accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
+accompanist-navigationanimation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanist" }
+accompanist-systemui = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist-systemui" }
+autovalue = { module = "com.google.auto.value:auto-value", version.ref = "autovalue" }
+autovalue-annotations = { module = "com.google.auto.value:auto-value-annotations", version.ref = "autovalue" }
+exoplayer-core = { module = "com.google.android.exoplayer:exoplayer-core", version.ref = "exoplayer" }
+exoplayer-ui = { module = "com.google.android.exoplayer:exoplayer-ui", version.ref = "exoplayer" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
+firebase-crashlytics-ndk = { group = "com.google.firebase", name = "firebase-crashlytics-ndk" }
+firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
+firebase-perf-ktx = { group = "com.google.firebase", name = "firebase-perf-ktx" }
+flexbox = { module = "com.google.android:flexbox", version.ref = "flexbox" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "maps-utils" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
+play-core = { module = "com.google.android.play:core", version.ref = "play-core" }
+play-core-ktx = { module = "com.google.android.play:core-ktx", version.ref = "play-core-ktx" }
+protobuff = { module = "com.google.protobuf:protobuf-java", version.ref = "protobuff" }
+services-location = { module = "com.google.android.gms:play-services-location", version.ref = "services-location" }
+services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "services-maps" }
+zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
+
+[bundles]
+firebase-bom = ["firebase-crashlytics-ndk", "firebase-crashlytics-ktx", "firebase-messaging-ktx", "firebase-perf-ktx"]

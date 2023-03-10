@@ -61,36 +61,29 @@ android {
 dependencies {
     implementation project(':domain')
 
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
-    implementation "com.google.code.gson:gson:$gsonVersion"
+    implementation lib.coroutines.core
+    implementation google.gson
+    implementation google.zxing
+    implementation androidx.exifinterface
+    implementation androidx.datastore.preferences
+    implementation androidx.preferences
+    implementation androidx.lifecycle.process
+    implementation lib.fresco
+    implementation androidx.work.ktx
+    implementation androidx.hilt.work
+    implementation google.hilt.android
+    kapt google.hilt.android.compiler
+    kapt androidx.hilt.compiler
 
-    kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
-    kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
-    implementation "com.google.dagger:hilt-android:$hiltVersion"
-    implementation "androidx.exifinterface:exifinterface:$exifinterfaceVersion"
-    implementation "androidx.datastore:datastore-preferences:$datastoreVersion"
-    implementation "androidx.preference:preference-ktx:$preferenceVersion"
+    gmsImplementation lib.billing.client.ktx
 
-    gmsImplementation "com.android.billingclient:billing-ktx:$billingVersion"
-
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+    coreLibraryDesugaring lib.desugar
 
     // Logging
-    implementation "org.slf4j:slf4j-api:$slf4jVersion"
-    implementation "com.github.tony19:logback-android:$logbackVersion"
-    implementation "com.jakewharton.timber:timber:$timberVersion"
+    implementation lib.bundles.logging
 
-    implementation "com.google.zxing:core:$zxingVersion"
-
-    implementation "com.google.auto.value:auto-value-annotations:$autovalueAnnotationVersion"
-    kapt "com.google.auto.value:auto-value:$autovalueVersion"
-
-    implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
-
-    implementation "com.facebook.fresco:fresco:$frescoVersion"
-
-    implementation "androidx.work:work-runtime-ktx:$workVersion"
-    implementation "androidx.hilt:hilt-work:$hiltAndroidXCompilerVersion"
+    implementation google.autovalue.annotations
+    kapt google.autovalue
 
     // Testing dependencies
     androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"

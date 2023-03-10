@@ -44,26 +44,21 @@ android {
 }
 
 dependencies {
+    lintChecks project(':lint')
+
     implementation(project(":domain"))
     implementation(project(":data"))
     implementation(project(":core-ui"))
 
-    implementation platform("androidx.compose:compose-bom:$composeBomVersion")
-    implementation "androidx.activity:activity-compose:$activityComposeVersion"
-    implementation "androidx.core:core-ktx:$ktxVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
-    implementation "com.google.android.material:material:$materialVersion"
-    implementation 'androidx.compose.ui:ui'
-    implementation 'androidx.compose.material:material'
-    implementation 'androidx.compose.ui:ui-tooling-preview'
-    implementation "androidx.compose.compiler:compiler:$composeCompilerVersion"
-    implementation 'androidx.compose.ui:ui-tooling'
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
-
-    lintChecks project(':lint')
-
-    kapt "androidx.hilt:hilt-compiler:$hiltAndroidXCompilerVersion"
-    kapt "com.google.dagger:hilt-android-compiler:$hiltVersion"
-    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    implementation lib.kotlin.ktx
+    implementation androidx.appcompat
+    implementation androidx.fragment
+    implementation google.material
+    implementation androidx.lifecycle.viewmodel
+    implementation androidx.compose.activity
+    implementation platform(androidx.compose.bom)
+    implementation androidx.bundles.compose.bom
+    implementation google.hilt.android
+    kapt google.hilt.android.compiler
+    kapt androidx.hilt.compiler
 }

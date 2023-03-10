@@ -1,0 +1,71 @@
+[versions]
+appcompat = "1.6.1"
+biometric = "1.1.0"
+cardview = "1.0.0"
+constraintlayout = "2.1.4"
+camerax = "1.2.1"
+compose-activity = "1.6.1"
+compose-bom = "2022.10.00"
+compose-compiler = "1.4.3"
+compose-viewmodel = "2.5.1"
+datastore = "1.0.0"
+emoji = "1.1.0"
+exifinterface = "1.3.0"
+fragment = "1.5.5"
+hilt = "1.0.0"
+lifecycle = "2.5.1"
+legacy-support = "1.0.0"
+multidex = "2.0.1"
+navigation = "2.5.3"
+palette = "1.0.0"
+preferences = "1.2.0"
+recyclerview = "1.3.0"
+recyclerview-selection = "1.1.0"
+viewpager2 = "1.1.0-beta01"
+work = "2.8.0"
+
+[libraries]
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
+cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
+constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
+camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
+camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
+compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
+compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
+compose-material = { group = "androidx.compose.material", name = "material" }
+compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "compose-viewmodel" }
+compose-ui = { group = "androidx.compose.ui", name = "ui" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+emoji = { module = "androidx.emoji:emoji-appcompat", version.ref = "emoji" }
+exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
+fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt" }
+hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt" }
+hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt" }
+legacy-support = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacy-support" }
+lifecycle-livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
+lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
+lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+lifecycle-reactivestreams = { module = "androidx.lifecycle:lifecycle-reactivestreams-ktx", version.ref = "lifecycle" }
+lifecycle-common = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "lifecycle" }
+lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycle" }
+lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle" }
+multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
+navigation-runtime = { module = "androidx.navigation:navigation-runtime-ktx", version.ref = "navigation" }
+navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
+navigation-ui = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
+palette = { module = "androidx.palette:palette-ktx", version.ref = "palette" }
+preferences = { module = "androidx.preference:preference-ktx", version.ref = "preferences" }
+recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
+recyclerview-selection = { module = "androidx.recyclerview:recyclerview-selection", version.ref = "recyclerview-selection" }
+viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
+work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+
+[bundles]
+lifecycle = ["lifecycle-livedata", "lifecycle-viewmodel", "lifecycle-runtime", "lifecycle-reactivestreams", "lifecycle-common", "lifecycle-process", "lifecycle-service"]
+navigation = ["navigation-runtime", "navigation-fragment", "navigation-ui"]
+compose-bom = ["compose-compiler", "compose-ui", "compose-ui-tooling", "compose-ui-tooling-preview", "compose-material"]

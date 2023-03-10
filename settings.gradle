@@ -1,4 +1,16 @@
 apply from: "tools/util.gradle"
+enableFeaturePreview("VERSION_CATALOGS")
+dependencyResolutionManagement {
+    versionCatalogs {
+        fileTree("./gradle/catalogs").matching {
+            include "**/*.toml"
+        }.each { file ->
+            create(file.getName().split("\\.")[0]) {
+                from(files(file))
+            }
+        }
+    }
+}
 
 include ':app'
 include ':domain'
