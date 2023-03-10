@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -48,7 +47,6 @@ import mega.privacy.android.app.databinding.ActivityFileInfoBinding
 import mega.privacy.android.app.databinding.DialogLinkBinding
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.listeners.ShareListener
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileContactListActivity
@@ -65,14 +63,13 @@ import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
 import mega.privacy.android.app.usecase.data.MoveRequestResult
-import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
+import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOLDER
@@ -85,12 +82,10 @@ import mega.privacy.android.app.utils.MegaNodeUtil.isEmptyFolder
 import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
-import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -99,6 +94,7 @@ import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 /**
@@ -117,14 +113,13 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             retryConnectionsAndSignalPresence()
-            if (isRemoveOffline) {
+            if (viewModel.uiState.value.isAvailableOffline.not()) {
                 val intent = Intent()
                 intent.putExtra(NODE_HANDLE, handle)
                 setResult(RESULT_OK, intent)
             }
             finish()
         }
-
     }
 
     private lateinit var binding: ActivityFileInfoBinding
@@ -151,8 +146,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     }
 
     private var typeExport = -1
-    private var mOffDelete: MegaOffline? = null
-    private var availableOfflineBoolean = false
     private var cC: ContactController? = null
     private var progressDialog: Pair<AlertDialog, FileInfoJobInProgressState?>? = null
     private var publicLink = false
@@ -160,7 +153,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     private var shareIt = true
     private var from = 0
     private var permissionsDialog: AlertDialog? = null
-    private var isRemoveOffline = false
     private var handle: Long = 0
     private var adapterType = 0
     private var selectedShare: MegaShare? = null
@@ -376,7 +368,10 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             currentVersionsSize = viewState.folderCurrentVersionSizeInBytesString,
             previousVersionsSize = viewState.folderVersionsSizeInBytesString
         )
-        updateAvailableOffline(!viewModel.node.isTakenDown && !viewState.isNodeInRubbish)
+        updateAvailableOffline(
+            enabled = viewState.isAvailableOfflineEnabled,
+            available = viewState.isAvailableOffline,
+        )
         updateIncomeShared(viewState)
         updateOutShares(viewState)
         updateLocation(viewState.nodeLocationInfo)
@@ -465,22 +460,17 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         }
     }
 
-    private fun updateAvailableOffline(enabled: Boolean) = with(bindingContent) {
-        if (enabled) {
-            filePropertiesSwitch.isEnabled = true
-            filePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
-                filePropertiesSwitch()
-            }
+    private fun updateAvailableOffline(enabled: Boolean, available: Boolean) =
+        with(bindingContent) {
+            bindingContent.filePropertiesSwitch.isChecked = available
+            filePropertiesSwitch.isEnabled = enabled
             filePropertiesAvailableOfflineText.setTextColor(
-                ContextCompat.getColor(this@FileInfoActivity, R.color.grey_087_white_087)
-            )
-        } else {
-            filePropertiesSwitch.isEnabled = false
-            filePropertiesAvailableOfflineText.setTextColor(
-                ContextCompat.getColor(this@FileInfoActivity, R.color.grey_700_026_grey_300_026)
+                ContextCompat.getColor(
+                    this@FileInfoActivity,
+                    if (enabled) R.color.grey_087_white_087 else R.color.grey_700_026_grey_300_026
+                )
             )
         }
-    }
 
     private fun updateOptionsMenu(state: FileInfoViewState) {
         if (state.jobInProgressState == null) {
@@ -528,6 +518,8 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                     }
                 }
             }
+            is FileInfoOneOffViewEvent.Message -> showSnackBar(event.message)
+            is FileInfoOneOffViewEvent.OverDiskQuota -> AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
         }
         viewModel.consumeOneOffEvent(event)
     }
@@ -650,6 +642,9 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             }
             filePropertiesSharedInfoButton.setOnClickListener {
                 viewModel.expandOutSharesClick()
+            }
+            filePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
+                viewModel.availableOfflineChanged(checked, WeakReference(this@FileInfoActivity))
             }
             //Owner Layout
             val ownerString = "(${getString(R.string.file_properties_owner)})"
@@ -1038,91 +1033,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 bindingContent.warningBannerLayout.isVisible = true
                 bindingContent.takenDownFileWarningClose.setOnClickListener {
                     bindingContent.warningBannerLayout.isVisible = false
-                }
-            }
-        }
-
-        //Choose the button bindingContent.filePropertiesSwitch
-        if (OfflineUtils.availableOffline(this, viewModel.node)) {
-            availableOfflineBoolean = true
-            bindingContent.filePropertiesSwitch.isChecked = true
-            return
-        }
-        availableOfflineBoolean = false
-        bindingContent.filePropertiesSwitch.isChecked = false
-    }
-
-    private fun filePropertiesSwitch() {
-        val isChecked = bindingContent.filePropertiesSwitch.isChecked
-        if (viewModel.getStorageState() === StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
-            bindingContent.filePropertiesSwitch.isChecked = !isChecked
-            return
-        }
-        if (!viewModel.uiState.value.isIncomingSharedNode) {
-            Timber.d("Owner: me")
-            if (!isChecked) {
-                Timber.d("isChecked")
-                isRemoveOffline = true
-                handle = viewModel.node.handle
-                availableOfflineBoolean = false
-                bindingContent.filePropertiesSwitch.isChecked = false
-                mOffDelete = dbH.findByHandle(handle)
-                OfflineUtils.removeOffline(mOffDelete, dbH, this)
-                showSnackbar(getString(R.string.file_removed_offline))
-            } else {
-                Timber.d("NOT Checked")
-                isRemoveOffline = false
-                handle = -1
-                availableOfflineBoolean = true
-                bindingContent.filePropertiesSwitch.isChecked = true
-                val destination =
-                    OfflineUtils.getOfflineParentFile(this, from, viewModel.node, megaApi)
-                Timber.d("Path destination: %s", destination)
-                if (FileUtil.isFileAvailable(destination) && destination.isDirectory) {
-                    val offlineFile = File(destination, viewModel.node.name)
-                    if (FileUtil.isFileAvailable(offlineFile) && viewModel.node.size == offlineFile.length() && offlineFile.name == viewModel.node.name) {
-                        //This means that is already available offline
-                        return
-                    }
-                }
-                Timber.d("Handle to save for offline : ${viewModel.node.handle}")
-                OfflineUtils.saveOffline(destination, viewModel.node, this)
-            }
-            invalidateOptionsMenu()
-        } else {
-            Timber.d("Not owner")
-            if (!isChecked) {
-                availableOfflineBoolean = false
-                bindingContent.filePropertiesSwitch.isChecked = false
-                mOffDelete = dbH.findByHandle(viewModel.node.handle)
-                OfflineUtils.removeOffline(mOffDelete, dbH, this)
-                invalidateOptionsMenu()
-            } else {
-                availableOfflineBoolean = true
-                bindingContent.filePropertiesSwitch.isChecked = true
-                invalidateOptionsMenu()
-                Timber.d("Checking the node%s", viewModel.node.handle)
-
-                //check the parent
-                val result = OfflineUtils.findIncomingParentHandle(viewModel.node, megaApi)
-                Timber.d("IncomingParentHandle: %s", result)
-                if (result != -1L) {
-                    val destination = OfflineUtils.getOfflineParentFile(
-                        this,
-                        Constants.FROM_INCOMING_SHARES,
-                        viewModel.node,
-                        megaApi
-                    )
-                    if (FileUtil.isFileAvailable(destination) && destination.isDirectory) {
-                        val offlineFile = File(destination, viewModel.node.name)
-                        if (FileUtil.isFileAvailable(offlineFile) && viewModel.node.size == offlineFile.length() && offlineFile.name == viewModel.node.name) { //This means that is already available offline
-                            return
-                        }
-                    }
-                    OfflineUtils.saveOffline(destination, viewModel.node, this)
-                } else {
-                    Timber.w("result=findIncomingParentHandle NOT result!")
                 }
             }
         }

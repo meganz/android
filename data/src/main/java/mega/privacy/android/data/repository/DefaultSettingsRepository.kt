@@ -201,9 +201,6 @@ internal class DefaultSettingsRepository @Inject constructor(
     override suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean) =
         megaLocalStorageGateway.setCameraFolderExternalSDCard(cameraFolderExternalSDCard)
 
-    override suspend fun setConversionOnCharging(onCharging: Boolean) =
-        megaLocalStorageGateway.setConversionOnCharging(onCharging)
-
     override suspend fun setChargingOnSize(size: Int) {
         megaLocalStorageGateway.setChargingOnSize(size)
     }

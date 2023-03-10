@@ -1,6 +1,10 @@
 package mega.privacy.android.app.presentation.photos.compose.albumcontent
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -17,6 +22,7 @@ import androidx.compose.material.Snackbar
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -57,7 +63,7 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun AlbumContentScreen(
     photosViewModel: PhotosViewModel,
@@ -77,6 +83,8 @@ fun AlbumContentScreen(
     val smallWidth = remember(configuration) {
         (configuration.screenWidthDp.dp - 1.dp) / 3
     }
+
+    val lazyListState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         albumsState.currentUserAlbum?.also { album ->
@@ -133,6 +141,7 @@ fun AlbumContentScreen(
     Box {
         if (photos.isNotEmpty()) {
             DynamicView(
+                lazyListState = lazyListState,
                 photos = photos,
                 smallWidth = smallWidth,
                 photoDownload = photosViewModel::downloadPhoto,
@@ -243,23 +252,41 @@ fun AlbumContentScreen(
                 )
             }
 
+            val scrollNotInProgress by remember {
+                derivedStateOf { !lazyListState.isScrollInProgress }
+            }
+
             if (albumsState.currentMediaType != FilterMediaType.ALL_MEDIA && albumsState.selectedPhotos.isEmpty()) {
-                FilterFabButton(
+                AnimatedVisibility(
                     modifier = Modifier
                         .align(Alignment.End)
                         .padding(end = 24.dp),
-                    onFilterClick = { albumsViewModel.showFilterDialog(true) }
-                )
+                    visible = scrollNotInProgress,
+                    exit = scaleOut(),
+                    enter = scaleIn()
+                ) {
+                    FilterFabButton(
+                        modifier = Modifier,
+                        onFilterClick = { albumsViewModel.showFilterDialog(true) }
+                    )
+                }
                 Spacer(modifier = Modifier.padding(top = 16.dp))
             }
 
             if (userAlbum != null && timelineState.photos.isNotEmpty() && albumsState.selectedPhotos.isEmpty() && !albumContentState.isAddingPhotos) {
-                AddFabButton(
+                AnimatedVisibility(
                     modifier = Modifier
                         .align(Alignment.End)
                         .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                    onNavigatePhotosSelection = { onNavigatePhotosSelection(userAlbum) }
-                )
+                    visible = scrollNotInProgress,
+                    exit = scaleOut(),
+                    enter = scaleIn()
+                ) {
+                    AddFabButton(
+                        modifier = Modifier,
+                        onNavigatePhotosSelection = { onNavigatePhotosSelection(userAlbum) }
+                    )
+                }
             }
         }
 

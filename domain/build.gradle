@@ -21,11 +21,11 @@ compileKotlin {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
-    implementation "javax.inject:javax.inject:1"
+    implementation lib.coroutines.core
+    implementation lib.javax.inject
 
-    kapt "com.google.dagger:hilt-compiler:$hiltVersion"
-    implementation "com.google.dagger:hilt-core:$hiltVersion"
+    kapt google.hilt.android.compiler
+    implementation google.hilt.core
 
     // Testing dependencies
     testImplementation "junit:junit:$junitVersion"

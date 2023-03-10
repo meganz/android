@@ -20,6 +20,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
@@ -339,7 +340,7 @@ private fun SelectLocationDialog(
     val isLight = MaterialTheme.colors.isLight
 
     Dialog(onDismissRequest = onDialogDismissed) {
-        Card(shape = RoundedCornerShape(2.dp)) {
+        Surface(shape = RoundedCornerShape(4.dp), elevation = 24.dp) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.size(12.dp))
                 TimelinePhotosSource.values().forEach { location ->

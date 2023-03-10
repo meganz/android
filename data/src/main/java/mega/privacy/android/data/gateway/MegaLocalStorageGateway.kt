@@ -355,6 +355,13 @@ interface MegaLocalStorageGateway {
     suspend fun isChargingRequiredForVideoCompression(): Boolean
 
     /**
+     * Sets whether compressing videos require the device to be charged or not
+     *
+     * @param chargingRequired Whether the device needs to be charged or not
+     */
+    suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean)
+
+    /**
      * Update sync record status by local path
      */
     suspend fun updateSyncRecordStatusByLocalPath(
@@ -483,13 +490,6 @@ interface MegaLocalStorageGateway {
      * @param syncStatus The new Video Sync Status, represented as an [Int]
      */
     suspend fun setUploadVideoSyncStatus(syncStatus: Int)
-
-    /**
-     * Set Conversion on charging
-     *
-     * @param onCharging
-     */
-    suspend fun setConversionOnCharging(onCharging: Boolean)
 
     /**
      * Set the size of Charging on

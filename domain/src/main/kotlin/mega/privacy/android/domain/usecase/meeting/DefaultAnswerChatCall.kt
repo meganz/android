@@ -12,15 +12,18 @@ class DefaultAnswerChatCall @Inject constructor(
 ) : AnswerChatCall {
 
     override suspend fun invoke(chatId: Long, video: Boolean, audio: Boolean): ChatCall? {
-        runCatching {
+        if (chatId == -1L)
+            return null
+
+        return runCatching {
             callRepository.answerChatCall(
                 chatId,
                 video,
                 audio
             )
         }.fold(
-            onSuccess = { request -> return callRepository.getChatCall(request.chatHandle) },
-            onFailure = { return null }
+            onSuccess = { request -> callRepository.getChatCall(request.chatHandle) },
+            onFailure = { null }
         )
     }
 }

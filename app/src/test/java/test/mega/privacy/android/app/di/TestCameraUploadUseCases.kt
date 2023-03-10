@@ -98,6 +98,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
@@ -401,4 +402,8 @@ object TestCameraUploadUseCases {
     @Provides
     fun provideIsChargingRequiredForVideoCompression() =
         mock<IsChargingRequiredForVideoCompression>()
+
+    @Provides
+    fun provideSetChargingRequiredForVideoCompression() =
+        mock<SetChargingRequiredForVideoCompression>()
 }

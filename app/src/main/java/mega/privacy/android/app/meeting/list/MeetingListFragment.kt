@@ -174,7 +174,7 @@ class MeetingListFragment : Fragment() {
                 binding.viewEmptySearch.root.isVisible = false
             }
 
-            if (state.currentCallChatId != null) {
+            state.currentCallChatId?.let {
                 viewModel.removeCurrentCall()
                 launchChatCallScreen(state.currentCallChatId)
             }

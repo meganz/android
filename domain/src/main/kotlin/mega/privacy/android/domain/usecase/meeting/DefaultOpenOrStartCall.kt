@@ -12,19 +12,22 @@ class DefaultOpenOrStartCall @Inject constructor(
 ) : OpenOrStartCall {
 
     override suspend fun invoke(chatId: Long, video: Boolean, audio: Boolean): ChatCall? {
+        if (chatId == -1L)
+            return null
+
         callRepository.getChatCall(chatId)?.let { call ->
             return call
         }
 
-        runCatching {
+        return runCatching {
             callRepository.startCallRinging(
                 chatId,
                 video,
                 audio
             )
         }.fold(
-            onSuccess = { request -> return callRepository.getChatCall(request.chatHandle) },
-            onFailure = { return null }
+            onSuccess = { request -> callRepository.getChatCall(request.chatHandle) },
+            onFailure = { null }
         )
     }
 }

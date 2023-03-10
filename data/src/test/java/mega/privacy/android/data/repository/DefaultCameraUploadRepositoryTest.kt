@@ -351,6 +351,23 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
+    fun `test that the device will now have to be charged when compressing videos`() =
+        testSetChargingRequiredForVideoCompression(true)
+
+    @Test
+    fun `test that the device will no longer have to be charged when compressing videos`() =
+        testSetChargingRequiredForVideoCompression(false)
+
+    private fun testSetChargingRequiredForVideoCompression(requireCharging: Boolean) = runTest {
+        underTest.setChargingRequiredForVideoCompression(requireCharging)
+
+        verify(
+            localStorageGateway,
+            times(1)
+        ).setChargingRequiredForVideoCompression(requireCharging)
+    }
+
+    @Test
     fun `test that setup primary folder returns success when api set camera upload folders returns API_OK`() =
         runTest {
             val result = 69L

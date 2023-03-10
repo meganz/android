@@ -58,6 +58,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.DialogProperties
@@ -349,6 +350,7 @@ fun DeleteAlbumsConfirmationDialog(
             id = R.plurals.photos_album_delete_confirmation_title,
             count = selectedAlbumIds.size,
         ),
+        fontWeight = FontWeight.W500,
         body = {
             Text(
                 modifier = Modifier.padding(),

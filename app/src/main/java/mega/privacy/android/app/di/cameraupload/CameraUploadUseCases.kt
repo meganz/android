@@ -159,6 +159,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
@@ -620,6 +621,17 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideIsChargingRequiredForVideoCompression(repository: CameraUploadRepository): IsChargingRequiredForVideoCompression =
             IsChargingRequiredForVideoCompression(repository::isChargingRequiredForVideoCompression)
+
+        /**
+         * Provides the [SetChargingRequiredForVideoCompression] implementation
+         *
+         * @param repository [CameraUploadRepository]
+         *
+         * @return [SetChargingRequiredForVideoCompression]
+         */
+        @Provides
+        fun provideSetChargingRequiredForVideoCompression(repository: CameraUploadRepository): SetChargingRequiredForVideoCompression =
+            SetChargingRequiredForVideoCompression(repository::setChargingRequiredForVideoCompression)
     }
 
     /**

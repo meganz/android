@@ -360,6 +360,13 @@ interface CameraUploadRepository {
     suspend fun isChargingRequiredForVideoCompression(): Boolean
 
     /**
+     * Sets whether compressing videos require the device to be charged or not
+     *
+     * @param chargingRequired Whether the device needs to be charged or not
+     */
+    suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean)
+
+    /**
      * Get charging on size string
      *
      * @return charging on size string

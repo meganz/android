@@ -631,7 +631,7 @@ class PhotosFragment : Fragment() {
     }
 
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {
-        val numPhotos = result.data?.getIntExtra(AlbumScreenWrapperActivity.NUM_PHOTOS, 0)
+        val numPhotos = result.data?.getIntExtra(AlbumScreenWrapperActivity.NUM_PHOTOS, 0) ?: 0
         if (numPhotos == 0) return
 
         val albumId = result.data?.getLongExtra(AlbumScreenWrapperActivity.ALBUM_ID, -1) ?: -1

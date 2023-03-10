@@ -88,7 +88,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val videoAttachmentMapper: VideoAttachmentMapper,
     private val uploadOptionMapper: UploadOptionMapper,
     private val uploadOptionIntMapper: UploadOptionIntMapper,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
@@ -382,6 +382,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun isChargingRequiredForVideoCompression() = withContext(ioDispatcher) {
         localStorageGateway.isChargingRequiredForVideoCompression()
     }
+
+    override suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean) =
+        withContext(ioDispatcher) {
+            localStorageGateway.setChargingRequiredForVideoCompression(chargingRequired)
+        }
 
     override suspend fun updateSyncRecordStatusByLocalPath(
         syncStatusType: Int,

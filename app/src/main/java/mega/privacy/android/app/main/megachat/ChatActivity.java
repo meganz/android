@@ -2067,7 +2067,7 @@ public class ChatActivity extends PasscodeActivity
             }
 
             ScheduledMeetingStatus schedMeetStatus = chatState.getScheduledMeetingStatus();
-            if (schedMeetStatus != null && (schedMeetStatus == ScheduledMeetingStatus.NotStarted ||
+            if (chatRoom.isActive() && !chatRoom.isArchived() && schedMeetStatus != null && (schedMeetStatus == ScheduledMeetingStatus.NotStarted ||
                     schedMeetStatus == ScheduledMeetingStatus.NotJoined)) {
 
                 startOrJoinMeetingBanner.setText(schedMeetStatus == ScheduledMeetingStatus.NotStarted ?
@@ -2079,14 +2079,17 @@ public class ChatActivity extends PasscodeActivity
                 startOrJoinMeetingBanner.setVisibility(View.GONE);
             }
 
-            if (chatState.getCurrentCallChatId() != MEGACHAT_INVALID_HANDLE) {
+            long callChatId = chatState.getCurrentCallChatId();
+
+            if (callChatId != MEGACHAT_INVALID_HANDLE) {
+                Timber.d("Open call with chat Id " + callChatId);
                 viewModel.removeCurrentCall();
                 Intent intentMeeting = new Intent(chatActivity, MeetingActivity.class);
                 intentMeeting.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intentMeeting.setAction(MEETING_ACTION_IN);
-                intentMeeting.putExtra(MEETING_CHAT_ID, chatState.getCurrentCallChatId());
-                intentMeeting.putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, true);
-                intentMeeting.putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, false);
+                intentMeeting.putExtra(MEETING_CHAT_ID, callChatId);
+                intentMeeting.putExtra(MeetingActivity.MEETING_AUDIO_ENABLE, chatState.getCurrentCallAudioStatus());
+                intentMeeting.putExtra(MeetingActivity.MEETING_VIDEO_ENABLE, chatState.getCurrentCallVideoStatus());
                 startActivity(intentMeeting);
             }
 
@@ -3700,7 +3703,7 @@ public class ChatActivity extends PasscodeActivity
      */
     private void startCall() {
         enableCallMenuItems(false);
-        viewModel.onCallTap(chatRoom.getChatId(), startVideo, true);
+        viewModel.onCallTap(startVideo);
     }
 
     private void enableCallMenuItems(Boolean enable) {
@@ -3833,7 +3836,9 @@ public class ChatActivity extends PasscodeActivity
                 break;
 
             case REQUEST_CAMERA:
-                startCall();
+                if(checkPermissionsCall()) {
+                    startCall();
+                }
                 break;
 
             case REQUEST_CAMERA_TAKE_PICTURE:
@@ -4591,7 +4596,10 @@ public class ChatActivity extends PasscodeActivity
                 break;
 
             case R.id.start_or_join_meeting_banner:
-                viewModel.startOrJoinSchedMeeting();
+                if (checkPermissionsCall()) {
+                    startVideo = false;
+                    startCall();
+                }
                 break;
 
         }

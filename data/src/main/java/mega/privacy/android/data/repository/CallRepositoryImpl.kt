@@ -238,6 +238,7 @@ internal class CallRepositoryImpl @Inject constructor(
     private fun onRequestCompleted(continuation: Continuation<ChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
+                Timber.d("Success")
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
             } else {
                 Timber.e("Error: ${error.errorString}")

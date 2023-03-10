@@ -14,5 +14,5 @@ android {
 }
 
 dependencies {
-    implementation "androidx.core:core-ktx:$ktxVersion"
+    implementation lib.kotlin.ktx
 }

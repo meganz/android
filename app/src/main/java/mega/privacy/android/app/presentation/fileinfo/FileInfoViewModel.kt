@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
+import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
@@ -39,6 +41,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
+import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
@@ -58,6 +61,7 @@ import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 /**
@@ -88,6 +92,8 @@ class FileInfoViewModel @Inject constructor(
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle,
     private val getOutShares: GetOutShares,
     private val getNodeLocationInfo: GetNodeLocationInfo,
+    private val isAvailableOffline: IsAvailableOffline,
+    private val setNodeAvailableOffline: SetNodeAvailableOffline,
     private val getNodeAccessPermission: GetNodeAccessPermission,
 ) : ViewModel() {
 
@@ -245,15 +251,41 @@ class FileInfoViewModel @Inject constructor(
     }
 
     /**
-     * Get latest value of [StorageState]
-     */
-    fun getStorageState(): StorageState = monitorStorageStateEvent.getState()
-
-    /**
      * change the state of isShareContactExpanded
      */
     fun expandOutSharesClick() {
         updateState { it.copy(isShareContactExpanded = !it.isShareContactExpanded) }
+    }
+
+    /**
+     * Change the current offline availability
+     */
+    fun availableOfflineChanged(
+        availableOffline: Boolean,
+        activity: WeakReference<Activity>,
+    ) {
+        if (availableOffline == _uiState.value.isAvailableOffline) return
+        if (availableOffline && monitorStorageStateEvent.getState() == StorageState.PayWall) {
+            updateState { it.copy(oneOffViewEvent = FileInfoOneOffViewEvent.OverDiskQuota) }
+            return
+        }
+        updateState {
+            it.copy(isAvailableOfflineEnabled = false) // to avoid multiple changes while changing
+        }
+        viewModelScope.launch {
+            setNodeAvailableOffline(
+                typedNode.id,
+                availableOffline,
+                activity
+            )
+            updateState {
+                it.copy(
+                    oneOffViewEvent = if (!availableOffline) FileInfoOneOffViewEvent.Message.RemovedOffline else null,
+                    isAvailableOffline = availableOffline,
+                    isAvailableOfflineEnabled = !typedNode.isTakenDown && !it.isNodeInRubbish,
+                )
+            }
+        }
     }
 
     private fun monitorNodeUpdates() =
@@ -338,11 +370,14 @@ class FileInfoViewModel @Inject constructor(
                 //a first cached fast version, later we'll ask for a fresh ContactItem
                 getContactItemFromInShareFolder(folderNode = it, skipCache = false)
             }
+            val isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue)
             uiState.copy(
                 title = typedNode.name,
                 isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
-                isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue),
+                isNodeInRubbish = isNodeInRubbish,
                 jobInProgressState = null,
+                isAvailableOffline = isAvailableOffline(typedNode),
+                isAvailableOfflineEnabled = !typedNode.isTakenDown && !isNodeInRubbish,
                 thumbnailUriString = (typedNode as? TypedFileNode)?.thumbnailPath
                     ?.let {
                         fileUtilWrapper.getFileIfExists(fileName = it)?.toURI()?.toString()
@@ -411,7 +446,6 @@ class FileInfoViewModel @Inject constructor(
             typedNode = getNodeById(NodeId(node.handle))
             it.copy(title = typedNode.name)
         }
-
     }
 
     private fun updateOutShares() = updateState {
