@@ -15,14 +15,14 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
-import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
 import mega.privacy.android.app.presentation.photos.model.DateCard
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
-import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.model.TimeBarTab
-import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.model.ZoomLevel
+import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMediaType
+import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
+import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
+import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import org.junit.After
 import org.junit.Before
@@ -73,6 +74,8 @@ class TimelineViewModelTest {
 
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
 
+    private val monitorCameraUploadProgress = mock<MonitorCameraUploadProgress>()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -88,6 +91,7 @@ class TimelineViewModelTest {
             ioDispatcher = StandardTestDispatcher(),
             mainDispatcher = StandardTestDispatcher(),
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
+            monitorCameraUploadProgress = monitorCameraUploadProgress,
         )
     }
 
@@ -251,6 +255,74 @@ class TimelineViewModelTest {
             underTest.state.test {
                 val state = awaitItem()
                 assertThat(state.shouldTriggerCameraUploads).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that when camera upload progress is received, then state is set properly`() =
+        runTest {
+            val expectedProgress = 50
+            val expectedPending = 25
+            val pair = Pair(expectedProgress, expectedPending)
+
+            whenever(monitorCameraUploadProgress()).thenReturn(flowOf(pair))
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.pending).isEqualTo(expectedPending)
+                assertThat(state.progressBarShowing).isEqualTo(true)
+                assertThat(state.progress).isEqualTo(expectedProgress.toFloat() / 100)
+            }
+        }
+
+    @Test
+    fun `test that when camera upload progress is received with pending 0, then progressBarShowing state is set to false`() =
+        runTest {
+            val expectedProgress = 50
+            val expectedPending = 0
+            val pair = Pair(expectedProgress, expectedPending)
+
+            whenever(monitorCameraUploadProgress()).thenReturn(flowOf(pair))
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.progressBarShowing).isEqualTo(false)
+            }
+        }
+
+    @Test
+    fun `test that when camera upload progress is received and some items are currently selected, the progressBarShowing state is set to false`() =
+        runTest {
+            val progress = flowOf(mock<Pair<Int, Int>>())
+
+            underTest.setSelectedPhotos(listOf(mock()))
+            whenever(monitorCameraUploadProgress()).thenReturn(progress)
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.progressBarShowing).isEqualTo(false)
+            }
+        }
+
+    @Test
+    fun `test that when camera upload progress is received and current view is not TimeBar ALL, the progressBarShowing state is set to false`() =
+        runTest {
+            val progress = flowOf(mock<Pair<Int, Int>>())
+
+            underTest.onTimeBarTabSelected(TimeBarTab.Years)
+            whenever(monitorCameraUploadProgress()).thenReturn(progress)
+
+            advanceUntilIdle()
+
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.progressBarShowing).isEqualTo(false)
             }
         }
 }

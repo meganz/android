@@ -3,10 +3,7 @@ package mega.privacy.android.app.presentation.photos
 import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.Manifest.permission.READ_MEDIA_IMAGES
 import android.Manifest.permission.READ_MEDIA_VIDEO
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -53,7 +50,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
@@ -87,12 +83,10 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurren
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUploadVideos
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setShowProgressBar
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingSortByDialog
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.updateFilterState
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.updateProgress
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomIn
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomOut
 import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
@@ -111,7 +105,6 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetThemeMode
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -198,7 +191,6 @@ class PhotosFragment : Fragment() {
     override fun onResume() {
         timelineViewModel.resetCUButtonAndProgress()
         albumsViewModel.revalidateInput()
-        registerCUUpdateReceiver()
         super.onResume()
     }
 
@@ -776,40 +768,6 @@ class PhotosFragment : Fragment() {
      */
     fun doesAccountHavePhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
 
-    /**
-     * Register Camera Upload Broadcast
-     */
-    private fun registerCUUpdateReceiver() {
-        val filter = IntentFilter(BroadcastConstants.ACTION_UPDATE_CU)
-        requireContext().registerReceiver(cuUpdateReceiver, filter)
-    }
-
-    /**
-     * Camera Upload Broadcast to recieve upload progress and pending file
-     */
-    private val cuUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val progress = intent.getIntExtra(BroadcastConstants.PROGRESS, 0)
-            val pending = intent.getIntExtra(BroadcastConstants.PENDING_TRANSFERS, 0)
-
-            updateProgressBarAndTextUI(progress, pending)
-        }
-    }
-
-    private fun updateProgressBarAndTextUI(progress: Int, pending: Int) {
-        val visible = pending > 0
-        if (timelineViewModel.state.value.selectedPhotoCount > 0 || !timelineViewModel.isInAllView()) {
-            timelineViewModel.setShowProgressBar(false)
-        } else {
-            // Check to avoid keeping setting same visibility
-            timelineViewModel.updateProgress(
-                pending, visible, progress.toFloat() / 100
-            )
-
-            Timber.d("CU Upload Progress: Pending: {$pending}, Progress: {$progress}")
-        }
-    }
-
     private fun deleteAlbums(albumIds: List<AlbumId>) {
         albumsViewModel.deleteAlbums(albumIds)
 
@@ -830,7 +788,6 @@ class PhotosFragment : Fragment() {
     }
 
     override fun onDestroy() {
-        requireContext().unregisterReceiver(cuUpdateReceiver)
         super.onDestroy()
     }
 }

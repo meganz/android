@@ -29,6 +29,7 @@ import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
+import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
@@ -66,6 +67,7 @@ import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
+import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.RenamePrimaryFolder
 import mega.privacy.android.domain.usecase.RenameSecondaryFolder
@@ -406,4 +408,12 @@ object TestCameraUploadUseCases {
     @Provides
     fun provideSetChargingRequiredForVideoCompression() =
         mock<SetChargingRequiredForVideoCompression>()
+
+    @Provides
+    fun provideBroadcastCameraUploadProgress() =
+        mock<BroadcastCameraUploadProgress>()
+
+    @Provides
+    fun provideMonitorCameraUploadsProgress() =
+        mock<MonitorCameraUploadProgress>()
 }
