@@ -99,6 +99,8 @@ import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapperImpl
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
+import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
+import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapperImpl
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
@@ -252,6 +254,9 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindCombinedChatRoomMapper(implementation: CombinedChatRoomMapperImpl): CombinedChatRoomMapper
+
+    @Binds
+    abstract fun bindFetchNodesUpdateMapper(implementation: FetchNodesUpdateMapperImpl): FetchNodesUpdateMapper
 
     companion object {
         /**
