@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 
 /**
@@ -109,4 +110,11 @@ interface LoginRepository {
      * @return Flow of [LoginStatus].
      */
     fun fastLoginFlow(session: String): Flow<LoginStatus>
+
+    /**
+     * Performs a fetch nodes.
+     *
+     * @return Flow of [FetchNodesUpdate].
+     */
+    fun fetchNodesFlow(): Flow<FetchNodesUpdate>
 }

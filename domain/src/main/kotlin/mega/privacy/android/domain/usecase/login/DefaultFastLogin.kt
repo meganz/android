@@ -4,8 +4,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
@@ -50,16 +48,15 @@ class DefaultFastLogin @Inject constructor(
             loginRepository.fastLoginFlow(session)
                 .collectLatest { loginStatus -> trySend(loginStatus) }
         }.onSuccess {
-            loginMutex.unlock()
             saveAccountCredentials()
-        }.onFailure {
             loginMutex.unlock()
-
+        }.onFailure {
             if (it !is LoginLoggedOutFromOtherLocation) {
                 chatLogout(disableChatApi)
                 resetChatSettings()
             }
 
+            loginMutex.unlock()
             throw it
         }
 

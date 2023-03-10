@@ -109,7 +109,6 @@ class FetchNodesUpdateMapperImplTest {
 
     @Test
     fun `test that correct Progress is returned with valid totalBytes`() {
-        val progress = transferredBytes.toFloat() / totalBytes.toFloat()
         val expectedUpdate = FetchNodesUpdate(Progress(progress), null)
         val request = mock<MegaRequest> {
             on { totalBytes }.thenReturn(totalBytes)
@@ -120,9 +119,9 @@ class FetchNodesUpdateMapperImplTest {
     }
 
     @Test
-    fun `test that negative progress returns 1F Progress`() {
+    fun `test that negative progress returns 0,99F Progress`() {
         transferredBytes = -1
-        val expectedUpdate = FetchNodesUpdate(Progress(1F), null)
+        val expectedUpdate = FetchNodesUpdate(Progress(0.99F), null)
         val request = mock<MegaRequest> {
             on { totalBytes }.thenReturn(totalBytes)
             on { transferredBytes }.thenReturn(transferredBytes)
@@ -132,9 +131,9 @@ class FetchNodesUpdateMapperImplTest {
     }
 
     @Test
-    fun `test that progress greater than 0,99 returns 1F Progress`() {
+    fun `test that progress greater than 0,99 returns 0,99F Progress`() {
         transferredBytes = 499L
-        val expectedUpdate = FetchNodesUpdate(Progress(1F), null)
+        val expectedUpdate = FetchNodesUpdate(Progress(0.99F), null)
         val request = mock<MegaRequest> {
             on { totalBytes }.thenReturn(totalBytes)
             on { transferredBytes }.thenReturn(transferredBytes)
@@ -145,7 +144,6 @@ class FetchNodesUpdateMapperImplTest {
 
     @Test
     fun `test that correct Progress is returned with valid totalBytes and error API_EAGAIN and value RETRY_RATE_LIMIT returns APIRate`() {
-        val progress = transferredBytes.toFloat() / totalBytes.toFloat()
         val expectedUpdate = FetchNodesUpdate(Progress(progress), FetchNodesTemporaryError.APIRate)
         val request = mock<MegaRequest> {
             on { totalBytes }.thenReturn(totalBytes)
@@ -157,5 +155,11 @@ class FetchNodesUpdateMapperImplTest {
         }
 
         Truth.assertThat(underTest(request, error)).isEqualTo(expectedUpdate)
+    }
+
+    @Test
+    fun `test that null request returns 1F Progress`() {
+        val expectedUpdate = FetchNodesUpdate(Progress(1F), null)
+        Truth.assertThat(underTest(null, null)).isEqualTo(expectedUpdate)
     }
 }

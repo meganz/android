@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.login.model
 
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.LoginException
 
 /**
@@ -11,7 +12,7 @@ import mega.privacy.android.domain.exception.LoginException
  * @property password                Typed password.
  * @property accountConfirmationLink Link for confirming a new account.
  * @property isFirstTime             True if account credentials are null for the first time
- * @property isFetchingNodes         True if it is fetching nodes, false otherwise.
+ * @property fetchNodesUpdate        [FetchNodesUpdate]. If not null, a fetch nodes is in progress.
  * @property isAlreadyLoggedIn       True if account credentials are not null, false otherwise.
  * @property pressedBackWhileLogin   True if pressed back while a login was in progress, false otherwise.
  * @property is2FAEnabled            True if should ask for 2FA, false otherwise.
@@ -39,7 +40,7 @@ data class LoginState(
     val accountSession: AccountSession? = null,
     val password: String? = null,
     val accountConfirmationLink: String? = null,
-    val isFetchingNodes: Boolean = false,
+    val fetchNodesUpdate: FetchNodesUpdate? = null,
     val isFirstTime: Boolean = false,
     val isAlreadyLoggedIn: Boolean = true,
     val pressedBackWhileLogin: Boolean = false,
@@ -61,7 +62,7 @@ data class LoginState(
     val isLocalLogoutInProgress: Boolean = false,
     val isLoginRequired: Boolean = false,
     val isLoginInProgress: Boolean = false,
-    val error: LoginException? = null,
+    val error: RuntimeException? = null,
 ) {
     companion object {
 

@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -15,6 +16,8 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
+import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.ChatLoggingOutException
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
@@ -27,6 +30,9 @@ import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginUnknownStatus
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
+import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
+import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
+import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.LoginRepository
 import nz.mega.sdk.MegaChatApi
@@ -52,6 +58,7 @@ internal class DefaultLoginRepository @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appEventGateway: AppEventGateway,
+    private val fetchNodesUpdateMapper: FetchNodesUpdateMapper,
 ) : LoginRepository {
 
     override suspend fun initMegaChat(session: String) =
@@ -275,4 +282,40 @@ internal class DefaultLoginRepository @Inject constructor(
 
     override fun fastLoginFlow(session: String) =
         loginRequest { megaApiGateway.fastLogin(session, it) }
+
+    override fun fetchNodesFlow(): Flow<FetchNodesUpdate> = callbackFlow {
+        val listener = OptionalMegaRequestListenerInterface(
+            onRequestStart = { Timber.d("onRequestStart: Fetch nodes") },
+            onRequestUpdate = { request ->
+                trySend(fetchNodesUpdateMapper(request, null))
+            },
+            onRequestTemporaryError = { request, error ->
+                Timber.w("onRequestTemporaryError: %s%d", request.requestString, error.errorCode)
+                trySend(fetchNodesUpdateMapper(request, error))
+            },
+            onRequestFinish = { request, error ->
+                when (error.errorCode) {
+                    MegaError.API_OK -> {
+                        trySend(fetchNodesUpdateMapper(null, null))
+                        close()
+                    }
+                    MegaError.API_EACCESS -> {
+                        Timber.e("Error API_EACCESS")
+                        close(FetchNodesErrorAccess(error.toException()))
+                    }
+                    MegaError.API_EBLOCKED -> {
+                        Timber.w("Suspended account - Reason: ${request.number}")
+                        close(FetchNodesBlockedAccount())
+                    }
+                    else -> {
+                        close(FetchNodesUnknownStatus(error.toException()))
+                    }
+                }
+
+            }
+        )
+
+        megaApiGateway.fetchNodes(listener)
+        awaitClose { megaApiGateway.removeRequestListener(listener) }
+    }
 }

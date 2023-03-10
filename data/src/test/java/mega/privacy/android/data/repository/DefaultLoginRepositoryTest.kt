@@ -10,6 +10,10 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
+import mega.privacy.android.domain.entity.Progress
+import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
+import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.ChatLoggingOutException
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
@@ -22,8 +26,12 @@ import mega.privacy.android.domain.exception.LoginTooManyAttempts
 import mega.privacy.android.domain.exception.LoginUnknownStatus
 import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
+import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
+import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
+import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaRequest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -41,6 +49,7 @@ class DefaultLoginRepositoryTest {
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val appEventGateway = mock<AppEventGateway>()
+    private val fetchNodesUpdateMapper = mock<FetchNodesUpdateMapper>()
 
     private val email = "test@email.com"
     private val password = "testPassword"
@@ -54,7 +63,8 @@ class DefaultLoginRepositoryTest {
             megaApiFolderGateway = megaApiFolderGateway,
             megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
-            appEventGateway = appEventGateway
+            appEventGateway = appEventGateway,
+            fetchNodesUpdateMapper = fetchNodesUpdateMapper,
         )
     }
 
@@ -507,4 +517,124 @@ class DefaultLoginRepositoryTest {
         underTest.refreshMegaChatUrl()
         verify(megaChatApiGateway).refreshUrl()
     }
+
+    @Test
+    fun `test that fetch nodes flow returns FetchNodesErrorAccess if the request fails with API_EACCESS`() =
+        runTest {
+            whenever(megaApiGateway.fetchNodes(any())).thenAnswer {
+                (it.arguments[0] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EACCESS) }
+                )
+            }
+
+            underTest.fetchNodesFlow().test {
+                assertThat(awaitError()).isInstanceOf(FetchNodesErrorAccess::class.java)
+            }
+        }
+
+    @Test
+    fun `test that fetch nodes flow returns FetchNodesBlockedAccount if the request fails with API_EBLOCKED`() =
+        runTest {
+            whenever(megaApiGateway.fetchNodes(any())).thenAnswer {
+                (it.arguments[0] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.API_EBLOCKED) }
+                )
+            }
+
+            underTest.fetchNodesFlow().test {
+                assertThat(awaitError()).isInstanceOf(FetchNodesBlockedAccount::class.java)
+            }
+        }
+
+    @Test
+    fun `test that fetch nodes flow returns FetchNodesUnknownStatus if the request fails with non contemplated error`() =
+        runTest {
+            whenever(megaApiGateway.fetchNodes(any())).thenAnswer {
+                (it.arguments[0] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    mock(),
+                    mock { on { errorCode }.thenReturn(MegaError.LOCAL_ENOSPC) }
+                )
+            }
+
+            underTest.fetchNodesFlow().test {
+                assertThat(awaitError()).isInstanceOf(FetchNodesUnknownStatus::class.java)
+            }
+        }
+
+    @Test
+    fun `test that fetch nodes flow returns FetchNodesUpdate with only Progress when onRequestUpdate`() =
+        runTest {
+            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+            val request = mock<MegaRequest> {
+                on { totalBytes }.thenReturn(500L)
+                on { transferredBytes }.thenReturn(350L)
+            }
+            val expectedProgress = Progress((350 / 500).toFloat())
+            val expectedUpdate = FetchNodesUpdate(expectedProgress, null)
+
+            whenever(fetchNodesUpdateMapper(request, null)).thenReturn(expectedUpdate)
+
+            underTest.fetchNodesFlow().test {
+                verify(megaApiGateway).fetchNodes(listenerCaptor.capture())
+                val listener = listenerCaptor.firstValue
+                listener.onRequestUpdate(mock(), request)
+                assertThat(awaitItem()).isEqualTo(expectedUpdate)
+                assertThat(expectedUpdate.progress).isEqualTo(expectedProgress)
+                assertThat(expectedUpdate.temporaryError).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that fetch nodes flow returns FetchNodesUpdate with Progress and FetchNodesTemporaryError when onRequestTemporaryError`() =
+        runTest {
+            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+            val request = mock<MegaRequest> {
+                on { totalBytes }.thenReturn(500L)
+                on { transferredBytes }.thenReturn(350L)
+            }
+            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EAGAIN) }
+            val expectedProgress = Progress((350 / 500).toFloat())
+            val expectedUpdate =
+                FetchNodesUpdate(expectedProgress, FetchNodesTemporaryError.ServerIssues)
+
+            whenever(fetchNodesUpdateMapper(request, error)).thenReturn(expectedUpdate)
+
+            underTest.fetchNodesFlow().test {
+                verify(megaApiGateway).fetchNodes(listenerCaptor.capture())
+                val listener = listenerCaptor.firstValue
+                listener.onRequestTemporaryError(mock(), request, error)
+                assertThat(awaitItem()).isEqualTo(expectedUpdate)
+                assertThat(expectedUpdate.progress).isEqualTo(expectedProgress)
+                assertThat(expectedUpdate.temporaryError)
+                    .isEqualTo(FetchNodesTemporaryError.ServerIssues)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that fetch nodes flow returns FetchNodesUpdate with only complete Progress when request finish with success`() =
+        runTest {
+            val listenerCaptor = argumentCaptor<OptionalMegaRequestListenerInterface>()
+            val error = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
+            val expectedProgress = Progress(1F)
+            val expectedUpdate = FetchNodesUpdate(expectedProgress, null)
+
+            whenever(fetchNodesUpdateMapper(null, null)).thenReturn(expectedUpdate)
+
+            underTest.fetchNodesFlow().test {
+                verify(megaApiGateway).fetchNodes(listenerCaptor.capture())
+                val listener = listenerCaptor.firstValue
+                listener.onRequestFinish(mock(), mock(), error)
+                assertThat(awaitItem()).isEqualTo(expectedUpdate)
+                assertThat(expectedUpdate.progress).isEqualTo(expectedProgress)
+                assertThat(expectedUpdate.temporaryError).isNull()
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 }

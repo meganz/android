@@ -47,11 +47,9 @@ class DefaultLogin @Inject constructor(
             runCatching {
                 emitAll(loginRepository.login(email, password))
             }.onSuccess {
-                loginMutex.unlock()
                 saveAccountCredentials()
-            }.onFailure {
                 loginMutex.unlock()
-
+            }.onFailure {
                 if (it !is LoginLoggedOutFromOtherLocation
                     && it !is LoginMultiFactorAuthRequired
                 ) {
@@ -59,6 +57,7 @@ class DefaultLogin @Inject constructor(
                     resetChatSettings()
                 }
 
+                loginMutex.unlock()
                 throw it
             }
         }

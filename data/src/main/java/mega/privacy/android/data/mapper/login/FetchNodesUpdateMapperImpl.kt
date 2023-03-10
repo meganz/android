@@ -13,19 +13,17 @@ import javax.inject.Inject
  */
 internal class FetchNodesUpdateMapperImpl @Inject constructor() : FetchNodesUpdateMapper {
 
-    override fun invoke(request: MegaRequest, error: MegaError?) =
+    override fun invoke(request: MegaRequest?, error: MegaError?) =
         FetchNodesUpdate(getProgress(request), getTemporaryError(error))
 
-    private fun getProgress(request: MegaRequest) = with(request) {
-        Progress(
-            if (totalBytes > 0) {
-                val progress = transferredBytes.toFloat() / totalBytes.toFloat()
-                if (progress > 0.99 || progress < 0) 1F else progress
-            } else {
-                0F
-            }
-        )
-    }
+    private fun getProgress(request: MegaRequest?) = Progress(request?.run {
+        if (totalBytes > 0) {
+            val progress = transferredBytes.toFloat() / totalBytes.toFloat()
+            if (progress > 0.99 || progress < 0) 0.99F else progress
+        } else {
+            0F
+        }
+    } ?: 1F)
 
     private fun getTemporaryError(error: MegaError?) = error?.let {
         when (it.errorCode) {

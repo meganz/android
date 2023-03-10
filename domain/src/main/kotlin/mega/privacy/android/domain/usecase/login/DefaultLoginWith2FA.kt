@@ -31,11 +31,11 @@ class DefaultLoginWith2FA @Inject constructor(
     ) = loginRepository.multiFactorAuthLogin(email, password, pin2FA)
         .onStart { loginMutex.lock() }
         .onCompletion { exception ->
-            loginMutex.unlock()
-
             if (exception == null) {
                 saveAccountCredentials()
             }
+
+            loginMutex.unlock()
         }.catch {
             if (it !is LoginLoggedOutFromOtherLocation
                 && it !is LoginWrongMultiFactorAuth

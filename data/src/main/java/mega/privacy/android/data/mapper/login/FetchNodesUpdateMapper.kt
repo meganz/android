@@ -12,8 +12,8 @@ internal fun interface FetchNodesUpdateMapper {
     /**
      * Invoke.
      *
-     * @param request [MegaRequest].
-     * @param error [MegaError].
+     * @param request [MegaRequest]. If null means the request finished.
+     * @param error [MegaError]. If null means there is a request update or the request finished.
      */
-    operator fun invoke(request: MegaRequest, error: MegaError?): FetchNodesUpdate
+    operator fun invoke(request: MegaRequest?, error: MegaError?): FetchNodesUpdate
 }

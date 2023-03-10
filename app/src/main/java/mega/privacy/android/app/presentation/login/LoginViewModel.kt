@@ -23,10 +23,13 @@ import mega.privacy.android.app.presentation.login.model.LoginState.Companion.CL
 import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
+import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
+import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.usecase.CancelTransfers
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.GetAccountCredentials
@@ -40,9 +43,9 @@ import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
-import mega.privacy.android.domain.usecase.login.ChatLogout
 import mega.privacy.android.domain.usecase.login.DisableChatApi
 import mega.privacy.android.domain.usecase.login.FastLogin
+import mega.privacy.android.domain.usecase.login.FetchNodes
 import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.login.Login
 import mega.privacy.android.domain.usecase.login.LoginWith2FA
@@ -71,10 +74,10 @@ class LoginViewModel @Inject constructor(
     private val querySignupLink: QuerySignupLink,
     private val cancelTransfers: CancelTransfers,
     private val localLogout: LocalLogout,
-    private val chatLogout: ChatLogout,
     private val login: Login,
     private val loginWith2FA: LoginWith2FA,
     private val fastLogin: FastLogin,
+    private val fetchNodes: FetchNodes,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -138,13 +141,8 @@ class LoginViewModel @Inject constructor(
             }
         }
 
-        initChatSettings()
+        viewModelScope.launch { resetChatSettings() }
     }
-
-    /**
-     * Reset chat settings.
-     */
-    fun initChatSettings() = viewModelScope.launch { resetChatSettings() }
 
     /**
      * Updates state with a new intentAction.
@@ -153,13 +151,6 @@ class LoginViewModel @Inject constructor(
      */
     fun setIntentAction(intentAction: String) {
         _state.update { it.copy(intentAction = intentAction) }
-    }
-
-    /**
-     * Updates isFirstFetchNodesUpdate as true in state.
-     */
-    fun updateFetchNodesUpdate() {
-        _state.update { it.copy(isFirstFetchNodesUpdate = false) }
     }
 
     /**
@@ -185,7 +176,7 @@ class LoginViewModel @Inject constructor(
             it.copy(
                 pressedBackWhileLogin = true,
                 isAlreadyLoggedIn = false,
-                isFetchingNodes = false,
+                fetchNodesUpdate = null,
                 is2FARequired = false,
                 is2FAEnabled = false,
                 was2FAErrorShown = false,
@@ -372,13 +363,6 @@ class LoginViewModel @Inject constructor(
     fun launchCancelTransfers() = viewModelScope.launch { cancelTransfers() }
 
     /**
-     * ChatLogout.
-     */
-    fun performChatLogout() = viewModelScope.launch {
-        chatLogout(DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi })
-    }
-
-    /**
      * Login.
      */
     fun performLogin() = viewModelScope.launch {
@@ -482,7 +466,6 @@ class LoginViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isLoginInProgress = false,
-                        isFetchingNodes = true,
                         is2FARequired = false,
                         isAlreadyLoggedIn = true
                     )
@@ -499,6 +482,26 @@ class LoginViewModel @Inject constructor(
      * Fetch nodes.
      */
     fun performFetchNodes() = viewModelScope.launch {
+        MegaApplication.getInstance().checkEnabledCookies()
+        _state.update { it.copy(fetchNodesUpdate = FetchNodesUpdate()) }
 
+        runCatching {
+            fetchNodes().collectLatest { update ->
+                _state.update { it.copy(fetchNodesUpdate = update) }
+            }
+        }.onFailure {
+            if (it !is FetchNodesException) return@launch
+
+            MegaApplication.isLoggingIn = false
+            _state.update { state ->
+                state.copy(
+                    isLoginInProgress = false,
+                    isLoginRequired = true,
+                    is2FAEnabled = false,
+                    is2FARequired = false,
+                    error = if (it is FetchNodesErrorAccess && !state.pressedBackWhileLogin) it else null
+                )
+            }
+        }.onSuccess { MegaApplication.isLoggingIn = false }
     }
 }
