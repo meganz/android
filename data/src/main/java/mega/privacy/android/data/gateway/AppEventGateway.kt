@@ -10,9 +10,28 @@ internal interface AppEventGateway {
     val monitorCameraUploadPauseState: Flow<Boolean>
 
     /**
+     * Monitor camera upload progress
+     *
+     * The value returned is a Pair of
+     *
+     * [Int] value representing progress between 0 and 100;
+     * [Int] value representing pending elements waiting for upload
+     */
+    val monitorCameraUploadProgress: Flow<Pair<Int, Int>>
+
+    /**
      * Broadcast upload pause state
      */
     suspend fun broadcastUploadPauseState()
+
+    /**
+     * Broadcast camera upload progress
+     *
+     * @param progress represents progress between 0 and 100
+     * @param pending represents elements waiting for upload
+     */
+    suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int)
+
 
     /**
      * Set the status for SMSVerification

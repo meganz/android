@@ -524,7 +524,13 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override fun monitorCameraUploadPauseState() = appEventGateway.monitorCameraUploadPauseState
 
+    override fun monitorCameraUploadProgress(): Flow<Pair<Int, Int>> =
+        appEventGateway.monitorCameraUploadProgress
+
     override suspend fun broadcastUploadPauseState() = appEventGateway.broadcastUploadPauseState()
+
+    override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) =
+        appEventGateway.broadcastCameraUploadProgress(progress, pending)
 
     override fun monitorBatteryInfo() = broadcastReceiverGateway.monitorBatteryInfo
 
