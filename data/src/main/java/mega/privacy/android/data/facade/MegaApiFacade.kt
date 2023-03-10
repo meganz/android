@@ -1027,4 +1027,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun getAccess(megaNode: MegaNode) =
         megaApi.getAccess(megaNode)
+
+    override fun stopSharingNode(megaNode: MegaNode) {
+        megaApi.disableExport(megaNode)
+    }
 }

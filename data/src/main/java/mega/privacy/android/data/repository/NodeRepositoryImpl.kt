@@ -262,6 +262,12 @@ internal class NodeRepositoryImpl @Inject constructor(
         appEventGateway.setUpgradeSecurity(isSecurityUpgrade)
     }
 
+    override suspend fun stopSharingNode(nodeId: NodeId): Unit = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
+            megaApiGateway.stopSharingNode(it)
+        }
+    }
+
     override suspend fun loadOfflineNodes(
         path: String,
         searchQuery: String?,

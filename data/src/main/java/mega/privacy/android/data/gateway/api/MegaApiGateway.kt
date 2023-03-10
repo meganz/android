@@ -1988,4 +1988,12 @@ interface MegaApiGateway {
      * @return The access level of the sharing
      */
     fun getAccess(megaNode: MegaNode): Int
+
+    /**
+     * Stop sharing a file/folder node
+     *
+     *
+     * @param megaNode [MegaNode] to stop sharing
+     */
+    fun stopSharingNode(megaNode: MegaNode)
 }

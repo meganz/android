@@ -8,7 +8,11 @@ import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.StopSharingNode
 
+/**
+ * Provide use-cases related to share nodes
+ */
 @Module
 @DisableInstallInCheck
 abstract class InternalSharesModule {
@@ -26,5 +30,12 @@ abstract class InternalSharesModule {
         @Provides
         fun provideGetNodeAccessPermission(repository: NodeRepository) =
             GetNodeAccessPermission(repository::getNodeAccessPermission)
+
+        /**
+         * Provides [StopSharingNode] use-case
+         */
+        @Provides
+        fun provideStopSharingNode(repository: NodeRepository) =
+            StopSharingNode(repository::stopSharingNode)
     }
 }

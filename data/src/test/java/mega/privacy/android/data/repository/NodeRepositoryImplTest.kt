@@ -124,6 +124,15 @@ class NodeRepositoryImplTest {
         verify(megaApiGateway, times(1)).getAccess(node)
     }
 
+    @Test
+    fun `test when stopSharingNode is called then api gateway stopSharingNode is called with the proper node`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            underTest.stopSharingNode(nodeId)
+            verify(megaApiGateway, times(1)).stopSharingNode(megaNode)
+        }
+
     private suspend fun mockFolderInfoResponse() {
         val fileNode: MegaNode = mock()
         whenever(folderNode.id).thenReturn(nodeId)

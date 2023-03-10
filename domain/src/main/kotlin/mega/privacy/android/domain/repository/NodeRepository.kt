@@ -153,6 +153,12 @@ interface NodeRepository {
     suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean)
 
     /**
+     * Stop sharing a node
+     * @param nodeId the [NodeId] of the node we want to stop sharing
+     */
+    suspend fun stopSharingNode(nodeId: NodeId)
+
+    /**
      * Load offline nodes
      *
      * @param path         Node path
