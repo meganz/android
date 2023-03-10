@@ -1608,7 +1608,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         rootNode = megaApi.rootNode
         if (rootNode == null || LoginActivity.isBackFromLoginPage || isHeartBeatAlive) {
             Timber.d("Action: %s", intent.action)
-            if (intent.action?.let { handleRedirectIntentActions(it) } == false) {
+            if (!handleRedirectIntentActions(intent.action)) {
                 refreshSession()
             }
             return true
@@ -2049,7 +2049,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
     }
 
-    private fun handleRedirectIntentActions(action: String): Boolean {
+    private fun handleRedirectIntentActions(action: String?): Boolean {
         when (action) {
             Constants.ACTION_IMPORT_LINK_FETCH_NODES -> {
                 val loginIntent = Intent(this, LoginActivity::class.java)
