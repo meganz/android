@@ -1,9 +1,10 @@
 [versions]
 appcompat = "1.6.1"
 biometric = "1.1.0"
+camera-view = "1.0.0-alpha32"
+camera-lifecycle = "1.0.0"
 cardview = "1.0.0"
 constraintlayout = "2.1.4"
-camerax = "1.2.1"
 compose-activity = "1.6.1"
 compose-bom = "2022.10.00"
 compose-compiler = "1.4.3"
@@ -29,8 +30,8 @@ appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat"
 biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 cardview = { module = "androidx.cardview:cardview", version.ref = "cardview" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
-camera-view = { module = "androidx.camera:camera-view", version.ref = "camerax" }
-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }
+camera-view = { module = "androidx.camera:camera-view", version.ref = "camera-view" }
+camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camera-lifecycle" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
