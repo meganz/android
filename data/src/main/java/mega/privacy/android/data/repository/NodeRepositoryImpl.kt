@@ -265,13 +265,9 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun loadOfflineNodes(
         path: String,
         searchQuery: String?,
-    ): List<OfflineNodeInformation> {
-        val offlineNodeInformationList = mutableListOf<OfflineNodeInformation>()
-        withContext(ioDispatcher) {
-            megaLocalStorageGateway.loadOfflineNodes(path, searchQuery).forEach {
-                offlineNodeInformationList.add(offlineNodeInformationMapper(it))
-            }
+    ): List<OfflineNodeInformation> = withContext(ioDispatcher) {
+        megaLocalStorageGateway.loadOfflineNodes(path, searchQuery).map {
+            offlineNodeInformationMapper(it)
         }
-        return offlineNodeInformationList
     }
 }
