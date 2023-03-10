@@ -62,7 +62,6 @@ object BroadcastConstants {
     const val ACTION_REFRESH_CLEAR_OFFLINE_SETTING = "ACTION_REFRESH_CLEAR_OFFLINE_SETTING"
     const val ACTION_UPDATE_RB_SCHEDULER = "ACTION_UPDATE_RB_SCHEDULER"
     const val ACTION_UPDATE_RETENTION_TIME = "ACTION_UPDATE_RETENTION_TIME"
-    const val ACTION_UPDATE_CU = "ACTION_UPDATE_CU"
 
     //    Broadcasts' extras
     const val EVENT_TEXT = "EVENT_TEXT"
@@ -87,8 +86,6 @@ object BroadcastConstants {
     const val RETENTION_TIME = "RETENTION_TIME"
     const val PENDING_MESSAGE_ID = "PENDING_MESSAGE_ID"
     const val ERROR_MESSAGE_TEXT = "ERROR_MESSAGE_TEXT"
-    const val PROGRESS = "PROGRESS"
-    const val PENDING_TRANSFERS = "PENDING_TRANSFERS"
     const val NODE_NAME = "NODE_NAME"
     const val NODE_HANDLE = "NODE_HANDLE"
     const val NODE_LOCAL_PATH = "NODE_LOCAL_PATH"

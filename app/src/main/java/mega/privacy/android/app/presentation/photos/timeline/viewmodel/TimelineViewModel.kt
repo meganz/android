@@ -41,6 +41,7 @@ import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
+import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
@@ -63,6 +64,7 @@ import javax.inject.Inject
  * @property ioDispatcher
  * @property mainDispatcher
  * @property checkEnableCameraUploadsStatus
+ * @param monitorCameraUploadProgress
  */
 @HiltViewModel
 class TimelineViewModel @Inject constructor(
@@ -77,6 +79,7 @@ class TimelineViewModel @Inject constructor(
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
+    monitorCameraUploadProgress: MonitorCameraUploadProgress,
 ) : ViewModel() {
 
     internal val _state = MutableStateFlow(TimelineViewState(loadPhotosDone = false))
@@ -99,6 +102,35 @@ class TimelineViewModel @Inject constructor(
                         showingPhotos = showingPhotos
                     )
                 }
+        }
+        viewModelScope.launch {
+            monitorCameraUploadProgress().collectLatest {
+                updateCameraUploadProgressIfNeeded(progress = it.first, pending = it.second)
+            }
+        }
+    }
+
+    /**
+     * Update the camera upload progress if needed
+     *
+     * The progress is set to the state only if no photos are currently selected or
+     * the current view is not [TimeBarTab.All]
+     *
+     * @param progress value between 0 and 100
+     * @param pending count of pending items to be uploaded
+     */
+    private fun updateCameraUploadProgressIfNeeded(progress: Int, pending: Int) {
+        if (state.value.selectedPhotoCount > 0 || !isInAllView()) {
+            setShowProgressBar(show = false)
+        } else {
+            // Check to avoid keeping setting same visibility
+            updateProgress(
+                pending = pending,
+                showProgress = pending > 0,
+                progress = progress.toFloat() / 100
+            )
+
+            Timber.d("CU Upload Progress: Pending: {$pending}, Progress: {$progress}")
         }
     }
 

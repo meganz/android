@@ -26,6 +26,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication
@@ -75,7 +76,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ImageProcessor
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.PreviewUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
@@ -87,6 +87,8 @@ import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.qualifier.MainDispatcher
+import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.ClearSyncRecords
 import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
@@ -167,11 +169,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
          * is aborted prematurely
          */
         const val EXTRA_ABORTED = "EXTRA_ABORTED"
-
-        /**
-         * Camera Uploads Cache Folder
-         */
-        private const val CU_CACHE_FOLDER = "cu"
     }
 
     /**
@@ -387,11 +384,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     lateinit var syncRecordTypeIntMapper: SyncRecordTypeIntMapper
 
     /**
-     * Coroutine dispatcher for camera upload work
+     * IO dispatcher for camera upload work
      */
     @IoDispatcher
     @Inject
     lateinit var ioDispatcher: CoroutineDispatcher
+
+    /**
+     * Main dispatcher for camera upload work
+     */
+    @MainDispatcher
+    @Inject
+    lateinit var mainDispatcher: CoroutineDispatcher
 
     /**
      * Monitor camera upload pause state
@@ -548,6 +552,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      */
     @Inject
     lateinit var deleteCameraUploadTemporaryRootDirectory: DeleteCameraUploadTemporaryRootDirectory
+
+    /**
+     * Broadcast camera upload progress
+     */
+    @Inject
+    lateinit var broadcastCameraUploadProgress: BroadcastCameraUploadProgress
 
     /**
      * Coroutine Scope for camera upload work
@@ -1642,6 +1652,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         if (coroutineScope?.isActive == true) {
             sendStatusToBackupCenter(aborted = aborted)
             cancelAllPendingTransfers()
+            broadcastProgress(100, 0)
             videoCompressionJob?.cancel()
             coroutineScope?.cancel(CancellationException(cancelMessage))
         }
@@ -1825,13 +1836,18 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             } else {
                 Timber.d("No pending videos, finish")
                 onQueueComplete()
-                sendBroadcast(
-                    Intent(BroadcastConstants.ACTION_UPDATE_CU)
-                        .putExtra(BroadcastConstants.PROGRESS, 100)
-                        .putExtra(BroadcastConstants.PENDING_TRANSFERS, 0)
-                )
             }
         }
+    }
+
+    /**
+     * Broadcast progress
+     *
+     * @param progress a value between 0 and 100
+     * @param pending count of items pending to be uploaded
+     */
+    private suspend fun broadcastProgress(progress: Int, pending: Int) {
+        broadcastCameraUploadProgress(progress, pending)
     }
 
     private fun isCompressorAvailable() = !(videoCompressionJob?.isActive ?: false)
@@ -2023,8 +2039,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         }
     }
 
-    @Synchronized
-    private fun updateProgressNotification() {
+    private suspend fun updateProgressNotification() {
         // refresh UI every 1 seconds to avoid too much workload on main thread
         val now = System.currentTimeMillis()
         lastUpdated = if (now - lastUpdated > Util.ONTRANSFERUPDATE_REFRESH_MILLIS) {
@@ -2053,20 +2068,16 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                 totalTransfers - pendingTransfers + 1
             }
 
-            sendBroadcast(
-                Intent(BroadcastConstants.ACTION_UPDATE_CU)
-                    .putExtra(BroadcastConstants.PROGRESS, progressPercent)
-                    .putExtra(BroadcastConstants.PENDING_TRANSFERS, pendingTransfers)
-            )
+            broadcastProgress(progressPercent, pendingTransfers)
 
             message = if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
-                StringResourcesUtils.getString(
+                getString(
                     R.string.upload_service_notification_paused,
                     inProgress,
                     totalTransfers
                 )
             } else {
-                StringResourcesUtils.getString(
+                getString(
                     R.string.upload_service_notification,
                     inProgress,
                     totalTransfers
@@ -2077,13 +2088,15 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         val info =
             Util.getProgressSize(this, totalSizeTransferred, totalSizePendingTransfer)
 
-        showProgressNotification(
-            progressPercent,
-            defaultPendingIntent,
-            message,
-            info,
-            getString(R.string.settings_camera_notif_title)
-        )
+        withContext(mainDispatcher) {
+            showProgressNotification(
+                progressPercent,
+                defaultPendingIntent,
+                message,
+                info,
+                getString(R.string.settings_camera_notif_title)
+            )
+        }
     }
 
     private fun createNotification(
