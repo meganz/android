@@ -1,0 +1,26 @@
+[versions]
+gradle = '7.2.2'
+lint = '30.2.2'
+kotlin = '1.7.20'
+navigation = '2.5.3'
+google-services = '4.3.10'
+hilt = "2.42"
+firebase-crashlytics = "2.8.1"
+firebase-performance = "1.4.2"
+firebase-app-distribution = "3.0.1"
+jacoco = '0.8.8'
+paparazzi = "1.0.0"
+jfrog = '4.29.2'
+
+[libraries]
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebase-crashlytics" }
+firebase-performance = { module = "com.google.firebase:perf-plugin", version.ref = "firebase-performance" }
+firebase-app-distribution = { module = "com.google.firebase:firebase-appdistribution-gradle", version.ref = "firebase-app-distribution" }
+build-tools = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+google-services = { module = "com.google.gms:google-services", version.ref = "google-services" }
+hilt-android = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }
+jacoco = { module = "org.jacoco:org.jacoco.core", version.ref = "jacoco" }
+kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+navigation-safeargs = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
+paparazzi = { module = "app.cash.paparazzi:paparazzi-gradle-plugin", version.ref = "paparazzi" }
+jfrog = { module = "org.jfrog.buildinfo:build-info-extractor-gradle", version.ref = "jfrog" }

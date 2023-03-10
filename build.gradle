@@ -1,39 +1,27 @@
 apply from: "tools/util.gradle"
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.gradleVersion = '7.2.2'
     ext.lintVersion = '30.2.2' // = gradleVersion + 23.0.0
     ext.kotlinVersion = '1.7.20'
-    ext.navigationVersion = '2.4.2'
-    ext.googleServicesVersion = '4.3.10'
     ext.hiltVersion = "2.42"
-    ext.firebaseCrashlyticsVersion = "2.8.1"
-    ext.firebasePerformanceVersion = "1.4.2"
-    ext.firebaseAppDistribution = "3.0.1"
-    ext.jacocoVersion = '0.8.8'
-    ext.paparazziVersion = "1.0.0"
-    ext.jfrogArtifactoryVersion = '4.29.2'
+
     repositories {
         google()
         maven { url "https://plugins.gradle.org/m2/" }
         jcenter()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:$gradleVersion"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navigationVersion"
-        classpath "com.google.gms:google-services:$googleServicesVersion"
-        classpath "com.google.dagger:hilt-android-gradle-plugin:$hiltVersion"
-        classpath "com.google.firebase:firebase-crashlytics-gradle:$firebaseCrashlyticsVersion"
-        classpath "com.google.firebase:perf-plugin:$firebasePerformanceVersion"
-        classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistribution"
-        //Jacoco Plugin for code coverage
-        classpath "org.jacoco:org.jacoco.core:$jacocoVersion"
-        classpath "app.cash.paparazzi:paparazzi-gradle-plugin:$paparazziVersion"
-        // jfrog artifactory publish&resolve
-        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:$jfrogArtifactoryVersion"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath plugin.build.tools
+        classpath plugin.kotlin.gradle
+        classpath plugin.navigation.safeargs
+        classpath plugin.google.services
+        classpath plugin.hilt.android
+        classpath plugin.firebase.crashlytics
+        classpath plugin.firebase.performance
+        classpath plugin.firebase.app.distribution
+        classpath plugin.jacoco
+        classpath plugin.paparazzi
+        classpath plugin.jfrog
     }
 }
 
