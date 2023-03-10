@@ -42,7 +42,6 @@ import mega.privacy.android.app.databinding.ActivityTwoFactorAuthenticationBindi
 import mega.privacy.android.app.databinding.Dialog2faHelpBinding
 import mega.privacy.android.app.databinding.DialogNoAuthenticationAppsBinding
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.app.utils.ColorUtils
@@ -123,7 +122,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
         supportActionBar?.apply {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
-            title = getFormattedStringOrDefault(R.string.settings_2fa)
+            title = getString(R.string.settings_2fa)
         }
 
         if (savedInstanceState == null) {
@@ -153,7 +152,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
             }
         }
         val explainQrText =
-            SpannableString(getFormattedStringOrDefault(R.string.explain_qr_seed_2fa_2) + "  QM")
+            SpannableString("${getString(R.string.explain_qr_seed_2fa_2)} QM")
         ContextCompat.getDrawable(this, R.drawable.ic_question_mark)?.apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 colorFilter =
@@ -230,7 +229,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                     buttonDismissRk.isVisible = rkSaved
                 }
                 else -> {
-                    megaApi.multiFactorAuthGetCode(this@TwoFactorAuthenticationActivity)
+                    viewModel.getAuthenticationCode()
                     scrollContainer2fa.visibility = View.VISIBLE
                     listOf(
                         scrollContainerVerify,
@@ -314,7 +313,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                 )
             )
             if (seed == null) {
-                megaApi.multiFactorAuthGetCode(this@TwoFactorAuthenticationActivity)
+                viewModel.getAuthenticationCode()
             } else {
                 Timber.d("Seed not null")
                 setSeed()
@@ -771,7 +770,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                             passFifth,
                             passSixth
                         ).forEachIndexed { index, pin ->
-                            pin.setText("" + code[index])
+                            pin.setText(code[index].toString())
                         }
                     }
                 } else {
@@ -821,6 +820,17 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
         this.collectFlow(viewModel.uiState) { state ->
             handleEnableMultiFactorAuthState(state)
             handleIsMasterKeyExported(state)
+            handleGetting2FACode(state)
+        }
+    }
+
+    private fun handleGetting2FACode(state: TwoFactorAuthenticationUIState) {
+        if (state.is2FAFetchCompleted) {
+            seed?.let {
+                this@TwoFactorAuthenticationActivity.seed = it
+                binding.qrProgressBar.visibility = View.VISIBLE
+                generate2FAQR()
+            } ?: showSnackbar(getString(R.string.qr_seed_text_error))
         }
     }
 
@@ -877,22 +887,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish")
         when (request.type) {
-            MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET -> {
-                Timber.d("MegaRequest.TYPE_MULTI_FACTOR_AUTH_GET")
-                if (e.errorCode == MegaError.API_OK) {
-                    Timber.d("MegaError.API_OK")
-                    seed = request.text
-                    if (seed == null) {
-                        showSnackbar(getString(R.string.qr_seed_text_error))
-                    } else {
-                        binding.qrProgressBar.visibility = View.VISIBLE
-                        generate2FAQR()
-                    }
-                } else {
-                    Timber.e("e.getErrorCode(): ${e.errorCode}")
-                    showSnackbar(getString(R.string.qr_seed_text_error))
-                }
-            }
             MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK -> {
                 if (e.errorCode == MegaError.API_OK) {
                     Timber.d("TYPE_MULTI_FACTOR_AUTH_CHECK: ${request.flag}")
