@@ -83,7 +83,7 @@ public class NodeController {
         }
     }
 
-    public void chooseLocationToCopyNodes(ArrayList<Long> handleList) {
+    public void chooseLocationToCopyNodes(List<Long> handleList) {
         Timber.d("chooseLocationToCopyNodes");
         Intent intent = new Intent(context, FileExplorerActivity.class);
         intent.setAction(FileExplorerActivity.ACTION_PICK_COPY_FOLDER);
@@ -135,7 +135,7 @@ public class NodeController {
 
     }
 
-    public void chooseLocationToMoveNodes(ArrayList<Long> handleList) {
+    public void chooseLocationToMoveNodes(List<Long> handleList) {
         Timber.d("chooseLocationToMoveNodes");
         Intent intent = new Intent(context, FileExplorerActivity.class);
         intent.setAction(FileExplorerActivity.ACTION_PICK_MOVE_FOLDER);

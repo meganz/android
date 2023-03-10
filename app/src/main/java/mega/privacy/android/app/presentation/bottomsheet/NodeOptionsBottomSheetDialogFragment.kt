@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.bottomsheet
 
-import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -36,7 +35,10 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog
-import mega.privacy.android.app.presentation.bottomsheet.model.NodeOptionsBottomSheetState
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.MODE_KEY
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.NODE_ID_KEY
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.SHARE_DATA_KEY
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -66,6 +68,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -75,35 +78,22 @@ import java.io.File
 import java.util.stream.Collectors
 
 @AndroidEntryPoint
-class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View.OnClickListener {
+class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     /**
      * Values used to control the display of option separators
      */
-    private var counterOpen = 2
-    private var counterSave = 2
-    private var counterShares = 6
-    private var counterModify = 4
-    private var mMode = 0
-    private var node: MegaNode? = null
-    private var shareData: ShareData? = null
+
+    private var mode = DEFAULT_MODE
     private lateinit var nodeController: NodeController
     private lateinit var nodeInfo: TextView
     private var drawerItem: DrawerItem? = null
     private var cannotOpenFileDialog: AlertDialog? = null
     private var user: MegaUser? = null
 
+
+    private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val searchViewModel: SearchViewModel by viewModels()
-    private val nodeOptionsBottomSheetViewModel: NodeOptionsBottomSheetViewModel by viewModels()
 
-    constructor(mode: Int) {
-        if (mode in DEFAULT_MODE..FAVOURITES_MODE) {
-            mMode = mode
-        }
-    }
-
-    constructor() {
-        mMode = DEFAULT_MODE
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -112,26 +102,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
     ): View {
         contentView = View.inflate(context, R.layout.bottom_sheet_node_item, null)
         itemsLayout = contentView.findViewById(R.id.items_layout_bottom_sheet_node)
-        if (savedInstanceState != null) {
-            val handle = savedInstanceState.getLong(Constants.HANDLE, MegaApiJava.INVALID_HANDLE)
-            node = megaApi.getNodeByHandle(handle)
-            if (requireActivity() is ManagerActivity) {
-                drawerItem = (requireActivity() as ManagerActivity).drawerItem
-            }
-            mMode = savedInstanceState.getInt(SAVED_STATE_KEY_MODE, DEFAULT_MODE)
-        } else {
-            if (requireActivity() is ManagerActivity) {
-                node = (requireActivity() as ManagerActivity).selectedNode
-                shareData = (requireActivity() as ManagerActivity).selectedShareData
-                drawerItem = (requireActivity() as ManagerActivity).drawerItem
-            }
-        }
+        mode = arguments?.getInt(MODE_KEY) ?: savedInstanceState?.getInt(MODE_KEY) ?: DEFAULT_MODE
+        drawerItem = (requireActivity() as? ManagerActivity)?.drawerItem
         nodeController = NodeController(requireActivity())
-        if (megaApi.isInRubbish(node)) {
-            mMode = RUBBISH_BIN_MODE
-        } else if (nodeController.nodeComesFromIncoming(node)) {
-            mMode = SHARED_ITEMS_MODE
-        }
         return contentView
     }
 
@@ -177,37 +150,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
         val optionLeaveShares = contentView.findViewById<TextView>(R.id.leave_share_option)
         val optionRubbishBin = contentView.findViewById<TextView>(R.id.rubbish_bin_option)
         val optionRemove = contentView.findViewById<TextView>(R.id.remove_option)
-        optionEdit.setOnClickListener(this)
-        optionLabel.setOnClickListener(this)
-        optionFavourite.setOnClickListener(this)
-        optionDownload.setOnClickListener(this)
-        optionOffline.setOnClickListener(this)
-        optionInfo.setOnClickListener(this)
-        optionLink.setOnClickListener(this)
-        optionRemoveLink.setOnClickListener(this)
-        optionShare.setOnClickListener(this)
-        optionShareFolder.setOnClickListener(this)
-        optionClearShares.setOnClickListener(this)
-        optionLeaveShares.setOnClickListener(this)
-        optionRename.setOnClickListener(this)
-        optionSendChat.setOnClickListener(this)
-        optionMove.setOnClickListener(this)
-        optionCopy.setOnClickListener(this)
-        optionRubbishBin.setOnClickListener(this)
-        optionRestoreFromRubbish.setOnClickListener(this)
-        optionRemove.setOnClickListener(this)
-        optionOpenFolder.setOnClickListener(this)
-        optionSlideshow.setOnClickListener(this)
-        optionOpenWith.setOnClickListener(this)
-        optionVersionsLayout.setOnClickListener(this)
         val viewInFolder = contentView.findViewById<TextView>(R.id.view_in_folder_option)
-        if (mMode == RECENTS_MODE || mMode == FAVOURITES_IN_TAB_MODE) {
-            viewInFolder.visibility = View.VISIBLE
-            viewInFolder.setOnClickListener(this)
-        } else {
-            viewInFolder.visibility = View.GONE
-            viewInFolder.setOnClickListener(null)
-        }
+
         val separatorInfo = contentView.findViewById<View>(R.id.separator_info_option)
         val separatorOpen = contentView.findViewById<LinearLayout>(R.id.separator_open_options)
         val separatorDownload =
@@ -223,251 +167,254 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
             nodeInfo.maxWidth = Util.scaleWidthPx(210, resources.displayMetrics)
         }
 
-        node?.let {
-            val isTakenDown = it.isTakenDown
-            val accessLevel = megaApi.getAccess(node)
-            if (it.isFile && !isTakenDown) {
-                optionOpenWith.visibility = View.VISIBLE
-            } else {
-                counterOpen--
-                optionOpenWith.visibility = View.GONE
-            }
-            if (isTakenDown) {
-                nodeName.setTextColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.red_800_red_400
+        viewLifecycleOwner.collectFlow(
+            nodeOptionsViewModel.state, Lifecycle.State.STARTED
+        ) { state: NodeBottomSheetUIState ->
+
+            var counterOpen = 2
+            var counterSave = 2
+            var counterShares = 6
+            var counterModify = 4
+
+
+            if (state.shareKeyCreated != null) {
+                if (state.shareKeyCreated) {
+                    showShareFolderOptions(state.node)
+                } else {
+                    Util.showSnackbar(
+                        requireActivity(),
+                        getString(R.string.general_something_went_wrong_error)
                     )
-                )
+                }
+                nodeOptionsViewModel.shareDialogDisplayed()
             }
 
-            //Due to requirement change, not just hide slideshow entry in node context menu
-            optionSlideshow.visibility = View.GONE
-            if (Util.isOnline(requireContext())) {
-                nodeName.text = it.name
-                if (it.isFolder) {
-                    optionVersionsLayout.visibility = View.GONE
-                    nodeInfo.text = MegaApiUtils.getMegaNodeFolderInfo(node)
-                    nodeVersionsIcon.visibility = View.GONE
-                    drawerItem?.let { item -> nodeThumb.setImageResource(getFolderIcon(it, item)) }
-                    if (isEmptyFolder(node)) {
-                        counterSave--
-                        optionOffline.visibility = View.GONE
-                    }
-                    counterShares--
-                    optionSendChat.visibility = View.GONE
+            state.node?.let { node ->
+                if (megaApi.isInRubbish(node)) {
+                    mode = RUBBISH_BIN_MODE
+                } else if (nodeController.nodeComesFromIncoming(node)) {
+                    mode = SHARED_ITEMS_MODE
+                }
+
+                if (mode == RECENTS_MODE || mode == FAVOURITES_IN_TAB_MODE) {
+                    viewInFolder.visibility = View.VISIBLE
+                    viewInFolder.setOnClickListener { onViewInFolderClicked(node) }
                 } else {
-                    if (typeForName(it.name).isOpenableTextFile(
-                            it.size
-                        ) && accessLevel >= MegaShare.ACCESS_READWRITE && !isTakenDown
-                    ) {
-                        optionEdit.visibility = View.VISIBLE
-                    }
-                    nodeInfo.text = getFileInfo(it)
-                    if (megaApi.hasVersions(node) && !isTakenDown) {
-                        nodeVersionsIcon.visibility = View.VISIBLE
-                        optionVersionsLayout.visibility = View.VISIBLE
-                        versions.text = megaApi.getNumVersions(node).toString()
-                    } else {
-                        nodeVersionsIcon.visibility = View.GONE
+                    viewInFolder.visibility = View.GONE
+                    viewInFolder.setOnClickListener(null)
+                }
+
+                optionEdit.setOnClickListener { onEditClicked(node) }
+                optionLabel.setOnClickListener { onLabelClicked(node) }
+                optionFavourite.setOnClickListener { onFavouriteClicked(node) }
+                optionDownload.setOnClickListener { onDownloadClicked(node) }
+                optionOffline.setOnClickListener { onOfflineClicked(node) }
+                optionInfo.setOnClickListener { onPropertiesClicked(node) }
+                optionLink.setOnClickListener { onLinkClicked(node) }
+                optionRemoveLink.setOnClickListener { onRemoveLinkClicked(node) }
+                optionShare.setOnClickListener { shareNode(requireActivity(), node) }
+                optionShareFolder.setOnClickListener { nodeOptionsViewModel.createShareKey() }
+                optionClearShares.setOnClickListener { onClearShareClicked(node) }
+                optionLeaveShares.setOnClickListener { onLeaveShareClicked(node) }
+                optionRename.setOnClickListener { onRenameClicked(node) }
+                optionSendChat.setOnClickListener { onSendChatClicked(node) }
+                optionMove.setOnClickListener { onMoveClicked(node) }
+                optionCopy.setOnClickListener { onCopyClicked(node) }
+                optionRubbishBin.setOnClickListener { onDeleteClicked(node) }
+                optionRestoreFromRubbish.setOnClickListener { onRestoreClicked(node) }
+                optionRemove.setOnClickListener { onDeleteClicked(node) }
+                optionOpenFolder.setOnClickListener { onOpenFolderClicked(node) }
+                optionSlideshow.setOnClickListener { onSlideShowClicked(node) }
+                optionOpenWith.setOnClickListener { onOpenWithClicked(node) }
+                optionVersionsLayout.setOnClickListener { onVersionsClicked(node) }
+
+
+                val isTakenDown = node.isTakenDown
+                val accessLevel = megaApi.getAccess(node)
+                if (node.isFile && !isTakenDown) {
+                    optionOpenWith.visibility = View.VISIBLE
+                } else {
+                    counterOpen--
+                    optionOpenWith.visibility = View.GONE
+                }
+                if (isTakenDown) {
+                    nodeName.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.red_800_red_400
+                        )
+                    )
+                }
+
+                //Due to requirement change, not just hide slideshow entry in node context menu
+                optionSlideshow.visibility = View.GONE
+                if (state.isOnline) {
+                    nodeName.text = node.name
+                    if (node.isFolder) {
                         optionVersionsLayout.visibility = View.GONE
-                    }
-                    setNodeThumbnail(requireContext(), it, nodeThumb)
-                    if (isTakenDown) {
+                        nodeInfo.text = MegaApiUtils.getMegaNodeFolderInfo(node)
+                        nodeVersionsIcon.visibility = View.GONE
+                        drawerItem?.let { item ->
+                            nodeThumb.setImageResource(
+                                getFolderIcon(
+                                    node,
+                                    item
+                                )
+                            )
+                        }
+                        if (isEmptyFolder(node)) {
+                            counterSave--
+                            optionOffline.visibility = View.GONE
+                        }
                         counterShares--
                         optionSendChat.visibility = View.GONE
                     } else {
-                        optionSendChat.visibility = View.VISIBLE
+                        if (typeForName(node.name).isOpenableTextFile(
+                                node.size
+                            ) && accessLevel >= MegaShare.ACCESS_READWRITE && !isTakenDown
+                        ) {
+                            optionEdit.visibility = View.VISIBLE
+                        }
+                        nodeInfo.text = getFileInfo(node)
+                        if (megaApi.hasVersions(node) && !isTakenDown) {
+                            nodeVersionsIcon.visibility = View.VISIBLE
+                            optionVersionsLayout.visibility = View.VISIBLE
+                            versions.text = megaApi.getNumVersions(node).toString()
+                        } else {
+                            nodeVersionsIcon.visibility = View.GONE
+                            optionVersionsLayout.visibility = View.GONE
+                        }
+                        setNodeThumbnail(requireContext(), node, nodeThumb)
+                        if (isTakenDown) {
+                            counterShares--
+                            optionSendChat.visibility = View.GONE
+                        } else {
+                            optionSendChat.visibility = View.VISIBLE
+                        }
                     }
                 }
-            }
-            if (isTakenDown) {
-                contentView.findViewById<View>(R.id.dispute_option).visibility = View.VISIBLE
-                contentView.findViewById<View>(R.id.dispute_option).setOnClickListener {
-                    startActivity(
-                        Intent(requireContext(), WebViewActivity::class.java)
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            .setData(Uri.parse(Constants.DISPUTE_URL))
-                    )
-                    dismiss()
-                }
-                counterSave--
-                optionDownload.visibility = View.GONE
-                if (optionOffline.isVisible()) {
-                    counterSave--
-                    optionOffline.visibility = View.GONE
-                }
-                separatorInfo.visibility = View.GONE
-                optionRename.visibility = View.VISIBLE
-            } else {
-                offlineSwitch.isChecked = OfflineUtils.availableOffline(requireContext(), node)
-            }
-            optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
-            optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
-            if (accessLevel != MegaShare.ACCESS_OWNER || isTakenDown) {
-                counterShares--
-                optionShare.visibility = View.GONE
-            }
-            if (it.isFolder) {
                 if (isTakenDown) {
-                    counterShares--
-                    optionShareFolder.visibility = View.GONE
-                    counterShares--
-                    optionClearShares.visibility = View.GONE
-                } else {
-                    optionShareFolder.visibility = View.VISIBLE
-                    if (isOutShare(it)) {
-                        optionShareFolder.setText(R.string.manage_share)
-                        optionClearShares.visibility = View.VISIBLE
-                    } else {
-                        optionShareFolder.setText(R.string.context_share_folder)
-                        counterShares--
-                        optionClearShares.visibility = View.GONE
+                    contentView.findViewById<View>(R.id.dispute_option).visibility = View.VISIBLE
+                    contentView.findViewById<View>(R.id.dispute_option).setOnClickListener {
+                        startActivity(
+                            Intent(requireContext(), WebViewActivity::class.java)
+                                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                .setData(Uri.parse(Constants.DISPUTE_URL))
+                        )
+                        dismiss()
                     }
-                }
-            } else {
-                counterShares--
-                optionShareFolder.visibility = View.GONE
-                counterShares--
-                optionClearShares.visibility = View.GONE
-            }
-            if (isTakenDown) {
-                counterShares--
-                optionLink.visibility = View.GONE
-                counterShares--
-                optionRemoveLink.visibility = View.GONE
-                counterModify--
-                optionCopy.visibility = View.GONE
-            } else {
-                optionLink.visibility = View.VISIBLE
-                if (it.isExported) {
-                    //Node has public link
-                    optionLink.setText(R.string.edit_link_option)
-                    optionRemoveLink.visibility = View.VISIBLE
-                } else {
-                    optionLink.text = resources.getQuantityString(R.plurals.get_links, 1)
-                    counterShares--
-                    optionRemoveLink.visibility = View.GONE
-                }
-            }
-            if (mMode == DEFAULT_MODE) {
-                mapDrawerItemToMode(drawerItem)
-            }
-            when (mMode) {
-                CLOUD_DRIVE_MODE, SEARCH_MODE -> {
-                    Timber.d("show Cloud bottom sheet")
-                    optionRemove.visibility = View.GONE
-                    optionLeaveShares.visibility = View.GONE
-                    counterOpen--
-                    optionOpenFolder.visibility = View.GONE
-                    counterModify--
-                    optionRestoreFromRubbish.visibility = View.GONE
-                }
-                INBOX_MODE -> Timber.d("show My Backups bottom sheet")
-                RUBBISH_BIN_MODE -> {
-                    Timber.d("show Rubbish bottom sheet")
-                    optionEdit.visibility = View.GONE
-                    val restoreHandle = it.restoreHandle
-                    val restoreNode = megaApi.getNodeByHandle(restoreHandle)
-                    if (restoreHandle == MegaApiJava.INVALID_HANDLE || !megaApi.isInRubbish(node) || restoreNode == null || megaApi.isInRubbish(
-                            restoreNode
-                        ) || megaApi.isInInbox(restoreNode)
-                    ) {
-                        counterModify--
-                        optionRestoreFromRubbish.visibility = View.GONE
-                    }
-                    optionLabel.visibility = View.GONE
-                    optionFavourite.visibility = View.GONE
-                    if (optionOpenWith.isVisible()) {
-                        counterOpen--
-                        optionOpenWith.visibility = View.GONE
-                    }
-                    counterModify--
-                    optionMove.visibility = View.GONE
-                    counterModify--
-                    optionRename.visibility = View.GONE
-                    if (optionCopy.isVisible()) {
-                        counterModify--
-                        optionCopy.visibility = View.GONE
-                    }
-                    if (optionClearShares.isVisible()) {
-                        counterShares--
-                        optionClearShares.visibility = View.GONE
-                    }
-                    optionLeaveShares.visibility = View.GONE
-                    optionRubbishBin.visibility = View.GONE
-                    if (optionShare.isVisible()) {
-                        counterShares--
-                        optionShare.visibility = View.GONE
-                    }
-                    if (optionShareFolder.isVisible()) {
-                        counterShares--
-                        optionShareFolder.visibility = View.GONE
-                    }
-                    if (optionLink.isVisible()) {
-                        counterShares--
-                        optionLink.visibility = View.GONE
-                    }
-                    if (optionRemoveLink.isVisible()) {
-                        counterShares--
-                        optionRemoveLink.visibility = View.GONE
-                    }
-                    counterOpen--
-                    optionOpenFolder.visibility = View.GONE
-                    if (optionDownload.isVisible()) {
-                        counterSave--
-                        optionDownload.visibility = View.GONE
-                    }
+                    counterSave--
+                    optionDownload.visibility = View.GONE
                     if (optionOffline.isVisible()) {
                         counterSave--
                         optionOffline.visibility = View.GONE
                     }
-                    if (optionSendChat.isVisible()) {
+                    separatorInfo.visibility = View.GONE
+                    optionRename.visibility = View.VISIBLE
+                } else {
+                    offlineSwitch.isChecked = OfflineUtils.availableOffline(requireContext(), node)
+                }
+                optionLabel.visibility = if (isTakenDown) View.GONE else View.VISIBLE
+                optionFavourite.visibility = if (isTakenDown) View.GONE else View.VISIBLE
+                if (accessLevel != MegaShare.ACCESS_OWNER || isTakenDown) {
+                    counterShares--
+                    optionShare.visibility = View.GONE
+                }
+                if (node.isFolder) {
+                    if (isTakenDown) {
                         counterShares--
-                        optionSendChat.visibility = View.GONE
+                        optionShareFolder.visibility = View.GONE
+                        counterShares--
+                        optionClearShares.visibility = View.GONE
+                    } else {
+                        optionShareFolder.visibility = View.VISIBLE
+                        if (isOutShare(node)) {
+                            optionShareFolder.setText(R.string.manage_share)
+                            optionClearShares.visibility = View.VISIBLE
+                        } else {
+                            optionShareFolder.setText(R.string.context_share_folder)
+                            counterShares--
+                            optionClearShares.visibility = View.GONE
+                        }
+                    }
+                } else {
+                    counterShares--
+                    optionShareFolder.visibility = View.GONE
+                    counterShares--
+                    optionClearShares.visibility = View.GONE
+                }
+                if (isTakenDown) {
+                    counterShares--
+                    optionLink.visibility = View.GONE
+                    counterShares--
+                    optionRemoveLink.visibility = View.GONE
+                    counterModify--
+                    optionCopy.visibility = View.GONE
+                } else {
+                    optionLink.visibility = View.VISIBLE
+                    if (node.isExported) {
+                        //Node has public link
+                        optionLink.setText(R.string.edit_link_option)
+                        optionRemoveLink.visibility = View.VISIBLE
+                    } else {
+                        optionLink.text = resources.getQuantityString(R.plurals.get_links, 1)
+                        counterShares--
+                        optionRemoveLink.visibility = View.GONE
                     }
                 }
-                SHARED_ITEMS_MODE -> {
-                    val tabSelected = (requireActivity() as ManagerActivity).tabItemShares
-                    if (tabSelected === SharesTab.INCOMING_TAB || nodeController.nodeComesFromIncoming(
-                            node
-                        )
-                    ) {
-                        Timber.d("showOptionsPanelIncoming")
+                if (mode == DEFAULT_MODE) {
+                    mapDrawerItemToMode(drawerItem)
+                }
+                when (mode) {
+                    CLOUD_DRIVE_MODE, SEARCH_MODE -> {
+                        Timber.d("show Cloud bottom sheet")
                         optionRemove.visibility = View.GONE
-                        if (optionShareFolder.isVisible()) {
-                            counterShares--
-                            optionShareFolder.visibility = View.GONE
+                        optionLeaveShares.visibility = View.GONE
+                        counterOpen--
+                        optionOpenFolder.visibility = View.GONE
+                        counterModify--
+                        optionRestoreFromRubbish.visibility = View.GONE
+                    }
+                    INBOX_MODE -> Timber.d("show My Backups bottom sheet")
+                    RUBBISH_BIN_MODE -> {
+                        Timber.d("show Rubbish bottom sheet")
+                        optionEdit.visibility = View.GONE
+                        val restoreHandle = node.restoreHandle
+                        val restoreNode = megaApi.getNodeByHandle(restoreHandle)
+                        if (restoreHandle == MegaApiJava.INVALID_HANDLE || !megaApi.isInRubbish(node) || restoreNode == null || megaApi.isInRubbish(
+                                restoreNode
+                            ) || megaApi.isInInbox(restoreNode)
+                        ) {
+                            counterModify--
+                            optionRestoreFromRubbish.visibility = View.GONE
+                        }
+                        optionLabel.visibility = View.GONE
+                        optionFavourite.visibility = View.GONE
+                        if (optionOpenWith.isVisible()) {
+                            counterOpen--
+                            optionOpenWith.visibility = View.GONE
+                        }
+                        counterModify--
+                        optionMove.visibility = View.GONE
+                        counterModify--
+                        optionRename.visibility = View.GONE
+                        if (optionCopy.isVisible()) {
+                            counterModify--
+                            optionCopy.visibility = View.GONE
                         }
                         if (optionClearShares.isVisible()) {
                             counterShares--
                             optionClearShares.visibility = View.GONE
                         }
-                        val dBT = nodeController.getIncomingLevel(node)
-                        Timber.d("DeepTree value:%s", dBT)
-                        if (dBT > Constants.FIRST_NAVIGATION_LEVEL) {
-                            optionLeaveShares.visibility = View.GONE
-                        } else {
-                            //Show the owner of the shared folder
-                            showOwnerSharedFolder()
-                            optionLeaveShares.visibility =
-                                if (isTakenDown) View.GONE else View.VISIBLE
-                            permissionsIcon.visibility = View.VISIBLE
-                            when (accessLevel) {
-                                MegaShare.ACCESS_FULL -> {
-                                    Timber.d("LEVEL 0 - access FULL")
-                                    permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess)
-                                }
-                                MegaShare.ACCESS_READ -> {
-                                    Timber.d("LEVEL 0 - access read")
-                                    permissionsIcon.setImageResource(R.drawable.ic_shared_read)
-                                }
-                                MegaShare.ACCESS_READWRITE -> {
-                                    Timber.d("LEVEL 0 - readwrite")
-                                    permissionsIcon.setImageResource(R.drawable.ic_shared_read_write)
-                                }
-                                else -> {}
-                            }
+                        optionLeaveShares.visibility = View.GONE
+                        optionRubbishBin.visibility = View.GONE
+                        if (optionShare.isVisible()) {
+                            counterShares--
+                            optionShare.visibility = View.GONE
+                        }
+                        if (optionShareFolder.isVisible()) {
+                            counterShares--
+                            optionShareFolder.visibility = View.GONE
                         }
                         if (optionLink.isVisible()) {
                             counterShares--
@@ -477,162 +424,215 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
                             counterShares--
                             optionRemoveLink.visibility = View.GONE
                         }
-                        when (accessLevel) {
-                            MegaShare.ACCESS_FULL -> {
-                                Timber.d("access FULL")
-                                optionFavourite.visibility = View.GONE
-                                if (dBT <= Constants.FIRST_NAVIGATION_LEVEL) {
-                                    optionRubbishBin.visibility = View.GONE
-                                    counterModify--
-                                    optionMove.visibility = View.GONE
+                        counterOpen--
+                        optionOpenFolder.visibility = View.GONE
+                        if (optionDownload.isVisible()) {
+                            counterSave--
+                            optionDownload.visibility = View.GONE
+                        }
+                        if (optionOffline.isVisible()) {
+                            counterSave--
+                            optionOffline.visibility = View.GONE
+                        }
+                        if (optionSendChat.isVisible()) {
+                            counterShares--
+                            optionSendChat.visibility = View.GONE
+                        }
+                    }
+                    SHARED_ITEMS_MODE -> {
+                        val tabSelected = (requireActivity() as ManagerActivity).tabItemShares
+                        if (tabSelected === SharesTab.INCOMING_TAB || nodeController.nodeComesFromIncoming(
+                                node
+                            )
+                        ) {
+                            Timber.d("showOptionsPanelIncoming")
+                            optionRemove.visibility = View.GONE
+                            if (optionShareFolder.isVisible()) {
+                                counterShares--
+                                optionShareFolder.visibility = View.GONE
+                            }
+                            if (optionClearShares.isVisible()) {
+                                counterShares--
+                                optionClearShares.visibility = View.GONE
+                            }
+                            val dBT = nodeController.getIncomingLevel(node)
+                            Timber.d("DeepTree value:%s", dBT)
+                            if (dBT > Constants.FIRST_NAVIGATION_LEVEL) {
+                                optionLeaveShares.visibility = View.GONE
+                            } else {
+                                //Show the owner of the shared folder
+                                showOwnerSharedFolder(node)
+                                optionLeaveShares.visibility =
+                                    if (isTakenDown) View.GONE else View.VISIBLE
+                                permissionsIcon.visibility = View.VISIBLE
+                                when (accessLevel) {
+                                    MegaShare.ACCESS_FULL -> {
+                                        Timber.d("LEVEL 0 - access FULL")
+                                        permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess)
+                                    }
+                                    MegaShare.ACCESS_READ -> {
+                                        Timber.d("LEVEL 0 - access read")
+                                        permissionsIcon.setImageResource(R.drawable.ic_shared_read)
+                                    }
+                                    MegaShare.ACCESS_READWRITE -> {
+                                        Timber.d("LEVEL 0 - readwrite")
+                                        permissionsIcon.setImageResource(R.drawable.ic_shared_read_write)
+                                    }
+                                    else -> {}
                                 }
                             }
-                            MegaShare.ACCESS_READ -> {
-                                Timber.d("access read")
-                                optionLabel.visibility = View.GONE
-                                optionFavourite.visibility = View.GONE
-                                counterModify--
-                                optionRename.visibility = View.GONE
-                                counterModify--
-                                optionMove.visibility = View.GONE
-                                optionRubbishBin.visibility = View.GONE
+                            if (optionLink.isVisible()) {
+                                counterShares--
+                                optionLink.visibility = View.GONE
                             }
-                            MegaShare.ACCESS_READWRITE -> {
-                                Timber.d("readwrite")
-                                optionLabel.visibility = View.GONE
-                                optionFavourite.visibility = View.GONE
-                                counterModify--
-                                optionRename.visibility = View.GONE
-                                counterModify--
-                                optionMove.visibility = View.GONE
-                                optionRubbishBin.visibility = View.GONE
+                            if (optionRemoveLink.isVisible()) {
+                                counterShares--
+                                optionRemoveLink.visibility = View.GONE
                             }
-                            else -> {}
+                            when (accessLevel) {
+                                MegaShare.ACCESS_FULL -> {
+                                    Timber.d("access FULL")
+                                    optionFavourite.visibility = View.GONE
+                                    if (dBT <= Constants.FIRST_NAVIGATION_LEVEL) {
+                                        optionRubbishBin.visibility = View.GONE
+                                        counterModify--
+                                        optionMove.visibility = View.GONE
+                                    }
+                                }
+                                MegaShare.ACCESS_READ -> {
+                                    Timber.d("access read")
+                                    optionLabel.visibility = View.GONE
+                                    optionFavourite.visibility = View.GONE
+                                    counterModify--
+                                    optionRename.visibility = View.GONE
+                                    counterModify--
+                                    optionMove.visibility = View.GONE
+                                    optionRubbishBin.visibility = View.GONE
+                                }
+                                MegaShare.ACCESS_READWRITE -> {
+                                    Timber.d("readwrite")
+                                    optionLabel.visibility = View.GONE
+                                    optionFavourite.visibility = View.GONE
+                                    counterModify--
+                                    optionRename.visibility = View.GONE
+                                    counterModify--
+                                    optionMove.visibility = View.GONE
+                                    optionRubbishBin.visibility = View.GONE
+                                }
+                                else -> {}
+                            }
+                        } else if (tabSelected === SharesTab.OUTGOING_TAB) {
+                            Timber.d("showOptionsPanelOutgoing")
+                            if (!isTakenDown && (requireActivity() as ManagerActivity).deepBrowserTreeOutgoing == Constants.FIRST_NAVIGATION_LEVEL && optionClearShares.isVisible()) {
+                                //Show the number of contacts who shared the folder
+                                val sl = megaApi.getOutShares(node)
+                                    .stream().filter { obj: MegaShare -> obj.isVerified }
+                                    .collect(Collectors.toList())
+                                if (sl.size != 0) {
+                                    nodeInfo.text = resources.getQuantityString(
+                                        R.plurals.general_num_shared_with,
+                                        sl.size, sl.size
+                                    )
+                                }
+                            } else if (optionClearShares.isVisible()) {
+                                counterShares--
+                                optionClearShares.visibility = View.GONE
+                            }
+                            counterModify--
+                            optionMove.visibility = View.GONE
+                            optionRemove.visibility = View.GONE
+                            optionLeaveShares.visibility = View.GONE
+                        } else if (tabSelected === SharesTab.LINKS_TAB) {
+                            if (!isTakenDown && node.isShared) {
+                                optionClearShares.visibility = View.VISIBLE
+                            } else if (optionClearShares.isVisible()) {
+                                counterShares--
+                                optionClearShares.visibility = View.GONE
+                            }
+                            counterModify--
+                            optionMove.visibility = View.GONE
+                            optionRemove.visibility = View.GONE
+                            optionLeaveShares.visibility = View.GONE
                         }
-                    } else if (tabSelected === SharesTab.OUTGOING_TAB) {
-                        Timber.d("showOptionsPanelOutgoing")
-                        if (!isTakenDown && (requireActivity() as ManagerActivity).deepBrowserTreeOutgoing == Constants.FIRST_NAVIGATION_LEVEL && optionClearShares.isVisible()) {
-                            //Show the number of contacts who shared the folder
-                            val sl = megaApi.getOutShares(node)
-                                .stream().filter { obj: MegaShare -> obj.isVerified }
-                                .collect(Collectors.toList())
-                            if (sl.size != 0) {
-                                nodeInfo.text = resources.getQuantityString(
-                                    R.plurals.general_num_shared_with,
-                                    sl.size, sl.size
-                                )
-                            }
-                        } else if (optionClearShares.isVisible()) {
-                            counterShares--
-                            optionClearShares.visibility = View.GONE
-                        }
+                        counterOpen--
+                        optionOpenFolder.visibility = View.GONE
                         counterModify--
-                        optionMove.visibility = View.GONE
-                        optionRemove.visibility = View.GONE
-                        optionLeaveShares.visibility = View.GONE
-                    } else if (tabSelected === SharesTab.LINKS_TAB) {
-                        if (!isTakenDown && it.isShared) {
-                            optionClearShares.visibility = View.VISIBLE
-                        } else if (optionClearShares.isVisible()) {
-                            counterShares--
-                            optionClearShares.visibility = View.GONE
-                        }
-                        counterModify--
-                        optionMove.visibility = View.GONE
-                        optionRemove.visibility = View.GONE
-                        optionLeaveShares.visibility = View.GONE
+                        optionRestoreFromRubbish.visibility = View.GONE
                     }
-                    counterOpen--
-                    optionOpenFolder.visibility = View.GONE
-                    counterModify--
-                    optionRestoreFromRubbish.visibility = View.GONE
+                    RECENTS_MODE, FAVOURITES_IN_TAB_MODE, FAVOURITES_MODE ->                 // If the Dialog Fragment is opened from the Favourites page, handle the display
+                        // of Dialog options accordingly
+                        handleRecentsAndFavouritesOptionsDisplay(
+                            accessLevel = accessLevel,
+                            decrementShares = { counterShares-- },
+                            decrementOpen = { counterOpen-- },
+                            decrementModify = { counterModify-- },
+                        )
+                    else -> {}
                 }
-                RECENTS_MODE, FAVOURITES_IN_TAB_MODE, FAVOURITES_MODE ->                 // If the Dialog Fragment is opened from the Favourites page, handle the display
-                    // of Dialog options accordingly
-                    handleRecentsAndFavouritesOptionsDisplay(accessLevel)
-                else -> {}
-            }
 
-            // After setting up the content to be displayed in the Options Dialog, check if
-            // read-only properties should be applied.
-            checkIfShouldApplyReadOnlyState()
-            separatorOpen.visibility = if (counterOpen <= 0) View.GONE else View.VISIBLE
-            separatorDownload.visibility = if (counterSave <= 0) View.GONE else View.VISIBLE
-            separatorShares.visibility = if (counterShares <= 0) View.GONE else View.VISIBLE
-            separatorModify.visibility = if (counterModify <= 0) View.GONE else View.VISIBLE
-            offlineSwitch.setOnCheckedChangeListener { v: CompoundButton, _: Boolean ->
-                onClick(
-                    v
+                // After setting up the content to be displayed in the Options Dialog, check if
+                // read-only properties should be applied.
+                checkIfShouldApplyReadOnlyState(
+                    node = node,
+                    decrementOpen = { counterOpen-- },
+                    decrementModify = { counterModify-- },
                 )
-            }
-            optionFavourite.setText(if (it.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite)
-            optionFavourite.setCompoundDrawablesWithIntrinsicBounds(
-                if (it.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite,
-                0, 0, 0
-            )
-            if (it.label != MegaNode.NODE_LBL_UNKNOWN) {
-                val color = ResourcesCompat.getColor(
-                    resources, getNodeLabelColor(
-                        it.label
-                    ), null
+                separatorOpen.visibility = if (counterOpen <= 0) View.GONE else View.VISIBLE
+                separatorDownload.visibility = if (counterSave <= 0) View.GONE else View.VISIBLE
+                separatorShares.visibility = if (counterShares <= 0) View.GONE else View.VISIBLE
+                separatorModify.visibility = if (counterModify <= 0) View.GONE else View.VISIBLE
+                offlineSwitch.setOnCheckedChangeListener { _: CompoundButton, _: Boolean ->
+                    onOfflineClicked(node)
+                }
+                optionFavourite.setText(if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite)
+                optionFavourite.setCompoundDrawablesWithIntrinsicBounds(
+                    if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite,
+                    0, 0, 0
                 )
-                val drawable = getNodeLabelDrawable(
-                    it.label, resources
-                )
-                optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    null,
-                    null,
-                    drawable,
-                    null
-                )
-                optionLabelCurrent.text = getNodeLabelText(it.label)
-                optionLabelCurrent.setTextColor(color)
-                optionLabelCurrent.visibility = View.VISIBLE
-            } else {
-                optionLabelCurrent.visibility = View.GONE
-            }
-            shareData?.let { data ->
-                setUnverifiedOutgoingNodeUserName(data)
-                hideNodeActions(shareData)
-            }
-            super.onViewCreated(view, savedInstanceState)
-            viewLifecycleOwner.collectFlow(
-                nodeOptionsBottomSheetViewModel.state, Lifecycle.State.STARTED
-            ) { (_, isOpenShareDialogSuccess): NodeOptionsBottomSheetState ->
-                if (isOpenShareDialogSuccess != null) {
-                    if (isOpenShareDialogSuccess) {
-                        showShareFolderOptions()
-                    } else {
-                        Util.showSnackbar(
+                if (node.label != MegaNode.NODE_LBL_UNKNOWN) {
+                    val color = ResourcesCompat.getColor(
+                        resources, getNodeLabelColor(
+                            node.label
+                        ), null
+                    )
+                    val drawable = getNodeLabelDrawable(
+                        node.label, resources
+                    )
+                    optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        null,
+                        null,
+                        drawable,
+                        null
+                    )
+                    optionLabelCurrent.text = getNodeLabelText(node.label)
+                    optionLabelCurrent.setTextColor(color)
+                    optionLabelCurrent.visibility = View.VISIBLE
+                } else {
+                    optionLabelCurrent.visibility = View.GONE
+                }
+                state.shareData?.let { data ->
+                    setUnverifiedOutgoingNodeUserName(data)
+                    hideNodeActions(data, node)
+                }
+
+
+                if (savedInstanceState?.getBoolean(
+                        Constants.CANNOT_OPEN_FILE_SHOWN,
+                        false
+                    ) == true
+                ) {
+                    contentView.post {
+                        cannotOpenFileDialog = this.showCannotOpenFileDialog(
                             requireActivity(),
-                            getString(R.string.general_something_went_wrong_error)
+                            node,
+                            (requireActivity() as ManagerActivity)::saveNodeByTap
                         )
                     }
                 }
-                nodeOptionsBottomSheetViewModel.resetIsOpenShareDialogSuccess()
             }
         }
+        super.onViewCreated(view, savedInstanceState)
     }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        if (savedInstanceState != null && savedInstanceState.getBoolean(
-                Constants.CANNOT_OPEN_FILE_SHOWN,
-                false
-            )
-        ) {
-            node?.let {
-                contentView.post {
-                    cannotOpenFileDialog = this.showCannotOpenFileDialog(
-                        requireActivity(),
-                        it,
-                        (requireActivity() as ManagerActivity)::saveNodeByTap
-                    )
-                }
-            }
-        }
-        super.onViewStateRestored(savedInstanceState)
-    }
-
 
     override fun onDestroyView() {
         dismissAlertDialogIfExists(cannotOpenFileDialog)
@@ -654,7 +654,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
      * Hiding the aforementioned options will reduce the counter values for the Modify and Open
      * group options
      */
-    private fun checkIfShouldApplyReadOnlyState() {
+    private fun checkIfShouldApplyReadOnlyState(
+        node: MegaNode?,
+        decrementOpen: () -> Unit,
+        decrementModify: () -> Unit,
+    ) {
         val optionEdit = contentView.findViewById<LinearLayout>(R.id.edit_file_option)
         val optionFavourite = contentView.findViewById<TextView>(R.id.favorite_option)
         val optionLabel = contentView.findViewById<LinearLayout>(R.id.option_label_layout)
@@ -678,8 +682,10 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
             optionLeaveShares.visibility = View.GONE
             optionOpenFolder.visibility = View.GONE
             optionRestoreFromRubbish.visibility = View.GONE
-            counterModify -= 3
-            counterOpen--
+            decrementModify()
+            decrementModify()
+            decrementModify()
+            decrementOpen()
         }
     }
 
@@ -689,7 +695,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
      *
      * @param accessLevel - Access Level of the Node
      */
-    private fun handleRecentsAndFavouritesOptionsDisplay(accessLevel: Int) {
+    private fun handleRecentsAndFavouritesOptionsDisplay(
+        accessLevel: Int,
+        decrementShares: () -> Unit,
+        decrementOpen: () -> Unit,
+        decrementModify: () -> Unit,
+    ) {
         val optionFavourite = contentView.findViewById<TextView>(R.id.favorite_option)
         val optionLabel = contentView.findViewById<LinearLayout>(R.id.option_label_layout)
         val optionRename = contentView.findViewById<TextView>(R.id.rename_option)
@@ -704,34 +715,34 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
         val optionShareFolder = contentView.findViewById<TextView>(R.id.share_folder_option)
         val optionClearShares = contentView.findViewById<TextView>(R.id.clear_share_option)
         if (optionShareFolder.isVisible()) {
-            counterShares--
+            decrementShares()
             optionShareFolder.visibility = View.GONE
         }
         if (optionClearShares.isVisible()) {
-            counterShares--
+            decrementShares()
             optionClearShares.visibility = View.GONE
         }
         optionRemove.visibility = View.GONE
         optionLeaveShares.visibility = View.GONE
-        counterOpen--
+        decrementOpen()
         optionOpenFolder.visibility = View.GONE
-        counterModify--
+        decrementModify()
         optionRestoreFromRubbish.visibility = View.GONE
         when (accessLevel) {
             MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_READ, MegaShare.ACCESS_UNKNOWN -> {
                 optionLabel.visibility = View.GONE
                 optionFavourite.visibility = View.GONE
-                counterModify--
+                decrementModify()
                 optionRename.visibility = View.GONE
-                counterModify--
+                decrementModify()
                 optionMove.visibility = View.GONE
                 optionRubbishBin.visibility = View.GONE
                 if (optionLink.isVisible()) {
-                    counterShares--
+                    decrementShares()
                     optionLink.visibility = View.GONE
                 }
                 if (optionRemoveLink.isVisible()) {
-                    counterShares--
+                    decrementShares()
                     optionRemoveLink.visibility = View.GONE
                 }
             }
@@ -739,7 +750,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
         }
     }
 
-    private fun showOwnerSharedFolder() {
+    private fun showOwnerSharedFolder(node: MegaNode?) {
         val sharesIncoming = megaApi.inSharesList
         for (j in sharesIncoming.indices) {
             val mS = sharesIncoming[j]
@@ -767,22 +778,22 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
         }
     }
 
-    private fun hideNodeActions(shareData: ShareData?) {
+    private fun hideNodeActions(shareData: ShareData, node: MegaNode) {
         val optionVerifyUser = contentView.findViewById<TextView>(R.id.verify_user_option)
         optionVerifyUser.visibility = View.VISIBLE
-        if (shareData != null && !shareData.isVerified) {
+        if (!shareData.isVerified) {
             optionVerifyUser.text = getString(
                 R.string.shared_items_bottom_sheet_menu_verify_user,
                 nodeInfo.text
             )
         }
-        optionVerifyUser.setOnClickListener(this)
+        optionVerifyUser.setOnClickListener { onVerifyUserClicked(shareData, node) }
         val nodeName = contentView.findViewById<TextView>(R.id.node_name_text)
         if (nodeController.nodeComesFromIncoming(node)) {
             nodeName.text =
                 resources.getString(R.string.shared_items_verify_credentials_undecrypted_folder)
         } else {
-            nodeName.text = node?.name
+            nodeName.text = node.name
         }
         contentView.findViewById<View>(R.id.favorite_option).visibility = View.GONE
         contentView.findViewById<View>(R.id.rename_option).visibility = View.GONE
@@ -799,168 +810,218 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
         contentView.findViewById<View>(R.id.clear_share_option).visibility = View.GONE
     }
 
-    @SuppressLint("NonConstantResourceId")
-    override fun onClick(v: View) {
-        node?.let {
-            val handleList = ArrayList<Long>()
-            handleList.add(it.handle)
-            when (v.id) {
-                R.id.download_option -> (requireActivity() as ManagerActivity).saveNodesToDevice(
-                    nodes = listOf(it),
-                    highPriority = false,
-                    isFolderLink = false,
-                    fromMediaViewer = false,
-                    fromChat = false
-                )
-                R.id.favorite_option -> megaApi.setNodeFavourite(node, !it.isFavourite)
-                R.id.option_label_layout -> (requireActivity() as ManagerActivity).showNodeLabelsPanel(
-                    it
-                )
-                R.id.file_properties_switch, R.id.option_offline_layout -> if (OfflineUtils.availableOffline(
-                        requireContext(),
-                        node
-                    )
-                ) {
-                    val mOffDelete = dbH.findByHandle(it.handle)
-                    removeFromOffline(mOffDelete)
-                    Util.showSnackbar(activity, resources.getString(R.string.file_removed_offline))
-                } else {
-                    saveForOffline()
-                }
-                R.id.properties_option -> {
-                    val fileInfoIntent = Intent(requireContext(), FileInfoActivity::class.java)
-                    fileInfoIntent.putExtra(Constants.HANDLE, it.handle)
-                    if (drawerItem === DrawerItem.SHARED_ITEMS) {
-                        if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
-                            fileInfoIntent.putExtra("from", Constants.FROM_INCOMING_SHARES)
-                            fileInfoIntent.putExtra(
-                                Constants.INTENT_EXTRA_KEY_FIRST_LEVEL,
-                                (requireActivity() as ManagerActivity).deepBrowserTreeIncoming <= Constants.FIRST_NAVIGATION_LEVEL
-                            )
-                        } else if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.OUTGOING_TAB) {
-                            fileInfoIntent.putExtra(
-                                "adapterType",
-                                Constants.OUTGOING_SHARES_ADAPTER
-                            )
-                        }
-                    } else if (drawerItem === DrawerItem.INBOX) {
-                        if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
-                            fileInfoIntent.putExtra("from", Constants.FROM_INBOX)
-                        }
-                    } else if (drawerItem === DrawerItem.SEARCH && nodeController.nodeComesFromIncoming(
-                            node
-                        )
-                    ) {
-                        fileInfoIntent.putExtra("from", Constants.FROM_INCOMING_SHARES)
-                        val dBT = nodeController.getIncomingLevel(node)
-                        fileInfoIntent.putExtra(
-                            Constants.INTENT_EXTRA_KEY_FIRST_LEVEL,
-                            dBT <= Constants.FIRST_NAVIGATION_LEVEL
-                        )
-                    }
-                    fileInfoIntent.putExtra(Constants.NAME, it.name)
-                    startActivityForResult(fileInfoIntent, Constants.REQUEST_CODE_FILE_INFO)
-                    dismissAllowingStateLoss()
-                }
-                R.id.link_option -> (requireActivity() as ManagerActivity).showGetLinkActivity(
-                    it.handle
-                )
-                R.id.view_in_folder_option -> (requireActivity() as ManagerActivity).viewNodeInFolder(
-                    it
-                )
-                R.id.remove_link_option -> (requireActivity() as ManagerActivity).showConfirmationRemovePublicLink(
-                    it
-                )
-                R.id.share_folder_option -> nodeOptionsBottomSheetViewModel.callOpenShareDialog(
-                    it.handle
-                )
-                R.id.clear_share_option -> {
-                    val shareList = megaApi.getOutShares(node)
-                    (requireActivity() as ManagerActivity).showConfirmationRemoveAllSharingContacts(
-                        shareList,
-                        node
-                    )
-                }
-                R.id.leave_share_option -> showConfirmationLeaveIncomingShare(
-                    requireActivity(),
-                    (requireActivity() as SnackbarShower), it
-                )
-                R.id.send_chat_option -> {
-                    (requireActivity() as ManagerActivity).attachNodeToChats(node)
-                    dismissAllowingStateLoss()
-                }
-                R.id.rename_option -> (requireActivity() as ManagerActivity).showRenameDialog(node)
-                R.id.move_option -> {
-                    nodeController.chooseLocationToMoveNodes(handleList)
-                    dismissAllowingStateLoss()
-                }
-                R.id.copy_option -> {
-                    nodeController.chooseLocationToCopyNodes(handleList)
-                    dismissAllowingStateLoss()
-                }
-                R.id.rubbish_bin_option, R.id.remove_option -> (requireActivity() as ManagerActivity).askConfirmationMoveToRubbish(
-                    handleList
-                )
-                R.id.option_slideshow -> {
-                    val intent = getIntentForParentNode(
-                        requireContext(),
-                        megaApi.getParentNode(node).handle,
-                        SortOrder.ORDER_PHOTO_ASC,
-                        it.handle,
-                        true
-                    )
-                    startActivity(intent)
-                    dismissAllowingStateLoss()
-                }
-                R.id.open_folder_option -> {
-                    searchViewModel.setTextSubmitted(true)
-                    nodeController.openFolderFromSearch(it.handle)
-                    dismissAllowingStateLoss()
-                }
-                R.id.open_with_option -> {
-                    onNodeTapped(
-                        requireActivity(),
-                        it,
-                        (requireActivity() as ManagerActivity)::saveNodeByOpenWith,
-                        (requireActivity() as ManagerActivity),
-                        (requireActivity() as ManagerActivity),
-                        true
-                    )
-                    dismissAllowingStateLoss()
-                    return
-                }
-                R.id.restore_option -> {
-                    val nodes: MutableList<MegaNode?> = ArrayList()
-                    nodes.add(node)
-                    (requireActivity() as ManagerActivity).restoreFromRubbish(nodes)
-                }
-                R.id.share_option -> shareNode(requireActivity(), node)
-                R.id.edit_file_option -> manageEditTextFileIntent(
-                    requireContext(),
-                    it,
-                    adapterType
-                )
-                R.id.option_versions_layout -> {
-                    val version = Intent(activity, VersionsFileActivity::class.java)
-                    version.putExtra("handle", it.handle)
-                    requireActivity().startActivityForResult(
-                        version,
-                        Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY
-                    )
-                }
-                R.id.verify_user_option -> if (shareData != null) {
-                    if (shareData?.isVerified == false && shareData?.isPending == true) {
-                        showCanNotVerifyContact(shareData?.user)
-                    } else {
-                        openAuthenticityCredentials(shareData?.user)
-                    }
-                } else if (!it.isNodeKeyDecrypted) {
-                    openAuthenticityCredentials(user?.email)
-                }
-                else -> {}
-            }
-            setStateBottomSheetBehaviorHidden()
+    private fun onDownloadClicked(node: MegaNode) {
+        (requireActivity() as ManagerActivity).saveNodesToDevice(
+            nodes = listOf(node),
+            highPriority = false,
+            isFolderLink = false,
+            fromMediaViewer = false,
+            fromChat = false
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onFavouriteClicked(node: MegaNode) {
+        megaApi.setNodeFavourite(node, !node.isFavourite)
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onLabelClicked(node: MegaNode) {
+        (requireActivity() as ManagerActivity).showNodeLabelsPanel(
+            NodeId(node.handle)
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onOfflineClicked(node: MegaNode) {
+        if (OfflineUtils.availableOffline(
+                requireContext(),
+                node
+            )
+        ) {
+            val mOffDelete = dbH.findByHandle(node.handle)
+            removeFromOffline(mOffDelete)
+            Util.showSnackbar(activity, resources.getString(R.string.file_removed_offline))
+        } else {
+            saveForOffline(node)
         }
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onPropertiesClicked(
+        node: MegaNode,
+    ) {
+        val fileInfoIntent = Intent(requireContext(), FileInfoActivity::class.java)
+        fileInfoIntent.putExtra(Constants.HANDLE, node.handle)
+        if (drawerItem === DrawerItem.SHARED_ITEMS) {
+            if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
+                fileInfoIntent.putExtra("from", Constants.FROM_INCOMING_SHARES)
+                fileInfoIntent.putExtra(
+                    Constants.INTENT_EXTRA_KEY_FIRST_LEVEL,
+                    (requireActivity() as ManagerActivity).deepBrowserTreeIncoming <= Constants.FIRST_NAVIGATION_LEVEL
+                )
+            } else if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.OUTGOING_TAB) {
+                fileInfoIntent.putExtra(
+                    "adapterType",
+                    Constants.OUTGOING_SHARES_ADAPTER
+                )
+            }
+        } else if (drawerItem === DrawerItem.INBOX) {
+            if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
+                fileInfoIntent.putExtra("from", Constants.FROM_INBOX)
+            }
+        } else if (drawerItem === DrawerItem.SEARCH && nodeController.nodeComesFromIncoming(
+                node
+            )
+        ) {
+            fileInfoIntent.putExtra("from", Constants.FROM_INCOMING_SHARES)
+            val dBT = nodeController.getIncomingLevel(node)
+            fileInfoIntent.putExtra(
+                Constants.INTENT_EXTRA_KEY_FIRST_LEVEL,
+                dBT <= Constants.FIRST_NAVIGATION_LEVEL
+            )
+        }
+        fileInfoIntent.putExtra(Constants.NAME, node.name)
+        startActivityForResult(fileInfoIntent, Constants.REQUEST_CODE_FILE_INFO)
+        dismissAllowingStateLoss()
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onLinkClicked(node: MegaNode) {
+        (requireActivity() as ManagerActivity).showGetLinkActivity(
+            node.handle
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onViewInFolderClicked(node: MegaNode) {
+        (requireActivity() as ManagerActivity).viewNodeInFolder(
+            node
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onRemoveLinkClicked(node: MegaNode) {
+        (requireActivity() as ManagerActivity).showConfirmationRemovePublicLink(
+            node
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onClearShareClicked(node: MegaNode?) {
+        val shareList = megaApi.getOutShares(node)
+        (requireActivity() as ManagerActivity).showConfirmationRemoveAllSharingContacts(
+            shareList,
+            node
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onLeaveShareClicked(node: MegaNode) {
+        showConfirmationLeaveIncomingShare(
+            requireActivity(),
+            (requireActivity() as SnackbarShower), node
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onRenameClicked(node: MegaNode) {
+        (requireActivity() as ManagerActivity).showRenameDialog(node)
+    }
+
+    private fun onSendChatClicked(node: MegaNode?) {
+        (requireActivity() as ManagerActivity).attachNodeToChats(node)
+        dismissAllowingStateLoss()
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onMoveClicked(node: MegaNode) {
+        nodeController.chooseLocationToMoveNodes(listOf(node.handle))
+        dismissAllowingStateLoss()
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onCopyClicked(node: MegaNode) {
+        nodeController.chooseLocationToCopyNodes(listOf(node.handle))
+        dismissAllowingStateLoss()
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onDeleteClicked(node: MegaNode) {
+        (requireActivity() as ManagerActivity).askConfirmationMoveToRubbish(
+            listOf(node.handle)
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onSlideShowClicked(node: MegaNode) {
+        val intent = getIntentForParentNode(
+            requireContext(),
+            megaApi.getParentNode(node).handle,
+            SortOrder.ORDER_PHOTO_ASC,
+            node.handle,
+            true
+        )
+        startActivity(intent)
+        dismissAllowingStateLoss()
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onOpenFolderClicked(node: MegaNode) {
+        searchViewModel.setTextSubmitted(true)
+        nodeController.openFolderFromSearch(node.handle)
+        dismissAllowingStateLoss()
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onOpenWithClicked(node: MegaNode) {
+        onNodeTapped(
+            requireActivity(),
+            node,
+            (requireActivity() as ManagerActivity)::saveNodeByOpenWith,
+            (requireActivity() as ManagerActivity),
+            (requireActivity() as ManagerActivity),
+            true
+        )
+        dismissAllowingStateLoss()
+    }
+
+    private fun onRestoreClicked(node: MegaNode?) {
+        val nodes: MutableList<MegaNode?> = ArrayList()
+        nodes.add(node)
+        (requireActivity() as ManagerActivity).restoreFromRubbish(nodes)
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onEditClicked(node: MegaNode) {
+        manageEditTextFileIntent(
+            requireContext(),
+            node,
+            adapterType
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onVersionsClicked(node: MegaNode) {
+        val version = Intent(activity, VersionsFileActivity::class.java)
+        version.putExtra("handle", node.handle)
+        requireActivity().startActivityForResult(
+            version,
+            Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY
+        )
+        setStateBottomSheetBehaviorHidden()
+    }
+
+    private fun onVerifyUserClicked(
+        shareData: ShareData,
+        node: MegaNode,
+    ) {
+        if (!shareData.isVerified && shareData.isPending) {
+            showCanNotVerifyContact(shareData.user)
+        } else {
+            openAuthenticityCredentials(shareData.user, node)
+        }
+        setStateBottomSheetBehaviorHidden()
     }
 
 
@@ -980,7 +1041,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
         refreshView()
     }
 
-    private fun saveForOffline() {
+    private fun saveForOffline(node: MegaNode?) {
         var adapterType = Constants.FROM_OTHERS
         when (drawerItem) {
             DrawerItem.INBOX -> adapterType = Constants.FROM_INBOX
@@ -1017,8 +1078,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        node?.handle?.let { outState.putLong(Constants.HANDLE, it) }
-        outState.putInt(SAVED_STATE_KEY_MODE, mMode)
+        outState.putAll(arguments)
         outState.putBoolean(
             Constants.CANNOT_OPEN_FILE_SHOWN,
             isAlertDialogShown(cannotOpenFileDialog)
@@ -1027,17 +1087,17 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
 
     private fun mapDrawerItemToMode(drawerItem: DrawerItem?) {
         when (drawerItem) {
-            DrawerItem.CLOUD_DRIVE -> mMode = CLOUD_DRIVE_MODE
-            DrawerItem.RUBBISH_BIN -> mMode = RUBBISH_BIN_MODE
-            DrawerItem.INBOX -> mMode = INBOX_MODE
-            DrawerItem.SHARED_ITEMS -> mMode = SHARED_ITEMS_MODE
-            DrawerItem.SEARCH -> mMode = SEARCH_MODE
+            DrawerItem.CLOUD_DRIVE -> mode = CLOUD_DRIVE_MODE
+            DrawerItem.RUBBISH_BIN -> mode = RUBBISH_BIN_MODE
+            DrawerItem.INBOX -> mode = INBOX_MODE
+            DrawerItem.SHARED_ITEMS -> mode = SHARED_ITEMS_MODE
+            DrawerItem.SEARCH -> mode = SEARCH_MODE
             else -> {}
         }
     }
 
     private val adapterType: Int
-        get() = when (mMode) {
+        get() = when (mode) {
             CLOUD_DRIVE_MODE -> Constants.FILE_BROWSER_ADAPTER
             RUBBISH_BIN_MODE -> Constants.RUBBISH_BIN_ADAPTER
             INBOX_MODE -> Constants.INBOX_ADAPTER
@@ -1053,7 +1113,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
             else -> Constants.INVALID_VALUE
         }
 
-    private fun showShareFolderOptions() {
+    private fun showShareFolderOptions(node: MegaNode?) {
         node?.let {
             val nodeType = checkBackupNodeTypeByHandle(megaApi, node)
             if (isOutShare(it)) {
@@ -1096,7 +1156,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
      * Open authenticityCredentials screen to verify user
      * @param email : Email of the user
      */
-    private fun openAuthenticityCredentials(email: String?) {
+    private fun openAuthenticityCredentials(email: String?, node: MegaNode?) {
         val authenticityCredentialsIntent =
             Intent(activity, AuthenticityCredentialsActivity::class.java)
         authenticityCredentialsIntent.putExtra(
@@ -1108,6 +1168,26 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
     }
 
     companion object {
+
+        fun newInstance(
+            nodeId: NodeId,
+            shareData: ShareData? = null,
+            mode: Int? = null,
+        ): NodeOptionsBottomSheetDialogFragment {
+            val fragment = NodeOptionsBottomSheetDialogFragment()
+
+            val args = Bundle()
+            args.putLong(NODE_ID_KEY, nodeId.longValue)
+            args.putInt(
+                MODE_KEY,
+                mode?.takeIf { it in DEFAULT_MODE..FAVOURITES_MODE } ?: DEFAULT_MODE)
+            shareData?.let { args.putSerializable(SHARE_DATA_KEY, it) }
+
+            fragment.arguments = args
+
+            return fragment
+        }
+
         /** The "modes" are defined to allow the client to specify the dialog style more flexibly.
          * At the same time, compatible with old code. For which mode corresponds to which dialog style,
          * please refer to the code  */
@@ -1155,6 +1235,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment, View
          * For Favourites
          */
         const val FAVOURITES_MODE = 8
-        private const val SAVED_STATE_KEY_MODE = "MODE"
+
     }
 }

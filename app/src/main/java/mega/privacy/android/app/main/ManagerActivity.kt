@@ -189,6 +189,7 @@ import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -331,6 +332,7 @@ import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.feature.sync.ui.SyncFragment
@@ -401,6 +403,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     internal val searchViewModel: SearchViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
+    private val bottomSheetViewModel: NodeOptionsViewModel by viewModels()
 
     @Inject
     lateinit var checkPasswordReminderUseCase: CheckPasswordReminderUseCase
@@ -477,8 +480,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
     }
     private var selectedTransfer: AndroidCompletedTransfer? = null
-    var selectedNode: MegaNode? = null
-    var selectedShareData: ShareData? = null
     var selectedOfflineNode: MegaOffline? = null
 
     @JvmField
@@ -5835,7 +5836,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @param handleList List of Nodes selected for removal
      */
-    fun askConfirmationMoveToRubbish(handleList: ArrayList<Long>?) {
+    fun askConfirmationMoveToRubbish(handleList: List<Long>?) {
         Timber.d("askConfirmationMoveToRubbish")
         if (handleList == null || handleList.isEmpty()) {
             Timber.w("handleList NULL or empty")
@@ -6862,19 +6863,20 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     ) {
         Timber.d("showNodeOptionsPanel")
         if (node == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        selectedNode = node
-        selectedShareData = shareData
-        bottomSheetDialogFragment = NodeOptionsBottomSheetDialogFragment(mode)
+        bottomSheetDialogFragment = NodeOptionsBottomSheetDialogFragment.newInstance(
+            nodeId = NodeId(node.handle),
+            shareData = shareData,
+            mode = mode,
+        )
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
-    fun showNodeLabelsPanel(node: MegaNode) {
+    fun showNodeLabelsPanel(node: NodeId) {
         Timber.d("showNodeLabelsPanel")
         if (bottomSheetDialogFragment.isBottomSheetDialogShown()) {
             bottomSheetDialogFragment?.dismiss()
         }
-        selectedNode = node
-        bottomSheetDialogFragment = NodeLabelBottomSheetDialogFragment.newInstance(node.handle)
+        bottomSheetDialogFragment = NodeLabelBottomSheetDialogFragment.newInstance(node.longValue)
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
