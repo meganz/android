@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 
 @Composable
 internal fun DynamicView(
+    lazyListState: LazyListState,
     photos: List<Photo>,
     smallWidth: Dp,
     photoDownload: PhotoDownload,
@@ -38,11 +39,7 @@ internal fun DynamicView(
         }
     }
 
-    LazyColumn(
-        state = rememberSaveable(saver = LazyListState.Saver) {
-            LazyListState()
-        },
-    ) {
+    LazyColumn(state = lazyListState) {
         this.items(
             dynamicList,
             key = { it.key }
