@@ -242,8 +242,8 @@ object PermissionUtils {
      * @return True, if permissions are granted. False, if not.
      */
     @JvmStatic
-    fun checkCallPermissions(activity: Activity): Boolean =
-        hasPermissions(activity, *getListCallPermissionsByVersion())
+    fun checkMandatoryCallPermissions(activity: Activity): Boolean =
+        hasPermissions(activity, *getMandatoryListCallPermissionsByVersion())
 
     /**
      * Ask for call permissions.
@@ -269,6 +269,23 @@ object PermissionUtils {
         } else {
             arrayOf(
                 getCameraPermission(),
+                getRecordAudioPermission(),
+            )
+        }
+
+    /**
+     * Get list of call permissions by version
+     *
+     * @return List of required permissions
+     */
+    private fun getMandatoryListCallPermissionsByVersion() =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
+                getBluetoothConnectPermission(),
+                getRecordAudioPermission()
+            )
+        } else {
+            arrayOf(
                 getRecordAudioPermission(),
             )
         }

@@ -90,6 +90,7 @@ import mega.privacy.android.app.utils.Constants.INVITE_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.LOGIN_FRAGMENT
 import mega.privacy.android.app.utils.Constants.MESSAGE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.MUTE_NOTIFICATIONS_SNACKBAR_TYPE
+import mega.privacy.android.app.utils.Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.OPEN_FILE_SNACKBAR_TYPE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
@@ -894,6 +895,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     s ?: return,
                     Snackbar.LENGTH_INDEFINITE
                 )
+                NOT_CALL_PERMISSIONS_SNACKBAR_TYPE -> Snackbar.make(
+                    view,
+                    s ?: return,
+                    Snackbar.LENGTH_LONG
+                )
                 else -> Snackbar.make(view, s ?: return, Snackbar.LENGTH_LONG)
             }
         } catch (e: Exception) {
@@ -964,6 +970,12 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     setAction(
                         R.string.button_resume_individual_transfer,
                         SnackbarNavigateOption(view.context, type)
+                    )
+                    show()
+                }
+                NOT_CALL_PERMISSIONS_SNACKBAR_TYPE -> {
+                    setAction(
+                        R.string.general_allow, toAppInfo(applicationContext)
                     )
                     show()
                 }

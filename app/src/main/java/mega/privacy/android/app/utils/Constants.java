@@ -564,6 +564,8 @@ public class Constants {
     public static final int SENT_REQUESTS_TYPE = 8;
     public static final int RESUME_TRANSFERS_TYPE = 9;
 
+    public static final int NOT_CALL_PERMISSIONS_SNACKBAR_TYPE = 10;
+
     public static final int INFO_ANIMATION = 3000;
     public static final int QUICK_INFO_ANIMATION = 500;
 
