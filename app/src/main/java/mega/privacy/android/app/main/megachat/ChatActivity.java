@@ -48,7 +48,6 @@ import static mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuota
 import static mega.privacy.android.app.utils.CacheFolderManager.buildVoiceClipFile;
 import static mega.privacy.android.app.utils.CallUtil.activateChrono;
 import static mega.privacy.android.app.utils.CallUtil.callStatusToString;
-import static mega.privacy.android.app.utils.CallUtil.canCallBeStartedFromContactOption;
 import static mega.privacy.android.app.utils.CallUtil.checkIfCanJoinOneToOneCall;
 import static mega.privacy.android.app.utils.CallUtil.getAnotherCallOnHold;
 import static mega.privacy.android.app.utils.CallUtil.getCallInProgress;
@@ -155,8 +154,6 @@ import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_DEFAULT_VA
 import static mega.privacy.android.app.utils.Constants.REACTION_ERROR_TYPE_USER;
 import static mega.privacy.android.app.utils.Constants.RECORD_VOICE_CLIP;
 import static mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS;
-import static mega.privacy.android.app.utils.Constants.REQUEST_BT_CONNECT;
-import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_SHOW_PREVIEW;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CAMERA_TAKE_PICTURE;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_GET_FILES;
@@ -165,7 +162,6 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_FILE;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_IMPORT_FOLDER;
 import static mega.privacy.android.app.utils.Constants.REQUEST_CODE_SEND_LOCATION;
 import static mega.privacy.android.app.utils.Constants.REQUEST_READ_STORAGE;
-import static mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO;
 import static mega.privacy.android.app.utils.Constants.REQUEST_SEND_CONTACTS;
 import static mega.privacy.android.app.utils.Constants.REQUEST_STORAGE_VOICE_CLIP;
 import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE_TAKE_PICTURE;
@@ -205,7 +201,9 @@ import static mega.privacy.android.app.utils.Util.mutateIcon;
 import static mega.privacy.android.app.utils.Util.scaleHeightPx;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
 import static mega.privacy.android.app.utils.Util.toCDATA;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.checkMandatoryCallPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions;
+import static mega.privacy.android.app.utils.permission.PermissionUtils.requestCallPermissions;
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 import static mega.privacy.android.data.facade.FileFacadeKt.INTENT_EXTRA_NODE_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
@@ -388,6 +386,7 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment;
+import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
@@ -405,6 +404,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.CallUtil;
 import mega.privacy.android.app.utils.ChatUtil;
 import mega.privacy.android.app.utils.ColorUtils;
+import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
@@ -815,6 +815,8 @@ public class ChatActivity extends PasscodeActivity
     private ActivityResultLauncher<Intent> scanDocumentLauncher = null;
     private ActivityResultLauncher<Intent> takePictureLauncher = null;
 
+    private ActivityResultLauncher<String[]> permissionsRequest = null;
+
     /**
      * Current contact online status.
      */
@@ -863,6 +865,7 @@ public class ChatActivity extends PasscodeActivity
             case MegaChatCall.CALL_STATUS_USER_NO_PRESENT:
             case MegaChatCall.CALL_STATUS_IN_PROGRESS:
             case MegaChatCall.CALL_STATUS_DESTROYED:
+
                 updateCallBanner();
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
                     cancelRecording();
@@ -1209,9 +1212,7 @@ public class ChatActivity extends PasscodeActivity
 
         startVideo = videoOn;
 
-        if (checkPermissionsCall()) {
-            startCall();
-        }
+        startCall();
     }
 
     @Override
@@ -1499,7 +1500,6 @@ public class ChatActivity extends PasscodeActivity
     public void onCreate(Bundle savedInstanceState) {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-
         viewModel = new ViewModelProvider(this).get(ChatViewModel.class);
 
         if (shouldRefreshSessionDueToKarere()) {
@@ -1589,6 +1589,21 @@ public class ChatActivity extends PasscodeActivity
                 new IntentFilter(BROADCAST_ACTION_RETRY_PENDING_MESSAGE));
 
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        permissionsRequest = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(),
+                result -> {
+                    if (checkMandatoryCallPermissions(chatActivity)) {
+                        enableCallMenuItems(false);
+                        viewModel.onCallTap(startVideo);
+                    } else {
+                        showSnackbar(Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE,
+                                fragmentContainer,
+                                getString(R.string.allow_acces_calls_subtitle_microphone),
+                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                        );
+                    }
+                });
 
         sendGifLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -2067,16 +2082,21 @@ public class ChatActivity extends PasscodeActivity
             }
 
             ScheduledMeetingStatus schedMeetStatus = chatState.getScheduledMeetingStatus();
+
             if (chatRoom.isActive() && !chatRoom.isArchived() && schedMeetStatus != null && (schedMeetStatus == ScheduledMeetingStatus.NotStarted ||
                     schedMeetStatus == ScheduledMeetingStatus.NotJoined)) {
-
                 startOrJoinMeetingBanner.setText(schedMeetStatus == ScheduledMeetingStatus.NotStarted ?
                         R.string.meetings_chat_room_start_scheduled_meeting_option :
                         R.string.meetings_chat_room_join_scheduled_meeting_option);
+
                 startOrJoinMeetingBanner.setVisibility(View.VISIBLE);
                 callInProgressLayout.setVisibility(View.GONE);
             } else {
                 startOrJoinMeetingBanner.setVisibility(View.GONE);
+            }
+
+            if (chatState.getSchedId() != null) {
+                updateCallBanner();
             }
 
             long callChatId = chatState.getCurrentCallChatId();
@@ -3692,7 +3712,12 @@ public class ChatActivity extends PasscodeActivity
             return;
         }
 
-        if (!participatingInACall() && canCallBeStartedFromContactOption(this, passcodeManagement)) {
+        if(StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
+            showOverDiskQuotaPaywallWarning();
+            return;
+        }
+
+        if (!participatingInACall()) {
             Timber.d("There is not a call in this chat and I am NOT in another call");
             startCall();
         }
@@ -3702,8 +3727,7 @@ public class ChatActivity extends PasscodeActivity
      * Start a call
      */
     private void startCall() {
-        enableCallMenuItems(false);
-        viewModel.onCallTap(startVideo);
+        requestCallPermissions(permissionsRequest);
     }
 
     private void enableCallMenuItems(Boolean enable) {
@@ -3784,18 +3808,6 @@ public class ChatActivity extends PasscodeActivity
         return checkPermissions(RECORD_VOICE_CLIP, Manifest.permission.RECORD_AUDIO);
     }
 
-    private boolean checkPermissionsCall() {
-        Timber.d("checkPermissionsCall");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            return checkPermissions(REQUEST_CAMERA, Manifest.permission.CAMERA)
-                    && checkPermissions(REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO)
-                    && checkPermissions(REQUEST_BT_CONNECT, Manifest.permission.BLUETOOTH_CONNECT);
-        } else {
-            return checkPermissions(REQUEST_CAMERA, Manifest.permission.CAMERA)
-                    && checkPermissions(REQUEST_RECORD_AUDIO, Manifest.permission.RECORD_AUDIO);
-        }
-    }
-
     private boolean checkPermissionsTakePicture() {
         Timber.d("checkPermissionsTakePicture");
         return checkPermissions(REQUEST_CAMERA_TAKE_PICTURE, Manifest.permission.CAMERA)
@@ -3829,18 +3841,6 @@ public class ChatActivity extends PasscodeActivity
         }
 
         switch (requestCode) {
-            case REQUEST_RECORD_AUDIO:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsCall()) {
-                    startCall();
-                }
-                break;
-
-            case REQUEST_CAMERA:
-                if(checkPermissionsCall()) {
-                    startCall();
-                }
-                break;
-
             case REQUEST_CAMERA_TAKE_PICTURE:
             case REQUEST_WRITE_STORAGE_TAKE_PICTURE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED && checkPermissionsTakePicture()) {
@@ -4596,10 +4596,8 @@ public class ChatActivity extends PasscodeActivity
                 break;
 
             case R.id.start_or_join_meeting_banner:
-                if (checkPermissionsCall()) {
-                    startVideo = false;
-                    startCall();
-                }
+                startVideo = false;
+                startCall();
                 break;
 
         }
@@ -8970,7 +8968,6 @@ public class ChatActivity extends PasscodeActivity
             }
 
             activityVisible = true;
-            updateCallBanner();
             if (aB != null && aB.getTitle() != null) {
                 titleToolbar.setText(titleToolbar.getText());
             }
@@ -9237,7 +9234,9 @@ public class ChatActivity extends PasscodeActivity
 
         chatIdBanner = call.getChatid();
 
-        if (callInProgressLayout != null && callInProgressLayout.getVisibility() != View.VISIBLE &&
+        if (!chatRoom.isArchived() && chatRoom.isActive() && callInProgressLayout != null &&
+                callInProgressLayout.getVisibility() != View.VISIBLE &&
+                viewModel.getState().getValue().getSchedId() != null &&
                 startOrJoinMeetingBanner.getVisibility() != View.VISIBLE) {
             callInProgressLayout.setAlpha(1);
             callInProgressLayout.setVisibility(View.VISIBLE);

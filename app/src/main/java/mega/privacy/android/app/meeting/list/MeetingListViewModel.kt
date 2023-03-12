@@ -256,6 +256,13 @@ class MeetingListViewModel @Inject constructor(
     }
 
     /**
+     * Update snackBar
+     */
+    fun updateSnackBar(text: Int?) {
+        state.update { it.copy(snackBar = text) }
+    }
+
+    /**
      * Archive chat
      *
      * @param chatId    Chat id to be archived

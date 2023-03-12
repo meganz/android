@@ -167,22 +167,19 @@ class ChatViewModel @Inject constructor(
                 getScheduledMeetingByChat(state.value.chatId)
             }.onFailure {
                 Timber.d("Scheduled meeting does not exist")
+                _state.update {
+                    it.copy(
+                        schedId = megaChatApiGateway.getChatInvalidHandle(),
+                        scheduledMeetingStatus = null
+                    )
+                }
             }.onSuccess { scheduledMeetingList ->
                 scheduledMeetingList?.let { list ->
                     list.forEach { scheduledMeetReceived ->
                         if (scheduledMeetReceived.parentSchedId == chatApiGateway.getChatInvalidHandle()) {
-                            _state.update {
-                                it.copy(
-                                    schedId = scheduledMeetReceived.schedId,
-                                    schedIsPending = !scheduledMeetReceived.isPast()
-                                )
-                            }
-                            var scheduledMeetingStatus: ScheduledMeetingStatus? = null
-                            getChatCallUpdates()
-
+                            var scheduledMeetingStatus = ScheduledMeetingStatus.NotStarted
                             if (!scheduledMeetReceived.isPast()) {
                                 Timber.d("Has scheduled meeting")
-                                scheduledMeetingStatus = ScheduledMeetingStatus.NotStarted
                                 getChatCall(scheduledMeetReceived.chatId)?.let { call ->
                                     when (call.status) {
                                         ChatCallStatus.UserNoPresent -> scheduledMeetingStatus =
@@ -197,12 +194,24 @@ class ChatViewModel @Inject constructor(
                             }
                             _state.update {
                                 it.copy(
+                                    schedId = scheduledMeetReceived.schedId,
+                                    schedIsPending = !scheduledMeetReceived.isPast(),
                                     scheduledMeetingStatus = scheduledMeetingStatus
                                 )
                             }
+                            return@forEach
                         }
+                    }
+                }
 
-                        return@forEach
+                getChatCallUpdates()
+
+                if (_state.value.schedId == null) {
+                    _state.update {
+                        it.copy(
+                            schedId = megaChatApiGateway.getChatInvalidHandle(),
+                            scheduledMeetingStatus = null
+                        )
                     }
                 }
             }

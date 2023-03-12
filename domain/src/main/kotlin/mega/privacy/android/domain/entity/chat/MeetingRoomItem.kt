@@ -62,7 +62,7 @@ data class MeetingRoomItem constructor(
     val scheduledStartTimestamp: Long? = null,
     val scheduledEndTimestamp: Long? = null,
     val scheduledTimestampFormatted: String? = null,
-    val scheduledMeetingStatus: ScheduledMeetingStatus = ScheduledMeetingStatus.NotStarted,
+    val scheduledMeetingStatus: ScheduledMeetingStatus? = null,
 ) {
 
     fun isSingleMeeting(): Boolean =

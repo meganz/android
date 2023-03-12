@@ -37,8 +37,8 @@ import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
 import mega.privacy.android.app.modalbottomsheet.MeetingBottomSheetDialogFragment
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaChatApiJava
 
 @AndroidEntryPoint
 class MeetingListFragment : Fragment() {
@@ -178,6 +178,16 @@ class MeetingListFragment : Fragment() {
                 viewModel.removeCurrentCall()
                 launchChatCallScreen(state.currentCallChatId)
             }
+
+            state.snackBar?.let {
+                (requireActivity() as ManagerActivity).showSnackbar(
+                    Constants.NOT_CALL_PERMISSIONS_SNACKBAR_TYPE,
+                    binding.root,
+                    getString(it),
+                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                )
+                viewModel.updateSnackBar(null)
+            }
         }
     }
 
@@ -289,26 +299,35 @@ class MeetingListFragment : Fragment() {
                                 .controlMuteNotificationsOfAChat(
                                     requireContext(),
                                     Constants.NOTIFICATIONS_ENABLED,
-                                    id)
+                                    id
+                                )
                         }
                         clearSelections()
                         true
                     }
                     R.id.cab_menu_archive -> {
-                        val chatsToArchive = meetingsAdapter.tracker?.selection?.toList() ?: return true
+                        val chatsToArchive =
+                            meetingsAdapter.tracker?.selection?.toList() ?: return true
                         viewModel.archiveChats(chatsToArchive)
                         clearSelections()
                         true
                     }
                     R.id.chat_list_leave_chat_layout -> {
-                        val chatsToLeave = meetingsAdapter.tracker?.selection?.toList() ?: return true
-                        MaterialAlertDialogBuilder(requireContext(), R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                            .setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
-                            .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
-                            .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave)) { _, _ ->
+                        val chatsToLeave =
+                            meetingsAdapter.tracker?.selection?.toList() ?: return true
+                        MaterialAlertDialogBuilder(
+                            requireContext(),
+                            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+                        )
+                            .setTitle(getString(R.string.title_confirmation_leave_group_chat))
+                            .setMessage(getString(R.string.confirmation_leave_group_chat))
+                            .setPositiveButton(getString(R.string.general_leave)) { _, _ ->
                                 viewModel.leaveChats(chatsToLeave)
                             }
-                            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                            .setNegativeButton(
+                                getString(R.string.general_cancel),
+                                null
+                            )
                             .show()
                         clearSelections()
                         true

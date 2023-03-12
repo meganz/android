@@ -29,7 +29,7 @@ import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivit
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.permission.PermissionUtils.checkCallPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.checkMandatoryCallPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestCallPermissions
 import mega.privacy.android.app.utils.setImageRequestFromFilePath
 import mega.privacy.android.app.utils.view.TextDrawable
@@ -85,7 +85,6 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             @SuppressLint("RestrictedApi")
             height = dpToPx(requireContext(), 71).toInt()
         }
-        permissionsRequest = getCallPermissionsRequest()
 
         return binding.root
     }
@@ -95,22 +94,27 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      */
     private fun getCallPermissionsRequest() =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            if (checkCallPermissions(requireActivity())) {
+            if (checkMandatoryCallPermissions(requireActivity())) {
                 currentMeeting?.let { room ->
-                    when (room.scheduledMeetingStatus) {
-                        ScheduledMeetingStatus.NotStarted -> viewModel.startSchedMeeting(
-                            room.chatId,
-                            room.schedId
-                        )
-                        ScheduledMeetingStatus.NotJoined -> viewModel.joinSchedMeeting(
-                            room.chatId
-                        )
-                        else -> {}
+                    room.scheduledMeetingStatus?.let { scheduledMeetingStatus ->
+                        when (scheduledMeetingStatus) {
+                            ScheduledMeetingStatus.NotStarted -> viewModel.startSchedMeeting(
+                                room.chatId,
+                                room.schedId
+                            )
+                            ScheduledMeetingStatus.NotJoined -> viewModel.joinSchedMeeting(
+                                room.chatId
+                            )
+                            else -> {}
+                        }
                     }
                 }
 
-                dismissAllowingStateLoss()
+            } else {
+                viewModel.updateSnackBar(R.string.allow_acces_calls_subtitle_microphone)
             }
+
+            dismissAllowingStateLoss()
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -120,6 +124,8 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             Lifecycle.State.RESUMED,
             ::showMeeting
         )
+
+        permissionsRequest = getCallPermissionsRequest()
     }
 
     private fun showMeeting(room: MeetingRoomItem?) {
@@ -185,31 +191,33 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.btnStartOrJoinSchedMeeting.isVisible =
-            room.isActive &&
+            room.isActive && room.scheduledMeetingStatus != null &&
                     room.scheduledMeetingStatus != ScheduledMeetingStatus.Joined
         binding.dividerStartOrJoinSchedMeeting.isVisible =
             binding.btnStartOrJoinSchedMeeting.isVisible
 
-        when (room.scheduledMeetingStatus) {
-            ScheduledMeetingStatus.NotStarted -> {
-                binding.btnStartOrJoinSchedMeeting.setText(R.string.meetings_list_start_scheduled_meeting_option)
-                binding.btnStartOrJoinSchedMeeting.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    R.drawable.start_sched_icon,
-                    0,
-                    0,
-                    0
-                )
+        room.scheduledMeetingStatus?.let { scheduledMeetingStatus ->
+            when (scheduledMeetingStatus) {
+                ScheduledMeetingStatus.NotStarted -> {
+                    binding.btnStartOrJoinSchedMeeting.setText(R.string.meetings_list_start_scheduled_meeting_option)
+                    binding.btnStartOrJoinSchedMeeting.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        R.drawable.start_sched_icon,
+                        0,
+                        0,
+                        0
+                    )
+                }
+                ScheduledMeetingStatus.NotJoined -> {
+                    binding.btnStartOrJoinSchedMeeting.setText(R.string.meetings_list_join_scheduled_meeting_option)
+                    binding.btnStartOrJoinSchedMeeting.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        R.drawable.join_sched_icon,
+                        0,
+                        0,
+                        0
+                    )
+                }
+                else -> {}
             }
-            ScheduledMeetingStatus.NotJoined -> {
-                binding.btnStartOrJoinSchedMeeting.setText(R.string.meetings_list_join_scheduled_meeting_option)
-                binding.btnStartOrJoinSchedMeeting.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                    R.drawable.join_sched_icon,
-                    0,
-                    0,
-                    0
-                )
-            }
-            else -> {}
         }
 
         binding.btnStartOrJoinSchedMeeting.setOnClickListener {
