@@ -119,6 +119,17 @@ data class RawFileTypeInfo(
 ) : ImageFileTypeInfo
 
 /**
+ * svg file type info
+ *
+ * @property mimeType
+ * @property extension
+ */
+data class SvgFileTypeInfo(
+    override val mimeType: String,
+    override val extension: String,
+) : ImageFileTypeInfo
+
+/**
  * Text file type info
  *
  * @property mimeType

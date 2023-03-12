@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
@@ -373,6 +374,35 @@ class FileTypeInfoMapperTest {
                 mimeType = expectedMimeType,
                 extension = expectedExtension,
                 duration = expectedDuration
+            )
+        )
+    }
+
+    @Test
+    fun `test that a file with svg extension is mapped correctly`() {
+        val expectedMimeType = "expected"
+        val node = mock<MegaNode>()
+        val expectedExtension = "svg"
+        whenever(node.name).thenReturn("withExtension.$expectedExtension")
+        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+            SvgFileTypeInfo(
+                mimeType = expectedMimeType,
+                extension = expectedExtension
+            )
+        )
+
+    }
+
+    @Test
+    fun `test that a file with capital svg extension is mapped correctly`() {
+        val expectedMimeType = "expected"
+        val node = mock<MegaNode>()
+        val expectedExtension = "SVG"
+        whenever(node.name).thenReturn("withExtension.$expectedExtension")
+        assertThat(underTest(node) { expectedMimeType }).isEqualTo(
+            SvgFileTypeInfo(
+                mimeType = expectedMimeType,
+                extension = expectedExtension
             )
         )
     }

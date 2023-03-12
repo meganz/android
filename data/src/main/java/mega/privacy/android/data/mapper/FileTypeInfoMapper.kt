@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.TextFileTypeInfo
 import mega.privacy.android.domain.entity.UnMappedFileTypeInfo
 import mega.privacy.android.domain.entity.UnknownFileTypeInfo
@@ -63,6 +64,12 @@ private fun getFileTypeInfoForExtension(
             extension = extension,
         )
     }
+    extension.lowercase().isSVGExtension() -> {
+        SvgFileTypeInfo(
+            mimeType = mimeType,
+            extension = extension,
+        )
+    }
     mimeType.startsWith("image/") -> {
         StaticImageFileTypeInfo(
             mimeType = mimeType,
@@ -116,6 +123,8 @@ private fun String.isVideoMimeType(extension: String) =
 private fun String.isGifExtension() = this == "gif"
 
 private fun String.isRawExtension() = this in rawExtensions
+
+private fun String.isSVGExtension() = this == "svg"
 
 private val rawExtensions = listOf(
     "3fr", "arw", "bay",

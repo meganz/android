@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.ImageFileTypeInfo
 import mega.privacy.android.domain.entity.RawFileTypeInfo
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
+import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
@@ -188,7 +189,9 @@ internal class DefaultPhotosRepository @Inject constructor(
             val fileType = fileTypeInfoMapper(megaNode)
             val isValid =
                 megaNode.isFile
-                        && (fileType is VideoFileTypeInfo || fileType is ImageFileTypeInfo)
+                        && (fileType is VideoFileTypeInfo
+                        || fileType is ImageFileTypeInfo
+                        && fileType !is SvgFileTypeInfo)
                         && !megaApiFacade.isInRubbish(megaNode)
             if (isValid.not()) return@mapNotNull null
             if (fileType is ImageFileTypeInfo) {
@@ -206,7 +209,7 @@ internal class DefaultPhotosRepository @Inject constructor(
      */
     private suspend fun mapPhotoNodesToImages(megaNodes: List<MegaNode>): List<Photo> {
         return megaNodes.filter {
-            it.isValidPhotoNode()
+            fileTypeInfoMapper(it) !is SvgFileTypeInfo && it.isValidPhotoNode()
         }.map { megaNode ->
             mapMegaNodeToImage(megaNode)
         }
