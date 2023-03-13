@@ -4627,13 +4627,13 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Join meeting</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">1 invite request successfully sent&#160;</item>
-        <item quantity="other">%1$d invite requests successfully sent&#160;</item>
+        <item quantity="one">1 invite request sent.&#160;</item>
+        <item quantity="other">%1$d invite requests sent.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
-        <item quantity="one">however, 1 request wasn’t sent.</item>
-        <item quantity="other">however, %1$d requests weren’t sent.</item>
+        <item quantity="one">However, 1 request wasn’t sent.</item>
+        <item quantity="other">However, %1$d requests weren’t sent.</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
     <plurals name="general_copy_snackbar_success">
@@ -4654,5 +4654,10 @@
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy 1 item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
     </plurals>
 </resources>

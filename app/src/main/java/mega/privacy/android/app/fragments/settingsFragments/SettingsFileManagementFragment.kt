@@ -34,6 +34,7 @@ import mega.privacy.android.app.presentation.settings.filesettings.model.FilePre
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import nz.mega.sdk.MegaAccountDetails
 import timber.log.Timber
 import javax.inject.Inject
@@ -308,7 +309,11 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
                 preferenceScreen.addPreference(it)
                 it.onPreferenceClickListener = this
                 it.summary =
-                    getString(R.string.settings_rb_scheduler_select_days_subtitle, daysCount)
+                    getQuantityString(
+                        R.plurals.settings_file_management_remove_files_older_than_days,
+                        daysCount.toInt(),
+                        daysCount.toInt()
+                    )
             }
         }
     }
