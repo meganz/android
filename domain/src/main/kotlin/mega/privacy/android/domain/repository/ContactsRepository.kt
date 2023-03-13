@@ -285,4 +285,19 @@ interface ContactsRepository {
      * @param handle user handle id
      */
     suspend fun getUserOnlineStatusByHandle(handle: Long): UserStatus
+
+    /**
+     * Get user email from chat id
+     *
+     * @param handle user handle
+     */
+    suspend fun getUserEmailFromChat(handle: Long): String?
+
+    /**
+     * Get contact item from user email
+     *
+     * @param email user email
+     * @return [ContactItem]
+     */
+    suspend fun getContactItemFromUserEmail(email: String): ContactItem?
 }

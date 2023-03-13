@@ -35,6 +35,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
+import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
@@ -914,5 +915,48 @@ class DefaultContactsRepositoryTest {
             expectedStatus,
             null
         )
+    }
+
+    @Test
+    fun `test if peer handle is returned when chat id is passed`() = runTest {
+        val megaChatRoom = mock<MegaChatRoom>()
+        whenever(megaChatApiGateway.getChatRoom(0L)).thenReturn(megaChatRoom)
+        whenever(megaChatRoom.getPeerHandle(0)).thenReturn(userHandle)
+        whenever(megaApiGateway.userHandleToBase64(userHandle)).thenReturn(userEmail)
+        val email = underTest.getUserEmailFromChat(0L)
+        assertEquals(userEmail, email)
+    }
+
+    @Test
+    fun `test if contact is returned from email`() = runTest {
+        val megaUser = mock<MegaUser> {
+            on { handle }.thenReturn(userHandle)
+            on { email }.thenReturn(userEmail)
+        }
+        val expectedColor = "color"
+        whenever(megaApiGateway.getContact(any())).thenReturn(megaUser)
+        whenever(megaApiGateway.areCredentialsVerified(megaUser)).thenReturn(true)
+        whenever(
+            megaApiGateway.getUserAlias(anyLong(), any())
+        ).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+        whenever(
+            megaApiGateway.getContactAvatar(anyString(), anyString(), any())
+        ).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+        whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                mock(), request, success
+            )
+        }
+        whenever(megaApiGateway.getUserAvatarColor(megaUser)).thenReturn(expectedColor)
+        val contact = underTest.getContactItemFromUserEmail(userEmail)
+        assertEquals(userEmail, contact?.email)
     }
 }

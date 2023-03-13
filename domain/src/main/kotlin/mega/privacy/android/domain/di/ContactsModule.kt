@@ -10,9 +10,10 @@ import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
+import mega.privacy.android.domain.usecase.contact.DefaultGetContactFromChat
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetContactData
-import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
+import mega.privacy.android.domain.usecase.contact.GetContactFromChat
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -27,12 +28,14 @@ import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.contact.DefaultReloadContactDatabase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetContactItem
+import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
+import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
 import mega.privacy.android.domain.usecase.contact.InviteContact
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
 
@@ -50,6 +53,9 @@ internal abstract class ContactsModule {
 
     @Binds
     abstract fun bindResetContactDatabase(implementation: DefaultReloadContactDatabase): ReloadContactDatabase
+
+    @Binds
+    abstract fun bindGetContactFromUserEmail(implementation: DefaultGetContactFromChat): GetContactFromChat
 
     companion object {
         @Provides
@@ -147,5 +153,9 @@ internal abstract class ContactsModule {
         @Provides
         fun provideGetUserOnlineStatusByHandle(contactsRepository: ContactsRepository): GetUserOnlineStatusByHandle =
             GetUserOnlineStatusByHandle(contactsRepository::getUserOnlineStatusByHandle)
+
+        @Provides
+        fun provideGetContactItemFromUserEmail(contactsRepository: ContactsRepository): GetContactFromEmail =
+            GetContactFromEmail(contactsRepository::getContactItemFromUserEmail)
     }
 }

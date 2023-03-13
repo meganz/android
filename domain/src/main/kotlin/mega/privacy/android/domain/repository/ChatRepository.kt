@@ -29,6 +29,14 @@ interface ChatRepository {
     suspend fun getChatRoom(chatId: Long): ChatRoom?
 
     /**
+     * Gets chat room if it exists
+     *
+     * @param userHandle      User handle
+     * @return [ChatRoom] containing the updated data.
+     */
+    suspend fun getChatRoomByUser(userHandle: Long): ChatRoom?
+
+    /**
      * Update open invite setting.
      *
      * @param chatId   The Chat id.

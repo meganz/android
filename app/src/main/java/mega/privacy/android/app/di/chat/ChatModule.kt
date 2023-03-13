@@ -17,6 +17,7 @@ import mega.privacy.android.domain.usecase.GetMeetingsImpl
 import mega.privacy.android.domain.usecase.DefaultMeetingRoomMapper
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomByUser
 import mega.privacy.android.domain.usecase.GetMeetings
 import mega.privacy.android.domain.usecase.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
@@ -101,6 +102,13 @@ abstract class ChatModule {
         @Provides
         fun provideGetChatRoom(chatRepository: ChatRepository): GetChatRoom =
             GetChatRoom(chatRepository::getChatRoom)
+
+        /**
+         * Provides the Use Case [GetChatRoomByUser]
+         */
+        @Provides
+        fun provideGetChatRoomByUser(chatRepository: ChatRepository): GetChatRoomByUser =
+            GetChatRoomByUser(chatRepository::getChatRoomByUser)
 
         /**
          * Provides the Use Case [GetChatCall]

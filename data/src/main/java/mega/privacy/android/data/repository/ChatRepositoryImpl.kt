@@ -102,6 +102,11 @@ internal class ChatRepositoryImpl @Inject constructor(
             megaChatApiGateway.getChatRoom(chatId)?.let(chatRoomMapper)
         }
 
+    override suspend fun getChatRoomByUser(userHandle: Long): ChatRoom? =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatRoomByUser(userHandle)?.let(chatRoomMapper)
+        }
+
     override suspend fun setOpenInvite(chatId: Long): Boolean =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->

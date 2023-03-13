@@ -722,9 +722,20 @@ internal class DefaultContactsRepository @Inject constructor(
         }
     }
 
-    private fun Long.toBase64Handle(): String =
-        megaApiGateway.userHandleToBase64(this)
+    private fun Long.toBase64Handle(): String = megaApiGateway.userHandleToBase64(this)
 
     override suspend fun getUserOnlineStatusByHandle(handle: Long) =
         userStatus[megaChatApiGateway.getUserOnlineStatus(handle)] ?: UserStatus.Invalid
+
+    override suspend fun getUserEmailFromChat(handle: Long) =
+        withContext(ioDispatcher) {
+            val chatRoom = megaChatApiGateway.getChatRoom(handle)
+            chatRoom?.getPeerHandle(0)?.toBase64Handle()
+        }
+
+    override suspend fun getContactItemFromUserEmail(email: String) = withContext(ioDispatcher) {
+        megaApiGateway.getContact(email)?.let {
+            getContactItem(it, true)
+        }
+    }
 }
