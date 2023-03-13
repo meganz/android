@@ -226,6 +226,7 @@ dependencies {
     implementation androidx.bundles.navigation
     implementation androidx.appcompat
     implementation androidx.biometric
+    implementation androidx.camera.camera2
     implementation androidx.camera.view
     implementation androidx.camera.lifecycle
     implementation androidx.cardview
