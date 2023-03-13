@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
@@ -280,6 +281,13 @@ class FileBrowserFragment : RotatableFragment() {
                         it
                     )
                 }
+                R.id.cab_menu_dispute -> {
+                    startActivity(
+                        Intent(context, WebViewActivity::class.java)
+                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            .setData(Uri.parse(Constants.DISPUTE_URL))
+                    )
+                }
             }
             return true
         }
@@ -344,8 +352,10 @@ class FileBrowserFragment : RotatableFragment() {
             var showCopy = true
             var showDownload = true
             var mediaCounter = 0
+            var showDispute = false
             for (node in selected) {
                 if (node?.isTakenDown == true) {
+                    showDispute = true
                     showShareOut = false
                     showCopy = false
                     showDownload = false
@@ -398,6 +408,15 @@ class FileBrowserFragment : RotatableFragment() {
                 control.copy().isVisible = true
                 if (control.alwaysActionCount() < CloudStorageOptionControlUtil.MAX_ACTION_COUNT) {
                     control.copy().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                }
+            }
+            if (showDispute) {
+                control.trash().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                control.move().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                if (selected.size == 1) {
+                    control.disputeTakedown().isVisible = true
+                    control.disputeTakedown().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
+                    control.rename().showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
                 }
             }
             if (!showDownload) {

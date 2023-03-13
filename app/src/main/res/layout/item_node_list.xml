@@ -117,6 +117,7 @@
             android:layout_width="16dp"
             android:layout_height="16dp"
             android:layout_marginStart="3dp"
+            android:layout_marginEnd="4dp"
             android:background="@null"
             android:src="@drawable/link_ic"
             android:visibility="@{item.node.exported ? View.VISIBLE : View.INVISIBLE}"

@@ -43,9 +43,18 @@
         tools:visible="true" />
 
     <item
+        android:id="@+id/cab_menu_dispute"
+        android:icon="@drawable/ic_taken_down_menu_option"
+        android:orderInCategory="150"
+        android:title="@string/dispute_takendown_file"
+        android:visible="false"
+        app:showAsAction="never"
+        tools:visible="true" />
+
+    <item
         android:id="@+id/cab_menu_rename"
         android:icon="@drawable/ic_rename"
-        android:orderInCategory="150"
+        android:orderInCategory="160"
         android:title="@string/context_rename"
         android:visible="false"
         app:iconTint="?attr/colorSecondary"
@@ -55,7 +64,7 @@
     <item
         android:id="@+id/cab_menu_share_link"
         android:icon="@drawable/ic_link_white"
-        android:orderInCategory="160"
+        android:orderInCategory="170"
         android:title="@{@plurals/get_links(one)}"
         android:visible="false"
         app:iconTint="?attr/colorSecondary"
@@ -65,7 +74,7 @@
     <item
         android:id="@+id/cab_menu_edit_link"
         android:icon="@drawable/ic_link_white"
-        android:orderInCategory="161"
+        android:orderInCategory="171"
         android:title="@string/edit_link_option"
         android:visible="false"
         app:iconTint="?attr/colorSecondary"
@@ -75,7 +84,7 @@
     <item
         android:id="@+id/cab_menu_share_folder"
         android:icon="@drawable/ic_share"
-        android:orderInCategory="170"
+        android:orderInCategory="180"
         android:title="@string/context_share_folder"
         android:visible="false"
         app:iconTint="?attr/colorSecondary"
@@ -85,7 +94,7 @@
     <item
         android:id="@+id/cab_menu_send_to_chat"
         android:icon="@drawable/ic_send_to_contact"
-        android:orderInCategory="171"
+        android:orderInCategory="181"
         android:title="@string/context_send_file_to_chat"
         android:visible="false"
         app:iconTint="?attr/colorSecondary"
@@ -134,7 +143,7 @@
 
     <item
         android:id="@+id/cab_menu_trash"
-        android:icon="@drawable/ic_close_white"
+        android:icon="@drawable/ic_move_to_rubbish_bin"
         android:orderInCategory="230"
         android:title="@string/context_move_to_trash"
         app:iconTint="?attr/colorSecondary"

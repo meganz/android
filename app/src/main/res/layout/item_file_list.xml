@@ -121,6 +121,7 @@
             android:layout_alignBottom="@id/file_list_filename"
             android:layout_centerVertical="true"
             android:layout_marginStart="3dp"
+            android:layout_marginEnd="4dp"
             android:layout_toEndOf="@+id/img_favourite"
             android:background="@null"
             android:src="@drawable/link_ic"
