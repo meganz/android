@@ -122,4 +122,9 @@ interface TransferRepository {
      *
      */
     suspend fun broadcastFailedTransfer(isFailed: Boolean)
+
+    /**
+     * Checks if exist ongoing transfers.
+     */
+    suspend fun existOngoingTransfers(): Boolean
 }

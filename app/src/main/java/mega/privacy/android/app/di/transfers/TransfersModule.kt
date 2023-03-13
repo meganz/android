@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.HasPendingUploads
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import mega.privacy.android.domain.usecase.ResetTotalDownloads
+import mega.privacy.android.domain.usecase.transfer.ExistOngoingTransfers
 
 /**
  * Use cases to check on transfer status
@@ -174,5 +175,12 @@ abstract class TransfersModule {
         fun provideResetTotalDownloads(transferRepository: TransferRepository):
                 ResetTotalDownloads =
             ResetTotalDownloads(transferRepository::resetTotalDownloads)
+
+        /**
+         * Provides [ExistOngoingTransfers].
+         */
+        @Provides
+        fun provideExistOngoingTransfers(transferRepository: TransferRepository): ExistOngoingTransfers =
+            ExistOngoingTransfers(transferRepository::existOngoingTransfers)
     }
 }

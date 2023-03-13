@@ -944,7 +944,9 @@ public class Util {
      *
      * @param megaApi
      * @return true if exist ongoing transfers, false otherwise
+     * @deprecated In favour of {@link mega.privacy.android.domain.usecase.transfer.ExistOngoingTransfers} use case.
      */
+    @Deprecated
     public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
         return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
     }

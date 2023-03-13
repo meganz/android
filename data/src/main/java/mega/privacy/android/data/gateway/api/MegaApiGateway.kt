@@ -1562,9 +1562,15 @@ interface MegaApiGateway {
     fun getFileVersionsOption(listener: MegaRequestListenerInterface)
 
     /**
-     * number of pending uploads
+     * Number of pending uploads
      */
     val numberOfPendingUploads: Int
+
+    /**
+     *
+     * Number of pending downloads.
+     */
+    val numberOfPendingDownloads: Int
 
     /**
      * Enable or disable file versioning

@@ -869,13 +869,17 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getFileVersionsOption(listener)
     }
 
-    @Suppress("DEPRECATION")
-    @Deprecated(
-        "Function related to statistics will be reviewed in future updates to\n" +
-                "     * provide more data and avoid race conditions. They could change or be removed in the current form."
+    @Deprecated("Function related to statistics will be reviewed in future updates to provide more " +
+            "data and avoid race conditions. They could change or be removed in the current form."
     )
     override val numberOfPendingUploads: Int
         get() = megaApi.numPendingUploads
+
+    @Deprecated("Function related to statistics will be reviewed in future updates to provide more" +
+            "data and avoid race conditions. They could change or be removed in the current form."
+    )
+    override val numberOfPendingDownloads: Int
+        get() = megaApi.numPendingDownloads
 
     override fun setFileVersionsOption(disable: Boolean, listener: MegaRequestListenerInterface) {
         megaApi.setFileVersionsOption(disable, listener)
