@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.FloatingActionButton
@@ -84,7 +83,7 @@ fun AlbumPhotosSelectionScreen(
 
     if (state.isInvalidAlbum) onBackClicked()
 
-    handleSelectLocationDialog(
+    HandleSelectLocationDialog(
         showSelectLocationDialog = showSelectLocationDialog,
         selectedLocation = state.selectedLocation,
         onLocationSelected = { location ->
@@ -98,14 +97,14 @@ fun AlbumPhotosSelectionScreen(
             showSelectLocationDialog = false
         },
     )
-    handleMaxSelectionDialog(
+    HandleMaxSelectionDialog(
         showMaxSelectionDialog = showMaxSelectionDialog,
         onDialogDismissed = {
             showMaxSelectionDialog = false
         }
     )
 
-    handleAddPhotosCompletion(
+    HandleAddPhotosCompletion(
         album = state.album,
         isSelectionCompleted = state.isSelectionCompleted,
         numCommittedPhotos = state.numCommittedPhotos,
@@ -316,7 +315,7 @@ private fun AlbumPhotosSelectionContent(
 }
 
 @Composable
-private fun handleSelectLocationDialog(
+private fun HandleSelectLocationDialog(
     showSelectLocationDialog: Boolean,
     selectedLocation: TimelinePhotosSource,
     onLocationSelected: (TimelinePhotosSource) -> Unit,
@@ -395,7 +394,7 @@ private fun SelectLocationDialog(
 }
 
 @Composable
-private fun handleMaxSelectionDialog(
+private fun HandleMaxSelectionDialog(
     showMaxSelectionDialog: Boolean,
     onDialogDismissed: () -> Unit,
 ) {
@@ -442,7 +441,7 @@ private fun MaxSelectionDialog(
 }
 
 @Composable
-private fun handleAddPhotosCompletion(
+private fun HandleAddPhotosCompletion(
     album: Album.UserAlbum?,
     isSelectionCompleted: Boolean,
     numCommittedPhotos: Int,

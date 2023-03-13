@@ -136,14 +136,14 @@ class ReportIssueFragment : Fragment() {
             cancelUpload = viewModel::cancelUpload,
         )
 
-        backHandler(
+        ReportIssueBackHandler(
             isEnabled = uiState.description.isNotBlank(),
             onDiscard = parentFragmentManager::popBackStack,
         )
     }
 
     @Composable
-    private fun backHandler(
+    private fun ReportIssueBackHandler(
         isEnabled: Boolean,
         onDiscard: () -> Unit,
     ) {

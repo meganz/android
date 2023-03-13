@@ -24,7 +24,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,7 +57,7 @@ fun AlbumCoverSelectionScreen(
 
     if (state.isInvalidAlbum) onBackClicked()
 
-    handleAlbumCoverCompletion(
+    HandleAlbumCoverCompletion(
         isSelectionCompleted = state.isSelectionCompleted,
         onCompletion = onCompletion,
     )
@@ -195,9 +194,8 @@ private fun AlbumCoverSelectionFooter(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun handleAlbumCoverCompletion(
+private fun HandleAlbumCoverCompletion(
     isSelectionCompleted: Boolean,
     onCompletion: (message: String) -> Unit,
 ) {

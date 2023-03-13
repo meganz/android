@@ -41,12 +41,12 @@ fun ReportIssueView(
     cancelUpload: () -> Unit = {},
 ) {
 
-    progressHandler(
+    ProgressHandler(
         cancelUpload = cancelUpload,
         uploadProgress = state.uploadProgress
     )
 
-    body(
+    ReportIssueBody(
         modifier = modifier,
         state = state,
         onDescriptionChanged = onDescriptionChanged,
@@ -55,7 +55,7 @@ fun ReportIssueView(
 }
 
 @Composable
-private fun body(
+private fun ReportIssueBody(
     modifier: Modifier,
     state: ReportIssueState,
     onDescriptionChanged: (String) -> Unit,
@@ -65,7 +65,11 @@ private fun body(
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
         modifier = modifier.padding(bottom = 8.dp),
     ) {
-        errorBanner(state.error)
+        if (state.error != null) {
+            ErrorBanner(
+                errorMessage = stringResource(id = state.error),
+            )
+        }
 
         Text(
             modifier = Modifier.padding(16.dp),
@@ -99,17 +103,7 @@ private fun body(
 }
 
 @Composable
-private fun errorBanner(error: Int?) {
-    if (error != null) {
-        ErrorBanner(
-            errorMessage = stringResource(id = error),
-        )
-    }
-}
-
-
-@Composable
-private fun progressHandler(
+private fun ProgressHandler(
     cancelUpload: () -> Unit,
     uploadProgress: Float?,
 ) {

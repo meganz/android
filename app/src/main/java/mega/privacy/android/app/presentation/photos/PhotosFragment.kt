@@ -415,8 +415,8 @@ class PhotosFragment : Fragment() {
             onTabSelected = this::onTabSelected,
             timelineLazyGridState = timelineLazyGridState,
             albumsLazyGridState = albumsLazyGridState,
-            timelineView = { timelineView(timelineViewState = timelineViewState) },
-            albumsView = { albumsView(albumsViewState = albumsViewState, timelineViewState) },
+            timelineView = { TimelineView(timelineViewState = timelineViewState) },
+            albumsView = { AlbumsView(albumsViewState = albumsViewState, timelineViewState) },
             timelineViewState = timelineViewState,
             albumsViewState = albumsViewState,
         )
@@ -432,7 +432,7 @@ class PhotosFragment : Fragment() {
     }
 
     @Composable
-    private fun timelineView(timelineViewState: TimelineViewState) = TimelineView(
+    private fun TimelineView(timelineViewState: TimelineViewState) = TimelineView(
         timelineViewState = timelineViewState,
         photoDownload = photosViewModel::downloadPhoto,
         lazyGridState = timelineLazyGridState,
@@ -440,8 +440,8 @@ class PhotosFragment : Fragment() {
         onFABClick = this::openFilterFragment,
         onCardClick = timelineViewModel::onCardClick,
         onTimeBarTabSelected = timelineViewModel::onTimeBarTabSelected,
-        enableCUView = { enableCUView(timelineViewState = timelineViewState) },
-        photosGridView = { photosGridView(timelineViewState = timelineViewState) },
+        enableCUView = { EnableCUView(timelineViewState = timelineViewState) },
+        photosGridView = { PhotosGridView(timelineViewState = timelineViewState) },
         emptyView = {
             EmptyState(
                 timelineViewState = timelineViewState,
@@ -452,7 +452,7 @@ class PhotosFragment : Fragment() {
     )
 
     @Composable
-    private fun albumsView(
+    private fun AlbumsView(
         albumsViewState: AlbumsViewState,
         timelineViewState: TimelineViewState,
     ) =
@@ -486,7 +486,7 @@ class PhotosFragment : Fragment() {
         }
 
     @Composable
-    private fun enableCUView(timelineViewState: TimelineViewState) = EnableCU(
+    private fun EnableCUView(timelineViewState: TimelineViewState) = EnableCU(
         timelineViewState = timelineViewState,
         onUploadVideosChanged = timelineViewModel::setCUUploadVideos,
         onUseCellularConnectionChanged = timelineViewModel::setCUUseCellularConnection,
@@ -494,7 +494,7 @@ class PhotosFragment : Fragment() {
     )
 
     @Composable
-    private fun photosGridView(timelineViewState: TimelineViewState) = PhotosGridView(
+    private fun PhotosGridView(timelineViewState: TimelineViewState) = PhotosGridView(
         timelineViewState = timelineViewState,
         downloadPhoto = photosViewModel::downloadPhoto,
         lazyGridState = timelineLazyGridState,
