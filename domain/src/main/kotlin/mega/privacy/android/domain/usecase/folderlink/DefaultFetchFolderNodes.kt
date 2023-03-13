@@ -12,7 +12,8 @@ import javax.inject.Inject
  */
 class DefaultFetchFolderNodes @Inject constructor(
     private val repository: FolderLinkRepository,
-    private val addNodeType: AddNodeType
+    private val addNodeType: AddNodeType,
+    private val getChildrenNodes: GetFolderLinkChildrenNodes,
 ) : FetchFolderNodes {
 
     override suspend fun invoke(): FetchFolderNodesResult {
@@ -29,11 +30,8 @@ class DefaultFetchFolderNodes @Inject constructor(
                             .onSuccess { typedFolderNode ->
                                 folderNodesResult.rootNode = typedFolderNode
 
-                                runCatching { repository.getNodeChildren(typedFolderNode.id.longValue) }
-                                    .onSuccess { untypedNodeList ->
-                                        folderNodesResult.childrenNodes =
-                                            untypedNodeList.map { addNodeType(it) }
-                                    }
+                                runCatching { getChildrenNodes(typedFolderNode.id.longValue, null) }
+                                    .onSuccess { folderNodesResult.childrenNodes = it }
                                     .onFailure { throw FetchFolderNodesException.GenericError() }
                             }
                             .onFailure { throw FetchFolderNodesException.GenericError() }

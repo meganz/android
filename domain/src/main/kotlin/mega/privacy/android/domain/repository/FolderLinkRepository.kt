@@ -33,5 +33,5 @@ interface FolderLinkRepository {
     /**
      * Get children nodes by handle
      */
-    suspend fun getNodeChildren(handle: Long): List<UnTypedNode>
+    suspend fun getNodeChildren(handle: Long, order: Int? = null): List<UnTypedNode>
 }

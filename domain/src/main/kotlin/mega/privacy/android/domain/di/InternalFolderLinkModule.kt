@@ -6,7 +6,9 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.FolderLinkRepository
 import mega.privacy.android.domain.usecase.folderlink.DefaultFetchFolderNodes
+import mega.privacy.android.domain.usecase.folderlink.DefaultGetFolderLinkChildrenNodes
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodes
+import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodes
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolder
 
 /**
@@ -18,6 +20,9 @@ internal abstract class InternalFolderLinkModule {
 
     @Binds
     abstract fun bindFetchFolderNode(implementation: DefaultFetchFolderNodes): FetchFolderNodes
+
+    @Binds
+    abstract fun bindGetChildrenNodes(implementation: DefaultGetFolderLinkChildrenNodes): GetFolderLinkChildrenNodes
 
     companion object {
         @Provides

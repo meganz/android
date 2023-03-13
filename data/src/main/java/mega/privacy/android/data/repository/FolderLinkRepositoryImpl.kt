@@ -96,10 +96,10 @@ class FolderLinkRepositoryImpl @Inject constructor(
     }
 
     @Throws(SynchronisationException::class)
-    override suspend fun getNodeChildren(handle: Long): List<UnTypedNode> {
+    override suspend fun getNodeChildren(handle: Long, order: Int?): List<UnTypedNode> {
         return withContext(ioDispatcher) {
             megaApiFolderGateway.getMegaNodeByHandle(handle)?.let { parent ->
-                megaApiFolderGateway.getChildrenByNode(parent)
+                megaApiFolderGateway.getChildrenByNode(parent, order)
                     .map { convertToUntypedNode(it) }
             } ?: throw SynchronisationException("Non null node found be null when fetched from api")
         }
