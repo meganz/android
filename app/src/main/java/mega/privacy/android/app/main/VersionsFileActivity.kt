@@ -714,17 +714,17 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         adapter?.notifyDataSetChanged()
     }
 
-    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>) {
+    override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
         Timber.d("onUsersUpdate")
     }
 
-    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>) {
+    override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
         Timber.d("onUserAlertsUpdate")
     }
 
-    override fun onEvent(api: MegaApiJava, event: MegaEvent) {}
-    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>) {}
-    override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>) {}
+    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
+    override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {}
+    override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>?) {}
     override fun onNodesUpdate(api: MegaApiJava, nodes: ArrayList<MegaNode?>?) {
         Timber.d("onNodesUpdate")
         var thisNode = false
@@ -840,7 +840,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
 
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
-        requests: ArrayList<MegaContactRequest>,
+        requests: ArrayList<MegaContactRequest>?,
     ) {
     }
 
