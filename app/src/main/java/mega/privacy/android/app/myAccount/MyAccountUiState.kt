@@ -1,5 +1,7 @@
 package mega.privacy.android.app.myAccount
 
+import java.io.File
+
 /**
  * My account ui state
  *
@@ -12,6 +14,7 @@ package mega.privacy.android.app.myAccount
  * @property changeUserNameResult
  * @property verifiedPhoneNumber
  * @property canVerifyPhoneNumber
+ * @property avatar
  */
 data class MyAccountUiState(
     val isFileVersioningEnabled: Boolean = true,
@@ -23,4 +26,5 @@ data class MyAccountUiState(
     val changeUserNameResult: Result<Unit>? = null,
     val verifiedPhoneNumber: String? = null,
     val canVerifyPhoneNumber: Boolean = false,
+    val avatar: File? = null
 )

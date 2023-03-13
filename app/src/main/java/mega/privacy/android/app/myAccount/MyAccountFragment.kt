@@ -1,6 +1,5 @@
 package mega.privacy.android.app.myAccount
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -37,7 +36,6 @@ import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.update
 import mega.privacy.android.app.myAccount.util.MyAccountViewUtil.updateBusinessOrProFlexi
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AvatarUtil
-import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChangeApiServerUtil
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
@@ -48,7 +46,6 @@ import mega.privacy.android.app.utils.Constants.PRO_II
 import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
-import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
@@ -128,8 +125,6 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         checkScroll()
 
-        setupAvatar(true)
-
         binding.myAccountThumbnail.setOnClickListener { viewModel.openQR(requireActivity()) }
 
         binding.myAccountTextInfoLayout.setOnClickListener {
@@ -157,10 +152,6 @@ class MyAccountFragment : Fragment(), Scrollable {
     }
 
     private fun setupObservers(monitorPhoneFlagEnabled: Boolean) {
-        viewLifecycleOwner.collectFlow(viewModel.onMyAvatarFileChanged) {
-            setupAvatar(true)
-        }
-
         viewLifecycleOwner.collectFlow(viewModel.state) { state ->
             binding.nameText.text = state.name
             binding.emailText.text = state.email
@@ -171,6 +162,7 @@ class MyAccountFragment : Fragment(), Scrollable {
                     registeredPhoneNumber = state.verifiedPhoneNumber,
                 )
             }
+            setProfileAvatar(state.avatar)
         }
 
         if (!monitorPhoneFlagEnabled) {
@@ -192,37 +184,14 @@ class MyAccountFragment : Fragment(), Scrollable {
         changeApiServerDialog?.dismiss()
     }
 
-    private fun setupAvatar(retry: Boolean) {
-        val avatar =
-            CacheFolderManager.buildAvatarFile(
-                requireContext(),
-                megaApi.myEmail + FileUtil.JPG_EXTENSION
-            )
-
-        if (avatar != null) {
-            setProfileAvatar(avatar, retry)
-        } else {
+    private fun setProfileAvatar(avatar: File?) {
+        avatar?.takeIf { avatar.exists() && avatar.length() > 0 }
+            ?.let { BitmapFactory.decodeFile(avatar.absolutePath, BitmapFactory.Options()) }
+            ?.let { bitmap ->
+                binding.myAccountThumbnail.setImageBitmap(bitmap)
+            } ?: run {
             setDefaultAvatar()
         }
-    }
-
-    private fun setProfileAvatar(avatar: File, retry: Boolean) {
-        val avatarBitmap: Bitmap?
-
-        if (avatar.exists() && avatar.length() > 0) {
-            avatarBitmap = BitmapFactory.decodeFile(avatar.absolutePath, BitmapFactory.Options())
-
-            if (avatarBitmap == null) {
-                avatar.delete()
-            } else {
-                binding.myAccountThumbnail.setImageBitmap(avatarBitmap)
-                return
-            }
-        }
-
-        if (retry) {
-            viewModel.getAvatar(requireContext()) { success -> showAvatarResult(success) }
-        } else setDefaultAvatar()
     }
 
     private fun setDefaultAvatar() {
@@ -234,14 +203,6 @@ class MyAccountFragment : Fragment(), Scrollable {
                 true
             )
         )
-    }
-
-    private fun showAvatarResult(success: Boolean) {
-        if (success) {
-            setupAvatar(false)
-        } else {
-            setDefaultAvatar()
-        }
     }
 
     private fun setupAchievements() {

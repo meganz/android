@@ -1996,4 +1996,17 @@ interface MegaApiGateway {
      * @param megaNode [MegaNode] to stop sharing
      */
     fun stopSharingNode(megaNode: MegaNode)
+
+    /**
+     * Set/Remove the avatar of the MEGA account
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getFile - Returns the source path (optional)
+     *
+     * @param srcFilePath Source path of the file that will be set as avatar.
+     *                    If NULL, the existing avatar will be removed (if any).
+     *                    In case the avatar never existed before, removing the avatar returns MegaError::API_ENOENT
+     * @param listener    MegaRequestListener to track this request
+     */
+    fun setAvatar(srcFilePath: String?, listener: MegaRequestListenerInterface)
 }

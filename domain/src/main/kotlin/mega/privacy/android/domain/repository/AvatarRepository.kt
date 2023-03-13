@@ -46,6 +46,13 @@ interface AvatarRepository {
     suspend fun getAvatarColor(userHandle: Long): Int
 
     /**
+     * Set avatar
+     *
+     * @param filePath
+     */
+    suspend fun setAvatar(filePath: String?)
+
+    /**
      * Update my avatar with new email
      *
      * @param oldEmail

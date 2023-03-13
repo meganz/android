@@ -1,21 +1,29 @@
 package mega.privacy.android.data.repository
 
+import app.cash.turbine.test
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.BitmapFactoryWrapper
+import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.ContactsRepository
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -31,7 +39,7 @@ import kotlin.test.fail
 @ExperimentalContracts
 internal class DefaultAvatarRepositoryTest {
     companion object {
-        private const val CURRENT_USER_EMAIL = "CURRENT_USER_EMAIL"
+        private const val CURRENT_USER_HANDLE = 123L
     }
 
     private lateinit var underTest: DefaultAvatarRepository
@@ -42,7 +50,7 @@ internal class DefaultAvatarRepositoryTest {
     private val currentUser = mock<MegaUser> {
         on { it.isOwnChange }.thenReturn(0)
         on { it.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) }.thenReturn(true)
-        on { it.email }.thenReturn(CURRENT_USER_EMAIL)
+        on { it.handle }.thenReturn(CURRENT_USER_HANDLE)
     }
     private val sharedFlow = MutableSharedFlow<GlobalUpdate>()
     private val avatarWrapper = mock<AvatarWrapper>()
@@ -50,7 +58,7 @@ internal class DefaultAvatarRepositoryTest {
 
     @Before
     fun setUp() {
-        whenever(megaApiGateway.accountEmail).thenReturn(CURRENT_USER_EMAIL)
+        Dispatchers.setMain(StandardTestDispatcher())
         whenever(cacheFolderGateway.buildAvatarFile(any())).thenReturn(File(""))
         whenever(megaApiGateway.globalUpdates).thenReturn(sharedFlow)
         underTest = DefaultAvatarRepository(
@@ -64,8 +72,14 @@ internal class DefaultAvatarRepositoryTest {
         )
     }
 
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     @Test
     fun `when globalUpdates emit OnAccountUpdate then monitorMyAvatarFile not emit`() = runTest {
+        whenever(megaApiGateway.getLoggedInUser()).thenReturn(currentUser)
         sharedFlow.emit(GlobalUpdate.OnAccountUpdate)
         val collectJob = launch(UnconfinedTestDispatcher()) {
             underTest.monitorMyAvatarFile().collect {
@@ -79,22 +93,20 @@ internal class DefaultAvatarRepositoryTest {
     @Test
     fun `when globalUpdates emit OnUsersUpdate with current user then monitorMyAvatarFile emit avatar file`() =
         runTest {
-            val avatarFile = MutableStateFlow<File?>(null)
-            val collectJob = launch(UnconfinedTestDispatcher()) {
-                underTest.monitorMyAvatarFile().collect { file ->
-                    avatarFile.value = file
-                }
-            }
-            sharedFlow.emit(GlobalUpdate.OnUsersUpdate(users = arrayListOf(currentUser)))
+            testScheduler.advanceUntilIdle()
+            whenever(megaApiGateway.myUser).thenReturn(currentUser)
             whenever(megaApiGateway.getUserAvatar(any(), any())).thenReturn(true)
-            delay(300L)
-            assertTrue(avatarFile.value != null)
-            collectJob.cancel()
+            underTest.monitorMyAvatarFile().test {
+                sharedFlow.emit(GlobalUpdate.OnUsersUpdate(users = arrayListOf(currentUser)))
+                val value = awaitItem()
+                assertTrue(value != null)
+            }
         }
 
     @Test
     fun `when globalUpdates emit OnUsersUpdate with another user then monitorMyAvatarFile not emit`() =
         runTest {
+            whenever(megaApiGateway.myUser).thenReturn(currentUser)
             val collectJob = launch(UnconfinedTestDispatcher()) {
                 underTest.monitorMyAvatarFile().collect {
                     fail("monitorMyAvatarFile emit")
@@ -114,6 +126,7 @@ internal class DefaultAvatarRepositoryTest {
     @Test
     fun `when globalUpdates emit OnUsersUpdate with current user and isOwnChange more than 0 then monitorMyAvatarFile not emit`() =
         runTest {
+            whenever(megaApiGateway.myUser).thenReturn(currentUser)
             val collectJob = launch(UnconfinedTestDispatcher()) {
                 underTest.monitorMyAvatarFile().collect {
                     fail("monitorMyAvatarFile emit")
@@ -158,5 +171,35 @@ internal class DefaultAvatarRepositoryTest {
                 .thenReturn(newFile)
             whenever(oldFile.renameTo(newFile)).thenReturn(false)
             assertFalse(underTest.updateMyAvatarWithNewEmail(oldEmail, newEmail))
+        }
+
+    @Test
+    fun `test that setAvatar calls success value when calling API returns success`() =
+        runTest {
+            whenever(megaApiGateway.setAvatar(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock {
+                        on { errorCode }.thenReturn(
+                            MegaError.API_OK
+                        )
+                    },
+                )
+            }
+            underTest.setAvatar(filePath = "")
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that setAvatar throw exception success value when calling API returns failed`() =
+        runTest {
+            whenever(megaApiGateway.setAvatar(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock { on { errorCode }.thenReturn(MegaError.API_EARGS) },
+                )
+            }
+            underTest.setAvatar(filePath = "")
         }
 }

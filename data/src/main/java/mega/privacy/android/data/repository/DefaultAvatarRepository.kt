@@ -4,16 +4,19 @@ import android.graphics.BitmapFactory
 import androidx.core.graphics.toColorInt
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -52,19 +55,29 @@ internal class DefaultAvatarRepository @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AvatarRepository {
+    private val myAvatarFile = MutableSharedFlow<File?>()
 
-    private val monitorMyAvatarFile = megaApiGateway.globalUpdates
-        .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
-        .mapNotNull { it.users?.find { user -> user.isOwnChange <= 0 && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) && user.email == megaApiGateway.accountEmail } }
-        .map { user ->
-            deleteAvatarFile(user)
-            loadAvatarFile(user)
-        }
-        .catch { Timber.e(it) }
-        .flowOn(ioDispatcher)
-        .shareIn(sharingScope, SharingStarted.WhileSubscribed(), replay = 1)
+    init {
+        megaApiGateway.globalUpdates
+            .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
+            .mapNotNull {
+                val currentUserHandle = megaApiGateway.myUser?.handle
+                it.users?.find { user ->
+                    user.isOwnChange == 0
+                            && user.hasChanged(MegaUser.CHANGE_TYPE_AVATAR)
+                            && user.handle == currentUserHandle
+                }
+            }
+            .map { user ->
+                deleteAvatarFile(user)
+                myAvatarFile.emit(loadAvatarFile(user))
+            }
+            .catch { Timber.e(it) }
+            .flowOn(ioDispatcher)
+            .launchIn(sharingScope)
+    }
 
-    override fun monitorMyAvatarFile() = monitorMyAvatarFile
+    override fun monitorMyAvatarFile() = myAvatarFile.asSharedFlow()
 
     private fun deleteAvatarFile(user: MegaUser) {
         val oldFile =
@@ -160,6 +173,19 @@ internal class DefaultAvatarRepository @Inject constructor(
             }
             return@withContext false
         }
+
+    override suspend fun setAvatar(filePath: String?) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("setAvatar") {}
+            megaApiGateway.setAvatar(filePath, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+        megaApiGateway.myUser?.let { user ->
+            deleteAvatarFile(user)
+            myAvatarFile.emit(loadAvatarFile(user))
+        }
+        Unit
+    }
 
     companion object {
         /**

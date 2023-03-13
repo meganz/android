@@ -1031,4 +1031,7 @@ internal class MegaApiFacade @Inject constructor(
     override fun stopSharingNode(megaNode: MegaNode) {
         megaApi.disableExport(megaNode)
     }
+
+    override fun setAvatar(srcFilePath: String?, listener: MegaRequestListenerInterface) =
+        megaApi.setAvatar(srcFilePath, listener)
 }

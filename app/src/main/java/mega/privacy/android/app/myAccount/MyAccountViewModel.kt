@@ -18,11 +18,12 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -45,11 +46,9 @@ import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase
 import mega.privacy.android.app.myAccount.usecase.CheckVersionsUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmCancelAccountUseCase
 import mega.privacy.android.app.myAccount.usecase.ConfirmChangeEmailUseCase
-import mega.privacy.android.app.myAccount.usecase.GetMyAvatarUseCase
 import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
-import mega.privacy.android.app.myAccount.usecase.SetAvatarUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.verification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -72,7 +71,6 @@ import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
 import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
@@ -83,12 +81,14 @@ import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
+import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
@@ -117,7 +117,7 @@ import javax.inject.Inject
  * @property checkVersionsUseCase
  * @property killSessionUseCase
  * @property cancelSubscriptionsUseCase
- * @property getMyAvatarUseCase
+ * @property getMyAvatarFile
  * @property checkPasswordReminderUseCase
  * @property resetPhoneNumberUseCase
  * @property resetSMSVerifiedPhoneNumber
@@ -151,7 +151,7 @@ class MyAccountViewModel @Inject constructor(
     private val checkVersionsUseCase: CheckVersionsUseCase,
     private val killSessionUseCase: KillSessionUseCase,
     private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
-    private val getMyAvatarUseCase: GetMyAvatarUseCase,
+    private val getMyAvatarFile: GetMyAvatarFile,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
     private val resetPhoneNumberUseCase: ResetPhoneNumberUseCase,
     private val resetSMSVerifiedPhoneNumber: ResetSMSVerifiedPhoneNumber,
@@ -209,12 +209,6 @@ class MyAccountViewModel @Inject constructor(
     private val _state = MutableStateFlow(MyAccountUiState())
     val state = _state.asStateFlow()
 
-    /**
-     * On my avatar file changed flow
-     */
-    val onMyAvatarFileChanged: Flow<File?>
-        get() = monitorMyAvatarFile()
-
     init {
         refreshNumberOfSubscription(false)
         refreshUserName(false)
@@ -242,6 +236,16 @@ class MyAccountViewModel @Inject constructor(
                             canVerifyPhoneNumber = status.canRequestOptInVerification,
                         )
                     }
+                }
+            }
+        }
+        viewModelScope.launch {
+            flow {
+                emit(getMyAvatarFile())
+                emitAll(monitorMyAvatarFile())
+            }.collect { file ->
+                _state.update {
+                    it.copy(avatar = file)
                 }
             }
         }
@@ -615,29 +619,6 @@ class MyAccountViewModel @Inject constructor(
     }
 
     /**
-     * Get avatar
-     *
-     * @param context
-     * @param action
-     * @receiver
-     */
-    fun getAvatar(context: Context, action: (Boolean) -> Unit) {
-        CacheFolderManager.buildAvatarFile(context, megaApi.myEmail)?.absolutePath?.let {
-            getMyAvatarUseCase.get(it)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onSuccess = { action.invoke(true) },
-                    onError = { error ->
-                        Timber.w(error)
-                        action.invoke(false)
-                    }
-                )
-                .addTo(composite)
-        }
-    }
-
-    /**
      * Kill sessions
      *
      * @param action
@@ -709,7 +690,7 @@ class MyAccountViewModel @Inject constructor(
             TAKE_PICTURE_PROFILE_CODE -> addProfileAvatar(null)
             CHOOSE_PICTURE_PROFILE_CODE -> {
                 if (data == null) {
-                    showResult(getString(R.string.error_changing_user_avatar_image_not_available))
+                    showResult(context.getString(R.string.error_changing_user_avatar_image_not_available))
                     return
                 }
 
@@ -733,7 +714,7 @@ class MyAccountViewModel @Inject constructor(
                 }
 
                 if (!fileExists) {
-                    showResult(getString(R.string.error_changing_user_avatar_image_not_available))
+                    showResult(context.getString(R.string.error_changing_user_avatar_image_not_available))
                     return
                 }
 
@@ -944,7 +925,7 @@ class MyAccountViewModel @Inject constructor(
         )
 
         if (!FileUtil.isFileAvailable(imgFile)) {
-            showResult(getString(R.string.general_error))
+            showResult(context.getString(R.string.general_error))
             return
         }
 
@@ -952,17 +933,16 @@ class MyAccountViewModel @Inject constructor(
 
         if (newFile != null) {
             MegaUtilsAndroid.createAvatar(imgFile, newFile)
-            setAvatarUseCase.set(newFile.absolutePath)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onComplete = {
-                        _state.update { it.copy(isLoading = false) }
-                        showResult(getString(R.string.success_changing_user_avatar))
-                    },
-                    onError = { showResult(getString(R.string.error_changing_user_avatar)) }
-                )
-                .addTo(composite)
+            viewModelScope.launch {
+                runCatching {
+                    setAvatarUseCase(newFile.absolutePath)
+                }.onSuccess {
+                    showResult(context.getString(R.string.success_changing_user_avatar))
+                }.onFailure {
+                    showResult(context.getString(R.string.error_changing_user_avatar))
+                }
+                _state.update { it.copy(isLoading = false) }
+            }
         } else {
             Timber.e("Destination PATH is NULL")
         }
@@ -981,15 +961,15 @@ class MyAccountViewModel @Inject constructor(
                 it.delete()
             }
         }
-
-        setAvatarUseCase.remove()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onComplete = { snackbarShower.showSnackbar(getString(R.string.success_deleting_user_avatar)) },
-                onError = { snackbarShower.showSnackbar(getString(R.string.error_deleting_user_avatar)) }
-            )
-            .addTo(composite)
+        viewModelScope.launch {
+            runCatching {
+                setAvatarUseCase(null)
+            }.onSuccess {
+                snackbarShower.showSnackbar(context.getString(R.string.success_deleting_user_avatar))
+            }.onFailure {
+                snackbarShower.showSnackbar(context.getString(R.string.error_deleting_user_avatar))
+            }
+        }
     }
 
     /**
@@ -1041,8 +1021,9 @@ class MyAccountViewModel @Inject constructor(
      */
     fun changeEmail(context: Context, newEmail: String): String? {
         return when {
-            newEmail == getEmail() -> getString(R.string.mail_same_as_old)
-            !EMAIL_ADDRESS.matcher(newEmail).matches() -> getString(R.string.error_invalid_email)
+            newEmail == getEmail() -> context.getString(R.string.mail_same_as_old)
+            !EMAIL_ADDRESS.matcher(newEmail)
+                .matches() -> context.getString(R.string.error_invalid_email)
             is2FaEnabled -> {
                 context.startActivity(
                     Intent(context, VerifyTwoFactorActivity::class.java)
@@ -1079,7 +1060,7 @@ class MyAccountViewModel @Inject constructor(
                     }
                     .onFailure {
                         Timber.e(it, "Reset phone number failed")
-                        snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
+                        snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_fail))
                     }
             } else {
                 runCatching { resetPhoneNumberUseCase() }
@@ -1088,7 +1069,7 @@ class MyAccountViewModel @Inject constructor(
                     }
                     .onFailure {
                         Timber.e(it, "Reset phone number failed")
-                        snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
+                        snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_fail))
                     }
             }
         }
@@ -1108,11 +1089,11 @@ class MyAccountViewModel @Inject constructor(
             .subscribeBy(
                 onComplete = {
                     if (isModify) action.invoke()
-                    else snackbarShower.showSnackbar(getString(R.string.remove_phone_number_success))
+                    else snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_success))
                 },
                 onError = { error ->
                     Timber.w("Reset phone number failed: ${error.message}")
-                    snackbarShower.showSnackbar(getString(R.string.remove_phone_number_fail))
+                    snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_fail))
                 })
             .addTo(composite)
     }
@@ -1233,9 +1214,9 @@ class MyAccountViewModel @Inject constructor(
         actionError: (String) -> Unit,
     ) {
         when (result) {
-            API_OK -> actionSuccess.invoke(getString(R.string.pass_changed_alert))
-            API_EARGS -> actionError.invoke(getString(R.string.old_password_provided_incorrect))
-            else -> actionError.invoke(getString(R.string.general_text_error))
+            API_OK -> actionSuccess.invoke(context.getString(R.string.pass_changed_alert))
+            API_EARGS -> actionError.invoke(context.getString(R.string.old_password_provided_incorrect))
+            else -> actionError.invoke(context.getString(R.string.general_text_error))
         }
     }
 
