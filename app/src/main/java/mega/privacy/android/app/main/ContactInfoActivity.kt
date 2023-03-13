@@ -294,23 +294,23 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private val megaGlobalListenerInterface = object : MegaGlobalListenerInterface {
-        override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>) {
-            if (users.isNotEmpty()) {
-                for (updatedUser in users) {
-                    if (updatedUser.handle == user?.handle) {
-                        user = updatedUser
-                        contentContactProperties.emailText.text = updatedUser.email
-                        break
-                    }
+        override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
+            if (users.isNullOrEmpty()) return
+
+            for (updatedUser in users) {
+                if (updatedUser.handle == user?.handle) {
+                    user = updatedUser
+                    contentContactProperties.emailText.text = updatedUser.email
+                    break
                 }
             }
         }
 
-        override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>) {
+        override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
             Timber.d("onUserAlertsUpdate")
         }
 
-        override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>) {
+        override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
             sharedFoldersFragment?.let {
                 if (it.isVisible) {
                     it.setNodes(parentHandle)
@@ -324,13 +324,13 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         override fun onAccountUpdate(api: MegaApiJava) {}
         override fun onContactRequestsUpdate(
             api: MegaApiJava,
-            requests: ArrayList<MegaContactRequest>,
+            requests: ArrayList<MegaContactRequest>?,
         ) {
         }
 
-        override fun onEvent(api: MegaApiJava, event: MegaEvent) {}
-        override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>) {}
-        override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>) {}
+        override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
+        override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {}
+        override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>?) {}
     }
 
     private val megaChatRequestListenerInterface = object : MegaChatRequestListenerInterface {

@@ -196,7 +196,9 @@ class GlobalListener @Inject constructor(
         }
     }
 
-    override fun onEvent(api: MegaApiJava, event: MegaEvent) {
+    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
+        if (event == null) return
+
         Timber.d("Event received: text(${event.text}), type(${event.type}), number(${event.number})")
 
         when (event.type) {

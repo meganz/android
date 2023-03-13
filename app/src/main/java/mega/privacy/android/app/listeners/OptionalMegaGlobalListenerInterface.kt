@@ -44,8 +44,8 @@ class OptionalMegaGlobalListenerInterface(
         onContactRequestsUpdate?.invoke(requests)
     }
 
-    override fun onEvent(api: MegaApiJava, event: MegaEvent) {
-        onEvent?.invoke(event)
+    override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
+        event?.let { onEvent?.invoke(event) }
     }
 
     override fun onSetsUpdate(api: MegaApiJava?, sets: ArrayList<MegaSet>?) {
