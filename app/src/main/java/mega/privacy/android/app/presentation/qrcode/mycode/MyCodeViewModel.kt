@@ -182,7 +182,7 @@ class MyCodeViewModel @Inject constructor(
             defaultLastName = context.getString(R.string.lastname_text)
         )
 
-        return getMyAvatarFile()?.takeIf { it.exists() && it.length() > 0 }
+        return getMyAvatarFile(isForceRefresh = false)?.takeIf { it.exists() && it.length() > 0 }
             ?.let { avatarFile ->
                 loadBitmapFromFile(avatarFile)
                     ?.let { getCircleBitmap(it) }

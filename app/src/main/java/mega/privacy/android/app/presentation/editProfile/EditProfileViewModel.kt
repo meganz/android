@@ -48,7 +48,7 @@ class EditProfileViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch(ioDispatcher) {
-            updateMyAvatarFile(getMyAvatarFile())
+            updateMyAvatarFile(getMyAvatarFile(isForceRefresh = false))
         }
         viewModelScope.launch {
             monitorUserUpdates()

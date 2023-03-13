@@ -241,7 +241,7 @@ class MyAccountViewModel @Inject constructor(
         }
         viewModelScope.launch {
             flow {
-                emit(getMyAvatarFile())
+                emit(getMyAvatarFile(isForceRefresh = false))
                 emitAll(monitorMyAvatarFile())
             }.collect { file ->
                 _state.update {

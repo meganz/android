@@ -20,7 +20,7 @@ interface AvatarRepository {
     /**
      * get avatar file
      */
-    suspend fun getMyAvatarFile(): File?
+    suspend fun getMyAvatarFile(isForceRefresh: Boolean = false): File?
 
     /**
      * Get avatar file for an user

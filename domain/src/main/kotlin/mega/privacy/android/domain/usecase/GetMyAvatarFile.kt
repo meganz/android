@@ -9,5 +9,5 @@ fun interface GetMyAvatarFile {
     /**
      * invoke
      */
-    suspend operator fun invoke(): File?
+    suspend operator fun invoke(isForceRefresh: Boolean): File?
 }

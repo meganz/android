@@ -265,7 +265,7 @@ class MyCodeViewModelTest {
         whenever(combineQRCodeAndAvatarMapper(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(expectedQrCodeBitmap)
         whenever(context.getString(any())).thenReturn("first name").thenReturn("last name")
-        whenever(getMyAvatarFile()).thenReturn(localAvatarFile)
+        whenever(getMyAvatarFile(isForceRefresh = false)).thenReturn(localAvatarFile)
 
         // start real testing
         underTest.resetQRCode(
@@ -333,7 +333,7 @@ class MyCodeViewModelTest {
         whenever(combineQRCodeAndAvatarMapper(any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(expectedQrCodeBitmap)
         whenever(context.getString(any())).thenReturn("first name").thenReturn("last name")
-        whenever(getMyAvatarFile()).thenReturn(localAvatarFile)
+        whenever(getMyAvatarFile(isForceRefresh = false)).thenReturn(localAvatarFile)
         underTest.createQRCode(
             width = qrCodeWidth,
             height = qrCodeHeight,

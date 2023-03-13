@@ -110,8 +110,15 @@ internal class DefaultAvatarRepository @Inject constructor(
         return getColor(megaApiGateway.getUserAvatarColor(user))
     }
 
-    override suspend fun getMyAvatarFile(): File? =
-        cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileConstant.JPG_EXTENSION)
+    override suspend fun getMyAvatarFile(isForceRefresh: Boolean): File? =
+        withContext(ioDispatcher) {
+            if (isForceRefresh) {
+                megaApiGateway.myUser?.let {
+                    return@withContext loadAvatarFile(it)
+                }
+            }
+            return@withContext cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileConstant.JPG_EXTENSION)
+        }
 
     override suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean): File? =
         withContext(ioDispatcher) {

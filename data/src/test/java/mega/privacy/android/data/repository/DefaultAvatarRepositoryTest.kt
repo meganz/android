@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import app.cash.turbine.test
+import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -28,6 +29,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
 import kotlin.contracts.ExperimentalContracts
@@ -40,6 +43,7 @@ import kotlin.test.fail
 internal class DefaultAvatarRepositoryTest {
     companion object {
         private const val CURRENT_USER_HANDLE = 123L
+        private const val CURRENT_USER_EMAIL = "myemail"
     }
 
     private lateinit var underTest: DefaultAvatarRepository
@@ -51,6 +55,7 @@ internal class DefaultAvatarRepositoryTest {
         on { it.isOwnChange }.thenReturn(0)
         on { it.hasChanged(MegaUser.CHANGE_TYPE_AVATAR) }.thenReturn(true)
         on { it.handle }.thenReturn(CURRENT_USER_HANDLE)
+        on { it.email }.thenReturn(CURRENT_USER_EMAIL)
     }
     private val sharedFlow = MutableSharedFlow<GlobalUpdate>()
     private val avatarWrapper = mock<AvatarWrapper>()
@@ -202,4 +207,26 @@ internal class DefaultAvatarRepositoryTest {
             }
             underTest.setAvatar(filePath = "")
         }
+
+    @Test
+    fun `test that getMyAvatarFile from the cache when pass isForceRefresh as false`() = runTest {
+        underTest.getMyAvatarFile(isForceRefresh = false)
+        verify(megaApiGateway, times(0)).myUser
+        verify(megaApiGateway, times(0)).getUserAvatar(any(), any())
+        verify(
+            cacheFolderGateway,
+            times(1)
+        ).buildAvatarFile(megaApiGateway.accountEmail + FileConstant.JPG_EXTENSION)
+    }
+
+    @Test
+    fun `test that getMyAvatarFile from the sdk when pass isForceRefresh as true`() = runTest {
+        val expectedFile = mock<File> {
+            on { absolutePath }.thenReturn("path")
+        }
+        whenever(megaApiGateway.myUser).thenReturn(currentUser)
+        whenever(megaApiGateway.accountEmail).thenReturn(CURRENT_USER_EMAIL)
+        whenever(cacheFolderGateway.buildAvatarFile(CURRENT_USER_EMAIL + FileConstant.JPG_EXTENSION)).thenReturn(expectedFile)
+        Truth.assertThat(underTest.getMyAvatarFile(true)).isEqualTo(expectedFile)
+    }
 }
