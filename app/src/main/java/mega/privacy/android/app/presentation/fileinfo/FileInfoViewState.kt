@@ -5,12 +5,13 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import nz.mega.sdk.MegaShare
 
 /**
  * Represents the view state of the File info screen
- * @param title title for this screen, usually node's name
+ * @param typedNode for this screen
  * @param oneOffViewEvent one-off events to be consumed by the view
  * @param jobInProgressState indicates if there are any job in progress that needs to be notified
  * @param historyVersions the num of history versions that this file contains, 0 if it's not a file or doesn't contain history versions
@@ -28,7 +29,7 @@ import nz.mega.sdk.MegaShare
  * @param accessPermission the [AccessPermission] the user has to this node
  */
 data class FileInfoViewState(
-    val title: String = "",
+    val typedNode: TypedNode? = null,
     val oneOffViewEvent: FileInfoOneOffViewEvent? = null,
     val jobInProgressState: FileInfoJobInProgressState? = FileInfoJobInProgressState.InitialLoading,
     val historyVersions: Int = 0,
@@ -45,6 +46,12 @@ data class FileInfoViewState(
     val inShareOwnerContactItem: ContactItem? = null,
     val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
 ) {
+
+    /**
+     * title for this screen, node's name
+     */
+    val title: String = typedNode?.name.orEmpty()
+
     /**
      * determines if the file history versions should be shown
      */

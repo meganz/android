@@ -20,9 +20,11 @@ import com.google.android.material.appbar.AppBarLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
-import nz.mega.sdk.MegaNode
 import kotlin.math.abs
 
 /**
@@ -38,6 +40,7 @@ internal class FileInfoToolbarHelper(
     private val fileInfoToolbarImage: SimpleDraweeView,
     private val fileInfoImageLayout: ViewGroup,
     private val fileInfoIconLayout: ViewGroup,
+    private val nestedView: NestedScrollView,
 ) {
 
     private var upArrow: Drawable? = null
@@ -114,7 +117,7 @@ internal class FileInfoToolbarHelper(
     /**
      * initial setup of the toolbar once we have the view created and the node fetched
      */
-    fun setupToolbar(isCollapsable: Boolean, nestedView: NestedScrollView, visibleTop: Int) {
+    fun setupToolbar(visibleTop: Int) {
         val params = fileInfoIconLayout.layoutParams as CollapsingToolbarLayout.LayoutParams
         params.setMargins(Util.dp2px(16f), Util.dp2px(90f) + visibleTop, 0, Util.dp2px(14f))
         fileInfoIconLayout.layoutParams = params
@@ -128,7 +131,6 @@ internal class FileInfoToolbarHelper(
         if (Util.isDarkMode(context)) {
             collapsingToolbarLayout.setContentScrimColor(statusBarColor)
         }
-        setupCollapsable(isCollapsable, nestedView)
     }
 
     /**
@@ -152,7 +154,7 @@ internal class FileInfoToolbarHelper(
     }
 
     fun updateOptionsMenu(
-        node: MegaNode,
+        node: TypedNode,
         isInRubbish: Boolean,
         isInInbox: Boolean,
         fromIncomingShares: Boolean,
@@ -173,6 +175,9 @@ internal class FileInfoToolbarHelper(
         )
         // Check if read-only properties should be applied on MenuItems
         shouldApplyMenuItemReadOnlyState(isInInbox)
+
+        val isCollapsible = (node as? TypedFileNode)?.hasPreview == true
+        setupCollapsible(isCollapsible, nestedView)
     }
 
     fun disableMenu() {
@@ -242,7 +247,7 @@ internal class FileInfoToolbarHelper(
      * @param isInRubbish the node is in rubbish or not
      */
     private fun setupOptionsToolbar(
-        node: MegaNode,
+        node: TypedNode,
         isInRubbish: Boolean,
         fromIncomingShares: Boolean,
         firstIncomingLevel: Boolean,
@@ -256,10 +261,10 @@ internal class FileInfoToolbarHelper(
     }
 
     /**
-     * setup the collapsable bar and its nested view
+     * setup the collapsible bar and its nested view
      */
-    private fun setupCollapsable(isCollapsable: Boolean, nestedView: NestedScrollView) {
-        if (isCollapsable) {
+    private fun setupCollapsible(isCollapsible: Boolean, nestedView: NestedScrollView) {
+        if (isCollapsible) {
             appBar.addOnOffsetChangedListener { appBar: AppBarLayout, offset: Int ->
                 val collapsed = offset < 0 && abs(offset) >= appBar.totalScrollRange / 2
                 setActionBarDrawablesColorFilter(
@@ -310,12 +315,12 @@ internal class FileInfoToolbarHelper(
      * Sets up the default items to be displayed on the Toolbar Menu
      */
     private fun setDefaultOptionsToolbar(
-        node: MegaNode,
+        node: TypedNode,
         fromIncomingShares: Boolean,
         firstIncomingLevel: Boolean,
         nodeAccess: AccessPermission?,
     ) {
-        if (!node.isTakenDown && !node.isFolder) {
+        if (!node.isTakenDown && node is TypedFileNode) {
             sendToChatMenuItem?.isVisible = true
             sendToChatMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         }
@@ -346,7 +351,7 @@ internal class FileInfoToolbarHelper(
             if (!node.isTakenDown) {
                 downloadMenuItem?.isVisible = true
                 downloadMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                if (node.isFolder) {
+                if (node is TypedFolderNode) {
                     shareMenuItem?.isVisible = true
                     shareMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
                 }

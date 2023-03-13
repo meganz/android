@@ -142,10 +142,10 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             fileInfoImageLayout = binding.fileInfoImageLayout,
             fileInfoToolbarImage = binding.fileInfoToolbarImage,
             fileInfoIconLayout = binding.fileInfoIconLayout,
+            nestedView = bindingContent.nestedLayout
         )
     }
 
-    private var typeExport = -1
     private var cC: ContactController? = null
     private var progressDialog: Pair<AlertDialog, FileInfoJobInProgressState?>? = null
     private var publicLink = false
@@ -327,7 +327,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             if (handle == MegaApiJava.INVALID_HANDLE) {
                 return
             }
-            val list = megaApi.getOutShares(viewModel.node)
+            val list = viewModel.uiState.value.outShares
             for (share in list) {
                 if (handle == share.nodeHandle) {
                     selectedShare = share
@@ -473,10 +473,10 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         }
 
     private fun updateOptionsMenu(state: FileInfoViewState) {
-        if (state.jobInProgressState == null) {
+        if (state.jobInProgressState == null && state.typedNode != null) {
             menuHelper.setNodeName(state.title)
             menuHelper.updateOptionsMenu(
-                node = viewModel.node,
+                node = state.typedNode,
                 isInInbox = state.isNodeInInbox,
                 isInRubbish = state.isNodeInRubbish,
                 fromIncomingShares = from == Constants.FROM_INCOMING_SHARES,
@@ -625,11 +625,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             setSupportActionBar(toolbar)
             val rect = Rect()
             window.decorView.getWindowVisibleDisplayFrame(rect)
-            menuHelper.setupToolbar(
-                isCollapsable = viewModel.node.hasPreview() || viewModel.node.hasThumbnail(),
-                nestedView = bindingContent.nestedLayout,
-                visibleTop = rect.top
-            )
+            menuHelper.setupToolbar(visibleTop = rect.top)
         }
 
         with(bindingContent) {
@@ -817,8 +813,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
                     .setView(dialogLayout.root)
                     .setPositiveButton(getString(R.string.context_remove)) { _: DialogInterface?, _: Int ->
-                        typeExport = TYPE_EXPORT_REMOVE
-                        megaApi.disableExport(viewModel.node)
+                        viewModel.stopSharing()
                     }.setNegativeButton(getString(R.string.general_cancel), null)
                     .show()
             }

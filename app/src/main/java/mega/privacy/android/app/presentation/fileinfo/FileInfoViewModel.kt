@@ -58,6 +58,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -95,6 +96,7 @@ class FileInfoViewModel @Inject constructor(
     private val isAvailableOffline: IsAvailableOffline,
     private val setNodeAvailableOffline: SetNodeAvailableOffline,
     private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val stopSharingNode: StopSharingNode,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -110,7 +112,12 @@ class FileInfoViewModel @Inject constructor(
     lateinit var node: MegaNode //this should be removed as all uses should be replaced by typedNode
         private set
 
-    private lateinit var typedNode: TypedNode
+    /**
+     * the node whose information are displayed
+     */
+    lateinit var typedNode: TypedNode
+        private set
+
     private var versions: List<Node>? = null
     private val monitoringJobs = ArrayList<Job?>()
     private val monitoringMutex = Mutex()
@@ -288,6 +295,16 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Stop sharing this node
+     */
+    fun stopSharing() {
+        updateState {
+            stopSharingNode(typedNode.id)
+            it.copy(typedNode = getNodeById(typedNode.id))
+        }
+    }
+
     private fun monitorNodeUpdates() =
         viewModelScope.launch {
             monitorNodeUpdatesById(typedNode.id).collect { changes ->
@@ -372,7 +389,7 @@ class FileInfoViewModel @Inject constructor(
             }
             val isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue)
             uiState.copy(
-                title = typedNode.name,
+                typedNode = typedNode,
                 isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
                 isNodeInRubbish = isNodeInRubbish,
                 jobInProgressState = null,
@@ -443,8 +460,7 @@ class FileInfoViewModel @Inject constructor(
 
     private fun updateTitle() {
         updateState {
-            typedNode = getNodeById(NodeId(node.handle))
-            it.copy(title = typedNode.name)
+            it.copy(typedNode = getNodeById(typedNode.id))
         }
     }
 

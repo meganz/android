@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
@@ -62,6 +63,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import org.junit.After
@@ -114,6 +116,7 @@ internal class FileInfoViewModelTest {
     private val isAvailableOffline: IsAvailableOffline = mock()
     private val setNodeAvailableOffline: SetNodeAvailableOffline = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
+    private val stopSharingNode: StopSharingNode = mock()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -161,6 +164,7 @@ internal class FileInfoViewModelTest {
             isAvailableOffline = isAvailableOffline,
             setNodeAvailableOffline = setNodeAvailableOffline,
             getNodeAccessPermission = getNodeAccessPermission,
+            stopSharingNode = stopSharingNode,
         )
     }
 
@@ -722,13 +726,28 @@ internal class FileInfoViewModelTest {
     }
 
     @Test
-    fun `test availableOfflineChanged does nothing if getState()`() = runTest {
+    fun `test availableOfflineChanged does nothing if getState`() = runTest {
         mockMonitorStorageStateEvent(StorageState.PayWall)
         whenever(isAvailableOffline.invoke(typedFileNode)).thenReturn(false)
         underTest.setNode(node.handle)
         underTest.availableOfflineChanged(true, activity)
         verifyNoInteractions(setNodeAvailableOffline)
     }
+
+    @Test
+    fun `test when stopSharing is called then disableExport use case is called and node is updated`() =
+        runTest {
+            val expected = mock<TypedNode> {
+                on { isExported }.thenReturn(false)
+            }
+            whenever(typedFileNode.isExported).thenReturn(true)
+            underTest.setNode(node.handle)
+            Truth.assertThat(underTest.uiState.value.typedNode?.isExported).isEqualTo(true)
+            whenever(getNodeById.invoke(nodeId)).thenReturn(expected)
+            underTest.stopSharing()
+            verify(stopSharingNode, times(1)).invoke(nodeId)
+            Truth.assertThat(underTest.uiState.value.typedNode?.isExported).isEqualTo(false)
+        }
 
     private fun mockMonitorStorageStateEvent(state: StorageState) {
         val storageStateEvent = StorageStateEvent(
