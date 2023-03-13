@@ -38,12 +38,17 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_012
 
+/**
+ * TextField for the App
+ */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MegaTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    showBorder: Boolean = true,
     readOnly: Boolean = false,
     textStyle: TextStyle = LocalTextStyle.current,
     label: @Composable (() -> Unit)? = null,
@@ -78,14 +83,24 @@ fun MegaTextField(
         handleColor = MaterialTheme.colors.secondary,
         backgroundColor = MaterialTheme.colors.secondary
     )
+    var modifiedModifier = modifier
+        .background(colors.backgroundColor(enabled).value, shape)
+    if (showBorder) {
+        modifiedModifier = modifiedModifier.then(
+            Modifier.indicatorLine(
+                enabled,
+                isError,
+                interactionSource,
+                colors
+            )
+        )
+    }
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
         @OptIn(ExperimentalMaterialApi::class)
         BasicTextField(
             value = value,
-            modifier = modifier
-                .background(colors.backgroundColor(enabled).value, shape)
-                .indicatorLine(enabled, isError, interactionSource, colors)
+            modifier = modifiedModifier
                 .defaultMinSize(
                     minWidth = TextFieldDefaults.MinWidth,
                     minHeight = TextFieldDefaults.MinHeight
@@ -116,10 +131,12 @@ fun MegaTextField(
                     isError = isError,
                     interactionSource = interactionSource,
                     colors = colors,
-                    contentPadding = PaddingValues(0.dp,
+                    contentPadding = PaddingValues(
+                        0.dp,
                         12.dp,
                         0.dp,
-                        12.dp) // following mega design
+                        12.dp
+                    ) // following mega design
                 )
             }
         )
