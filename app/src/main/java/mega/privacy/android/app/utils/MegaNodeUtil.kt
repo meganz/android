@@ -1908,7 +1908,7 @@ object MegaNodeUtil {
 
         children?.forEach {
             val mime = MimeTypeList.typeForName(it?.name)
-            if (mime.isImage || mime.isVideoMimeType) return true
+            if (!mime.isSvgMimeType && (mime.isImage || mime.isVideoMimeType)) return true
         }
 
         return false

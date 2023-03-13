@@ -350,6 +350,11 @@ class MimeTypeList private constructor(val type: String, val extension: String) 
             type.startsWith("video/") || extension == "vob"
 
     /**
+     * Check if MimeType is svg
+     */
+    val isSvgMimeType = extension == "svg"
+
+    /**
      * Returns if type is non supported video
      */
     val isVideoNotSupported get() = extension == "mpg" || extension == "avi" || extension == "wmv"
