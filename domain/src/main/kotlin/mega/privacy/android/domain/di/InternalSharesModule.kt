@@ -6,8 +6,10 @@ import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInShareFolder
+import mega.privacy.android.domain.usecase.shares.DefaultSetShareFolderAccessPermission
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.SetShareFolderAccessPermission
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 
 /**
@@ -22,6 +24,12 @@ abstract class InternalSharesModule {
      */
     @Binds
     abstract fun bindGetContactItemFromInShareFolder(useCase: DefaultGetContactItemFromInShareFolder): GetContactItemFromInShareFolder
+
+    /**
+     * Provides [DefaultSetShareFolderAccessPermission] implementation.
+     */
+    @Binds
+    abstract fun bindDefaultSetShareAccess(useCase: DefaultSetShareFolderAccessPermission): SetShareFolderAccessPermission
 
     companion object {
         /**

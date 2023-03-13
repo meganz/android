@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -90,6 +91,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val nodeUpdateMapper: NodeUpdateMapper,
     private val appEventGateway: AppEventGateway,
     private val accessPermissionMapper: AccessPermissionMapper,
+    private val accessPermissionIntMapper: AccessPermissionIntMapper,
 ) : NodeRepository {
 
 
@@ -265,6 +267,20 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun stopSharingNode(nodeId: NodeId): Unit = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
             megaApiGateway.stopSharingNode(it)
+        }
+    }
+
+    override suspend fun setShareAccess(
+        nodeId: NodeId,
+        accessPermission: AccessPermission,
+        email: String,
+    ): Unit = withContext(ioDispatcher) {
+        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
+            megaApiGateway.setShareAccess(
+                it,
+                email,
+                accessPermissionIntMapper.invoke(accessPermission),
+            )
         }
     }
 

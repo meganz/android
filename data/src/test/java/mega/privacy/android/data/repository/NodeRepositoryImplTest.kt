@@ -21,6 +21,7 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -63,6 +64,7 @@ class NodeRepositoryImplTest {
     private val folderNode: FolderNode = mock()
     private val appEventGateway: AppEventGateway = mock()
     private val accessPermissionMapper: AccessPermissionMapper = mock()
+    private val accessPermissionIntMapper: AccessPermissionIntMapper = mock()
 
     @Before
     fun setup() {
@@ -86,6 +88,7 @@ class NodeRepositoryImplTest {
             nodeUpdateMapper = nodeUpdateMapper,
             appEventGateway = appEventGateway,
             accessPermissionMapper = accessPermissionMapper,
+            accessPermissionIntMapper = accessPermissionIntMapper,
         )
     }
 
@@ -131,6 +134,16 @@ class NodeRepositoryImplTest {
             whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
             underTest.stopSharingNode(nodeId)
             verify(megaApiGateway, times(1)).stopSharingNode(megaNode)
+        }
+
+    @Test
+    fun `test when setShareAccess is called then api gateway setShareAccess is called with the proper parameters`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            val email = "example@example.com"
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            underTest.setShareAccess(nodeId, AccessPermission.READ, email)
+            verify(megaApiGateway, times(1)).setShareAccess(megaNode, email, ACCESS_READ)
         }
 
     private suspend fun mockFolderInfoResponse() {

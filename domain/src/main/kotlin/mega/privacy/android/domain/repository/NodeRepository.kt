@@ -159,6 +159,16 @@ interface NodeRepository {
     suspend fun stopSharingNode(nodeId: NodeId)
 
     /**
+     * Add, update or remove(access == UNKNOWN) a node's outgoing shared access for one users
+     * In case of errors a ShareAccessNotSetException is thrown
+     * @param nodeId the [NodeId] of the node we want to change permission
+     * @param accessPermission [AccessPermission] that will be set
+     * @param email of the user we want to set the permission for this node
+     * @throws ShareAccessNotSetException with the proper information of how many users have errors
+     */
+    suspend fun setShareAccess(nodeId: NodeId, accessPermission: AccessPermission, email: String)
+
+    /**
      * Load offline nodes
      *
      * @param path         Node path

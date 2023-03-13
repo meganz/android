@@ -1998,6 +1998,26 @@ interface MegaApiGateway {
     fun stopSharingNode(megaNode: MegaNode)
 
     /**
+     * Add, update or remove(access == ACCESS_UNKNOWN) a node's outgoing shared access for a user
+     * @param megaNode the [MegaNode] that will be affected
+     * @param email of the user we want to change access
+     * @param accessLevel, can be one of the following:
+     *
+     * * - ACCESS_UNKNOWN = -1
+     * It means that the access will be removed
+     *
+     * - ACCESS_READ = 0
+     * The user can read the folder only
+     *
+     * - ACCESS_READWRITE = 1
+     * The user can read and write the folder
+     *
+     * - ACCESS_FULL = 2
+     * The user has full permissions over the folder
+     */
+    fun setShareAccess(megaNode: MegaNode, email: String, accessLevel: Int)
+
+    /**
      * Set/Remove the avatar of the MEGA account
      * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_USER
      * Valid data in the MegaRequest object received on callbacks:
