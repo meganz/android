@@ -52,7 +52,7 @@ import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
-import mega.privacy.android.app.presentation.extensions.getErrorStringId
+import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FORCE_RELOAD_ACCOUNT
@@ -80,14 +80,10 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.exception.LoginBlockedAccount
+import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
-import mega.privacy.android.domain.exception.LoginRequireValidation
-import mega.privacy.android.domain.exception.LoginTooManyAttempts
-import mega.privacy.android.domain.exception.LoginUnknownStatus
-import mega.privacy.android.domain.exception.LoginWrongEmailOrPassword
 import mega.privacy.android.domain.exception.QuerySignupLinkException
-import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
+import mega.privacy.android.domain.exception.login.FetchNodesException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import timber.log.Timber
@@ -208,29 +204,17 @@ class LoginFragment : Fragment() {
 
                 if (isLocalLogoutInProgress) disableLoginButton() else enableLoginButton()
 
-                error?.let {
-                    when (error) {
+                error?.let { exception ->
+                    when (exception) {
                         is LoginLoggedOutFromOtherLocation -> {
                             (requireActivity() as LoginActivity).showAlertLoggedOut()
+                            null
                         }
-                        else -> {
-                            //It will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
-                            if (error is LoginBlockedAccount) return@let
-
-                            //Pending refactor: Map the error and just show the Snackbar.
-                            (requireActivity() as LoginActivity).showSnackbar(
-                                requireActivity().getString(
-                                    when (error) {
-                                        is LoginWrongEmailOrPassword -> R.string.error_incorrect_email_or_password
-                                        is LoginTooManyAttempts -> R.string.too_many_attempts_login
-                                        is LoginRequireValidation -> R.string.account_not_validated_login
-                                        is LoginUnknownStatus -> error.megaException.getErrorStringId()
-                                        is FetchNodesErrorAccess -> error.megaException.getErrorStringId()
-                                        else -> R.string.general_error
-                                    }
-                                )
-                            )
-                        }
+                        is LoginException -> exception.error
+                        is FetchNodesException -> exception.error
+                        else -> null
+                    }?.let {
+                        (requireActivity() as LoginActivity).showSnackbar(getString(it))
                     }
 
                     viewModel.setErrorShown()

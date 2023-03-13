@@ -25,6 +25,7 @@ import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
+import mega.privacy.android.domain.exception.LoginBlockedAccount
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
@@ -448,7 +449,8 @@ class LoginViewModel @Inject constructor(
                 isLoginRequired = true,
                 is2FAEnabled = is2FARequest,
                 is2FARequired = false,
-                error = this
+                //If LoginBlockedAccount will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
+                error = this.takeUnless { exception -> exception is LoginBlockedAccount }
             )
         }
 
@@ -499,7 +501,7 @@ class LoginViewModel @Inject constructor(
                     isLoginRequired = true,
                     is2FAEnabled = false,
                     is2FARequired = false,
-                    error = if (it is FetchNodesErrorAccess && !state.pressedBackWhileLogin) it else null
+                    error = it.takeUnless { it is FetchNodesErrorAccess || state.pressedBackWhileLogin }
                 )
             }
         }.onSuccess { MegaApplication.isLoggingIn = false }
