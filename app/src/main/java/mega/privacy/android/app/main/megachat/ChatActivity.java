@@ -9177,6 +9177,8 @@ public class ChatActivity extends PasscodeActivity
             Timber.d("sendMessageToUI");
             AndroidMegaChatMessage newNodeAttachmentMsg = new AndroidMegaChatMessage(pMsgSingle, true);
             sendMessageToUI(newNodeAttachmentMsg);
+        } else {
+            pendingMessagesLoaded = false;
         }
         intent.putExtra(ChatUploadService.EXTRA_CHAT_ID, idChat);
 
