@@ -16,7 +16,7 @@ import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
-import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import nz.mega.sdk.MegaNode
 import org.junit.After
@@ -41,6 +41,8 @@ class NodeOptionsViewModelTest {
 
     private val nodeIdFlow = MutableStateFlow(-1L)
 
+    private val nodeShareInformationFlow = MutableStateFlow<NodeShareInformation?>(null)
+
     private val savedStateHandle = mock<SavedStateHandle> {
         on {
             getStateFlow(
@@ -50,8 +52,8 @@ class NodeOptionsViewModelTest {
         }.thenReturn(nodeIdFlow)
 
         on {
-            getStateFlow<ShareData?>(NodeOptionsViewModel.SHARE_DATA_KEY, null)
-        }.thenReturn(MutableStateFlow(null))
+            getStateFlow<NodeShareInformation?>(NodeOptionsViewModel.SHARE_DATA_KEY, null)
+        }.thenReturn(nodeShareInformationFlow)
     }
 
     @Before
@@ -123,7 +125,7 @@ class NodeOptionsViewModelTest {
     }
 
     @Test
-    fun `test that shareKeyCreated is false if called with null node`() = runTest{
+    fun `test that shareKeyCreated is false if called with null node`() = runTest {
         createShareKey.stub {
             onBlocking { invoke(any()) }.thenAnswer { throw Throwable() }
         }
@@ -138,6 +140,21 @@ class NodeOptionsViewModelTest {
                 testScheduler.advanceUntilIdle()
                 assertThat(awaitItem().shareKeyCreated).isFalse()
             }
+    }
+
+    @Test
+    fun `test that share info is returned if found`() = runTest {
+        val expectedShareInformation = NodeShareInformation(
+            user = null,
+            isPending = false,
+            isVerified = false
+        )
+
+        underTest.state.test {
+            assertThat(awaitItem().shareData).isNull()
+            nodeShareInformationFlow.emit(expectedShareInformation)
+            assertThat(awaitItem().shareData).isEqualTo(expectedShareInformation)
+        }
     }
 
 }

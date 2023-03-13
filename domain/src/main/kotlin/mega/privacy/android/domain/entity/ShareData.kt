@@ -1,7 +1,5 @@
 package mega.privacy.android.domain.entity
 
-import java.io.Serializable
-
 /**
  * Share data
  *
@@ -19,4 +17,4 @@ data class ShareData(
     val timeStamp: Long,
     val isPending: Boolean,
     val isVerified: Boolean,
-) : Serializable
+)

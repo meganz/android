@@ -39,6 +39,7 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Co
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.NODE_ID_KEY
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.SHARE_DATA_KEY
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -767,27 +768,27 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     /**
      * Set the node info of the unverified node with the name of the contact
-     * @param shareData
+     * @param nodeShareInformation
      */
-    private fun setUnverifiedOutgoingNodeUserName(shareData: ShareData) {
-        user = megaApi.getContact(shareData.user)
+    private fun setUnverifiedOutgoingNodeUserName(nodeShareInformation: NodeShareInformation) {
+        user = megaApi.getContact(nodeShareInformation.user)
         if (user != null) {
             nodeInfo.text = ContactUtil.getMegaUserNameDB(user)
         } else {
-            nodeInfo.text = shareData.user
+            nodeInfo.text = nodeShareInformation.user
         }
     }
 
-    private fun hideNodeActions(shareData: ShareData, node: MegaNode) {
+    private fun hideNodeActions(nodeShareInformation: NodeShareInformation, node: MegaNode) {
         val optionVerifyUser = contentView.findViewById<TextView>(R.id.verify_user_option)
         optionVerifyUser.visibility = View.VISIBLE
-        if (!shareData.isVerified) {
+        if (!nodeShareInformation.isVerified) {
             optionVerifyUser.text = getString(
                 R.string.shared_items_bottom_sheet_menu_verify_user,
                 nodeInfo.text
             )
         }
-        optionVerifyUser.setOnClickListener { onVerifyUserClicked(shareData, node) }
+        optionVerifyUser.setOnClickListener { onVerifyUserClicked(nodeShareInformation, node) }
         val nodeName = contentView.findViewById<TextView>(R.id.node_name_text)
         if (nodeController.nodeComesFromIncoming(node)) {
             nodeName.text =
@@ -1013,13 +1014,13 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onVerifyUserClicked(
-        shareData: ShareData,
+        nodeShareInformation: NodeShareInformation,
         node: MegaNode,
     ) {
-        if (!shareData.isVerified && shareData.isPending) {
-            showCanNotVerifyContact(shareData.user)
+        if (!nodeShareInformation.isVerified && nodeShareInformation.isPending) {
+            showCanNotVerifyContact(nodeShareInformation.user)
         } else {
-            openAuthenticityCredentials(shareData.user, node)
+            openAuthenticityCredentials(nodeShareInformation.user, node)
         }
         setStateBottomSheetBehaviorHidden()
     }
@@ -1181,7 +1182,14 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             args.putInt(
                 MODE_KEY,
                 mode?.takeIf { it in DEFAULT_MODE..FAVOURITES_MODE } ?: DEFAULT_MODE)
-            shareData?.let { args.putSerializable(SHARE_DATA_KEY, it) }
+            shareData?.let {
+                val shareInfo = NodeShareInformation(
+                    user = it.user,
+                    isPending = it.isPending,
+                    isVerified = it.isVerified
+                )
+                args.putParcelable(SHARE_DATA_KEY, shareInfo)
+            }
 
             fragment.arguments = args
 

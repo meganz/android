@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
-import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -42,7 +42,7 @@ class NodeOptionsViewModel @Inject constructor(
                 savedStateHandle.getStateFlow(SHARE_DATA_KEY, null),
                 shareKeyCreated,
                 monitorConnectivity()
-            ) { node: MegaNode?, shareData: ShareData?, shareKeyCreated: Boolean?, isOnline: Boolean ->
+            ) { node: MegaNode?, shareData: NodeShareInformation?, shareKeyCreated: Boolean?, isOnline: Boolean ->
                 { state: NodeBottomSheetUIState ->
                     state.copy(
                         node = node,
