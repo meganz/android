@@ -8,13 +8,17 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
+import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolder
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,6 +33,8 @@ class FolderLinkViewModelTest {
     private val monitorViewType = mock<MonitorViewType>()
     private val monitorConnectivity = mock<MonitorConnectivity>()
     private val loginToFolder = mock<LoginToFolder>()
+    private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
+    private val copyNodeUseCase: CopyNodeUseCase = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -39,8 +45,19 @@ class FolderLinkViewModelTest {
         initViewModel()
     }
 
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     private fun initViewModel() {
-        underTest = FolderLinkViewModel(monitorConnectivity, monitorViewType, loginToFolder)
+        underTest = FolderLinkViewModel(
+            monitorConnectivity,
+            monitorViewType,
+            loginToFolder,
+            checkNameCollisionUseCase,
+            copyNodeUseCase
+        )
     }
 
     @Test
@@ -51,6 +68,9 @@ class FolderLinkViewModelTest {
             assertThat(initial.isLoginComplete).isEqualTo(false)
             assertThat(initial.isNodesFetched).isEqualTo(false)
             assertThat(initial.askForDecryptionKeyDialog).isEqualTo(false)
+            assertThat(initial.collisions).isNull()
+            assertThat(initial.copyResultText).isNull()
+            assertThat(initial.copyThrowable).isNull()
             assertThat(initial.errorDialogTitle).isEqualTo(-1)
             assertThat(initial.errorDialogContent).isEqualTo(-1)
             assertThat(initial.snackBarMessage).isEqualTo(-1)
@@ -120,4 +140,23 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.askForDecryptionKeyDialog).isFalse()
             }
         }
+
+    @Test
+    fun `test that launchCollisionActivity values are reset `() = runTest {
+        underTest.state.test {
+            underTest.resetLaunchCollisionActivity()
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.collisions).isNull()
+        }
+    }
+
+    @Test
+    fun `test that showCopyResult values are reset `() = runTest {
+        underTest.state.test {
+            underTest.resetShowCopyResult()
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.copyResultText).isNull()
+            assertThat(newValue.copyThrowable).isNull()
+        }
+    }
 }

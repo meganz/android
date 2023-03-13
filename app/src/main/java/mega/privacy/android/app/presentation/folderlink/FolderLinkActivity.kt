@@ -35,9 +35,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.isClosedChat
@@ -63,14 +60,9 @@ import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
-import mega.privacy.android.app.usecase.CopyNodeUseCase
-import mega.privacy.android.app.usecase.data.CopyRequestResult
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
@@ -110,18 +102,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     DecryptDialogListener, SnackbarShower {
 
     private lateinit var binding: ActivityFolderLinkBinding
-
-    /**
-     * CheckNameCollisionUseCase
-     */
-    @Inject
-    lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
-
-    /**
-     * CheckNameCollisionUseCase
-     */
-    @Inject
-    lateinit var copyNodeUseCase: CopyNodeUseCase
 
     /**
      * CookieDialogHandler
@@ -346,52 +326,12 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     showSnackbar(R.string.context_no_copied)
                     return@ActivityResultCallback
                 }
-
-                checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { result: Pair<ArrayList<NameCollision>, List<MegaNode>>, throwable: Throwable? ->
-                        if (throwable == null) {
-                            val collisions: ArrayList<NameCollision> = result.first
-                            if (collisions.isNotEmpty()) {
-                                dismissAlertDialogIfExists(statusDialog)
-                                nameCollisionActivityContract?.launch(collisions)
-                            }
-                            val nodesWithoutCollisions: List<MegaNode> = result.second
-                            if (nodesWithoutCollisions.isNotEmpty()) {
-                                copyNodeUseCase.copy(nodesWithoutCollisions, toHandle)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { copyRequestResult: CopyRequestResult?, copyThrowable: Throwable? ->
-                                        showCopyResult(copyRequestResult, copyThrowable)
-                                    }
-                            }
-                        }
-                    }
+                viewModel.checkNameCollision(nodes, toHandle)
 
             } else if (selectedNode != null) {
                 Timber.d("No multiple select")
                 selectedNode = megaApiFolder.authorizeNode(selectedNode)
-                checkNameCollisionUseCase.check(selectedNode, toHandle, NameCollisionType.COPY)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onSuccess = { collisionResult ->
-                            dismissAlertDialogIfExists(statusDialog)
-                            nameCollisionActivityContract?.launch(arrayListOf(collisionResult))
-                        },
-                        onError = { error ->
-                            Timber.e(error, "No collision.")
-                            copyNodeUseCase.copy(selectedNode, toHandle)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(
-                                    { showCopyResult(null, null) },
-                                    { copyThrowable: Throwable? ->
-                                        showCopyResult(null, copyThrowable)
-                                    })
-                        }
-                    )
+                selectedNode?.let { viewModel.checkNameCollision(listOf(it), toHandle) }
 
             } else {
                 Timber.w("Selected Node is NULL")
@@ -731,6 +671,15 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                             // Get cookies settings after login.
                             getInstance().checkEnabledCookies()
                         }
+                        it.collisions != null -> {
+                            dismissAlertDialogIfExists(statusDialog)
+                            nameCollisionActivityContract?.launch(it.collisions)
+                            viewModel.resetLaunchCollisionActivity()
+                        }
+                        it.copyResultText != null || it.copyThrowable != null -> {
+                            showCopyResult(it.copyResultText, it.copyThrowable)
+                            viewModel.resetShowCopyResult()
+                        }
                         it.isLoginComplete && it.isNodesFetched -> {}
                         it.askForDecryptionKeyDialog -> {
                             askForDecryptionKeyDialog()
@@ -840,15 +789,16 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     /**
      * Shows the copy Result.
      *
-     * @param copyRequestResult Object containing the request result.
+     * @param copyResultText Copy result text.
      * @param throwable
      */
-    private fun showCopyResult(copyRequestResult: CopyRequestResult?, throwable: Throwable?) {
+
+    private fun showCopyResult(copyResultText: String?, throwable: Throwable?) {
         dismissAlertDialogIfExists(statusDialog)
         clearSelections()
         hideMultipleSelect()
-        if (copyRequestResult != null) {
-            showSnackbar(copyRequestResult.getResultText())
+        if (copyResultText != null) {
+            showSnackbar(copyResultText)
         } else throwable?.let { manageCopyMoveException(it) }
             ?: showSnackbar(R.string.context_correctly_copied)
     }
