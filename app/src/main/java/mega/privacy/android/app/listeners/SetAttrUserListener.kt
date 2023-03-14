@@ -5,16 +5,10 @@ import android.content.Intent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.jobservices.CameraUploadsService
-import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.ContactUtil
-import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.facade.BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING
-import mega.privacy.android.data.facade.INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE
-import mega.privacy.android.data.facade.INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -69,12 +63,15 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                     } else {
                         Timber.w("Error setting \"My chat files\" folder as user's attribute")
                     }
+
                     MegaApiJava.USER_ATTR_FIRSTNAME -> if (e.errorCode == MegaError.API_OK) {
                         ContactUtil.updateFirstName(text, email)
                     }
+
                     MegaApiJava.USER_ATTR_LASTNAME -> if (e.errorCode == MegaError.API_OK) {
                         ContactUtil.updateLastName(text, email)
                     }
+
                     MegaApiJava.USER_ATTR_ALIAS -> when (e.errorCode) {
                         MegaError.API_OK -> {
                             databaseHandler.setContactNickname(text, nodeHandle)
@@ -86,61 +83,17 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                             Util.showSnackbar(context, message)
                             ContactUtil.notifyNicknameUpdate(context, nodeHandle)
                         }
+
                         MegaError.API_ENOENT -> {
                             databaseHandler.setContactNickname(null, nodeHandle)
                             ContactUtil.notifyNicknameUpdate(context, nodeHandle)
                         }
+
                         else -> {
                             Timber.e("Error adding, updating or removing the alias%s", e.errorCode)
                         }
                     }
-                    MegaApiJava.USER_ATTR_CAMERA_UPLOADS_FOLDER -> if (e.errorCode == MegaError.API_OK) {
-                        val prefs = databaseHandler.preferences ?: return
-                        // Database and preference update
-                        Timber.d(
-                            "Set CU folders successfully primary: %d, secondary: %d",
-                            nodeHandle,
-                            parentHandle
-                        )
-                        if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
-                            CameraUploadUtil.resetPrimaryTimeline()
-                            databaseHandler.setCamSyncHandle(nodeHandle)
-                            prefs.camSyncHandle = nodeHandle.toString()
-                            CameraUploadUtil.forceUpdateCameraUploadFolderIcon(false, nodeHandle)
-                            Timber.d("Start CU by set primary, try to start CU, true.")
-                            context?.let { JobUtil.fireRestartCameraUploadJob(it) }
-                        }
-                        if (parentHandle != MegaApiJava.INVALID_HANDLE) {
-                            CameraUploadUtil.resetSecondaryTimeline()
-                            databaseHandler.setSecondaryFolderHandle(parentHandle)
-                            prefs.megaHandleSecondaryFolder = parentHandle.toString()
-                            CameraUploadUtil.forceUpdateCameraUploadFolderIcon(
-                                true,
-                                parentHandle
-                            )
-                            //make sure to start the process once secondary is enabled
-                            Timber.d("Start CU by set primary, try to start CU, true.")
-                            context?.let { JobUtil.fireRestartCameraUploadJob(it) }
-                        }
-                        Intent(BROADCAST_ACTION_UPDATE_CU_DESTINATION_FOLDER_SETTING).run {
-                            if (nodeHandle != MegaApiJava.INVALID_HANDLE) {
-                                putExtra(INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY, false)
-                                putExtra(INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE, nodeHandle)
-                            }
-                            if (parentHandle != MegaApiJava.INVALID_HANDLE) {
-                                putExtra(INTENT_EXTRA_IS_CU_DESTINATION_SECONDARY, true)
-                                putExtra(INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE, parentHandle)
-                            }
-                            MegaApplication.getInstance().sendBroadcast(this)
-                        }
-                    } else {
-                        Timber.w(
-                            "Set CU attributes failed, error code: %d, %s",
-                            e.errorCode,
-                            e.errorString
-                        )
-                        context?.let { JobUtil.fireStopCameraUploadJob(it) }
-                    }
+
                     MegaApiJava.USER_ATTR_RUBBISH_TIME -> if (e.errorCode == MegaError.API_OK) {
                         Intent(BroadcastConstants.ACTION_UPDATE_RB_SCHEDULER).run {
                             putExtra(BroadcastConstants.DAYS_COUNT, number)
@@ -149,6 +102,7 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                     } else {
                         Util.showSnackbar(context, context?.getString(R.string.error_general_nodes))
                     }
+
                     MegaApiJava.USER_ATTR_RICH_PREVIEWS -> if (e.errorCode != MegaError.API_OK) {
                         MegaApplication.getInstance()
                             .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE))

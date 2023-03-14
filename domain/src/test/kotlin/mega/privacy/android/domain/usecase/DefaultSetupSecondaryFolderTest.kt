@@ -56,9 +56,9 @@ class DefaultSetupSecondaryFolderTest {
         }
 
     @Test
-    fun `test that if setup secondary folder returns an error`() =
+    fun `test that if setup secondary folder returns an error, then throws an error`() =
         runTest {
-            whenever(cameraUploadRepository.setupPrimaryFolder(any())).thenAnswer { throw Exception() }
+            whenever(cameraUploadRepository.setupSecondaryFolder(any())).thenAnswer { throw Exception() }
             Assert.assertThrows(Exception::class.java) {
                 runBlocking { underTest(any()) }
             }

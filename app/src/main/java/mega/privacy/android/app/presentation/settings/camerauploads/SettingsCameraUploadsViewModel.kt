@@ -16,9 +16,10 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
-import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
@@ -33,6 +34,8 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
+import mega.privacy.android.domain.usecase.SetupPrimaryFolder
+import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
@@ -60,9 +63,12 @@ import javax.inject.Inject
  * @property restoreSecondaryTimestamps Restore the Secondary Timestamps
  * @property setCameraUploadsByWifi Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setLocationTagsEnabled Sets whether Location Tags should be embedded in each Photo to be uploaded or not
+ * @property setupDefaultSecondaryFolder Sets up a default Secondary Folder of Camera Uploads
  * @property setUploadOption Sets the new upload option of Camera Uploads
  * @property setUploadVideoQuality Sets the new Video Quality of Videos to be uploaded
  * @property setUploadVideoSyncStatus Sets the new Sync Status of Videos to be uploaded
+ * @property setupPrimaryFolder Sets up the Primary Folder of Camera Uploads
+ * @property setupSecondaryFolder Sets up the Secondary Folder of Camera Uploads
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
@@ -81,9 +87,12 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
     private val setCameraUploadsByWifi: SetCameraUploadsByWifi,
     private val setLocationTagsEnabled: SetLocationTagsEnabled,
+    private val setupDefaultSecondaryFolder: SetupDefaultSecondaryFolder,
     private val setUploadOption: SetUploadOption,
     private val setUploadVideoQuality: SetUploadVideoQuality,
     private val setUploadVideoSyncStatus: SetUploadVideoSyncStatus,
+    private val setupPrimaryFolder: SetupPrimaryFolder,
+    private val setupSecondaryFolder: SetupSecondaryFolder,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -209,6 +218,33 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun restoreSecondaryTimestampsAndSyncRecordProcess() {
         viewModelScope.launch {
             restoreSecondaryTimestamps()
+        }
+    }
+
+    /**
+     * Sets up a Secondary Folder with a Media Uploads folder name
+     */
+    fun setupDefaultSecondaryCameraUploadFolder(secondaryFolderName: String) {
+        viewModelScope.launch {
+            setupDefaultSecondaryFolder(secondaryFolderName)
+        }
+    }
+
+    /**
+     * Sets up the Primary Folder with a given folder handle
+     */
+    fun setupPrimaryCameraUploadFolder(primaryHandle: Long) {
+        viewModelScope.launch {
+            setupPrimaryFolder(primaryHandle)
+        }
+    }
+
+    /**
+     * Sets up the Secondary Folder with a given folder handle
+     */
+    fun setupSecondaryCameraUploadFolder(secondaryHandle: Long) {
+        viewModelScope.launch {
+            setupSecondaryFolder(secondaryHandle)
         }
     }
 

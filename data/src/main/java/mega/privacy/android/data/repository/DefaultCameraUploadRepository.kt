@@ -536,17 +536,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 
     override fun monitorChargingStoppedInfo() = broadcastReceiverGateway.monitorChargingStoppedState
 
-    override suspend fun setCameraUploadsFolders(primaryFolder: Long, secondaryFolder: Long): Unit =
-        withContext(ioDispatcher) {
-            suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener { return@getRequestListener }
-                megaApiGateway.setCameraUploadsFolders(primaryFolder, secondaryFolder, listener)
-                continuation.invokeOnCancellation {
-                    megaApiGateway.removeRequestListener(listener)
-                }
-            }
-        }
-
     override suspend fun renameNode(nodeHandle: Long, newName: String): Unit =
         withContext(ioDispatcher) {
             val node = megaApiGateway.getMegaNodeByHandle(nodeHandle)

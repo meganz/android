@@ -25,6 +25,7 @@ import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
+import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolder
 import mega.privacy.android.app.domain.usecase.GetCameraUploadAttributes
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
@@ -47,6 +48,7 @@ import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
+import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -697,6 +699,12 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindSetupSecondaryFolder(setupSecondaryFolder: DefaultSetupSecondaryFolder): SetupSecondaryFolder
+
+    /**
+     * Provide the [SetupDefaultSecondaryFolder] implementation
+     */
+    @Binds
+    abstract fun bindSetupDefaultSecondaryFolder(defaultSetupDefaultSecondaryFolder: DefaultSetupDefaultSecondaryFolder): SetupDefaultSecondaryFolder
 
     /**
      * Provide the [SetPrimarySyncHandle] implementation

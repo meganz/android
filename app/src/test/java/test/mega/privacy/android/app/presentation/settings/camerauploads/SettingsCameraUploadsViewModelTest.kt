@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
+import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.domain.entity.SyncStatus
@@ -27,6 +28,8 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
+import mega.privacy.android.domain.usecase.SetupPrimaryFolder
+import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
@@ -66,9 +69,12 @@ class SettingsCameraUploadsViewModelTest {
     private val restoreSecondaryTimestamps = mock<RestoreSecondaryTimestamps>()
     private val setCameraUploadsByWifi = mock<SetCameraUploadsByWifi>()
     private val setLocationTagsEnabled = mock<SetLocationTagsEnabled>()
+    private val setupDefaultSecondaryFolder = mock<SetupDefaultSecondaryFolder>()
     private val setUploadOption = mock<SetUploadOption>()
     private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
     private val setUploadVideoSyncStatus = mock<SetUploadVideoSyncStatus>()
+    private val setupPrimaryFolder = mock<SetupPrimaryFolder>()
+    private val setupSecondaryFolder = mock<SetupSecondaryFolder>()
 
     @Before
     fun setUp() {
@@ -100,9 +106,12 @@ class SettingsCameraUploadsViewModelTest {
             restoreSecondaryTimestamps = restoreSecondaryTimestamps,
             setCameraUploadsByWifi = setCameraUploadsByWifi,
             setLocationTagsEnabled = setLocationTagsEnabled,
+            setupDefaultSecondaryFolder = setupDefaultSecondaryFolder,
             setUploadOption = setUploadOption,
             setUploadVideoQuality = setUploadVideoQuality,
             setUploadVideoSyncStatus = setUploadVideoSyncStatus,
+            setupPrimaryFolder = setupPrimaryFolder,
+            setupSecondaryFolder = setupSecondaryFolder,
         )
     }
 
@@ -407,6 +416,42 @@ class SettingsCameraUploadsViewModelTest {
             underTest.restoreSecondaryTimestampsAndSyncRecordProcess()
 
             verify(restoreSecondaryTimestamps, times(1)).invoke()
+        }
+
+    @Test
+    fun `test that setupDefaultSecondaryFolder is invoked when calling setupDefaultSecondaryCameraUploadFolder`() =
+        runTest {
+            setupUnderTest()
+
+            val testName = "Media Uploads"
+
+            underTest.setupDefaultSecondaryCameraUploadFolder(testName)
+
+            verify(setupDefaultSecondaryFolder, times(1)).invoke(testName)
+        }
+
+    @Test
+    fun `test that setupPrimaryFolder is invoked when calling setupPrimaryCameraUploadFolder`() =
+        runTest {
+            setupUnderTest()
+
+            val testHandle = 69L
+
+            underTest.setupPrimaryCameraUploadFolder(testHandle)
+
+            verify(setupPrimaryFolder, times(1)).invoke(testHandle)
+        }
+
+    @Test
+    fun `test that setupSecondaryFolder is invoked when calling setupSecondaryCameraUploadFolder`() =
+        runTest {
+            setupUnderTest()
+
+            val testHandle = 69L
+
+            underTest.setupSecondaryCameraUploadFolder(testHandle)
+
+            verify(setupSecondaryFolder, times(1)).invoke(testHandle)
         }
 
     @Test

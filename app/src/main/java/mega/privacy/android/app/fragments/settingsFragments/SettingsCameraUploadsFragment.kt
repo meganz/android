@@ -66,28 +66,25 @@ import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_CAMERA_
 import mega.privacy.android.app.constants.SettingsConstants.REQUEST_MEGA_SECONDARY_MEDIA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.SELECTED_MEGA_FOLDER
 import mega.privacy.android.app.extensions.navigateToAppSettings
-import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.presentation.settings.camerauploads.SettingsCameraUploadsViewModel
+import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updatePrimaryLocalFolder
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updateSecondaryLocalFolder
-import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.JobUtil
-import mega.privacy.android.app.utils.MegaNodeUtil.isNodeInRubbishOrDeleted
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.displayNotificationPermissionRationale
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getNotificationsPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasAccessMediaLocationPermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.VideoQuality
-import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasAccessMediaLocationPermission
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
@@ -132,7 +129,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var megaNodeSecondaryMediaFolder: MegaNode? = null
     private var megaPathSecMediaFolder = ""
     private var isExternalSDCardMU = false
-    private var setAttrUserListener: SetAttrUserListener? = null
 
     private val localDCIMFolderPath: String
         get() = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
@@ -171,7 +167,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         val lv = v.findViewById<ListView>(android.R.id.list)
         lv?.setPadding(0, 0, 0, 0)
         setOnlineOptions(viewModel.isConnected && megaApi != null && megaApi.rootNode != null)
-        setAttrUserListener = SetAttrUserListener(context)
         return v
     }
 
@@ -478,24 +473,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 if (secondaryUpload) {
                     Timber.d("Enable Media Uploads.")
                     // If there is any possible secondary folder, set it as the default one
-                    val setSecondaryFolderHandle = CameraUploadUtil.getSecondaryFolderHandle()
-                    val possibleSecondaryFolderHandle =
-                        CameraUploadUtil.findDefaultFolder(
-                            getString(
-                                R.string.section_secondary_media_uploads
-                            )
-                        )
-                    if ((setSecondaryFolderHandle == MegaApiJava.INVALID_HANDLE || isNodeInRubbishOrDeleted(
-                            setSecondaryFolderHandle
-                        )) &&
-                        possibleSecondaryFolderHandle != MegaApiJava.INVALID_HANDLE
-                    ) {
-                        megaApi.setCameraUploadsFolders(
-                            MegaApiJava.INVALID_HANDLE,
-                            possibleSecondaryFolderHandle,
-                            setAttrUserListener
-                        )
-                    }
+                    viewModel.setupDefaultSecondaryCameraUploadFolder(getString(R.string.section_secondary_media_uploads))
                     viewModel.restoreSecondaryTimestampsAndSyncRecordProcess()
                     dbH.setSecondaryUploadEnabled(true)
 
@@ -643,11 +621,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 if (handle != MegaApiJava.INVALID_HANDLE) {
                     // Set Primary Folder only
                     Timber.d("Set Camera Uploads Primary Attribute: %s", handle)
-                    megaApi.setCameraUploadsFolders(
-                        handle,
-                        MegaApiJava.INVALID_HANDLE,
-                        setAttrUserListener
-                    )
+                    viewModel.setupPrimaryCameraUploadFolder(handle)
                 } else {
                     Timber.e("Error choosing the Mega folder for Primary Uploads")
                 }
@@ -706,11 +680,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 }
                 if (secondaryHandle != MegaApiJava.INVALID_HANDLE) {
                     Timber.d("Set Camera Uploads Secondary Attribute: %s", secondaryHandle)
-                    megaApi.setCameraUploadsFolders(
-                        MegaApiJava.INVALID_HANDLE,
-                        secondaryHandle,
-                        setAttrUserListener
-                    )
+                    viewModel.setupSecondaryCameraUploadFolder(secondaryHandle)
                 } else {
                     Timber.e("Error choosing the Mega folder for Secondary Uploads")
                 }

@@ -28,6 +28,7 @@ import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
+import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.domain.usecase.BackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
 import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
@@ -323,6 +324,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideSetupSecondaryFolder() = mock<SetupSecondaryFolder>()
+
+    @Provides
+    fun provideSetupDefaultSecondaryFolder() = mock<SetupDefaultSecondaryFolder>()
 
     @Provides
     fun provideGetCameraUploadFolderName() = mock<GetCameraUploadFolderName>()

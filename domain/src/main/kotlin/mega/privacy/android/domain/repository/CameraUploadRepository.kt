@@ -512,16 +512,6 @@ interface CameraUploadRepository {
     fun monitorChargingStoppedInfo(): Flow<Boolean>
 
     /**
-     * set camera upload folder
-     * @param primaryFolder handle
-     * @param secondaryFolder handle
-     */
-    suspend fun setCameraUploadsFolders(
-        primaryFolder: Long,
-        secondaryFolder: Long,
-    )
-
-    /**
      * rename camera uploads folder name
      *
      * @param nodeHandle handle for node to change name
