@@ -11,13 +11,13 @@ lintOptions {
 }
 
 dependencies {
+    compileOnly lib.kotlin.stdlib.jdk7
     // For a description of the below dependencies, see the main project README
-    compileOnly "com.android.tools.lint:lint-api:$lintVersion"
+    compileOnly tools.lint.api
     // You typically don't need this one:
-    compileOnly "com.android.tools.lint:lint-checks:$lintVersion"
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    compileOnly tools.lint.checks
 
-    testImplementation "junit:junit:4.13.2"
-    testImplementation "com.android.tools.lint:lint:$lintVersion"
-    testImplementation "com.android.tools.lint:lint-tests:$lintVersion"
+    testImplementation testlib.junit
+    testImplementation tools.lint
+    testImplementation tools.lint.tests
 }

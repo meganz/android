@@ -1,0 +1,45 @@
+[versions]
+androidx-test = "1.5.0"
+androidx-arch = "2.2.0"
+coroutines-test = "1.6.0"
+espresso = "3.4.0"
+hamcrest = "1.3"
+junit = "4.13.2"
+junit-test = "1.1.5"
+jraska-livedata-test = "1.2.0"
+mockito = "5.1.1"
+mockito-inline = "3.11.2"
+mockito-kotlin = "4.0.0"
+test-parameter-injector = "1.8"
+truth = "1.1.3"
+turbine = "0.7.0"
+roboelectric = "4.7.3"
+room-test = "2.5.0"
+
+[libraries]
+arch-core-test = { module = "androidx.arch.core:core-testing", version.ref = "androidx-arch" }
+compose-junit = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+compose-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines-test" }
+junit = { module = "junit:junit", version.ref = "junit" }
+junit-test-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junit-test" }
+espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
+espresso-contrib = { module = "androidx.test.espresso:espresso-contrib", version.ref = "espresso" }
+espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espresso" }
+hamcrest = { module = "org.hamcrest:hamcrest-library", version.ref = "hamcrest" }
+jraska-livedata-test = { module = "com.jraska.livedata:testing-ktx", version.ref = "jraska-livedata-test" }
+mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito" }
+mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito-inline" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+test-core-ktx = { module = "androidx.test:core-ktx", version.ref = "androidx-test" }
+test-parameter-injector = { module = "com.google.testparameterinjector:test-parameter-injector", version.ref = "test-parameter-injector" }
+truth = { module = "com.google.truth:truth", version.ref = "truth" }
+truth-ext = { module = "androidx.test.ext:truth", version.ref = "androidx-test" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+roboelectric = { module = "org.robolectric:robolectric", version.ref = "roboelectric" }
+room-test = { module = "androidx.room:room-testing", version.ref = "room-test" }
+
+[bundles]
+unit-test = ["junit", "truth", "hamcrest", "mockito", "mockito-inline", "mockito-kotlin", "turbine"]
+ui-test = ["roboelectric", "espresso", "espresso-intents"]

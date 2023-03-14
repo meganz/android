@@ -1,10 +1,6 @@
 apply from: "tools/util.gradle"
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.lintVersion = '30.2.2' // = gradleVersion + 23.0.0
-    ext.kotlinVersion = '1.8.10'
-    ext.hiltVersion = "2.45"
-
     repositories {
         google()
         maven { url "https://plugins.gradle.org/m2/" }
@@ -58,27 +54,6 @@ ext {
 
     // Prebuilt MEGA SDK version
     megaSdkVersion = '20230308.101554-rel'
-    
-    // App dependencies
-    androidxArchCoreVersion = '2.1.0'
-    androidxTestExtVersion = '1.1.3'
-    androidxTestVersion = '1.4.0'
-    appCompatVersion = '1.5.1'
-    composeCompilerVersion = '1.4.2'
-    composeBomVersion = '2022.10.00'
-    coroutineTestVersion = '1.6.0'
-    espressoVersion = '3.4.0'
-    fragmentTestingVersion = '1.4.1'
-    junitVersion = '4.13.2'
-    mockitoKotlinVersion = '4.0.0'
-    mockitoVersion = '5.1.1'
-    roboletricVersion = '4.7.3'
-    roomVersion = '2.4.2'
-    showkaseVersion = '1.0.0-beta13'
-    truthVersion = '1.1.3'
-    turbineVersion = '0.7.0'
-    workVersion = '2.8.0'
-    exifinterfaceVersion = '1.3.0'
 }
 
 ext.shouldSuppressWarnings = { ->

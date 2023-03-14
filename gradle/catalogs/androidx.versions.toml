@@ -44,6 +44,7 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences", v
 emoji = { module = "androidx.emoji:emoji-appcompat", version.ref = "emoji" }
 exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "exifinterface" }
 fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment" }
+fragment-test = { module = "androidx.fragment:fragment-testing", version.ref = "fragment" }
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-android" }
 hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt-android" }
 hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-android" }
@@ -66,6 +67,7 @@ recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "r
 recyclerview-selection = { module = "androidx.recyclerview:recyclerview-selection", version.ref = "recyclerview-selection" }
 viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
+work-test = { module = "androidx.work:work-testing", version.ref = "work" }
 
 [bundles]
 lifecycle = ["lifecycle-livedata", "lifecycle-viewmodel", "lifecycle-runtime", "lifecycle-reactivestreams", "lifecycle-common", "lifecycle-process", "lifecycle-service", "lifecycle-runtime-compose"]

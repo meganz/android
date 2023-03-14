@@ -86,24 +86,13 @@ dependencies {
     kapt google.autovalue
 
     // Testing dependencies
-    androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
-    androidTestImplementation "com.google.truth:truth:$truthVersion"
-    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-    androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
+    testImplementation testlib.bundles.unit.test
+    testImplementation testlib.truth.ext
+    testImplementation testlib.test.core.ktx
+    testImplementation lib.bundles.unit.test
 
-    testImplementation "junit:junit:$junitVersion"
-    testImplementation "com.google.truth:truth:$truthVersion"
-    testImplementation "androidx.test.ext:truth:$androidxTestVersion"
-    testImplementation "androidx.test:core-ktx:$androidxTestVersion"
-    testImplementation "androidx.test:core:$androidxTestVersion"
-    testImplementation "org.mockito:mockito-core:$mockitoVersion"
-    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-    testImplementation "app.cash.turbine:turbine:$turbineVersion"
-
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
-    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
+    androidTestImplementation testlib.bundles.unit.test
+    androidTestImplementation lib.bundles.unit.test
+    androidTestImplementation testlib.junit.test.ktx
 }
 

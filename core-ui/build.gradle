@@ -13,7 +13,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion composeCompilerVersion
+        kotlinCompilerExtensionVersion androidx.versions.compose.compiler.get()
     }
 
     defaultConfig {
@@ -56,9 +56,9 @@ dependencies {
     implementation lib.showkase
     kapt lib.showkase.processor
 
-    testImplementation 'junit:junit:4.13.2'
-    testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
-    testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-    androidTestImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    testImplementation testlib.junit
+    testImplementation testlib.junit.test.ktx
+    testImplementation testlib.espresso
+    androidTestImplementation testlib.junit.test.ktx
+    androidTestImplementation testlib.espresso
 }

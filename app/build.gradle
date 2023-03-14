@@ -30,7 +30,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion composeCompilerVersion
+        kotlinCompilerExtensionVersion androidx.versions.compose.compiler.get()
     }
 
     defaultConfig {
@@ -322,6 +322,7 @@ dependencies {
             type = "aar"
         }
     }
+    implementation testlib.hamcrest
 
     coreLibraryDesugaring lib.desugar
 
@@ -341,62 +342,48 @@ dependencies {
     jacocoAnt 'org.jacoco:org.jacoco.ant:0.8.8:nodeps'
 
     // Testing dependencies
-    testImplementation "junit:junit:$junitVersion"
-    testImplementation "com.google.truth:truth:$truthVersion"
-    testImplementation "androidx.test.ext:truth:$androidxTestVersion"
-    testImplementation "androidx.arch.core:core-testing:$androidxArchCoreVersion"
-    testImplementation "androidx.test:core-ktx:$androidxTestVersion"
-    testImplementation "androidx.test:core:$androidxTestVersion"
-    testImplementation "org.robolectric:robolectric:$roboletricVersion"
-    testImplementation "androidx.test.ext:junit-ktx:$androidxTestExtVersion"
-    testImplementation "org.mockito:mockito-core:$mockitoVersion"
-    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-    testImplementation "org.mockito:mockito-inline:3.11.2"
-    testImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-    testImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
-    testImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+    testImplementation testlib.bundles.unit.test
+    testImplementation lib.bundles.unit.test
+    testImplementation testlib.bundles.ui.test
+    testImplementation testlib.truth.ext
+    testImplementation testlib.arch.core.test
+    testImplementation testlib.test.core.ktx
+    testImplementation testlib.junit.test.ktx
+    testImplementation(testlib.espresso.contrib) {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }
-    testImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
-    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
-    testImplementation "app.cash.turbine:turbine:$turbineVersion"
-    testImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
-        exclude group: 'org.checkerframework', module: 'checker'
-        exclude module: "protobuf-lite"
-    }
-    testImplementation "androidx.work:work-testing:$workVersion"
-    testImplementation "androidx.room:room-testing:$roomVersion"
-    testImplementation 'androidx.compose.ui:ui-test-junit4'
-    implementation 'org.hamcrest:hamcrest-library:1.3'
+    testImplementation google.hilt.android.test
+    testImplementation androidx.work.test
+    testImplementation testlib.room.test
+    testImplementation testlib.compose.junit
 
-    androidTestImplementation platform("androidx.compose:compose-bom:$composeBomVersion")
-    androidTestImplementation "androidx.test.ext:junit:$androidxTestExtVersion"
-    androidTestImplementation "com.google.truth:truth:$truthVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-    androidTestImplementation "com.google.dagger:hilt-android-testing:$hiltVersion"
-    androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-    androidTestImplementation "org.mockito:mockito-android:$mockitoVersion"
-    androidTestImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion") {
+    androidTestImplementation platform(androidx.compose.bom)
+    androidTestImplementation testlib.junit.test.ktx
+    androidTestImplementation testlib.truth
+    androidTestImplementation testlib.espresso
+    androidTestImplementation google.hilt.android.test
+    androidTestImplementation testlib.mockito
+    androidTestImplementation testlib.mockito.kotlin
+    androidTestImplementation testlib.mockito.android
+    androidTestImplementation(testlib.espresso.contrib) {
         exclude group: 'org.checkerframework', module: 'checker'
         exclude module: "protobuf-lite"
     }
-    androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
-    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    androidTestImplementation testlib.espresso.intents
+    androidTestImplementation testlib.compose.junit
 
-    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
-    kaptTest "com.google.dagger:hilt-android-compiler:$hiltVersion"
-    debugImplementation "androidx.fragment:fragment-testing:$fragmentTestingVersion"
-    debugImplementation 'androidx.compose.ui:ui-test-manifest'
+    kaptAndroidTest google.hilt.android.compiler
+    kaptTest google.hilt.android.compiler
+    debugImplementation androidx.fragment.test
+    debugImplementation testlib.compose.manifest
 
     // Live Data testing
-    testImplementation 'com.jraska.livedata:testing-ktx:1.2.0'
+    testImplementation testlib.jraska.livedata.test
 
     //QA
-    qaImplementation 'com.google.firebase:firebase-appdistribution:16.0.0-beta03'
-    qaImplementation 'androidx.compose.ui:ui-test-manifest'
+    qaImplementation google.firebase.app.distribution
+    qaImplementation testlib.compose.manifest
 
     lintChecks project(':lint')
 

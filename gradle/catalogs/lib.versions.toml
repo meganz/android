@@ -2,23 +2,23 @@
 anko = "0.10.8"
 bannerviewpager = "3.4.0"
 billing-client = "5.1.0"
-kotlin-ktx = "1.7.0"
-logging-logback = "2.0.0"
-logging-slf4j = "1.7.30"
-logging-timber = "5.0.1"
 coil = "2.1.0"
 coroutines = "1.6.0"
 desugar = "1.1.5"
 fresco = "2.6.0"
 javax = "1"
 kotlin = "1.8.10"
+kotlin-ktx = "1.7.0"
 liveeventbus = "1.7.3"
+logging-logback = "2.0.0"
+logging-slf4j = "1.7.30"
+logging-timber = "5.0.1"
 retrofit = "2.9.0"
 rx-android = "3.0.0"
 rx-coroutines = "1.6.4"
 rx-java = "3.0.4"
 rx-kotlin = "3.0.1"
-showkase = "1.0.0-beta13"
+showkase = '1.0.0-beta13'
 simplestorage = "1.1.0"
 
 [libraries]
@@ -33,6 +33,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 collapsingtoolbar = 'net.opacapp:multiline-collapsingtoolbar:27.1.1'
 coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 documentscanner = 'com.github.meganz.AndroidDocumentScanner:documentscanner:2.0.10'
 facebook-inferannotation = "com.facebook.infer.annotation:infer-annotation:0.18.0"
@@ -44,6 +45,7 @@ javax-inject = { module = "javax.inject:javax.inject", version.ref = "javax" }
 kotlin-ktx = { module = "androidx.core:core-ktx", version.ref = "kotlin-ktx" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 liveeventbus = { module = "com.jeremyliao:live-event-bus-x", version.ref = "liveeventbus" }
 logging-logback = { module = "com.github.tony19:logback-android", version.ref = "logging-logback" }
 logging-slf4j = { module = "org.slf4j:slf4j-api", version.ref = "logging-slf4j" }
@@ -60,6 +62,7 @@ shimmerlayout = 'io.supercharge:shimmerlayout:2.1.0'
 shortcutbadger = 'me.leolin:ShortcutBadger:1.1.22'
 showkase = { module = "com.airbnb.android:showkase", version.ref = "showkase" }
 showkase-processor = { module = "com.airbnb.android:showkase-processor", version.ref = "showkase" }
+showkase-screenshot-test = { module = "com.airbnb.android:showkase-screenshot-testing", version.ref = "showkase" }
 simplestorage = { module = "com.anggrayudi:storage", version.ref = "simplestorage" }
 stickyheader = 'com.brandongogetap:stickyheaders:0.6.1'
 vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
@@ -68,4 +71,5 @@ vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
 [bundles]
 fresco = ["fresco", "fresco-gif", "fresco-webp", "fresco-webpsupport"]
 logging = ["logging-slf4j", "logging-logback", "logging-timber"]
+unit-test = ["coroutines-test", "kotlin-test"]
 rx = ["rx-android", "rx-coroutines", "rx-java", "rx-kotlin"]

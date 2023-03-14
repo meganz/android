@@ -28,12 +28,6 @@ dependencies {
     implementation google.hilt.core
 
     // Testing dependencies
-    testImplementation "junit:junit:$junitVersion"
-    testImplementation "com.google.truth:truth:$truthVersion"
-    testImplementation "org.mockito:mockito-core:$mockitoVersion"
-    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutineTestVersion"
-    testImplementation "org.jetbrains.kotlin:kotlin-test:$kotlinVersion"
-    testImplementation "app.cash.turbine:turbine:$turbineVersion"
-
+    testImplementation testlib.bundles.unit.test
+    testImplementation lib.bundles.unit.test
 }

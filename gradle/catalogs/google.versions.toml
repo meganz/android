@@ -4,6 +4,7 @@ accompanist-systemui = "0.23.1"
 autovalue = "1.9"
 exoplayer = "2.18.4"
 firebase = "31.1.1"
+firebase-app-distribution = "16.0.0-beta03"
 flexbox = "2.0.1"
 gson = "2.8.6"
 hilt = "2.45"
@@ -26,6 +27,7 @@ autovalue-annotations = { module = "com.google.auto.value:auto-value-annotations
 exoplayer-core = { module = "com.google.android.exoplayer:exoplayer-core", version.ref = "exoplayer" }
 exoplayer-ui = { module = "com.google.android.exoplayer:exoplayer-ui", version.ref = "exoplayer" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase" }
+firebase-app-distribution = { module = "com.google.firebase:firebase-appdistribution", version.ref = "firebase-app-distribution" }
 firebase-crashlytics-ndk = { group = "com.google.firebase", name = "firebase-crashlytics-ndk" }
 firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx" }
@@ -35,6 +37,7 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-core = { module = "com.google.dagger:hilt-core", version.ref = "hilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+hilt-android-test = { module = "com.google.dagger:hilt-android-testing", version.ref = "hilt" }
 maps-utils = { module = "com.google.maps.android:android-maps-utils", version.ref = "maps-utils" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 play-core = { module = "com.google.android.play:core", version.ref = "play-core" }

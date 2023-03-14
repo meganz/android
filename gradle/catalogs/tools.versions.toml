@@ -1,0 +1,8 @@
+[versions]
+lint = "30.2.2"
+
+[libraries]
+lint = { module = "com.android.tools.lint:lint", version.ref = "lint" }
+lint-api = { module = "com.android.tools.lint:lint-api", version.ref = "lint" }
+lint-checks = { module = "com.android.tools.lint:lint-checks", version.ref = "lint" }
+lint-tests = { module = "com.android.tools.lint:lint-tests", version.ref = "lint" }
