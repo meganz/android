@@ -9,7 +9,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
-import mega.privacy.android.app.presentation.view.ListView
+import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.domain.entity.node.FolderNode
 import org.junit.Rule
 import org.junit.Test
@@ -20,7 +20,7 @@ import org.mockito.kotlin.whenever
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-class ListViewTest {
+class NodesViewTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -39,9 +39,15 @@ class ListViewTest {
             )
         ).thenReturn(" 2 Folder 1 file")
         composeTestRule.setContent {
-            ListView(
+            NodesView(
                 modifier = Modifier,
-                nodeUIItem = listOf(NodeUIItem(node = node, isSelected = true)),
+                nodeUIItems = listOf(
+                    NodeUIItem(
+                        node = node,
+                        isSelected = true,
+                        isInvisible = false
+                    )
+                ),
                 stringUtilWrapper = stringUtilWrapper,
                 onItemClicked = {},
                 onMenuClick = {},
@@ -72,9 +78,15 @@ class ListViewTest {
             )
         ).thenReturn(" 2 Folder 1 file")
         composeTestRule.setContent {
-            ListView(
+            NodesView(
                 modifier = Modifier,
-                nodeUIItem = listOf(NodeUIItem(node = node, isSelected = true)),
+                nodeUIItems = listOf(
+                    NodeUIItem(
+                        node = node,
+                        isSelected = true,
+                        isInvisible = false
+                    )
+                ),
                 stringUtilWrapper = stringUtilWrapper,
                 onItemClicked = {},
                 onMenuClick = {},
@@ -106,9 +118,15 @@ class ListViewTest {
             )
         ).thenReturn(" 2 Folder 1 file")
         composeTestRule.setContent {
-            ListView(
+            NodesView(
                 modifier = Modifier,
-                nodeUIItem = listOf(NodeUIItem(node = node, isSelected = true)),
+                nodeUIItems = listOf(
+                    NodeUIItem(
+                        node = node,
+                        isSelected = true,
+                        isInvisible = false
+                    )
+                ),
                 stringUtilWrapper = stringUtilWrapper,
                 onItemClicked = {},
                 onMenuClick = {},
@@ -143,9 +161,15 @@ class ListViewTest {
                 )
             ).thenReturn(" 2 Folder 1 file")
             composeTestRule.setContent {
-                ListView(
+                NodesView(
                     modifier = Modifier,
-                    nodeUIItem = listOf(NodeUIItem(node = node, isSelected = false)),
+                    nodeUIItems = listOf(
+                        NodeUIItem(
+                            node = node,
+                            isSelected = false,
+                            isInvisible = false
+                        )
+                    ),
                     stringUtilWrapper = stringUtilWrapper,
                     onItemClicked = {},
                     onMenuClick = {},
@@ -164,7 +188,7 @@ class ListViewTest {
         }
 
     @Test
-    fun `test when list item is folder info then it shows folder and file count`() = runTest {
+    fun `test when grid item is folder info then it does not show info text`() = runTest {
         val node: FolderNode = mock()
         whenever(node.name).thenReturn("Some name")
         whenever(node.childFileCount).thenReturn(1)
@@ -176,21 +200,27 @@ class ListViewTest {
             )
         ).thenReturn("2 Folder 1 file")
         composeTestRule.setContent {
-            ListView(
+            NodesView(
                 modifier = Modifier,
-                nodeUIItem = listOf(NodeUIItem(node = node, isSelected = true)),
+                nodeUIItems = listOf(
+                    NodeUIItem(
+                        node = node,
+                        isSelected = true,
+                        isInvisible = false
+                    )
+                ),
                 stringUtilWrapper = stringUtilWrapper,
                 onItemClicked = {},
                 onMenuClick = {},
                 onLongClick = {},
                 onSortOrderClick = {},
                 onChangeViewTypeClick = {},
-                isListView = false,
+                isListView = true,
                 sortOrder = "Any Name"
             )
         }
         composeTestRule.run {
-            onAllNodes(hasTestTag("Info Text"))
+            onAllNodes(hasTestTag("Info Text").not())
         }
     }
 }

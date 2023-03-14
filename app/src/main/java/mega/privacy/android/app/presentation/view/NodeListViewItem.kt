@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.view
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -22,15 +20,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.utils.ThumbnailUtils
+import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
+import mega.privacy.android.core.ui.theme.extensions.grey_087_white
+import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_060
+import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * List view item for file/folder info
@@ -43,19 +45,19 @@ import mega.privacy.android.domain.entity.node.FolderNode
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ListViewItem(
+internal fun NodeListViewItem(
     modifier: Modifier,
     nodeUIItem: NodeUIItem,
     stringUtilWrapper: StringUtilWrapper,
     onMenuClick: () -> Unit,
-    onItemClicked: (Long) -> Unit,
-    onLongClick: (Long) -> Unit,
+    onItemClicked: (NodeId) -> Unit,
+    onLongClick: (NodeId) -> Unit,
 ) {
     Column(
         modifier = modifier
             .combinedClickable(
-                onClick = { onItemClicked(nodeUIItem.id.longValue) },
-                onLongClick = { onLongClick(nodeUIItem.id.longValue) }
+                onClick = { onItemClicked(nodeUIItem.id) },
+                onLongClick = { onLongClick(nodeUIItem.id) }
             )
 
             .fillMaxWidth()
@@ -78,17 +80,10 @@ private fun ListViewItem(
                 )
             } else {
                 if (nodeUIItem.node is FolderNode) {
-                    val painter = if (nodeUIItem.isIncomingShare) {
-                        painterResource(id = R.drawable.ic_folder_incoming)
-                    } else if (nodeUIItem.isExported) {
-                        painterResource(id = R.drawable.ic_folder_outgoing)
-                    } else {
-                        painterResource(id = R.drawable.ic_folder_list)
-                    }
                     Image(
                         modifier = thumbNailModifier
                             .testTag("Folder Tag"),
-                        painter = painter,
+                        painter = getPainter(nodeUIItem = nodeUIItem.node),
                         contentDescription = "Folder Thumbnail"
                     )
                 } else {
@@ -106,11 +101,7 @@ private fun ListViewItem(
                     Text(
                         text = nodeUIItem.name,
                         style = MaterialTheme.typography.subtitle1,
-                        color = if (nodeUIItem.isTakenDown) colorResource(id = R.color.red_800_red_400) else if (MaterialTheme.colors.isLight) colorResource(
-                            id = R.color.grey_alpha_087
-                        ) else colorResource(
-                            id = R.color.white
-                        ),
+                        color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.grey_087_white,
                         maxLines = 1
                     )
                     val iconModifier = Modifier
@@ -134,9 +125,7 @@ private fun ListViewItem(
                             painter = painterResource(id = R.drawable.link_ic),
                             contentDescription = "Link",
                             colorFilter = ColorFilter.tint(
-                                if (MaterialTheme.colors.isLight) colorResource(id = R.color.grey_alpha_060) else colorResource(
-                                    id = R.color.white_alpha_060
-                                )
+                                MaterialTheme.colors.grey_white_alpha_060
                             )
                         )
                     }
@@ -165,77 +154,20 @@ private fun ListViewItem(
                         }"
                     },
                     style = MaterialTheme.typography.body2,
-                    color = if (MaterialTheme.colors.isLight) colorResource(id = R.color.grey_alpha_060) else colorResource(
-                        id = R.color.white_alpha_060
-                    ),
+                    color = MaterialTheme.colors.grey_white_alpha_060,
                     modifier = Modifier.testTag("Info Text"),
                     maxLines = 1
                 )
             }
 
             Spacer(modifier = Modifier.weight(1f))
-            Image(
-                painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
-                contentDescription = "3 dots",
-                modifier = Modifier.clickable { onMenuClick.invoke() }
-            )
+            MenuItem(onMenuClick)
         }
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
                 .absolutePadding(left = 64.dp),
-            color = colorResource(id = R.color.grey_012_white_012), thickness = 1.dp
+            color = MaterialTheme.colors.grey_012_white_012, thickness = 1.dp
         )
-    }
-}
-
-/**
- * /**
- * List view for file/folder list
- * @param modifier [Modifier]
- * @param nodeUIItem [NodeUIItem]
- * @param stringUtilWrapper [StringUtilWrapper] to format Info
- * @param onLongClick onLongItemClick
- * @param onItemClicked itemClick
- * @param onMenuClick three dots click
- * @param isListView current view type
- * @param onChangeViewTypeClick changeViewType Click
- * @param onSortOrderClick change sort order click
- * @param sortOrder current sort name
-*/
- */
-@Composable
-fun ListView(
-    modifier: Modifier,
-    nodeUIItem: List<NodeUIItem>,
-    stringUtilWrapper: StringUtilWrapper,
-    onMenuClick: () -> Unit,
-    onItemClicked: (Long) -> Unit,
-    onLongClick: (Long) -> Unit,
-    sortOrder: String,
-    isListView: Boolean,
-    onSortOrderClick: () -> Unit,
-    onChangeViewTypeClick: () -> Unit,
-) {
-    LazyColumn {
-        item {
-            HeaderViewItem(
-                modifier = modifier,
-                onSortOrderClick = onSortOrderClick,
-                onChangeViewTypeClick = onChangeViewTypeClick,
-                sortOrder = sortOrder,
-                isListView = isListView
-            )
-        }
-        items(nodeUIItem.size) {
-            ListViewItem(
-                modifier = modifier,
-                nodeUIItem = nodeUIItem[it],
-                stringUtilWrapper = stringUtilWrapper,
-                onMenuClick,
-                onItemClicked,
-                onLongClick
-            )
-        }
     }
 }
