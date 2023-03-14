@@ -126,5 +126,5 @@ interface TransferRepository {
     /**
      * Checks if exist ongoing transfers.
      */
-    suspend fun existOngoingTransfers(): Boolean
+    suspend fun ongoingTransfersExist(): Boolean
 }

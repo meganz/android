@@ -102,7 +102,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -944,7 +943,7 @@ public class Util {
      *
      * @param megaApi
      * @return true if exist ongoing transfers, false otherwise
-     * @deprecated In favour of {@link mega.privacy.android.domain.usecase.transfer.ExistOngoingTransfers} use case.
+     * @deprecated In favour of {@link mega.privacy.android.domain.usecase.transfer.OngoingTransfersExist} use case.
      */
     @Deprecated
     public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {

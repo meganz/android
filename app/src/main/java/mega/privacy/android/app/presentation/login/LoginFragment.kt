@@ -77,29 +77,20 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.exception.login.FetchNodesException
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Login fragment.
- *
- * @property megaApi [MegaApiAndroid]
  */
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
-
-    @MegaApi
-    @Inject
-    lateinit var megaApi: MegaApiAndroid
 
     private val viewModel: LoginViewModel by activityViewModels()
 
@@ -166,6 +157,13 @@ class LoginFragment : Fragment() {
         viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
             with(uiState) {
                 when {
+                    ongoingTransfersExist != null -> {
+                        if (ongoingTransfersExist) {
+                            showCancelTransfersDialog()
+                        } else {
+                            loginClicked()
+                        }
+                    }
                     isLoginInProgress -> {
                         showLoginInProgress()
                     }
@@ -329,8 +327,7 @@ class LoginFragment : Fragment() {
             setOnClickListener { viewModel.clickKarereLogs(requireActivity()) }
             val onLongPress = Runnable {
                 if (!isAlertDialogShown(changeApiServerDialog)) {
-                    changeApiServerDialog =
-                        showChangeApiServerDialog((requireActivity() as LoginActivity), megaApi)
+                    changeApiServerDialog = showChangeApiServerDialog(requireActivity())
                 }
             }
             val onTap = Runnable {
@@ -384,7 +381,7 @@ class LoginFragment : Fragment() {
             background.clearColorFilter()
             setOnEditorActionListener(TextView.OnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    submitForm()
+                    checkTypedValues()
                     return@OnEditorActionListener true
                 }
                 false
@@ -402,7 +399,7 @@ class LoginFragment : Fragment() {
                 viewModel.updatePressedBackWhileLogin(false)
                 LoginActivity.isBackFromLoginPage = false
                 loginEmailText.removeLeadingAndTrailingSpaces()
-                submitForm()
+                checkTypedValues()
             }
         }
 
@@ -594,8 +591,7 @@ class LoginFragment : Fragment() {
             intentAction?.let { action ->
                 when (action) {
                     Constants.ACTION_REFRESH -> {
-                        isLoggingIn = true
-                        startFetchNodes()
+                        viewModel.performFetchNodes(true)
                         return
                     }
                     Constants.ACTION_REFRESH_API_SERVER -> {
@@ -906,22 +902,8 @@ class LoginFragment : Fragment() {
         if (!uiState.is2FAErrorShown) {
             Timber.d("Login with factor login")
             progressbarVerify2fa.isVisible = true
-            isLoggingIn = true
             viewModel.performLoginWith2FA(twoFAPin)
         }
-    }
-
-    /**
-     * Updates the UI for fetching nodes.
-     */
-    private fun startFetchNodes() {
-        Timber.d("startLoginInProcess")
-
-        if (!viewModel.updateEmailAndSession()) {
-            return
-        }
-
-        viewModel.performFetchNodes()
     }
 
     /**
@@ -936,7 +918,6 @@ class LoginFragment : Fragment() {
         showFetchingNodes(fetchingNodes = false)
 
         if (!isLoggingIn) {
-            isLoggingIn = true
             viewModel.performFastLogin(requireActivity().intent?.action == Constants.ACTION_REFRESH_API_SERVER)
         } else {
             viewModel.setIntentAction(ACTION_OPEN_APP)
@@ -959,22 +940,13 @@ class LoginFragment : Fragment() {
         showFetchingNodes(fetchingNodes = false, generatingKeys = true)
         Timber.d("Generating keys")
 
-        onKeysGenerated()
-    }
-
-    /**
-     * Submit typed data for a login.
-     */
-    private fun submitForm() {
-        if (checkTypedValues()) {
-            performLogin()
-        }
+        viewModel.performLogin()
     }
 
     /**
      * Updates the UI for logging.
      */
-    private fun performLogin() = with(binding) {
+    private fun loginClicked() = with(binding) {
         loginEmailText.hideKeyboard()
 
         if (!isConnected()) {
@@ -983,11 +955,11 @@ class LoginFragment : Fragment() {
 
         showFetchingNodes(fetchingNodes = false, generatingKeys = true)
 
-        val lastEmail = loginEmailText.text.toString().lowercase().trim { it <= ' ' }
-        val lastPassword = loginPasswordText.text.toString()
+        val typedEmail = loginEmailText.text.toString().lowercase().trim { it <= ' ' }
+        val typedPassword = loginPasswordText.text.toString()
         Timber.d("Generating keys")
-        viewModel.updateCredentials(email = lastEmail, password = lastPassword)
-        onKeysGenerated()
+
+        viewModel.performLogin(typedEmail, typedPassword)
     }
 
     /**
@@ -1008,22 +980,6 @@ class LoginFragment : Fragment() {
         loginEmailText.requestFocus()
     }
 
-    /**
-     * Updates the UI and launches the login request if there is network connection.
-     */
-    private fun onKeysGenerated() {
-        Timber.d("onKeysGenerated")
-        if (!isConnected()) {
-            return
-        }
-
-        if (!isLoggingIn) {
-            isLoggingIn = true
-            showLoginInProgress()
-            viewModel.performLogin()
-        }
-    }
-
     private fun showLoginInProgress() = with(binding) {
         loginLoggingInText.isVisible = true
         loginFetchNodesText.isVisible = false
@@ -1040,7 +996,8 @@ class LoginFragment : Fragment() {
             val value = binding.loginEmailText.text.toString()
             return when {
                 value.isEmpty() -> getString(R.string.error_enter_email)
-                !Constants.EMAIL_ADDRESS.matcher(value).matches() -> getString(R.string.error_invalid_email)
+                !Constants.EMAIL_ADDRESS.matcher(value)
+                    .matches() -> getString(R.string.error_invalid_email)
                 else -> null
             }
         }
@@ -1059,25 +1016,18 @@ class LoginFragment : Fragment() {
     /**
      * Checks if the email and password are typed and has the correct format.
      * Shows errors if not.
-     *
-     * @return True if the typed data is correct, false otherwise.
      */
-    private fun checkTypedValues(): Boolean {
+    private fun checkTypedValues() {
         val emailError = emailError
         val passwordError = passwordError
         setError(binding.loginEmailText, emailError)
         setError(binding.loginPasswordText, passwordError)
-        if (emailError != null) {
-            binding.loginEmailText.requestFocus()
-            return false
-        } else if (passwordError != null) {
-            binding.loginPasswordText.requestFocus()
-            return false
-        } else if (Util.existOngoingTransfers(megaApi)) {
-            showCancelTransfersDialog()
-            return false
+
+        when {
+            emailError != null -> binding.loginEmailText.requestFocus()
+            passwordError != null -> binding.loginPasswordText.requestFocus()
+            else -> viewModel.checkOngoingTransfers()
         }
-        return true
     }
 
     /**
@@ -1534,9 +1484,9 @@ class LoginFragment : Fragment() {
         setMessage(R.string.login_warning_abort_transfers)
         setPositiveButton(R.string.login_text) { _, _ ->
             viewModel.launchCancelTransfers()
-            performLogin()
+            loginClicked()
         }
-        setNegativeButton(R.string.general_cancel, null)
+        setNegativeButton(R.string.general_cancel) { _, _ -> viewModel.resetOngoingTransfers() }
         setCancelable(false)
         show()
     }

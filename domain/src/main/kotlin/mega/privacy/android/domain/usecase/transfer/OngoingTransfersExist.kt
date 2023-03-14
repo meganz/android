@@ -3,7 +3,7 @@ package mega.privacy.android.domain.usecase.transfer
 /**
  * Use case for checking if there are ongoing transfers.
  */
-fun interface ExistOngoingTransfers {
+fun interface OngoingTransfersExist {
 
     /**
      * Invoke.

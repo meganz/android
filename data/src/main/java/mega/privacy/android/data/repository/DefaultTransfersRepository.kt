@@ -225,6 +225,6 @@ internal class DefaultTransfersRepository @Inject constructor(
         appEventGateway.broadcastFailedTransfer(isFailed)
     }
 
-    override suspend fun existOngoingTransfers(): Boolean =
+    override suspend fun ongoingTransfersExist(): Boolean =
         megaApiGateway.numberOfPendingUploads > 0 || megaApiGateway.numberOfPendingDownloads > 0
 }

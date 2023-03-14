@@ -7,7 +7,6 @@ import mega.privacy.android.domain.exception.LoginException
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.login.LoginFragment].
  *
- * @property isFirstFetchNodesUpdate True while there was not any fetch nodes update, false otherwise.
  * @property accountSession          [AccountSession]
  * @property password                Typed password.
  * @property accountConfirmationLink Link for confirming a new account.
@@ -34,9 +33,9 @@ import mega.privacy.android.domain.exception.LoginException
  * @property isLoginRequired         True if should ask for login, false otherwise.
  * @property isLoginInProgress       True if a login is in progress, false otherwise.
  * @property error                   [LoginException].
+ * @property ongoingTransfersExist   True if exist ongoing transfers, false if not. Null if pending to check.
  */
 data class LoginState(
-    val isFirstFetchNodesUpdate: Boolean = true,
     val accountSession: AccountSession? = null,
     val password: String? = null,
     val accountConfirmationLink: String? = null,
@@ -63,6 +62,7 @@ data class LoginState(
     val isLoginRequired: Boolean = false,
     val isLoginInProgress: Boolean = false,
     val error: RuntimeException? = null,
+    val ongoingTransfersExist: Boolean? = null,
 ) {
     companion object {
 

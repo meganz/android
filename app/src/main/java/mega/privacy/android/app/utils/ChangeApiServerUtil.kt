@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
@@ -40,15 +41,11 @@ object ChangeApiServerUtil {
      * Shows a dialog to point to a different api server than the current one.
      *
      * @param activity Current Activity.
-     * @param megaApi  MegaApiJava to point launch the requests if needed.
      * @return The dialog.
      */
     @SuppressLint("InflateParams")
     @JvmStatic
-    fun showChangeApiServerDialog(
-        activity: Activity,
-        megaApi: MegaApiJava
-    ): AlertDialog {
+    fun showChangeApiServerDialog(activity: Activity): AlertDialog {
         val preferences =
             activity.getSharedPreferences(API_SERVER_PREFERENCES, MODE_PRIVATE)
         val currentApiServerValue = preferences.getInt(API_SERVER, PRODUCTION_SERVER_VALUE)
@@ -96,7 +93,7 @@ object ChangeApiServerUtil {
         val changeApiServerDialog = builder.create()
         changeApiServerDialog.show()
         changeApiServerDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            changeApiServer(activity, megaApi, preferences, changeApiServerDialog)
+            changeApiServer(activity, preferences, changeApiServerDialog)
         }
 
         enableOrDisableDialogButton(
@@ -111,13 +108,11 @@ object ChangeApiServerUtil {
      * Points to the new api server selected.
      *
      * @param activity              Current Activity.
-     * @param megaApi               MegaApiJava to point launch the requests.
      * @param preferences           Shared preferences to get/set api values.
      * @param changeApiServerDialog AlertDialog where the new api server was selected.
      */
     private fun changeApiServer(
         activity: Activity,
-        megaApi: MegaApiJava,
         preferences: SharedPreferences,
         changeApiServerDialog: AlertDialog
     ) {
@@ -129,6 +124,8 @@ object ChangeApiServerUtil {
         if (newApiServerValue == currentApiServerValue) {
             return
         }
+
+        val megaApi = MegaApplication.getInstance().megaApi
 
         if (currentApiServerValue == SANDBOX3_SERVER_VALUE) {
             megaApi.setPublicKeyPinning(true)

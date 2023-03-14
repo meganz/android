@@ -235,7 +235,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
     private fun showChangeAPIServerDialog() {
         changeApiServerDialog =
-            ChangeApiServerUtil.showChangeApiServerDialog(requireActivity(), megaApi)
+            ChangeApiServerUtil.showChangeApiServerDialog(requireActivity())
     }
 
     private fun setupContactConnections() {

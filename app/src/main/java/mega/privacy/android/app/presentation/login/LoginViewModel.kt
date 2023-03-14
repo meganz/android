@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.login.Login
 import mega.privacy.android.domain.usecase.login.LoginWith2FA
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
+import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExist
 import javax.inject.Inject
 
 /**
@@ -79,6 +80,7 @@ class LoginViewModel @Inject constructor(
     private val loginWith2FA: LoginWith2FA,
     private val fastLogin: FastLogin,
     private val fetchNodes: FetchNodes,
+    private val ongoingTransfersExist: OngoingTransfersExist,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -260,21 +262,6 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * Updates email and password values in state.
-     */
-    fun updateCredentials(email: String?, password: String?) {
-        val accountSession = state.value.accountSession
-
-        _state.update {
-            it.copy(
-                accountSession = accountSession?.copy(email = email)
-                    ?: AccountSession(email = email),
-                password = password
-            )
-        }
-    }
-
-    /**
      * Updates temporal email and password values in state.
      */
     fun setTemporalCredentials(email: String?, password: String?) {
@@ -285,7 +272,13 @@ class LoginViewModel @Inject constructor(
      * Set temporal email and password values in state as current email and password.
      */
     fun setTemporalCredentialsAsCurrentCredentials() = with(state.value) {
-        updateCredentials(temporalEmail, temporalPassword)
+        _state.update {
+            it.copy(
+                accountSession = accountSession?.copy(email = temporalEmail)
+                    ?: AccountSession(email = temporalEmail),
+                password = temporalPassword
+            )
+        }
     }
 
     /**
@@ -366,29 +359,39 @@ class LoginViewModel @Inject constructor(
     /**
      * Login.
      */
-    fun performLogin() = viewModelScope.launch {
-        with(state.value) {
-            runCatching {
-                login(
-                    accountSession?.email ?: return@launch,
-                    password ?: return@launch,
-                    DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
-                ).collectLatest { status -> status.checkStatus() }
-            }.onFailure { exception ->
-                if (exception !is LoginException) return@onFailure
-                MegaApplication.isLoggingIn = false
+    fun performLogin(typedEmail: String? = null, typedPassword: String? = null) {
+        if (MegaApplication.isLoggingIn) {
+            return
+        }
 
-                if (exception is LoginMultiFactorAuthRequired) {
-                    _state.update {
-                        it.copy(
-                            isLoginInProgress = false,
-                            is2FAEnabled = true,
-                            isLoginRequired = false,
-                            is2FARequired = true
-                        )
+        MegaApplication.isLoggingIn = true
+        viewModelScope.launch {
+            with(state.value) {
+                val email = typedEmail ?: accountSession?.email ?: return@launch
+                val password = typedPassword ?: this.password ?: return@launch
+
+                runCatching {
+                    login(
+                        email,
+                        password,
+                        DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
+                    ).collectLatest { status -> status.checkStatus(email, password) }
+                }.onFailure { exception ->
+                    if (exception !is LoginException) return@onFailure
+                    MegaApplication.isLoggingIn = false
+
+                    if (exception is LoginMultiFactorAuthRequired) {
+                        _state.update {
+                            it.copy(
+                                isLoginInProgress = false,
+                                is2FAEnabled = true,
+                                isLoginRequired = false,
+                                is2FARequired = true
+                            )
+                        }
+                    } else {
+                        exception.loginFailed()
                     }
-                } else {
-                    exception.loginFailed()
                 }
             }
         }
@@ -398,6 +401,8 @@ class LoginViewModel @Inject constructor(
      * Login with 2FA.
      */
     fun performLoginWith2FA(pin2FA: String) = viewModelScope.launch {
+        MegaApplication.isLoggingIn = true
+
         with(state.value) {
             runCatching {
                 loginWith2FA(
@@ -429,6 +434,7 @@ class LoginViewModel @Inject constructor(
      * Fast login.
      */
     fun performFastLogin(refreshChatUrl: Boolean) = viewModelScope.launch {
+        MegaApplication.isLoggingIn = true
         runCatching {
             fastLogin(
                 state.value.accountSession?.session ?: return@launch,
@@ -454,13 +460,17 @@ class LoginViewModel @Inject constructor(
             )
         }
 
-    private fun LoginStatus.checkStatus() {
+    private fun LoginStatus.checkStatus(email: String? = null, password: String? = null) {
         when (this) {
             LoginStatus.LoginStarted -> {
                 _state.update {
                     it.copy(
                         isLoginInProgress = true,
-                        is2FARequired = false
+                        is2FARequired = false,
+                        accountSession = (state.value.accountSession?.copy(email = email)
+                            ?: AccountSession(email = email)).takeUnless { email.isNullOrEmpty() },
+                        password = password.takeUnless { password.isNullOrEmpty() },
+                        ongoingTransfersExist = null
                     )
                 }
             }
@@ -468,8 +478,10 @@ class LoginViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isLoginInProgress = false,
+                        isLoginRequired = false,
                         is2FARequired = false,
-                        isAlreadyLoggedIn = true
+                        isAlreadyLoggedIn = true,
+                        fetchNodesUpdate = FetchNodesUpdate()
                     )
                 }
                 performFetchNodes()
@@ -483,13 +495,23 @@ class LoginViewModel @Inject constructor(
     /**
      * Fetch nodes.
      */
-    fun performFetchNodes() = viewModelScope.launch {
+    fun performFetchNodes(isRefreshSession: Boolean = false) = viewModelScope.launch {
+        if (isRefreshSession && !updateEmailAndSession()) return@launch
+
         MegaApplication.getInstance().checkEnabledCookies()
-        _state.update { it.copy(fetchNodesUpdate = FetchNodesUpdate()) }
+
+        if (isRefreshSession) {
+            MegaApplication.isLoggingIn = true
+            _state.update { it.copy(fetchNodesUpdate = FetchNodesUpdate()) }
+        }
 
         runCatching {
             fetchNodes().collectLatest { update ->
                 _state.update { it.copy(fetchNodesUpdate = update) }
+
+                if (update.progress?.floatValue == 1F) {
+                    MegaApplication.isLoggingIn = false
+                }
             }
         }.onFailure {
             if (it !is FetchNodesException) return@launch
@@ -504,6 +526,19 @@ class LoginViewModel @Inject constructor(
                     error = it.takeUnless { it is FetchNodesErrorAccess || state.pressedBackWhileLogin }
                 )
             }
-        }.onSuccess { MegaApplication.isLoggingIn = false }
+        }
     }
+
+    /**
+     * Checks if there are ongoing transfers.
+     */
+    fun checkOngoingTransfers() = viewModelScope.launch {
+        _state.update { state -> state.copy(ongoingTransfersExist = ongoingTransfersExist()) }
+    }
+
+    /**
+     * Sets to null ongoingTransfersExist in state.
+     */
+    fun resetOngoingTransfers() =
+        _state.update { state -> state.copy(ongoingTransfersExist = null) }
 }
