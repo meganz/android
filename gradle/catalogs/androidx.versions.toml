@@ -13,7 +13,7 @@ emoji = "1.1.0"
 exifinterface = "1.3.0"
 fragment = "1.5.5"
 hilt-android = "1.0.0"
-lifecycle = "2.5.1"
+lifecycle = "2.6.0"
 legacy-support = "1.0.0"
 multidex = "2.0.1"
 navigation = "2.5.3"
@@ -55,6 +55,7 @@ lifecycle-reactivestreams = { module = "androidx.lifecycle:lifecycle-reactivestr
 lifecycle-common = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "lifecycle" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycle" }
 lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
 multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }
 navigation-runtime = { module = "androidx.navigation:navigation-runtime-ktx", version.ref = "navigation" }
 navigation-fragment = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
@@ -67,6 +68,6 @@ viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpag
 work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "work" }
 
 [bundles]
-lifecycle = ["lifecycle-livedata", "lifecycle-viewmodel", "lifecycle-runtime", "lifecycle-reactivestreams", "lifecycle-common", "lifecycle-process", "lifecycle-service"]
+lifecycle = ["lifecycle-livedata", "lifecycle-viewmodel", "lifecycle-runtime", "lifecycle-reactivestreams", "lifecycle-common", "lifecycle-process", "lifecycle-service", "lifecycle-runtime-compose"]
 navigation = ["navigation-runtime", "navigation-fragment", "navigation-ui"]
 compose-bom = ["compose-compiler", "compose-ui", "compose-ui-tooling", "compose-ui-tooling-preview", "compose-material"]

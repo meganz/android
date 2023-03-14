@@ -13,7 +13,9 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.repo.MegaNodeRepo
-import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
+import mega.privacy.android.app.utils.FileUtil.getTotalSize
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.TimeUtils
@@ -39,7 +41,10 @@ class OfflineFileInfoViewModel @Inject constructor(
     val added: LiveData<String?> = _added
 
     fun loadNode(handle: String) {
-        add(Maybe.fromCallable<MegaOffline> { repo.findOfflineNode(handle) }
+        add(Maybe.fromCallable<MegaOffline> {
+            repo.findOfflineNode(handle)
+                ?: throw NullPointerException()
+        }
             .map {
                 val thumbnail = if (MimeTypeList.typeForName(it.name).isImage) {
                     getOfflineFile(context, it)

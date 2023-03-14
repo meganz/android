@@ -295,7 +295,7 @@ class OfflineViewModel @Inject constructor(
 
         if (rootFolderOnly) {
             _pathLiveData.value = folder.path + folder.name + "/"
-            openFolderFullscreenAction.onNext(_pathLiveData.value)
+            openFolderFullscreenAction.onNext(_pathLiveData.value.orEmpty())
         } else {
             navigateTo(folder.path + folder.name + "/", folder.name)
         }

@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.photos.compose.photosfilter
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import collectAsStateWithLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.view.PhotosFilterView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel

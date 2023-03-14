@@ -7,7 +7,6 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
@@ -19,6 +18,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiAndroid
@@ -54,7 +54,7 @@ class GetNodeUseCase @Inject constructor(
      * @return              Single with Mega Node
      */
     fun get(nodeHandle: Long): Single<MegaNode> =
-        Single.fromCallable { nodeHandle.getMegaNode() }
+        Single.fromCallable { nodeHandle.getMegaNode() ?: throw NullPointerException() }
 
     /**
      * Get a MegaNodeItem given a Node Handle.

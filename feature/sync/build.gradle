@@ -55,6 +55,7 @@ dependencies {
     implementation androidx.fragment
     implementation google.material
     implementation androidx.lifecycle.viewmodel
+    implementation androidx.lifecycle.runtime.compose
     implementation androidx.compose.activity
     implementation platform(androidx.compose.bom)
     implementation androidx.bundles.compose.bom
