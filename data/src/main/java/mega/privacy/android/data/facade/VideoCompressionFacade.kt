@@ -76,7 +76,7 @@ internal class VideoCompressionFacade @Inject constructor(private val fileGatewa
                     runCatching {
                         attachment?.let {
                             outputRoot?.run {
-                                if (fileGateway.hasEnoughStorage(
+                                if (!fileGateway.hasEnoughStorage(
                                         rootPath = this,
                                         File(it.originalPath)
                                     )

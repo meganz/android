@@ -10,7 +10,9 @@ import mega.privacy.android.domain.entity.VideoAttachment
 import mega.privacy.android.domain.entity.VideoCompressionState
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -43,7 +45,7 @@ class VideoCompressionFacadeTest {
     }
 
     @Test
-    fun `test that when video attachments are empty then compression ends`() = runTest {
+    fun `test that compression ends when video attachments are empty`() = runTest {
         underTest.start().test {
             val event = awaitItem()
             assertThat(event.javaClass).isEqualTo(VideoCompressionState.Finished::class.java)
@@ -52,9 +54,23 @@ class VideoCompressionFacadeTest {
     }
 
     @Test
-    fun `test that when output roots is not set then insufficient storage event is emitted`() =
+    fun `test that insufficient storage event is emitted when output roots is not set`() =
         runTest {
             underTest.addItems(videoAttachments)
+            underTest.start().test {
+                val event = awaitItem()
+                assertThat(event.javaClass)
+                    .isEqualTo(VideoCompressionState.InsufficientStorage::class.java)
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that insufficient storage event is emitted when there is not enough storage`() =
+        runTest {
+            underTest.setOutputRoot("/path/to/root")
+            underTest.addItems(videoAttachments)
+            whenever(fileGateway.hasEnoughStorage(any(), any())).thenReturn(false)
             underTest.start().test {
                 val event = awaitItem()
                 assertThat(event.javaClass)
