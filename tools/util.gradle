@@ -121,27 +121,33 @@ boolean shouldCombineLintReports() {
 }
 
 /**
+ * S
  *
- * @param property the property to query. possible value: 'sdk-commit', 'chat-commit'
- * @param version version of the pre-built SDK. It can be read at the value of megaSdkVersion in
+ * @param property the property to query.
+ *                  possible value: 'sdk-commit', 'chat-commit', 'sdk-branch', 'chat-branch'
+ * @param version version of the pre-built SDK. It can be read at the value of "megaSdkVersion" in
  * project build.gradle file.
  * @return property value
  */
 def queryPrebuiltSdkProperty(String property, String version) {
     def commit = "N/A"
-    def stdout = new ByteArrayOutputStream()
-    def url = "${System.env.ARTIFACTORY_BASE_URL}/artifactory/api/storage/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar?properties"
-    exec {
-        workingDir '.'
-        commandLine 'curl', url
-        standardOutput = stdout
-    }
-    def response = stdout.toString().trim()
+    // Only query SDK property in CI. Skip this step in local build to reduce compile time
+    if (isCiBuild()) {
+        def stdout = new ByteArrayOutputStream()
+        def url = "${System.env.ARTIFACTORY_BASE_URL}/artifactory/api/storage/mega-gradle/mega-sdk-android/nz/mega/sdk/sdk/${version}/sdk-${version}.aar?properties"
+        exec {
+            workingDir '.'
+            commandLine 'curl', url
+            standardOutput = stdout
+        }
+        def response = stdout.toString().trim()
 
-    def properties = new JsonSlurperClassic().parseText(response).properties
-    if (properties != null && properties.containsKey(property)) {
-        commit = properties[property][0]
+        def properties = new JsonSlurperClassic().parseText(response).properties
+        if (properties != null && properties.containsKey(property)) {
+            commit = properties[property][0]
+        }
     }
+
     return commit
 }
 

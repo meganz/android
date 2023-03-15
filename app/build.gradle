@@ -38,9 +38,14 @@ android {
 
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode readVersionCode()
         versionName rootProject.appVersion
-        versionNameSuffix "${readVersionNameChannel()}(${readVersionCode()}${readVersionNameTag()})(${getAppGitHash()})"
+
+        if (buildTypes.debug) {
+            versionCode 9999
+        } else {
+            versionCode readVersionCode()
+            versionNameSuffix "${readVersionNameChannel()}(${readVersionCode()}${readVersionNameTag()})(${getAppGitHash()})"
+        }
 
         multiDexEnabled true
         ndk.abiFilters 'armeabi-v7a', 'x86', 'x86_64', 'arm64-v8a'
@@ -110,6 +115,7 @@ android {
             //  minifyEnabled false
             //   proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             ext.enableCrashlytics = false
+            ext.alwaysUpdateBuildId = false
         }
         release {
             //  minifyEnabled false
