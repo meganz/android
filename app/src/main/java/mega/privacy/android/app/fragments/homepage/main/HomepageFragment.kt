@@ -18,6 +18,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -35,12 +36,14 @@ import com.zhpan.indicator.enums.IndicatorStyle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.search.FloatingSearchView
 import mega.privacy.android.app.databinding.FabMaskLayoutBinding
 import mega.privacy.android.app.databinding.FragmentHomepageBinding
 import mega.privacy.android.app.fragments.homepage.banner.BannerAdapter
 import mega.privacy.android.app.fragments.homepage.banner.BannerClickHandler
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.notAlertAnymoreAboutStartScreen
 import mega.privacy.android.app.presentation.settings.startscreen.util.StartScreenUtil.shouldShowStartScreenDialog
 import mega.privacy.android.app.presentation.startconversation.StartConversationActivity
@@ -81,6 +84,7 @@ class HomepageFragment : Fragment() {
     }
 
     private val viewModel: HomePageViewModel by viewModels()
+    private val userInfoViewModel: UserInfoViewModel by activityViewModels()
 
     private lateinit var viewDataBinding: FragmentHomepageBinding
 
@@ -311,8 +315,8 @@ class HomepageFragment : Fragment() {
         viewModel.notificationCount.observe(viewLifecycleOwner) {
             searchInputView.setLeftNotificationCount(it)
         }
-        viewModel.avatar.observe(viewLifecycleOwner) {
-            searchInputView.setAvatar(it)
+        viewLifecycleOwner.collectFlow(userInfoViewModel.state) {
+            searchInputView.setAvatar(it.avatarContent)
         }
 
         viewModel.onShowCallIcon().observe(viewLifecycleOwner) {

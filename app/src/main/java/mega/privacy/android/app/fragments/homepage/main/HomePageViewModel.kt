@@ -14,26 +14,20 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.login.MonitorLogout
-import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaBanner
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository,
-    private val monitorMyAvatarFile: MonitorMyAvatarFile,
     getCallUseCase: GetCallUseCase,
-    private val monitorConnectivity: MonitorConnectivity,
+    monitorConnectivity: MonitorConnectivity,
     private val monitorLogout: MonitorLogout,
 ) : BaseRxViewModel() {
 
@@ -68,13 +62,6 @@ class HomePageViewModel @Inject constructor(
         LiveEventBus.get(EVENT_CHAT_STATUS_CHANGE, Int::class.java)
             .observeForever(chatOnlineStatusObserver)
 
-        viewModelScope.launch {
-            monitorMyAvatarFile()
-                .collect {
-                    loadAvatar()
-                }
-        }
-
         getCallUseCase.isThereAnOngoingCall()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -85,11 +72,6 @@ class HomePageViewModel @Inject constructor(
                 onError = Timber::e
             )
             .addTo(composite)
-
-        // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
-        showDefaultAvatar().invokeOnCompletion {
-            loadAvatar(true)
-        }
 
         viewModelScope.launch { monitorLogout().collect { repository.logout() } }
     }
@@ -104,38 +86,6 @@ class HomePageViewModel @Inject constructor(
     }
 
     fun onShowCallIcon(): LiveData<Boolean> = showCallIcon
-
-    private fun showDefaultAvatar() = viewModelScope.launch {
-        _avatar.value = repository.getDefaultAvatar()
-    }
-
-    /**
-     * Generate and show the round avatar based on the actual avatar stored in the cache folder.
-     * Try to retrieve the avatar from the server if it has not been cached.
-     * Showing the default avatar if the retrieve failed
-     */
-    private fun loadAvatar(retry: Boolean = false) {
-        viewModelScope.launch {
-            repository.loadAvatar()?.also {
-                when {
-                    it.first -> _avatar.value = it.second
-                    retry -> repository.createAvatar(OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { request, e ->
-                            if (request.type == MegaRequest.TYPE_GET_ATTR_USER
-                                && request.paramType == MegaApiJava.USER_ATTR_AVATAR
-                                && e.errorCode == MegaError.API_OK
-                            ) {
-                                loadAvatar()
-                            } else {
-                                showDefaultAvatar()
-                            }
-                        }
-                    ))
-                    else -> showDefaultAvatar()
-                }
-            }
-        }
-    }
 
     fun isRootNodeNull() = repository.isRootNodeNull()
 

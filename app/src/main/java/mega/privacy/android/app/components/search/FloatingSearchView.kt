@@ -6,7 +6,6 @@ import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -14,6 +13,11 @@ import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.widget.FrameLayout
 import androidx.annotation.NonNull
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -23,6 +27,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.SearchQuerySectionBinding
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
+import mega.privacy.android.app.presentation.avatar.model.AvatarContent
+import mega.privacy.android.app.presentation.avatar.model.TextAvatarContent
+import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.utils.Util
 
 /**
@@ -210,10 +217,22 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     /**
      * Set the avatar shown on the right side
      *
-     * @param avatar the avatar bitmap
+     * @param avatarContent
      */
-    fun setAvatar(avatar: Bitmap) {
-        binding.avatarImage.setImageBitmap(avatar)
+    fun setAvatar(avatarContent: AvatarContent?) {
+        avatarContent?.let {
+            val content = if (avatarContent is TextAvatarContent) {
+                avatarContent.copy(textSize = 20.sp)
+            } else {
+                avatarContent
+            }
+            binding.avatarImage.apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                setContent {
+                    Avatar(modifier = Modifier.size(30.dp), content = content)
+                }
+            }
+        }
     }
 
     /**
@@ -265,8 +284,10 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
     }
 
     private fun initDrawables() {
-        menuBtnDrawable = BadgeDrawerArrowDrawable(context, R.color.red_600_red_300,
-            R.color.white_dark_grey, R.color.white_dark_grey)
+        menuBtnDrawable = BadgeDrawerArrowDrawable(
+            context, R.color.red_600_red_300,
+            R.color.white_dark_grey, R.color.white_dark_grey
+        )
         menuBtnDrawable?.setBadgeEnabled(menuBtnShowDot)
         iconClear = Util.getWrappedDrawable(context, R.drawable.ic_clear_black)
     }
@@ -524,6 +545,6 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         private const val MAX_NOTIFICATION_COUNT_TEXT = "9+"
         private const val ANIMATION_SCALE = 1.4f
         private const val ANIMATION_ALPHA = 0F
-        private const val ANIMATION_DURATION:Long = 1300
+        private const val ANIMATION_DURATION: Long = 1300
     }
 }

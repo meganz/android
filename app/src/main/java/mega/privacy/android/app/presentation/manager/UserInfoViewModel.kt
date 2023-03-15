@@ -68,7 +68,7 @@ internal class UserInfoViewModel @Inject constructor(
                         UserChanges.Firstname,
                         UserChanges.Lastname,
                         -> {
-                            getUserFullName()
+                            getUserFullName(true)
                             getUserAvatarOrDefault(isForceRefresh = false)
                         }
                         else -> Unit
@@ -88,6 +88,11 @@ internal class UserInfoViewModel @Inject constructor(
                 .collect {
                     getUserAvatarOrDefault(isForceRefresh = false)
                 }
+        }
+        // Load from the cache first, in case offline mode
+        viewModelScope.launch {
+            getUserFullName(false)
+            getUserAvatarOrDefault(false)
         }
     }
 
@@ -165,27 +170,38 @@ internal class UserInfoViewModel @Inject constructor(
             }
     }
 
+    /**
+     * Get user info from sdk
+     *
+     */
     fun getUserInfo() {
         viewModelScope.launch {
             getMyEmail()
-            getUserFullName()
+            getUserFullName(true)
             getUserAvatarOrDefault(true)
         }
     }
 
     private suspend fun getMyEmail() {
-        _state.update { it.copy(email = getCurrentUserEmail().orEmpty()) }
+        runCatching { getCurrentUserEmail() }
+            .onSuccess { mail ->
+                _state.update { it.copy(email = mail.orEmpty()) }
+            }.onFailure {
+                Timber.e(it)
+            }
     }
 
-    private suspend fun getUserFullName() {
-        _state.update {
-            it.copy(
-                fullName = getCurrentUserFullName(
-                    forceRefresh = true,
-                    defaultFirstName = context.getString(R.string.first_name_text),
-                    defaultLastName = context.getString(R.string.lastname_text),
-                )
+    private suspend fun getUserFullName(isForceRefresh: Boolean) {
+        runCatching {
+            getCurrentUserFullName(
+                forceRefresh = isForceRefresh,
+                defaultFirstName = context.getString(R.string.first_name_text),
+                defaultLastName = context.getString(R.string.lastname_text),
             )
+        }.onSuccess { fullName ->
+            _state.update { it.copy(fullName = fullName) }
+        }.onFailure {
+            Timber.e(it)
         }
     }
 

@@ -90,14 +90,11 @@
         </FrameLayout>
 
 
-        <mega.privacy.android.app.components.RoundedImageView
+        <androidx.compose.ui.platform.ComposeView
             android:id="@+id/avatar_image"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_marginEnd="17dp"
-            android:scaleType="fitCenter"
-            app:border_width="0dp"
-            app:corner_radius="14dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
