@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.core.ui.controls.LabelledSwitch
 import mega.privacy.android.core.ui.controls.MegaDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
@@ -131,15 +132,12 @@ fun SlideshowSettingsView() {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = stringResource(R.string.slideshow_setting_repeat),
-                fontSize = settingsTitleFontSize,
-                color = settingsTitleColour,
-            )
-
-            Switch(
+            LabelledSwitch(
+                label = stringResource(R.string.slideshow_setting_repeat),
                 checked = repeatEnabled.value,
-                onCheckedChange = { repeatEnabled.value = !repeatEnabled.value }
+                onCheckChanged = { repeatEnabled.value = !repeatEnabled.value },
+                modifier = Modifier
+                    .fillMaxWidth(),
             )
         }
 

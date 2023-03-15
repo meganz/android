@@ -1935,7 +1935,7 @@
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">Lost your authenticator device?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
-    <string name="login_verification">Login Verification</string>
+    <string name="login_verification">Login verification</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
     <string name="verify_2fa_subtitle_change_password">Change password</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
@@ -2173,8 +2173,6 @@
     <string name="settings_compression_queue_subtitle">The minimum size is %1$s and the maximum size is %2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">Remove files older than</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d days</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">Notify me when size is larger than</string>
     <!-- Title of compression queue size option in settings -->
@@ -4047,22 +4045,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">See less</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Contact verification</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you share information with before they can access the shared folders.</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">We protect your data with zero-knowledge encryption. To ensure extra security, we ask you to verify the contacts you receive information from before you can access the shared folders.</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">To verify your contact, ensure the credentials you see above match their account credentials. You can ask them to share their credentials with you.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Undecrypted folder]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">To access the shared folder, the person who shared it with you should verify you, too.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verify %s</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Your credentials</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparing file for preview</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4645,12 +4635,18 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
@@ -4665,9 +4661,9 @@
     <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
     <string name="media_player_video_enable_subtitle_dialog_option_off">Off</string>
     <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
-    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Add subtitle&#8230;</string>
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Add subtitles&#8230;</string>
     <!-- Slideshow settings page title -->
-    <string name="slideshow_settings_page_title">Slideshow option</string>
+    <string name="slideshow_settings_page_title">Slideshow options</string>
     <!-- Slideshow speed preference -->
     <string name="slideshow_setting_speed">Slideshow speed</string>
     <!-- Slideshow speed slow -->
@@ -4675,7 +4671,7 @@
     <!-- Slideshow speed normal -->
     <string name="slideshow_speed_normal">Normal (4s)</string>
     <!-- Slideshow speed fast -->
-    <string name="slideshow_speed_fast">Fast (1s)</string>
+    <string name="slideshow_speed_fast">Fast (2s)</string>
     <!-- Slideshow order preference -->
     <string name="slideshow_settings_order">Slideshow order</string>
     <!-- Slideshow order shuffle -->
