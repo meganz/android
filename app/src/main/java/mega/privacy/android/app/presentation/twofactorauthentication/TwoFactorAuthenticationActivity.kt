@@ -3,12 +3,9 @@ package mega.privacy.android.app.presentation.twofactorauthentication
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BlendMode
 import android.graphics.BlendModeColorFilter
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.net.Uri
 import android.os.Build
@@ -27,12 +24,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.MultiFormatWriter
-import com.google.zxing.WriterException
-import com.google.zxing.common.BitMatrix
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -42,6 +33,7 @@ import mega.privacy.android.app.databinding.ActivityTwoFactorAuthenticationBindi
 import mega.privacy.android.app.databinding.Dialog2faHelpBinding
 import mega.privacy.android.app.databinding.DialogNoAuthenticationAppsBinding
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.app.utils.ColorUtils
@@ -49,27 +41,19 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
-import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
-import java.util.EnumMap
 
 /**
  * TwoFactorAuthenticationActivity
  */
-class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerInterface {
+class TwoFactorAuthenticationActivity : PasscodeActivity() {
 
     private lateinit var binding: ActivityTwoFactorAuthenticationBinding
     private val viewModel: TwoFactorAuthenticationViewModel by viewModels()
 
-    private var seed: String? = null
-    private var url: String? = null
     private var pin = ""
-
-    private val arraySeed: ArrayList<String> by lazy { ArrayList() }
-
+    private var seed = ""
+    private var url: String? = null
     private val sb = StringBuilder()
     private var pinsViewsList = emptyList<EditTextPIN>()
     private var scanOrCopyIsShown = false
@@ -82,8 +66,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
     private var rkSaved = false
     private var isHelpDialogShown = false
     private var isNoAppsDialogShown = false
-
-    private var qr: Bitmap? = null
     private var imm: InputMethodManager? = null
 
     private val onBackPressedCallback: OnBackPressedCallback =
@@ -144,9 +126,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                 isErrorShown = getBoolean("isErrorShown", false)
                 firstTime = getBoolean("firstTimeAfterInstallation", true)
                 rkSaved = getBoolean("rkSaved", false)
-                seed = getString("seed", "")
-                arraySeed.clear()
-                arraySeed.addAll(getStringArrayList("arraySeed") ?: emptyList())
                 isNoAppsDialogShown = getBoolean("isNoAppsDialogShown", false)
                 isHelpDialogShown = getBoolean("isHelpDialogShown", false)
             }
@@ -271,14 +250,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
             putBoolean("isNoAppsDialogShown", isNoAppsDialogShown)
             putBoolean("isHelpDialogShown", isHelpDialogShown)
         }
-
-        if (scanOrCopyIsShown) {
-            Timber.d("scanOrCopyIsShown")
-            with(outState) {
-                putString("seed", seed)
-                putStringArrayList("arraySeed", arraySeed)
-            }
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -312,18 +283,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                     R.color.white_grey_700
                 )
             )
-            if (seed == null) {
-                viewModel.getAuthenticationCode()
-            } else {
-                Timber.d("Seed not null")
-                setSeed()
-                if (qr != null) {
-                    Timber.d("QR not null")
-                    qr2fa.setImageBitmap(qr)
-                } else {
-                    generate2FAQR()
-                }
-            }
 
             if (isNoAppsDialogShown) {
                 showAlertNotAppAvailable()
@@ -333,7 +292,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                 showAlertHelp()
             }
         }
-
     }
 
     private fun showAlertHelp() {
@@ -400,31 +358,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
     }
 
     private fun generate2FAQR() {
-        Timber.d("generate2FAQR")
-        url = null
-        val myEmail = megaApi.myEmail
-        if (myEmail != null && seed != null) {
-            url = getString(R.string.url_qr_2fa, myEmail, seed)
-            setSeed()
-        }
-        if (url == null) return
-
-        val hints: MutableMap<EncodeHintType, ErrorCorrectionLevel> =
-            EnumMap(EncodeHintType::class.java)
-        hints[EncodeHintType.ERROR_CORRECTION] = ErrorCorrectionLevel.H
-        val bitMatrix: BitMatrix? = try {
-            MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 40, 40, null)
-
-        } catch (e: WriterException) {
-            e.printStackTrace()
-            return
-        }
-        bitMatrix?.apply bitMatrix@{
-            val w = bitMatrix.width
-            val h = bitMatrix.height
-            val pixels = IntArray(w * h)
-            val width = w * WIDTH / FACTOR
-            qr = Bitmap.createBitmap(width, width, Bitmap.Config.ARGB_8888)
+        url?.let {
             val colorBackground = ContextCompat.getColor(
                 this@TwoFactorAuthenticationActivity,
                 R.color.white_grey_700
@@ -433,116 +367,13 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                 this@TwoFactorAuthenticationActivity,
                 R.color.dark_grey
             )
-            val paint = Paint()
-            paint.isAntiAlias = true
-            paint.color = colorBackground
-            qr?.apply qrApply@{
-                val c = Canvas(this)
-                c.drawRect(0f, 0f, width.toFloat(), width.toFloat(), paint)
-                paint.color = colorCode
-                val size = (w - 12).toFloat()
-                for (y in 0 until h) {
-                    val offset = y * w
-                    for (x in 0 until w) {
-                        pixels[offset + x] =
-                            if (bitMatrix.get(x, y)) colorCode else colorBackground
-                        if (pixels[offset + x] == colorCode) {
-                            c.drawCircle(x * RESIZE, y * RESIZE, 3.5f, paint)
-                        }
-                    }
-                }
-
-                //            8.5 width
-                paint.color = colorBackground
-                c.drawRect(3 * RESIZE, 3 * RESIZE, 11.5f * RESIZE, 11.5f * RESIZE, paint)
-                c.drawRect(
-                    size * RESIZE,
-                    3 * RESIZE,
-                    (size + 8.5f) * RESIZE,
-                    11.5f * RESIZE,
-                    paint
-                )
-                c.drawRect(
-                    3 * RESIZE,
-                    size * RESIZE,
-                    11.5f * RESIZE,
-                    (size + 8.5f) * RESIZE,
-                    paint
-                )
-                paint.color = colorCode
-                c.drawRoundRect(
-                    3.75f * RESIZE,
-                    3.75f * RESIZE,
-                    10.75f * RESIZE,
-                    10.75f * RESIZE,
-                    15f,
-                    15f,
-                    paint
-                )
-                //                7 width, 0.75 more than last
-                c.drawRoundRect(
-                    (size + 0.75f) * RESIZE,
-                    3.75f * RESIZE,
-                    (size + 0.75f + 7f) * RESIZE,
-                    10.75f * RESIZE,
-                    15f,
-                    15f,
-                    paint
-                )
-                c.drawRoundRect(
-                    3.75f * RESIZE,
-                    (size + 0.75f) * RESIZE,
-                    10.75f * RESIZE,
-                    (size + 0.75f + 7f) * RESIZE,
-                    15f,
-                    15f,
-                    paint
-                )
-                paint.color = colorBackground
-                c.drawRoundRect(
-                    4.75f * RESIZE,
-                    4.75f * RESIZE,
-                    9.75f * RESIZE,
-                    9.75f * RESIZE,
-                    12.5f,
-                    12.5f,
-                    paint
-                )
-                //                5 width, 1.75 more than first
-                c.drawRoundRect(
-                    (size + 1.75f) * RESIZE,
-                    4.75f * RESIZE,
-                    (size + 1.75f + 5f) * RESIZE,
-                    9.75f * RESIZE,
-                    12.5f,
-                    12.5f,
-                    paint
-                )
-                c.drawRoundRect(
-                    4.75f * RESIZE,
-                    (size + 1.75f) * RESIZE,
-                    9.75f * RESIZE,
-                    (size + 1.75f + 5f) * RESIZE,
-                    12.5f,
-                    12.5f,
-                    paint
-                )
-                paint.color = colorCode
-                c.drawCircle(7.25f * RESIZE, 7.25f * RESIZE, 12f, paint)
-                //            4.25 more than first
-                c.drawCircle((size + 4.25f) * RESIZE, 7.25f * RESIZE, 12f, paint)
-                c.drawCircle(7.25f * RESIZE, (size + 4.25f) * RESIZE, 12f, paint)
-                if (qr != null) {
-                    with(binding) {
-                        qr2fa.setImageBitmap(qr)
-                        qrProgressBar.visibility = View.GONE
-                    }
-                } else {
-                    showSnackbar(getString(R.string.qr_seed_text_error))
-                }
-            }
-
-
+            viewModel.generateQRCodeBitmap(
+                qrCodeUrl = it,
+                width = 300,
+                height = 300,
+                bgColor = colorBackground,
+                penColor = colorCode
+            )
         }
     }
 
@@ -550,16 +381,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
         showSnackbar(binding.container2fa, s)
     }
 
-    private fun setSeed() {
-        arraySeed.clear()
-        seed?.let { it ->
-            var index = 0
-            for (i in 0 until LENGTH_SEED) {
-                arraySeed.add(it.substring(index, index + 4))
-                index += 4
-            }
-        } ?: return
-
+    private fun setSeed(arraySeed: ArrayList<String>) {
         with(binding) {
             listOf(
                 seed2fa1,
@@ -579,7 +401,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                 currentSeed.text = arraySeed[index]
             }
         }
-
     }
 
     private fun addListeners() {
@@ -596,15 +417,8 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
 
             }
             buttonOpenWith2fa.setOnClickListener {
-                if (url == null) {
-                    val myEmail = megaApi.myEmail
-                    if (myEmail != null && seed != null) {
-                        url = getString(R.string.url_qr_2fa, myEmail, seed)
-                    }
-                }
-                if (url != null) {
+                url?.let {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                    Timber.d("URL: $url seed: $seed")
                     if (MegaApiUtils.isIntentAvailable(
                             this@TwoFactorAuthenticationActivity,
                             intent
@@ -650,7 +464,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                 showAlertHelp()
             }
             seed2fa.setOnLongClickListener {
-                copySeed()
+                copySeed(seed)
                 return@setOnLongClickListener true
             }
             pinsViewsList.forEach { currentPin ->
@@ -713,7 +527,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
         }
     }
 
-
     private fun showKeyboard(view: View) {
         imm?.showSoftInput(view, InputMethodManager.RESULT_UNCHANGED_SHOWN)
     }
@@ -733,10 +546,10 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
         }
     }
 
-    private fun copySeed() {
+    private fun copySeed(seed: String) {
         Timber.d("Copy seed")
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        seed?.let {
+        seed.let {
             ClipData.newPlainText("seed", seed)?.let {
                 clipboard.setPrimaryClip(it)
                 showSnackbar(getString(R.string.messages_copied_clipboard))
@@ -821,17 +634,42 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
             handleEnableMultiFactorAuthState(state)
             handleIsMasterKeyExported(state)
             handleGetting2FACode(state)
+            handleGettingUserEmail(state)
+            handleQRCode(state)
+        }
+    }
+
+    private fun handleQRCode(state: TwoFactorAuthenticationUIState) {
+        with(state) {
+            if (isQRCodeGenerationCompleted) {
+                if (qrBitmap == null) {
+                    showSnackbar(getString(R.string.qr_seed_text_error))
+                    return
+                }
+                with(binding) {
+                    qr2fa.setImageBitmap(qrBitmap)
+                    qrProgressBar.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun handleGettingUserEmail(state: TwoFactorAuthenticationUIState) {
+        with(state) {
+            if (userEmail != null && seed != null) {
+                url = getString(R.string.url_qr_2fa, userEmail, seed)
+                generate2FAQR()
+            }
         }
     }
 
     private fun handleGetting2FACode(state: TwoFactorAuthenticationUIState) {
-        if (state.is2FAFetchCompleted) {
-            seed?.let {
-                this@TwoFactorAuthenticationActivity.seed = it
-                binding.qrProgressBar.visibility = View.VISIBLE
-                generate2FAQR()
-            } ?: showSnackbar(getString(R.string.qr_seed_text_error))
-        }
+        state.seed.takeIf { state.is2FAFetchCompleted }?.let {
+            seed = it
+            binding.qrProgressBar.visibility = View.VISIBLE
+            setSeed(seed.toSeedArray())
+
+        } ?: showSnackbar(getString(R.string.qr_seed_text_error))
     }
 
     private fun handleIsMasterKeyExported(state: TwoFactorAuthenticationUIState) {
@@ -861,7 +699,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
                     }
                     else -> {
                         showSnackbar(getString(R.string.error_enable_2fa))
-
                     }
                 }
             }
@@ -876,41 +713,5 @@ class TwoFactorAuthenticationActivity : PasscodeActivity(), MegaRequestListenerI
 
     private fun clearText(editText: EditText) {
         editText.setText("")
-    }
-
-    override fun onRequestStart(p0: MegaApiJava?, p1: MegaRequest?) {
-    }
-
-    override fun onRequestUpdate(p0: MegaApiJava?, p1: MegaRequest?) {
-    }
-
-    override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        Timber.d("onRequestFinish")
-        when (request.type) {
-            MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK -> {
-                if (e.errorCode == MegaError.API_OK) {
-                    Timber.d("TYPE_MULTI_FACTOR_AUTH_CHECK: ${request.flag}")
-                }
-            }
-        }
-    }
-
-    override fun onRequestTemporaryError(
-        p0: MegaApiJava?,
-        p1: MegaRequest?,
-        p2: MegaError?,
-    ) {
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        megaApi.removeRequestListener(this)
-    }
-
-    companion object {
-        private const val LENGTH_SEED = 13
-        private const val WIDTH = 520
-        private const val FACTOR = 65
-        private const val RESIZE = 8f
     }
 }

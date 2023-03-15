@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.twofactorauthentication
 
+import androidx.annotation.ColorInt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,12 +8,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
 import mega.privacy.android.domain.usecase.GetMultiFactorAuthCode
 import mega.privacy.android.domain.usecase.IsMasterKeyExported
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import javax.inject.Inject
 
 /**
@@ -23,6 +26,8 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
     private val enableMultiFactorAuth: EnableMultiFactorAuth,
     private val isMasterKeyExported: IsMasterKeyExported,
     private val getMultiFactorAuthCode: GetMultiFactorAuthCode,
+    private val getCurrentUserEmail: GetCurrentUserEmail,
+    private val qrCodeMapper: QRCodeMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TwoFactorAuthenticationUIState())
@@ -32,6 +37,57 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
      */
     val uiState = _uiState.asStateFlow()
 
+
+    /**
+     * Generate the QR code for the 2fa
+     *
+     * @param qrCodeUrl the text value of QR code.
+     * @param width width of the target bitmap.
+     * @param height height of the target bitmap.
+     * @param penColor pen color of the QR code. Color format is ARGB.
+     * @param bgColor background color of the QR code. Color format is ARGB.
+     */
+    fun generateQRCodeBitmap(
+        qrCodeUrl: String,
+        width: Int,
+        height: Int,
+        @ColorInt penColor: Int,
+        @ColorInt bgColor: Int,
+    ) {
+        viewModelScope.launch {
+            runCatching {
+                qrCodeMapper(
+                    text = qrCodeUrl,
+                    width = width,
+                    height = height,
+                    penColor = penColor,
+                    bgColor = bgColor
+                ).let { bitmap ->
+                    _uiState.update {
+                        it.copy(
+                            isQRCodeGenerationCompleted = true,
+                            qrBitmap = bitmap
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Get the current user's email
+     */
+    fun getUserEmail() {
+        viewModelScope.launch {
+            runCatching {
+                getCurrentUserEmail().let { email ->
+                    _uiState.update {
+                        it.copy(userEmail = email)
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * Get the multi factor authentication code required to enable the 2FA
@@ -45,6 +101,7 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
                         is2FAFetchCompleted = true
                     )
                 }
+                getUserEmail()
             }
         }
     }
@@ -58,7 +115,7 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isMasterKeyExported = result.isSuccess,
-                        dismissRecoveryKey = result.getOrNull() ?: false
+                        dismissRecoveryKey = result.getOrElse { false }
                     )
                 }
             }

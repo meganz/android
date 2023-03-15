@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.twofactorauthentication
 
+import android.graphics.Bitmap
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -8,6 +9,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationViewModel
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
@@ -15,20 +17,26 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
 import mega.privacy.android.domain.usecase.GetMultiFactorAuthCode
 import mega.privacy.android.domain.usecase.IsMasterKeyExported
+import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(RobolectricTestRunner::class)
 internal class TwoFactorAuthenticationViewModelTest {
     private lateinit var underTest: TwoFactorAuthenticationViewModel
     private val enableMultiFactorAuth = mock<EnableMultiFactorAuth>()
     private val isMasterKeyExported = mock<IsMasterKeyExported>()
     private val getMultiFactorAuthCode = mock<GetMultiFactorAuthCode>()
+    private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
+    private val qrCodeMapper = mock<QRCodeMapper>()
 
     @Before
     fun setup() {
@@ -37,7 +45,9 @@ internal class TwoFactorAuthenticationViewModelTest {
         underTest = TwoFactorAuthenticationViewModel(
             enableMultiFactorAuth,
             isMasterKeyExported,
-            getMultiFactorAuthCode
+            getMultiFactorAuthCode,
+            getCurrentUserEmail,
+            qrCodeMapper
         )
     }
 
@@ -171,4 +181,52 @@ internal class TwoFactorAuthenticationViewModelTest {
                 assertThat(state.seed).isNull()
             }
         }
+
+    @Test
+    fun `test that userEmail should not be null when getting the current user email is successful`() {
+        runTest {
+            val expectedFakeEmail = "abc@mega.nz.com"
+            whenever(getCurrentUserEmail()).thenReturn(expectedFakeEmail)
+            underTest.getUserEmail()
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.userEmail).isNotNull()
+                assertThat(state.userEmail).isEqualTo(expectedFakeEmail)
+            }
+        }
+    }
+
+    @Test
+    fun `test that isQRCodeGenerationCompleted should true when generating the QR code process is successful`() {
+        runTest {
+            val text = "random url"
+            val width = 300
+            val height = 300
+            val penColor = 0xFF00000
+            val bgColor = 0xFFFFFF
+            val qrBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+
+            whenever(
+                qrCodeMapper(
+                    text = text,
+                    width = width,
+                    height = height,
+                    penColor = penColor,
+                    bgColor = bgColor
+                )
+            ).thenReturn(qrBitmap)
+            underTest.generateQRCodeBitmap(
+                qrCodeUrl = text,
+                width = width,
+                height = height,
+                penColor = penColor,
+                bgColor = bgColor
+            )
+            underTest.uiState.test {
+                val state = awaitItem()
+                assertThat(state.isQRCodeGenerationCompleted).isEqualTo(true)
+                assertThat(state.qrBitmap).isEqualTo(qrBitmap)
+            }
+        }
+    }
 }
