@@ -156,15 +156,22 @@ internal class CallRepositoryImpl @Inject constructor(
                     since,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = { request: MegaChatRequest, error: MegaChatError ->
-                            if (error.errorCode == MegaChatError.ERROR_OK
-                                && (request.megaChatScheduledMeetingOccurrList?.size() ?: 0) > 0
-                            ) {
+                            if (error.errorCode == MegaChatError.ERROR_OK) {
                                 val occurrences = mutableListOf<ChatScheduledMeetingOccurr>()
-                                request.megaChatScheduledMeetingOccurrList.apply {
-                                    for (i in 0 until size()) {
-                                        occurrences.add(chatScheduledMeetingOccurrMapper(at(i)))
+                                request.megaChatScheduledMeetingOccurrList?.let { occursList ->
+                                    if (occursList.size() > 0) {
+                                        for (i in 0 until occursList.size()) {
+                                            occurrences.add(
+                                                chatScheduledMeetingOccurrMapper(
+                                                    occursList.at(
+                                                        i
+                                                    )
+                                                )
+                                            )
+                                        }
                                     }
                                 }
+
                                 continuation.resume(occurrences)
                             } else {
                                 continuation.failWithError(error)
@@ -214,12 +221,11 @@ internal class CallRepositoryImpl @Inject constructor(
             }
         }
 
-    override fun monitorChatCallUpdates(): Flow<ChatCall> =
-        megaChatApiGateway.chatCallUpdates
-            .filterIsInstance<ChatCallUpdate.OnChatCallUpdate>()
-            .mapNotNull { it.item }
-            .map { chatCallMapper(it) }
-            .flowOn(dispatcher)
+    override fun monitorChatCallUpdates(): Flow<ChatCall> = megaChatApiGateway.chatCallUpdates
+        .filterIsInstance<ChatCallUpdate.OnChatCallUpdate>()
+        .mapNotNull { it.item }
+        .map { chatCallMapper(it) }
+        .flowOn(dispatcher)
 
     override fun monitorScheduledMeetingUpdates(): Flow<ChatScheduledMeeting> =
         megaChatApiGateway.scheduledMeetingUpdates

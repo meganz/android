@@ -317,11 +317,6 @@ internal class MegaChatApiFacade @Inject constructor(
 
     override fun fetchScheduledMeetingOccurrencesByChat(
         chatId: Long,
-        listener: MegaChatRequestListenerInterface,
-    ) = chatApi.fetchScheduledMeetingOccurrencesByChat(chatId, listener)
-
-    override fun fetchScheduledMeetingOccurrencesByChat(
-        chatId: Long,
         since: Long,
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.fetchScheduledMeetingOccurrencesByChat(chatId, since, listener)
