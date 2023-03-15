@@ -59,4 +59,11 @@ interface EnvironmentRepository {
      * @return memory size in bytes if found
      */
     suspend fun getDeviceMemorySizeInBytes(): Long?
+
+    /**
+     * Get is first launch
+     *
+     * @return first launch value, or null if not set
+     */
+    suspend fun getIsFirstLaunch(): Boolean?
 }

@@ -4,11 +4,11 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_LABEL_ASC
@@ -369,6 +369,9 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun clearPreferences() = dbHandler.clearPreferences()
 
     override suspend fun setFirstTime(firstTime: Boolean) = dbHandler.setFirstTime(firstTime)
+
+    override suspend fun getFirstTime(): Boolean? =
+        dbHandler.preferences?.firstTime?.toBooleanStrictOrNull()
 
     override suspend fun clearOffline() = dbHandler.clearOffline()
 

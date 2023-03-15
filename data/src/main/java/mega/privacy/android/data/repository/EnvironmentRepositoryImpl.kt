@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.R
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.DeviceGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppInfoPreferencesGateway
 import mega.privacy.android.domain.entity.AppInfo
@@ -27,6 +28,7 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val appInfoGateway: AppInfoGateway,
     private val appInfoPreferencesGateway: AppInfoPreferencesGateway,
+    private val megaLocalStorageGateway: MegaLocalStorageGateway,
 ) : EnvironmentRepository {
 
     override suspend fun getDeviceInfo() =
@@ -68,5 +70,9 @@ internal class EnvironmentRepositoryImpl @Inject constructor(
 
     override suspend fun getDeviceMemorySizeInBytes() = withContext(ioDispatcher) {
         deviceGateway.getDeviceMemory()
+    }
+
+    override suspend fun getIsFirstLaunch() = withContext(ioDispatcher){
+        megaLocalStorageGateway.getFirstTime()
     }
 }
