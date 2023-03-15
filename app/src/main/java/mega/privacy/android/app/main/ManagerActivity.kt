@@ -56,6 +56,10 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -106,7 +110,6 @@ import mega.privacy.android.app.activities.OfflineFileInfoActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomViewPager
-import mega.privacy.android.app.components.RoundedImageView
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.components.twemoji.EmojiTextView
@@ -188,6 +191,8 @@ import mega.privacy.android.app.myAccount.usecase.CheckPasswordReminderUseCase
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.avatar.model.AvatarContent
+import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
@@ -281,7 +286,6 @@ import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.askForCustomizedPlan
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
-import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CameraUploadUtil
@@ -540,7 +544,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private lateinit var nVEmail: TextView
     private lateinit var businessLabel: TextView
     private lateinit var proFlexiLabel: TextView
-    private lateinit var profileImageView: RoundedImageView
+    private lateinit var profileImageView: ComposeView
     private lateinit var spaceTextView: TextView
     private lateinit var usedSpaceProgressBar: ProgressBar
 
@@ -1623,7 +1627,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             dbH.setInvalidateSdkCache(false)
             MegaMessageService.getToken(this)
             userInfoViewModel.getUserInfo()
-            setProfileAvatar()
             preloadPayment()
             megaApi.isGeolocationEnabled(this)
             if (savedInstanceState == null) {
@@ -2399,10 +2402,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     private fun collectFlows() {
         this.collectFlow(
-            viewModel.onMyAvatarFileChanged,
-            Lifecycle.State.STARTED
-        ) { setProfileAvatar() }
-        this.collectFlow(
             viewModel.state,
             Lifecycle.State.STARTED
         ) { managerState: ManagerState ->
@@ -2468,6 +2467,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Lifecycle.State.STARTED
         ) { state: UserInfoUiState ->
             updateUserNameNavigationView(state.fullName)
+            setProfileAvatar(state.avatarContent)
             nVEmail.visibility = View.VISIBLE
             nVEmail.text = state.email
         }
@@ -3111,11 +3111,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 Constants.ACTION_PRE_OVERQUOTA_STORAGE -> {
                     showOverQuotaAlert(true)
                 }
-                Constants.ACTION_CHANGE_AVATAR -> {
-                    Timber.d("Intent CHANGE AVATAR")
-                    val path = intent.getStringExtra("IMAGE_PATH")
-                    megaApi.setAvatar(path, this)
-                }
                 Constants.ACTION_CANCEL_CAM_SYNC -> {
                     Timber.d("ACTION_CANCEL_UPLOAD or ACTION_CANCEL_DOWNLOAD or ACTION_CANCEL_CAM_SYNC")
                     drawerItem = DrawerItem.TRANSFERS
@@ -3318,50 +3313,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    fun setProfileAvatar() {
-        Timber.d("setProfileAvatar")
-        val circleAvatar =
-            AvatarUtil.getCircleAvatar(this, megaApi.myEmail)
-        if (circleAvatar?.first == true) {
-            profileImageView.setImageBitmap(circleAvatar.second)
-        } else {
-            setDefaultAvatar()
-            val avatarFile = CacheFolderManager.buildAvatarFile(
-                this,
-                megaApi.myEmail + FileUtil.JPG_EXTENSION
-            )
-            if (avatarFile?.exists() == true) {
-                megaApi.getUserAvatar(megaApi.myUser, avatarFile.absolutePath, this)
+    private fun setProfileAvatar(avatar: AvatarContent?) {
+        avatar?.let {
+            profileImageView.apply {
+                setContent {
+                    Avatar(modifier = Modifier.size(48.dp), content = avatar)
+                }
             }
-        }
-    }
-
-    private fun setDefaultAvatar() {
-        Timber.d("setDefaultAvatar")
-        profileImageView.setImageBitmap(
-            AvatarUtil.getDefaultAvatar(
-                AvatarUtil.getColorAvatar(
-                    megaApi.myUser
-                ), megaChatApi.myFullname, Constants.AVATAR_SIZE, true
-            )
-        )
-    }
-
-    fun setOfflineAvatar(email: String?, myHandle: Long, name: String?) {
-        Timber.d("setOfflineAvatar")
-        val circleAvatar =
-            AvatarUtil.getCircleAvatar(this, email)
-        if (circleAvatar?.first == true) {
-            profileImageView.setImageBitmap(circleAvatar.second)
-        } else {
-            profileImageView.setImageBitmap(
-                AvatarUtil.getDefaultAvatar(
-                    AvatarUtil.getColorAvatar(myHandle),
-                    name,
-                    Constants.AVATAR_SIZE,
-                    true
-                )
-            )
         }
     }
 
@@ -3912,10 +3870,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             usedSpaceLayout.visibility = View.GONE
             nVEmail.text = megaChatApi.myEmail
             nVDisplayName.text = megaChatApi.myFullname
-            setOfflineAvatar(
-                megaChatApi.myEmail, megaChatApi.myUserHandle,
-                megaChatApi.myFullname
-            )
             Timber.d("DrawerItem on start offline: %s", drawerItem)
             if (drawerItem == null) {
                 Timber.w("drawerItem == null --> On start OFFLINE MODE")
@@ -7119,6 +7073,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
         Timber.d("onNewIntent")
         if (Intent.ACTION_SEARCH == intent.action) {
             intent.getStringExtra(SearchManager.QUERY)
@@ -7145,7 +7100,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             selectDrawerItem(drawerItem)
             return
         }
-        super.onNewIntent(intent)
         setIntent(intent)
     }
 
@@ -9480,7 +9434,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun updateUserNameNavigationView(fullName: String?) {
         Timber.d("updateUserNameNavigationView")
         nVDisplayName.text = fullName
-        setProfileAvatar()
     }
 
     fun hideFabButton() {

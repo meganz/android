@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.avatar.mapper
 
 import android.content.Context
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.sp
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -43,7 +46,13 @@ class AvatarContentMapperImplTest {
             whenever(avatarWrapper.getFirstLetter(any())).thenReturn("L")
             whenever(emojiManagerWrapper.getFirstEmoji(any())).thenReturn(null)
 
-            val result = underTest(fullName = "full name", localFile = null)
+            val result = underTest(
+                fullName = "full name",
+                localFile = null,
+                showBorder = true,
+                backgroundColor = { Color.Black.toArgb() },
+                textSize = 38.sp
+            )
             assertThat(result).isInstanceOf(TextAvatarContent::class.java)
         }
 
@@ -53,7 +62,13 @@ class AvatarContentMapperImplTest {
             whenever(avatarWrapper.getFirstLetter(any())).thenReturn("L")
             whenever(emojiManagerWrapper.getFirstEmoji(any())).thenReturn(R.drawable.emoji_twitter_0033_fe0f_20e3)
 
-            val result = underTest(fullName = "full name", localFile = null)
+            val result = underTest(
+                fullName = "full name",
+                localFile = null,
+                showBorder = true,
+                backgroundColor = { Color.Black.toArgb() },
+                textSize = 38.sp,
+            )
             assertThat(result).isInstanceOf(EmojiAvatarContent::class.java)
         }
 
@@ -69,7 +84,13 @@ class AvatarContentMapperImplTest {
             whenever(context.getString(R.string.first_name_text)).thenReturn(defaultFirstName)
             whenever(context.getString(R.string.lastname_text)).thenReturn(defaultLastName)
 
-            val result = underTest(fullName = null, localFile = null)
+            val result = underTest(
+                fullName = null,
+                localFile = null,
+                showBorder = true,
+                backgroundColor = { Color.Black.toArgb() },
+                textSize = 38.sp,
+            )
             assertThat(result).isInstanceOf(TextAvatarContent::class.java)
         }
 
@@ -79,7 +100,13 @@ class AvatarContentMapperImplTest {
         whenever(localFile.exists()).thenReturn(true)
         whenever(localFile.length()).thenReturn(100)
         whenever(localFile.toURI()).thenReturn(URI(expectedFilePath))
-        val result = underTest(fullName = "name", localFile = localFile)
+        val result = underTest(
+            fullName = "name",
+            localFile = localFile,
+            showBorder = true,
+            backgroundColor = { Color.Black.toArgb() },
+            textSize = 38.sp,
+        )
         assertThat(result).isInstanceOf(PhotoAvatarContent::class.java)
     }
 
@@ -89,7 +116,13 @@ class AvatarContentMapperImplTest {
         whenever(avatarWrapper.getFirstLetter(any())).thenReturn("L")
         whenever(emojiManagerWrapper.getFirstEmoji(any())).thenReturn(null)
 
-        val result = underTest(fullName = "full name", localFile = localFile)
+        val result = underTest(
+            fullName = "full name",
+            localFile = localFile,
+            showBorder = true,
+            backgroundColor = { Color.Black.toArgb() },
+            textSize = 38.sp,
+        )
         assertThat(result).isInstanceOf(TextAvatarContent::class.java)
     }
 }

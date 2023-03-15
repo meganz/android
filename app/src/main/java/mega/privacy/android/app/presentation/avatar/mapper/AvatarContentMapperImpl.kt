@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.avatar.mapper
 
 import android.content.Context
+import androidx.compose.ui.unit.TextUnit
 import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.wrapper.EmojiManagerWrapper
@@ -28,15 +29,23 @@ class AvatarContentMapperImpl @Inject constructor(
      * @param localFile local path of the avatar photo
      * @return specific types of [AvatarContent]
      */
-    override suspend fun invoke(fullName: String?, localFile: File?) =
-        mapAvatarPathToPhoto(localFile)
-            ?: mapNameToAvatarText(fullName).let {
-                mapAvatarTextToEmoji(it) ?: TextAvatarContent(it)
+    override suspend fun invoke(
+        fullName: String?,
+        localFile: File?,
+        showBorder: Boolean,
+        textSize: TextUnit,
+        backgroundColor: suspend () -> Int,
+    ): AvatarContent =
+        mapAvatarPathToPhoto(localFile, showBorder)
+            ?: mapNameToAvatarText(fullName).let { name ->
+                val color = backgroundColor()
+                mapAvatarTextToEmoji(name, color, showBorder)
+                    ?: TextAvatarContent(name, color, showBorder, textSize)
             }
 
-    private fun mapAvatarPathToPhoto(localFile: File?): PhotoAvatarContent? =
+    private fun mapAvatarPathToPhoto(localFile: File?, showBorder: Boolean): PhotoAvatarContent? =
         localFile?.takeIf { it.exists() && it.length() > 0 }?.let {
-            PhotoAvatarContent(localFile.toURI().toString())
+            PhotoAvatarContent(localFile.toURI().toString(), showBorder)
         }
 
     private fun mapNameToAvatarText(name: String?) = avatarWrapper.getFirstLetter(
@@ -44,7 +53,16 @@ class AvatarContentMapperImpl @Inject constructor(
             ?: "${context.getString(R.string.first_name_text)} ${context.getString(R.string.lastname_text)}"
     )
 
-    private suspend fun mapAvatarTextToEmoji(avatarText: String) =
-        emojiManagerWrapper.getFirstEmoji(avatarText)
-            ?.let { emojiDrawable -> EmojiAvatarContent(emojiDrawable) }
+    private suspend fun mapAvatarTextToEmoji(
+        avatarText: String,
+        backgroundColor: Int,
+        showBorder: Boolean,
+    ) = emojiManagerWrapper.getFirstEmoji(avatarText)
+        ?.let { emojiDrawable ->
+            EmojiAvatarContent(
+                emojiDrawable,
+                backgroundColor,
+                showBorder
+            )
+        }
 }

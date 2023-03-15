@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.avatar.mapper
 
+import androidx.compose.ui.unit.TextUnit
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import java.io.File
 
@@ -13,5 +14,11 @@ fun interface AvatarContentMapper {
      * @param localFile file of avatar photo
      * @return [AvatarContent] that contains the mapped avatar information.
      */
-    suspend operator fun invoke(fullName: String?, localFile: File?): AvatarContent
+    suspend operator fun invoke(
+        fullName: String?,
+        localFile: File?,
+        showBorder: Boolean,
+        textSize: TextUnit,
+        backgroundColor: suspend () -> Int,
+    ): AvatarContent
 }

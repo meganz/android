@@ -33,7 +33,6 @@ import mega.privacy.android.app.presentation.qrcode.mapper.QRCodeMapper
 import mega.privacy.android.app.presentation.qrcode.mycode.model.MyCodeUIState
 import mega.privacy.android.core.ui.controls.LoadingDialog
 import mega.privacy.android.core.ui.theme.grey_700
-import mega.privacy.android.core.ui.theme.secondary_light
 import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
@@ -82,9 +81,8 @@ fun MyQRCodeView(
                     )
 
                     Avatar(
-                        modifier = Modifier,
+                        modifier = Modifier.size(66.dp),
                         content = uiState.avatarContent,
-                        avatarBgColor = uiState.avatarBgColor ?: secondary_light.toArgb(),
                     )
 
                 }
@@ -140,7 +138,7 @@ fun MyQRCodeViewPreview() {
     val uiState = MyCodeUIState.QRCodeAvailable(
         contactLink = "https://conatctlink",
         avatarBgColor = Color.Red.toArgb(),
-        avatarContent = TextAvatarContent(avatarText = "Jackson")
+        avatarContent = TextAvatarContent(avatarText = "Jackson", Color.Red.toArgb())
     )
     MyQRCodeView(
         uiState = uiState,

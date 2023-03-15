@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.manager
 
 import android.content.Context
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,12 +14,16 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
+import mega.privacy.android.domain.usecase.GetMyAvatarColor
+import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
@@ -42,6 +47,10 @@ internal class UserInfoViewModel @Inject constructor(
     private val getCurrentUserAliases: GetCurrentUserAliases,
     private val reloadContactDatabase: ReloadContactDatabase,
     private val getContactEmail: GetContactEmail,
+    private val getMyAvatarFile: GetMyAvatarFile,
+    private val monitorMyAvatarFile: MonitorMyAvatarFile,
+    private val getMyAvatarColor: GetMyAvatarColor,
+    private val avatarContentMapper: AvatarContentMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
@@ -58,7 +67,10 @@ internal class UserInfoViewModel @Inject constructor(
                         UserChanges.Email -> handleEmailChange()
                         UserChanges.Firstname,
                         UserChanges.Lastname,
-                        -> getUserFullName()
+                        -> {
+                            getUserFullName()
+                            getUserAvatarOrDefault(isForceRefresh = false)
+                        }
                         else -> Unit
                     }
                 }
@@ -69,6 +81,32 @@ internal class UserInfoViewModel @Inject constructor(
                 .collect {
                     handleOtherUsersUpdate(it)
                 }
+        }
+        viewModelScope.launch {
+            monitorMyAvatarFile()
+                .catch { Timber.e(it) }
+                .collect {
+                    getUserAvatarOrDefault(isForceRefresh = false)
+                }
+        }
+    }
+
+    private suspend fun getUserAvatarOrDefault(isForceRefresh: Boolean) {
+        viewModelScope.launch {
+            val avatarFile = runCatching { getMyAvatarFile(isForceRefresh) }
+                .onFailure { Timber.e(it) }.getOrNull()
+            val avatarContent = avatarContentMapper(
+                fullName = _state.value.fullName,
+                localFile = avatarFile,
+                backgroundColor = { getMyAvatarColor() },
+                showBorder = false,
+                textSize = 36.sp
+            )
+            _state.update {
+                it.copy(
+                    avatarContent = avatarContent,
+                )
+            }
         }
     }
 
@@ -131,6 +169,7 @@ internal class UserInfoViewModel @Inject constructor(
         viewModelScope.launch {
             getMyEmail()
             getUserFullName()
+            getUserAvatarOrDefault(true)
         }
     }
 

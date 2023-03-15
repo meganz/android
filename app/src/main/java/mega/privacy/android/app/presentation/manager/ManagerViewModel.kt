@@ -59,7 +59,6 @@ import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorFinishActivity
-import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.Check2FADialog
@@ -72,7 +71,6 @@ import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -84,7 +82,6 @@ import javax.inject.Inject
  * @property hasInboxChildren
  * @property sendStatisticsMediaDiscovery
  * @property savedStateHandle
- * @property monitorMyAvatarFile
  * @property monitorStorageStateEvent
  * @property monitorViewType
  * @property getPrimarySyncHandle
@@ -118,7 +115,6 @@ class ManagerViewModel @Inject constructor(
     private val hasInboxChildren: HasInboxChildren,
     private val sendStatisticsMediaDiscovery: SendStatisticsMediaDiscovery,
     private val savedStateHandle: SavedStateHandle,
-    private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val monitorStorageStateEvent: MonitorStorageStateEvent,
     private val monitorViewType: MonitorViewType,
     private val getPrimarySyncHandle: GetPrimarySyncHandle,
@@ -283,12 +279,6 @@ class ManagerViewModel @Inject constructor(
             .also { Timber.d("onContactRequestsUpdate") }
             .map { Event(it) }
             .asLiveData()
-
-    /**
-     * On my avatar file changed
-     */
-    val onMyAvatarFileChanged: Flow<File?>
-        get() = monitorMyAvatarFile()
 
     /**
      * Flow that monitors the View Type

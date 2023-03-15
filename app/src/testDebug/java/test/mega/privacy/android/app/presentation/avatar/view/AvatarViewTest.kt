@@ -32,9 +32,9 @@ class AvatarViewTest {
         composeTestRule.setContent {
             Avatar(
                 modifier = Modifier,
-                avatarBgColor = Color.Red.toArgb(),
                 content = EmojiAvatarContent(
-                    emojiContent = R.drawable.emoji_twitter_0033_fe0f_20e3
+                    emojiContent = R.drawable.emoji_twitter_0033_fe0f_20e3,
+                    backgroundColor = Color.Red.toArgb(),
                 )
             )
         }
@@ -48,9 +48,9 @@ class AvatarViewTest {
         composeTestRule.setContent {
             Avatar(
                 modifier = Modifier,
-                avatarBgColor = Color.Red.toArgb(),
                 content = TextAvatarContent(
-                    avatarText = "R"
+                    avatarText = "R",
+                    backgroundColor = Color.Red.toArgb(),
                 )
             )
         }
@@ -64,9 +64,8 @@ class AvatarViewTest {
         composeTestRule.setContent {
             Avatar(
                 modifier = Modifier,
-                avatarBgColor = Color.Red.toArgb(),
                 content = PhotoAvatarContent(
-                    path = "file:/path/to/avatar/file.jpg"
+                    path = "file:/path/to/avatar/file.jpg",
                 )
             )
         }

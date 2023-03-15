@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -27,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -43,26 +43,33 @@ import mega.privacy.android.core.ui.theme.white
  * Avatar Composable
  */
 @Composable
-fun Avatar(modifier: Modifier = Modifier, content: AvatarContent, @ColorInt avatarBgColor: Int) {
+fun Avatar(
+    modifier: Modifier = Modifier,
+    content: AvatarContent,
+) {
     when (content) {
         is TextAvatarContent -> {
             TextAvatar(
                 modifier = modifier,
-                avatarBgColor = avatarBgColor,
+                avatarBgColor = content.backgroundColor,
                 firstLetter = content.avatarText,
+                showBorder = content.showBorder,
+                textSize = content.textSize
             )
         }
         is EmojiAvatarContent -> {
             EmojiAvatar(
                 modifier = modifier,
-                avatarBgColor = avatarBgColor,
+                avatarBgColor = content.backgroundColor,
                 resId = content.emojiContent,
+                showBorder = content.showBorder
             )
         }
         is PhotoAvatarContent -> {
             PhotoAvatar(
                 modifier = modifier,
                 photoPath = content.path,
+                showBorder = content.showBorder
             )
         }
     }
@@ -76,23 +83,26 @@ fun Avatar(modifier: Modifier = Modifier, content: AvatarContent, @ColorInt avat
  * @param firstLetter first letter of user name
  */
 @Composable
-fun TextAvatar(modifier: Modifier, @ColorInt avatarBgColor: Int, firstLetter: String) {
+fun TextAvatar(
+    modifier: Modifier,
+    @ColorInt avatarBgColor: Int,
+    firstLetter: String,
+    showBorder: Boolean,
+    textSize: TextUnit,
+) {
     Box(
-        modifier = modifier
-            .size(66.dp)
-            .background(Color.Transparent),
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        AvatarBackground(avatarBgColor = avatarBgColor)
+        AvatarBackground(avatarBgColor = avatarBgColor, showBorder = showBorder)
 
         Text(
             modifier = Modifier
-                .padding(15.dp)
                 .wrapContentSize(unbounded = true)
                 .testTag("TextAvatar"),
             text = firstLetter,
             color = Color.White,
-            fontSize = 38.sp,
+            fontSize = textSize,
             textAlign = TextAlign.Center,
             fontFamily = FontFamily.SansSerif
         )
@@ -110,15 +120,14 @@ fun TextAvatar(modifier: Modifier, @ColorInt avatarBgColor: Int, firstLetter: St
 fun EmojiAvatar(
     modifier: Modifier,
     avatarBgColor: Int,
+    showBorder: Boolean,
     @DrawableRes resId: Int,
 ) {
     Box(
-        modifier = modifier
-            .size(66.dp)
-            .background(Color.Transparent),
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        AvatarBackground(avatarBgColor = avatarBgColor)
+        AvatarBackground(avatarBgColor = avatarBgColor, showBorder = showBorder)
 
         Image(
             painter = painterResource(id = resId),
@@ -135,36 +144,48 @@ fun EmojiAvatar(
 fun PhotoAvatar(
     modifier: Modifier = Modifier,
     photoPath: String,
+    showBorder: Boolean = true,
 ) {
     AsyncImage(
         modifier = modifier
-            .size(66.dp)
             .clip(CircleShape)
-            .border(
-                width = 3.dp,
-                color = borderColor(),
-                shape = CircleShape
-            )
-            .testTag("PhotoAvatar"),
+            .testTag("PhotoAvatar")
+            .run {
+                if (showBorder) {
+                    border(
+                        width = 3.dp,
+                        color = borderColor(),
+                        shape = CircleShape
+                    )
+                } else this
+            },
         model = photoPath,
         contentDescription = "Photo Avatar"
     )
 }
 
 @Composable
-private fun AvatarBackground(modifier: Modifier = Modifier, avatarBgColor: Int) {
+private fun AvatarBackground(
+    modifier: Modifier = Modifier,
+    avatarBgColor: Int,
+    showBorder: Boolean,
+) {
     Image(
         painter = ColorPainter(color = Color(avatarBgColor)),
         contentDescription = null,
         modifier = modifier
             .fillMaxSize()
             .clip(CircleShape)
-            .border(
-                width = 3.dp,
-                color = borderColor(),
-                shape = CircleShape
-            )
             .testTag("AvatarBackground")
+            .run {
+                if (showBorder) {
+                    border(
+                        width = 3.dp,
+                        color = borderColor(),
+                        shape = CircleShape
+                    )
+                } else this
+            }
     )
 }
 
@@ -180,9 +201,10 @@ private fun borderColor() = white.takeIf { MaterialTheme.colors.isLight } ?: dar
 fun PreviewEmojiAvatar() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         EmojiAvatar(
-            modifier = Modifier,
+            modifier = Modifier.size(66.dp),
             avatarBgColor = Color.Blue.toArgb(),
-            resId = R.drawable.emoji_twitter_1f604
+            resId = R.drawable.emoji_twitter_1f604,
+            showBorder = true
         )
     }
 }
@@ -197,9 +219,11 @@ fun PreviewEmojiAvatar() {
 fun PreviewTextAvatar() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         TextAvatar(
-            modifier = Modifier,
+            modifier = Modifier.size(66.dp),
             avatarBgColor = Color.Magenta.toArgb(),
             firstLetter = "R",
+            showBorder = true,
+            textSize = 38.sp,
         )
     }
 }

@@ -36,7 +36,7 @@ class MyQRCodeViewTest {
         val uiState = MyCodeUIState.QRCodeAvailable(
             contactLink = expectedContactLink,
             avatarBgColor = Color.Red.toArgb(),
-            avatarContent = TextAvatarContent("Jack")
+            avatarContent = TextAvatarContent("Jack", Color.Black.toArgb())
         )
         prepareQRCodeMapper()
         composeTestRule.setContent {
@@ -72,7 +72,7 @@ class MyQRCodeViewTest {
         val uiState = MyCodeUIState.QRCodeAvailable(
             contactLink = expectedContactLink,
             avatarBgColor = Color.Red.toArgb(),
-            avatarContent = TextAvatarContent("Jack")
+            avatarContent = TextAvatarContent("Jack", Color.Black.toArgb())
         )
         prepareQRCodeMapper()
         composeTestRule.setContent {
@@ -121,7 +121,7 @@ class MyQRCodeViewTest {
         val uiState = MyCodeUIState.QRCodeAvailable(
             contactLink = "https://contact.link",
             avatarBgColor = Color.Red.toArgb(),
-            avatarContent = TextAvatarContent("Jack")
+            avatarContent = TextAvatarContent("Jack", Color.Black.toArgb())
         )
         prepareQRCodeMapper()
 

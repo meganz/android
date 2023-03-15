@@ -11,12 +11,16 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.presentation.avatar.mapper.AvatarContentMapper
 import mega.privacy.android.app.presentation.manager.UserInfoViewModel
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
+import mega.privacy.android.domain.usecase.GetMyAvatarColor
+import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
@@ -57,6 +61,10 @@ internal class UserInfoViewModelTest {
     private val reloadContactDatabase: ReloadContactDatabase = mock()
     private val getContactEmail: GetContactEmail = mock()
     private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
+    private val avatarContentMapper: AvatarContentMapper = mock()
+    private val getMyAvatarColor: GetMyAvatarColor = mock()
+    private val getMyAvatarFile: GetMyAvatarFile = mock()
+    private val monitorMyAvatarFile: MonitorMyAvatarFile = mock()
 
     @Before
     fun setUp() {
@@ -78,6 +86,10 @@ internal class UserInfoViewModelTest {
             reloadContactDatabase = reloadContactDatabase,
             getContactEmail = getContactEmail,
             applicationScope = applicationScope,
+            avatarContentMapper = avatarContentMapper,
+            getMyAvatarColor = getMyAvatarColor,
+            getMyAvatarFile = getMyAvatarFile,
+            monitorMyAvatarFile = monitorMyAvatarFile,
         )
     }
 

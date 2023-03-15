@@ -45,7 +45,6 @@ import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.Check2FADialog
@@ -81,10 +80,6 @@ class ManagerViewModelTest {
             ManagerViewModel.isFirstLoginKey to initialIsFirsLoginValue
         )
     )
-    private val monitorMyAvatarFile = mock<MonitorMyAvatarFile> {
-        onBlocking { invoke() }.thenReturn(
-            flow { awaitCancellation() })
-    }
     private val getInboxNode = mock<GetInboxNode> { onBlocking { invoke() }.thenReturn(null) }
     private val monitorStorageState = mock<MonitorStorageStateEvent> {
         onBlocking { invoke() }.thenReturn(
@@ -158,7 +153,6 @@ class ManagerViewModelTest {
             hasInboxChildren = hasInboxChildren,
             sendStatisticsMediaDiscovery = sendStatisticsMediaDiscovery,
             savedStateHandle = savedStateHandle,
-            monitorMyAvatarFile = monitorMyAvatarFile,
             getInboxNode = getInboxNode,
             monitorStorageStateEvent = monitorStorageState,
             monitorViewType = monitorViewType,
