@@ -40,13 +40,13 @@ import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.MegaPreferences
-import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -706,12 +706,13 @@ class SqliteDatabaseHandler(
     override fun saveCredentials(userCredentials: UserCredentials) {
         val values = ContentValues().apply {
             with(userCredentials) {
+                put(KEY_ID, 1)
                 email?.let { put(KEY_EMAIL, encrypt(it)) }
                 session?.let { put(KEY_SESSION, encrypt(it)) }
                 myHandle?.let { put(KEY_MY_HANDLE, encrypt(it)) }
             }
         }
-        db.insert(TABLE_CREDENTIALS, null, values)
+        db.insertWithOnConflict(TABLE_CREDENTIALS, null, values, SQLiteDatabase.CONFLICT_REPLACE)
     }
 
     override fun saveSyncRecord(record: SyncRecord) {
@@ -1205,7 +1206,7 @@ class SqliteDatabaseHandler(
             try {
                 db.rawQuery(selectQuery, null)?.use { cursor ->
                     //get the credential of last login
-                    if (cursor.moveToLast()) {
+                    if (cursor.moveToFirst()) {
                         val email = decrypt(cursor.getString(1))
                         val session = decrypt(cursor.getString(2))
                         val firstName = decrypt(cursor.getString(3))
