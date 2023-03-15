@@ -260,7 +260,7 @@ import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
-import mega.privacy.android.app.sync.BackupState
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM

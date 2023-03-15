@@ -16,7 +16,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import mega.privacy.android.app.jobservices.SyncHeartbeatCameraUploadWorker
+import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

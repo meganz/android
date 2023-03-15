@@ -9,11 +9,11 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import mega.privacy.android.app.di.getDbHandler
-import mega.privacy.android.app.jobservices.CameraUploadsService
-import mega.privacy.android.app.jobservices.StartCameraUploadWorker
-import mega.privacy.android.app.jobservices.StopCameraUploadWorker
-import mega.privacy.android.app.jobservices.SyncHeartbeatCameraUploadWorker
 import mega.privacy.android.app.presentation.extensions.getStorageState
+import mega.privacy.android.data.worker.EXTRA_ABORTED
+import mega.privacy.android.data.worker.StartCameraUploadWorker
+import mega.privacy.android.data.worker.StopCameraUploadWorker
+import mega.privacy.android.data.worker.SyncHeartbeatCameraUploadWorker
 import mega.privacy.android.domain.entity.StorageState
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -164,7 +164,7 @@ object JobUtil {
             .addTag(STOP_CAMERA_UPLOAD_TAG)
             .setInputData(
                 Data.Builder()
-                    .putBoolean(CameraUploadsService.EXTRA_ABORTED, aborted)
+                    .putBoolean(EXTRA_ABORTED, aborted)
                     .build()
             )
             .build()

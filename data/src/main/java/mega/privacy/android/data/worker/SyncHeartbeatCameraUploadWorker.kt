@@ -1,4 +1,4 @@
-package mega.privacy.android.app.jobservices
+package mega.privacy.android.data.worker
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
@@ -6,7 +6,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
+import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import timber.log.Timber
 
 /**
@@ -14,11 +14,10 @@ import timber.log.Timber
  */
 @HiltWorker
 class SyncHeartbeatCameraUploadWorker @AssistedInject constructor(
-    @Assisted private val appContext: Context,
+    @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val cameraUploadSyncManagerWrapper: CameraUploadSyncManagerWrapper
-) :
-    Worker(appContext, workerParams) {
+    private val cameraUploadSyncManagerWrapper: CameraUploadSyncManagerWrapper,
+) : Worker(context, workerParams) {
 
     override fun doWork(): Result {
         if (isStopped) return Result.failure()

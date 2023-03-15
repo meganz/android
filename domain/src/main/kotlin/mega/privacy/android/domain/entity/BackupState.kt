@@ -1,4 +1,4 @@
-package mega.privacy.android.app.sync
+package mega.privacy.android.domain.entity
 
 /**
  * Enum class that provides different types of Backup States

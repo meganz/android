@@ -84,6 +84,7 @@ import mega.privacy.android.domain.usecase.DefaultGetGPSCoordinates
 import mega.privacy.android.domain.usecase.DefaultGetSyncRecordByPath
 import mega.privacy.android.domain.usecase.DefaultGetUploadFolderHandle
 import mega.privacy.android.domain.usecase.DefaultIsChargingRequired
+import mega.privacy.android.domain.usecase.DefaultIsNotEnoughQuota
 import mega.privacy.android.domain.usecase.DefaultRenamePrimaryFolder
 import mega.privacy.android.domain.usecase.DefaultRenameSecondaryFolder
 import mega.privacy.android.domain.usecase.DefaultResetCameraUploadTimeStamps
@@ -125,6 +126,7 @@ import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
+import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
@@ -867,6 +869,12 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindResetMediaUploadTimeStamps(resetMediaUploadTimeStamps: DefaultResetMediaUploadTimeStamps): ResetMediaUploadTimeStamps
+
+    /**
+     * Provide the [IsNotEnoughQuota] implementation
+     */
+    @Binds
+    abstract fun bindIsNotEnoughQuota(isNotEnoughQuota: DefaultIsNotEnoughQuota): IsNotEnoughQuota
 
     /**
      * Provide the [DisableCameraUploadSettings] implementation

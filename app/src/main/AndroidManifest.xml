@@ -519,7 +519,7 @@
             android:name=".mediaplayer.service.VideoPlayerService"
             android:exported="false" />
         <service
-            android:name=".jobservices.CameraUploadsService"
+            android:name=".cameraupload.CameraUploadsService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
         <receiver

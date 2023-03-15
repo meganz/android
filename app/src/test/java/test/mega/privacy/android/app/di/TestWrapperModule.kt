@@ -5,7 +5,6 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.UtilWrapperModule
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
@@ -13,10 +12,12 @@ import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
-import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
+import mega.privacy.android.data.wrapper.CameraUploadServiceWrapper
+import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
+import mega.privacy.android.data.wrapper.JobUtilWrapper
 import org.mockito.kotlin.mock
 
 @Module
@@ -32,6 +33,7 @@ object TestWrapperModule {
     val cameraUploadSyncManagerWrapper = mock<CameraUploadSyncManagerWrapper>()
     val jobUtilWrapper = mock<JobUtilWrapper>()
     val permissionUtilWrapper = mock<PermissionUtilWrapper>()
+    val cameraUploadServiceWrapper = mock<CameraUploadServiceWrapper>()
     val getOfflineThumbnailFileWrapper = mock<GetOfflineThumbnailFileWrapper>()
     val fetchNodeWrapper = mock<FetchNodeWrapper>()
     val timeWrapper = mock<TimeWrapper>()
@@ -55,6 +57,9 @@ object TestWrapperModule {
 
     @Provides
     fun providePermissionUtilWrapper(): PermissionUtilWrapper = permissionUtilWrapper
+
+    @Provides
+    fun provideCameraUploadServiceWrapper(): CameraUploadServiceWrapper = cameraUploadServiceWrapper
 
     @Provides
     fun provideGetOfflineThumbnailFileWrapper(): GetOfflineThumbnailFileWrapper =

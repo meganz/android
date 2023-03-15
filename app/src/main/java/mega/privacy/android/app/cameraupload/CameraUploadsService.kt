@@ -1,10 +1,11 @@
-package mega.privacy.android.app.jobservices
+package mega.privacy.android.app.cameraupload
 
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
@@ -59,7 +60,6 @@ import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
 import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
 import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
-import mega.privacy.android.app.sync.BackupState
 import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.isActive
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.onUploadSuccess
@@ -81,6 +81,9 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.worker.ACTION_STOP
+import mega.privacy.android.data.worker.EXTRA_ABORTED
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
@@ -159,16 +162,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_NAME
 
         /**
-         * Stop Camera Sync
+         * Get a new intent to the Camera Upload Service
          */
-        const val ACTION_STOP = "STOP_SYNC"
-
-        /**
-         * Aborted extra properties
-         * Received from external components to notify that the service
-         * is aborted prematurely
-         */
-        const val EXTRA_ABORTED = "EXTRA_ABORTED"
+        fun newIntent(context: Context) = Intent(context, CameraUploadsService::class.java)
     }
 
     /**

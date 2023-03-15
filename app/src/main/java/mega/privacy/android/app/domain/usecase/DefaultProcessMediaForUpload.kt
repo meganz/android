@@ -5,8 +5,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.sync.BackupState
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
+import mega.privacy.android.domain.entity.BackupState
+import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType

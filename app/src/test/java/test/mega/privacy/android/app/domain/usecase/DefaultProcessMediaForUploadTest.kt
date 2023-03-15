@@ -15,8 +15,8 @@ import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
-import mega.privacy.android.app.sync.BackupState
-import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManagerWrapper
+import mega.privacy.android.domain.entity.BackupState
+import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp

@@ -2,7 +2,6 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import mega.privacy.android.app.R
-import mega.privacy.android.app.jobservices.CameraUploadsService
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity

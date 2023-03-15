@@ -1,6 +1,7 @@
 package mega.privacy.android.app.sync
 
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
+import mega.privacy.android.domain.entity.BackupState
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 

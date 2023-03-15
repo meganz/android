@@ -18,7 +18,7 @@ import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.Backup
-import mega.privacy.android.app.sync.BackupState
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removeSecondaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.setPrimaryBackup

@@ -11,7 +11,7 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.Backup
-import mega.privacy.android.app.sync.BackupState
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE

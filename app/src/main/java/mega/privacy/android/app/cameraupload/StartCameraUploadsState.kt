@@ -1,4 +1,4 @@
-package mega.privacy.android.app.jobservices
+package mega.privacy.android.app.cameraupload
 
 /**
  * Enum class that represents a state for Camera Uploads upon enabling the feature

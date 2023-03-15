@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.cameraupload
 
 import android.content.Context
+import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ForegroundInfo
@@ -14,17 +15,25 @@ import androidx.work.impl.utils.WorkProgressUpdater
 import androidx.work.impl.utils.taskexecutor.WorkManagerTaskExecutor
 import androidx.work.workDataOf
 import com.google.common.truth.Truth.assertThat
-import mega.privacy.android.app.jobservices.StartCameraUploadWorker
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import mega.privacy.android.app.cameraupload.CameraUploadsService
+import mega.privacy.android.data.gateway.PermissionGateway
+import mega.privacy.android.data.worker.StartCameraUploadWorker
+import mega.privacy.android.data.wrapper.CameraUploadServiceWrapper
+import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.anyVararg
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.di.TestWrapperModule
 import java.util.UUID
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class StartCameraUploadWorkerTest {
 
@@ -33,6 +42,9 @@ class StartCameraUploadWorkerTest {
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var worker: StartCameraUploadWorker
     private lateinit var workDatabase: WorkDatabase
+    private val permissionGateway = mock<PermissionGateway>()
+    private val isNotEnoughQuota = mock<IsNotEnoughQuota>()
+    private val cameraUploadServiceWrapper = mock<CameraUploadServiceWrapper>()
 
     @Before
     fun setUp() {
@@ -40,6 +52,9 @@ class StartCameraUploadWorkerTest {
         executor = Executors.newSingleThreadExecutor()
         workExecutor = WorkManagerTaskExecutor(executor)
         workDatabase = WorkDatabase.create(context, workExecutor.serialTaskExecutor, true)
+        cameraUploadServiceWrapper.stub {
+            on { newIntent(context) }.thenReturn(Intent(context, CameraUploadsService::class.java))
+        }
 
         worker = StartCameraUploadWorker(
             context,
@@ -65,38 +80,34 @@ class StartCameraUploadWorkerTest {
                     override fun isEnqueuedInForeground(workSpecId: String): Boolean = true
                 }, workExecutor)
             ),
-            TestWrapperModule.permissionUtilWrapper,
-            TestWrapperModule.jobUtilWrapper,
+            cameraUploadServiceWrapper,
+            permissionGateway,
+            isNotEnoughQuota,
         )
     }
 
     @Test
-    fun `test that camera upload worker is started successfully if the read external permission is granted, the user is not over quota`() {
-
-        whenever(
-            TestWrapperModule.permissionUtilWrapper.hasPermissions(anyVararg())
-        ).thenReturn(true)
-        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
-        val result = worker.doWork()
-        assertThat(result).isEqualTo(ListenableWorker.Result.success())
-    }
+    fun `test that camera upload worker is started successfully if the read external permission is granted, the user is not over quota`() =
+        runTest {
+            whenever(permissionGateway.hasPermissions(anyVararg())).thenReturn(true)
+            whenever(isNotEnoughQuota()).thenReturn(false)
+            val result = worker.doWork()
+            assertThat(result).isEqualTo(ListenableWorker.Result.success())
+        }
 
     @Test
-    fun `test that the camera upload worker fails to start if read external storage permission is not granted`() {
-        whenever(
-            TestWrapperModule.permissionUtilWrapper.hasPermissions(anyVararg())
-        ).thenReturn(false)
-        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(false)
-        val result = worker.doWork()
-        assertThat(result).isEqualTo(ListenableWorker.Result.failure())
-    }
+    fun `test that the camera upload worker fails to start if read external storage permission is not granted`() =
+        runTest {
+            whenever(permissionGateway.hasPermissions(anyVararg())).thenReturn(false)
+            whenever(isNotEnoughQuota()).thenReturn(false)
+            val result = worker.doWork()
+            assertThat(result).isEqualTo(ListenableWorker.Result.failure())
+        }
 
     @Test
-    fun `test that the camera upload worker fails to start if the user is over quota`() {
-        whenever(
-            TestWrapperModule.permissionUtilWrapper.hasPermissions(anyVararg())
-        ).thenReturn(true)
-        whenever(TestWrapperModule.jobUtilWrapper.isOverQuota()).thenReturn(true)
+    fun `test that the camera upload worker fails to start if the user is over quota`() = runTest {
+        whenever(permissionGateway.hasPermissions(anyVararg())).thenReturn(true)
+        whenever(isNotEnoughQuota()).thenReturn(true)
         val result = worker.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }

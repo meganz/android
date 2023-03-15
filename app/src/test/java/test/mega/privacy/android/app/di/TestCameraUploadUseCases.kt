@@ -63,6 +63,7 @@ import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
+import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
@@ -363,6 +364,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideIsNodeInRubbishOrDeleted() = mock<IsNodeInRubbishOrDeleted>()
+
+    @Provides
+    fun provideIsNotEnoughQuota() = mock<IsNotEnoughQuota>()
 
     @Provides
     fun provideMonitorBatteryInfo() = mock<MonitorBatteryInfo>()
