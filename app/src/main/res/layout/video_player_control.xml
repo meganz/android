@@ -172,6 +172,16 @@
                 app:layout_constraintHorizontal_bias="0.1"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/subtitle"
+                style="@style/VideoPlayerButton"
+                android:src="@drawable/ic_subtitles_disable"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/white" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -11,6 +11,7 @@ import android.view.SurfaceView
 import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -30,11 +31,13 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -58,6 +61,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    savedStateHandle: SavedStateHandle,
 ) : BaseRxViewModel() {
 
     private val collision = SingleLiveEvent<NameCollision>()
@@ -103,6 +107,95 @@ class MediaPlayerViewModel @Inject constructor(
      */
     fun renameUpdate(node: MegaNode?) {
         _renameUpdate.value = node
+    }
+
+    private val subtitleDialogShowKey = "SUBTITLE_DIALOG_SHOW"
+    private val subtitleShowKey = "SUBTITLE_SHOW"
+    private val videoPlayerPausedForPlaylistKey = "VIDEO_PLAYER_PAUSED_FOR_PLAYLIST"
+    private val currentSubtitleFileInfoKey = "CURRENT_SUBTITLE_FILE_INFO"
+
+    private val _isSubtitleDialogShown = savedStateHandle.getStateFlow(
+        viewModelScope,
+        subtitleDialogShowKey,
+        false
+    )
+
+    /**
+     * The state for subtitle dialog shown
+     */
+    val subtitleDialogShownState: StateFlow<Boolean> = _isSubtitleDialogShown
+
+    private val _isSubtitleShown = savedStateHandle.getStateFlow(
+        viewModelScope,
+        subtitleShowKey,
+        SUBTITLE_STATUS_HIDDEN
+    )
+
+    /**
+     * The state for subtitle shown
+     */
+    val subtitleShownState
+        get() = _isSubtitleShown.value
+
+    private val _videoPlayerPausedForPlaylist = savedStateHandle.getStateFlow(
+        viewModelScope,
+        videoPlayerPausedForPlaylistKey,
+        false
+    )
+
+    /**
+     * The state for video player paused
+     */
+    val videoPlayerPausedForPlaylistState
+        get() = _videoPlayerPausedForPlaylist.value
+
+    private val _currentSubtitleFileInfo: MutableStateFlow<SubtitleFileInfo?> =
+        savedStateHandle.getStateFlow(
+            viewModelScope,
+            currentSubtitleFileInfoKey,
+            null
+        )
+
+    /**
+     * The state for current subtitle file info
+     */
+    val currentSubtitleFileInfoState
+        get() = _currentSubtitleFileInfo.value
+
+    /**
+     * Update whether video player paused for playlist
+     *
+     * @param isPaused true is paused, otherwise is false
+     */
+    fun updateVideoPlayerPausedForPlaylist(isPaused: Boolean) {
+        _videoPlayerPausedForPlaylist.update { isPaused }
+    }
+
+    /**
+     * Update current subtitle file info
+     *
+     * @param subtitleFileInfo [SubtitleFileInfo]
+     */
+    fun updateCurrentSubtitleFileInfo(subtitleFileInfo: SubtitleFileInfo) {
+        _currentSubtitleFileInfo.update { subtitleFileInfo }
+    }
+
+    /**
+     * Update the subtitle shown state
+     *
+     * @param showState true is that subtitle is shown, otherwise is false
+     */
+    fun updateSubtitleShownState(showState: Int) {
+        _isSubtitleShown.update { showState }
+    }
+
+    /**
+     * Update state for subtitle dialog shown state
+     *
+     * @param isShow true is show dialog, otherwise is false
+     */
+    fun updateSubtitleDialogShownState(isShow: Boolean) {
+        _isSubtitleDialogShown.update { isShow }
     }
 
     /**
@@ -251,10 +344,13 @@ class MediaPlayerViewModel @Inject constructor(
             "$rootFolderPath$SCREENSHOT_NAME_PREFIX$screenshotFileName$SCREENSHOT_NAME_SUFFIX"
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val screenshotBitmap = Bitmap.createBitmap(captureView.width,
+                val screenshotBitmap = Bitmap.createBitmap(
+                    captureView.width,
                     captureView.height,
-                    Bitmap.Config.ARGB_8888)
-                PixelCopy.request(captureView as SurfaceView,
+                    Bitmap.Config.ARGB_8888
+                )
+                PixelCopy.request(
+                    captureView as SurfaceView,
                     Rect(0, 0, captureAreaView.width, captureAreaView.height),
                     screenshotBitmap,
                     { copyResult ->
@@ -264,7 +360,8 @@ class MediaPlayerViewModel @Inject constructor(
                             }
                         }
                     },
-                    Handler(Looper.getMainLooper()))
+                    Handler(Looper.getMainLooper())
+                )
             }
         } catch (e: Exception) {
             Timber.e("Capture screenshot error: ${e.message}")
@@ -309,8 +406,11 @@ class MediaPlayerViewModel @Inject constructor(
         val minutes =
             TimeUnit.SECONDS.toMinutes(seconds.toLong()) - TimeUnit.HOURS.toMinutes(hour)
         val resultSeconds =
-            seconds.toLong() - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(
-                seconds.toLong()))
+            seconds.toLong() - TimeUnit.MINUTES.toSeconds(
+                TimeUnit.SECONDS.toMinutes(
+                    seconds.toLong()
+                )
+            )
 
         return if (hour >= 1) {
             String.format("%2d:%02d:%02d", hour, minutes, resultSeconds)
@@ -324,5 +424,8 @@ class MediaPlayerViewModel @Inject constructor(
         private const val DATE_FORMAT_PATTERN = "yyyyMMdd-HHmmss"
         private const val SCREENSHOT_NAME_PREFIX = "Screenshot_"
         private const val SCREENSHOT_NAME_SUFFIX = ".jpg"
+
+        internal const val SUBTITLE_STATUS_SHOWN = 0
+        internal const val SUBTITLE_STATUS_HIDDEN = 1
     }
 }

@@ -15,6 +15,11 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * Enable add subtitle feature
+     */
+    AddSubtitle("Enable the feature that adding subtitle", false),
+
+    /**
      * Monitor phone number
      */
     MonitorPhoneNumber(

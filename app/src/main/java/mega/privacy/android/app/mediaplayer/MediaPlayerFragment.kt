@@ -19,6 +19,8 @@ import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -26,16 +28,22 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_STATUS_HIDDEN
+import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_STATUS_SHOWN
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
@@ -45,17 +53,19 @@ import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.isVisible
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
 import java.io.File
+import javax.inject.Inject
 
 /**
  * MediaPlayer Fragment
  */
+@AndroidEntryPoint
 class MediaPlayerFragment : Fragment() {
     private var audioPlayerVH: AudioPlayerViewHolder? = null
     private var videoPlayerVH: VideoPlayerViewHolder? = null
@@ -66,7 +76,6 @@ class MediaPlayerFragment : Fragment() {
     private var playerServiceViewModelGateway: PlayerServiceViewModelGateway? = null
 
     private var playlistObserved = false
-    private var videoPlayerPausedForPlaylist = false
 
     private var delayHideToolbarCanceled = false
 
@@ -75,6 +84,14 @@ class MediaPlayerFragment : Fragment() {
     private var isAudioPlayer = false
 
     private var playbackPositionDialog: Dialog? = null
+
+    private var currentMediaPlayerMediaId: String? = null
+
+    /**
+     * GetFeatureFlagValue injection
+     */
+    @Inject
+    lateinit var getFeatureFlagValue: GetFeatureFlagValue
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -99,6 +116,23 @@ class MediaPlayerFragment : Fragment() {
         override fun onPlaybackStateChanged(state: Int) {
             if (isResumed) {
                 updateLoadingAnimation(state)
+            }
+            // The subtitle button is enable after the video is in buffering state
+            videoPlayerVH?.subtitleButtonEnable(state >= Player.STATE_BUFFERING)
+        }
+
+        override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+            super.onMediaItemTransition(mediaItem, reason)
+            if (view != null) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    videoPlayerVH?.let {
+                        if (currentMediaPlayerMediaId != mediaItem?.mediaId) {
+                            it.updateSubtitleButtonUI(false)
+                            viewModel.updateSubtitleShownState(SUBTITLE_STATUS_HIDDEN)
+                            currentMediaPlayerMediaId = mediaItem?.mediaId
+                        }
+                    }
+                }
             }
         }
     }
@@ -135,10 +169,6 @@ class MediaPlayerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         isAudioPlayer = MediaPlayerActivity.isAudioPlayer(requireActivity().intent)
-        if (savedInstanceState != null) {
-            videoPlayerPausedForPlaylist =
-                savedInstanceState.getBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, false)
-        }
         val playerServiceIntent = Intent(
             requireContext(),
             if (isAudioPlayer) AudioPlayerService::class.java else VideoPlayerService::class.java
@@ -168,13 +198,8 @@ class MediaPlayerFragment : Fragment() {
         super.onPause()
         if (isVideoPlayer() && serviceGateway?.playing() == true) {
             serviceGateway?.setPlayWhenReady(false)
-            videoPlayerPausedForPlaylist = true
+            viewModel.updateVideoPlayerPausedForPlaylist(true)
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean(KEY_VIDEO_PAUSED_FOR_PLAYLIST, videoPlayerPausedForPlaylist)
     }
 
     override fun onDestroyView() {
@@ -218,17 +243,23 @@ class MediaPlayerFragment : Fragment() {
                             MaterialAlertDialogBuilder(requireContext())
                                 .setTitle(R.string.video_playback_position_dialog_title)
                                 .setMessage(
-                                    String.format(getString(
-                                        R.string.video_playback_position_dialog_message),
+                                    String.format(
+                                        getString(
+                                            R.string.video_playback_position_dialog_message
+                                        ),
                                         state.mediaItemName,
                                         viewModel.formatMillisecondsToString(
-                                            state.playbackPosition ?: 0)))
+                                            state.playbackPosition ?: 0
+                                        )
+                                    )
+                                )
                                 .setNegativeButton(
                                     R.string.video_playback_position_dialog_resume_button
                                 ) { _, _ ->
                                     if (state.isDialogShownBeforeBuildSources)
                                         gateway.setResumePlaybackPositionBeforeBuildSources(
-                                            state.playbackPosition)
+                                            state.playbackPosition
+                                        )
                                     else
                                         gateway.setResumePlaybackPosition(state.playbackPosition)
 
@@ -275,13 +306,13 @@ class MediaPlayerFragment : Fragment() {
                                 retryFailedDialog = MaterialAlertDialogBuilder(requireContext())
                                     .setCancelable(false)
                                     .setMessage(
-                                        StringResourcesUtils.getString(
+                                        getString(
                                             if (isOnline(requireContext())) R.string.error_fail_to_open_file_general
                                             else R.string.error_fail_to_open_file_no_network
                                         )
                                     )
                                     .setPositiveButton(
-                                        StringResourcesUtils.getString(R.string.general_ok)
+                                        getString(R.string.general_ok)
                                     ) { _, _ ->
                                         serviceGateway?.stopAudioPlayer()
                                         requireActivity().finish()
@@ -326,14 +357,6 @@ class MediaPlayerFragment : Fragment() {
         } else {
             videoPlayerVH?.let { viewHolder ->
                 videoPlayerView = viewHolder.binding.playerView
-                serviceGateway?.run {
-                    setupPlayerView(this, viewHolder.binding.playerView, true)
-
-                    if (videoPlayerPausedForPlaylist) {
-                        setPlayWhenReady(true)
-                        videoPlayerPausedForPlaylist = false
-                    }
-                }
                 with(viewHolder) {
                     // we need setup control buttons again, because reset player would reset PlayerControlView
                     playerServiceViewModelGateway?.run {
@@ -348,15 +371,44 @@ class MediaPlayerFragment : Fragment() {
                             delayHideWhenLocked()
                         }
                     }
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        setupSubtitleButton(
+                            // Add feature flag, and will be removed after the feature is finished.
+                            isShow = getFeatureFlagValue(feature = AppFeatures.AddSubtitle),
+                            viewModel.subtitleShownState != SUBTITLE_STATUS_HIDDEN
+                        ) {
+                            when (viewModel.subtitleShownState) {
+                                SUBTITLE_STATUS_SHOWN -> {
+                                    viewModel.updateSubtitleShownState(SUBTITLE_STATUS_HIDDEN)
+                                    serviceGateway?.hideSubtitle()
+                                }
+                                SUBTITLE_STATUS_HIDDEN -> {
+                                    viewLifecycleOwner.lifecycleScope.launch {
+                                        initAddSubtitleDialog(viewHolder)
+                                    }
+                                    viewModel.updateSubtitleShownState(SUBTITLE_STATUS_SHOWN)
+                                    serviceGateway?.setPlayWhenReady(false)
+                                }
+                            }
+                            val isSubtitleShown =
+                                viewModel.subtitleShownState != SUBTITLE_STATUS_HIDDEN
+                            updateSubtitleButtonUI(isSubtitleShown)
+                            viewModel.updateSubtitleDialogShownState(isSubtitleShown)
+                            delayHideToolbar()
+                        }
+                    }
+
                     setupScreenshotButton {
                         val rootPath =
                             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
                         val screenshotsFolderPath =
                             "${rootPath}${File.separator}$MEGA_SCREENSHOTS_FOLDER_NAME${File.separator}"
                         viewHolder.binding.playerView.videoSurfaceView?.let { view ->
-                            viewModel.screenshotWhenVideoPlaying(requireActivity().window.decorView,
+                            viewModel.screenshotWhenVideoPlaying(
+                                requireActivity().window.decorView,
                                 screenshotsFolderPath,
-                                view) { bitmap ->
+                                view
+                            ) { bitmap ->
                                 requireActivity().runOnUiThread {
                                     showCaptureScreenshotAnimation(
                                         view = binding.screenshotScaleAnimationView,
@@ -370,6 +422,14 @@ class MediaPlayerFragment : Fragment() {
                                 }
                             }
                         }
+                    }
+                }
+                serviceGateway?.run {
+                    setupPlayerView(this, viewHolder.binding.playerView, true)
+
+                    if (viewModel.videoPlayerPausedForPlaylistState) {
+                        setPlayWhenReady(true)
+                        viewModel.updateVideoPlayerPausedForPlaylist(false)
                     }
                 }
                 initRepeatToggleButtonForVideo(viewHolder)
@@ -395,7 +455,8 @@ class MediaPlayerFragment : Fragment() {
             SCREENSHOT_SCALE_ORIGINAL, scaleY,  // Start and end values for the X axis scaling
             SCREENSHOT_SCALE_ORIGINAL, scaleY,  // Start and end values for the Y axis scaling
             Animation.RELATIVE_TO_SELF, SCREENSHOT_RELATE_X,  // Pivot point of X scaling
-            Animation.RELATIVE_TO_PARENT, SCREENSHOT_RELATE_Y) // Pivot point of Y scaling
+            Animation.RELATIVE_TO_PARENT, SCREENSHOT_RELATE_Y
+        ) // Pivot point of Y scaling
 
         anim.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(p0: Animation?) {
@@ -422,7 +483,8 @@ class MediaPlayerFragment : Fragment() {
     private fun initRepeatToggleButtonForVideo(viewHolder: VideoPlayerViewHolder) {
         serviceGateway?.run {
             val defaultRepeatMode = when (requireContext().defaultSharedPreferences.getInt(
-                KEY_VIDEO_REPEAT_MODE, RepeatToggleMode.REPEAT_NONE.ordinal)) {
+                KEY_VIDEO_REPEAT_MODE, RepeatToggleMode.REPEAT_NONE.ordinal
+            )) {
                 RepeatToggleMode.REPEAT_NONE.ordinal -> RepeatToggleMode.REPEAT_NONE
                 RepeatToggleMode.REPEAT_ONE.ordinal -> RepeatToggleMode.REPEAT_ONE
                 else -> RepeatToggleMode.REPEAT_ALL
@@ -435,8 +497,10 @@ class MediaPlayerFragment : Fragment() {
                     RepeatToggleMode.REPEAT_ONE
                 }
             )
-            viewHolder.setupRepeatToggleButton(requireContext(),
-                defaultRepeatMode) { repeatToggleButton ->
+            viewHolder.setupRepeatToggleButton(
+                requireContext(),
+                defaultRepeatMode
+            ) { repeatToggleButton ->
                 val repeatToggleMode =
                     playerServiceViewModelGateway?.videoRepeatToggleMode()
                         ?: RepeatToggleMode.REPEAT_NONE
@@ -582,8 +646,49 @@ class MediaPlayerFragment : Fragment() {
 
     private fun isVideoPlayer() = playerServiceViewModelGateway?.isAudioPlayer() == false
 
+    /**
+     * Init the add subtitle dialog
+     *
+     * @param videoPlayerViewHolder VideoPlayerViewHolder
+     */
+    private suspend fun initAddSubtitleDialog(videoPlayerViewHolder: VideoPlayerViewHolder) {
+        val subtitleFileInfo =
+            playerServiceViewModelGateway?.getMatchedSubtitleFileInfoForPlayingItem(".srt")
+        videoPlayerViewHolder.binding.addSubtitleDialog.apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                if (viewModel.subtitleDialogShownState.collectAsState().value) {
+                    AddSubtitleDialog(
+                        matchedItemName = subtitleFileInfo?.name,
+                        onAutoMatch = {
+                            subtitleFileInfo?.url?.let {
+                                if (viewModel.currentSubtitleFileInfoState?.url == it) {
+                                    serviceGateway?.showSubtitle()
+                                } else {
+                                    serviceGateway?.addSubtitle(it)
+                                    viewModel.updateCurrentSubtitleFileInfo(subtitleFileInfo)
+                                }
+                                viewModel.updateSubtitleShownState(SUBTITLE_STATUS_SHOWN)
+                                viewModel.updateSubtitleDialogShownState(false)
+                                serviceGateway?.setPlayWhenReady(true)
+                            }
+                        },
+                        onToSelectSubtitle = {
+                            viewModel.updateSubtitleDialogShownState(false)
+                            Timber.d("open select subtitle page")
+                        }) {
+                        // onDismissRequest
+                        viewModel.updateSubtitleShownState(SUBTITLE_STATUS_HIDDEN)
+                        viewModel.updateSubtitleDialogShownState(false)
+                        videoPlayerVH?.updateSubtitleButtonUI(false)
+                        serviceGateway?.setPlayWhenReady(true)
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
-        private const val KEY_VIDEO_PAUSED_FOR_PLAYLIST = "VIDEO_PAUSED_FOR_PLAYLIST"
         private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots"
         private const val SCREENSHOT_SCALE_ORIGINAL: Float = 1F
         private const val SCREENSHOT_SCALE_PORTRAIT: Float = 0.4F

@@ -30,6 +30,7 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     private val playerLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_player)
     private val unlockLayout = binding.root.findViewById<ConstraintLayout>(R.id.layout_unlock)
     private val screenshotButton = binding.root.findViewById<ImageButton>(R.id.image_screenshot)
+    private val subtitleButton = binding.root.findViewById<ImageButton>(R.id.subtitle)
 
     /**
      * Setup playlist button.
@@ -73,11 +74,13 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
     ) {
         with(repeatToggleButton) {
             isVisible = true
-            setColorFilter(if (defaultRepeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
-                context.getColor(R.color.white)
-            } else {
-                context.getColor(R.color.teal_300)
-            })
+            setColorFilter(
+                if (defaultRepeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
+                    context.getColor(R.color.white)
+                } else {
+                    context.getColor(R.color.teal_300)
+                }
+            )
             setOnClickListener {
                 clickedCallback(this)
             }
@@ -100,6 +103,48 @@ class VideoPlayerViewHolder(val binding: FragmentVideoPlayerBinding) {
             updateUI(false, lockCallback)
         }
     }
+
+    /**
+     * Setup subtitle button
+     *
+     * @param isShow the addSubtitle icon whether is shown
+     * @param isSubtitleShown the subtitle whether is shown
+     * @param clickedCallback the callback regarding lock feature
+     */
+    fun setupSubtitleButton(
+        isShow: Boolean,
+        isSubtitleShown: Boolean,
+        clickedCallback: () -> Unit,
+    ) {
+        subtitleButton.isVisible = isShow
+        updateSubtitleButtonUI(isSubtitleShown)
+        subtitleButton.setOnClickListener {
+            clickedCallback.invoke()
+        }
+    }
+
+    /**
+     * Set the subtitle button whether is enabled
+     *
+     * @param enable true is enable, otherwise is false
+     */
+    fun subtitleButtonEnable(enable: Boolean) {
+        subtitleButton.isEnabled = enable
+    }
+
+    /**
+     * Update the subtitle button icon UI
+     *
+     * @param isSubtitleShown true is using enabled icon, otherwise is false.
+     */
+    fun updateSubtitleButtonUI(isSubtitleShown: Boolean) =
+        subtitleButton.setImageResource(
+            if (isSubtitleShown) {
+                R.drawable.ic_subtitles_enable
+            } else {
+                R.drawable.ic_subtitles_disable
+            }
+        )
 
     private fun updateUI(isLock: Boolean, lockCallback: (isLock: Boolean) -> Unit) {
         playerLayout.isVisible = !isLock

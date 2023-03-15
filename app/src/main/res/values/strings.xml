@@ -688,7 +688,7 @@
     <string name="pin_lock_enter">Enter</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="one">1 failed passcode attempt</item>
+        <item quantity="one">%1$d failed passcode attempt</item>
         <item quantity="other">%1$d failed passcode attempts</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
@@ -912,7 +912,7 @@
     <string name="confirm_email_explanation">Please check your email and tap the link to confirm your account.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
-        <item quantity="one">1 item</item>
+        <item quantity="one">%1$d item</item>
         <item quantity="other">%1$d items</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
@@ -1236,7 +1236,7 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
-        <item quantity="one">1 file already uploaded</item>
+        <item quantity="one">%1$d file already uploaded</item>
         <item quantity="other">%1$d files already uploaded</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
@@ -2061,7 +2061,7 @@
     <string name="settings_file_management_file_versions_title">File versions</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">1 file version, taking a total of %2$s</item>
+        <item quantity="one">%1$d file version, taking a total of %2$s</item>
         <item quantity="other">%1$d file versions, taking a total of %2$s</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
@@ -2671,12 +2671,12 @@
     <string name="invite_contact_action_button">Invite a friend via&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">1 file already downloaded.</item>
+        <item quantity="one">%d file already downloaded.</item>
         <item quantity="other">%d files already downloaded.</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">1 file pending.</item>
+        <item quantity="one">%d file pending.</item>
         <item quantity="other">%d files pending.</item>
     </plurals>
     <!-- Title of the login screen -->
@@ -2870,7 +2870,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]You must act immediately to save your data.[/B]</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
-        <item quantity="one">1 day</item>
+        <item quantity="one">%d day</item>
         <item quantity="other">%d days</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
@@ -3019,17 +3019,17 @@
     <string name="retention_time_picker_year">year</string>
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
-        <item quantity="one">1 hour</item>
+        <item quantity="one">%1$d hour</item>
         <item quantity="other">%1$d hours</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
-        <item quantity="one">1 week</item>
+        <item quantity="one">%1$d week</item>
         <item quantity="other">%1$d weeks</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
-        <item quantity="one">1 month</item>
+        <item quantity="one">%1$d month</item>
         <item quantity="other">%1$d months</item>
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
@@ -3192,7 +3192,7 @@
     <string name="years_view_button">Years</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
-        <item quantity="one">Upload in progress, 1 file pending</item>
+        <item quantity="one">Upload in progress, %1$d file pending</item>
         <item quantity="other">Upload in progress, %1$d files pending</item>
     </plurals>
     <!-- Text to show as production api server option -->
@@ -3211,12 +3211,12 @@
     <string name="warning_share_owner_storage_quota">The file cannot be sent as the target user is over their storage quota.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
+        <item quantity="one">1 file already downloaded. %d file pending.</item>
         <item quantity="other">1 file already downloaded. %d files pending.</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 file already downloaded. 1 file pending.</item>
+        <item quantity="one">%d file already downloaded. 1 file pending.</item>
         <item quantity="other">%d files already downloaded. 1 file pending.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
@@ -3226,7 +3226,7 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item moved to the Rubbish bin, but the other one not moved. Try again later.</item>
+        <item quantity="one">%d item moved to the Rubbish bin, but the other one not moved. Try again later.</item>
         <item quantity="other">%d items moved to the Rubbish bin, but 1 item not moved. Try again later.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
@@ -3236,27 +3236,27 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item restored but the other one not restored. Try again later.</item>
+        <item quantity="one">%d item restored but the other one not restored. Try again later.</item>
         <item quantity="other">%d items restored but 1 item not restored. Try again later.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to Rubbish bin</item>
+        <item quantity="one">%d item moved to Rubbish bin</item>
         <item quantity="other">%d items moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item wasn’t moved to the Rubbish bin</item>
+        <item quantity="one">%d item wasn’t moved to the Rubbish bin</item>
         <item quantity="other">%d items weren’t moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item restored</item>
+        <item quantity="one">%d item restored</item>
         <item quantity="other">%d items restored</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item wasn’t restored</item>
+        <item quantity="one">%d item wasn’t restored</item>
         <item quantity="other">%d items weren’t restored</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
@@ -3287,7 +3287,7 @@
     <string name="title_user_purchased_subscription">Awaiting confirmation</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
-        <item quantity="one">1 connection</item>
+        <item quantity="one">%1$d connection</item>
         <item quantity="other">%1$d connections</item>
     </plurals>
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
@@ -3645,12 +3645,12 @@
     <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left the call</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s and 1 other joined</item>
+        <item quantity="one">%1$s and %2$d other joined</item>
         <item quantity="other">%1$s and %2$d others joined</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left the call</item>
+        <item quantity="one">%1$s and %2$d other left the call</item>
         <item quantity="other">%1$s and %2$d others left the call</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
@@ -3844,7 +3844,7 @@
     </plurals>
     <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
     <plurals name="num_folders_num_files_2">
-        <item quantity="one">1 file</item>
+        <item quantity="one">%1$d file</item>
         <item quantity="other">%1$d files</item>
     </plurals>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
@@ -4627,32 +4627,32 @@
     <string name="meetings_chat_room_join_scheduled_meeting_option">Join meeting</string>
     <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_sent">
-        <item quantity="one">1 invite request sent.&#160;</item>
+        <item quantity="one">%1$d invite request sent.&#160;</item>
         <item quantity="other">%1$d invite requests sent.&#160;</item>
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
-        <item quantity="one">However, 1 request wasn’t sent.</item>
+        <item quantity="one">However, %1$d request wasn’t sent.</item>
         <item quantity="other">However, %1$d requests weren’t sent.</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
     <plurals name="general_copy_snackbar_success">
-        <item quantity="one">Copied 1 item</item>
+        <item quantity="one">Copied %1$d item</item>
         <item quantity="other">Copied %1$d items</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
     <plurals name="general_copy_snackbar_fail">
-        <item quantity="one">Couldn’t copy 1 item</item>
+        <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_success">
-        <item quantity="one">Copied 1 item,&#160;</item>
+        <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
     <plurals name="general_copy_snackbar_concat_fail">
-        <item quantity="one">couldn’t copy 1 item</item>
+        <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>
     </plurals>
     <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
@@ -4660,4 +4660,10 @@
         <item quantity="one">%1$d day</item>
         <item quantity="other">%1$d days</item>
     </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">Subtitles</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">Off</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Add subtitle&#8230;</string>
 </resources>

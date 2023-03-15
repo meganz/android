@@ -36,4 +36,10 @@
         android:layout_height="82dp"
         android:layout_gravity="center"
         android:indeterminateDrawable="@drawable/video_player_progress_indeterminate_anim_large_material" />
+
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/add_subtitle_dialog"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </FrameLayout>

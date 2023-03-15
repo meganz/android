@@ -85,6 +85,8 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     private val mainHandler = Handler(Looper.getMainLooper())
 
+    private var currentMediaPlaySources: MediaPlaySources? = null
+
     // We need keep it as Runnable here, because we need remove it from handler later,
     // using lambda doesn't work when remove it from handler.
     private val resumePlayRunnable = Runnable {
@@ -378,6 +380,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         lifecycleScope.launch {
             viewModelGateway.playerSourceUpdate().collect { mediaPlaySources ->
                 if (mediaPlaySources.mediaItems.isNotEmpty()) {
+                    currentMediaPlaySources = mediaPlaySources
                     playSource(mediaPlaySources)
                 }
             }
@@ -609,6 +612,9 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun addSubtitle(subtitleFileUrl: String) {
         mediaPlayerGateway.addSubtitle(subtitleFileUrl)
+        currentMediaPlaySources?.let {
+            playSource(it)
+        }
     }
 
     override fun showSubtitle() {

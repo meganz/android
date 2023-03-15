@@ -27,7 +27,7 @@ class CopyRequestMessageMapperTest {
     fun `test that mapper should return correct message when there is only 1 copy request and is successful `() {
         val underTest = copyRequestMessageMapper(CopyRequestResult(count = 1, errorCount = 0))
         val expected =
-            mContext.resources.getQuantityString(R.plurals.general_copy_snackbar_success, 1)
+            mContext.resources.getQuantityString(R.plurals.general_copy_snackbar_success, 1, 1)
 
         assertThat(underTest).isEqualTo(expected)
     }
@@ -50,7 +50,7 @@ class CopyRequestMessageMapperTest {
     fun `test that when there is only 1 copy request and failed should return correct message`() {
         val underTest = copyRequestMessageMapper(CopyRequestResult(count = 1, errorCount = 1))
         val expected =
-            mContext.resources.getQuantityString(R.plurals.general_copy_snackbar_fail, 1)
+            mContext.resources.getQuantityString(R.plurals.general_copy_snackbar_fail, 1, 1)
 
         assertThat(underTest).isEqualTo(expected)
     }
@@ -80,11 +80,13 @@ class CopyRequestMessageMapperTest {
             mContext.resources.getQuantityString(
                 R.plurals.general_copy_snackbar_concat_success,
                 1,
+                1
             )
         }${
             mContext.resources.getQuantityString(
                 R.plurals.general_copy_snackbar_concat_fail,
                 1,
+                1
             )
         }"
 
@@ -105,6 +107,7 @@ class CopyRequestMessageMapperTest {
             mContext.resources.getQuantityString(
                 R.plurals.general_copy_snackbar_concat_success,
                 1,
+                1
             )
         }${
             mContext.resources.getQuantityString(
@@ -131,6 +134,7 @@ class CopyRequestMessageMapperTest {
         }${
             mContext.resources.getQuantityString(
                 R.plurals.general_copy_snackbar_concat_fail,
+                1,
                 1
             )
         }"
