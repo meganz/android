@@ -4666,4 +4666,20 @@
     <string name="media_player_video_enable_subtitle_dialog_option_off">Off</string>
     <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
     <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Add subtitle&#8230;</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">Slideshow option</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">Slideshow speed</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">Slow (8s)</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">Normal (4s)</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">Fast (1s)</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">Slideshow order</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">Shuffle</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">Repeat</string>
 </resources>

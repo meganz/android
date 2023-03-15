@@ -1,5 +1,6 @@
 package mega.privacy.android.app.imageviewer.slideshow
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -13,10 +14,15 @@ import androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_B
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentImageSlideshowBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
@@ -26,13 +32,18 @@ import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STOPPE
 import mega.privacy.android.app.imageviewer.util.FadeOutPageTransformer
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Image Viewer fragment that contains a slideshow to show each Image
  */
 @AndroidEntryPoint
 class ImageSlideshowFragment : Fragment() {
+
+    @Inject
+    lateinit var getFeatureFlag: GetFeatureFlagValue
 
     private lateinit var binding: FragmentImageSlideshowBinding
 
@@ -75,14 +86,24 @@ class ImageSlideshowFragment : Fragment() {
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        lifecycleScope.launch {
+            if (getFeatureFlag(AppFeatures.SlideshowSettings)) {
+                menu.findItem(R.id.action_options).isVisible = true
+            }
+        }
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.fragment_image_slideshow, menu)
     }
 
+    @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onOptionsItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {
             R.id.action_options -> {
-                // do something
+                getNavController()?.navigate(ImageSlideshowFragmentDirections.actionImageSlideshowToSlideshowSettings())
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -232,4 +253,9 @@ class ImageSlideshowFragment : Fragment() {
             }
         }
     }
+
+    private fun getNavController(): NavController? =
+        activity?.let {
+            it.supportFragmentManager.findFragmentById(R.id.images_nav_host_fragment) as NavHostFragment
+        }?.navController
 }

@@ -20,6 +20,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     AddSubtitle("Enable the feature that adding subtitle", false),
 
     /**
+     * Slideshow settings
+     */
+    SlideshowSettings(
+        "Settings screen for the slideshow feature",
+        false
+    ),
+
+    /**
      * Monitor phone number
      */
     MonitorPhoneNumber(

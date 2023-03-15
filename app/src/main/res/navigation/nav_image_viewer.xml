@@ -19,5 +19,15 @@
         android:id="@+id/image_slideshow"
         android:name="mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowFragment"
         android:label="@string/action_slideshow"
-        tools:layout="@layout/fragment_image_slideshow" />
+        tools:layout="@layout/fragment_image_slideshow" >
+        <action
+            android:id="@+id/action_image_slideshow_to_slideshow_settings"
+            app:destination="@id/slideshow_settings" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/slideshow_settings"
+        android:name="mega.privacy.android.app.presentation.slideshow.SlideshowSettingsFragment"
+        android:label="@string/slideshow_settings_page_title"/>
+
 </navigation>
