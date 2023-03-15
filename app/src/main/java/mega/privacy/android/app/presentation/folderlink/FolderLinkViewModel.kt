@@ -19,7 +19,8 @@ import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.usecase.CopyNodeUseCase
-import mega.privacy.android.app.usecase.data.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.MonitorConnectivity
@@ -38,6 +39,7 @@ class FolderLinkViewModel @Inject constructor(
     private val loginToFolder: LoginToFolder,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
+    private val copyRequestMessageMapper: CopyRequestMessageMapper
 ) : ViewModel() {
 
     /**
@@ -153,7 +155,7 @@ class FolderLinkViewModel @Inject constructor(
                             .subscribe { copyRequestResult: CopyRequestResult?, copyThrowable: Throwable? ->
                                 _state.update {
                                     it.copy(
-                                        copyResultText = copyRequestResult?.getResultText(),
+                                        copyResultText = copyRequestMessageMapper(copyRequestResult),
                                         copyThrowable = copyThrowable
                                     )
                                 }

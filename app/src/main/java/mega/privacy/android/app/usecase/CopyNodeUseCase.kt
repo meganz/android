@@ -6,15 +6,14 @@ import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
+import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
-import mega.privacy.android.app.usecase.data.CopyRequestData
-import mega.privacy.android.app.usecase.data.CopyRequestResult
-import mega.privacy.android.app.usecase.data.CopyRequestResult.CopyRequestResultFactory
 import mega.privacy.android.app.usecase.exception.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
 import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
 import mega.privacy.android.app.usecase.exception.toMegaException
+import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
@@ -39,7 +38,6 @@ class CopyNodeUseCase @Inject constructor(
     private val getNodeUseCase: GetNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     private val getChatMessageUseCase: GetChatMessageUseCase,
-    private val copyRequestResultFactory: CopyRequestResultFactory,
 ) {
     /**
      * Copies a node.
@@ -171,11 +169,9 @@ class CopyNodeUseCase @Inject constructor(
                             emitter.isDisposed -> return@blockingSubscribeBy
                             error.shouldEmmitError() -> emitter.onError(error)
                             else -> emitter.onSuccess(
-                                copyRequestResultFactory.create(
-                                    CopyRequestData(
-                                        count = 1,
-                                        errorCount = 1
-                                    )
+                                CopyRequestResult(
+                                    count = 1,
+                                    errorCount = 1
                                 )
                             )
                         }
@@ -184,12 +180,10 @@ class CopyNodeUseCase @Inject constructor(
                         when {
                             emitter.isDisposed -> return@blockingSubscribeBy
                             else -> emitter.onSuccess(
-                                copyRequestResultFactory.create(
-                                    CopyRequestData(
-                                        count = 1,
-                                        errorCount = 0
-                                    )
-                                ).apply { resetAccountDetailsIfNeeded() }
+                                CopyRequestResult(
+                                    count = 1,
+                                    errorCount = 0
+                                ).also { resetAccountDetailsIfNeeded(it) }
                             )
                         }
                     }
@@ -224,12 +218,10 @@ class CopyNodeUseCase @Inject constructor(
             when {
                 emitter.isDisposed -> return@create
                 else -> emitter.onSuccess(
-                    copyRequestResultFactory.create(
-                        CopyRequestData(
-                            count = collisions.size,
-                            errorCount = errorCount
-                        )
-                    ).apply { resetAccountDetailsIfNeeded() }
+                    CopyRequestResult(
+                        count = collisions.size,
+                        errorCount = errorCount
+                    ).also { resetAccountDetailsIfNeeded(it) }
                 )
             }
         }
@@ -272,12 +264,10 @@ class CopyNodeUseCase @Inject constructor(
             when {
                 emitter.isDisposed -> return@create
                 else -> emitter.onSuccess(
-                    copyRequestResultFactory.create(
-                        CopyRequestData(
-                            handles.size,
-                            errorCount
-                        )
-                    ).apply { resetAccountDetailsIfNeeded() }
+                    CopyRequestResult(
+                        handles.size,
+                        errorCount
+                    ).also { resetAccountDetailsIfNeeded(it) }
                 )
             }
         }
@@ -314,12 +304,10 @@ class CopyNodeUseCase @Inject constructor(
             when {
                 emitter.isDisposed -> return@create
                 else -> emitter.onSuccess(
-                    copyRequestResultFactory.create(
-                        CopyRequestData(
-                            nodes.size,
-                            errorCount
-                        )
-                    ).apply { resetAccountDetailsIfNeeded() }
+                    CopyRequestResult(
+                        nodes.size,
+                        errorCount
+                    ).also { resetAccountDetailsIfNeeded(it) }
                 )
             }
         }
@@ -335,4 +323,9 @@ class CopyNodeUseCase @Inject constructor(
             else -> false
         }
 
+    private fun resetAccountDetailsIfNeeded(result: CopyRequestResult) {
+        if (result.successCount > 0) {
+            DBUtil.resetAccountDetailsTimeStamp()
+        }
+    }
 }

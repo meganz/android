@@ -98,7 +98,8 @@ import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.data.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -172,6 +173,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     @Inject
     lateinit var copyNodeUseCase: CopyNodeUseCase
+
+    @Inject
+    lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
 
     private lateinit var activityChatContactBinding: ActivityChatContactPropertiesBinding
     private val contentContactProperties get() = activityChatContactBinding.contentContactProperties
@@ -629,7 +633,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                                             copyThrowable?.let { manageCopyMoveException(it) }
                                                 ?: showSnackbar(
                                                     Constants.SNACKBAR_TYPE,
-                                                    copyResult.getResultText(),
+                                                    copyRequestMessageMapper(copyResult),
                                                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                                                 )
                                         }

@@ -100,6 +100,7 @@ import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.NodeAttach
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.chat.NodeAttachmentHistoryViewModel;
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
@@ -131,6 +132,8 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     CheckNameCollisionUseCase checkNameCollisionUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    CopyRequestMessageMapper copyRequestMessageMapper;
 
     private NodeAttachmentHistoryViewModel viewModel;
 
@@ -1184,7 +1187,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                                         }
 
                                         showSnackbar(SNACKBAR_TYPE, copyThrowable == null
-                                                        ? copyResult.getResultText()
+                                                        ? copyRequestMessageMapper.invoke(copyResult)
                                                         : StringResourcesUtils.getString(R.string.import_success_error),
                                                 MEGACHAT_INVALID_HANDLE);
                                     });

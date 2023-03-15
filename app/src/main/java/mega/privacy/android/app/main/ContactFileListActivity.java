@@ -105,6 +105,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel;
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
@@ -149,6 +150,8 @@ public class ContactFileListActivity extends PasscodeActivity
     UploadUseCase uploadUseCase;
     @Inject
     CopyNodeUseCase copyNodeUseCase;
+    @Inject
+    CopyRequestMessageMapper copyRequestMessageMapper;
 
     private ContactFileListViewModel viewModel;
 
@@ -717,7 +720,7 @@ public class ContactFileListActivity extends PasscodeActivity
                                                 contactFileListFragment.hideMultipleSelect();
                                             }
                                             if (copyThrowable == null) {
-                                                showSnackbar(SNACKBAR_TYPE, copyResult.getResultText(), MEGACHAT_INVALID_HANDLE);
+                                                showSnackbar(SNACKBAR_TYPE, copyRequestMessageMapper.invoke(copyResult), MEGACHAT_INVALID_HANDLE);
                                             } else {
                                                 manageCopyMoveException(copyThrowable);
                                             }

@@ -386,6 +386,7 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.ChatViewModel;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsDialogFragment;
 import mega.privacy.android.app.presentation.chat.dialog.AddParticipantsNoContactsLeftToAddDialogFragment;
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity;
 import mega.privacy.android.app.presentation.login.LoginActivity;
@@ -564,6 +565,8 @@ public class ChatActivity extends PasscodeActivity
     MegaChatRequestHandler chatRequestHandler;
     @Inject
     RTCAudioManagerGateway rtcAudioManagerGateway;
+    @Inject
+    CopyRequestMessageMapper copyRequestMessageMapper;
 
     private ChatViewModel viewModel;
 
@@ -4207,7 +4210,7 @@ public class ChatActivity extends PasscodeActivity
                                         }
 
                                         showSnackbar(SNACKBAR_TYPE, copyThrowable == null
-                                                        ? copyResult.getResultText()
+                                                        ? copyRequestMessageMapper.invoke(copyResult)
                                                         : StringResourcesUtils.getString(R.string.import_success_error),
                                                 MEGACHAT_INVALID_HANDLE);
                                     });

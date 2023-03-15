@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
@@ -35,6 +36,7 @@ class FolderLinkViewModelTest {
     private val loginToFolder = mock<LoginToFolder>()
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
     private val copyNodeUseCase: CopyNodeUseCase = mock()
+    private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -56,7 +58,8 @@ class FolderLinkViewModelTest {
             monitorViewType,
             loginToFolder,
             checkNameCollisionUseCase,
-            copyNodeUseCase
+            copyNodeUseCase,
+            copyRequestMessageMapper
         )
     }
 

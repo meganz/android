@@ -274,7 +274,8 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.data.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.usecase.data.RemoveRequestResult
 import mega.privacy.android.app.usecase.exception.ForeignNodeException
@@ -454,6 +455,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     internal lateinit var uploadBottomSheetDialogActionHandler: ManagerUploadBottomSheetDialogActionHandler
+
+    @Inject
+    lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
 
     private val subscriptions = CompositeDisposable()
 
@@ -7752,7 +7756,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun showCopyResult(result: CopyRequestResult) {
         showSnackbar(
             Constants.SNACKBAR_TYPE,
-            result.getResultText(),
+            copyRequestMessageMapper(result),
             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
         )
         if (result.successCount <= 0) {
