@@ -13,6 +13,7 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.gateway.api.StreamingGateway
+import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
@@ -28,6 +29,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.repository.NodeRepository
+import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
@@ -36,6 +38,7 @@ import nz.mega.sdk.MegaShare.ACCESS_READ
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -142,8 +145,25 @@ class NodeRepositoryImplTest {
             val megaNode = mock<MegaNode>()
             val email = "example@example.com"
             whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            whenever(megaApiGateway.setShareAccess(any(), any(), any(), any())).thenAnswer {
+                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    api = mock(),
+                    request = mock(),
+                    error = mock {
+                        on { errorCode }.thenReturn(
+                            MegaError.API_OK
+                        )
+                    },
+                )
+            }
+
             underTest.setShareAccess(nodeId, AccessPermission.READ, email)
-            verify(megaApiGateway, times(1)).setShareAccess(megaNode, email, ACCESS_READ)
+            verify(megaApiGateway, times(1)).setShareAccess(
+                eq(megaNode),
+                eq(email),
+                eq(ACCESS_READ),
+                any()
+            )
         }
 
     private suspend fun mockFolderInfoResponse() {

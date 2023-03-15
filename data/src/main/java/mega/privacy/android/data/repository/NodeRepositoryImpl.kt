@@ -274,13 +274,22 @@ internal class NodeRepositoryImpl @Inject constructor(
         nodeId: NodeId,
         accessPermission: AccessPermission,
         email: String,
-    ): Unit = withContext(ioDispatcher) {
-        megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
-            megaApiGateway.setShareAccess(
-                it,
-                email,
-                accessPermissionIntMapper.invoke(accessPermission),
-            )
+    ) {
+        return withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
+                suspendCancellableCoroutine { continuation ->
+                    val listener = continuation.getRequestListener("setShareAccess") {}
+                    megaApiGateway.setShareAccess(
+                        it,
+                        email,
+                        accessPermissionIntMapper.invoke(accessPermission),
+                        listener,
+                    )
+                    continuation.invokeOnCancellation {
+                        megaApiGateway.removeRequestListener(listener)
+                    }
+                }
+            }
         }
     }
 

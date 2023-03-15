@@ -164,7 +164,6 @@ interface NodeRepository {
      * @param nodeId the [NodeId] of the node we want to change permission
      * @param accessPermission [AccessPermission] that will be set
      * @param email of the user we want to set the permission for this node
-     * @throws ShareAccessNotSetException with the proper information of how many users have errors
      */
     suspend fun setShareAccess(nodeId: NodeId, accessPermission: AccessPermission, email: String)
 

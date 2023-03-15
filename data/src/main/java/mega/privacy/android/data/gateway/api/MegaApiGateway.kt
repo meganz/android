@@ -2020,8 +2020,14 @@ interface MegaApiGateway {
      *
      * - ACCESS_FULL = 2
      * The user has full permissions over the folder
+     *  @param listener    MegaRequestListener to track this request
      */
-    fun setShareAccess(megaNode: MegaNode, email: String, accessLevel: Int)
+    fun setShareAccess(
+        megaNode: MegaNode,
+        email: String,
+        accessLevel: Int,
+        listener: MegaRequestListenerInterface,
+    )
 
     /**
      * Set/Remove the avatar of the MEGA account
