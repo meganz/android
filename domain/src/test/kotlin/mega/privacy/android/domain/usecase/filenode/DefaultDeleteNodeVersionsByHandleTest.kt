@@ -26,7 +26,7 @@ internal class DefaultDeleteNodeVersionsByHandleTest {
     }
 
     @Test
-    fun `test that nodeRepository_deleteVersion is called for each version except last one`() =
+    fun `test that when DeleteNodeVersionsByHandle is called then nodeRepository_deleteVersion is called for each version except last one`() =
         runTest {
             whenever(nodeRepository.getNodeHistoryVersions(nodeId)).thenReturn(versions)
             underTest.invoke(nodeId)
@@ -37,7 +37,7 @@ internal class DefaultDeleteNodeVersionsByHandleTest {
         }
 
     @Test
-    fun `test that the number of not deleted versions is returned as an exception with correct amount`() =
+    fun `test that when some versions are not deleted then the number of not deleted versions is returned as an exception with the correct amount`() =
         runTest {
             whenever(nodeRepository.getNodeHistoryVersions(nodeId)).thenReturn(versions)
             val successDelete = versionIds.filter { it.longValue.mod(2) == 0 }

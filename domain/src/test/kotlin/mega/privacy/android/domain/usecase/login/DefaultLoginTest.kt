@@ -14,11 +14,11 @@ import mega.privacy.android.domain.repository.LoginRepository
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import org.junit.Before
+import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import kotlin.test.Test
 
 @ExperimentalCoroutinesApi
 class DefaultLoginTest {

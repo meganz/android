@@ -3,6 +3,7 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'dagger.hilt.android.plugin'
+    id("de.mannodermaus.android-junit5")
 }
 
 apply plugin: 'jacoco'
@@ -90,6 +91,9 @@ dependencies {
     testImplementation testlib.truth.ext
     testImplementation testlib.test.core.ktx
     testImplementation lib.bundles.unit.test
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
+    testRuntimeOnly testlib.junit.jupiter.engine
 
     androidTestImplementation testlib.bundles.unit.test
     androidTestImplementation lib.bundles.unit.test
