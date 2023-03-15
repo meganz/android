@@ -7,6 +7,7 @@ import mega.privacy.android.domain.exception.LoginException
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.login.LoginFragment].
  *
+ * @property intentState             [LoginIntentState]
  * @property accountSession          [AccountSession]
  * @property password                Typed password.
  * @property accountConfirmationLink Link for confirming a new account.
@@ -16,14 +17,9 @@ import mega.privacy.android.domain.exception.LoginException
  * @property pressedBackWhileLogin   True if pressed back while a login was in progress, false otherwise.
  * @property is2FAEnabled            True if should ask for 2FA, false otherwise.
  * @property is2FARequired           True if 2FA needs to be requested, false otherwise.
- * @property was2FAErrorShown        True if a pin was wrong already , false otherwise.
- * @property is2FAErrorShown         True if 2FA error is shown because of a wrong pin typed.
- * @property isPinLongClick          True if it is trying to paste 2FA pin with a long click on any of the pin fields.
+ * @property multiFactorAuthState    [MultiFactorAuthState]
  * @property isAccountConfirmed      True if account is confirmed after creation, false otherwise.
- * @property intentAction            Intent action.
- * @property pendingClicksKarere     Number of pending clicks before enabling/disabling MEGAChat logs.
- * @property pendingClicksSDK        Number of pending clicks before enabling/disabling SDK logs.
- * @property isRefreshApiServer      True if it is refreshing API server, false otherwise.
+ * @property pendingAction           Pending action.
  * @property temporalEmail           Temporal email used for account creation.
  * @property temporalPassword        Temporal password used for account creation.
  * @property hasPreferences          True if has user preferences, false otherwise.
@@ -34,8 +30,10 @@ import mega.privacy.android.domain.exception.LoginException
  * @property isLoginInProgress       True if a login is in progress, false otherwise.
  * @property error                   [LoginException].
  * @property ongoingTransfersExist   True if exist ongoing transfers, false if not. Null if pending to check.
+ * @property querySignupLinkResult   Result of query signup link.
  */
 data class LoginState(
+    val intentState: LoginIntentState? = null,
     val accountSession: AccountSession? = null,
     val password: String? = null,
     val accountConfirmationLink: String? = null,
@@ -45,14 +43,9 @@ data class LoginState(
     val pressedBackWhileLogin: Boolean = false,
     val is2FAEnabled: Boolean = false,
     val is2FARequired: Boolean = false,
-    val was2FAErrorShown: Boolean = false,
-    val is2FAErrorShown: Boolean = false,
-    val isPinLongClick: Boolean = false,
+    val multiFactorAuthState: MultiFactorAuthState? = null,
     val isAccountConfirmed: Boolean = false,
-    val intentAction: String? = null,
-    val pendingClicksKarere: Int = CLICKS_TO_ENABLE_LOGS,
-    val pendingClicksSDK: Int = CLICKS_TO_ENABLE_LOGS,
-    val isRefreshApiServer: Boolean = false,
+    val pendingAction: String? = null,
     val temporalEmail: String? = null,
     val temporalPassword: String? = null,
     val hasPreferences: Boolean = false,
@@ -63,12 +56,5 @@ data class LoginState(
     val isLoginInProgress: Boolean = false,
     val error: RuntimeException? = null,
     val ongoingTransfersExist: Boolean? = null,
-) {
-    companion object {
-
-        /**
-         * Necessary click in a view to enable or disable logs.
-         */
-        const val CLICKS_TO_ENABLE_LOGS = 5
-    }
-}
+    val querySignupLinkResult: Result<String>? = null,
+)

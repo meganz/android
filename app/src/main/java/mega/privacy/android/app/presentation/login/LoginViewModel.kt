@@ -1,7 +1,6 @@
 package mega.privacy.android.app.presentation.login
 
 import android.app.Activity
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,10 +17,10 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
-import mega.privacy.android.app.presentation.login.model.LoginState.Companion.CLICKS_TO_ENABLE_LOGS
+import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.psa.PsaManager
-import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -86,14 +85,6 @@ class LoginViewModel @Inject constructor(
     private val _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state
 
-    // All these SingleLiveEvents will be contemplated in state and removed once migrated to Compose.
-    private val querySignupLinkFinished = SingleLiveEvent<Result<String>>()
-
-    /**
-     * Notifies about querySignupLink request finish.
-     */
-    fun onQuerySignupLinkFinished(): LiveData<Result<String>> = querySignupLinkFinished
-
     /**
      * Get latest value of StorageState.
      */
@@ -121,6 +112,7 @@ class LoginViewModel @Inject constructor(
                 flowOf(getSession()).map { session ->
                     { state: LoginState ->
                         state.copy(
+                            intentState = LoginIntentState.ReadyForInitialSetup,
                             accountSession = AccountSession(session = session),
                             is2FAEnabled = false,
                             isAccountConfirmed = false,
@@ -150,10 +142,10 @@ class LoginViewModel @Inject constructor(
     /**
      * Updates state with a new intentAction.
      *
-     * @param intentAction Intent action.
+     * @param pendingAction Intent action.
      */
-    fun setIntentAction(intentAction: String) {
-        _state.update { it.copy(intentAction = intentAction) }
+    fun setPendingAction(pendingAction: String) {
+        _state.update { it.copy(pendingAction = pendingAction) }
     }
 
     /**
@@ -164,11 +156,9 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * Updates accountConfirmationLink value in state.
+     * Sets querySignupLinkResult as null in state.
      */
-    fun updateAccountConfirmationLink(accountConfirmationLink: String?) {
-        _state.update { it.copy(accountConfirmationLink = accountConfirmationLink) }
-    }
+    fun querySignupLinkResultShown() = _state.update { it.copy(querySignupLinkResult = null) }
 
     /**
      * Stops logging in.
@@ -182,8 +172,6 @@ class LoginViewModel @Inject constructor(
                 fetchNodesUpdate = null,
                 is2FARequired = false,
                 is2FAEnabled = false,
-                was2FAErrorShown = false,
-                is2FAErrorShown = false,
                 isLoginInProgress = false,
                 isLocalLogoutInProgress = true,
                 isLoginRequired = true,
@@ -199,38 +187,10 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * Updates was2FAErrorShown and is2FAErrorShown values as true in state.
-     */
-    fun setWas2FAErrorShown() {
-        _state.update { it.copy(was2FAErrorShown = true, is2FAErrorShown = true) }
-    }
-
-    /**
-     * Updates is2FAErrorShown value as false in state.
-     */
-    fun setIs2FAErrorNotShown() {
-        _state.update { it.copy(is2FAErrorShown = false) }
-    }
-
-    /**
      * Updates isAccountConfirmed value in state.
      */
     fun updateIsAccountConfirmed(isAccountConfirmed: Boolean) {
         _state.update { it.copy(isAccountConfirmed = isAccountConfirmed) }
-    }
-
-    /**
-     * Updates isPinLongClick value in state.
-     */
-    fun updateIsPinLongClick(isPinLongClick: Boolean) {
-        _state.update { it.copy(isPinLongClick = isPinLongClick) }
-    }
-
-    /**
-     * Updates isRefreshApiServer value in state.
-     */
-    fun updateIsRefreshApiServer(isRefreshApiServer: Boolean) {
-        _state.update { it.copy(isRefreshApiServer = isRefreshApiServer) }
     }
 
     /**
@@ -301,24 +261,17 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * Decrements the required value for enabling/disabling Karere logs.
+     * Enables Karere logs if not enabled. Disables them if already enabled.
      *
      * @param activity Required [Activity]
      */
-    fun clickKarereLogs(activity: Activity) = with(state.value) {
-        if (pendingClicksKarere == 1) {
-            viewModelScope.launch {
-                if (!getFeatureFlagValue(AppFeatures.PermanentLogging)) {
-                    if (loggingSettings.areKarereLogsEnabled()) {
-                        loggingSettings.setStatusLoggerKarere(activity, false)
-                    } else {
-                        (activity as LoginActivity).showConfirmationEnableLogsKarere()
-                    }
-                }
+    fun checkAndUpdateKarereLogs(activity: Activity) = viewModelScope.launch {
+        if (!getFeatureFlagValue(AppFeatures.PermanentLogging)) {
+            if (loggingSettings.areKarereLogsEnabled()) {
+                loggingSettings.setStatusLoggerKarere(activity, false)
+            } else {
+                (activity as LoginActivity).showConfirmationEnableLogsKarere()
             }
-            _state.update { it.copy(pendingClicksKarere = CLICKS_TO_ENABLE_LOGS) }
-        } else {
-            _state.update { it.copy(pendingClicksKarere = pendingClicksKarere - 1) }
         }
     }
 
@@ -327,20 +280,13 @@ class LoginViewModel @Inject constructor(
      *
      * @param activity Required [Activity]
      */
-    fun clickSDKLogs(activity: Activity) = with(state.value) {
-        if (pendingClicksSDK == 1) {
-            viewModelScope.launch {
-                if (!getFeatureFlagValue(AppFeatures.PermanentLogging)) {
-                    if (loggingSettings.areSDKLogsEnabled()) {
-                        loggingSettings.setStatusLoggerSDK(activity, false)
-                    } else {
-                        (activity as LoginActivity).showConfirmationEnableLogsSDK()
-                    }
-                }
+    fun checkAndUpdateSDKLogs(activity: Activity) = viewModelScope.launch {
+        if (!getFeatureFlagValue(AppFeatures.PermanentLogging)) {
+            if (loggingSettings.areSDKLogsEnabled()) {
+                loggingSettings.setStatusLoggerSDK(activity, false)
+            } else {
+                (activity as LoginActivity).showConfirmationEnableLogsSDK()
             }
-            _state.update { it.copy(pendingClicksSDK = CLICKS_TO_ENABLE_LOGS) }
-        } else {
-            _state.update { it.copy(pendingClicksSDK = pendingClicksSDK - 1) }
         }
     }
 
@@ -348,7 +294,13 @@ class LoginViewModel @Inject constructor(
      * Checks a signup link.
      */
     fun checkSignupLink(link: String) = viewModelScope.launch {
-        querySignupLinkFinished.value = kotlin.runCatching { querySignupLink(link) }
+        val result = runCatching { querySignupLink(link) }
+        _state.update { state ->
+            state.copy(
+                querySignupLinkResult = result,
+                intentState = LoginIntentState.AlreadySet
+            )
+        }
     }
 
     /**
@@ -410,7 +362,9 @@ class LoginViewModel @Inject constructor(
                     password ?: return@launch,
                     pin2FA,
                     DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
-                ).collectLatest { status -> status.checkStatus() }
+                ).collectLatest { status ->
+                    status.checkStatus()
+                }
             }.onFailure { exception ->
                 if (exception !is LoginException) return@onFailure
                 MegaApplication.isLoggingIn = false
@@ -420,7 +374,7 @@ class LoginViewModel @Inject constructor(
                         it.copy(
                             isLoginInProgress = false,
                             is2FARequired = true,
-                            is2FAErrorShown = true
+                            multiFactorAuthState = MultiFactorAuthState.Failed
                         )
                     }
                 } else {
@@ -464,14 +418,23 @@ class LoginViewModel @Inject constructor(
         when (this) {
             LoginStatus.LoginStarted -> {
                 _state.update {
-                    it.copy(
-                        isLoginInProgress = true,
-                        is2FARequired = false,
-                        accountSession = (state.value.accountSession?.copy(email = email)
-                            ?: AccountSession(email = email)).takeUnless { email.isNullOrEmpty() },
-                        password = password.takeUnless { password.isNullOrEmpty() },
-                        ongoingTransfersExist = null
-                    )
+                    if (email != null && password != null) {
+                        it.copy(
+                            isLoginInProgress = true,
+                            is2FARequired = false,
+                            accountSession = state.value.accountSession?.copy(email = email)
+                                ?: AccountSession(email = email),
+                            password = password,
+                            ongoingTransfersExist = null
+                        )
+                    } else {
+                        it.copy(
+                            isLoginInProgress = true,
+                            is2FARequired = false,
+                            ongoingTransfersExist = null
+                        )
+                    }
+
                 }
             }
             LoginStatus.LoginSucceed -> {
@@ -511,6 +474,7 @@ class LoginViewModel @Inject constructor(
 
                 if (update.progress?.floatValue == 1F) {
                     MegaApplication.isLoggingIn = false
+                    _state.update { it.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
                 }
             }
         }.onFailure {
@@ -541,4 +505,24 @@ class LoginViewModel @Inject constructor(
      */
     fun resetOngoingTransfers() =
         _state.update { state -> state.copy(ongoingTransfersExist = null) }
+
+    /**
+     * Checks and updates 2FA error.
+     */
+    fun checkAndUpdate2FAState() = state.value.multiFactorAuthState?.apply {
+        _state.update { state ->
+            state.copy(
+                multiFactorAuthState =
+                if (this == MultiFactorAuthState.Failed) MultiFactorAuthState.Fixed
+                else null
+            )
+        }
+    }
+
+    /**
+     * Intent set.
+     */
+    fun intentSet() {
+        _state.update { state -> state.copy(intentState = LoginIntentState.AlreadySet) }
+    }
 }

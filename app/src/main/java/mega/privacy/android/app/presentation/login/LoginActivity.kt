@@ -99,14 +99,14 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
     private val onFetchNodesFinishedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            when (viewModel.state.value.intentAction) {
+            when (viewModel.state.value.pendingAction) {
                 ACTION_FORCE_RELOAD_ACCOUNT -> {
                     MegaApplication.isLoggingIn = false
                     finish()
                 }
                 ACTION_OPEN_APP -> {
                     if (loginFragment?.isAdded == true) {
-                        loginFragment?.readyToManager()
+                        loginFragment?.readyToFinish(viewModel.state.value)
                     } else {
                         finish()
                     }
