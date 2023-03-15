@@ -318,4 +318,8 @@ internal class DefaultLoginRepository @Inject constructor(
         megaApiGateway.fetchNodes(listener)
         awaitClose { megaApiGateway.removeRequestListener(listener) }
     }
+
+    override fun monitorFetchNodesFinish() = appEventGateway.monitorFetchNodesFinish()
+
+    override suspend fun broadcastFetchNodesFinish() = appEventGateway.broadcastFetchNodesFinish()
 }

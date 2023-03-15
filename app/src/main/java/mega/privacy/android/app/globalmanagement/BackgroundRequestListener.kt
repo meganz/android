@@ -7,7 +7,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.PushNotificationSettingManagement
 import mega.privacy.android.app.listeners.GetAttrUserListener
-import mega.privacy.android.app.presentation.login.LoginActivity.Companion.ACTION_FETCH_NODES_FINISHED
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.CUBackupInitializeChecker
@@ -18,6 +17,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
+import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinish
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -32,26 +32,28 @@ import javax.inject.Inject
 /**
  * Background request listener
  *
- * @property application
- * @property myAccountInfo
- * @property megaChatApi
- * @property sharingScope
- * @property dbH
- * @property megaApi
- * @property transfersManagement
- * @property pushNotificationSettingManagement
+ * @property application [Application]
+ * @property myAccountInfo [MyAccountInfo]
+ * @property megaChatApi [MegaChatApiAndroid]
+ * @property dbH [DatabaseHandler]
+ * @property megaApi [MegaApiAndroid]
+ * @property transfersManagement [TransfersManagement]
+ * @property pushNotificationSettingManagement [PushNotificationSettingManagement]
+ * @property applicationScope [CoroutineScope]
+ * @property getFullAccountInfo [GetFullAccountInfo]
+ * @property broadcastFetchNodesFinish [BroadcastFetchNodesFinish]
  */
 class BackgroundRequestListener @Inject constructor(
     private val application: Application,
     private val myAccountInfo: MyAccountInfo,
     private val megaChatApi: MegaChatApiAndroid,
-    @ApplicationScope private val sharingScope: CoroutineScope,
     private val dbH: DatabaseHandler,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val transfersManagement: TransfersManagement,
     private val pushNotificationSettingManagement: PushNotificationSettingManagement,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFullAccountInfo: GetFullAccountInfo,
+    private val broadcastFetchNodesFinish: BroadcastFetchNodesFinish,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -148,7 +150,7 @@ class BackgroundRequestListener @Inject constructor(
 
     private fun handleFetchNodeRequest(e: MegaError) {
         Timber.d("TYPE_FETCH_NODES")
-        application.sendBroadcast(Intent(ACTION_FETCH_NODES_FINISHED))
+        applicationScope.launch { broadcastFetchNodesFinish() }
 
         if (e.errorCode == MegaError.API_OK) {
             askForFullAccountInfo()
@@ -188,7 +190,7 @@ class BackgroundRequestListener @Inject constructor(
             Timber.w("TYPE_LOGOUT:API_ESID")
             myAccountInfo.resetDefaults()
             (application as MegaApplication).isEsid = true
-            AccountController.localLogoutApp(application, sharingScope)
+            AccountController.localLogoutApp(application, applicationScope)
         } else if (e.errorCode == MegaError.API_EBLOCKED) {
             api.localLogout()
             megaChatApi.logout()

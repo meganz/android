@@ -96,4 +96,14 @@ internal interface AppEventGateway {
      * Broadcast Finish Activity
      */
     suspend fun broadcastFinishActivity()
+
+    /**
+     * Monitors fetch nodes.
+     */
+    fun monitorFetchNodesFinish(): Flow<Boolean>
+
+    /**
+     * Broadcast fetch nodes.
+     */
+    suspend fun broadcastFetchNodesFinish()
 }

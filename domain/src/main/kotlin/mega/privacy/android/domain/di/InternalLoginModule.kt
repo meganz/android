@@ -11,6 +11,7 @@ import mega.privacy.android.domain.usecase.BroadcastFinishActivity
 import mega.privacy.android.domain.usecase.Logout
 import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
+import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinish
 import mega.privacy.android.domain.usecase.login.BroadcastLogout
 import mega.privacy.android.domain.usecase.login.ChatLogout
 import mega.privacy.android.domain.usecase.login.DefaultBackgroundFastLogin
@@ -26,6 +27,7 @@ import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
 import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.login.Login
 import mega.privacy.android.domain.usecase.login.LoginWith2FA
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinish
 import mega.privacy.android.domain.usecase.login.MonitorLogout
 import javax.inject.Singleton
 
@@ -123,5 +125,19 @@ internal abstract class InternalLoginModule {
         @Provides
         fun provideBroadcastFinishActivity(loginRepository: LoginRepository): BroadcastFinishActivity =
             BroadcastFinishActivity(loginRepository::broadcastFinishActivity)
+
+        /**
+         * Provides [MonitorFetchNodesFinish]
+         */
+        @Provides
+        fun provideMonitorFetchNodesFinish(loginRepository: LoginRepository): MonitorFetchNodesFinish =
+            MonitorFetchNodesFinish(loginRepository::monitorFetchNodesFinish)
+
+        /**
+         * Provides [BroadcastFetchNodesFinish]
+         */
+        @Provides
+        fun provideBroadcastFetchNodesFinish(loginRepository: LoginRepository): BroadcastFetchNodesFinish =
+            BroadcastFetchNodesFinish(loginRepository::broadcastFetchNodesFinish)
     }
 }

@@ -16,8 +16,12 @@ import android.view.ViewTreeObserver
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
@@ -28,7 +32,6 @@ import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.main.ConfirmEmailFragment
 import mega.privacy.android.app.main.CreateAccountFragment
 import mega.privacy.android.app.main.TourFragment
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.Util
@@ -97,24 +100,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         }
     }
 
-    private val onFetchNodesFinishedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            when (viewModel.state.value.pendingAction) {
-                ACTION_FORCE_RELOAD_ACCOUNT -> {
-                    MegaApplication.isLoggingIn = false
-                    finish()
-                }
-                ACTION_OPEN_APP -> {
-                    if (loginFragment?.isAdded == true) {
-                        loginFragment?.readyToFinish(viewModel.state.value)
-                    } else {
-                        finish()
-                    }
-                }
-            }
-        }
-    }
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -173,6 +158,16 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     }
 
     private fun setupObservers() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.state.collect { uiState ->
+                    if (uiState.pendingToFinishActivity) {
+                        finish()
+                    }
+                }
+            }
+        }
+
         registerReceiver(onAccountUpdateReceiver,
             IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE).apply {
                 addAction(BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE)
@@ -310,9 +305,9 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
         if (!isFinishing) {
             MaterialAlertDialogBuilder(this)
-                .setTitle(getFormattedStringOrDefault(R.string.title_alert_logged_out))
-                .setMessage(getFormattedStringOrDefault(R.string.error_server_expired_session))
-                .setPositiveButton(getFormattedStringOrDefault(R.string.general_ok), null)
+                .setTitle(getString(R.string.title_alert_logged_out))
+                .setMessage(getString(R.string.error_server_expired_session))
+                .setPositiveButton(getString(R.string.general_ok), null)
                 .show()
         }
     }
@@ -321,8 +316,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         Timber.d("onResume")
         super.onResume()
         Util.setAppFontSize(this)
-
-        registerReceiver(onFetchNodesFinishedReceiver, IntentFilter(ACTION_FETCH_NODES_FINISHED))
 
         if (intent == null) return
 
@@ -334,22 +327,16 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        unregisterReceiver(onFetchNodesFinishedReceiver)
-    }
-
     private fun showCancelCUWarning() {
         Timber.d("ACTION_CANCEL_CAM_SYNC")
-        val title = getFormattedStringOrDefault(R.string.cam_sync_syncing)
-        val text = getFormattedStringOrDefault(R.string.cam_sync_cancel_sync)
+        val title = getString(R.string.cam_sync_syncing)
+        val text = getString(R.string.cam_sync_cancel_sync)
 
         Util.getCustomAlertBuilder(this, title, text, null)
-            .setPositiveButton(getFormattedStringOrDefault(R.string.general_yes)
-            ) { _, _ ->
+            .setPositiveButton(getString(R.string.general_yes)) { _, _ ->
                 JobUtil.fireStopCameraUploadJob(this@LoginActivity)
                 dbH.setCamSyncEnabled(false)
-            }.setNegativeButton(getFormattedStringOrDefault(R.string.general_no), null)
+            }.setNegativeButton(getString(R.string.general_no), null)
             .show()
     }
 
@@ -522,20 +509,5 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
          */
         @JvmField
         var isBackFromLoginPage = false
-
-        /**
-         * Intent action for showing the login fetching nodes.
-         */
-        const val ACTION_FORCE_RELOAD_ACCOUNT = "FORCE_RELOAD"
-
-        /**
-         * Intent action for opening app.
-         */
-        const val ACTION_OPEN_APP = "OPEN_APP"
-
-        /**
-         * Intent action for notifying fetchNodes finished.
-         */
-        const val ACTION_FETCH_NODES_FINISHED = "FETCH_NODES_FINISHED"
     }
 }

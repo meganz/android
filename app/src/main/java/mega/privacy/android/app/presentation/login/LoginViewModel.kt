@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.login.FetchNodes
 import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.login.Login
 import mega.privacy.android.domain.usecase.login.LoginWith2FA
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinish
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExist
 import javax.inject.Inject
@@ -80,6 +81,7 @@ class LoginViewModel @Inject constructor(
     private val fastLogin: FastLogin,
     private val fetchNodes: FetchNodes,
     private val ongoingTransfersExist: OngoingTransfersExist,
+    private val monitorFetchNodesFinish: MonitorFetchNodesFinish,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -137,6 +139,23 @@ class LoginViewModel @Inject constructor(
         }
 
         viewModelScope.launch { resetChatSettings() }
+        monitorFetchNodes()
+    }
+
+    private fun monitorFetchNodes() = viewModelScope.launch {
+        monitorFetchNodesFinish().collectLatest {
+            with(state.value.pendingAction) {
+                when (this) {
+                    ACTION_FORCE_RELOAD_ACCOUNT -> {
+                        MegaApplication.isLoggingIn = false
+                        _state.update { it.copy(pendingToFinishActivity = true) }
+                    }
+                    ACTION_OPEN_APP -> {
+                        _state.update { it.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -470,11 +489,16 @@ class LoginViewModel @Inject constructor(
 
         runCatching {
             fetchNodes().collectLatest { update ->
-                _state.update { it.copy(fetchNodesUpdate = update) }
-
                 if (update.progress?.floatValue == 1F) {
                     MegaApplication.isLoggingIn = false
-                    _state.update { it.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
+                    _state.update {
+                        it.copy(
+                            intentState = LoginIntentState.ReadyForFinalSetup,
+                            fetchNodesUpdate = update
+                        )
+                    }
+                } else {
+                    _state.update { it.copy(fetchNodesUpdate = update) }
                 }
             }
         }.onFailure {
@@ -524,5 +548,17 @@ class LoginViewModel @Inject constructor(
      */
     fun intentSet() {
         _state.update { state -> state.copy(intentState = LoginIntentState.AlreadySet) }
+    }
+
+    companion object {
+        /**
+         * Intent action for showing the login fetching nodes.
+         */
+        const val ACTION_FORCE_RELOAD_ACCOUNT = "FORCE_RELOAD"
+
+        /**
+         * Intent action for opening app.
+         */
+        const val ACTION_OPEN_APP = "OPEN_APP"
     }
 }

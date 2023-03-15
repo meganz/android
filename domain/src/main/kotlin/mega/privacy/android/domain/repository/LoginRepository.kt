@@ -117,4 +117,17 @@ interface LoginRepository {
      * @return Flow of [FetchNodesUpdate].
      */
     fun fetchNodesFlow(): Flow<FetchNodesUpdate>
+
+    /**
+     * Monitors fetch nodes finish.
+     *
+     * @return Flow of Boolean.
+     */
+    fun monitorFetchNodesFinish(): Flow<Boolean>
+
+    /**
+     * Broadcast fetch nodes finish.
+     *
+     */
+    suspend fun broadcastFetchNodesFinish()
 }

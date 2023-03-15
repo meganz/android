@@ -31,6 +31,7 @@ import mega.privacy.android.domain.exception.LoginException
  * @property error                   [LoginException].
  * @property ongoingTransfersExist   True if exist ongoing transfers, false if not. Null if pending to check.
  * @property querySignupLinkResult   Result of query signup link.
+ * @property pendingToFinishActivity True if should finish the activity, false otherwise.
  */
 data class LoginState(
     val intentState: LoginIntentState? = null,
@@ -57,4 +58,5 @@ data class LoginState(
     val error: RuntimeException? = null,
     val ongoingTransfersExist: Boolean? = null,
     val querySignupLinkResult: Result<String>? = null,
+    val pendingToFinishActivity: Boolean = false
 )

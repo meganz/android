@@ -23,6 +23,7 @@ internal class AppEventFacade @Inject constructor(
     private val _monitorCameraUploadProgress = MutableSharedFlow<Pair<Int, Int>>()
     private val _transferOverQuota = MutableSharedFlow<Boolean>()
     private val logout = MutableSharedFlow<Boolean>()
+    private val fetchNodesFinish = MutableSharedFlow<Boolean>()
     private val _transferFailed = MutableSharedFlow<Boolean>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
@@ -75,6 +76,10 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorFinishActivity() = _finishActivity.toSharedFlow(appScope)
 
     override suspend fun broadcastFinishActivity() = _finishActivity.emit(true)
+
+    override fun monitorFetchNodesFinish() = fetchNodesFinish.asSharedFlow()
+
+    override suspend fun broadcastFetchNodesFinish() = fetchNodesFinish.emit(true)
 }
 
 private fun <T> Flow<T>.toSharedFlow(
