@@ -18,6 +18,7 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
@@ -72,8 +73,12 @@ class FileBrowserViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
+            assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
             assertThat(initial.fileBrowserHandle).isEqualTo(-1L)
             assertThat(initial.mediaDiscoveryViewSettings).isEqualTo(MediaDiscoveryViewSettings.INITIAL.ordinal)
+            assertThat(initial.nodes).isEmpty()
+            assertThat(initial.parentHandle).isNull()
+            assertThat(initial.mediaHandle).isEqualTo(-1L)
         }
     }
 
@@ -137,8 +142,10 @@ class FileBrowserViewModelTest {
         underTest.setBrowserParentHandle(newValue)
 
         val shouldEnter =
-            underTest.shouldEnterMediaDiscoveryMode(newValue,
-                MediaDiscoveryViewSettings.INITIAL.ordinal)
+            underTest.shouldEnterMediaDiscoveryMode(
+                newValue,
+                MediaDiscoveryViewSettings.INITIAL.ordinal
+            )
         assertFalse(shouldEnter)
     }
 
@@ -223,4 +230,20 @@ class FileBrowserViewModelTest {
             underTest.onBackPressed()
             verify(getBrowserChildrenNode, times(1)).invoke(newValue)
         }
+
+    @Test
+    fun `test that the list view type is set when updating the current view type`() =
+        testSetCurrentViewType(ViewType.LIST)
+
+    @Test
+    fun `test that the grid view type is set when updating the current view type`() =
+        testSetCurrentViewType(ViewType.GRID)
+
+    private fun testSetCurrentViewType(expectedValue: ViewType) = runTest {
+        underTest.setCurrentViewType(expectedValue)
+
+        underTest.state.test {
+            assertThat(awaitItem().currentViewType).isEqualTo(expectedValue)
+        }
+    }
 }

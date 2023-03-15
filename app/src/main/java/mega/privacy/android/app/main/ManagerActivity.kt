@@ -5565,7 +5565,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (item == CLOUD_DRIVE_BNV) {
             drawerItem = DrawerItem.CLOUD_DRIVE
             if (isCloudAdded) {
-                fileBrowserFragment?.setTransferOverQuotaBannerVisibility()
+                fileBrowserFragment?.changeTransferOverQuotaBannerVisibility()
             }
         } else if (item == PHOTOS_BNV) {
             drawerItem = DrawerItem.PHOTOS

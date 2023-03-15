@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSe
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
@@ -56,12 +57,6 @@ class FileBrowserViewModel @Inject constructor(
      */
     private val lastPositionStack = Stack<Int>()
     private val handleStack = Stack<Long>()
-
-    /**
-     * Serves as the original View Type.
-     * When an update from MonitorViewType is received, this value is used to determine if the View Type changed
-     */
-    var originalIsList = true
 
     init {
         monitorMediaDiscovery()
@@ -223,5 +218,14 @@ class FileBrowserViewModel @Inject constructor(
     fun onFolderItemClicked(lastFirstVisiblePosition: Int, handle: Long) {
         pushPositionOnStack(lastFirstVisiblePosition)
         setBrowserParentHandle(handle)
+    }
+
+    /**
+     * Updates the value of [FileBrowserState.currentViewType]
+     *
+     * @param newViewType The new [ViewType]
+     */
+    fun setCurrentViewType(newViewType: ViewType) {
+        _state.update { it.copy(currentViewType = newViewType) }
     }
 }
