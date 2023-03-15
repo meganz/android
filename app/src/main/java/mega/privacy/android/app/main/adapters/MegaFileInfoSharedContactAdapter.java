@@ -10,16 +10,29 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import mega.privacy.android.app.R;
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import timber.log.Timber;
 
 public class MegaFileInfoSharedContactAdapter extends MegaSharedFolderAdapter {
 
-    public MegaFileInfoSharedContactAdapter(Context _context, MegaNode node, List<MegaShare> _shareList, RecyclerView _lv) {
-        super(_context, node, _shareList, _lv);
+    public interface MegaFileInfoSharedContactAdapterListener {
+
+        void itemClick(int currentPosition);
+
+        void showOptionsPanel(MegaShare share);
+
+        void hideMultipleSelect();
+
+        void activateActionMode();
     }
+
+    public MegaFileInfoSharedContactAdapter(Context _context, MegaNode node, List<MegaShare> _shareList, RecyclerView _lv, MegaFileInfoSharedContactAdapterListener listener) {
+        super(_context, node, _shareList, _lv);
+        this.listener = listener;
+    }
+    
+    private MegaFileInfoSharedContactAdapterListener listener;
 
     @Override
     public void onClick(View v) {
@@ -32,15 +45,15 @@ public class MegaFileInfoSharedContactAdapter extends MegaSharedFolderAdapter {
         switch (v.getId()) {
             case R.id.shared_folder_three_dots_layout: {
                 if (multipleSelect) {
-                    ((FileInfoActivity) context).itemClick(currentPosition);
+                    listener.itemClick(currentPosition);
                 } else {
-                    ((FileInfoActivity) context).showOptionsPanel(s);
+                    listener.showOptionsPanel(s);
                 }
 
                 break;
             }
             case R.id.shared_folder_item_layout: {
-                ((FileInfoActivity) context).itemClick(currentPosition);
+                listener.itemClick(currentPosition);
                 break;
             }
         }
@@ -70,7 +83,7 @@ public class MegaFileInfoSharedContactAdapter extends MegaSharedFolderAdapter {
                 @Override
                 public void onAnimationEnd(Animation animation) {
                     if (selectedItems.size() <= 0) {
-                        ((FileInfoActivity) context).hideMultipleSelect();
+                        listener.hideMultipleSelect();
                     }
                 }
 
@@ -109,7 +122,7 @@ public class MegaFileInfoSharedContactAdapter extends MegaSharedFolderAdapter {
                 @Override
                 public void onAnimationEnd(Animation animation) {
                     if (selectedItems.size() <= 0) {
-                        ((FileInfoActivity) context).hideMultipleSelect();
+                        listener.hideMultipleSelect();
                     }
                     notifyItemChanged(positionToflip);
                 }
@@ -131,8 +144,8 @@ public class MegaFileInfoSharedContactAdapter extends MegaSharedFolderAdapter {
         ViewHolderShareList holder = (ViewHolderShareList) v.getTag();
         int currentPosition = holder.currentPosition;
 
-        ((FileInfoActivity) context).activateActionMode();
-        ((FileInfoActivity) context).itemClick(currentPosition);
+        listener.activateActionMode();
+        listener.itemClick(currentPosition);
 
         return true;
     }

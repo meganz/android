@@ -1,11 +1,20 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import static mega.privacy.android.app.utils.AvatarUtil.setImageAvatar;
+import static mega.privacy.android.app.utils.Constants.EMAIL;
+import static mega.privacy.android.app.utils.Constants.INVALID_ID;
+import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
+import static mega.privacy.android.app.utils.Util.scaleWidthPx;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
@@ -17,14 +26,6 @@ import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
-
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.ContactUtil.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
@@ -42,10 +43,21 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
         }
     }
 
+    public FileContactsListBottomSheetDialogFragment(MegaShare share, MegaNode node) {
+        this.share = share;
+        this.node = node;
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_file_contact_list, null);
         itemsLayout = contentView.findViewById(R.id.items_layout);
+        if (contact == null) {
+            contact = megaApi.getContact(share.getUser());
+        }
+        if (this.contact == null) {
+            nonContactEmail = this.share.getUser();
+        }
 
         if (savedInstanceState != null) {
             String email = savedInstanceState.getString(EMAIL);

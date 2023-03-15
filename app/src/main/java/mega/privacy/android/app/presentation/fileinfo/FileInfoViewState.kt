@@ -27,6 +27,8 @@ import nz.mega.sdk.MegaShare
  * @param isAvailableOfflineEnabled true if offline availability can be changed, false if not
  * @param inShareOwnerContactItem the [ContactItem] of the owner
  * @param accessPermission the [AccessPermission] the user has to this node
+ * @param outShareContactShowOptions the contact selected to show related options
+ * @param outShareContactsSelected a list of contacts selected to batch modify
  */
 data class FileInfoViewState(
     val typedNode: TypedNode? = null,
@@ -45,6 +47,8 @@ data class FileInfoViewState(
     val isAvailableOfflineEnabled: Boolean = false,
     val inShareOwnerContactItem: ContactItem? = null,
     val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
+    val outShareContactShowOptions: MegaShare? = null,
+    val outShareContactsSelected: List<String> = emptyList(),
 ) {
 
     /**

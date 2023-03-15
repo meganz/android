@@ -3,8 +3,6 @@ package mega.privacy.android.app.presentation.fileinfo
 import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
-import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import nz.mega.sdk.MegaError
@@ -83,21 +81,44 @@ sealed class FileInfoJobInProgressState(
         override fun customErrorMessage(context: Context, exception: Throwable?) =
             (exception as? VersionsNotDeletedException)?.let {
                 val versionsDeleted = it.totalRequestedToDelete - it.totalNotDeleted
-                val firstLine = context.getFormattedStringOrDefault(
+                val firstLine = context.getString(
                     R.string.version_history_deleted_erroneously
                 )
-                val secondLine = context.getQuantityStringOrDefault(
+                val secondLine = context.resources.getQuantityString(
                     R.plurals.versions_deleted_succesfully,
                     versionsDeleted,
                     versionsDeleted
                 )
-                val thirdLine = context.getQuantityStringOrDefault(
+                val thirdLine = context.resources.getQuantityString(
                     R.plurals.versions_not_deleted,
                     it.totalNotDeleted,
                     it.totalNotDeleted
                 )
                 "$firstLine\n$secondLine\n$thirdLine"
             }
+    }
 
+    /**
+     * Permission for outgoing shares of the node will be changed
+     */
+    sealed class ChangeSharePermission(@StringRes progressMessage: Int?) :
+        FileInfoJobInProgressState(
+            progressMessage = progressMessage,
+            successMessage = null,
+            failMessage = null,
+        ) {
+        /**
+         * Permission will be changed or set
+         */
+        object Set : ChangeSharePermission(
+            progressMessage = R.string.context_permissions_changing_folder,
+        )
+
+        /**
+         * Permission will be removed
+         */
+        object Remove : ChangeSharePermission(
+            progressMessage = R.string.context_removing_contact_folder,
+        )
     }
 }

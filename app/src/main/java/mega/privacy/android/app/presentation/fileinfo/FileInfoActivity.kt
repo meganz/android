@@ -47,11 +47,10 @@ import mega.privacy.android.app.databinding.ActivityFileInfoBinding
 import mega.privacy.android.app.databinding.DialogLinkBinding
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.listeners.ShareListener
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.adapters.MegaFileInfoSharedContactAdapter
-import mega.privacy.android.app.main.controllers.ContactController
+import mega.privacy.android.app.main.adapters.MegaFileInfoSharedContactAdapter.MegaFileInfoSharedContactAdapterListener
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
@@ -87,7 +86,7 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.node.NodeId
-import nz.mega.sdk.MegaApiJava
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -115,7 +114,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             retryConnectionsAndSignalPresence()
             if (viewModel.uiState.value.isAvailableOffline.not()) {
                 val intent = Intent()
-                intent.putExtra(NODE_HANDLE, handle)
+                intent.putExtra(NODE_HANDLE, viewModel.typedNode.id.longValue)
                 setResult(RESULT_OK, intent)
             }
             finish()
@@ -146,22 +145,50 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         )
     }
 
-    private var cC: ContactController? = null
     private var progressDialog: Pair<AlertDialog, FileInfoJobInProgressState?>? = null
     private var publicLink = false
     private val density by lazy { outMetrics.density }
-    private var shareIt = true
     private var from = 0
-    private var permissionsDialog: AlertDialog? = null
-    private var handle: Long = 0
     private var adapterType = 0
-    private var selectedShare: MegaShare? = null
     private val adapter: MegaFileInfoSharedContactAdapter by lazy {
         MegaFileInfoSharedContactAdapter(
             this,
             viewModel.node,
             emptyList(),
-            bindingContent.fileInfoContactListView
+            bindingContent.fileInfoContactListView,
+            object : MegaFileInfoSharedContactAdapterListener {
+                override fun itemClick(currentPosition: Int) {
+                    Timber.d("Position: %s", currentPosition)
+                    if (adapter.isMultipleSelect) {
+                        adapter.toggleSelection(currentPosition)
+                        updateActionModeTitle()
+                    } else {
+                        val megaUser =
+                            viewModel.uiState.value.outShares.getOrNull(currentPosition)?.user
+                        val contact = megaUser?.let { megaApi.getContact(it) }
+                        if (contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
+                            ContactUtil.openContactInfoActivity(this@FileInfoActivity, megaUser)
+                        }
+                    }
+                }
+
+                override fun showOptionsPanel(share: MegaShare?) {
+                    viewModel.contactSelectedToShowOptions(share)
+                }
+
+                override fun hideMultipleSelect() {
+                    hideMultipleSelectOfSharedContacts()
+                }
+
+                override fun activateActionMode() {
+                    Timber.d("activateActionMode")
+                    if (!adapter.isMultipleSelect) {
+                        adapter.isMultipleSelect = true
+                        actionMode = startSupportActionMode(ActionBarCallBack())
+                    }
+                }
+
+            }
         ).apply {
             positionClicked = -1
             isMultipleSelect = false
@@ -173,17 +200,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
     private lateinit var copyLauncher: ActivityResultLauncher<LongArray>
     private lateinit var moveLauncher: ActivityResultLauncher<LongArray>
-
-    /**
-     * activate action mode from adapter
-     */
-    fun activateActionMode() {
-        Timber.d("activateActionMode")
-        if (!adapter.isMultipleSelect) {
-            adapter.isMultipleSelect = true
-            actionMode = startSupportActionMode(ActionBarCallBack())
-        }
-    }
 
     /**
      * show snack bar
@@ -199,40 +215,16 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             when (item.itemId) {
                 R.id.action_file_contact_list_permissions -> {
                     //Change permissions
-                    val dialogBuilder = MaterialAlertDialogBuilder(
-                        this@FileInfoActivity,
-                        R.style.ThemeOverlay_Mega_MaterialAlertDialog
-                    ).apply {
-                        setTitle(getString(R.string.file_properties_shared_folder_permissions))
-
-                        val items = arrayOf<CharSequence>(
-                            getString(R.string.file_properties_shared_folder_read_only),
-                            getString(R.string.file_properties_shared_folder_read_write),
-                            getString(R.string.file_properties_shared_folder_full_access)
-                        )
-
-                        setSingleChoiceItems(items, -1) { _, it ->
-                            clearSelections()
-                            permissionsDialog?.dismiss()
-                            showProgressDialog(
-                                getString(R.string.context_permissions_changing_folder)
-                            )
-                            cC?.changePermissions(cC?.getEmailShares(shares), it, viewModel.node)
-                        }
+                    showAccessPermissionOptions { permission ->
+                        //once the adapter is removed in favour of compose LazyColumn, this won't be needed
+                        viewModel.contactsSelectedInSharedList(shares.map { it.user })
+                        viewModel.setSharePermissionForCurrentSelectedList(permission.toAccessPermission())
+                        clearSelections()
                     }
-
-                    permissionsDialog = dialogBuilder.show()
                 }
                 R.id.action_file_contact_list_delete -> {
-                    shares?.size?.takeIf { it > 0 }?.let { size ->
-                        if (size > 1) {
-                            Timber.d("Remove multiple contacts")
-                            showConfirmationRemoveMultipleContactFromShare(shares)
-                        } else {
-                            Timber.d("Remove one contact")
-                            showConfirmationRemoveContactFromShare(shares[0].user)
-                        }
-                    }
+                    Timber.d("Remove  contacts")
+                    showConfirmationRemoveContactsFromShare(*shares.map { it.user }.toTypedArray())
                 }
                 R.id.cab_menu_select_all -> {
                     selectAll()
@@ -319,21 +311,9 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         })
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         initFileBackupManager()
-        cC = ContactController(this)
         adapterType = intent.getIntExtra("adapterType", Constants.FILE_BROWSER_ADAPTER)
 
         savedInstanceState?.apply {
-            val handle = getLong(KEY_SELECTED_SHARE_HANDLE, MegaApiJava.INVALID_HANDLE)
-            if (handle == MegaApiJava.INVALID_HANDLE) {
-                return
-            }
-            val list = viewModel.uiState.value.outShares
-            for (share in list) {
-                if (handle == share.nodeHandle) {
-                    selectedShare = share
-                    break
-                }
-            }
             nodeAttacher.restoreState(this)
             nodeSaver.restoreState(this)
         }
@@ -375,6 +355,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         updateIncomeShared(viewState)
         updateOutShares(viewState)
         updateLocation(viewState.nodeLocationInfo)
+        updateContactShareBottomSheet(viewState)
 
         refreshProperties()
     }
@@ -472,6 +453,20 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             )
         }
 
+    private fun updateContactShareBottomSheet(viewState: FileInfoViewState) =
+        viewState.outShareContactShowOptions?.takeIf {
+            viewState.jobInProgressState !is FileInfoJobInProgressState.ChangeSharePermission &&
+                    !bottomSheetDialogFragment.isBottomSheetDialogShown()
+        }?.let { share ->
+            Timber.d("showNodeOptionsPanel")
+            bottomSheetDialogFragment =
+                FileContactsListBottomSheetDialogFragment(share, viewModel.node)
+            bottomSheetDialogFragment?.show(
+                supportFragmentManager,
+                bottomSheetDialogFragment?.tag
+            )
+        }
+
     private fun updateOptionsMenu(state: FileInfoViewState) {
         if (state.jobInProgressState == null && state.typedNode != null) {
             menuHelper.setNodeName(state.title)
@@ -556,7 +551,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         if (visibleOutShares.isNotEmpty()) {
             if (adapter.isMultipleSelect) {
                 adapter.clearSelections()
-                hideMultipleSelect()
+                hideMultipleSelectOfSharedContacts()
             }
             adapter.setShareList(visibleOutShares)
             //set more button text
@@ -788,7 +783,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 if (showTakenDownNodeActionNotAvailableDialog(viewModel.node, this)) {
                     return false
                 }
-                shareIt = false
                 val dialogLayout = DialogLinkBinding.inflate(layoutInflater).apply {
                     (dialogLinkTextRemove.layoutParams as RelativeLayout.LayoutParams).setMargins(
                         Util.scaleWidthPx(
@@ -868,28 +862,12 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                                 MegaShare.ACCESS_READ
                             ) != true
                         ) {
-                            val items = arrayOf<CharSequence>(
-                                getString(R.string.file_properties_shared_folder_read_only),
-                                getString(R.string.file_properties_shared_folder_read_write),
-                                getString(R.string.file_properties_shared_folder_full_access)
-                            )
-                            permissionsDialog =
-                                MaterialAlertDialogBuilder(
-                                    this,
-                                    R.style.ThemeOverlay_Mega_MaterialAlertDialog
+                            showAccessPermissionOptions {
+                                viewModel.setSharePermissionForUsers(
+                                    it.toAccessPermission(),
+                                    contactsData
                                 )
-                                    .setTitle(getString(R.string.file_properties_shared_folder_permissions))
-                                    .setSingleChoiceItems(items, -1) { _, item ->
-                                        showProgressDialog(
-                                            getString(R.string.context_sharing_folder)
-                                        )
-                                        permissionsDialog?.dismiss()
-                                        nodeController.shareFolder(
-                                            megaApi.getNodeByHandle(viewModel.node.handle),
-                                            contactsData,
-                                            item
-                                        )
-                                    }.show()
+                            }
                         }
                     } else {
                         Timber.w("ERROR, the file is not folder")
@@ -1044,6 +1022,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
 
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog).apply {
             val messageId = if (!viewModel.uiState.value.isNodeInRubbish) {
+                val handle = viewModel.typedNode.id.longValue
                 when {
                     CameraUploadUtil.getPrimaryFolderHandle() == handle && CameraUploadUtil.isPrimaryEnabled() -> {
                         R.string.confirmation_move_cu_folder_to_rubbish
@@ -1095,65 +1074,36 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
      */
     public override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (selectedShare != null) {
-            outState.putLong(KEY_SELECTED_SHARE_HANDLE, selectedShare?.nodeHandle ?: -1)
-        }
         nodeAttacher.saveState(outState)
         nodeSaver.saveState(outState)
     }
 
     /**
-     * receive the click of an item from the adapter
+     * Receive the change permissions action to show the different permission options from bottom sheet
      */
-    fun itemClick(position: Int) {
-        Timber.d("Position: %s", position)
-        if (adapter.isMultipleSelect) {
-            adapter.toggleSelection(position)
-            updateActionModeTitle()
-        } else {
-            val megaUser = viewModel.uiState.value.outShares.getOrNull(position)?.user
-            val contact = megaUser?.let { megaApi.getContact(it) }
-            if (contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
-                ContactUtil.openContactInfoActivity(this, megaUser)
-            }
+    fun changePermissions() {
+        Timber.d("changePermissions")
+        showAccessPermissionOptions(viewModel.uiState.value.outShareContactShowOptions?.access) {
+            viewModel.setSharePermissionForCurrentSelectedOptions(it.toAccessPermission())
         }
     }
 
     /**
-     * receive the show options panel action from the adapter
+     * Receive remove contact action to show a confirmation dialog
      */
-    fun showOptionsPanel(sShare: MegaShare?) {
-        Timber.d("showNodeOptionsPanel")
-        if (sShare == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        selectedShare = sShare
-        bottomSheetDialogFragment =
-            FileContactsListBottomSheetDialogFragment(
-                selectedShare,
-                selectedContact,
-                viewModel.node
-            )
-        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+    fun removeFileContactShare() = viewModel.uiState.value.outShareContactShowOptions?.let {
+        showConfirmationRemoveContactsFromShare(it.user)
     }
 
-    /**
-     * hides the multi select option
-     */
-    fun hideMultipleSelect() {
+    private fun hideMultipleSelectOfSharedContacts() {
         adapter.isMultipleSelect = false
         actionMode?.finish()
     }
 
-    private val selectedContact: MegaUser?
-        get() {
-            val email = selectedShare?.user
-            return megaApi.getContact(email)
-        }
-
-    /**
-     * Receive the change permissions action to show the different permission options
-     */
-    fun changePermissions() {
-        Timber.d("changePermissions")
+    private fun showAccessPermissionOptions(
+        selected: Int? = null,
+        onSelect: (permission: Int) -> Unit,
+    ) {
         val dialogBuilder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
         dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions))
@@ -1162,78 +1112,35 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             getString(R.string.file_properties_shared_folder_read_write),
             getString(R.string.file_properties_shared_folder_full_access)
         )
-        val selected = selectedShare ?: return
-        dialogBuilder.setSingleChoiceItems(items, selected.access) { _, item ->
-            showProgressDialog(
-                getString(R.string.context_permissions_changing_folder)
-            )
-            permissionsDialog?.dismiss()
-            cC?.changePermission(
-                selected.user,
-                item,
-                viewModel.node,
-                ShareListener(this, ShareListener.CHANGE_PERMISSIONS_LISTENER, 1)
-            )
-        }
-        permissionsDialog = dialogBuilder.show()
+        dialogBuilder.setSingleChoiceItems(items, selected ?: -1) { dialog, item ->
+            dialog.dismiss()
+            onSelect(item)
+        }.show()
     }
 
-    /**
-     * Receive remove contact action to show a confirmation dialog
-     */
-    fun removeFileContactShare(): AlertDialog =
-        showConfirmationRemoveContactFromShare(selectedShare?.user)
-
-    private fun showConfirmationRemoveContactFromShare(email: String?) =
-        MaterialAlertDialogBuilder(this)
-            .setMessage(getString(R.string.remove_contact_shared_folder, email))
-            .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int ->
-                removeShare(email)
-            }
-            .setNegativeButton(R.string.general_cancel, null)
-            .show()
-
-    private fun removeShare(email: String?) {
-        showProgressDialog(
-            getString(R.string.context_removing_contact_folder)
-        )
-        nodeController.removeShare(
-            ShareListener(
-                this,
-                ShareListener.REMOVE_SHARE_LISTENER,
-                1
-            ), viewModel.node, email
-        )
-    }
-
-    private fun showConfirmationRemoveMultipleContactFromShare(contacts: ArrayList<MegaShare>) =
+    private fun showConfirmationRemoveContactsFromShare(vararg contacts: String) =
         MaterialAlertDialogBuilder(this)
             .setMessage(
-                resources.getQuantityString(
+                contacts.singleOrNull()?.let { singleContact ->
+                    getString(R.string.remove_contact_shared_folder, singleContact)
+                } ?: resources.getQuantityString(
                     R.plurals.remove_multiple_contacts_shared_folder,
                     contacts.size,
                     contacts.size
                 )
             )
             .setPositiveButton(getString(R.string.general_remove)) { _: DialogInterface?, _: Int ->
-                removeMultipleShares(contacts)
+                viewModel.removeSharePermissionForUsers(*contacts)
             }
             .setNegativeButton(R.string.general_cancel, null)
             .show()
-
-    private fun removeMultipleShares(shares: ArrayList<MegaShare>?) {
-        Timber.d("removeMultipleShares")
-        showProgressDialog(
-            getString(R.string.context_removing_contact_folder)
-        )
-        nodeController.removeShares(shares, viewModel.node)
-    }
 
     // Clear all selected items
     private fun clearSelections() {
         if (adapter.isMultipleSelect) {
             adapter.clearSelections()
         }
+        viewModel.contactsSelectedInSharedList(emptyList())
     }
 
     private fun selectAll() {
@@ -1245,6 +1152,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             adapter.selectAll()
             actionMode = startSupportActionMode(ActionBarCallBack())
         }
+        viewModel.selectAllVisibleContacts()
         Handler(Looper.getMainLooper()).post { updateActionModeTitle() }
     }
 
@@ -1309,6 +1217,13 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
          */
         @JvmField
         var TYPE_EXPORT_REMOVE = 1
-        private const val KEY_SELECTED_SHARE_HANDLE = "KEY_SELECTED_SHARE_HANDLE"
+
+        private fun Int.toAccessPermission() = when (this) {
+            MegaShare.ACCESS_READ -> AccessPermission.READ
+            MegaShare.ACCESS_READWRITE -> AccessPermission.READWRITE
+            MegaShare.ACCESS_FULL -> AccessPermission.FULL
+            MegaShare.ACCESS_OWNER -> AccessPermission.OWNER
+            else -> AccessPermission.UNKNOWN
+        }
     }
 }

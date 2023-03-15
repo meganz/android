@@ -4,7 +4,6 @@ import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
+import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
@@ -23,6 +23,7 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges.Inshare
 import mega.privacy.android.domain.entity.node.NodeChanges.Name
@@ -58,8 +59,10 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.SetShareFolderAccessPermission
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference
@@ -96,6 +99,8 @@ class FileInfoViewModel @Inject constructor(
     private val isAvailableOffline: IsAvailableOffline,
     private val setNodeAvailableOffline: SetNodeAvailableOffline,
     private val getNodeAccessPermission: GetNodeAccessPermission,
+    private val createShareKey: CreateShareKey,
+    private val setShareFolderAccessPermission: SetShareFolderAccessPermission,
     private val stopSharingNode: StopSharingNode,
 ) : ViewModel() {
 
@@ -305,11 +310,114 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
+    /**
+     * A contact is selected to show Sharing info
+     */
+    fun contactSelectedToShowOptions(share: MegaShare?) {
+        if (_uiState.value.outShareContactShowOptions == share) {
+            //this won't be needed once migrated to compose because outShareContactShowOptions will be set to null when hided
+            _uiState.update {
+                it.copy(
+                    outShareContactShowOptions = null,
+                    outShareContactsSelected = emptyList(),
+                )
+            }
+        }
+        updateState {
+            it.copy(
+                outShareContactShowOptions = share,
+                outShareContactsSelected = emptyList(),
+            )
+        }
+    }
+
+    /**
+     * Contacts of the shared list are selected
+     */
+    fun contactsSelectedInSharedList(emails: List<String>) {
+        updateState {
+            it.copy(
+                outShareContactsSelected = emails,
+                outShareContactShowOptions = null,
+            )
+        }
+    }
+
+    /**
+     * All visible contacts of the shared list are selected
+     */
+    fun selectAllVisibleContacts() =
+        contactsSelectedInSharedList(_uiState.value.outSharesCoerceMax.map { it.user })
+
+    /**
+     * Set out sharing permission for the current selected contact to show info. Set with [contactSelectedToShowOptions]
+     */
+    fun setSharePermissionForCurrentSelectedOptions(accessPermission: AccessPermission) =
+        _uiState.value.outShareContactShowOptions?.user?.let { email ->
+            changeSharePermissionForUsers(
+                accessPermission,
+                FileInfoJobInProgressState.ChangeSharePermission.Set,
+                email
+            )
+        }
+
+    /**
+     * Set out sharing permission for the current selected contacts in list. Set with [contactsSelectedInSharedList]
+     */
+    fun setSharePermissionForCurrentSelectedList(accessPermission: AccessPermission) =
+        _uiState.value.outShareContactsSelected.takeIf { it.isNotEmpty() }?.let { emails ->
+            setSharePermissionForUsers(accessPermission, emails)
+        }
+
+    /**
+     * Set out sharing permission for contacts in [emails] list.
+     */
+    fun setSharePermissionForUsers(accessPermission: AccessPermission, emails: List<String>) {
+        changeSharePermissionForUsers(
+            accessPermission,
+            FileInfoJobInProgressState.ChangeSharePermission.Set,
+            *emails.toTypedArray()
+        )
+    }
+
+    /**
+     * Removes permission for contacts in [emails]
+     */
+    fun removeSharePermissionForUsers(vararg emails: String) =
+        changeSharePermissionForUsers(
+            AccessPermission.UNKNOWN,
+            FileInfoJobInProgressState.ChangeSharePermission.Remove,
+            *emails
+        )
+
+    private fun changeSharePermissionForUsers(
+        accessPermission: AccessPermission,
+        progress: FileInfoJobInProgressState.ChangeSharePermission,
+        vararg emails: String,
+    ) = (typedNode as? FolderNode)?.let { folderNode ->
+        //clear selection to update related UI state (close bottom sheet, etc.)
+        _uiState.update {
+            it.copy(
+                outShareContactsSelected = emptyList(),
+                outShareContactShowOptions = null,
+            )
+        }
+        //update permissions
+        this.performBlockSettingProgress(progress) {
+            runCatching {
+                createShareKey(node)
+                setShareFolderAccessPermission(folderNode, accessPermission, *emails)
+            }.onFailure {
+                Timber.e("FileInfoViewModel changeSharePermissionForUsers error $it")
+            }
+        }
+    }
+
     private fun monitorNodeUpdates() =
         viewModelScope.launch {
             monitorNodeUpdatesById(typedNode.id).collect { changes ->
                 //node has been updated
-                Timber.d("FileInfoViewModel updated $changes")
+                Timber.d("FileInfoViewModel monitorNodeUpdates $changes")
                 val updateNode = changes.any { change ->
                     when (change) {
                         Remove -> {
@@ -511,10 +619,10 @@ class FileInfoViewModel @Inject constructor(
         block: suspend () -> Result<*>?,
     ) {
         if (checkAndHandleIsDeviceConnected()) {
-            viewModelScope.launch(Dispatchers.IO) {
-                _uiState.update {
-                    it.copy(jobInProgressState = progressState)
-                }
+            _uiState.update {
+                it.copy(jobInProgressState = progressState)
+            }
+            viewModelScope.launch {
                 val result = block()
                 // if there's a result, the job has finished, (for instance: collision detected returns null because it handles the ui update)
                 if (result != null) {

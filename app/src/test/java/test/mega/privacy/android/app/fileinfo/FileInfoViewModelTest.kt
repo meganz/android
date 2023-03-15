@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -63,6 +62,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.SetShareFolderAccessPermission
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -116,6 +116,7 @@ internal class FileInfoViewModelTest {
     private val isAvailableOffline: IsAvailableOffline = mock()
     private val setNodeAvailableOffline: SetNodeAvailableOffline = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
+    private val setShareFolderAccessPermission: SetShareFolderAccessPermission = mock()
     private val stopSharingNode: StopSharingNode = mock()
 
     private val typedFileNode: TypedFileNode = mock()
@@ -164,7 +165,9 @@ internal class FileInfoViewModelTest {
             isAvailableOffline = isAvailableOffline,
             setNodeAvailableOffline = setNodeAvailableOffline,
             getNodeAccessPermission = getNodeAccessPermission,
+            setShareFolderAccessPermission = setShareFolderAccessPermission,
             stopSharingNode = stopSharingNode,
+            createShareKey = mock(),
         )
     }
 
@@ -201,7 +204,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test that viewModel state's historyVersions property reflects the value of the getFileHistoryNumVersions use case after updating the node`() =
-        runBlocking {
+        runTest {
             for (n in 0..5) {
                 whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(n)
                 underTest.setNode(node.handle)
@@ -211,7 +214,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test that viewModel state's isNodeInInbox property reflects the value of the isNodeInInbox use case after updating the node`() =
-        runBlocking {
+        runTest {
             suspend fun verify(isNodeInInbox: Boolean) {
                 whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(isNodeInInbox)
                 underTest.setNode(node.handle)
@@ -238,7 +241,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test showHistoryVersions is true if the node contains one version and is not in the inbox`() =
-        runBlocking {
+        runTest {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(1)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.setNode(node.handle)
@@ -247,7 +250,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test showHistoryVersions is true if the node contains more than one version and is not in the inbox`() =
-        runBlocking {
+        runTest {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(2)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.setNode(node.handle)
@@ -256,7 +259,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test showHistoryVersions is false if the node contains one version but is in the inbox`() =
-        runBlocking {
+        runTest {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(1)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(true)
             underTest.setNode(node.handle)
@@ -266,7 +269,7 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test showHistoryVersions is false if the node contains no versions and is not in the inbox`() =
-        runBlocking {
+        runTest {
             whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.setNode(node.handle)
@@ -749,6 +752,30 @@ internal class FileInfoViewModelTest {
             Truth.assertThat(underTest.uiState.value.typedNode?.isExported).isEqualTo(false)
         }
 
+    @Test
+    fun `test when setSharePermissionForUsers for a set of users then SetSharePermission use case is called`() =
+        runTest {
+            val emails = List(5) { "email$it@example.com" }
+            val folderNode = mockFolder()
+            underTest.setNode(folderNode.id.longValue)
+            underTest.setSharePermissionForUsers(AccessPermission.READ, emails)
+
+            verify(setShareFolderAccessPermission, times(1))
+                .invoke(folderNode, AccessPermission.READ, *emails.toTypedArray())
+        }
+
+    @Test
+    fun `test when removeSharePermissionForUsers for a set of users then SetSharePermission use case is called`() =
+        runTest {
+            val emails = Array(5) { "email$it@example.com" }
+            val folderNode = mockFolder()
+            underTest.setNode(folderNode.id.longValue)
+            underTest.removeSharePermissionForUsers(*emails)
+
+            verify(setShareFolderAccessPermission, times(1))
+                .invoke(folderNode, AccessPermission.UNKNOWN, *emails)
+        }
+
     private fun mockMonitorStorageStateEvent(state: StorageState) {
         val storageStateEvent = StorageStateEvent(
             1L, "", 1L, "", EventType.Storage,
@@ -882,7 +909,7 @@ internal class FileInfoViewModelTest {
     private suspend fun testProgressSetAndUnset(
         progress: FileInfoJobInProgressState,
         block: () -> Unit,
-    ) = runBlocking {
+    ) = runTest {
         underTest.uiState.map { it.jobInProgressState }.distinctUntilChanged().test {
             Truth.assertThat(awaitItem()).isNull()
             block()
