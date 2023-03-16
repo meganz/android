@@ -32,7 +32,6 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountDetailMapper
-import mega.privacy.android.data.mapper.AccountSessionMapper
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.CurrencyMapper
@@ -42,6 +41,7 @@ import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
+import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
