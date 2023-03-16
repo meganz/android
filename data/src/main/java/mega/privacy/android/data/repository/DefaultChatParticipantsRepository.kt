@@ -161,29 +161,24 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
         if (participant.isMe) avatarRepository.getMyAvatarColor() else avatarRepository.getAvatarColor(
             participant.handle)
 
-    override suspend fun getAvatarUri(participant: ChatParticipant): File? {
-        if (participant.isMe) {
-            avatarRepository.getMyAvatarFile()?.let { file ->
-                if (file.exists() && file.length() > 0) {
-                    return file
+    override suspend fun getAvatarUri(participant: ChatParticipant, skipCache: Boolean): File? =
+        runCatching {
+            if (participant.isMe) {
+                avatarRepository.getMyAvatarFile()
+            } else {
+                if (participant.email.isNotBlank()) {
+                    avatarRepository.getAvatarFile(
+                        userEmail = participant.email,
+                        skipCache = skipCache
+                    )
+                } else {
+                    avatarRepository.getAvatarFile(
+                        userHandle = participant.handle,
+                        skipCache = skipCache
+                    )
                 }
             }
-
-            return null
-        } else {
-            runCatching { avatarRepository.getAvatarFile(userHandle = participant.handle) }.fold(
-                onSuccess = { file ->
-                    file?.let {
-                        if (it.exists() && it.length() > 0) {
-                            return file
-                        }
-                    }
-                    return null
-                },
-                onFailure = { return null }
-            )
-        }
-    }
+        }.getOrNull()?.takeIf { it.exists() && it.length() > 0 }
 
     override suspend fun getPermissions(
         chatId: Long,

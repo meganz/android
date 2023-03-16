@@ -28,7 +28,7 @@ interface AvatarRepository {
      * @param userEmail  User email
      * @param skipCache  Skip cached avatar.
      */
-    suspend fun getAvatarFile(userEmail: String, skipCache: Boolean = false): File?
+    suspend fun getAvatarFile(userEmail: String, skipCache: Boolean = false): File
 
     /**
      * Get avatar file for an user
@@ -36,7 +36,7 @@ interface AvatarRepository {
      * @param userHandle  User handle
      * @param skipCache  Skip cached avatar.
      */
-    suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean = false): File?
+    suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean = false): File
 
     /**
      * Get avatar color for an user

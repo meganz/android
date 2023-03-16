@@ -77,7 +77,6 @@ class DefaultGetChatParticipants @Inject constructor(
                                 currentItem),
                             defaultAvatarColor = chatParticipantsRepository.getAvatarColor(
                                 currentItem),
-                            fileUpdated = !currentItem.fileUpdated,
                             data = currentItem.data.copy(alias = chatParticipantsRepository.getAlias(
                                 currentItem),
                                 avatarUri = chatParticipantsRepository.getAvatarUri(currentItem)
@@ -144,7 +143,6 @@ class DefaultGetChatParticipants @Inject constructor(
                                                 newItem),
                                             defaultAvatarColor = chatParticipantsRepository.getAvatarColor(
                                                 newItem),
-                                            fileUpdated = !newItem.fileUpdated,
                                             data = newItem.data.copy(alias = chatParticipantsRepository.getAlias(
                                                 newItem),
                                                 avatarUri = chatParticipantsRepository.getAvatarUri(
@@ -188,7 +186,6 @@ class DefaultGetChatParticipants @Inject constructor(
                                                     newItem),
                                                 defaultAvatarColor = chatParticipantsRepository.getAvatarColor(
                                                     newItem),
-                                                fileUpdated = !newItem.fileUpdated,
                                                 data = newItem.data.copy(alias = chatParticipantsRepository.getAlias(
                                                     newItem),
                                                     avatarUri = chatParticipantsRepository.getAvatarUri(
@@ -238,7 +235,7 @@ class DefaultGetChatParticipants @Inject constructor(
                             }
                             this[currentItemIndex] =
                                 currentItem.copy(defaultAvatarColor = avatarRepository.getMyAvatarColor(),
-                                    fileUpdated = !currentItem.fileUpdated,
+                                    avatarUpdateTimestamp = System.currentTimeMillis(),
                                     data = currentItem.data.copy(
                                         avatarUri = avatarUri)
                                 )
@@ -333,10 +330,12 @@ class DefaultGetChatParticipants @Inject constructor(
                                     this[currentItemIndex] =
                                         currentItem.copy(defaultAvatarColor = avatarRepository.getAvatarColor(
                                             currentItem.handle),
-                                            fileUpdated = !currentItem.fileUpdated,
+                                            avatarUpdateTimestamp = System.currentTimeMillis(),
                                             data = currentItem.data.copy(
                                                 avatarUri = chatParticipantsRepository.getAvatarUri(
-                                                    currentItem)?.toString())
+                                                    currentItem,
+                                                    true
+                                                )?.toString())
                                         )
                                 }
 

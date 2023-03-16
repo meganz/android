@@ -16,7 +16,7 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
  * @property areCredentialsVerified     True if user credentials are verified, false otherwise.
  * @property status                     [UserStatus].
  * @property lastSeen                   User last seen.
- * @property fileUpdated                Check if avatar file is updated.
+ * @property avatarUpdateTimestamp      Timestamp for last avatar file update
  * @property privilegesUpdated                Check if privilege are updated.
  */
 data class ChatParticipant(
@@ -29,6 +29,6 @@ data class ChatParticipant(
     val areCredentialsVerified: Boolean = false,
     val status: UserStatus = UserStatus.Invalid,
     val lastSeen: Int? = null,
-    val fileUpdated: Boolean = false,
+    val avatarUpdateTimestamp: Long? = null,
     val privilegesUpdated: Boolean = false,
 )

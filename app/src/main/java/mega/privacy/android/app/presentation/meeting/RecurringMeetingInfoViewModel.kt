@@ -124,8 +124,8 @@ class RecurringMeetingInfoViewModel @Inject constructor(
                     Timber.d("Updated first and second participant")
                     _state.update {
                         it.copy(
-                            firstParticipant = if (list.isNotEmpty()) list.first() else null,
-                            secondParticipant = if (list.size > 1) list[1] else null
+                            firstParticipant = list.firstOrNull(),
+                            secondParticipant = list.getOrNull(1)
                         )
                     }
                 }

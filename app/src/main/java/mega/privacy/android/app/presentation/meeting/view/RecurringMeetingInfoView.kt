@@ -1,10 +1,12 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -42,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.getDateFormatted
 import mega.privacy.android.app.presentation.extensions.getTimeFormatted
 import mega.privacy.android.app.presentation.meeting.model.RecurringMeetingInfoState
@@ -278,45 +282,47 @@ private fun OccurrenceItemView(
 private fun RecurringMeetingAvatar(state: RecurringMeetingInfoState) {
     if (state.isEmptyMeeting()) {
         state.schedTitle?.let {
-            DefaultMeetingAvatarView(
-                title = it,
-                colorBackground = grey_alpha_012.takeIf { MaterialTheme.colors.isLight }
-                    ?: white_alpha_012)
+            MeetingAvatarView(
+                avatarUri = null,
+                avatarPlaceholder = it,
+                avatarColor = null,
+                modifier = Modifier.border(1.dp, Color.White, CircleShape)
+            )
         }
     } else if (state.isSingleMeeting()) {
-        state.firstParticipant?.let {
-            if (it.fileUpdated) {
-                ParticipantAvatarView(participant = it)
-            } else {
-                ParticipantAvatarView(participant = it)
-            }
+        state.firstParticipant?.let { participant ->
+            MeetingAvatarView(
+                avatarUri = participant.data.avatarUri,
+                avatarPlaceholder = participant.getAvatarFirstLetter(),
+                avatarColor = participant.defaultAvatarColor,
+                avatarTimestamp = participant.avatarUpdateTimestamp,
+                modifier = Modifier.border(1.dp, Color.White, CircleShape),
+            )
         }
-    } else {
-        state.firstParticipant?.let { first ->
-            state.secondParticipant?.let { second ->
-                if (first.fileUpdated) {
-                    ParticipantsAvatarView(
-                        firstParticipant = first,
-                        secondParticipant = second
-                    )
-                } else {
-                    ParticipantsAvatarView(
-                        firstParticipant = first,
-                        secondParticipant = second
-                    )
-                }
-                if (second.fileUpdated) {
-                    ParticipantsAvatarView(
-                        firstParticipant = first,
-                        secondParticipant = second
-                    )
-                } else {
-                    ParticipantsAvatarView(
-                        firstParticipant = first,
-                        secondParticipant = second
-                    )
-                }
-            }
+    } else if (state.firstParticipant != null && state.secondParticipant != null) {
+        Box(
+            Modifier.fillMaxSize()
+        ) {
+            MeetingAvatarView(
+                avatarUri = state.secondParticipant.data.avatarUri,
+                avatarPlaceholder = state.secondParticipant.getAvatarFirstLetter(),
+                avatarColor = state.secondParticipant.defaultAvatarColor,
+                avatarTimestamp = state.secondParticipant.avatarUpdateTimestamp,
+                modifier = Modifier
+                    .size(26.dp)
+                    .align(Alignment.BottomEnd)
+                    .border(1.dp, Color.White, CircleShape)
+            )
+            MeetingAvatarView(
+                avatarUri = state.firstParticipant.data.avatarUri,
+                avatarPlaceholder = state.firstParticipant.getAvatarFirstLetter(),
+                avatarColor = state.firstParticipant.defaultAvatarColor,
+                avatarTimestamp = state.firstParticipant.avatarUpdateTimestamp,
+                modifier = Modifier
+                    .size(26.dp)
+                    .align(Alignment.TopStart)
+                    .border(1.dp, Color.White, CircleShape)
+            )
         }
     }
 }

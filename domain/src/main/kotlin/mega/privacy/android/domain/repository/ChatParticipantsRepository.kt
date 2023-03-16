@@ -48,9 +48,10 @@ interface ChatParticipantsRepository {
      * Get avatar
      *
      * @param participant [ChatParticipant].
+     * @param skipCache
      * @return Participant avatar.
      */
-    suspend fun getAvatarUri(participant: ChatParticipant): File?
+    suspend fun getAvatarUri(participant: ChatParticipant, skipCache: Boolean = false): File?
 
     /**
      * Get avatar color

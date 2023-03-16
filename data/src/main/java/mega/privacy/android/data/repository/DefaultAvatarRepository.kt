@@ -120,12 +120,13 @@ internal class DefaultAvatarRepository @Inject constructor(
             return@withContext cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileConstant.JPG_EXTENSION)
         }
 
-    override suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean): File? =
+    override suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean): File =
         withContext(ioDispatcher) {
-            getUserEmail(userHandle)?.let { email -> getAvatarFile(email) }
+            val userEmail = getUserEmail(userHandle) ?: error("Could not get user email")
+            getAvatarFile(userEmail, skipCache)
         }
 
-    override suspend fun getAvatarFile(userEmail: String, skipCache: Boolean): File? =
+    override suspend fun getAvatarFile(userEmail: String, skipCache: Boolean): File =
         withContext(ioDispatcher) {
             val file = cacheFolderGateway.buildAvatarFile(userEmail + FileConstant.JPG_EXTENSION)
                 ?: error("Could not generate avatar file")
@@ -143,6 +144,9 @@ internal class DefaultAvatarRepository @Inject constructor(
                             if (error.errorCode == MegaError.API_OK) {
                                 continuation.resume(file)
                             } else {
+                                if (error.errorCode == MegaError.API_ENOENT && file.exists()) {
+                                    file.delete()
+                                }
                                 continuation.failWithError(error)
                             }
                         }
@@ -156,11 +160,7 @@ internal class DefaultAvatarRepository @Inject constructor(
         }
 
     private suspend fun getUserEmail(userHandle: Long): String? =
-        runCatching { contactsRepository.getUserEmail(userHandle) }
-            .fold(
-                onSuccess = { email -> email },
-                onFailure = { null }
-            )
+        runCatching { contactsRepository.getUserEmail(userHandle) }.getOrNull()
 
     private fun getColor(color: String?): Int =
         color?.toColorInt() ?: avatarWrapper.getSpecificAvatarColor(AVATAR_PRIMARY_COLOR)

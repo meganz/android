@@ -242,6 +242,7 @@ dependencies {
     implementation androidx.camera.lifecycle
     implementation androidx.cardview
     implementation androidx.constraintlayout
+    implementation androidx.constraintlayout.compose
     implementation androidx.datastore.preferences
     implementation androidx.emoji
     implementation androidx.exifinterface
@@ -272,6 +273,7 @@ dependencies {
     implementation google.zxing
     implementation google.accompanist.pager
     implementation google.accompanist.flowlayout
+    implementation google.accompanist.placeholder
     implementation google.accompanist.navigationanimation
     implementation google.autovalue.annotations
     kapt google.autovalue

@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.meeting.view
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -451,32 +452,46 @@ private fun ScheduledMeetingSubtitle(state: ScheduledMeetingInfoState) {
 @Composable
 private fun MeetingAvatar(state: ScheduledMeetingInfoState) {
     if (state.isEmptyMeeting()) {
-        DefaultMeetingAvatarView(
-            title = state.chatTitle,
-            colorBackground = grey_alpha_012.takeIf { isLight() }
-                ?: white_alpha_012)
+        MeetingAvatarView(
+            avatarUri = null,
+            avatarPlaceholder = state.chatTitle,
+            avatarColor = null,
+            modifier = Modifier.border(1.dp, Color.White, CircleShape)
+        )
     } else if (state.isSingleMeeting()) {
-        state.firstParticipant?.let {
-            if (it.fileUpdated) {
-                ParticipantAvatarView(participant = it)
-            } else {
-                ParticipantAvatarView(participant = it)
-            }
+        state.firstParticipant?.let { participant ->
+            MeetingAvatarView(
+                avatarUri = participant.data.avatarUri,
+                avatarPlaceholder = participant.getAvatarFirstLetter(),
+                avatarColor = participant.defaultAvatarColor,
+                avatarTimestamp = participant.avatarUpdateTimestamp,
+                modifier = Modifier.border(1.dp, Color.White, CircleShape),
+            )
         }
-    } else {
-        state.firstParticipant?.let { first ->
-            state.secondParticipant?.let { last ->
-                if (first.fileUpdated) {
-                    ParticipantsAvatarView(firstParticipant = first, secondParticipant = last)
-                } else {
-                    ParticipantsAvatarView(firstParticipant = first, secondParticipant = last)
-                }
-                if (last.fileUpdated) {
-                    ParticipantsAvatarView(firstParticipant = first, secondParticipant = last)
-                } else {
-                    ParticipantsAvatarView(firstParticipant = first, secondParticipant = last)
-                }
-            }
+    } else if (state.firstParticipant != null && state.secondParticipant != null) {
+        Box(
+            Modifier.fillMaxSize()
+        ) {
+            MeetingAvatarView(
+                avatarUri = state.secondParticipant.data.avatarUri,
+                avatarPlaceholder = state.secondParticipant.getAvatarFirstLetter(),
+                avatarColor = state.secondParticipant.defaultAvatarColor,
+                avatarTimestamp = state.secondParticipant.avatarUpdateTimestamp,
+                modifier = Modifier
+                    .size(26.dp)
+                    .align(Alignment.BottomEnd)
+                    .border(1.dp, Color.White, CircleShape)
+            )
+            MeetingAvatarView(
+                avatarUri = state.firstParticipant.data.avatarUri,
+                avatarPlaceholder = state.firstParticipant.getAvatarFirstLetter(),
+                avatarColor = state.firstParticipant.defaultAvatarColor,
+                avatarTimestamp = state.firstParticipant.avatarUpdateTimestamp,
+                modifier = Modifier
+                    .size(26.dp)
+                    .align(Alignment.TopStart)
+                    .border(1.dp, Color.White, CircleShape)
+            )
         }
     }
 }
@@ -981,15 +996,15 @@ private fun ParticipantItemView(
                     .height(72.dp)
             ) {
                 Box {
-                    val avatarModifier = Modifier
-                        .padding(16.dp)
-                        .size(40.dp)
-                        .clip(CircleShape)
-                    if (participant.fileUpdated) {
-                        ParticipantAvatar(participant = participant, modifier = avatarModifier)
-                    } else {
-                        ParticipantAvatar(participant = participant, modifier = avatarModifier)
-                    }
+                    MeetingAvatarView(
+                        avatarUri = participant.data.avatarUri,
+                        avatarPlaceholder = participant.getAvatarFirstLetter(),
+                        avatarColor = participant.defaultAvatarColor,
+                        avatarTimestamp = participant.avatarUpdateTimestamp,
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .size(40.dp)
+                    )
 
                     if (participant.areCredentialsVerified) {
                         Image(
