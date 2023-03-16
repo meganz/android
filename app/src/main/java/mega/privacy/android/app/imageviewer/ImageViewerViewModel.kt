@@ -106,7 +106,7 @@ class ImageViewerViewModel @Inject constructor(
         private const val SLIDESHOW_DELAY = 4L
     }
 
-    private val images = MutableLiveData<List<ImageItem>?>()
+    val images = MutableLiveData<List<ImageItem>?>()
     private val currentImageId = MutableLiveData<Long?>()
     private val showToolbar = MutableLiveData<Boolean>(true)
     private val snackBarMessage = SingleLiveEvent<String>()

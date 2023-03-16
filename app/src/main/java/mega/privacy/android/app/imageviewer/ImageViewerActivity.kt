@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -22,12 +23,14 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityImageViewerBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.imageviewer.dialog.ImageBottomSheetDialogFragment
 import mega.privacy.android.app.imageviewer.util.shouldShowDownloadOption
@@ -67,6 +70,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -287,6 +291,9 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
+
+    @Inject
+    lateinit var getFeatureFlag: GetFeatureFlagValue
 
     private val nodeHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE) }
     private val nodeOfflineHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE) }
@@ -547,7 +554,13 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
                 true
             }
             R.id.action_slideshow -> {
-                getNavController().navigate(ImageViewerFragmentDirections.actionViewerToSlideshow())
+                lifecycleScope.launch {
+                    val enabled = getFeatureFlag(AppFeatures.SlideShowCompose)
+                    if (enabled)
+                        getNavController().navigate(ImageViewerFragmentDirections.actionViewerToNewSlideshow())
+                    else
+                        getNavController().navigate(ImageViewerFragmentDirections.actionViewerToSlideshow())
+                }
                 true
             }
             R.id.action_forward, R.id.action_send_to_chat -> {

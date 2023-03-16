@@ -13,6 +13,10 @@
         <action
             android:id="@+id/action_viewer_to_slideshow"
             app:destination="@id/image_slideshow" />
+
+        <action
+            android:id="@+id/action_viewer_to_new_slideshow"
+            app:destination="@id/new_slideshow" />
     </fragment>
 
     <fragment
@@ -30,4 +34,8 @@
         android:name="mega.privacy.android.app.presentation.slideshow.SlideshowSettingsFragment"
         android:label="@string/slideshow_settings_page_title"/>
 
+    <fragment
+        android:id="@+id/new_slideshow"
+        android:name="mega.privacy.android.app.presentation.slideshow.SlideshowFragment"
+        android:label="@string/action_slideshow"/>
 </navigation>

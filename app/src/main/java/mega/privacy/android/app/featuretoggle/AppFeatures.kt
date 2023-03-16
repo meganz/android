@@ -15,6 +15,14 @@ enum class AppFeatures(override val description: String, private val defaultValu
     Feature {
 
     /**
+     * To switch into new compose slideshow or not toggle.
+     */
+    SlideShowCompose(
+        "Enable slideshow compose",
+        false
+    ),
+
+    /**
      * Enable add subtitle feature
      */
     AddSubtitle("Enable the feature that adding subtitle", false),
