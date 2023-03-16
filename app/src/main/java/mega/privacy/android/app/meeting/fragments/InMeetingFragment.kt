@@ -986,11 +986,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            sharedModel.cameraGranted.collect { allowed ->
-                if (allowed) {
-                    bottomFloatingPanelViewHolder.updateCamPermissionWaring(allowed)
-                }
+        viewLifecycleOwner.collectFlow(sharedModel.cameraGranted) { allowed ->
+            if (allowed) {
+                bottomFloatingPanelViewHolder.updateCamPermissionWaring(allowed)
             }
         }
 
@@ -1044,11 +1042,9 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            sharedModel.recordAudioGranted.collect { allowed ->
-                if (allowed && !sharedModel.micLocked) {
-                    bottomFloatingPanelViewHolder.updateMicPermissionWaring(allowed)
-                }
+        viewLifecycleOwner.collectFlow(sharedModel.recordAudioGranted) { allowed ->
+            if (allowed && !sharedModel.micLocked) {
+                bottomFloatingPanelViewHolder.updateMicPermissionWaring(allowed)
             }
         }
 
@@ -1056,218 +1052,196 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             inMeetingViewModel.updateNetworkStatus(haveConnection)
         }
 
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.updateCallId.collect {
-                if (it != MEGACHAT_INVALID_HANDLE) {
-                    checkButtonsStatus()
-                    showMuteBanner()
-                    inMeetingViewModel.getCall()
-                        ?.let { isCallOnHold(inMeetingViewModel.isCallOnHold()) }
-                }
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.updateCallId) {
+            if (it != MEGACHAT_INVALID_HANDLE) {
+                checkButtonsStatus()
+                showMuteBanner()
+                inMeetingViewModel.getCall()
+                    ?.let { isCallOnHold(inMeetingViewModel.isCallOnHold()) }
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.showCallDuration.collect { isVisible ->
-                if (isVisible) {
-                    meetingChrono?.let { chrono ->
-                        chrono.stop()
-                        inMeetingViewModel.getCallDuration().let {
-                            if (it != INVALID_VALUE.toLong()) {
-                                chrono.base =
-                                    SystemClock.elapsedRealtime() - it * MILLISECONDS_IN_ONE_SECOND
-                                chrono.start()
-                                chrono.isVisible = true
-                            }
-                        }
-                    }
-                } else {
-                    meetingChrono?.let {
-                        it.stop()
-                        it.isVisible = false
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.updateCallSubtitle.collect { type ->
-                toolbarSubtitle?.let {
-                    when (type) {
-                        InMeetingViewModel.SubtitleCallType.TYPE_CONNECTING -> {
-                            it.text = StringResourcesUtils.getString(R.string.chat_connecting)
-                        }
-                        InMeetingViewModel.SubtitleCallType.TYPE_CALLING -> {
-                            it.text =
-                                StringResourcesUtils.getString(R.string.outgoing_call_starting)
-                        }
-                        InMeetingViewModel.SubtitleCallType.TYPE_ESTABLISHED -> {
-                            it.text = ""
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.showCallDuration) { isVisible ->
+            if (isVisible) {
+                meetingChrono?.let { chrono ->
+                    chrono.stop()
+                    inMeetingViewModel.getCallDuration().let {
+                        if (it != INVALID_VALUE.toLong()) {
+                            chrono.base =
+                                SystemClock.elapsedRealtime() - it * MILLISECONDS_IN_ONE_SECOND
+                            chrono.start()
+                            chrono.isVisible = true
                         }
                     }
                 }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.allowClickingOnToolbar.collect { allowed ->
-                if (allowed) {
-                    meetingActivity.binding.toolbar.setOnClickListener {
-                        showMeetingInfoFragment()
-                    }
-                } else {
-                    meetingActivity.binding.toolbar.setOnClickListener(null)
+            } else {
+                meetingChrono?.let {
+                    it.stop()
+                    it.isVisible = false
                 }
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.anotherChatTitle.collect { title ->
-                if (title.isNotEmpty()) {
-                    bannerAnotherCallTitle?.text = title
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.getParticipantsChanges.collect { (type, title) ->
-                if (title.trim().isNotEmpty()) {
-                    participantsChangesBanner?.apply {
-                        clearAnimation()
-                        hideCallWillEndInBanner()
-
-                        text = title
-                        isVisible = true
-                        alpha =
-                            if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
-                            else 1f
-
-                        animate()
-                            .alpha(0f)
-                            .setDuration(INFO_ANIMATION)
-                            .withEndAction {
-                                isVisible = false
-                                if (type == TYPE_LEFT) {
-                                    inMeetingViewModel.checkShowOnlyMeBanner()
-                                }
-                            }
-                    }
-                } else {
-                    participantsChangesBanner?.apply {
-                        clearAnimation()
-                        isVisible = false
-                    }
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.showOnlyMeBanner.collect { shouldBeShown ->
-                checkMenuItemsVisibility()
-                if (shouldBeShown && !MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
-                    showCallWillEndBannerAndOnlyMeDialog()
-                } else {
-                    hideCallBannerAndOnlyMeDialog()
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.showWaitingForOthersBanner.collect { shouldBeShown ->
-                checkMenuItemsVisibility()
-                if (shouldBeShown) {
-                    showWaitingForOthersBanner()
-                } else {
-                    hideCallWillEndInBanner()
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.updateAnotherCallBannerType.collect { type ->
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.updateCallSubtitle) { type ->
+            toolbarSubtitle?.let {
                 when (type) {
-                    InMeetingViewModel.AnotherCallType.TYPE_NO_CALL -> {
-                        Timber.d("No other calls in progress or on hold")
-                        bannerAnotherCallLayout.isVisible = false
-                        bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
-                            false
-                        )
-
+                    InMeetingViewModel.SubtitleCallType.TYPE_CONNECTING -> {
+                        it.text = StringResourcesUtils.getString(R.string.chat_connecting)
                     }
-                    InMeetingViewModel.AnotherCallType.TYPE_IN_PROGRESS -> {
-                        bannerAnotherCallLayout.let {
-                            it.alpha = 1f
-                            it.isVisible = true
-                        }
-                        bannerAnotherCallSubtitle?.text =
-                            StringResourcesUtils.getString(R.string.call_in_progress_layout)
-
-                        bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
-                            false
-                        )
-
+                    InMeetingViewModel.SubtitleCallType.TYPE_CALLING -> {
+                        it.text =
+                            StringResourcesUtils.getString(R.string.outgoing_call_starting)
                     }
-                    InMeetingViewModel.AnotherCallType.TYPE_ON_HOLD -> {
-                        bannerAnotherCallLayout.let {
-                            it.alpha = 0.9f
-                            it.isVisible = true
-                        }
-
-                        bannerAnotherCallSubtitle?.text =
-                            StringResourcesUtils.getString(R.string.call_on_hold)
-
-                        bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
-                            true
-                        )
+                    InMeetingViewModel.SubtitleCallType.TYPE_ESTABLISHED -> {
+                        it.text = ""
                     }
                 }
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.showPoorConnectionBanner.collect { shouldBeShown ->
-                bannerInfo?.apply {
-                    alpha = 1f
-                    isVisible = shouldBeShown
-                    if (shouldBeShown) {
-                        setBackgroundColor(
-                            ContextCompat.getColor(
-                                MegaApplication.getInstance().applicationContext,
-                                R.color.dark_grey_alpha_070
-                            )
-                        )
-                        text =
-                            StringResourcesUtils.getString(R.string.calls_call_screen_poor_network_quality)
-                    }
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.allowClickingOnToolbar) { allowed ->
+            if (allowed) {
+                meetingActivity.binding.toolbar.setOnClickListener {
+                    showMeetingInfoFragment()
                 }
+            } else {
+                meetingActivity.binding.toolbar.setOnClickListener(null)
+            }
+        }
 
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.anotherChatTitle) { title ->
+            if (title.isNotEmpty()) {
+                bannerAnotherCallTitle?.text = title
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.getParticipantsChanges) { (type, title) ->
+            if (title.trim().isNotEmpty()) {
+                participantsChangesBanner?.apply {
+                    clearAnimation()
+                    hideCallWillEndInBanner()
+
+                    text = title
+                    isVisible = true
+                    alpha =
+                        if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
+                        else 1f
+
+                    animate()
+                        .alpha(0f)
+                        .setDuration(INFO_ANIMATION)
+                        .withEndAction {
+                            isVisible = false
+                            if (type == TYPE_LEFT) {
+                                inMeetingViewModel.checkShowOnlyMeBanner()
+                            }
+                        }
+                }
+            } else {
+                participantsChangesBanner?.apply {
+                    clearAnimation()
+                    isVisible = false
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.showOnlyMeBanner) { shouldBeShown ->
+            checkMenuItemsVisibility()
+            if (shouldBeShown && !MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored) {
+                showCallWillEndBannerAndOnlyMeDialog()
+            } else {
+                hideCallBannerAndOnlyMeDialog()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.showWaitingForOthersBanner) { shouldBeShown ->
+            checkMenuItemsVisibility()
+            if (shouldBeShown) {
+                showWaitingForOthersBanner()
+            } else {
+                hideCallWillEndInBanner()
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.updateAnotherCallBannerType) { type ->
+            when (type) {
+                InMeetingViewModel.AnotherCallType.TYPE_NO_CALL -> {
+                    Timber.d("No other calls in progress or on hold")
+                    bannerAnotherCallLayout.isVisible = false
+                    bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
+                        false
+                    )
+
+                }
+                InMeetingViewModel.AnotherCallType.TYPE_IN_PROGRESS -> {
+                    bannerAnotherCallLayout.let {
+                        it.alpha = 1f
+                        it.isVisible = true
+                    }
+                    bannerAnotherCallSubtitle?.text =
+                        StringResourcesUtils.getString(R.string.call_in_progress_layout)
+
+                    bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
+                        false
+                    )
+
+                }
+                InMeetingViewModel.AnotherCallType.TYPE_ON_HOLD -> {
+                    bannerAnotherCallLayout.let {
+                        it.alpha = 0.9f
+                        it.isVisible = true
+                    }
+
+                    bannerAnotherCallSubtitle?.text =
+                        StringResourcesUtils.getString(R.string.call_on_hold)
+
+                    bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
+                        true
+                    )
+                }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.showPoorConnectionBanner) { shouldBeShown ->
+            bannerInfo?.apply {
+                alpha = 1f
+                isVisible = shouldBeShown
                 if (shouldBeShown) {
-                    reconnecting()
-                } else {
-                    checkChildFragments()
+                    setBackgroundColor(
+                        ContextCompat.getColor(
+                            MegaApplication.getInstance().applicationContext,
+                            R.color.dark_grey_alpha_070
+                        )
+                    )
+                    text =
+                        StringResourcesUtils.getString(R.string.calls_call_screen_poor_network_quality)
                 }
+            }
+
+            if (shouldBeShown) {
+                reconnecting()
+            } else {
+                checkChildFragments()
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.showReconnectingBanner.collect { shouldBeShown ->
-                bannerInfo?.apply {
-                    alpha = 1f
-                    isVisible = shouldBeShown
-                    if (shouldBeShown) {
-                        setBackgroundColor(
-                            ContextCompat.getColor(
-                                MegaApplication.getInstance().applicationContext,
-                                android.R.color.transparent
-                            )
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.showReconnectingBanner) { shouldBeShown ->
+            bannerInfo?.apply {
+                alpha = 1f
+                isVisible = shouldBeShown
+                if (shouldBeShown) {
+                    setBackgroundColor(
+                        ContextCompat.getColor(
+                            MegaApplication.getInstance().applicationContext,
+                            android.R.color.transparent
                         )
-                        text =
-                            StringResourcesUtils.getString(R.string.reconnecting_message)
-                        startAnimation(blink)
-                    } else {
-                        clearAnimation()
-                        inMeetingViewModel.checkBannerInfo()
-                    }
+                    )
+                    text =
+                        StringResourcesUtils.getString(R.string.reconnecting_message)
+                    startAnimation(blink)
+                } else {
+                    clearAnimation()
+                    inMeetingViewModel.checkBannerInfo()
                 }
             }
         }

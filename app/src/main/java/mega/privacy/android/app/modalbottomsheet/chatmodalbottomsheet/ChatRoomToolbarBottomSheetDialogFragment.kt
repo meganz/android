@@ -9,17 +9,16 @@ import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetChatRoomToolbarBinding
 import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActionListener
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.chatAdapters.FileStorageChatAdapter
-import mega.privacy.android.domain.entity.chat.FileGalleryItem
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.Util
@@ -28,6 +27,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermiss
 import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.domain.entity.chat.FileGalleryItem
 
 /**
  * Bottom Sheet Dialog which shows the chat options
@@ -46,15 +46,19 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var hasStoragePermission = false
 
     private val filesAdapter by lazy {
-        FileStorageChatAdapter(::onTakePictureClick,
+        FileStorageChatAdapter(
+            ::onTakePictureClick,
             ::onClickItem,
             ::onLongClickItem,
-            viewLifecycleOwner)
+            viewLifecycleOwner
+        )
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return BottomSheetDialog(requireContext(),
-            R.style.BottomSheetFragmentWithTransparentBackground).apply {
+        return BottomSheetDialog(
+            requireContext(),
+            R.style.BottomSheetFragmentWithTransparentBackground
+        ).apply {
             setCanceledOnTouchOutside(true)
         }
     }
@@ -81,52 +85,40 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupButtons()
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.filesGallery.collect { filesList ->
-                binding.emptyGallery.isVisible = filesList.isEmpty()
-                binding.list.isVisible = filesList.isNotEmpty()
-                filesAdapter.submitList(filesList)
+        viewLifecycleOwner.collectFlow(viewModel.filesGallery) { filesList ->
+            binding.emptyGallery.isVisible = filesList.isEmpty()
+            binding.list.isVisible = filesList.isNotEmpty()
+            filesAdapter.submitList(filesList)
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.showSendImagesButton) { visibility ->
+            isMultiselectMode = visibility
+            binding.sendFilesButton.isVisible = visibility
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.hasReadStoragePermissionsGranted) { isGranted ->
+            hasStoragePermission = isGranted
+            if (!hasStoragePermission) {
+                viewModel.checkStoragePermission()
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.showSendImagesButton.collect { visibility ->
-                isMultiselectMode = visibility
-                binding.sendFilesButton.isVisible = visibility
+        viewLifecycleOwner.collectFlow(viewModel.hasCameraPermissionsGranted) { isGranted ->
+            hasCameraPermission = isGranted
+            if (!hasCameraPermission && hasStoragePermission) {
+                viewModel.checkCameraPermission()
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.hasReadStoragePermissionsGranted.collect { isGranted ->
-                hasStoragePermission = isGranted
-                if (!hasStoragePermission) {
-                    viewModel.checkStoragePermission()
-                }
+        viewLifecycleOwner.collectFlow(viewModel.checkReadStoragePermissions) { shouldCheck ->
+            if (shouldCheck) {
+                checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.hasCameraPermissionsGranted.collect { isGranted ->
-                hasCameraPermission = isGranted
-                if (!hasCameraPermission && hasStoragePermission) {
-                    viewModel.checkCameraPermission()
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            viewModel.checkReadStoragePermissions.collect { shouldCheck ->
-                if (shouldCheck) {
-                    checkPermissions(Manifest.permission.READ_EXTERNAL_STORAGE)
-                }
-            }
-        }
-
-        lifecycleScope.launchWhenStarted {
-            viewModel.checkCameraPermissions.collect { shouldCheck ->
-                if (shouldCheck) {
-                    checkPermissions(Manifest.permission.CAMERA)
-                }
+        viewLifecycleOwner.collectFlow(viewModel.checkCameraPermissions) { shouldCheck ->
+            if (shouldCheck) {
+                checkPermissions(Manifest.permission.CAMERA)
             }
         }
 

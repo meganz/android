@@ -11,16 +11,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.chat.dialog.view.AskForDisplayOverDialog
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import javax.inject.Inject
 
 /**
@@ -43,37 +43,35 @@ class AskForDisplayOverActivity : ComponentActivity() {
 
         viewModel.onOpenDialog()
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.finish.collect { shouldFinish ->
-                if (shouldFinish) {
-                    finish()
-                }
+        collectFlow(viewModel.finish) { shouldFinish ->
+            if (shouldFinish) {
+                finish()
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.toSettings.collect { allow ->
-                if (allow) {
-                    startActivity(Intent(
+        collectFlow(viewModel.toSettings) { allow ->
+            if (allow) {
+                startActivity(
+                    Intent(
                         Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                         Uri.parse("package:$packageName")
-                    ))
-                    viewModel.onFinishActivity()
-                }
+                    )
+                )
+                viewModel.onFinishActivity()
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            viewModel.dismiss.collect { notNow ->
-                if (notNow) {
-                    // This will keep showing after the activity is destroyed, so can't use snack bar.
-                    Toast.makeText(MegaApplication.getInstance().applicationContext,
-                        R.string.ask_for_display_over_explain,
-                        Toast.LENGTH_LONG)
-                        .show()
+        collectFlow(viewModel.dismiss) { notNow ->
+            if (notNow) {
+                // This will keep showing after the activity is destroyed, so can't use snack bar.
+                Toast.makeText(
+                    MegaApplication.getInstance().applicationContext,
+                    R.string.ask_for_display_over_explain,
+                    Toast.LENGTH_LONG
+                )
+                    .show()
 
-                    viewModel.onFinishActivity()
-                }
+                viewModel.onFinishActivity()
             }
         }
 

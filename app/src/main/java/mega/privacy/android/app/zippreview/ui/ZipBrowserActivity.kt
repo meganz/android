@@ -26,6 +26,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -161,7 +162,7 @@ class ZipBrowserActivity : PasscodeActivity() {
             openFile.observe(this@ZipBrowserActivity) { (first, second) ->
                 openFile(second, first)
             }
-            lifecycleScope.launchWhenStarted {
+            lifecycleScope.launch {
                 enableBackPressedHandler.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                     .collect { isEnabled ->
                         onBackPressedCallback.isEnabled = isEnabled

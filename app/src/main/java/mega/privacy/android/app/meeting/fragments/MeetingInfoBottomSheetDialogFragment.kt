@@ -19,11 +19,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.twemoji.EmojiEditText
 import mega.privacy.android.app.databinding.FragmentMeetingInfoBinding
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
@@ -94,20 +94,18 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.updateModeratorsName.collect { moderatorsName ->
-                binding.moderatorName.text = moderatorsName
-                binding.moderatorName.isVisible = moderatorsName.isNotEmpty()
-            }
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.updateModeratorsName) { moderatorsName ->
+            binding.moderatorName.text = moderatorsName
+            binding.moderatorName.isVisible = moderatorsName.isNotEmpty()
         }
 
-        lifecycleScope.launchWhenStarted {
-            inMeetingViewModel.updateNumParticipants.collect { numParticipants ->
-                binding.participantSize.text =
-                    StringResourcesUtils.getQuantityString(R.plurals.meeting_call_screen_meeting_info_bottom_panel_num_of_participants,
-                        numParticipants,
-                        numParticipants)
-            }
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.updateNumParticipants) { numParticipants ->
+            binding.participantSize.text =
+                StringResourcesUtils.getQuantityString(
+                    R.plurals.meeting_call_screen_meeting_info_bottom_panel_num_of_participants,
+                    numParticipants,
+                    numParticipants
+                )
         }
 
         initAction()
@@ -144,11 +142,15 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
                 requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText("Copied Text", chatLink)
             clipboard.setPrimaryClip(clip)
-            showSnackbar(requireContext(),
-                StringResourcesUtils.getString(R.string.copied_meeting_link))
+            showSnackbar(
+                requireContext(),
+                StringResourcesUtils.getString(R.string.copied_meeting_link)
+            )
         } else {
-            showSnackbar(requireContext(),
-                StringResourcesUtils.getString(R.string.general_text_error))
+            showSnackbar(
+                requireContext(),
+                StringResourcesUtils.getString(R.string.general_text_error)
+            )
         }
     }
 
@@ -195,8 +197,10 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
             }
             false
         }
-        input.setImeActionLabel(StringResourcesUtils.getString(R.string.change_meeting_name),
-            EditorInfo.IME_ACTION_DONE)
+        input.setImeActionLabel(
+            StringResourcesUtils.getString(R.string.change_meeting_name),
+            EditorInfo.IME_ACTION_DONE
+        )
         builder.setTitle(R.string.change_meeting_name)
             .setPositiveButton(StringResourcesUtils.getString(R.string.change_pass), null)
             .setNegativeButton(android.R.string.cancel, null)

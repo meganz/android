@@ -12,7 +12,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.NavHostFragment
@@ -20,6 +19,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityMeetingBinding
 import mega.privacy.android.app.meeting.CallNotificationIntentService
 import mega.privacy.android.app.meeting.fragments.CreateMeetingFragment
@@ -172,26 +172,22 @@ class MeetingActivity : BaseActivity() {
         initNavigation()
         setStatusBarTranslucent()
 
-        lifecycleScope.launchWhenStarted {
-            meetingViewModel.finishMeetingActivity.collect { shouldFinish ->
-                if (shouldFinish) {
-                    if (meetingViewModel.amIAGuest()) {
-                        meetingViewModel.logOutTheGuest(this@MeetingActivity)
-                    } else {
-                        finish()
-                    }
+        collectFlow(meetingViewModel.finishMeetingActivity) { shouldFinish ->
+            if (shouldFinish) {
+                if (meetingViewModel.amIAGuest()) {
+                    meetingViewModel.logOutTheGuest(this@MeetingActivity)
+                } else {
+                    finish()
                 }
             }
         }
 
-        lifecycleScope.launchWhenStarted {
-            meetingViewModel.switchCall.collect { chatId ->
-                if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.currentChatId.value != chatId) {
-                    Timber.d("Switch call")
-                    passcodeManagement.showPasscodeScreen = true
-                    MegaApplication.getInstance().openCallService(chatId)
-                    startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
-                }
+        collectFlow(meetingViewModel.switchCall) { chatId ->
+            if (chatId != MEGACHAT_INVALID_HANDLE && meetingViewModel.currentChatId.value != chatId) {
+                Timber.d("Switch call")
+                passcodeManagement.showPasscodeScreen = true
+                MegaApplication.getInstance().openCallService(chatId)
+                startActivity(getIntentOngoingCall(this@MeetingActivity, chatId))
             }
         }
     }

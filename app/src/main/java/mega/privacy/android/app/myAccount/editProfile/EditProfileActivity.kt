@@ -302,7 +302,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             }
         }
 
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launch {
             editProfileViewModel.state.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect {
                     setUpAvatar(it.avatarFile, it.avatarColor)
