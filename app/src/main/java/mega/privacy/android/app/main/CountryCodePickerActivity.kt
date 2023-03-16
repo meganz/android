@@ -30,7 +30,9 @@ class CountryCodePickerActivity : PasscodeActivity() {
     private val selectedCountries = mutableListOf<Country>()
     private var searchInput: String? = null
     private var searchAutoComplete: SearchView.SearchAutoComplete? = null
-    private var receivedCountryCodes: ArrayList<String>? = null
+    private val receivedCountryCodes by lazy(LazyThreadSafetyMode.NONE) {
+        intent.extras?.getStringArrayList("country_code")
+    }
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
@@ -47,7 +49,6 @@ class CountryCodePickerActivity : PasscodeActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
-
         countries = loadCountries()
 
         supportActionBar?.apply {
@@ -86,8 +87,6 @@ class CountryCodePickerActivity : PasscodeActivity() {
         if (savedInstanceState != null) {
             searchInput = savedInstanceState.getString(SAVED_QUERY_STRING)
         }
-
-        receivedCountryCodes = intent.extras?.getStringArrayList("country_code")
     }
 
     /**
@@ -155,7 +154,7 @@ class CountryCodePickerActivity : PasscodeActivity() {
         // Each string in ArrayList is "DO:1809,1829,1849,"
         val countryCodeList = ArrayList<Country>()
         if (receivedCountryCodes != null) {
-            for (countryString in receivedCountryCodes!!) {
+            for (countryString in receivedCountryCodes.orEmpty()) {
                 val splitIndex = countryString.indexOf(":")
                 val countryCode = countryString.substring(0, countryString.indexOf(":"))
                 val dialCodes = countryString.substring(splitIndex + 1).split(",".toRegex())
