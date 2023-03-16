@@ -21,6 +21,8 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.presentation.favourites.model.mapper.HeaderMapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.toFavourite
 import mega.privacy.android.app.presentation.favourites.model.mapper.toHeader
+import mega.privacy.android.app.presentation.manager.model.mapper.InitialScreenMapper
+import mega.privacy.android.app.presentation.manager.model.mapper.InitialScreenMapperImpl
 import mega.privacy.android.app.presentation.meeting.mapper.MeetingLastTimestampMapper
 import mega.privacy.android.app.presentation.meeting.mapper.ScheduledMeetingTimestampMapper
 import mega.privacy.android.app.presentation.meeting.mapper.toLastTimeFormatted
@@ -111,4 +113,10 @@ class MapperModule {
     @Provides
     fun provideScheduledMeetingTimestampMapper(): ScheduledMeetingTimestampMapper =
         ::toScheduledTimeFormatted
+
+    /**
+     * Provide initial screen mapper
+     */
+    @Provides
+    fun provideInitialScreenMapper(): InitialScreenMapper = InitialScreenMapperImpl()
 }

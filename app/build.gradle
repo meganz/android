@@ -7,6 +7,7 @@ apply plugin: 'androidx.navigation.safeargs.kotlin'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: 'jacoco'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'de.mannodermaus.android-junit5'
 
 apply from: "$project.rootDir/tools/util.gradle"
 apply from: "$project.rootDir/tools/sdk.gradle"
@@ -367,6 +368,11 @@ dependencies {
     testImplementation androidx.work.test
     testImplementation testlib.room.test
     testImplementation testlib.compose.junit
+
+    //jUnit 5
+    testImplementation(platform(testlib.junit5.bom))
+    testImplementation(testlib.bundles.junit5.api)
+    testRuntimeOnly testlib.junit.jupiter.engine
 
     androidTestImplementation platform(androidx.compose.bom)
     androidTestImplementation testlib.junit.test.ktx
