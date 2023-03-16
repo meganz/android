@@ -198,6 +198,8 @@ import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
+import mega.privacy.android.app.presentation.copynode.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogFragment
@@ -260,7 +262,6 @@ import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.app.psa.PsaViewHolder
 import mega.privacy.android.app.service.iar.RatingHandlerImpl
 import mega.privacy.android.app.service.push.MegaMessageService
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.BackupDialogState.BACKUP_DIALOG_SHOW_CONFIRM
@@ -274,8 +275,6 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.presentation.copynode.CopyRequestResult
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.usecase.data.MoveRequestResult
 import mega.privacy.android.app.usecase.data.RemoveRequestResult
 import mega.privacy.android.app.usecase.exception.ForeignNodeException
@@ -331,6 +330,7 @@ import mega.privacy.android.app.zippreview.ui.ZipBrowserActivity
 import mega.privacy.android.data.facade.BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.ShareData
@@ -926,7 +926,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
             Constants.REQUEST_WRITE_STORAGE -> {
-                if (getFirstLogin()) {
+                if (viewModel.state.value.isFirstLogin) {
                     Timber.d("The first time")
                     if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                         if (typesCameraPermission == Constants.TAKE_PICTURE_OPTION) {
@@ -1913,6 +1913,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.d("Check if there any INCOMING pendingRequest contacts")
             setContactTitleSection()
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
+            val firstLaunch = intent?.getBooleanExtra(IntentConstants.EXTRA_FIRST_LOGIN, false) == true
             if (drawerItem == null) {
                 drawerItem = getStartDrawerItem()
                 if (intent != null) {
@@ -2031,7 +2032,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             //INITIAL FRAGMENT
             if (selectDrawerItemPending) {
-                selectDrawerItem(drawerItem)
+                selectDrawerItem(drawerItem, firstLaunch)
             }
         }
         return false
@@ -2566,7 +2567,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 drawerItem = DrawerItem.ASK_PERMISSIONS
                 askForAccess()
             }
-        } else if (getFirstLogin() && !newCreationAccount && canVerifyPhoneNumber() && !onAskingPermissionsFragment) {
+        } else if (viewModel.state.value.isFirstLogin && !newCreationAccount && canVerifyPhoneNumber() && !onAskingPermissionsFragment) {
             askForSMSVerification()
         } else if (requestNotificationsPermissionFirstLogin) {
             askForNotificationsPermission()
@@ -2601,7 +2602,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (myAccountInfo.isBusinessAlertShown) {
             return false
         }
-        if (getFirstLogin() && myAccountInfo.wasNotBusinessAlertShownYet()) {
+        if (viewModel.state.value.isFirstLogin && myAccountInfo.wasNotBusinessAlertShownYet()) {
             val status: Int = megaApi.businessStatus
             if (status == MegaApiJava.BUSINESS_STATUS_EXPIRED) {
                 myAccountInfo.isBusinessAlertShown = true
@@ -4206,7 +4207,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     @SuppressLint("NewApi")
-    fun selectDrawerItem(item: DrawerItem?) {
+    @JvmOverloads
+    fun selectDrawerItem(item: DrawerItem?, firstLaunch: Boolean = false) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         drawerItem = item ?: drawerItem ?: DrawerItem.CLOUD_DRIVE
 
@@ -4315,7 +4317,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else {
                     appBarLayout.visibility = View.VISIBLE
                     if (getPhotosFragment() == null) {
-                        photosFragment = PhotosFragment()
+                        photosFragment = PhotosFragment.newInstance(firstLaunch)
                     } else {
                         refreshFragment(FragmentTag.PHOTOS.tag)
                     }
@@ -4673,7 +4675,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     private fun setRequestNotificationsPermissionFirstLogin(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
-            requestNotificationsPermissionFirstLogin = getFirstLogin()
+            requestNotificationsPermissionFirstLogin = viewModel.state.value.isFirstLogin
         }
     }
 
@@ -5581,7 +5583,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private val isFirstTimeCam: Unit
         get() {
-            if (getFirstLogin()) {
+            if (viewModel.state.value.isFirstLogin) {
                 viewModel.setIsFirstLogin(false)
                 dbH.setCamSyncEnabled(false)
                 bottomNavigationCurrentItem = CLOUD_DRIVE_BNV
@@ -9395,10 +9397,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     ): Boolean {
         Timber.d("onTransferData")
         return true
-    }
-
-    fun getFirstLogin(): Boolean {
-        return viewModel.state.value.isFirstLogin
     }
 
     fun setFirstLogin(isFirst: Boolean) {

@@ -34,13 +34,14 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -197,7 +198,7 @@ class PhotosFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        if (managerActivity.getFirstLogin()) {
+        if (arguments?.getBoolean(firsLoginKey) == true) {
             timelineViewModel.shouldEnableCUPage(true)
         }
         setUpFlow()
@@ -233,7 +234,7 @@ class PhotosFragment : Fragment() {
                     if (
                         timelineViewModel.state.value.enableCameraUploadPageShowing
                         && timelineViewModel.state.value.currentShowingPhotos.isNotEmpty()
-                        || managerActivity.getFirstLogin()
+                        || arguments?.getBoolean(firsLoginKey) == true
                     ) {
                         photosViewModel.setMenuShowing(false)
                     }
@@ -669,9 +670,9 @@ class PhotosFragment : Fragment() {
      * Performs actions when the Button to enable Camera Uploads has been clicked
      */
     private fun onCameraUploadsButtonClicked() {
-        if (managerActivity.getFirstLogin()) {
+        if (arguments?.getBoolean(firsLoginKey) == true) {
             timelineViewModel.setInitialPreferences()
-            managerActivity.setFirstLogin(false)
+            arguments?.putBoolean(firsLoginKey, false)
         }
         MegaApplication.getInstance().sendSignalPresenceActivity()
 
@@ -789,5 +790,16 @@ class PhotosFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+    }
+
+    companion object {
+        fun newInstance(isFirstLogin: Boolean): PhotosFragment {
+            val fragment = PhotosFragment()
+            fragment.arguments = bundleOf(firsLoginKey to isFirstLogin)
+
+            return fragment
+        }
+
+        private const val firsLoginKey = "PHOTOS_FRAGMENT_FIRST_LOGIN_ARGUMENT"
     }
 }
