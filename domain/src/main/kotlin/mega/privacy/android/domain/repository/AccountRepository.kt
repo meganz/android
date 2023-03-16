@@ -203,7 +203,7 @@ interface AccountRepository {
      * Registered email of current account
      * @return email address or null
      */
-    suspend fun getAccountEmail(): String?
+    suspend fun getAccountEmail(forceRefresh: Boolean = true): String?
 
     /**
      * Monitor account detail

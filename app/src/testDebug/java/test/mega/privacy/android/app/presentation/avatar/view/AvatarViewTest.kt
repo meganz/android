@@ -66,6 +66,7 @@ class AvatarViewTest {
                 modifier = Modifier,
                 content = PhotoAvatarContent(
                     path = "file:/path/to/avatar/file.jpg",
+                    size = 0L
                 )
             )
         }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.constant.FileConstant
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -60,6 +61,7 @@ internal class DefaultAvatarRepositoryTest {
     private val sharedFlow = MutableSharedFlow<GlobalUpdate>()
     private val avatarWrapper = mock<AvatarWrapper>()
     private val bitmapFactoryWrapper = mock<BitmapFactoryWrapper>()
+    private val databaseHandler = mock<DatabaseHandler>()
 
     @Before
     fun setUp() {
@@ -73,7 +75,8 @@ internal class DefaultAvatarRepositoryTest {
             cacheFolderGateway = cacheFolderGateway,
             contactsRepository = contactsRepository,
             sharingScope = TestScope(),
-            ioDispatcher = UnconfinedTestDispatcher()
+            ioDispatcher = UnconfinedTestDispatcher(),
+            databaseHandler = databaseHandler
         )
     }
 
@@ -210,13 +213,15 @@ internal class DefaultAvatarRepositoryTest {
 
     @Test
     fun `test that getMyAvatarFile from the cache when pass isForceRefresh as false`() = runTest {
+        val email = "my_email"
+        whenever(databaseHandler.myEmail).thenReturn(email)
         underTest.getMyAvatarFile(isForceRefresh = false)
         verify(megaApiGateway, times(0)).myUser
         verify(megaApiGateway, times(0)).getUserAvatar(any(), any())
         verify(
             cacheFolderGateway,
             times(1)
-        ).buildAvatarFile(megaApiGateway.accountEmail + FileConstant.JPG_EXTENSION)
+        ).buildAvatarFile(email + FileConstant.JPG_EXTENSION)
     }
 
     @Test

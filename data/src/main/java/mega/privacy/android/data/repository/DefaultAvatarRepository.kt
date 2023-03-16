@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.FileConstant
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.CacheFolderGateway
@@ -52,6 +53,7 @@ internal class DefaultAvatarRepository @Inject constructor(
     private val cacheFolderGateway: CacheFolderGateway,
     private val avatarWrapper: AvatarWrapper,
     private val bitmapFactoryWrapper: BitmapFactoryWrapper,
+    private val databaseHandler: DatabaseHandler,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AvatarRepository {
@@ -117,7 +119,7 @@ internal class DefaultAvatarRepository @Inject constructor(
                     return@withContext loadAvatarFile(it)
                 }
             }
-            return@withContext cacheFolderGateway.buildAvatarFile(megaApiGateway.accountEmail + FileConstant.JPG_EXTENSION)
+            return@withContext cacheFolderGateway.buildAvatarFile(databaseHandler.myEmail + FileConstant.JPG_EXTENSION)
         }
 
     override suspend fun getAvatarFile(userHandle: Long, skipCache: Boolean): File =

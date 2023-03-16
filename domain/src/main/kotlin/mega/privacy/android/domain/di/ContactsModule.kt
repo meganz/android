@@ -5,15 +5,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
-import mega.privacy.android.domain.usecase.contact.DefaultGetContactFromChat
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetContactData
-import mega.privacy.android.domain.usecase.contact.GetContactFromChat
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -25,12 +22,13 @@ import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.account.DefaultUpdateCurrentUserName
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
+import mega.privacy.android.domain.usecase.contact.DefaultGetContactFromChat
 import mega.privacy.android.domain.usecase.contact.DefaultReloadContactDatabase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
-import mega.privacy.android.domain.usecase.contact.GetContactItem
+import mega.privacy.android.domain.usecase.contact.GetContactFromChat
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
+import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
-import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
@@ -125,10 +123,6 @@ internal abstract class ContactsModule {
         @Provides
         fun provideInviteContact(contactsRepository: ContactsRepository): InviteContact =
             InviteContact(contactsRepository::inviteContact)
-
-        @Provides
-        fun provideGetCurrentUserEmail(accountRepository: AccountRepository): GetCurrentUserEmail =
-            GetCurrentUserEmail { accountRepository.getAccountEmail() }
 
         @Provides
         fun provideGetUserFirstName(contactsRepository: ContactsRepository): GetUserFirstName =

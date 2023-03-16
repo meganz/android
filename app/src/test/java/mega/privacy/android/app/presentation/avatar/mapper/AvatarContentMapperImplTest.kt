@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.sp
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.twemoji.wrapper.EmojiManagerWrapper
@@ -37,6 +38,7 @@ class AvatarContentMapperImplTest {
             avatarWrapper = avatarWrapper,
             emojiManagerWrapper = emojiManagerWrapper,
             context = context,
+            ioDispatcher = UnconfinedTestDispatcher()
         )
     }
 

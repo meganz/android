@@ -91,6 +91,7 @@ internal class UserInfoViewModel @Inject constructor(
         }
         // Load from the cache first, in case offline mode
         viewModelScope.launch {
+            getMyEmail(false)
             getUserFullName(false)
             getUserAvatarOrDefault(false)
         }
@@ -161,7 +162,7 @@ internal class UserInfoViewModel @Inject constructor(
 
     private suspend fun handleEmailChange() {
         val oldEmail = _state.value.email
-        getMyEmail()
+        getMyEmail(true)
         val newEmail = _state.value.email
         runCatching { updateMyAvatarWithNewEmail(oldEmail, newEmail) }
             .onSuccess { success -> if (success) Timber.d("The avatar file was correctly renamed") }
@@ -176,14 +177,14 @@ internal class UserInfoViewModel @Inject constructor(
      */
     fun getUserInfo() {
         viewModelScope.launch {
-            getMyEmail()
+            getMyEmail(true)
             getUserFullName(true)
             getUserAvatarOrDefault(true)
         }
     }
 
-    private suspend fun getMyEmail() {
-        runCatching { getCurrentUserEmail() }
+    private suspend fun getMyEmail(forceRefresh: Boolean) {
+        runCatching { getCurrentUserEmail(forceRefresh) }
             .onSuccess { mail ->
                 _state.update { it.copy(email = mail.orEmpty()) }
             }.onFailure {

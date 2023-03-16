@@ -42,6 +42,12 @@ data class EmojiAvatarContent(
 /**
  * A photo avatar
  * @property path Path of a photo avatar
+ * @property size we use the size here because StateFlow will not emit if the path the same,
+ * size parameter to know the avatar file already changed
  * @property showBorder
  */
-data class PhotoAvatarContent(val path: String, val showBorder: Boolean = true) : AvatarContent
+data class PhotoAvatarContent(
+    val path: String,
+    val size: Long,
+    val showBorder: Boolean = true,
+) : AvatarContent

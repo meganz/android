@@ -1,14 +1,19 @@
 package mega.privacy.android.domain.usecase.contact
 
+import mega.privacy.android.domain.repository.AccountRepository
+import javax.inject.Inject
+
 /**
  * Get current user email
  *
  */
-fun interface GetCurrentUserEmail {
+class GetCurrentUserEmail @Inject constructor(
+    private val accountRepository: AccountRepository
+) {
     /**
      * Invoke
      *
      * @return
      */
-    suspend operator fun invoke(): String?
+    suspend operator fun invoke(forceRefresh: Boolean = true) = accountRepository.getAccountEmail(forceRefresh)
 }
