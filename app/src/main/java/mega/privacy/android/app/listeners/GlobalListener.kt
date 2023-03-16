@@ -261,18 +261,25 @@ class GlobalListener @Inject constructor(
         Timber.d("showSharedFolderNotification")
         try {
             val sharesIncoming = megaApi.inSharesList ?: return
-            var name: String? = ""
 
-            for (mS in sharesIncoming) {
-                if (mS.nodeHandle == n.handle) {
-                    val user = megaApi.getContact(mS.user)
-                    name = ContactUtil.getMegaUserNameDB(user) ?: ""
-                }
-            }
+            val notificationTitle = appContext.getString(
+                if (n.hasChanged(MegaNode.CHANGE_TYPE_NEW))
+                    R.string.title_incoming_folder_notification
+                else R.string.context_permissions_changed
+            )
+
+            val userName = sharesIncoming.firstOrNull { it.nodeHandle == n.handle }?.let {
+                val user = megaApi.getContact(it.user)
+                ContactUtil.getMegaUserNameDB(user) ?: ""
+            } ?: ""
+
+            val folderName = if (n.isNodeKeyDecrypted) n.name else notificationTitle
+
             val source =
-                "<b>" + n.name + "</b> " + appContext.getString(R.string.incoming_folder_notification) + " " + Util.toCDATA(
-                    name
-                )
+                "<b>$folderName</b> " +
+                        appContext.getString(R.string.incoming_folder_notification) +
+                        " " +
+                        Util.toCDATA(userName)
             val notificationContent = HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY)
             val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CLOUDDRIVE_ID
             val intent: Intent = Intent(appContext, ManagerActivity::class.java)
@@ -282,8 +289,6 @@ class GlobalListener @Inject constructor(
                 appContext, 0, intent,
                 PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
             )
-            val notificationTitle: String =
-                appContext.getString(if (n.hasChanged(MegaNode.CHANGE_TYPE_NEW)) R.string.title_incoming_folder_notification else R.string.context_permissions_changed)
             val notificationManager =
                 appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
