@@ -62,7 +62,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.domain.usecase.shares.SetShareFolderAccessPermission
+import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -116,7 +116,7 @@ internal class FileInfoViewModelTest {
     private val isAvailableOffline: IsAvailableOffline = mock()
     private val setNodeAvailableOffline: SetNodeAvailableOffline = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
-    private val setShareFolderAccessPermission: SetShareFolderAccessPermission = mock()
+    private val setOutgoingPermissions: SetOutgoingPermissions = mock()
     private val stopSharingNode: StopSharingNode = mock()
 
     private val typedFileNode: TypedFileNode = mock()
@@ -165,9 +165,8 @@ internal class FileInfoViewModelTest {
             isAvailableOffline = isAvailableOffline,
             setNodeAvailableOffline = setNodeAvailableOffline,
             getNodeAccessPermission = getNodeAccessPermission,
-            setShareFolderAccessPermission = setShareFolderAccessPermission,
+            setOutgoingPermissions = setOutgoingPermissions,
             stopSharingNode = stopSharingNode,
-            createShareKey = mock(),
         )
     }
 
@@ -760,7 +759,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(folderNode.id.longValue)
             underTest.setSharePermissionForUsers(AccessPermission.READ, emails)
 
-            verify(setShareFolderAccessPermission, times(1))
+            verify(setOutgoingPermissions, times(1))
                 .invoke(folderNode, AccessPermission.READ, *emails.toTypedArray())
         }
 
@@ -772,7 +771,7 @@ internal class FileInfoViewModelTest {
             underTest.setNode(folderNode.id.longValue)
             underTest.removeSharePermissionForUsers(*emails)
 
-            verify(setShareFolderAccessPermission, times(1))
+            verify(setOutgoingPermissions, times(1))
                 .invoke(folderNode, AccessPermission.UNKNOWN, *emails)
         }
 

@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mega.privacy.android.app.domain.usecase.CheckNameCollision
-import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
@@ -23,7 +22,6 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges.Inshare
 import mega.privacy.android.domain.entity.node.NodeChanges.Name
@@ -59,7 +57,7 @@ import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.domain.usecase.shares.SetShareFolderAccessPermission
+import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
@@ -99,8 +97,7 @@ class FileInfoViewModel @Inject constructor(
     private val isAvailableOffline: IsAvailableOffline,
     private val setNodeAvailableOffline: SetNodeAvailableOffline,
     private val getNodeAccessPermission: GetNodeAccessPermission,
-    private val createShareKey: CreateShareKey,
-    private val setShareFolderAccessPermission: SetShareFolderAccessPermission,
+    private val setOutgoingPermissions: SetOutgoingPermissions,
     private val stopSharingNode: StopSharingNode,
 ) : ViewModel() {
 
@@ -394,7 +391,7 @@ class FileInfoViewModel @Inject constructor(
         accessPermission: AccessPermission,
         progress: FileInfoJobInProgressState.ChangeSharePermission,
         vararg emails: String,
-    ) = (typedNode as? FolderNode)?.let { folderNode ->
+    ) = (typedNode as? TypedFolderNode)?.let { folderNode ->
         //clear selection to update related UI state (close bottom sheet, etc.)
         _uiState.update {
             it.copy(
@@ -405,8 +402,7 @@ class FileInfoViewModel @Inject constructor(
         //update permissions
         this.performBlockSettingProgress(progress) {
             runCatching {
-                createShareKey(node)
-                setShareFolderAccessPermission(folderNode, accessPermission, *emails)
+                setOutgoingPermissions(folderNode, accessPermission, *emails)
             }.onFailure {
                 Timber.e("FileInfoViewModel changeSharePermissionForUsers error $it")
             }

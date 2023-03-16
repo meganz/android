@@ -5,11 +5,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.shares.CreateShareKey
+import mega.privacy.android.domain.usecase.shares.DefaultCreateShareKey
 import mega.privacy.android.domain.usecase.shares.DefaultGetContactItemFromInShareFolder
-import mega.privacy.android.domain.usecase.shares.DefaultSetShareFolderAccessPermission
+import mega.privacy.android.domain.usecase.shares.DefaultSetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
-import mega.privacy.android.domain.usecase.shares.SetShareFolderAccessPermission
+import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 
 /**
@@ -26,10 +28,16 @@ abstract class InternalSharesModule {
     abstract fun bindGetContactItemFromInShareFolder(useCase: DefaultGetContactItemFromInShareFolder): GetContactItemFromInShareFolder
 
     /**
-     * Provides [DefaultSetShareFolderAccessPermission] implementation.
+     * Provides [CreateShareKey] implementation.
      */
     @Binds
-    abstract fun bindDefaultSetShareAccess(useCase: DefaultSetShareFolderAccessPermission): SetShareFolderAccessPermission
+    abstract fun bindCreateShareKey(useCase: DefaultCreateShareKey): CreateShareKey
+
+    /**
+     * Provides [SetOutgoingPermissions] implementation.
+     */
+    @Binds
+    abstract fun bindDefaultSetShareAccess(useCase: DefaultSetOutgoingPermissions): SetOutgoingPermissions
 
     companion object {
         /**

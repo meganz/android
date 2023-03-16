@@ -3,8 +3,8 @@ package mega.privacy.android.domain.usecase.shares
 import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.exception.ShareAccessNotSetException
 import mega.privacy.android.domain.repository.NodeRepository
@@ -14,18 +14,21 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultSetShareFolderAccessPermissionTest {
+class DefaultSetOutgoingPermissionsTest {
     private val nodeRepository = mock<NodeRepository>()
-    private val underTest: SetShareFolderAccessPermission =
-        DefaultSetShareFolderAccessPermission(nodeRepository)
+    private val underTest: SetOutgoingPermissions =
+        DefaultSetOutgoingPermissions(nodeRepository)
+
 
     @Test
     fun `test that when share access is set then nodeRepository is called for each user`() =
         runTest {
+            val block = mock<((AccessPermission, String) -> Unit)>()
+            whenever(nodeRepository.createShareKey(folderNode)).thenReturn(block)
             underTest.invoke(folderNode, accessPermission, *emails)
 
             emails.forEach {
-                verify(nodeRepository).setShareAccess(nodeId, accessPermission, it)
+                verify(block).invoke(accessPermission, it)
             }
         }
 
@@ -34,14 +37,14 @@ class DefaultSetShareFolderAccessPermissionTest {
         runTest {
             val successSet = emails.filterIndexed { index, _ -> index.mod(2) == 0 }
             val failSet = emails.asList() - successSet.toSet()
+            val block = mock<((AccessPermission, String) -> Unit)>()
             successSet.forEach {
-                whenever(nodeRepository.setShareAccess(nodeId, accessPermission, it))
-                    .thenReturn(Unit)
+                whenever(block(accessPermission, it)).thenReturn(Unit)
             }
             failSet.forEach {
-                whenever(nodeRepository.setShareAccess(nodeId, accessPermission, it))
-                    .thenThrow(RuntimeException::class.java)
+                whenever(block(accessPermission, it)).thenThrow(RuntimeException::class.java)
             }
+            whenever(nodeRepository.createShareKey(folderNode)).thenReturn(block)
             val exception = runCatching {
                 underTest.invoke(folderNode, accessPermission, *emails)
             }.exceptionOrNull()
@@ -55,7 +58,7 @@ class DefaultSetShareFolderAccessPermissionTest {
     private companion object {
         val accessPermission = AccessPermission.READ
         val nodeId = NodeId(1L)
-        val folderNode = mock<FolderNode> {
+        val folderNode = mock<TypedFolderNode> {
             on { id }.thenReturn(nodeId)
         }
         val emails = Array(10) { "example$it@example.com" }

@@ -8,6 +8,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -178,4 +179,11 @@ interface NodeRepository {
         path: String,
         searchQuery: String?,
     ): List<OfflineNodeInformation>
+
+    /**
+     * Creates a new share key for the node if there is no share key already created and returns a lambda that can be used to set permissions to this node
+     * @param node [TypedNode] whose key will be created
+     * @return a suspending lambda to add permissions to the node
+     */
+    suspend fun createShareKey(node: TypedNode): (suspend (AccessPermission, userEmail: String) -> Unit)?
 }

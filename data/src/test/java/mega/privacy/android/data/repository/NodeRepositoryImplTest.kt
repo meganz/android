@@ -22,11 +22,12 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaError
@@ -64,10 +65,11 @@ class NodeRepositoryImplTest {
     private val chatFilesFolderUserAttributeMapper: ChatFilesFolderUserAttributeMapper = mock()
     private val streamingGateway: StreamingGateway = mock()
     private val nodeUpdateMapper: NodeUpdateMapper = mock()
-    private val folderNode: FolderNode = mock()
+    private val folderNode: TypedFolderNode = mock()
     private val appEventGateway: AppEventGateway = mock()
     private val accessPermissionMapper: AccessPermissionMapper = mock()
     private val accessPermissionIntMapper: AccessPermissionIntMapper = mock()
+    private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
 
     @Before
     fun setup() {
@@ -92,6 +94,7 @@ class NodeRepositoryImplTest {
             appEventGateway = appEventGateway,
             accessPermissionMapper = accessPermissionMapper,
             accessPermissionIntMapper = accessPermissionIntMapper,
+            nodeShareKeyResultMapper = nodeShareKeyResultMapper
         )
     }
 
@@ -140,13 +143,28 @@ class NodeRepositoryImplTest {
         }
 
     @Test
-    fun `test when setShareAccess is called then api gateway setShareAccess is called with the proper parameters`() =
+    fun `test when setShareAccess is called then nodeShareKeyResultMapper is called with the meganode returned by megaApiGateway`() =
         runTest {
             val megaNode = mock<MegaNode>()
             val email = "example@example.com"
+            val mapperResultBlock = mock<((AccessPermission, String) -> Unit)>()
+            whenever(nodeShareKeyResultMapper.invoke(megaNode)).thenReturn(mapperResultBlock)
             whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
-            whenever(megaApiGateway.setShareAccess(any(), any(), any(), any())).thenAnswer {
-                ((it.arguments[3]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+
+            underTest.setShareAccess(nodeId, AccessPermission.READ, email)
+            verify(mapperResultBlock, times(1)).invoke(AccessPermission.READ, email)
+        }
+
+    @Test
+    fun `test when createShareKey is called then api gateway openShareDialog is called and the result of the mapper returned`() =
+        runTest {
+            val megaNode = mock<MegaNode>()
+            val expected = mock<(suspend (AccessPermission, String) -> Unit)>()
+            whenever(folderNode.id).thenReturn(nodeId)
+            whenever(nodeShareKeyResultMapper.invoke(megaNode)).thenReturn(expected)
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
+            whenever(megaApiGateway.openShareDialog(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
                     api = mock(),
                     request = mock(),
                     error = mock {
@@ -157,13 +175,9 @@ class NodeRepositoryImplTest {
                 )
             }
 
-            underTest.setShareAccess(nodeId, AccessPermission.READ, email)
-            verify(megaApiGateway, times(1)).setShareAccess(
-                eq(megaNode),
-                eq(email),
-                eq(ACCESS_READ),
-                any()
-            )
+            val actual = underTest.createShareKey(folderNode)
+            verify(megaApiGateway, times(1)).openShareDialog(eq(megaNode), any())
+            assertThat(actual).isEqualTo(expected)
         }
 
     private suspend fun mockFolderInfoResponse() {

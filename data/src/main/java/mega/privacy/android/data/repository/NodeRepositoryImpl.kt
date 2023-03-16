@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.model.GlobalUpdate
@@ -38,6 +39,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -92,6 +94,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val appEventGateway: AppEventGateway,
     private val accessPermissionMapper: AccessPermissionMapper,
     private val accessPermissionIntMapper: AccessPermissionIntMapper,
+    private val nodeShareKeyResultMapper: NodeShareKeyResultMapper,
 ) : NodeRepository {
 
 
@@ -270,25 +273,31 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun createShareKey(node: TypedNode): (suspend (AccessPermission, String) -> Unit)? {
+        return withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(node.id.longValue)?.let { megaNode ->
+                suspendCancellableCoroutine { continuation ->
+                    val listener = continuation.getRequestListener("openShareDialog") {
+                        return@getRequestListener nodeShareKeyResultMapper(megaNode)
+                    }
+
+                    megaApiGateway.openShareDialog(megaNode, listener)
+                    continuation.invokeOnCancellation {
+                        megaApiGateway.removeRequestListener(listener)
+                    }
+                }
+            }
+        }
+    }
+
     override suspend fun setShareAccess(
         nodeId: NodeId,
         accessPermission: AccessPermission,
         email: String,
     ) {
-        return withContext(ioDispatcher) {
+        withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let {
-                suspendCancellableCoroutine { continuation ->
-                    val listener = continuation.getRequestListener("setShareAccess") {}
-                    megaApiGateway.setShareAccess(
-                        it,
-                        email,
-                        accessPermissionIntMapper.invoke(accessPermission),
-                        listener,
-                    )
-                    continuation.invokeOnCancellation {
-                        megaApiGateway.removeRequestListener(listener)
-                    }
-                }
+                nodeShareKeyResultMapper(it)(accessPermission, email)
             }
         }
     }

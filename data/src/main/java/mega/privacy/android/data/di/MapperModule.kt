@@ -108,6 +108,8 @@ import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapperImpl
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
+import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
+import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapperImpl
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapperImpl
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
@@ -262,6 +264,9 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindFetchNodesUpdateMapper(implementation: FetchNodesUpdateMapperImpl): FetchNodesUpdateMapper
+
+    @Binds
+    abstract fun bindNodeShareKeyResultMapper(implementation: NodeShareKeyResultMapperImpl): NodeShareKeyResultMapper
 
     companion object {
         /**
