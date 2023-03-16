@@ -73,7 +73,6 @@ import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
-import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
@@ -101,6 +100,8 @@ import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
 import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapperImpl
+import mega.privacy.android.data.mapper.login.UserCredentialsMapper
+import mega.privacy.android.data.mapper.login.UserCredentialsMapperImpl
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
@@ -162,7 +163,6 @@ import mega.privacy.android.data.mapper.toSubscriptionStatus
 import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
-import mega.privacy.android.data.mapper.toUserCredentialsMapper
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
@@ -267,6 +267,9 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindNodeShareKeyResultMapper(implementation: NodeShareKeyResultMapperImpl): NodeShareKeyResultMapper
+
+    @Binds
+    abstract fun bindUserCredentialsMapper(implementation: UserCredentialsMapperImpl): UserCredentialsMapper
 
     companion object {
         /**
@@ -663,12 +666,6 @@ internal abstract class MapperModule {
         @Provides
         fun provideInviteContactRequestMapper(): InviteContactRequestMapper =
             ::toInviteContactRequest
-
-        /**
-         * Provides user credentials mapper
-         */
-        @Provides
-        fun provideUserCredentialsMapper(): UserCredentialsMapper = ::toUserCredentialsMapper
 
         /**
          * Provides account session mapper

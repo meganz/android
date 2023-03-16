@@ -25,8 +25,8 @@ import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
-import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
+import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.model.GlobalUpdate

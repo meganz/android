@@ -40,9 +40,9 @@ import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
-import mega.privacy.android.data.mapper.UserCredentialsMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
+import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
