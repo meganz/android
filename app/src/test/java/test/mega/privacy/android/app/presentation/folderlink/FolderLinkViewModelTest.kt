@@ -16,9 +16,12 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolder
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -37,6 +40,9 @@ class FolderLinkViewModelTest {
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
     private val copyNodeUseCase: CopyNodeUseCase = mock()
     private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
+    private val hasCredentials: HasCredentials = mock()
+    private val rootNodeExists: RootNodeExists = mock()
+    private val setViewType: SetViewType = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -59,7 +65,10 @@ class FolderLinkViewModelTest {
             loginToFolder,
             checkNameCollisionUseCase,
             copyNodeUseCase,
-            copyRequestMessageMapper
+            copyRequestMessageMapper,
+            hasCredentials,
+            rootNodeExists,
+            setViewType
         )
     }
 
@@ -141,6 +150,32 @@ class FolderLinkViewModelTest {
                 assertThat(newValue.isLoginComplete).isFalse()
                 assertThat(newValue.isInitialState).isFalse()
                 assertThat(newValue.askForDecryptionKeyDialog).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that on valid credentials and no root node shouldShowLogin is returned true`() =
+        runTest {
+            whenever(hasCredentials()).thenReturn(true)
+            whenever(rootNodeExists()).thenReturn(false)
+            underTest.state.test {
+                underTest.checkLoginRequired()
+                val value = expectMostRecentItem()
+                assertThat(value.shouldLogin).isTrue()
+                assertThat(value.hasDbCredentials).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that on valid credentials and root node shouldShowLogin is returned false`() =
+        runTest {
+            whenever(hasCredentials()).thenReturn(true)
+            whenever(rootNodeExists()).thenReturn(true)
+            underTest.state.test {
+                underTest.checkLoginRequired()
+                val value = expectMostRecentItem()
+                assertThat(value.shouldLogin).isFalse()
+                assertThat(value.hasDbCredentials).isTrue()
             }
         }
 

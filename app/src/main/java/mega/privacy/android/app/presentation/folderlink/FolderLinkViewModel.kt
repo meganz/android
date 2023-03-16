@@ -23,9 +23,12 @@ import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.RootNodeExists
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolder
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -39,7 +42,10 @@ class FolderLinkViewModel @Inject constructor(
     private val loginToFolder: LoginToFolder,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
-    private val copyRequestMessageMapper: CopyRequestMessageMapper
+    private val copyRequestMessageMapper: CopyRequestMessageMapper,
+    private val hasCredentials: HasCredentials,
+    private val rootNodeExists: RootNodeExists,
+    private val setViewType: SetViewType,
 ) : ViewModel() {
 
     /**
@@ -180,6 +186,33 @@ class FolderLinkViewModel @Inject constructor(
     fun resetShowCopyResult() {
         _state.update {
             it.copy(copyResultText = null, copyThrowable = null)
+        }
+    }
+
+    /**
+     * Check if login is required
+     */
+    fun checkLoginRequired() {
+        viewModelScope.launch {
+            val hasCredentials = hasCredentials()
+            _state.update {
+                it.copy(
+                    shouldLogin = (hasCredentials && !rootNodeExists()),
+                    hasDbCredentials = hasCredentials
+                )
+            }
+        }
+    }
+
+    /**
+     * Update the preferred view type
+     *
+     * @param isList    Whether the updated view type is list or grid
+     */
+    fun updateViewType(isList: Boolean) {
+        val viewType = if (isList) ViewType.LIST else ViewType.GRID
+        viewModelScope.launch {
+            setViewType(viewType)
         }
     }
 }

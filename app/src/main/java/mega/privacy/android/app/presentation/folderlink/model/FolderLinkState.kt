@@ -13,6 +13,8 @@ import mega.privacy.android.app.namecollision.data.NameCollision
  * @property collisions                 List of nodes with existing names
  * @property copyResultText             Text to show on successful copy
  * @property copyThrowable              Throwable error on copy
+ * @property shouldLogin                Whether to show login screen
+ * @property hasDbCredentials           Whether db credentials are valid
  * @property errorDialogTitle           String id of title for error dialog
  * @property errorDialogContent         String id of content for error dialog
  * @property snackBarMessage            String id of content for snack bar
@@ -25,6 +27,8 @@ data class FolderLinkState(
     val collisions: ArrayList<NameCollision>? = null,
     val copyThrowable: Throwable? = null,
     val copyResultText: String? = null,
+    val shouldLogin: Boolean? = null,
+    val hasDbCredentials: Boolean = false,
     @StringRes val errorDialogTitle: Int = -1,
     @StringRes val errorDialogContent: Int = -1,
     @StringRes val snackBarMessage: Int = -1,

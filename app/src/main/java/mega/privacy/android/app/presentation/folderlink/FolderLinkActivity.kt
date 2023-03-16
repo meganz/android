@@ -61,6 +61,7 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
@@ -79,7 +80,6 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.mapper.SortOrderIntMapper
-import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiAndroid
@@ -90,7 +90,6 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import java.io.File
-import java.util.Objects
 import java.util.Stack
 import javax.inject.Inject
 
@@ -134,7 +133,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private var fragmentHandle: Long = -1
     private var statusDialog: AlertDialog? = null
     private val orderGetChildren = SortOrder.ORDER_DEFAULT_ASC
-    private var prefs: MegaPreferences? = null
     private var actionMode: ActionMode? = null
     private var pN: MegaNode? = null
     private var fileLinkFolderLink = false
@@ -145,6 +143,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         this, this, this,
         showSaveToDeviceConfirmDialog(this)
     )
+    private val uiState: FolderLinkState
+        get() = viewModel.state.value
 
     private val viewModel: FolderLinkViewModel by viewModels()
     private val sortByHeaderViewModel: SortByHeaderViewModel by viewModels()
@@ -259,7 +259,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     supportActionBar?.title = parentNode.name
                     invalidateOptionsMenu()
                     parentHandle = parentNode.handle
-                    nodes = megaApiFolder.getChildren(parentNode, sortOrderIntMapper(orderGetChildren))
+                    nodes =
+                        megaApiFolder.getChildren(parentNode, sortOrderIntMapper(orderGetChildren))
                     it.setNodes(ArrayList(nodes))
                     var lastVisiblePosition = 0
 
@@ -484,29 +485,14 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         if (intentReceived != null) {
             url = intentReceived.dataString
         }
-        if (dbH.credentials != null && (megaApi.rootNode == null)) {
-            Timber.d("Refresh session - sdk or karere")
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
-            intent.data = Uri.parse(url)
-            intent.action = Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-            startActivity(intent)
-            finish()
-            return
-        }
         if (savedInstanceState != null) {
             nodeSaver.restoreState(savedInstanceState)
         }
-        folderLinkActivity = this
-        prefs = dbH.preferences
+        setupObservers()
+        viewModel.checkLoginRequired()
+    }
 
-        if (prefs?.preferredViewList == null) {
-            viewModel.isList = true
-        } else {
-            viewModel.isList = prefs?.preferredViewList.toBoolean()
-        }
-
+    private fun initSetup() {
         lastPositionStack = Stack()
         setContentView(binding.root)
         setupView()
@@ -544,7 +530,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         }
 
         binding.folderLinkFragmentContainer.post { cookieDialogHandler.showDialogIfNeeded(this) }
-        setupObservers()
     }
 
     private fun setupView() {
@@ -641,7 +626,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                 visibility = View.INVISIBLE
             }
 
-            if (dbH.credentials != null) {
+            if (uiState.hasDbCredentials) {
                 folderLinkImportButton.visibility = View.VISIBLE
             } else {
                 folderLinkImportButton.visibility = View.GONE
@@ -649,11 +634,22 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         }
     }
 
+    private fun showLoginScreen() {
+        Timber.d("Refresh session - sdk or karere")
+        val intent = Intent(this@FolderLinkActivity, LoginActivity::class.java)
+        intent.putExtra(Constants.VISIBLE_FRAGMENT, Constants.LOGIN_FRAGMENT)
+        intent.data = Uri.parse(url)
+        intent.action = Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
+        finish()
+    }
+
     private fun setupObservers() {
         observeDragSupportEvents(this, recyclerView, Constants.VIEWER_FROM_FOLDER_LINK)
 
         LiveEventBus.get(EVENT_UPDATE_VIEW_MODE, Boolean::class.java)
-            .observe(this) { isList: Boolean -> updateView(isList) }
+            .observe(this) { isList: Boolean -> viewModel.updateViewType(isList) }
 
         collectFlow(viewModel.onViewTypeChanged, Lifecycle.State.STARTED) { viewType: ViewType ->
             updateViewType(viewType)
@@ -664,6 +660,13 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                 viewModel.state.collect {
                     when {
                         it.isInitialState -> {
+                            it.shouldLogin?.let { showLogin ->
+                                if (showLogin) {
+                                    showLoginScreen()
+                                } else {
+                                    initSetup()
+                                }
+                            }
                             return@collect
                         }
                         it.isLoginComplete && !it.isNodesFetched -> {
@@ -731,12 +734,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         super.onDestroy()
     }
 
-    override fun onPause() {
-        folderLinkActivity = null
-        Timber.d("onPause")
-        super.onPause()
-    }
-
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -755,12 +752,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
             }
         }
         cookieDialogHandler.showDialogIfNeeded(this, true)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        folderLinkActivity = this
-        Timber.d("onResume")
     }
 
     private fun downloadNodes(nodes: List<MegaNode>) {
@@ -870,7 +861,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                                         )
                                         folderLinkFileLinkButtonDownload.isVisible = true
 
-                                        if (dbH.credentials != null) {
+                                        if (uiState.hasDbCredentials) {
                                             folderLinkFileLinkButtonImport.isVisible = true
                                         } else {
                                             folderLinkFileLinkButtonImport.visibility =
@@ -997,7 +988,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                 val closedChat = isClosedChat
                 if (closedChat) {
                     val backIntent = Intent(
-                        Objects.requireNonNullElse(folderLinkActivity, this@FolderLinkActivity),
+                        this@FolderLinkActivity,
                         ManagerActivity::class.java
                     )
                     startActivity(backIntent)
@@ -1228,7 +1219,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     }
 
                     val localPath = FileUtil.getLocalFile(node)
-                    val api = if (dbH.credentials != null) megaApi else megaApiFolder
+                    val api = if (uiState.hasDbCredentials) megaApi else megaApiFolder
                     val paramsSetSuccessfully =
                         if (FileUtil.isLocalFile(node, megaApiFolder, localPath)) {
                             FileUtil.setLocalIntentParams(
@@ -1270,7 +1261,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     pdfIntent.putExtra("APP", true)
                     pdfIntent.putExtra("adapterType", Constants.FOLDER_LINK_ADAPTER)
                     val localPath = FileUtil.getLocalFile(node)
-                    val api = if (dbH.credentials != null) megaApi else megaApiFolder
+                    val api = if (uiState.hasDbCredentials) megaApi else megaApiFolder
 
                     val paramsSetSuccessfully: Boolean =
                         if (FileUtil.isLocalFile(node, megaApiFolder, localPath)) {
@@ -1394,13 +1385,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private fun updateViewType(viewType: ViewType) {
         Timber.d("The updated View Type is ${viewType.name}")
         viewModel.isList = viewType === ViewType.LIST
-    }
-
-    private fun updateView(isList: Boolean) {
-        if (viewModel.isList != isList) {
-            viewModel.isList = isList
-            dbH.setPreferredViewList(isList)
-        }
         setupRecyclerViewAdapter()
     }
 
