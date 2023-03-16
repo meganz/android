@@ -53,7 +53,7 @@ import javax.inject.Singleton
  */
 @Singleton
 internal class DefaultPhotosRepository @Inject constructor(
-    private val nodeRepository: NodeRepository,
+    nodeRepository: NodeRepository,
     private val megaApiFacade: MegaApiGateway,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -145,6 +145,25 @@ internal class DefaultPhotosRepository @Inject constructor(
             } ?: emptyList()
         }
 
+    override suspend fun getPhotosByIds(ids: List<NodeId>): List<Photo> =
+        withContext(ioDispatcher) {
+            ids.mapNotNull { id ->
+                val cache = photosCache[id]
+                if (cache != null) {
+                    cache
+                } else {
+                    var photo: Photo? = null
+                    megaApiFacade.getMegaNodeByHandle(id.longValue)?.also { node ->
+                        photo = mapMegaNodeToPhoto(node)
+                        photo?.let {
+                            photosCache[id] = it
+                        }
+                    }
+                    photo
+                }
+            }
+        }
+
     private suspend fun searchImages(): List<MegaNode> = withContext(ioDispatcher) {
         val token = MegaCancelToken.createInstance()
         val imageNodes = megaApiFacade.searchByType(
@@ -199,6 +218,25 @@ internal class DefaultPhotosRepository @Inject constructor(
             } else {
                 mapMegaNodeToVideo(megaNode)
             }
+        }
+    }
+
+    /**
+     * Map megaNode to Photo.
+     */
+    private suspend fun mapMegaNodeToPhoto(megaNode: MegaNode): Photo? {
+        val fileType = fileTypeInfoMapper(megaNode)
+        val isValid =
+            megaNode.isFile
+                    && (fileType is VideoFileTypeInfo
+                    || fileType is ImageFileTypeInfo
+                    && fileType !is SvgFileTypeInfo)
+                    && !megaApiFacade.isInRubbish(megaNode)
+        if (isValid.not()) return null
+        return if (fileType is ImageFileTypeInfo) {
+            mapMegaNodeToImage(megaNode)
+        } else {
+            mapMegaNodeToVideo(megaNode)
         }
     }
 

@@ -8,6 +8,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeListByIds
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.DefaultCreateAlbum
@@ -41,6 +42,7 @@ import mega.privacy.android.domain.usecase.FilterGIF
 import mega.privacy.android.domain.usecase.FilterRAW
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
+import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPhotosByFolderId
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
@@ -152,5 +154,9 @@ abstract class PhotosUseCases {
         @Provides
         fun provideDownloadPreview(repository: ImageRepository): DownloadPreview =
             DownloadPreview(repository::downloadPreview)
+
+        @Provides
+        fun provideGetPhotosByIds(repository: PhotosRepository): GetPhotosByIds =
+            GetPhotosByIds(repository::getPhotosByIds)
     }
 }

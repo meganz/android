@@ -8,6 +8,7 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.photos.PhotosUseCases
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
+import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPhotosByFolderId
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
@@ -50,4 +51,7 @@ object TestPhotosUseCases {
 
     @Provides
     fun provideUpdateAlbumCoverUseCase(): UpdateAlbumCover = mock()
+
+    @Provides
+    fun provideGetPhotosByIdsUseCase(): GetPhotosByIds = mock()
 }
