@@ -18,6 +18,10 @@ compileKotlin {
         suppressWarnings = shouldSuppressWarnings()
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
+
+    kotlin {
+        jvmToolchain(11)
+    }
 }
 
 test {
