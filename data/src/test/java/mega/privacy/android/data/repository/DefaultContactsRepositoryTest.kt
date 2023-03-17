@@ -8,24 +8,21 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.extensions.getCredentials
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
-import mega.privacy.android.data.mapper.contact.ContactDataMapperImpl
-import mega.privacy.android.data.mapper.contact.ContactItemMapperImpl
-import mega.privacy.android.data.mapper.toContactCredentials
+import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
+import mega.privacy.android.data.mapper.contact.ContactDataMapper
+import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.wrapper.ContactWrapper
-import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -41,6 +38,7 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaUser
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
@@ -68,21 +66,14 @@ class DefaultContactsRepositoryTest {
     private val userUpdateMapper = mock<UserUpdateMapper>()
     private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
     private val onlineStatusMapper = mock<OnlineStatusMapper>()
+    private val contactItemMapper = mock<ContactItemMapper>()
+    private val contactDataMapper = mock<ContactDataMapper>()
+    private val contactCredentialsMapper = mock<ContactCredentialsMapper>()
     private val inviteContactRequestMapper = mock<InviteContactRequestMapper>()
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val contactWrapper: ContactWrapper = mock()
     private val databaseHandler: DatabaseHandler = mock()
     private val context: Context = mock()
-
-    private val contactItemMapper = ContactItemMapperImpl()
-    private val contactDataMapper = ContactDataMapperImpl()
-
-    private val contactCredentialsMapper: ContactCredentialsMapper =
-        { credentials: String?, email: String, name: String ->
-            (credentials?.getCredentials()?.let {
-                AccountCredentials.ContactCredentials(it, email, name)
-            })
-        }
 
     private val userEmail = "test@mega.nz"
     private val userHandle = -123456L
@@ -144,7 +135,7 @@ class DefaultContactsRepositoryTest {
                 on { paramType }.thenReturn(MegaApiJava.USER_ATTR_ALIAS)
                 on { name }.thenReturn(alias)
             }
-            val expectedCredentials = toContactCredentials(
+            val expectedCredentials = contactCredentialsMapper(
                 validCredentials, userEmail, alias
             )
 
@@ -905,8 +896,7 @@ class DefaultContactsRepositoryTest {
         whenever(cacheFolderGateway.getCacheFile(any(), any())).thenReturn(cacheFile)
         whenever(megaChatApiGateway.getUserAliasFromCache(any())).thenReturn(testName)
 
-        val expectedContactData =
-            contactDataMapper(expectedFullName, testName, avatarUri)
+        val expectedContactData = contactDataMapper(expectedFullName, testName, avatarUri)
         return contactItemMapper(
             megaUser,
             expectedContactData,
@@ -933,30 +923,66 @@ class DefaultContactsRepositoryTest {
             on { handle }.thenReturn(userHandle)
             on { email }.thenReturn(userEmail)
         }
+        val expectedFullName = "full name"
+        val expectedStatus = MegaChatApi.STATUS_ONLINE
         val expectedColor = "color"
+        val expectedCredentials = true
+        val expectedAlias = "alias"
+
         whenever(megaApiGateway.getContact(any())).thenReturn(megaUser)
-        whenever(megaApiGateway.areCredentialsVerified(megaUser)).thenReturn(true)
-        whenever(
-            megaApiGateway.getUserAlias(anyLong(), any())
-        ).thenAnswer {
-            ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(), request, success
-            )
+        val firstNameRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_FIRSTNAME)
+            on { text }.thenReturn("full")
         }
-        whenever(
-            megaApiGateway.getContactAvatar(anyString(), anyString(), any())
-        ).thenAnswer {
-            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(), request, success
-            )
+        whenever(megaApiGateway.getUserAttribute(anyString(), anyInt(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface)
+                .onRequestFinish(mock(), firstNameRequest, success)
         }
-        whenever(megaApiGateway.getUserAttribute(anyString(), any(), any())).thenAnswer {
-            ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
-                mock(), request, success
-            )
+        val lastNameRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_LASTNAME)
+            on { text }.thenReturn("name")
+        }
+        whenever(megaApiGateway.getUserAttribute(anyString(), anyInt(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface)
+                .onRequestFinish(mock(), lastNameRequest, success)
+        }
+        whenever(megaChatApiGateway.getUserFullNameFromCache(any())).thenReturn(expectedFullName)
+
+        val aliasRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_ALIAS)
+            on { name }.thenReturn(expectedAlias)
+        }
+        whenever(megaApiGateway.getUserAlias(any(), any())).thenAnswer {
+            ((it.arguments[1]) as OptionalMegaRequestListenerInterface)
+                .onRequestFinish(mock(), aliasRequest, success)
+        }
+        whenever(megaChatApiGateway.getUserOnlineStatus(any())).thenReturn(expectedStatus)
+        val avatarRequest = mock<MegaRequest> {
+            on { type }.thenReturn(MegaRequest.TYPE_GET_ATTR_USER)
+            on { paramType }.thenReturn(MegaApiJava.USER_ATTR_AVATAR)
+            on { file }.thenReturn(avatarUri)
+        }
+        whenever(megaApiGateway.getContactAvatar(any(), any(), any())).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaRequestListenerInterface)
+                .onRequestFinish(mock(), avatarRequest, success)
         }
         whenever(megaApiGateway.getUserAvatarColor(megaUser)).thenReturn(expectedColor)
+        whenever(megaApiGateway.areCredentialsVerified(any())).thenReturn(expectedCredentials)
+
+        val expectedContactData = contactDataMapper(expectedFullName, expectedAlias, avatarUri)
+        val expectedContact = contactItemMapper(
+            megaUser,
+            expectedContactData,
+            expectedColor,
+            expectedCredentials,
+            expectedStatus,
+            null
+        )
+
         val contact = underTest.getContactItemFromUserEmail(userEmail)
-        assertEquals(userEmail, contact?.email)
+        assertEquals(contact, expectedContact)
     }
 }

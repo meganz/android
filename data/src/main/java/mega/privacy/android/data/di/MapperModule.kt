@@ -24,7 +24,6 @@ import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapperImpl
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapperImpl
-import mega.privacy.android.data.mapper.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
@@ -91,6 +90,8 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
+import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
+import mega.privacy.android.data.mapper.contact.ContactCredentialsMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
@@ -129,7 +130,6 @@ import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
 import mega.privacy.android.data.mapper.toChatListItem
 import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toChatRoom
-import mega.privacy.android.data.mapper.toContactCredentials
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toCountryCallingCodes
@@ -273,6 +273,9 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindAccountSessionMapper(implementation: AccountSessionMapperImpl): AccountSessionMapper
+
+    @Binds
+    abstract fun bindContactCredentialsMapper(implementation: ContactCredentialsMapperImpl): ContactCredentialsMapper
 
     companion object {
         /**
@@ -554,12 +557,6 @@ internal abstract class MapperModule {
         @Provides
         fun provideMyAccountCredentialsMapper(): MyAccountCredentialsMapper =
             ::toMyAccountCredentials
-
-        /**
-         * Provide [ContactCredentialsMapper] mapper
-         */
-        @Provides
-        fun provideContactCredentialsMapper(): ContactCredentialsMapper = ::toContactCredentials
 
         @Provides
         fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
