@@ -46,6 +46,7 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer

@@ -16,7 +16,6 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.app.EphemeralCredentials
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.R
@@ -32,6 +31,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError

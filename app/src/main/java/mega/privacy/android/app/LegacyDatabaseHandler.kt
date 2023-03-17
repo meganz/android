@@ -8,6 +8,7 @@ import mega.privacy.android.app.objects.SDTransfer
 import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.domain.entity.login.EphemeralCredentials
 
 /**
  * Legacy database handler

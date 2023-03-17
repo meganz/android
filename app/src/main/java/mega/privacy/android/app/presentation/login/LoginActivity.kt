@@ -334,9 +334,8 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         this.emailTemp = emailTemp
         val ephemeral = dbH.ephemeral ?: return
 
-        ephemeral.email = emailTemp
         dbH.clearEphemeral()
-        dbH.saveEphemeral(ephemeral)
+        dbH.saveEphemeral(ephemeral.copy(email = emailTemp))
     }
 
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
