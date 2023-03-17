@@ -115,7 +115,9 @@
         android:roundIcon="@mipmap/ic_launcher_mega_round"
         android:screenOrientation="fullUser"
         android:theme="@style/Theme.Mega"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:localeConfig="@xml/locales_config"
+        >
         <activity
             android:name=".presentation.settings.SettingsActivity"
             android:exported="false"

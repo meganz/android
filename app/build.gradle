@@ -60,6 +60,8 @@ android {
         resValue("string", "karere_version", "\"${getChatGitHash(megaSdkVersion)}\"")
 
         testInstrumentationRunner "test.mega.privacy.android.app.HiltTestRunner"
+
+        resourceConfigurations += ["en", "ar", "de", "es", "fr", "id", "jt", "ja", "ko", "nl", "pl", "pt", "ro", "ru", "th", "vi", "zh-rCH", "zh-rTW"]
     }
 
     sourceSets {
@@ -330,8 +332,8 @@ dependencies {
     implementation lib.blurry
     implementation lib.documentscanner
     implementation lib.simplestorage
-    implementation (lib.shortcutbadger) {
-        artifact{
+    implementation(lib.shortcutbadger) {
+        artifact {
             type = "aar"
         }
     }
