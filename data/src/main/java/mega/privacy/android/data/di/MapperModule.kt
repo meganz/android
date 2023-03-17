@@ -47,7 +47,6 @@ import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.data.mapper.MegaTransferMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
-import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
@@ -96,6 +95,8 @@ import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapperImpl
+import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
+import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapperImpl
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
@@ -146,7 +147,6 @@ import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toMegaSku
-import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toOnlineStatus
@@ -276,6 +276,9 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindContactCredentialsMapper(implementation: ContactCredentialsMapperImpl): ContactCredentialsMapper
+
+    @Binds
+    abstract fun bindMyAccountCredentialsMapper(implementation: MyAccountCredentialsMapperImpl): MyAccountCredentialsMapper
 
     companion object {
         /**
@@ -550,13 +553,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideChatRoomMapper(): ChatRoomMapper = ::toChatRoom
-
-        /**
-         * Provide [MyAccountCredentialsMapper] mapper
-         */
-        @Provides
-        fun provideMyAccountCredentialsMapper(): MyAccountCredentialsMapper =
-            ::toMyAccountCredentials
 
         @Provides
         fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =

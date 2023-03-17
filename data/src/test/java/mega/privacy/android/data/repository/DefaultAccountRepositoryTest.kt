@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.extensions.getCredentials
 import mega.privacy.android.data.facade.AccountInfoWrapper
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -22,13 +21,12 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
-import mega.privacy.android.data.mapper.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
+import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.toAccountType
-import mega.privacy.android.data.mapper.toMyAccountCredentials
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionOption
@@ -37,7 +35,6 @@ import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
-import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.ChangeEmailException
@@ -91,10 +88,7 @@ class DefaultAccountRepositoryTest {
     private val cacheFolderGateway = mock<CacheFolderGateway>()
     private val passwordStrengthMapper = mock<PasswordStrengthMapper>()
 
-    private val myAccountCredentialsMapper: MyAccountCredentialsMapper =
-        { credentials: String? ->
-            (credentials?.getCredentials()?.let { AccountCredentials.MyAccountCredentials(it) })
-        }
+    private val myAccountCredentialsMapper = mock<MyAccountCredentialsMapper>()
 
     private val pricing = mock<MegaPricing> {
         on { numProducts }.thenReturn(1)
@@ -474,7 +468,7 @@ class DefaultAccountRepositoryTest {
     fun `test that getMyCredentials returns valid credentials if api returns valid credentials`() =
         runTest {
             val validCredentials = "KJ9hFK67vhj3cNCIUHAi8ccwciojiot4hVE5yab3"
-            val expectedCredentials = toMyAccountCredentials(validCredentials)
+            val expectedCredentials = myAccountCredentialsMapper(validCredentials)
 
             whenever(megaApiGateway.myCredentials).thenReturn(validCredentials)
             assertThat(underTest.getMyCredentials()).isEqualTo(expectedCredentials)
