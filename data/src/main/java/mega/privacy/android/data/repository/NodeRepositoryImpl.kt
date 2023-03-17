@@ -148,6 +148,27 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getNodeChildren(
+        nodeId: NodeId,
+        order: SortOrder?,
+    ): List<UnTypedNode> {
+        return withContext(ioDispatcher) {
+            return@withContext megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { parent ->
+                val childList = order?.let { sortOrder ->
+                    megaApiGateway.getChildrenByNode(
+                        parent,
+                        sortOrderIntMapper(sortOrder)
+                    )
+                } ?: run {
+                    megaApiGateway.getChildrenByNode(parent)
+                }
+                childList.map { convertToUnTypedNode(it) }
+            } ?: run {
+                emptyList()
+            }
+        }
+    }
+
     override suspend fun getNodeHistoryNumVersions(handle: Long): Int = withContext(ioDispatcher) {
         megaApiGateway.getMegaNodeByHandle(handle)?.let {
             if (megaApiGateway.hasVersion(it)) {
@@ -309,5 +330,9 @@ internal class NodeRepositoryImpl @Inject constructor(
         megaLocalStorageGateway.loadOfflineNodes(path, searchQuery).map {
             offlineNodeInformationMapper(it)
         }
+    }
+
+    override suspend fun getInvalidHandle(): Long {
+        return megaApiGateway.getInvalidHandle()
     }
 }

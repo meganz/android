@@ -64,6 +64,15 @@ interface NodeRepository {
     suspend fun getNodeChildren(folderNode: FolderNode): List<UnTypedNode>
 
     /**
+     * Get node children
+     *
+     * @param nodeId [NodeId]
+     * @param order [SortOrder]
+     * @return
+     */
+    suspend fun getNodeChildren(nodeId: NodeId, order: SortOrder?): List<UnTypedNode>
+
+    /**
      * Get the number of versions in node's history
      * @param handle the handle of the node
      * @return the number of history versions or 0 if the file is not found or has no versions
@@ -179,6 +188,11 @@ interface NodeRepository {
         path: String,
         searchQuery: String?,
     ): List<OfflineNodeInformation>
+
+    /**
+     * Gets invalid handle
+     */
+    suspend fun getInvalidHandle(): Long
 
     /**
      * Creates a new share key for the node if there is no share key already created and returns a lambda that can be used to set permissions to this node
