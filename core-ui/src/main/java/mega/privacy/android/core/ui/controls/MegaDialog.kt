@@ -41,26 +41,31 @@ fun MegaDialog(
             elevation = 24.dp,
             shape = RoundedCornerShape(4.dp)
         ) {
-            Column(modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp)) {
-                // Dialog title
-                if (titleString != null) {
-                    Text(
-                        textAlign = titleAlign ?: TextAlign.Center,
-                        text = titleString,
-                        style = h6,
-                        fontWeight = fontWeight,
-                        modifier = Modifier.padding(bottom = 16.dp),
-                    )
-                }
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .padding(start = 24.dp, top = 16.dp, end = 24.dp),
+                ) {
+                    // Dialog title
+                    if (titleString != null) {
+                        Text(
+                            textAlign = titleAlign ?: TextAlign.Center,
+                            text = titleString,
+                            style = h6,
+                            fontWeight = fontWeight,
+                            modifier = Modifier.padding(bottom = 16.dp),
+                        )
+                    }
 
-                // Dialog body
-                body()
+                    // Dialog body
+                    body()
+                }
 
                 // Dialog button row
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 32.dp, bottom = 8.dp),
+                        .padding(start = 8.dp, end = 8.dp, top = 32.dp, bottom = 8.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
                     // Dialog dismiss button

@@ -3,9 +3,14 @@ package mega.privacy.android.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
@@ -26,7 +31,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
-import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
@@ -53,7 +58,7 @@ import javax.inject.Singleton
  */
 @Singleton
 internal class DefaultPhotosRepository @Inject constructor(
-    nodeRepository: NodeRepository,
+    private val nodeRepository: NodeRepository,
     private val megaApiFacade: MegaApiGateway,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -71,17 +76,58 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     private var previewFolderPath: String? = null
 
+    private val refreshPhotosStateFlow: MutableStateFlow<Boolean> = MutableStateFlow(true)
+
+    private val photosStateFlow: MutableStateFlow<List<Photo>?> = MutableStateFlow(null)
+
+    private val photosRefreshRules = listOf(
+        NodeChanges.New,
+        NodeChanges.Favourite,
+        NodeChanges.Attributes,
+        NodeChanges.Parent,
+    )
+
+    @Volatile
+    private var isMonitorRefreshPhotosInitiated: Boolean = false
+
     init {
-        nodeRepository.monitorNodeUpdates()
-            .map { it.changes.keys.toList() }
-            .onEach(::invalidatePhotosCache)
-            .launchIn(appScope)
+        monitorNodeUpdates()
     }
 
-    private fun invalidatePhotosCache(nodes: List<Node>) {
-        for (node in nodes) {
-            photosCache.remove(node.id)
+    private fun monitorNodeUpdates() = nodeRepository.monitorNodeUpdates()
+        .onEach { nodeUpdate ->
+            appScope.launch {
+                val nodes = nodeUpdate.changes.keys.toList()
+                nodes.forEach { photosCache.remove(it.id) }
+            }
+
+            appScope.launch {
+                val changes = nodeUpdate.changes.values
+                if (changes.flatten().intersect(photosRefreshRules).isNotEmpty()) {
+                    refreshPhotos()
+                }
+            }
+        }.launchIn(appScope)
+
+    private fun monitorRefreshPhotos() {
+        refreshPhotosStateFlow
+            .filter { it }
+            .onEach {
+                photosStateFlow.value = searchMegaPhotos()
+                refreshPhotosStateFlow.value = false
+            }.launchIn(appScope)
+    }
+
+    override fun monitorPhotos(): Flow<List<Photo>> {
+        if (!isMonitorRefreshPhotosInitiated) {
+            isMonitorRefreshPhotosInitiated = true
+            monitorRefreshPhotos()
         }
+        return photosStateFlow.filterNotNull()
+    }
+
+    override fun refreshPhotos() {
+        refreshPhotosStateFlow.update { true }
     }
 
     override suspend fun getPublicLinksCount(): Int = withContext(ioDispatcher) {
@@ -102,7 +148,7 @@ internal class DefaultPhotosRepository @Inject constructor(
         getMediaUploadFolderId
     }
 
-    override suspend fun searchMegaPhotos(): List<Photo> = withContext(ioDispatcher) {
+    private suspend fun searchMegaPhotos(): List<Photo> = withContext(ioDispatcher) {
         val images = async { mapPhotoNodesToImages(searchImages()) }
         val videos = async { mapPhotoNodesToVideos(searchVideos()) }
         images.await() + videos.await()

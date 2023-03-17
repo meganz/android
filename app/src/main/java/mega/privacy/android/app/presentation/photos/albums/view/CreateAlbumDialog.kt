@@ -117,8 +117,7 @@ fun CreateNewAlbumDialog(
     MegaDialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         modifier = Modifier
-            .padding(horizontal = 40.dp)
-            .widthIn(max = 280.dp),
+            .padding(horizontal = 40.dp),
         onDismissRequest = onDismissRequest,
         titleString = stringResource(id = titleResID),
         fontWeight = FontWeight.W500,

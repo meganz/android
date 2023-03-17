@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
@@ -10,6 +11,15 @@ import java.io.File
  * The repository interface regarding Timeline.
  */
 interface PhotosRepository {
+    /**
+     * Monitor photos
+     */
+    fun monitorPhotos(): Flow<List<Photo>>
+
+    /**
+     * Refresh photos
+     */
+    fun refreshPhotos()
 
     /**
      * Get public links count
@@ -34,11 +44,6 @@ interface PhotosRepository {
      * @return
      */
     suspend fun getMediaUploadFolderId(): Long?
-
-    /**
-     * Search all the Photos in mega
-     */
-    suspend fun searchMegaPhotos(): List<Photo>
 
     /**
      * Get photo with [nodeId]
