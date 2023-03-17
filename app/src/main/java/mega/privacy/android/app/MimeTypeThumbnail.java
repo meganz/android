@@ -1,10 +1,6 @@
 package mega.privacy.android.app;
 
-import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
-
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.SparseArray;
 import android.webkit.MimeTypeMap;
 
@@ -112,7 +108,9 @@ public class MimeTypeThumbnail {
 
 	/*
 	 * Get Icon for current MimeType
+	 * @deprecated use @link{#GetFileIcon.getFileIcon}
 	 */
+	@Deprecated()
 	public int getIconResourceId() {
 		if (resId == -1) {
 			if (resourcesCache.containsKey(extension)) {
