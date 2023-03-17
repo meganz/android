@@ -69,7 +69,6 @@ import mega.privacy.android.data.mapper.SyncStatusIntMapper
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
-import mega.privacy.android.data.mapper.UserLastGreenMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.VideoAttachmentMapper
@@ -90,6 +89,8 @@ import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapperImpl
+import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
+import mega.privacy.android.data.mapper.chat.UserLastGreenMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
@@ -164,7 +165,6 @@ import mega.privacy.android.data.mapper.toTransferEventModel
 import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
-import mega.privacy.android.data.mapper.toUserUserLastGreen
 import mega.privacy.android.data.mapper.toVideo
 import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.data.mapper.toVideoQuality
@@ -283,6 +283,9 @@ internal abstract class MapperModule {
     @Binds
     abstract fun bindMegaChatPeerListMapper(implementation: MegaChatPeerListMapperImpl): MegaChatPeerListMapper
 
+    @Binds
+    abstract fun bindUserLastGreenMapper(implementation: UserLastGreenMapperImpl): UserLastGreenMapper
+
     companion object {
         /**
          * Provide account type mapper
@@ -313,12 +316,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
-
-        /**
-         * Provide user last green mapper
-         */
-        @Provides
-        fun provideUserLastGreenMapper(): UserLastGreenMapper = ::toUserUserLastGreen
 
         /**
          * Provide mega transfer mapper
