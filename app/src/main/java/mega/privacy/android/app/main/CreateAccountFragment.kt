@@ -524,6 +524,16 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                 createAccountProgressBar.isVisible = false
             }
         } else {
+            dbH.clearEphemeral()
+            val ephemeral = EphemeralCredentials(
+                request.email,
+                request.password,
+                request.sessionKey,
+                request.name,
+                request.text
+            )
+            dbH.saveEphemeral(ephemeral)
+
             if (createAccountEmailText.text != null && createAccountNameText.text != null
                 && createAccountLastNameText.text != null && createAccountPasswordText.text != null
             ) {
@@ -534,17 +544,6 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                     createAccountPasswordText.text.toString()
                 )
             }
-
-            dbH.clearEphemeral()
-            val ephemeral = EphemeralCredentials(
-                request.email,
-                request.password,
-                request.sessionKey,
-                request.name,
-                request.text
-            )
-            dbH.saveEphemeral(ephemeral)
-            loginActivity?.showFragment(Constants.CONFIRM_EMAIL_FRAGMENT)
         }
     }
 

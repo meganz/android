@@ -917,6 +917,7 @@ class LoginFragment : Fragment() {
         loginEmailText.hideKeyboard()
 
         if (!isConnected()) {
+            viewModel.resetOngoingTransfers()
             return
         }
 

@@ -322,4 +322,8 @@ internal class DefaultLoginRepository @Inject constructor(
     override fun monitorFetchNodesFinish() = appEventGateway.monitorFetchNodesFinish()
 
     override suspend fun broadcastFetchNodesFinish() = appEventGateway.broadcastFetchNodesFinish()
+
+    override fun monitorAccountUpdate() = appEventGateway.monitorAccountUpdate()
+
+    override suspend fun broadcastAccountUpdate() = appEventGateway.broadcastAccountUpdate()
 }

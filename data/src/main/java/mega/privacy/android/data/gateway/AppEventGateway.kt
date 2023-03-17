@@ -106,4 +106,14 @@ internal interface AppEventGateway {
      * Broadcast fetch nodes.
      */
     suspend fun broadcastFetchNodesFinish()
+
+    /**
+     * Monitors account update.
+     */
+    fun monitorAccountUpdate(): Flow<Boolean>
+
+    /**
+     * Broadcast account update.
+     */
+    suspend fun broadcastAccountUpdate()
 }

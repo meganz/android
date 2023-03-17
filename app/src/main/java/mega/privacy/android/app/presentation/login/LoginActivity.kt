@@ -1,10 +1,7 @@
 package mega.privacy.android.app.presentation.login
 
 import android.annotation.SuppressLint
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.graphics.Rect
 import android.os.Bundle
@@ -17,21 +14,19 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityLoginBinding
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
 import mega.privacy.android.app.main.ConfirmEmailFragment
 import mega.privacy.android.app.main.CreateAccountFragment
 import mega.privacy.android.app.main.TourFragment
+import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.Util
@@ -65,7 +60,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     private var createAccountFragment: CreateAccountFragment? = null
 
     private var visibleFragment = 0
-    private var waitingForConfirmAccount = false
     private var sessionTemp: String? = null
     private var emailTemp: String? = null
     private var passwdTemp: String? = null
@@ -90,16 +84,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         }
     }
 
-    private val onAccountUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE && waitingForConfirmAccount) {
-                waitingForConfirmAccount = false
-                visibleFragment = Constants.LOGIN_FRAGMENT
-                showFragment(visibleFragment)
-            }
-        }
-    }
-
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -117,7 +101,6 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     override fun onDestroy() {
         Timber.d("onDestroy")
         chatRequestHandler.setIsLoggingRunning(false)
-        unregisterReceiver(onAccountUpdateReceiver)
         super.onDestroy()
     }
 
@@ -158,20 +141,14 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
     }
 
     private fun setupObservers() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { uiState ->
-                    if (uiState.pendingToFinishActivity) {
-                        finish()
-                    }
+        collectFlow(viewModel.state, Lifecycle.State.RESUMED) { uiState ->
+            with(uiState) {
+                when {
+                    isPendingToFinishActivity -> finish()
+                    isPendingToShowFragment != null -> showFragment(isPendingToShowFragment.toConstant())
                 }
             }
         }
-
-        registerReceiver(onAccountUpdateReceiver,
-            IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_ON_ACCOUNT_UPDATE).apply {
-                addAction(BroadcastConstants.ACTION_ON_ACCOUNT_UPDATE)
-            })
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -377,9 +354,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             try {
                 if (request.paramType == 1) {
                     if (e.errorCode == MegaError.API_OK) {
-                        waitingForConfirmAccount = true
-                        visibleFragment = Constants.CONFIRM_EMAIL_FRAGMENT
-                        showFragment(visibleFragment)
+                        viewModel.setIsWaitingForConfirmAccount()
                     } else {
                         cancelConfirmationAccount()
                     }
@@ -404,11 +379,9 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         dbH.clearEphemeral()
         dbH.clearCredentials()
         cancelledConfirmationProcess = true
-        waitingForConfirmAccount = false
         passwdTemp = null
         emailTemp = null
-        visibleFragment = Constants.TOUR_FRAGMENT
-        showFragment(visibleFragment)
+        viewModel.setTourAsPendingFragment()
     }
 
     override fun onRequestTemporaryError(api: MegaApiJava, request: MegaRequest, e: MegaError) {
@@ -459,9 +432,11 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
             private val rect = Rect()
 
             override fun onGlobalLayout() {
-                val estimatedKeyboardHeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                val estimatedKeyboardHeight = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
                     EstimatedKeyboardDP.toFloat(),
-                    parentView.resources.displayMetrics).toInt()
+                    parentView.resources.displayMetrics
+                ).toInt()
                 parentView.getWindowVisibleDisplayFrame(rect)
 
                 val heightDiff = parentView.rootView.height - (rect.bottom - rect.top)
@@ -499,7 +474,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
         firstNameTemp = name
         lastNameTemp = lastName
         passwdTemp = password
-        waitingForConfirmAccount = true
+        viewModel.setIsWaitingForConfirmAccount()
     }
 
     companion object {

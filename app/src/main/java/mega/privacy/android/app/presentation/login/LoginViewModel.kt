@@ -17,6 +17,7 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
@@ -49,6 +50,7 @@ import mega.privacy.android.domain.usecase.login.FetchNodes
 import mega.privacy.android.domain.usecase.login.LocalLogout
 import mega.privacy.android.domain.usecase.login.Login
 import mega.privacy.android.domain.usecase.login.LoginWith2FA
+import mega.privacy.android.domain.usecase.login.MonitorAccountUpdate
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinish
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExist
@@ -82,6 +84,7 @@ class LoginViewModel @Inject constructor(
     private val fetchNodes: FetchNodes,
     private val ongoingTransfersExist: OngoingTransfersExist,
     private val monitorFetchNodesFinish: MonitorFetchNodesFinish,
+    private val monitorAccountUpdate: MonitorAccountUpdate,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -140,6 +143,7 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch { resetChatSettings() }
         monitorFetchNodes()
+        monitorAccountUpdates()
     }
 
     private fun monitorFetchNodes() = viewModelScope.launch {
@@ -148,7 +152,7 @@ class LoginViewModel @Inject constructor(
                 when (this) {
                     ACTION_FORCE_RELOAD_ACCOUNT -> {
                         MegaApplication.isLoggingIn = false
-                        _state.update { it.copy(pendingToFinishActivity = true) }
+                        _state.update { it.copy(isPendingToFinishActivity = true) }
                     }
                     ACTION_OPEN_APP -> {
                         _state.update { it.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
@@ -157,6 +161,27 @@ class LoginViewModel @Inject constructor(
             }
         }
     }
+
+    private fun monitorAccountUpdates() = viewModelScope.launch {
+        monitorAccountUpdate().collectLatest {
+            if (state.value.isPendingToShowFragment == LoginFragmentType.ConfirmEmail) {
+                _state.update { it.copy(isPendingToShowFragment = LoginFragmentType.Login) }
+            }
+        }
+    }
+
+
+    /**
+     * Sets confirm email fragment as pending in state.
+     */
+    fun setIsWaitingForConfirmAccount() =
+        _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.ConfirmEmail) }
+
+    /**
+     * Sets tour as pending fragment in state.
+     */
+    fun setTourAsPendingFragment() =
+        _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Tour) }
 
     /**
      * Updates state with a new intentAction.
