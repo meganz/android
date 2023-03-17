@@ -40,7 +40,6 @@ import mega.privacy.android.data.mapper.LocalPricingMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
-import mega.privacy.android.data.mapper.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
@@ -89,6 +88,8 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
+import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
+import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
@@ -143,7 +144,6 @@ import mega.privacy.android.data.mapper.toLocalPricing
 import mega.privacy.android.data.mapper.toMediaStoreFileType
 import mega.privacy.android.data.mapper.toMediaStoreFileTypeUri
 import mega.privacy.android.data.mapper.toMegaAchievement
-import mega.privacy.android.data.mapper.toMegaChatPeerList
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toMegaSku
@@ -280,6 +280,9 @@ internal abstract class MapperModule {
     @Binds
     abstract fun bindMyAccountCredentialsMapper(implementation: MyAccountCredentialsMapperImpl): MyAccountCredentialsMapper
 
+    @Binds
+    abstract fun bindMegaChatPeerListMapper(implementation: MegaChatPeerListMapperImpl): MegaChatPeerListMapper
+
     companion object {
         /**
          * Provide account type mapper
@@ -389,12 +392,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideNodeUpdateMapper(): NodeUpdateMapper = ::mapMegaNodeListToNodeUpdate
-
-        /**
-         * Provide mega chat peer list mapper
-         */
-        @Provides
-        fun provideMegaChatPeerListMapper(): MegaChatPeerListMapper = ::toMegaChatPeerList
 
         /**
          * Provide online status mapper
