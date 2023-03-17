@@ -273,6 +273,11 @@ internal class MegaChatApiFacade @Inject constructor(
         listener: MegaChatRequestListenerInterface,
     ) = chatApi.answerChatCall(chatId, enabledVideo, enabledAudio, listener)
 
+    override fun hangChatCall(
+        callId: Long,
+        listener: MegaChatRequestListenerInterface,
+    ) = chatApi.hangChatCall(callId, listener)
+
     override fun setChatVideoInDevice(
         device: String,
         listener: MegaChatRequestListenerInterface?,

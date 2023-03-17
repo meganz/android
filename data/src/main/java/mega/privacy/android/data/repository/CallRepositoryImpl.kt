@@ -10,10 +10,10 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
+import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
@@ -120,6 +120,20 @@ internal class CallRepositoryImpl @Inject constructor(
                 enabledVideo,
                 enabledAudio,
                 callback
+            )
+        }
+    }
+
+    override suspend fun hangChatCall(
+        callId: Long,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCoroutine { continuation ->
+            val callback = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.hangChatCall(
+                callId, callback
             )
         }
     }

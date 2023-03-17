@@ -66,6 +66,16 @@ interface CallRepository {
     ): ChatRequest
 
     /**
+     * Hang a call.
+     *
+     * @param callId            The Call id.
+     * @return                  [ChatRequest]
+     */
+    suspend fun hangChatCall(
+        callId: Long,
+    ): ChatRequest
+
+    /**
      * Get all scheduled meetings
      *
      * @return List of scheduled meetings

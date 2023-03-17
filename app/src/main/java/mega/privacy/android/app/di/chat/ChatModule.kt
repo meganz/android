@@ -13,12 +13,12 @@ import mega.privacy.android.domain.usecase.ArchiveChat
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.DefaultGetChatParticipants
-import mega.privacy.android.domain.usecase.GetMeetingsImpl
 import mega.privacy.android.domain.usecase.DefaultMeetingRoomMapper
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetChatRoomByUser
 import mega.privacy.android.domain.usecase.GetMeetings
+import mega.privacy.android.domain.usecase.GetMeetingsImpl
 import mega.privacy.android.domain.usecase.GetScheduledMeeting
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.InviteContact
@@ -37,11 +37,13 @@ import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.DefaultAnswerChatCall
+import mega.privacy.android.domain.usecase.meeting.DefaultHangChatCall
 import mega.privacy.android.domain.usecase.meeting.DefaultOpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.DefaultStartChatCallNoRinging
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.HangChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
@@ -94,6 +96,12 @@ abstract class ChatModule {
      */
     @Binds
     abstract fun bindAnswerChatCall(useCase: DefaultAnswerChatCall): AnswerChatCall
+
+    /**
+     * Hang call
+     */
+    @Binds
+    abstract fun bindHangChatCall(useCase: DefaultHangChatCall): HangChatCall
 
     companion object {
         /**

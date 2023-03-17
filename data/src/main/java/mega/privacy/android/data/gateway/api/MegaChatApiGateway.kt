@@ -299,6 +299,17 @@ interface MegaChatApiGateway {
     )
 
     /**
+     * Hang call.
+     *
+     * @param callId  The call id.
+     * @param listener Listener.
+     */
+    fun hangChatCall(
+        callId: Long,
+        listener: MegaChatRequestListenerInterface,
+    )
+
+    /**
      * Select the video device to be used in calls.
      *
      * @param device Identifier of device to be selected.
