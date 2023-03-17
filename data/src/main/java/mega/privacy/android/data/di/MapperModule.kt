@@ -16,7 +16,6 @@ import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
-import mega.privacy.android.data.mapper.ChatRequestMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingMapperImpl
@@ -49,12 +48,9 @@ import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
-import mega.privacy.android.data.mapper.OnlineStatusMapper
 import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
 import mega.privacy.android.data.mapper.PaymentPlatformTypeMapper
 import mega.privacy.android.data.mapper.PricingMapper
-import mega.privacy.android.data.mapper.RecentActionBucketMapper
-import mega.privacy.android.data.mapper.RecentActionsMapper
 import mega.privacy.android.data.mapper.ScannedContactLinkResultMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapperImpl
@@ -87,8 +83,12 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
+import mega.privacy.android.data.mapper.chat.ChatRequestMapper
+import mega.privacy.android.data.mapper.chat.ChatRequestMapperImpl
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapperImpl
+import mega.privacy.android.data.mapper.chat.OnlineStatusMapper
+import mega.privacy.android.data.mapper.chat.OnlineStatusMapperImpl
 import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
 import mega.privacy.android.data.mapper.chat.UserLastGreenMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
@@ -116,6 +116,10 @@ import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapperImpl
+import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
+import mega.privacy.android.data.mapper.recentactions.RecentActionsMapper
+import mega.privacy.android.data.mapper.recentactions.RecentActionsMapperImpl
+import mega.privacy.android.data.mapper.recentactions.toRecentActionBucket
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapperImpl
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
@@ -131,7 +135,6 @@ import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toAchievementsOverview
 import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
 import mega.privacy.android.data.mapper.toChatListItem
-import mega.privacy.android.data.mapper.toChatRequest
 import mega.privacy.android.data.mapper.toChatRoom
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
@@ -150,12 +153,9 @@ import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toMegaSku
 import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOfflineNodeInformation
-import mega.privacy.android.data.mapper.toOnlineStatus
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPaymentPlatformType
 import mega.privacy.android.data.mapper.toPricing
-import mega.privacy.android.data.mapper.toRecentActionBucket
-import mega.privacy.android.data.mapper.toRecentActionBucketList
 import mega.privacy.android.data.mapper.toScannedContactLinkResult
 import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toStorageState
@@ -286,6 +286,15 @@ internal abstract class MapperModule {
     @Binds
     abstract fun bindUserLastGreenMapper(implementation: UserLastGreenMapperImpl): UserLastGreenMapper
 
+    @Binds
+    abstract fun bindOnlineStatusMapper(implementation: OnlineStatusMapperImpl): OnlineStatusMapper
+
+    @Binds
+    abstract fun bindChatRequestMapper(implementation: ChatRequestMapperImpl): ChatRequestMapper
+
+    @Binds
+    abstract fun bindRecentActionsMapper(implementation: RecentActionsMapperImpl): RecentActionsMapper
+
     companion object {
         /**
          * Provide account type mapper
@@ -304,12 +313,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideUserAlertMapper(): UserAlertMapper = ::toUserAlert
-
-        /**
-         * Provide chat request mapper
-         */
-        @Provides
-        fun provideChatRequestMapper(): ChatRequestMapper = ::toChatRequest
 
         /**
          * Provide start screen mapper
@@ -389,12 +392,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideNodeUpdateMapper(): NodeUpdateMapper = ::mapMegaNodeListToNodeUpdate
-
-        /**
-         * Provide online status mapper
-         */
-        @Provides
-        fun provideOnlineStatusMapper(): OnlineStatusMapper = ::toOnlineStatus
 
         /**
          * Provide mega share mapper
@@ -484,12 +481,6 @@ internal abstract class MapperModule {
         @Provides
         fun provideAchievementsOverviewMapper(): AchievementsOverviewMapper =
             ::toAchievementsOverview
-
-        /**
-         * Provide [RecentActionsMapper] mapper
-         */
-        @Provides
-        fun provideRecentActionsMapper(): RecentActionsMapper = ::toRecentActionBucketList
 
         /**
          * Provide [UserSetMapper] mapper

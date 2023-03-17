@@ -14,7 +14,7 @@ import mega.privacy.android.app.middlelayer.BuildFlavorHelper.isHMS
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.data.mapper.ChatRequestMapper
+import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.BroadcastFinishActivity

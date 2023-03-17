@@ -7,8 +7,8 @@ import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.RecentActionBucketMapper
-import mega.privacy.android.data.mapper.RecentActionsMapper
+import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
+import mega.privacy.android.data.mapper.recentactions.RecentActionsMapper
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.RecentActionsRepository

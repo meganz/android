@@ -1,7 +1,7 @@
 package mega.privacy.android.data.mapper.contact
 
 import com.google.common.truth.Truth
-import mega.privacy.android.data.mapper.userStatus
+import mega.privacy.android.data.mapper.chat.OnlineStatusMapperImpl.Companion.userStatus
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility

@@ -7,9 +7,8 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.MegaRecentActionBucketProvider
-import mega.privacy.android.data.mapper.RecentActionBucketMapper
-import mega.privacy.android.data.mapper.RecentActionsMapper
+import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
+import mega.privacy.android.data.mapper.recentactions.RecentActionsMapper
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import nz.mega.sdk.MegaApiJava
@@ -32,12 +31,7 @@ class DefaultRecentActionsRepositoryTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
 
-    private val recentActionsMapper: RecentActionsMapper =
-        { list: MegaRecentActionBucketList?, bucketProvider: MegaRecentActionBucketProvider ->
-            list?.let { actions ->
-                (0 until actions.size()).map { bucketProvider(mock()) }
-            } ?: emptyList()
-        }
+    private val recentActionsMapper = mock<RecentActionsMapper>()
 
     private val recentActionBucketMapper = mock<RecentActionBucketMapper>()
 
@@ -81,17 +75,20 @@ class DefaultRecentActionsRepositoryTest {
                 error
             )
         }
-        whenever(recentActionsMapper(bucketList, mock())).thenReturn(list)
-        whenever(recentActionBucketMapper.invoke(
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-            mock(),
-        )).thenReturn(recentActionBucket)
+        whenever(megaApiGateway.copyBucket(any())).thenReturn(mock())
+        whenever(recentActionsMapper(any(), any())).thenReturn(list)
+        whenever(
+            recentActionBucketMapper.invoke(
+                mock(),
+                mock(),
+                mock(),
+                mock(),
+                mock(),
+                mock(),
+                mock(),
+                mock(),
+            )
+        ).thenReturn(recentActionBucket)
 
         assertThat(underTest.getRecentActions().size).isEqualTo(expected.size)
     }
