@@ -728,7 +728,7 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun successPasswordReminderDialog() {
+    override suspend fun notifyPasswordChecked() {
         onPasswordReminderAction("passwordReminderDialogSucceeded") { listener ->
             megaApiGateway.successPasswordReminderDialog(listener)
         }

@@ -350,5 +350,5 @@ interface AccountRepository {
     /**
      * Notify the user has successfully checked his password
      */
-    suspend fun successPasswordReminderDialog()
+    suspend fun notifyPasswordChecked()
 }
