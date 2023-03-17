@@ -869,14 +869,16 @@ internal class MegaApiFacade @Inject constructor(
         megaApi.getFileVersionsOption(listener)
     }
 
-    @Deprecated("Function related to statistics will be reviewed in future updates to provide more " +
-            "data and avoid race conditions. They could change or be removed in the current form."
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to provide more " +
+                "data and avoid race conditions. They could change or be removed in the current form."
     )
     override val numberOfPendingUploads: Int
         get() = megaApi.numPendingUploads
 
-    @Deprecated("Function related to statistics will be reviewed in future updates to provide more" +
-            "data and avoid race conditions. They could change or be removed in the current form."
+    @Deprecated(
+        "Function related to statistics will be reviewed in future updates to provide more" +
+                "data and avoid race conditions. They could change or be removed in the current form."
     )
     override val numberOfPendingDownloads: Int
         get() = megaApi.numPendingDownloads
@@ -1045,4 +1047,13 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun setAvatar(srcFilePath: String?, listener: MegaRequestListenerInterface) =
         megaApi.setAvatar(srcFilePath, listener)
+
+    override fun skipPasswordReminderDialog(listener: MegaRequestListenerInterface) =
+        megaApi.passwordReminderDialogSkipped(listener)
+
+    override fun blockPasswordReminderDialog(listener: MegaRequestListenerInterface) =
+        megaApi.passwordReminderDialogBlocked(listener)
+
+    override fun successPasswordReminderDialog(listener: MegaRequestListenerInterface) =
+        megaApi.passwordReminderDialogSucceeded(listener)
 }

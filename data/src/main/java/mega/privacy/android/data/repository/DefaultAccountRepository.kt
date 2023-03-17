@@ -60,10 +60,12 @@ import mega.privacy.android.domain.exception.QRCodeException
 import mega.privacy.android.domain.exception.QuerySignupLinkException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AccountRepository
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaRequestListenerInterface
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -711,6 +713,39 @@ internal class DefaultAccountRepository @Inject constructor(
                 null
             else
                 accountPreferencesGateway.getLatestTargetPathPreference().firstOrNull()
+        }
+    }
+
+    override suspend fun skipPasswordReminderDialog() {
+        onPasswordReminderAction("passwordReminderDialogSkipped") { listener ->
+            megaApiGateway.skipPasswordReminderDialog(listener)
+        }
+    }
+
+    override suspend fun blockPasswordReminderDialog() {
+        onPasswordReminderAction("passwordReminderDialogBlocked") { listener ->
+            megaApiGateway.blockPasswordReminderDialog(listener)
+        }
+    }
+
+    override suspend fun successPasswordReminderDialog() {
+        onPasswordReminderAction("passwordReminderDialogSucceeded") { listener ->
+            megaApiGateway.successPasswordReminderDialog(listener)
+        }
+    }
+
+    private suspend fun onPasswordReminderAction(
+        methodName: String,
+        block: (MegaRequestListenerInterface) -> Unit,
+    ) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener(methodName) {
+                it.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER
+            }
+            block(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
         }
     }
 

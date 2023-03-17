@@ -2041,4 +2041,22 @@ interface MegaApiGateway {
      * @param listener    MegaRequestListener to track this request
      */
     fun setAvatar(srcFilePath: String?, listener: MegaRequestListenerInterface)
+
+    /**
+     *  Notify the user has successfully skipped the password check
+     *  @param listener    MegaRequestListener to track this request
+     */
+    fun skipPasswordReminderDialog(listener: MegaRequestListenerInterface)
+
+    /**
+     * Notify the user wants to totally disable the password check
+     * @param listener    MegaRequestListener to track this request
+     */
+    fun blockPasswordReminderDialog(listener: MegaRequestListenerInterface)
+
+    /**
+     * Notify the user has successfully checked his password
+     * @param listener    MegaRequestListener to track this request
+     */
+    fun successPasswordReminderDialog(listener: MegaRequestListenerInterface)
 }

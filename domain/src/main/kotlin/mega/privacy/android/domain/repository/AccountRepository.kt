@@ -336,4 +336,19 @@ interface AccountRepository {
      * Get last target path of move/copy
      */
     suspend fun getLatestTargetPathPreference(): Long?
+
+    /**
+     *  Notify the user has successfully skipped the password check
+     */
+    suspend fun skipPasswordReminderDialog()
+
+    /**
+     * Notify the user wants to totally disable the password check
+     */
+    suspend fun blockPasswordReminderDialog()
+
+    /**
+     * Notify the user has successfully checked his password
+     */
+    suspend fun successPasswordReminderDialog()
 }
