@@ -20,11 +20,6 @@ enum class StartCameraUploadsState {
     DISABLED_SYNC,
 
     /**
-     * The User is offline
-     */
-    OFFLINE_USER,
-
-    /**
      * The device is below the minimum percentage required
      */
     BELOW_DEVICE_BATTERY_LEVEL,

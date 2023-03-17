@@ -7,7 +7,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.os.IBinder
 import android.os.StatFs
@@ -57,8 +56,6 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
 import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
 import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
-import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver
-import mega.privacy.android.app.receivers.NetworkTypeChangeReceiver.OnNetworkTypeChangeCallback
 import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.isActive
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.onUploadSuccess
@@ -115,6 +112,7 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
+import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
@@ -144,7 +142,7 @@ import kotlin.math.roundToInt
  * Service to handle upload of photos and videos
  */
 @AndroidEntryPoint
-class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
+class CameraUploadsService : LifecycleService() {
 
     companion object {
 
@@ -399,6 +397,12 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     lateinit var monitorCameraUploadPauseState: MonitorCameraUploadPauseState
 
     /**
+     * Monitor connectivity
+     */
+    @Inject
+    lateinit var monitorConnectivity: MonitorConnectivity
+
+    /**
      * Monitor battery level
      */
     @Inject
@@ -560,11 +564,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     private var missingAttributesChecked = false
 
     /**
-     * Broadcast receiver that monitors the network changes
-     */
-    private var receiver: NetworkTypeChangeReceiver? = null
-
-    /**
      * Notification manager used to display notifications
      */
     private var notificationManager: NotificationManager? = null
@@ -621,6 +620,19 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         }
     }
 
+    private fun monitorConnectivityStatus() {
+        coroutineScope?.launch {
+            monitorConnectivity().collect {
+                if (!it || isWifiNotSatisfied()) {
+                    endService(
+                        cancelMessage = "Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload",
+                        aborted = true
+                    )
+                }
+            }
+        }
+    }
+
     private fun monitorBatteryLevelStatus() {
         coroutineScope?.launch {
             monitorBatteryInfo().collect {
@@ -661,8 +673,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     override fun onDestroy() {
         Timber.d("Service destroys.")
         super.onDestroy()
-        receiver?.let { unregisterReceiver(it) }
-
         stopActiveHeartbeat()
         coroutineScope?.cancel()
     }
@@ -673,21 +683,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     override fun onBind(intent: Intent): IBinder? {
         super.onBind(intent)
         return null
-    }
-
-    /**
-     * Network type change
-     */
-    override fun onTypeChanges(type: Int) {
-        Timber.d("Network type change to: %s", type)
-        coroutineScope?.launch {
-            if (type == NetworkTypeChangeReceiver.MOBILE && isCameraUploadByWifi()) {
-                endService(
-                    cancelMessage = "Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload",
-                    aborted = true
-                )
-            }
-        }
     }
 
     /**
@@ -774,15 +769,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         startForeground(notificationId, notification)
     }
 
-    private fun registerNetworkTypeChangeReceiver() {
-        if (receiver != null) {
-            unregisterReceiver(receiver)
-        }
-        receiver = NetworkTypeChangeReceiver()
-        receiver?.setCallback(this)
-        registerReceiver(receiver, IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"))
-    }
-
     /**
      * Function that starts the Camera Uploads functionality
      */
@@ -817,7 +803,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      *
      * 1. The Preferences exist - [preferencesExist],
      * 2. The Camera Uploads sync is enabled - [cameraUploadsSyncEnabled],
-     * 3. The User is online - [isUserOnline],
      * 4. The Device battery level is above the minimum threshold - [deviceAboveMinimumBatteryLevel],
      * 5. The Camera Uploads local path exists - [hasCameraUploadsLocalPath],
      * 6. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
@@ -837,10 +822,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         when {
             !preferencesExist() -> StartCameraUploadsState.MISSING_PREFERENCES
             !cameraUploadsSyncEnabled() -> StartCameraUploadsState.DISABLED_SYNC
-            !isUserOnline() -> StartCameraUploadsState.OFFLINE_USER
+            !isWifiConstraintSatisfied() -> StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
             !deviceAboveMinimumBatteryLevel -> StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
             !hasCameraUploadsLocalPath() -> StartCameraUploadsState.MISSING_LOCAL_PATH
-            !isWifiConstraintSatisfied() -> StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
             !hasLocalPrimaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER
             !hasLocalSecondaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER
             !isUserLoggedIn() -> StartCameraUploadsState.LOGGED_OUT_USER
@@ -860,7 +844,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         when (state) {
             StartCameraUploadsState.MISSING_PREFERENCES,
             StartCameraUploadsState.DISABLED_SYNC,
-            StartCameraUploadsState.OFFLINE_USER,
             StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL,
             StartCameraUploadsState.MISSING_LOCAL_PATH,
             StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT,
@@ -936,17 +919,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     private suspend fun cameraUploadsSyncEnabled(): Boolean =
         isCameraUploadSyncEnabled().also {
             if (!it) Timber.w("Camera Upload sync disabled")
-        }
-
-    /**
-     * Checks if the User is online through [Util.isOnline]
-     *
-     * @return true if the User is online, and false if otherwise
-     */
-    @Suppress("DEPRECATION")
-    private fun isUserOnline(): Boolean =
-        Util.isOnline(applicationContext).also {
-            if (!it) Timber.w("User is offline")
         }
 
     /**
@@ -1548,7 +1520,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     private suspend fun initService() {
         // Start monitoring external events
         startWakeAndWifiLocks()
-        registerNetworkTypeChangeReceiver()
+        monitorConnectivityStatus()
         monitorChargingStoppedStatus()
         monitorBatteryLevelStatus()
         monitorUploadPauseStatus()
