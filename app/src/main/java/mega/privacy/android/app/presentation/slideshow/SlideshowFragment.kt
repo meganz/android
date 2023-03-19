@@ -46,6 +46,7 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.yield
 import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
@@ -104,7 +105,9 @@ class SlideshowFragment : Fragment() {
     private fun setupObserver() {
         imageViewerViewModel.images.observe(viewLifecycleOwner) { items ->
             items?.let {
-                slideshowViewModel.setData(it)
+                if (it.isNotEmpty()) {
+                    slideshowViewModel.setData(it)
+                }
             }
         }
     }
@@ -134,24 +137,38 @@ class SlideshowFragment : Fragment() {
         }
         val photoState = rememberPhotoState()
         LaunchedEffect(isPlaying) {
-            while (true) {
-                yield()
-                delay(speed.second * 1000L)
-                tween<Float>(600)
-                if (isPlaying) {
-                    pagerState.animateScrollToPage(
-                        page = (pagerState.currentPage + 1) % (pagerState.pageCount)
-                    )
+            if (isPlaying) {
+                while (true) {
+                    yield()
+                    delay(speed.second * 1000L)
+                    tween<Float>(600)
+                    if (isPlaying) {
+                        pagerState.animateScrollToPage(
+                            page = (pagerState.currentPage + 1) % (pagerState.pageCount)
+                        )
+                    }
                 }
             }
         }
 
-        LaunchedEffect(repeat, pagerState.currentPage) {
-            snapshotFlow { pagerState.currentPage }.collect { page ->
-                // When move to next, reset scale
+        // When move to next, reset scale
+        LaunchedEffect(pagerState, repeat) {
+            snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { page ->
                 photoState.resetScale()
-                if (repeat.not() && page == 1) {
-                    isPlaying = false
+
+                imageViewerViewModel.images.value?.let { sourceImages ->
+                    // handle repeat playing
+                    if (page == sourceImages.size.minus(1) && repeat.not()) {
+                        isPlaying = false
+                        // Make sure the last picture completely showed
+                        pagerState.animateScrollToPage(
+                            page = pagerState.pageCount - 1
+                        )
+                    }
+
+                    if (page == pagerState.pageCount.minus(1)) {
+                        slideshowViewModel.playSlideshowItems(sourceImages)
+                    }
                 }
             }
         }
@@ -200,9 +217,7 @@ class SlideshowFragment : Fragment() {
                     modifier = Modifier.fillMaxSize(),
                     count = playItems.size,
                     state = pagerState,
-                    key = {
-                        it + id
-                    }
+                    key = { playItems[it].id }
                 ) { index ->
 
                     val imageState = produceState<String?>(initialValue = null) {
@@ -244,7 +259,7 @@ class SlideshowFragment : Fragment() {
 
                 if (showBottomPanel) {
                     LaunchedEffect(true) {
-                        delay(3000L)
+                        delay(5000L)
                         showBottomPanel = false
                         imageViewerViewModel.showToolbar(showBottomPanel)
                     }

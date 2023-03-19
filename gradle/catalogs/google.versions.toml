@@ -1,5 +1,5 @@
 [versions]
-accompanist = "0.24.13-rc"
+accompanist = "0.28.0"
 accompanist-systemui = "0.23.1"
 autovalue = "1.9"
 exoplayer = "2.18.4"
