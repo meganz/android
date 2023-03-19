@@ -1,11 +1,13 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
@@ -28,8 +30,10 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import mega.privacy.android.domain.entity.set.UserSet
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.AlbumRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaSet
@@ -47,21 +51,45 @@ typealias AlbumPhotosRemovingProgressPool = MutableMap<AlbumId, MutableSharedFlo
  */
 @Singleton
 internal class DefaultAlbumRepository @Inject constructor(
+    private val nodeRepository: NodeRepository,
     private val megaApiGateway: MegaApiGateway,
     private val userSetMapper: UserSetMapper,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val albumStringResourceGateway: AlbumStringResourceGateway,
+    @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : AlbumRepository {
     private val userSets: MutableMap<Long, UserSet> = mutableMapOf()
 
+    private val nodeSetsMap: MutableMap<NodeId, MutableSet<Long>> = mutableMapOf()
+
     private val userSetsFlow: MutableSharedFlow<List<UserSet>> = MutableSharedFlow(replay = 1)
+
+    private val userSetsElementsFlow: MutableSharedFlow<List<UserSet>> = MutableSharedFlow(replay = 1)
 
     private val albumElements: MutableMap<AlbumId, List<AlbumPhotoId>> = mutableMapOf()
 
     private val albumPhotosAddingProgressPool: AlbumPhotosAddingProgressPool = mutableMapOf()
 
     private val albumPhotosRemovingProgressPool: AlbumPhotosRemovingProgressPool = mutableMapOf()
+
+    init {
+        monitorNodeUpdates()
+    }
+
+    private fun monitorNodeUpdates() = nodeRepository.monitorNodeUpdates()
+        .onEach { nodeUpdate ->
+            val userSets = nodeUpdate.changes.keys
+                .flatMap { node ->
+                    val setIds = nodeSetsMap[node.id] ?: emptySet()
+                    setIds.mapNotNull { userSets[it] }
+                }.distinctBy { it.id }
+
+            if (userSets.isNotEmpty()) {
+                userSetsFlow.tryEmit(userSets)
+                userSetsElementsFlow.tryEmit(userSets)
+            }
+        }.launchIn(appScope)
 
     override suspend fun createAlbum(name: String): UserSet = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
@@ -114,25 +142,38 @@ internal class DefaultAlbumRepository @Inject constructor(
             .filterIsInstance<GlobalUpdate.OnSetsUpdate>()
             .mapNotNull { it.sets }
             .map { sets -> sets.map { it.toUserSet() } },
-        userSetsFlow,
+        userSetsFlow
+            .onEach { sets ->
+                sets.forEach { albumElements.remove(AlbumId(it.id)) }
+            },
     )
 
     override suspend fun getAlbumElementIDs(albumId: AlbumId): List<AlbumPhotoId> =
         albumElements[albumId] ?: withContext(ioDispatcher) {
             val elementList = megaApiGateway.getSetElements(sid = albumId.id)
-            (0 until elementList.size()).map { index ->
-                elementList[index].toAlbumPhotoId()
+            (0 until elementList.size()).mapNotNull { index ->
+                val element = elementList[index]
+                val sets = nodeSetsMap.getOrPut(NodeId(element.node())) { mutableSetOf() }
+                sets.add(element.setId())
+
+                if (isNodeInRubbish(element.node())) null
+                else element.toAlbumPhotoId()
             }.also { albumElements[albumId] = it }
         }
 
-    override fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<AlbumPhotoId>> =
+    override fun monitorAlbumElementIds(albumId: AlbumId): Flow<List<AlbumPhotoId>> = merge(
         megaApiGateway.globalUpdates
             .filterIsInstance<GlobalUpdate.OnSetElementsUpdate>()
             .mapNotNull { it.elements }
             .map { elements -> elements.filter { it.setId() == albumId.id } }
             .onEach(::checkSetsCoverRemoved)
-            .map { elements -> elements.map { it.toAlbumPhotoId() } }
-            .onEach { albumElements.remove(albumId) }
+            .map { listOf(AlbumPhotoId.default) }
+            .onEach { albumElements.remove(albumId) },
+        userSetsElementsFlow
+            .mapNotNull { sets -> sets.find { it.id == albumId.id } }
+            .map { listOf(AlbumPhotoId.default) }
+            .onEach { albumElements.remove(albumId) },
+    )
 
     private fun checkSetsCoverRemoved(elements: List<MegaSetElement>) {
         val userSets = elements.mapNotNull { element ->
@@ -269,13 +310,8 @@ internal class DefaultAlbumRepository @Inject constructor(
     private fun getAlbumPhotosRemovingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosRemovingProgress?> =
         albumPhotosRemovingProgressPool.getOrPut(albumId) { MutableSharedFlow(replay = 1) }
 
-    private suspend fun MegaSet.toUserSet(): UserSet {
-        var cover = cover()
-        if (cover != -1L) {
-            getAlbumElementIDs(AlbumId(id()))
-                .find { it.id == cover && !isNodeInRubbish(handle = it.nodeId.longValue) }
-                .let { cover = it?.id ?: -1L }
-        }
+    private fun MegaSet.toUserSet(): UserSet {
+        val cover = cover().takeIf { it != -1L }
         return userSetMapper(id(), name(), cover, ts())
     }
 

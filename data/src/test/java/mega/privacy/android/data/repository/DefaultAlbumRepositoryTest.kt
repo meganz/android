@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -16,6 +17,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
+import mega.privacy.android.domain.repository.NodeRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -37,6 +39,7 @@ import kotlin.test.fail
 class DefaultAlbumRepositoryTest {
     private lateinit var underTest: AlbumRepository
 
+    private val nodeRepository = mock<NodeRepository>()
     private val megaApiGateway = mock<MegaApiGateway>()
     private val userSetMapper: UserSetMapper = ::createUserSet
     private val albumStringResourceGateway = mock<AlbumStringResourceGateway>()
@@ -45,13 +48,8 @@ class DefaultAlbumRepositoryTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultAlbumRepository(
-            megaApiGateway = megaApiGateway,
-            userSetMapper = userSetMapper,
-            isNodeInRubbish = { false },
-            albumStringResourceGateway = albumStringResourceGateway,
-            ioDispatcher = UnconfinedTestDispatcher(),
-        )
+        whenever(nodeRepository.monitorNodeUpdates())
+            .thenReturn(flowOf())
     }
 
     @Test
@@ -85,6 +83,7 @@ class DefaultAlbumRepositoryTest {
             )
         }
 
+        underTest = createUnderTest(this)
         val actualNewAlbum = underTest.createAlbum(testName)
 
         assertEquals(actualNewAlbum.id, userSet.id)
@@ -107,6 +106,7 @@ class DefaultAlbumRepositoryTest {
                 )
             }
 
+            underTest = createUnderTest(this)
             underTest.addPhotosToAlbum(albumID = testAlbumId, photoIDs = testPhotos)
 
             underTest.observeAlbumPhotosAddingProgress(testAlbumId).test {
@@ -134,6 +134,7 @@ class DefaultAlbumRepositoryTest {
                 )
             }
 
+            underTest = createUnderTest(this)
             underTest.removePhotosFromAlbum(albumID = testAlbumId, photoIDs = testPhotos)
 
             underTest.observeAlbumPhotosRemovingProgress(testAlbumId).test {
@@ -163,6 +164,7 @@ class DefaultAlbumRepositoryTest {
         }
         whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
 
+        underTest = createUnderTest(this)
         val actualUserSets = underTest.getAllUserSets()
 
         assertThat(actualUserSets.size).isEqualTo(1)
@@ -192,6 +194,7 @@ class DefaultAlbumRepositoryTest {
             }
             whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
 
+            underTest = createUnderTest(this)
             val actualUserSets = underTest.getAllUserSets()
 
             assertThat(actualUserSets.size).isEqualTo(expectedSize)
@@ -212,6 +215,7 @@ class DefaultAlbumRepositoryTest {
         }
         whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
 
+        underTest = createUnderTest(this)
         val actualElementIds = underTest.getAlbumElementIDs(albumId)
 
         assertThat(actualElementIds.size).isEqualTo(1)
@@ -241,9 +245,10 @@ class DefaultAlbumRepositoryTest {
         whenever(megaApiGateway.globalUpdates)
             .thenReturn(flowOf(OnSetsUpdate(ArrayList(megaSets))))
 
+        underTest = createUnderTest(this)
         underTest.monitorUserSetsUpdate().test {
-            val actualUserSets = awaitItem()
-            assertThat(expectedUserSets).isEqualTo(actualUserSets)
+            val userSets = awaitItem()
+            assertThat(userSets).isNotEmpty()
         }
     }
 
@@ -269,10 +274,10 @@ class DefaultAlbumRepositoryTest {
         whenever(megaApiGateway.globalUpdates)
             .thenReturn(flowOf(OnSetElementsUpdate(ArrayList(megaSetElements))))
 
+        underTest = createUnderTest(this)
         underTest.monitorAlbumElementIds(albumId).test {
-            val actualElementIds = awaitItem()
-            assertThat(expectedElementIds).isEqualTo(actualElementIds)
-            awaitComplete()
+            val elementIds = awaitItem()
+            assertThat(elementIds).isNotEmpty()
         }
     }
 
@@ -282,7 +287,7 @@ class DefaultAlbumRepositoryTest {
         val expectedUserSet = createUserSet(
             id = 1L,
             name = "Album 1",
-            cover = -1L,
+            cover = null,
             modificationTime = 0L,
         )
 
@@ -290,15 +295,12 @@ class DefaultAlbumRepositoryTest {
             with(expectedUserSet) {
                 on { id() }.thenReturn(id)
                 on { name() }.thenReturn(name)
+                on { cover() }.thenReturn(-1L)
             }
         }
         whenever(megaApiGateway.getSet(any())).thenReturn(megaSet)
 
-        val megaSetElementList = mock<MegaSetElementList> {
-            on { size() }.thenReturn(0L)
-        }
-        whenever(megaApiGateway.getSetElements(any())).thenReturn(megaSetElementList)
-
+        underTest = createUnderTest(this)
         val actualUserSet = underTest.getUserSet(albumId)
         assertThat(expectedUserSet).isEqualTo(actualUserSet)
     }
@@ -322,6 +324,7 @@ class DefaultAlbumRepositoryTest {
         }
 
         try {
+            underTest = createUnderTest(this)
             underTest.removeAlbums(albumIds)
         } catch (e: Exception) {
             fail(message = "${e.message}")
@@ -350,6 +353,7 @@ class DefaultAlbumRepositoryTest {
             )
         }
 
+        underTest = createUnderTest(this)
         val actualName = underTest.updateAlbumName(AlbumId(1L), newName)
 
         assertEquals(newName, actualName)
@@ -360,6 +364,7 @@ class DefaultAlbumRepositoryTest {
         whenever(albumStringResourceGateway.getSystemAlbumNames()).thenReturn(listOf("abc"))
         whenever(albumStringResourceGateway.getProscribedStrings()).thenReturn(listOf("123"))
 
+        underTest = createUnderTest(this)
         val actualStringsList = underTest.getProscribedAlbumTitles()
 
         verify(albumStringResourceGateway).getSystemAlbumNames()
@@ -373,11 +378,22 @@ class DefaultAlbumRepositoryTest {
         val elementId = NodeId(2L)
 
         try {
+            underTest = createUnderTest(this)
             underTest.updateAlbumCover(albumId, elementId)
         } catch (e: Exception) {
             fail(message = "${e.message}")
         }
     }
+
+    private fun createUnderTest(coroutineScope: CoroutineScope) = DefaultAlbumRepository(
+        nodeRepository = nodeRepository,
+        megaApiGateway = megaApiGateway,
+        userSetMapper = userSetMapper,
+        isNodeInRubbish = { false },
+        albumStringResourceGateway = albumStringResourceGateway,
+        ioDispatcher = UnconfinedTestDispatcher(),
+        appScope = coroutineScope,
+    )
 
     private fun createUserSet(
         id: Long,

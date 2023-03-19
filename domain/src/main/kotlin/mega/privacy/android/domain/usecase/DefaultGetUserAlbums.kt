@@ -32,10 +32,9 @@ class DefaultGetUserAlbums @Inject constructor(
         albumRepository.getAllUserSets()
             .map { set ->
                 val photo = set.cover?.let { eid ->
-                    if (eid == -1L) null
-                    else albumRepository.getAlbumElementIDs(albumId = AlbumId(set.id))
+                    albumRepository.getAlbumElementIDs(albumId = AlbumId(set.id))
                         .find { it.id == eid }
-                        ?.let { photosRepository.getPhotoFromNodeID(it.nodeId, it) }
+                        ?.run { photosRepository.getPhotoFromNodeID(nodeId, this) }
                 }
                 Album.UserAlbum(
                     id = AlbumId(set.id),

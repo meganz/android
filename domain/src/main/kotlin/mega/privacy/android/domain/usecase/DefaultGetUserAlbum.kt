@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
@@ -32,10 +32,9 @@ class DefaultGetUserAlbum @Inject constructor(
     private suspend fun getUserAlbum(albumId: AlbumId): Album.UserAlbum? =
         albumRepository.getUserSet(albumId)?.let { set ->
             val photo = set.cover?.let { eid ->
-                if (eid == -1L) null
-                else albumRepository.getAlbumElementIDs(albumId = AlbumId(set.id))
+                albumRepository.getAlbumElementIDs(albumId = AlbumId(set.id))
                     .find { it.id == eid }
-                    ?.let { photosRepository.getPhotoFromNodeID(it.nodeId, it) }
+                    ?.run { photosRepository.getPhotoFromNodeID(nodeId, this) }
             }
             Album.UserAlbum(
                 id = AlbumId(set.id),
@@ -47,6 +46,6 @@ class DefaultGetUserAlbum @Inject constructor(
 
     private fun monitorUserAlbumUpdate(albumId: AlbumId): Flow<Album.UserAlbum?> =
         albumRepository.monitorUserSetsUpdate()
-            .map { sets -> sets.firstOrNull { it.id == albumId.id } }
+            .mapNotNull { sets -> sets.find { it.id == albumId.id } }
             .mapLatest { getUserAlbum(albumId) }
 }
