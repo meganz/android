@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.IsSMSVerificationShown
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.DefaultMonitorVerifiedPhoneNumber
+import mega.privacy.android.domain.usecase.verification.FormatPhoneNumber
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.MonitorVerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
@@ -99,5 +100,13 @@ abstract class SMSVerificationModule {
         @Provides
         fun provideVerifyPhoneNumber(repository: VerificationRepository): VerifyPhoneNumber =
             VerifyPhoneNumber(repository::verifyPhoneNumber)
+
+        /**
+         * Provides the Use Case [FormatPhoneNumber]
+         */
+        @Provides
+        fun provideFormatPhoneNumber(repository: VerificationRepository): FormatPhoneNumber =
+            FormatPhoneNumber(repository::formatPhoneNumber)
+
     }
 }

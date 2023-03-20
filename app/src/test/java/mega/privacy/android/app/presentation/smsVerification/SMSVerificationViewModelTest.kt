@@ -5,9 +5,9 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -19,8 +19,9 @@ import mega.privacy.android.app.presentation.verification.model.mapper.SmsVerifi
 import mega.privacy.android.domain.usecase.AreAccountAchievementsEnabled
 import mega.privacy.android.domain.usecase.GetAccountAchievements
 import mega.privacy.android.domain.usecase.GetCountryCallingCodes
-import mega.privacy.android.domain.usecase.Logout
+import mega.privacy.android.domain.usecase.GetCurrentCountryCode
 import mega.privacy.android.domain.usecase.SetSMSVerificationShown
+import mega.privacy.android.domain.usecase.verification.FormatPhoneNumber
 import mega.privacy.android.domain.usecase.verification.SendSMSVerificationCode
 import org.junit.After
 import org.junit.Before
@@ -42,23 +43,24 @@ class SMSVerificationViewModelTest {
 
     private val setSMSVerificationShown: SetSMSVerificationShown = mock()
     private val getCountryCallingCodes: GetCountryCallingCodes = mock()
-    private val logout: Logout = mock()
     private val sendSMSVerificationCode: SendSMSVerificationCode = mock()
     private val areAccountAchievementsEnabled: AreAccountAchievementsEnabled = mock()
     private val getAccountAchievements: GetAccountAchievements = mock()
     private val smsVerificationTextMapper: SMSVerificationTextMapper = mock()
     private val smsVerificationTextErrorMapper: SmsVerificationTextErrorMapper = mock()
+    private val getCurrentCountryCode: GetCurrentCountryCode = mock()
     private val stringUtilWrapper: StringUtilWrapper = mock()
     private val savedState: SavedStateHandle = mock()
+    private val formatPhoneNumber: FormatPhoneNumber = mock()
 
-    private val countryCallingCodes = listOf("A,B,C,D")
-    private val countryCode = "A"
-    private val countryName = "B"
-    private val dialCode = "+1"
+    private val countryCallingCodes = listOf("BD:880,", "AU:61,", "NZ:64,", "IN:91,")
+    private val countryCode = "NZ"
+    private val countryName = "New Zealand"
+    private val dialCode = "+64"
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(StandardTestDispatcher())
+        Dispatchers.setMain(UnconfinedTestDispatcher())
         initViewModel()
     }
 
@@ -69,6 +71,7 @@ class SMSVerificationViewModelTest {
 
     private fun initViewModel() {
         runBlocking {
+            whenever(getCurrentCountryCode()).thenReturn(countryCode)
             whenever(smsVerificationTextMapper(any())).thenReturn(getInitialState())
             whenever(savedState.get<String>(COUNTRY_CODE)).thenReturn(countryCode)
             whenever(savedState.get<String>(COUNTRY_NAME)).thenReturn(countryName)
@@ -78,10 +81,11 @@ class SMSVerificationViewModelTest {
         underTest = SMSVerificationViewModel(
             setSMSVerificationShown = setSMSVerificationShown,
             getCountryCallingCodes = getCountryCallingCodes,
-            logout = logout,
             sendSMSVerificationCode = sendSMSVerificationCode,
             areAccountAchievementsEnabled = areAccountAchievementsEnabled,
             getAccountAchievements = getAccountAchievements,
+            getCurrentCountryCode = getCurrentCountryCode,
+            formatPhoneNumber = formatPhoneNumber,
             stringUtilWrapper = stringUtilWrapper,
             savedState = savedState,
             smsVerificationTextMapper = smsVerificationTextMapper,
@@ -91,6 +95,7 @@ class SMSVerificationViewModelTest {
 
     private fun getInitialState() = SMSVerificationUIState(
         countryCallingCodes = countryCallingCodes,
+        inferredCountryCode = countryCode,
         selectedCountryCode = countryCode,
         selectedCountryName = countryName,
         selectedDialCode = dialCode,
@@ -106,7 +111,6 @@ class SMSVerificationViewModelTest {
             assertThat(actual.isPhoneNumberValid).isEqualTo(expected.isPhoneNumberValid)
             assertThat(actual.inferredCountryCode).isEqualTo(expected.inferredCountryCode)
             assertThat(actual.selectedCountryCode).isEqualTo(expected.selectedCountryCode)
-            assertThat(actual.isSelectedCountryCodeValid).isEqualTo(expected.isSelectedCountryCodeValid)
             assertThat(actual.selectedCountryName).isEqualTo(expected.selectedCountryName)
             assertThat(actual.selectedDialCode).isEqualTo(expected.selectedDialCode)
             assertThat(actual.isUserLocked).isEqualTo(expected.isUserLocked)
@@ -137,10 +141,32 @@ class SMSVerificationViewModelTest {
         whenever(getAccountAchievements(any(), any())).thenReturn(mock())
         whenever(stringUtilWrapper.getSizeString(any())).thenReturn(bonusStorage)
         underTest.setIsUserLocked(false)
-        underTest.uiState.drop(1).test {
+        advanceUntilIdle()
+        underTest.uiState.test {
             val actual = awaitItem()
             assertThat(actual.isUserLocked).isEqualTo(expected.isUserLocked)
             assertThat(actual.bonusStorageSMS).isEqualTo(expected.bonusStorageSMS)
+        }
+    }
+
+    @Test
+    fun `test that sms send code states are updated when verification code is send`() = runTest {
+        val phoneNumber = "+012324567"
+        val expected =
+            getInitialState().copy(
+                isVerificationCodeSent = true,
+                isNextEnabled = false,
+                phoneNumber = phoneNumber
+            )
+        whenever(formatPhoneNumber(any(), any())).thenReturn(phoneNumber)
+        whenever(sendSMSVerificationCode(phoneNumber)).thenReturn(Unit)
+        underTest.setPhoneNumber(phoneNumber)
+        underTest.validatePhoneNumber()
+        advanceUntilIdle()
+        underTest.uiState.test {
+            val actual = awaitItem()
+            assertThat(actual.isVerificationCodeSent).isEqualTo(expected.isVerificationCodeSent)
+            assertThat(actual.isNextEnabled).isEqualTo(expected.isNextEnabled)
         }
     }
 }

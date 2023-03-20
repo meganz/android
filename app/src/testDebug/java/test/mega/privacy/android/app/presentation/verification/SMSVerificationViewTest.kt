@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.verification
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -35,7 +36,7 @@ class SMSVerificationViewTest {
         composeTestRule.setContent {
             SMSVerificationView(
                 state = state,
-                {}, {}, {}, {}, {}
+                {}, {}, {}, {}, {}, {}, {}
             )
         }
         with(composeTestRule) {
@@ -53,7 +54,7 @@ class SMSVerificationViewTest {
         composeTestRule.setContent {
             SMSVerificationView(
                 state = state,
-                {}, {}, {}, {}, {}
+                {}, {}, {}, {}, {}, {}, {}
             )
         }
         with(composeTestRule) {
@@ -68,13 +69,34 @@ class SMSVerificationViewTest {
         composeTestRule.setContent {
             SMSVerificationView(
                 state = state,
-                {}, {}, {}, {}, {}
+                {}, {}, {}, {}, {}, {}, {}
             )
         }
         with(composeTestRule) {
             onNodeWithText(R.string.verify_account_phone_number_placeholder)
                 .assertIsDisplayed()
             onNodeWithText(R.string.verify_account_invalid_phone_number)
+                .assertIsDisplayed()
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "fr-rFr-w1080dp-h1920dp")
+    fun `test that warning is shown when sending sms code returns error`() {
+        val errorText = "You have reached your daily limit"
+        val state = getDefaultState().copy(
+            countryCodeText = "",
+            isPhoneNumberValid = true,
+            phoneNumberErrorText = errorText
+        )
+        composeTestRule.setContent {
+            SMSVerificationView(
+                state = state,
+                {}, {}, {}, {}, {}, {}, {}
+            )
+        }
+        with(composeTestRule) {
+            onNodeWithText(errorText)
                 .assertIsDisplayed()
         }
     }
@@ -90,11 +112,29 @@ class SMSVerificationViewTest {
         composeTestRule.setContent {
             SMSVerificationView(
                 state = state,
-                {}, {}, {}, {}, {}
+                {}, {}, {}, {}, {}, {}, {}
             )
         }
         composeTestRule.onNodeWithTag(NOT_NOW_BUTTON_TEST_TAG)
             .assertIsDisplayed()
+    }
+
+    @Test
+    @Config(qualifiers = "fr-rFr-w1080dp-h1920dp")
+    fun `test that next button is disabled when isNextEnabled is false`() {
+        val state = getDefaultState().copy(
+            countryCodeText = "",
+            isPhoneNumberValid = false,
+            isUserLocked = false,
+            isNextEnabled = false
+        )
+        composeTestRule.setContent {
+            SMSVerificationView(
+                state = state,
+                {}, {}, {}, {}, {}, {}, {}
+            )
+        }
+        composeTestRule.onNodeWithTag(NEXT_BUTTON_TEST_TAG).assertIsNotEnabled()
     }
 
     @Test
@@ -108,7 +148,7 @@ class SMSVerificationViewTest {
         composeTestRule.setContent {
             SMSVerificationView(
                 state = state,
-                {}, {}, {}, {}, {}
+                {}, {}, {}, {}, {}, {}, {}
             )
         }
         composeTestRule.onNodeWithTag(LOGOUT_BUTTON_TEST_TAG)

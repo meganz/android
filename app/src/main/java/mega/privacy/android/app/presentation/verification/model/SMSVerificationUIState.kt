@@ -25,11 +25,6 @@ data class SMSVerificationUIState(
     val selectedCountryCode: String = "",
 
     /**
-     * is selected country code valid or not
-     */
-    val isSelectedCountryCodeValid: Boolean = true,
-
-    /**
      * selected country name
      */
     val selectedCountryName: String = "",
@@ -77,7 +72,18 @@ data class SMSVerificationUIState(
      * country code text
      */
     val phoneNumberErrorText: String = "",
-) {
+
+    /**
+     * whether verification code sent or not
+     */
+    val isVerificationCodeSent: Boolean = false,
+
+    /**
+     * whether sent button should be disabled or not
+     */
+    val isNextEnabled: Boolean = false,
+
+    ) {
     /**
      *  is selected country code valid or not
      */

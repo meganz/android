@@ -24,7 +24,6 @@ import mega.privacy.android.core.ui.theme.red_800
 import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.core.ui.theme.white_alpha_005
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_038
 import mega.privacy.android.core.ui.theme.white_alpha_054
@@ -39,6 +38,16 @@ import mega.privacy.android.core.ui.theme.yellow_600
 val Colors.textColorPrimary: Color
     get() = if (isLight) dark_grey else white
 
+/**
+ * Text Color Secondary for Composable
+ */
+val Colors.textColorSecondary: Color
+    get() = if (isLight) grey_alpha_054 else white_alpha_054
+
+@Deprecated(
+    "Deprecated because custom color are accessed through MaterialTheme.Colors",
+    ReplaceWith("mega.privacy.android.core.ui.theme.extensions.textColorSecondary")
+)
 /**
  * Text Color Secondary for Composable
  */

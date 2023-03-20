@@ -24,10 +24,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.verification.model.SMSVerificationUIState
 import mega.privacy.android.core.ui.controls.MegaSpannedText
@@ -55,6 +58,7 @@ import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.blue_400_blue_200
 import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.extensions.white_087_grey_087
 
 /**
@@ -83,7 +87,21 @@ fun SMSVerificationView(
     onNotNowClicked: () -> Unit,
     onNextClicked: () -> Unit,
     onLogout: () -> Unit,
+    onSMSCodeSent: () -> Unit,
+    onConsumeSMSCodeSentFinishedEvent: () -> Unit,
 ) {
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setStatusBarColor(
+        color = MaterialTheme.colors.blue_400_blue_200,
+    )
+    LaunchedEffect(
+        state.isVerificationCodeSent
+    ) {
+        if (state.isVerificationCodeSent) {
+            onSMSCodeSent()
+            onConsumeSMSCodeSentFinishedEvent()
+        }
+    }
 
     var shouldShowLogoutDialog by remember {
         mutableStateOf(false)
@@ -125,7 +143,7 @@ private fun ColumnScope.ActionButtonView(
     onNextClicked: () -> Unit,
     onLogout: () -> Unit,
 ) {
-    Row(modifier = Modifier.padding(vertical = 16.dp)) {
+    Row(modifier = Modifier.padding(vertical = 24.dp)) {
         Spacer(Modifier.weight(1f))
         if (state.isUserLocked.not()) {
             TextButton(
@@ -147,6 +165,7 @@ private fun ColumnScope.ActionButtonView(
                 .padding(horizontal = 16.dp)
                 .testTag(NEXT_BUTTON_TEST_TAG),
             onClick = onNextClicked,
+            enabled = state.isNextEnabled,
             colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.secondary)
         ) {
             Text(
@@ -165,7 +184,8 @@ private fun ColumnScope.ActionButtonView(
             value = stringResource(id = R.string.sms_logout),
             baseStyle = MaterialTheme.typography.caption.copy(
                 lineHeight = 1.5.em,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.onPrimary
             ),
             styles = hashMapOf(
                 SpanIndicator('A') to SpanStyle(color = MaterialTheme.colors.secondary)
@@ -178,10 +198,10 @@ private fun ColumnScope.ActionButtonView(
 private fun InfoView(uiState: SMSVerificationUIState) {
     Text(
         text = uiState.infoText,
-        textAlign = TextAlign.Center,
+        textAlign = TextAlign.Start,
         modifier = Modifier
-            .padding(all = 16.dp),
-        color = MaterialTheme.colors.onPrimary,
+            .padding(horizontal = 24.dp, vertical = 24.dp),
+        color = MaterialTheme.colors.textColorSecondary,
         style = MaterialTheme.typography.subtitle1
     )
 }
@@ -201,7 +221,7 @@ private fun HeaderView(uiState: SMSVerificationUIState) {
                 modifier = Modifier
                     .padding(vertical = 44.dp, horizontal = 16.dp),
                 color = MaterialTheme.colors.white_087_grey_087,
-                style = MaterialTheme.typography.body1,
+                style = MaterialTheme.typography.h6,
             )
         }
         Image(
@@ -218,16 +238,16 @@ private fun RegionSelectionView(state: SMSVerificationUIState, onRegionSelection
             .clickable {
                 onRegionSelection()
             }
-            .padding(start = 16.dp),
+            .padding(start = 16.dp, top = 16.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             modifier = Modifier
-                .padding(horizontal = 14.dp),
+                .padding(start = 14.dp, end = 2.dp),
             painter = painterResource(id = R.drawable.ic_country),
             contentDescription = "Country",
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
         )
         Box(modifier = Modifier.height(56.dp)) {
             if (state.isCountryCodeValid) {
@@ -247,7 +267,7 @@ private fun RegionSelectionView(state: SMSVerificationUIState, onRegionSelection
                     .padding(start = 8.dp),
                 text = state.countryCodeText,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.secondary,
+                color = MaterialTheme.colors.textColorSecondary,
                 style = MaterialTheme.typography.body1
             )
         }
@@ -263,11 +283,6 @@ private fun RegionSelectionView(state: SMSVerificationUIState, onRegionSelection
         modifier = Modifier
             .padding(horizontal = 16.dp),
         color = if (state.isCountryCodeValid) MaterialTheme.colors.grey_012_white_012 else MaterialTheme.colors.error,
-    )
-    Divider(
-        modifier = Modifier
-            .padding(horizontal = 16.dp),
-        color = MaterialTheme.colors.grey_012_white_012,
     )
     if (state.isCountryCodeValid.not()) {
         Text(
@@ -287,16 +302,18 @@ private fun MobileNumberInputView(
     onPhoneNumberChange: (phoneNumber: String) -> Unit,
     onNextClicked: () -> Unit,
 ) {
-    if (state.phoneNumber.isNotEmpty()) {
-        Text(
-            modifier = Modifier
-                .padding(start = 64.dp, top = 8.dp),
-            text = stringResource(id = R.string.verify_account_phone_number_placeholder),
-            textAlign = TextAlign.Start,
-            color = if (state.isPhoneNumberValid) MaterialTheme.colors.secondary else MaterialTheme.colors.error,
-            style = MaterialTheme.typography.body2
-        )
-    }
+    Text(
+        modifier = Modifier
+            .padding(start = 64.dp, top = 8.dp),
+        text = if (state.phoneNumber.isNotEmpty()) {
+            stringResource(id = R.string.verify_account_phone_number_placeholder)
+        } else {
+            ""
+        },
+        textAlign = TextAlign.Start,
+        color = if (state.isPhoneNumberValid) MaterialTheme.colors.secondary else MaterialTheme.colors.error,
+        style = MaterialTheme.typography.body2
+    )
     Row(
         modifier = Modifier
             .height(56.dp)
@@ -314,23 +331,25 @@ private fun MobileNumberInputView(
                 Image(
                     painter = painterResource(id = R.drawable.ic_verify_phone),
                     contentDescription = "Phone",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onPrimary)
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.textColorSecondary)
                 )
             },
             placeholder =
             {
                 Text(
                     text = stringResource(id = R.string.verify_account_phone_number_placeholder),
+                    color = MaterialTheme.colors.textColorSecondary,
                 ).takeIf { (state.phoneNumber.isEmpty()) }
             },
             trailingIcon =
             {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_input_warning),
-                    contentDescription = "Input Error",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.error)
-                ).takeIf { state.isPhoneNumberValid.not() }
-
+                if (!state.isPhoneNumberValid) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_input_warning),
+                        contentDescription = "Input Error",
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.error)
+                    )
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -348,7 +367,8 @@ private fun MobileNumberInputView(
                     focusManager.clearFocus()
                     onNextClicked()
                 }
-            )
+            ),
+            textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colors.textColorSecondary)
         )
     }
     Divider(
@@ -361,6 +381,16 @@ private fun MobileNumberInputView(
             modifier = Modifier
                 .padding(start = 24.dp, top = 8.dp),
             text = stringResource(id = R.string.verify_account_invalid_phone_number),
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colors.error,
+            style = MaterialTheme.typography.body1
+        )
+    }
+    if (state.phoneNumberErrorText.isNotEmpty() && state.isPhoneNumberValid) {
+        Text(
+            modifier = Modifier
+                .padding(start = 24.dp, top = 8.dp),
+            text = state.phoneNumberErrorText,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colors.error,
             style = MaterialTheme.typography.body1
@@ -389,7 +419,7 @@ private fun ConfirmLogoutDialog(
 
 
 /**
- * Preview of MyQRCodeView
+ * Preview of SMSVerificationView
  */
 @Preview
 @Preview(
@@ -398,11 +428,17 @@ private fun ConfirmLogoutDialog(
 )
 @Composable
 private fun SMSVerificationViewPreview() {
-    val uiState = SMSVerificationUIState()
+    val uiState = SMSVerificationUIState(
+        selectedCountryCode = "NZ",
+        selectedCountryName = "New Zealand",
+        selectedDialCode = "+64",
+        countryCodeText = "(NZ+64)New Zealand",
+        isUserLocked = true,
+    )
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         SMSVerificationView(
             state = uiState,
-            {}, {}, {}, {}, {}
+            {}, {}, {}, {}, {}, {}, {}
         )
     }
 }
