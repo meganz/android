@@ -26,9 +26,13 @@ class DefaultFetchNodes @Inject constructor(
 
         runCatching {
             loginRepository.fetchNodesFlow()
-                .collectLatest { update -> trySend(update) }
-        }.onSuccess {
-            loginMutex.unlock()
+                .collectLatest { update ->
+                    trySend(update)
+
+                    if (update.progress?.floatValue == 1F) {
+                        loginMutex.unlock()
+                    }
+                }
         }.onFailure {
             if (it !is FetchNodesBlockedAccount) {
                 resetChatSettings()

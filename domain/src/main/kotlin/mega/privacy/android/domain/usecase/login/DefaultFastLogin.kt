@@ -46,10 +46,14 @@ class DefaultFastLogin @Inject constructor(
 
         runCatching {
             loginRepository.fastLoginFlow(session)
-                .collectLatest { loginStatus -> trySend(loginStatus) }
-        }.onSuccess {
-            saveAccountCredentials()
-            loginMutex.unlock()
+                .collectLatest { loginStatus ->
+                    if (loginStatus == LoginStatus.LoginSucceed) {
+                        saveAccountCredentials()
+                        loginMutex.unlock()
+                    }
+
+                    trySend(loginStatus)
+                }
         }.onFailure {
             if (it !is LoginLoggedOutFromOtherLocation) {
                 chatLogout(disableChatApi)

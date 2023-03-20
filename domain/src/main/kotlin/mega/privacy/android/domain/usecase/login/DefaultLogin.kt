@@ -1,7 +1,7 @@
 package mega.privacy.android.domain.usecase.login
 
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
@@ -26,7 +26,7 @@ class DefaultLogin @Inject constructor(
 ) : Login {
 
     override fun invoke(email: String, password: String, disableChatApi: DisableChatApi) =
-        flow {
+        callbackFlow {
             loginMutex.lock()
 
             runCatching { loginRepository.initMegaChat() }
@@ -36,19 +36,23 @@ class DefaultLogin @Inject constructor(
                             chatLogout(disableChatApi)
                         }
                         is ChatNotInitializedUnknownStatus -> {
-                            emit(LoginStatus.LoginCannotStart)
+                            trySend(LoginStatus.LoginCannotStart)
                             loginMutex.unlock()
-                            return@flow
+                            return@callbackFlow
                         }
                     }
 
                 }
 
             runCatching {
-                emitAll(loginRepository.login(email, password))
-            }.onSuccess {
-                saveAccountCredentials()
-                loginMutex.unlock()
+                loginRepository.login(email, password).collectLatest { loginStatus ->
+                    if (loginStatus == LoginStatus.LoginSucceed) {
+                        saveAccountCredentials()
+                        loginMutex.unlock()
+                    }
+
+                    trySend(loginStatus)
+                }
             }.onFailure {
                 if (it !is LoginLoggedOutFromOtherLocation
                     && it !is LoginMultiFactorAuthRequired

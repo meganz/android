@@ -47,7 +47,7 @@ class DefaultLoginWith2FATest {
         )
     }
 
-    @Test(expected = LoginRequireValidation::class)
+    @Test
     fun `test that login invokes chatLogout and resetChatSettings if throws LoginRequireValidation`() =
         runTest {
             whenever(loginRepository.multiFactorAuthLogin(email, password, pin2FA))
@@ -57,13 +57,12 @@ class DefaultLoginWith2FATest {
                 assertThat(awaitError()).isInstanceOf(LoginRequireValidation::class.java)
             }
 
-            verify(loginRepository).initMegaChat()
-            verify(loginRepository).login(email, password)
+            verify(loginRepository).multiFactorAuthLogin(email, password, pin2FA)
             verify(chatLogout).invoke(disableChatApi)
             verify(resetChatSettings).invoke()
         }
 
-    @Test(expected = LoginWrongMultiFactorAuth::class)
+    @Test
     fun `test that login does not invoke chatLogout and resetChatSettings if throws LoginWrongMultiFactorAuth`() =
         runTest {
             whenever(loginRepository.multiFactorAuthLogin(email, password, pin2FA))
@@ -78,7 +77,7 @@ class DefaultLoginWith2FATest {
             verifyNoInteractions(resetChatSettings)
         }
 
-    @Test(expected = LoginLoggedOutFromOtherLocation::class)
+    @Test
     fun `test that login does not invoke chatLogout and resetChatSettings if throws LoggedOutFromOtherLocation`() =
         runTest {
             whenever(loginRepository.multiFactorAuthLogin(email, password, pin2FA))

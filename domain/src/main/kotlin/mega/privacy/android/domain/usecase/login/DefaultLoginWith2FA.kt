@@ -1,9 +1,9 @@
 package mega.privacy.android.domain.usecase.login
 
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
+import mega.privacy.android.domain.entity.login.LoginStatus
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.qualifier.LoginMutex
@@ -28,15 +28,20 @@ class DefaultLoginWith2FA @Inject constructor(
         password: String,
         pin2FA: String,
         disableChatApi: DisableChatApi,
-    ) = loginRepository.multiFactorAuthLogin(email, password, pin2FA)
-        .onStart { loginMutex.lock() }
-        .onCompletion { exception ->
-            if (exception == null) {
-                saveAccountCredentials()
-            }
+    ) = callbackFlow {
+        loginMutex.lock()
 
-            loginMutex.unlock()
-        }.catch {
+        runCatching {
+            loginRepository.multiFactorAuthLogin(email, password, pin2FA)
+                .collectLatest { loginStatus ->
+                    if (loginStatus == LoginStatus.LoginSucceed) {
+                        saveAccountCredentials()
+                        loginMutex.unlock()
+                    }
+
+                    trySend(loginStatus)
+                }
+        }.onFailure {
             if (it !is LoginLoggedOutFromOtherLocation
                 && it !is LoginWrongMultiFactorAuth
             ) {
@@ -44,6 +49,8 @@ class DefaultLoginWith2FA @Inject constructor(
                 resetChatSettings()
             }
 
+            loginMutex.unlock()
             throw it
         }
+    }
 }
