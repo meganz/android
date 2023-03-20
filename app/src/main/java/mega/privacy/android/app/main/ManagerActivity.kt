@@ -408,7 +408,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     internal val searchViewModel: SearchViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
-    private val bottomSheetViewModel: NodeOptionsViewModel by viewModels()
 
     @Inject
     lateinit var checkPasswordReminderUseCase: CheckPasswordReminderUseCase
@@ -692,8 +691,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
     private var isBusinessGraceAlertShown = false
     private var businessGraceAlert: AlertDialog? = null
-    private var isBusinessCUAlertShown = false
-    private var businessCUAlert: AlertDialog? = null
     private var bottomSheetDialogFragment: BottomSheetDialogFragment? = null
     private var psaViewHolder: PsaViewHolder? = null
     private var openLinkDialog: AlertDialog? = null
@@ -1061,9 +1058,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             )
         }
         outState.putBoolean(BUSINESS_GRACE_ALERT_SHOWN, isBusinessGraceAlertShown)
-        if (isBusinessCUAlertShown) {
-            outState.putBoolean(BUSINESS_CU_ALERT_SHOWN, isBusinessCUAlertShown)
-        }
         outState.putInt(Constants.TYPE_CALL_PERMISSION, typesCameraPermission)
         outState.putBoolean(JOINING_CHAT_LINK, joiningToChatLink)
         outState.putString(LINK_JOINING_CHAT_LINK, linkJoinToChatLink)
@@ -2351,7 +2345,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         )
         isBusinessGraceAlertShown =
             savedInstanceState.getBoolean(BUSINESS_GRACE_ALERT_SHOWN, false)
-        isBusinessCUAlertShown = savedInstanceState.getBoolean(BUSINESS_CU_ALERT_SHOWN, false)
         typesCameraPermission = savedInstanceState.getInt(
             Constants.TYPE_CALL_PERMISSION,
             Constants.INVALID_TYPE_PERMISSIONS
@@ -2595,10 +2588,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             showBusinessGraceAlert()
             return true
         }
-        if (isBusinessCUAlertShown) {
-            showBusinessCUAlert()
-            return true
-        }
         if (myAccountInfo.isBusinessAlertShown) {
             return false
         }
@@ -2643,29 +2632,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.w(e, "Exception showing businessGraceAlert")
         }
         isBusinessGraceAlertShown = true
-    }
-
-    /**
-     * Shows a warning to business users about the risks of enabling CU.
-     */
-    private fun showBusinessCUAlert() {
-        if (businessCUAlert?.isShowing == true) {
-            return
-        }
-        val builder = MaterialAlertDialogBuilder(this)
-        builder.setTitle(R.string.section_photo_sync)
-            .setMessage(R.string.camera_uploads_business_alert)
-            .setNegativeButton(R.string.general_cancel) { _: DialogInterface?, _: Int -> }
-            .setPositiveButton(R.string.general_enable) { _: DialogInterface?, _: Int ->
-                if (getPhotosFragment() != null) {
-                    photosFragment?.enableCameraUploads()
-                }
-            }
-            .setCancelable(false)
-            .setOnDismissListener { isBusinessCUAlertShown = false }
-        businessCUAlert = builder.create()
-        businessCUAlert?.show()
-        isBusinessCUAlertShown = true
     }
 
     private fun openContactLink(handle: Long) {
@@ -10568,7 +10534,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         private const val BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE =
             "BOTTOM_ITEM_BEFORE_OPEN_FULLSCREEN_OFFLINE"
         private const val BUSINESS_GRACE_ALERT_SHOWN = "BUSINESS_GRACE_ALERT_SHOWN"
-        private const val BUSINESS_CU_ALERT_SHOWN = "BUSINESS_CU_ALERT_SHOWN"
         const val NEW_CREATION_ACCOUNT = "NEW_CREATION_ACCOUNT"
         const val JOINING_CHAT_LINK = "JOINING_CHAT_LINK"
         const val LINK_JOINING_CHAT_LINK = "LINK_JOINING_CHAT_LINK"
