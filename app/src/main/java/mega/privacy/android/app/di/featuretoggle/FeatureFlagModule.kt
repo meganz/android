@@ -10,13 +10,11 @@ import dagger.multibindings.IntoMap
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.data.featuretoggle.file.FileFeatureFlagValueProvider
 import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
-import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
 import mega.privacy.android.domain.usecase.DefaultGetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
-import mega.privacy.android.domain.usecase.SetSecureFlag
 
 /**
  * Feature flag module
@@ -69,15 +67,5 @@ abstract class FeatureFlagModule {
         )
         fun provideFeatureFlagValueProvider(): @JvmSuppressWildcards FeatureFlagValueProvider =
             AppFeatures.Companion
-
-        /**
-         * Provides [SetSecureFlag] implementation
-         *
-         * @param megaNodeRepository [MegaNodeRepository]
-         * @return [SetSecureFlag]
-         */
-        @Provides
-        fun provideSetSecureFlag(megaNodeRepository: MegaNodeRepository): SetSecureFlag =
-            SetSecureFlag(megaNodeRepository::setSecureFlag)
     }
 }

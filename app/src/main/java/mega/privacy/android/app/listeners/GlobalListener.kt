@@ -46,8 +46,8 @@ import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.filenode.SetSecurityUpgrade
 import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdate
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -76,7 +76,7 @@ class GlobalListener @Inject constructor(
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
     private val getNumberOfSubscription: GetNumberOfSubscription,
-    private val setSecurityUpgrade: SetSecurityUpgrade,
+    private val setSecurityUpgradeInApp: SetSecurityUpgradeInApp,
     private val broadcastAccountUpdate: BroadcastAccountUpdate,
 ) : MegaGlobalListenerInterface {
 
@@ -234,7 +234,7 @@ class GlobalListener @Inject constructor(
             MegaEvent.EVENT_MISC_FLAGS_READY -> checkEnabledCookies()
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()
             MegaEvent.EVENT_UPGRADE_SECURITY -> applicationScope.launch {
-                setSecurityUpgrade(true)
+                setSecurityUpgradeInApp(true)
             }
         }
     }

@@ -26,9 +26,13 @@ import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.ResetAccountInfo
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
+import mega.privacy.android.domain.usecase.account.SetSecureFlag
+import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 
 /**
@@ -148,5 +152,21 @@ internal abstract class InternalAccountModule {
         @Provides
         fun provideGetLatestTargetPath(accountRepository: AccountRepository): GetLatestTargetPath =
             GetLatestTargetPath(accountRepository::getLatestTargetPathPreference)
+
+        @Provides
+        fun provideUpgradeSecurity(accountRepository: AccountRepository): UpgradeSecurity =
+            UpgradeSecurity(accountRepository::upgradeSecurity)
+
+        @Provides
+        fun provideMonitorSecurityUpgradeInApp(accountRepository: AccountRepository): MonitorSecurityUpgradeInApp =
+            MonitorSecurityUpgradeInApp(accountRepository::monitorSecurityUpgrade)
+
+        @Provides
+        fun provideSetSecurityUpgradeInApp(accountRepository: AccountRepository): SetSecurityUpgradeInApp =
+            SetSecurityUpgradeInApp(accountRepository::setUpgradeSecurity)
+
+        @Provides
+        fun provideSetSecureFlag(accountRepository: AccountRepository): SetSecureFlag =
+            SetSecureFlag(accountRepository::setSecureFlag)
     }
 }

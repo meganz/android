@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -104,6 +105,8 @@ class DefaultAccountRepositoryTest {
         on { currencyName }.thenReturn("EUR")
     }
 
+    private val appEventGateway: AppEventGateway = mock()
+
     private val subscriptionOption = SubscriptionOption(
         accountType = toAccountType(1),
         months = 1,
@@ -140,7 +143,8 @@ class DefaultAccountRepositoryTest {
             callsPreferencesGateway = callsPreferencesGateway,
             accountPreferencesGateway = accountPreferencesGateway,
             cacheFolderGateway = cacheFolderGateway,
-            passwordStrengthMapper = passwordStrengthMapper
+            passwordStrengthMapper = passwordStrengthMapper,
+            appEventGateway = appEventGateway,
         )
 
         whenever(megaChatApiGateway.getMyEmail()).thenReturn("my@email.com")

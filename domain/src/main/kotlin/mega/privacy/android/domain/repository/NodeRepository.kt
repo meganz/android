@@ -27,6 +27,19 @@ interface NodeRepository {
      */
     suspend fun getOutgoingSharesNode(order: SortOrder): List<ShareData>
 
+    /**
+     * Provides Unverified incoming shares count from SDK
+     *
+     * @return List of [ShareData]
+     */
+    suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData>
+
+    /**
+     * Provides Unverified outgoing shares count from SDK
+     *
+     * @return List of [ShareData]
+     */
+    suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData>
 
     /**
      * check whether the node is in rubbish bin or not
@@ -147,20 +160,6 @@ interface NodeRepository {
      * @return the [AccessPermission] enum value for this node
      */
     suspend fun getNodeAccessPermission(nodeId: NodeId): AccessPermission?
-
-    /**
-     * Monitor update upgrade security events
-     *
-     * @return
-     */
-    fun monitorSecurityUpgrade(): Flow<Boolean>
-
-    /**
-     * Set upgrade security
-     *
-     * @param isSecurityUpgrade
-     */
-    suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean)
 
     /**
      * Stop sharing a node

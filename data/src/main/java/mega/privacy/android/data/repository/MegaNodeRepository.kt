@@ -1,7 +1,6 @@
 package mega.privacy.android.data.repository
 
 import mega.privacy.android.domain.entity.FolderVersionInfo
-import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.MegaException
@@ -295,20 +294,6 @@ interface MegaNodeRepository {
     suspend fun checkAccessErrorExtended(node: MegaNode, level: Int): MegaException
 
     /**
-     * Provides Unverified incoming shares count from SDK
-     *
-     * @return List of [ShareData]
-     */
-    suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData>
-
-    /**
-     * Provides Unverified outgoing shares count from SDK
-     *
-     * @return List of [ShareData]
-     */
-    suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData>
-
-    /**
      * Provides searched nodes InShares from query
      * @param query String to be searched
      * @param megaCancelToken [MegaCancelToken]
@@ -369,16 +354,4 @@ interface MegaNodeRepository {
      * @param megaNode : [MegaNode] object which needs to be shared
      */
     suspend fun createShareKey(megaNode: MegaNode)
-
-    /**
-     * Update cryptographic security
-     */
-    suspend fun upgradeSecurity()
-
-    /**
-     * Sets the secure share flag to true or false
-     *
-     * @param enable : Boolean
-     */
-    suspend fun setSecureFlag(enable: Boolean)
 }

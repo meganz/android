@@ -351,4 +351,30 @@ interface AccountRepository {
      * Notify the user has successfully checked his password
      */
     suspend fun notifyPasswordChecked()
+
+    /**
+     * Update cryptographic security
+     */
+    suspend fun upgradeSecurity()
+
+    /**
+     * Sets the secure share flag to true or false
+     *
+     * @param enable : Boolean
+     */
+    suspend fun setSecureFlag(enable: Boolean)
+
+    /**
+     * Monitor update upgrade security events set in app
+     *
+     * @return
+     */
+    fun monitorSecurityUpgrade(): Flow<Boolean>
+
+    /**
+     * Set upgrade security in app
+     *
+     * @param isSecurityUpgrade
+     */
+    suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean)
 }

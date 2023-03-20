@@ -7,8 +7,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeViewModel
-import mega.privacy.android.domain.usecase.UpgradeSecurity
-import mega.privacy.android.domain.usecase.filenode.SetSecurityUpgrade
+import mega.privacy.android.domain.usecase.account.UpgradeSecurity
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -20,12 +20,12 @@ class SecurityUpgradeViewModelTest {
 
     private lateinit var underTest: SecurityUpgradeViewModel
     private val upgradeSecurity = mock<UpgradeSecurity>()
-    private val setSecurityUpgrade = mock<SetSecurityUpgrade>()
+    private val setSecurityUpgradeInApp = mock<SetSecurityUpgradeInApp>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = SecurityUpgradeViewModel(upgradeSecurity, setSecurityUpgrade)
+        underTest = SecurityUpgradeViewModel(upgradeSecurity, setSecurityUpgradeInApp)
     }
 
     @After

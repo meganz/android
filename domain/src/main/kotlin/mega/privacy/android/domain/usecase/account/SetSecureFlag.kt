@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.account
 
 /**
  * Interface to set secure flag value to true or false

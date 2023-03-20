@@ -41,14 +41,14 @@ import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
-import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
-import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.Check2FADialog
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaUserAlert
 import org.junit.After
@@ -66,7 +66,7 @@ class ManagerViewModelTest {
     private val monitorGlobalUpdates = MutableStateFlow<GlobalUpdate>(GlobalUpdate.OnReloadNeeded)
     private val monitorNodeUpdates = MutableSharedFlow<NodeUpdate>()
     private val monitorContactUpdates = MutableSharedFlow<UserUpdate>()
-    private val monitorSecurityUpgrade = MutableStateFlow(false)
+    private val monitorSecurityUpgradeInApp = MutableStateFlow(false)
     private val getNumUnreadUserAlerts =
         mock<GetNumUnreadUserAlerts> { onBlocking { invoke() }.thenReturn(0) }
     private val hasInboxChildren =
@@ -173,7 +173,7 @@ class ManagerViewModelTest {
             monitorVerificationStatus = { monitorVerificationStatus },
             check2FADialog = check2FADialog,
             setLatestTargetPath = setLatestTargetPath,
-            monitorSecurityUpgrade = { monitorSecurityUpgrade },
+            monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
             listenToNewMedia = mock()
         )
     }

@@ -11,13 +11,13 @@ import mega.privacy.android.domain.usecase.DefaultMonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.DefaultMonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
-import mega.privacy.android.domain.usecase.filenode.MonitorSecurityUpgrade
-import mega.privacy.android.domain.usecase.filenode.SetSecurityUpgrade
 
 /**
  * module to provide FileNode modules
@@ -72,12 +72,24 @@ abstract class InternalNodeModule {
         fun provideGetNodeVersionsByHandle(nodeRepository: NodeRepository): GetNodeVersionsByHandle =
             GetNodeVersionsByHandle(nodeRepository::getNodeHistoryVersions)
 
+        /**
+         * Provides [GetUnverifiedIncomingShares] implementation
+         *
+         * @param nodeRepository [NodeRepository]
+         * @return [GetUnverifiedIncomingShares]
+         */
         @Provides
-        fun provideMonitorSecurityUpgrade(nodeRepository: NodeRepository): MonitorSecurityUpgrade =
-            MonitorSecurityUpgrade(nodeRepository::monitorSecurityUpgrade)
+        fun provideGetUnVerifiedIncomingShares(nodeRepository: NodeRepository): GetUnverifiedIncomingShares =
+            GetUnverifiedIncomingShares(nodeRepository::getUnverifiedIncomingShares)
 
+        /**
+         * Provides [GetUnverifiedOutgoingShares] implementation
+         *
+         * @param nodeRepository [NodeRepository]
+         * @return [GetUnverifiedOutgoingShares]
+         */
         @Provides
-        fun provideSetSecurityUpgrade(nodeRepository: NodeRepository): SetSecurityUpgrade =
-            SetSecurityUpgrade(nodeRepository::setUpgradeSecurity)
+        fun provideGetUnverifiedOutgoingShares(nodeRepository: NodeRepository): GetUnverifiedOutgoingShares =
+            GetUnverifiedOutgoingShares(nodeRepository::getUnverifiedOutgoingShares)
     }
 }

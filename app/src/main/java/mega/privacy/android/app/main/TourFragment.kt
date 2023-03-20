@@ -39,7 +39,7 @@ import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.usecase.GetFeatureFlagValue
-import mega.privacy.android.domain.usecase.SetSecureFlag
+import mega.privacy.android.domain.usecase.account.SetSecureFlag
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject

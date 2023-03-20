@@ -21,6 +21,7 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isType
 import mega.privacy.android.data.extensions.toException
 import mega.privacy.android.data.facade.AccountInfoWrapper
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -97,6 +98,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatPreferencesGateway       [chatPreferencesGateway]
  * @property callsPreferencesGateway      [CallsPreferencesGateway]
  * @property cacheFolderGateway           [CacheFolderGateway]
+ * @property appEventGateway              [AppEventGateway]
  */
 @ExperimentalContracts
 internal class DefaultAccountRepository @Inject constructor(
@@ -124,6 +126,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val cacheFolderGateway: CacheFolderGateway,
     private val accountPreferencesGateway: AccountPreferencesGateway,
     private val passwordStrengthMapper: PasswordStrengthMapper,
+    private val appEventGateway: AppEventGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -752,6 +755,27 @@ internal class DefaultAccountRepository @Inject constructor(
             }
         }
     }
+
+
+    override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { return@getRequestListener }
+            megaApiGateway.upgradeSecurity(listener)
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun setSecureFlag(enable: Boolean) = withContext(ioDispatcher) {
+        megaApiGateway.setSecureFlag(enable)
+    }
+
+    override fun monitorSecurityUpgrade(): Flow<Boolean> =
+        appEventGateway.monitorSecurityUpgrade()
+
+    override suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean) =
+        appEventGateway.setUpgradeSecurity(isSecurityUpgrade)
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

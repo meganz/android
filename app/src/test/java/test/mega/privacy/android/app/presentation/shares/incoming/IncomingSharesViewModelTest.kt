@@ -25,7 +25,7 @@ import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before

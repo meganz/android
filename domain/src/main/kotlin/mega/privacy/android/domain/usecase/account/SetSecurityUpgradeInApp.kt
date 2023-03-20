@@ -1,10 +1,10 @@
-package mega.privacy.android.domain.usecase.filenode
+package mega.privacy.android.domain.usecase.account
 
 /**
- * Set account security upgrade
+ * Set account security upgrade in app
  *
  */
-fun interface SetSecurityUpgrade {
+fun interface SetSecurityUpgradeInApp {
     /**
      * Invoke
      *

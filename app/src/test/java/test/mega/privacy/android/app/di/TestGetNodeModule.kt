@@ -11,9 +11,6 @@ import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.usecase.GetUnverifiedIncomingShares
-import mega.privacy.android.domain.usecase.GetUnverifiedOutgoingShares
-import mega.privacy.android.domain.usecase.UpgradeSecurity
 import nz.mega.sdk.MegaNode
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -41,18 +38,6 @@ object TestGetNodeModule {
     }
 
     @Provides
-    fun provideGetUnverifiedIncomingShares() = mock<GetUnverifiedIncomingShares>() {
-        onBlocking { invoke(any()) }.thenReturn(emptyList())
-    }
-
-    @Provides
-    fun provideGetUnverifiedOutgoingShares() = mock<GetUnverifiedOutgoingShares>() {
-        onBlocking { invoke(any()) }.thenReturn(emptyList())
-    }
-
-    @Provides
     fun provideOpenShareDialog() = mock<CreateShareKey>()
 
-    @Provides
-    fun provideUpgradeSecurity() = mock<UpgradeSecurity>()
 }

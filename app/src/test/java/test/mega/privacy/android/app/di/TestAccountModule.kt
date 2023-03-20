@@ -20,9 +20,13 @@ import mega.privacy.android.domain.usecase.QuerySignupLink
 import mega.privacy.android.domain.usecase.ResetAccountInfo
 import mega.privacy.android.domain.usecase.RetryPendingConnections
 import mega.privacy.android.domain.usecase.SaveAccountCredentials
+import mega.privacy.android.domain.usecase.account.SetSecureFlag
+import mega.privacy.android.domain.usecase.account.UpgradeSecurity
 import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
 import org.mockito.kotlin.mock
 
@@ -108,4 +112,16 @@ object TestAccountModule {
 
     @Provides
     fun provideGetLatestTargetPath() = mock<GetLatestTargetPath>()
+
+    @Provides
+    fun provideSetSecureFlag() = mock<SetSecureFlag>()
+
+    @Provides
+    fun provideUpgradeSecurity() = mock<UpgradeSecurity>()
+
+    @Provides
+    fun provideSetSecurityUpgradeInApp() = mock<SetSecurityUpgradeInApp>()
+
+    @Provides
+    fun provideMonitorSecurityUpgradeInApp() = mock<MonitorSecurityUpgradeInApp>()
 }
