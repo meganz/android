@@ -107,6 +107,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -416,6 +417,9 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetVideoCompressionSizeLimit() = mock<GetVideoCompressionSizeLimit>()
+
+    @Provides
+    fun provideSetVideoCompressionSizeLimit() = mock<SetVideoCompressionSizeLimit>()
 
     @Provides
     fun provideBroadcastCameraUploadProgress() =

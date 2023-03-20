@@ -364,6 +364,13 @@ interface MegaLocalStorageGateway {
     suspend fun getVideoCompressionSizeLimit(): Int
 
     /**
+     * Sets the maximum video file size that can be compressed
+     *
+     * @param size The maximum video file size that can be compressed
+     */
+    suspend fun setVideoCompressionSizeLimit(size: Int)
+
+    /**
      * Update sync record status by local path
      */
     suspend fun updateSyncRecordStatusByLocalPath(
@@ -492,13 +499,6 @@ interface MegaLocalStorageGateway {
      * @param syncStatus The new Video Sync Status, represented as an [Int]
      */
     suspend fun setUploadVideoSyncStatus(syncStatus: Int)
-
-    /**
-     * Set the size of Charging on
-     *
-     * @param size
-     */
-    suspend fun setChargingOnSize(size: Int)
 
     /**
      * Set camera upload on/off

@@ -110,11 +110,6 @@ interface SettingsRepository {
     suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean)
 
     /**
-     * Set conversion charging on size
-     */
-    suspend fun setChargingOnSize(size: Int)
-
-    /**
      * Get always ask for storage value
      *
      * @return isStorageAskAlways as [Boolean]

@@ -170,6 +170,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 
 /**
  * Provides the use case implementation for camera upload
@@ -656,6 +657,17 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideGetVideoCompressionSizeLimit(repository: CameraUploadRepository): GetVideoCompressionSizeLimit =
             GetVideoCompressionSizeLimit(repository::getVideoCompressionSizeLimit)
+
+        /**
+         * Provides the [SetVideoCompressionSizeLimit] implementation
+         *
+         * @param repository [CameraUploadRepository]
+         *
+         * @return [SetVideoCompressionSizeLimit]
+         */
+        @Provides
+        fun provideSetVideoCompressionSizeLimit(repository: CameraUploadRepository): SetVideoCompressionSizeLimit =
+            SetVideoCompressionSizeLimit(repository::setVideoCompressionSizeLimit)
     }
 
     /**

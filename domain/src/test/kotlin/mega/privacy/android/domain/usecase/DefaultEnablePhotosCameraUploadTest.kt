@@ -7,6 +7,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.inOrder
@@ -23,6 +24,7 @@ class DefaultEnablePhotosCameraUploadTest {
     private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
     private val setChargingRequiredForVideoCompression =
         mock<SetChargingRequiredForVideoCompression>()
+    private val setVideoCompressionSizeLimit = mock<SetVideoCompressionSizeLimit>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
 
     @Before
@@ -31,6 +33,7 @@ class DefaultEnablePhotosCameraUploadTest {
             settingsRepository = settingsRepository,
             setUploadVideoQuality = setUploadVideoQuality,
             setChargingRequiredForVideoCompression = setChargingRequiredForVideoCompression,
+            setVideoCompressionSizeLimit = setVideoCompressionSizeLimit,
             cameraUploadRepository = cameraUploadRepository,
         )
     }
@@ -55,6 +58,7 @@ class DefaultEnablePhotosCameraUploadTest {
             settingsRepository,
             setUploadVideoQuality,
             setChargingRequiredForVideoCompression,
+            setVideoCompressionSizeLimit,
             cameraUploadRepository
         )
 
@@ -64,7 +68,7 @@ class DefaultEnablePhotosCameraUploadTest {
         inOrder.verify(settingsRepository).setCameraFolderExternalSDCard(false)
         inOrder.verify(setUploadVideoQuality).invoke(expectedVideoQuality)
         inOrder.verify(setChargingRequiredForVideoCompression).invoke(true)
-        inOrder.verify(settingsRepository).setChargingOnSize(expectedConversionChargingOnSize)
+        inOrder.verify(setVideoCompressionSizeLimit).invoke(expectedConversionChargingOnSize)
         inOrder.verify(settingsRepository).setEnableCameraUpload(true)
         inOrder.verify(cameraUploadRepository).listenToNewMedia()
 

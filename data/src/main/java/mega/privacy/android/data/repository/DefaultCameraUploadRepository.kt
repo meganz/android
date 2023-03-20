@@ -384,6 +384,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.getVideoCompressionSizeLimit()
     }
 
+    override suspend fun setVideoCompressionSizeLimit(size: Int) = withContext(ioDispatcher) {
+        localStorageGateway.setVideoCompressionSizeLimit(size)
+    }
+
     override suspend fun updateSyncRecordStatusByLocalPath(
         syncStatusType: Int,
         localPath: String?,

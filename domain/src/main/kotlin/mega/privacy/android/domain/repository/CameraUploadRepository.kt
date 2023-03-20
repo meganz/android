@@ -374,6 +374,13 @@ interface CameraUploadRepository {
     suspend fun getVideoCompressionSizeLimit(): Int
 
     /**
+     * Sets the maximum video file size that can be compressed
+     *
+     * @param size The maximum video file size that can be compressed
+     */
+    suspend fun setVideoCompressionSizeLimit(size: Int)
+
+    /**
      * Update camera upload folder (node list) icon
      *
      * @param nodeHandle    updated node handle

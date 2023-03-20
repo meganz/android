@@ -5,6 +5,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 import javax.inject.Inject
 
 /**
@@ -13,12 +14,14 @@ import javax.inject.Inject
  * @property settingsRepository [SettingsRepository]
  * @property setChargingRequiredForVideoCompression [SetChargingRequiredForVideoCompression]
  * @property setUploadVideoQuality [SetUploadVideoQuality]
+ * @property setVideoCompressionSizeLimit [SetVideoCompressionSizeLimit]
  * @property cameraUploadRepository [CameraUploadRepository]
  */
 class DefaultEnablePhotosCameraUpload @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val setChargingRequiredForVideoCompression: SetChargingRequiredForVideoCompression,
     private val setUploadVideoQuality: SetUploadVideoQuality,
+    private val setVideoCompressionSizeLimit: SetVideoCompressionSizeLimit,
     private val cameraUploadRepository: CameraUploadRepository,
 ) : EnablePhotosCameraUpload {
 
@@ -36,7 +39,7 @@ class DefaultEnablePhotosCameraUpload @Inject constructor(
             setCameraFolderExternalSDCard(false)
             setUploadVideoQuality(videoQuality)
             setChargingRequiredForVideoCompression(true)
-            setChargingOnSize(conversionChargingOnSize)
+            setVideoCompressionSizeLimit(conversionChargingOnSize)
             // After target and local folder setup, then enable CU.
             setEnableCameraUpload(true)
         }

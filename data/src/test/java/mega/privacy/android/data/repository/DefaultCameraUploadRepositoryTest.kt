@@ -371,6 +371,12 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
+    fun `test that the new video compression size limit is set`() = runTest {
+        underTest.setVideoCompressionSizeLimit(300)
+        verify(localStorageGateway).setVideoCompressionSizeLimit(300)
+    }
+
+    @Test
     fun `test that setup primary folder returns success when api set camera upload folders returns API_OK`() =
         runTest {
             val result = 69L
