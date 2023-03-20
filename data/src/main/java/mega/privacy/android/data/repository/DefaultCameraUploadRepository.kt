@@ -371,14 +371,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.getVideoSyncRecordsByStatus(syncStatusIntMapper(syncStatusType))
         }
 
-    override suspend fun getChargingOnSizeString(): String = withContext(ioDispatcher) {
-        localStorageGateway.getChargingOnSizeString()
-    }
-
-    override suspend fun getChargingOnSize() = withContext(ioDispatcher) {
-        localStorageGateway.getChargingOnSizeString().toInt()
-    }
-
     override suspend fun isChargingRequiredForVideoCompression() = withContext(ioDispatcher) {
         localStorageGateway.isChargingRequiredForVideoCompression()
     }
@@ -387,6 +379,10 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         withContext(ioDispatcher) {
             localStorageGateway.setChargingRequiredForVideoCompression(chargingRequired)
         }
+
+    override suspend fun getVideoCompressionSizeLimit() = withContext(ioDispatcher) {
+        localStorageGateway.getVideoCompressionSizeLimit()
+    }
 
     override suspend fun updateSyncRecordStatusByLocalPath(
         syncStatusType: Int,

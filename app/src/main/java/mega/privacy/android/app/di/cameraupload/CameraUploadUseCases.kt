@@ -110,7 +110,6 @@ import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
-import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetNumberOfPendingUploads
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
@@ -163,6 +162,7 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
@@ -213,13 +213,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideIsCameraUploadByWifi(cameraUploadRepository: CameraUploadRepository): IsCameraUploadByWifi =
             IsCameraUploadByWifi(cameraUploadRepository::isSyncByWifi)
-
-        /**
-         * Provide the [GetChargingOnSizeString] implementation
-         */
-        @Provides
-        fun provideGetChargingOnSizeString(cameraUploadRepository: CameraUploadRepository): GetChargingOnSizeString =
-            GetChargingOnSizeString(cameraUploadRepository::getChargingOnSizeString)
 
         /**
          * Provide the [GetPendingSyncRecords] implementation
@@ -652,6 +645,17 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideSetChargingRequiredForVideoCompression(repository: CameraUploadRepository): SetChargingRequiredForVideoCompression =
             SetChargingRequiredForVideoCompression(repository::setChargingRequiredForVideoCompression)
+
+        /**
+         * Provides the [GetVideoCompressionSizeLimit] implementation
+         *
+         * @param repository [CameraUploadRepository]
+         *
+         * @return [GetVideoCompressionSizeLimit]
+         */
+        @Provides
+        fun provideGetVideoCompressionSizeLimit(repository: CameraUploadRepository): GetVideoCompressionSizeLimit =
+            GetVideoCompressionSizeLimit(repository::getVideoCompressionSizeLimit)
     }
 
     /**

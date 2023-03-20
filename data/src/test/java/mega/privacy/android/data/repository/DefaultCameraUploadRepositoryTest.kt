@@ -333,12 +333,6 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload retrieves charging on size`() = runTest {
-        whenever(localStorageGateway.getChargingOnSizeString()).thenReturn("1")
-        assertThat(underTest.getChargingOnSize()).isEqualTo(1)
-    }
-
-    @Test
     fun `test that the device needs to be charged when compressing videos`() =
         testIsChargingRequiredForVideoCompression(true)
 
@@ -368,6 +362,12 @@ class DefaultCameraUploadRepositoryTest {
             localStorageGateway,
             times(1)
         ).setChargingRequiredForVideoCompression(requireCharging)
+    }
+
+    @Test
+    fun `test that the video compression size limit is retrieved`() = runTest {
+        whenever(localStorageGateway.getVideoCompressionSizeLimit()).thenReturn(300)
+        assertThat(underTest.getVideoCompressionSizeLimit()).isEqualTo(300)
     }
 
     @Test

@@ -48,7 +48,6 @@ import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.FileNameExists
 import mega.privacy.android.domain.usecase.GetCameraUploadFolderName
-import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetGPSCoordinates
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
@@ -100,6 +99,7 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
@@ -142,9 +142,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideIsCameraUploadByWifi() = mock<IsCameraUploadByWifi>()
-
-    @Provides
-    fun provideGetChargingOnSizeString() = mock<GetChargingOnSizeString>()
 
     @Provides
     fun provideGetPendingSyncRecords() = mock<GetPendingSyncRecords>()
@@ -416,6 +413,9 @@ object TestCameraUploadUseCases {
     @Provides
     fun provideSetChargingRequiredForVideoCompression() =
         mock<SetChargingRequiredForVideoCompression>()
+
+    @Provides
+    fun provideGetVideoCompressionSizeLimit() = mock<GetVideoCompressionSizeLimit>()
 
     @Provides
     fun provideBroadcastCameraUploadProgress() =

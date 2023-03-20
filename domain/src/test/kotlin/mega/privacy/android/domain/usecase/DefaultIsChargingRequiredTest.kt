@@ -3,12 +3,13 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 
 /**
  * Test class for [DefaultIsChargingRequired]
@@ -17,14 +18,14 @@ import org.mockito.kotlin.stub
 class DefaultIsChargingRequiredTest {
     private lateinit var underTest: IsChargingRequired
 
-    private val cameraUploadRepository = mock<CameraUploadRepository>()
+    private val getVideoCompressionSizeLimit = mock<GetVideoCompressionSizeLimit>()
     private val isChargingRequiredForVideoCompression =
         mock<IsChargingRequiredForVideoCompression>()
 
     @Before
     fun setUp() {
         underTest = DefaultIsChargingRequired(
-            cameraUploadRepository = cameraUploadRepository,
+            getVideoCompressionSizeLimit = getVideoCompressionSizeLimit,
             isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression,
         )
     }
@@ -43,9 +44,7 @@ class DefaultIsChargingRequiredTest {
     fun `test that false is returned if queue is smaller than the limit`() = runTest {
         val queueSize = 5
 
-        cameraUploadRepository.stub {
-            onBlocking { getChargingOnSize() }.thenReturn(queueSize + 1)
-        }
+        whenever(getVideoCompressionSizeLimit()).thenReturn(queueSize + 1)
         isChargingRequiredForVideoCompression.stub {
             onBlocking { invoke() }.thenReturn(true)
         }
@@ -57,9 +56,7 @@ class DefaultIsChargingRequiredTest {
     fun `test that true is returned if queue is larger than the limit`() = runTest {
         val queueSize = 5
 
-        cameraUploadRepository.stub {
-            onBlocking { getChargingOnSize() }.thenReturn(queueSize - 1)
-        }
+        whenever(getVideoCompressionSizeLimit()).thenReturn(queueSize - 1)
         isChargingRequiredForVideoCompression.stub {
             onBlocking { invoke() }.thenReturn(true)
         }

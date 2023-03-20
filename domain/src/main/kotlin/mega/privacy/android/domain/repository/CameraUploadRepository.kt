@@ -367,18 +367,11 @@ interface CameraUploadRepository {
     suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean)
 
     /**
-     * Get charging on size string
+     * Retrieves the maximum video file size that can be compressed
      *
-     * @return charging on size string
+     * @return An [Int] that represents the maximum video file size that can be compressed
      */
-    suspend fun getChargingOnSizeString(): String
-
-    /**
-     * Get charging on size int
-     *
-     * @return charging on size int
-     */
-    suspend fun getChargingOnSize(): Int
+    suspend fun getVideoCompressionSizeLimit(): Int
 
     /**
      * Update camera upload folder (node list) icon

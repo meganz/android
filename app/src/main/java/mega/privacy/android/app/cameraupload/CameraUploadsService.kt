@@ -103,7 +103,6 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.GetChargingOnSizeString
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSession
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
@@ -129,6 +128,7 @@ import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -302,10 +302,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     lateinit var setSyncRecordPendingByPath: SetSyncRecordPendingByPath
 
     /**
-     * GetChargingOnSizeString
+     * Get Video Compression Size Limit
      */
     @Inject
-    lateinit var getChargingOnSizeString: GetChargingOnSizeString
+    lateinit var getVideoCompressionSizeLimit: GetVideoCompressionSizeLimit
 
     /**
      * IsChargingRequired
@@ -1923,10 +1923,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         val pendingIntent =
             PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val title = getString(R.string.title_compression_size_over_limit)
-        val size = getChargingOnSizeString()
+        val size = getVideoCompressionSizeLimit()
         val message = getString(
             R.string.message_compression_size_over_limit,
-            getString(R.string.label_file_size_mega_byte, size)
+            getString(R.string.label_file_size_mega_byte, size.toString())
         )
         showNotification(title, message, pendingIntent, true)
     }

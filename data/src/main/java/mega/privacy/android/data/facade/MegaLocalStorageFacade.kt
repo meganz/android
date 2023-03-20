@@ -222,15 +222,15 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord> =
         dbHandler.findVideoSyncRecordsByState(syncStatusType)
 
-    override suspend fun getChargingOnSizeString(): String =
-        dbHandler.preferences?.chargingOnSize ?: DEFAULT_CONVENTION_QUEUE_SIZE.toString()
-
     override suspend fun isChargingRequiredForVideoCompression(): Boolean =
         dbHandler.preferences?.conversionOnCharging?.toBoolean() ?: true
 
     override suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean) {
         dbHandler.setConversionOnCharging(chargingRequired)
     }
+
+    override suspend fun getVideoCompressionSizeLimit(): Int =
+        dbHandler.preferences?.chargingOnSize?.toInt() ?: DEFAULT_CONVENTION_QUEUE_SIZE
 
     override suspend fun updateSyncRecordStatusByLocalPath(
         syncStatusType: Int,

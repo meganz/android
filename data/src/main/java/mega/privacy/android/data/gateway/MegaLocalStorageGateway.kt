@@ -342,11 +342,6 @@ interface MegaLocalStorageGateway {
     suspend fun getVideoSyncRecordsByStatus(syncStatusType: Int): List<SyncRecord>
 
     /**
-     * Get charging on size string
-     */
-    suspend fun getChargingOnSizeString(): String
-
-    /**
      * Checks whether compressing videos require the device to be charged or not
      *
      * @return true if the device needs to be charged to compress videos, and false if otherwise
@@ -360,6 +355,13 @@ interface MegaLocalStorageGateway {
      * @param chargingRequired Whether the device needs to be charged or not
      */
     suspend fun setChargingRequiredForVideoCompression(chargingRequired: Boolean)
+
+    /**
+     * Retrieves the maximum video file size that can be compressed
+     *
+     * @return An [Int] that represents the maximum video file size that can be compressed
+     */
+    suspend fun getVideoCompressionSizeLimit(): Int
 
     /**
      * Update sync record status by local path
