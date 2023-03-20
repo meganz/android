@@ -311,7 +311,7 @@
             android:name=".main.megachat.ContactAttachmentActivity"
             android:configChanges="orientation|screenSize" />
         <activity
-            android:name=".main.TestPasswordActivity"
+            android:name=".presentation.testpassword.TestPasswordActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".main.FileLinkActivity"

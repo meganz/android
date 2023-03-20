@@ -123,7 +123,7 @@ internal class DefaultAccountRepository @Inject constructor(
     private val callsPreferencesGateway: CallsPreferencesGateway,
     private val cacheFolderGateway: CacheFolderGateway,
     private val accountPreferencesGateway: AccountPreferencesGateway,
-    private val passwordStrengthMapper: PasswordStrengthMapper
+    private val passwordStrengthMapper: PasswordStrengthMapper,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
         val user = megaApiGateway.getLoggedInUser()
@@ -716,32 +716,36 @@ internal class DefaultAccountRepository @Inject constructor(
         }
     }
 
-    override suspend fun skipPasswordReminderDialog() {
-        onPasswordReminderAction("passwordReminderDialogSkipped") { listener ->
+    override suspend fun skipPasswordReminderDialog() =
+        onPasswordReminderAction { listener ->
             megaApiGateway.skipPasswordReminderDialog(listener)
         }
-    }
 
-    override suspend fun blockPasswordReminderDialog() {
-        onPasswordReminderAction("passwordReminderDialogBlocked") { listener ->
+    override suspend fun blockPasswordReminderDialog() =
+        onPasswordReminderAction { listener ->
             megaApiGateway.blockPasswordReminderDialog(listener)
         }
-    }
 
-    override suspend fun notifyPasswordChecked() {
-        onPasswordReminderAction("passwordReminderDialogSucceeded") { listener ->
+    override suspend fun notifyPasswordChecked() =
+        onPasswordReminderAction { listener ->
             megaApiGateway.successPasswordReminderDialog(listener)
         }
-    }
 
     private suspend fun onPasswordReminderAction(
-        methodName: String,
         block: (MegaRequestListenerInterface) -> Unit,
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener(methodName) {
-                it.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER
-            }
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (request.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER &&
+                        (error.errorCode == MegaError.API_OK || error.errorCode == MegaError.API_ENOENT)
+                    ) {
+                        continuation.resumeWith(Result.success(Unit))
+                    } else {
+                        continuation.failWithError(error)
+                    }
+                },
+            )
             block(listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
