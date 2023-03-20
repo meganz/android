@@ -60,5 +60,10 @@ interface Node {
      * Is node key decrypted by verification from owner
      */
     val isNodeKeyDecrypted: Boolean
+
+    /**
+     * Creation time
+     */
+    val creationTime: Long
 }
 

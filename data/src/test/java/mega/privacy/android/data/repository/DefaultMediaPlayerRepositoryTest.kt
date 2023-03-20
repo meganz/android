@@ -70,6 +70,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedDevice = "device id"
     private val expectedSize = 1000L
     private val expectedModificationTime = 2000L
+    private val expectedCreationTime = 2000L
     private val expectedThumbnailPath: String? = null
     private val expectedFingerprint = "fingerprint"
     private val expectedType = StaticImageFileTypeInfo(mimeType = "", extension = "image")
@@ -315,6 +316,7 @@ class DefaultMediaPlayerRepositoryTest {
         isPendingShare = expectedIsPendingShare,
         device = expectedDevice,
         isNodeKeyDecrypted = isNodeKetDecrypted,
+        creationTime = expectedCreationTime,
     )
 
     private fun createTypedFileNode() = DefaultFileNode(
@@ -329,6 +331,7 @@ class DefaultMediaPlayerRepositoryTest {
         isTakenDown = expectedIsTakenDown,
         isIncomingShare = expectedIncomingShare,
         size = expectedSize,
+        creationTime = expectedCreationTime,
         modificationTime = expectedModificationTime,
         fingerprint = expectedFingerprint,
         thumbnailPath = expectedThumbnailPath,

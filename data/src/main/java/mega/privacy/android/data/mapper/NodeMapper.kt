@@ -55,6 +55,7 @@ internal suspend fun toNode(
         isPendingShare = isPendingShare(megaNode),
         device = megaNode.deviceId,
         isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
+        creationTime = megaNode.creationTime,
     )
 } else {
     DefaultFileNode(
@@ -64,6 +65,7 @@ internal suspend fun toNode(
         label = megaNode.label,
         parentId = NodeId(megaNode.parentHandle),
         base64Id = megaNode.base64Handle,
+        creationTime = megaNode.creationTime,
         modificationTime = megaNode.modificationTime,
         hasVersion = hasVersion(megaNode),
         thumbnailPath = thumbnailPath(megaNode),

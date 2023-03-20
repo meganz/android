@@ -335,6 +335,7 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginLeft="72dp"
+            android:visibility="gone"
             android:gravity="left">
 
             <LinearLayout
@@ -366,6 +367,7 @@
             android:id="@+id/file_properties_folder_current_versions_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:visibility="gone"
             android:layout_marginLeft="72dp"
             android:gravity="left">
 
@@ -398,6 +400,7 @@
             android:id="@+id/file_properties_folder_previous_versions_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
+            android:visibility="gone"
             android:layout_marginLeft="72dp"
             android:gravity="left">
 
@@ -497,7 +500,7 @@
         <!-- CREATED LAYOUT -->
 
         <RelativeLayout
-            android:id="@+id/file_properties_created_layout"
+            android:id="@+id/file_properties_modified_layout"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginLeft="72dp"
@@ -510,7 +513,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/file_properties_info_menu_created"
+                    android:id="@+id/file_properties_info_menu_modified"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="8dp"
@@ -518,10 +521,9 @@
                     android:textAppearance="@style/TextAppearance.Mega.Subtitle2" />
 
                 <TextView
-                    android:id="@+id/file_properties_info_data_created"
+                    android:id="@+id/file_properties_info_data_modified"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/file_properties_info_menu_created"
                     android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary" />
             </LinearLayout>
 

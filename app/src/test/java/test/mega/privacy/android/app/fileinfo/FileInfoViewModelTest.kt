@@ -36,7 +36,6 @@ import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
@@ -737,18 +736,11 @@ internal class FileInfoViewModelTest {
     }
 
     @Test
-    fun `test when stopSharing is called then disableExport use case is called and node is updated`() =
+    fun `test when stopSharing is called then disableExport use case is called`() =
         runTest {
-            val expected = mock<TypedNode> {
-                on { isExported }.thenReturn(false)
-            }
-            whenever(typedFileNode.isExported).thenReturn(true)
             underTest.setNode(node.handle)
-            Truth.assertThat(underTest.uiState.value.typedNode?.isExported).isEqualTo(true)
-            whenever(getNodeById.invoke(nodeId)).thenReturn(expected)
             underTest.stopSharing()
             verify(stopSharingNode, times(1)).invoke(nodeId)
-            Truth.assertThat(underTest.uiState.value.typedNode?.isExported).isEqualTo(false)
         }
 
     @Test

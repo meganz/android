@@ -17,6 +17,7 @@ import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.node.model.getIcon
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -301,9 +302,8 @@ class FileInfoViewModel @Inject constructor(
      * Stop sharing this node
      */
     fun stopSharing() {
-        updateState {
+        viewModelScope.launch {
             stopSharingNode(typedNode.id)
-            it.copy(typedNode = getNodeById(typedNode.id))
         }
     }
 
@@ -436,8 +436,11 @@ class FileInfoViewModel @Inject constructor(
                                 // maybe it's moved, or a new version is created, etc. let's update all to be safe
                                 return@any true
                             }
-                        Timestamp -> return@any true //will update only dates, for now update everything
-                        Outshare -> updateOutShares()
+                        Timestamp -> updateTimeStamp()
+                        Outshare -> {
+                            updateOutShares()
+                            updateIcon()
+                        }
                         Public_link -> return@any true //will update only public link, for now update everything
                         else -> return@any false
                     }
@@ -494,6 +497,7 @@ class FileInfoViewModel @Inject constructor(
             val isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue)
             uiState.copy(
                 typedNode = typedNode,
+                iconResource = typedNode.getIcon(),
                 isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
                 isNodeInRubbish = isNodeInRubbish,
                 jobInProgressState = null,
@@ -521,6 +525,17 @@ class FileInfoViewModel @Inject constructor(
         }
     }
 
+    private fun updateIcon() {
+        updateState {
+            //we need to update the typedNode to get changes, for instance, on outgoing shares
+            typedNode = getNodeById(typedNode.id)
+            it.copy(
+                typedNode = typedNode,
+                iconResource = typedNode.getIcon(),
+            )
+        }
+    }
+
     private fun updatePreview() {
         viewModelScope.launch {
             if ((typedNode as? TypedFileNode)?.hasPreview == true && _uiState.value.previewUriString == null) {
@@ -528,6 +543,16 @@ class FileInfoViewModel @Inject constructor(
                     it.copy(previewUriString = getPreview(typedNode.id.longValue)?.uriStringIfExists())
                 }
             }
+        }
+    }
+
+    private fun updateTimeStamp() {
+        updateState {
+            //we need to update the typedNode to get changes in timeStamps
+            typedNode = getNodeById(typedNode.id)
+            it.copy(
+                typedNode = typedNode,
+            )
         }
     }
 
@@ -564,7 +589,8 @@ class FileInfoViewModel @Inject constructor(
 
     private fun updateTitle() {
         updateState {
-            it.copy(typedNode = getNodeById(typedNode.id))
+            typedNode = getNodeById(typedNode.id)
+            it.copy(typedNode = typedNode)
         }
     }
 

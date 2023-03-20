@@ -11,6 +11,7 @@ internal data class DefaultFileNode(
     override val base64Id: String,
     override val size: Long,
     override val label: Int,
+    override val creationTime: Long,
     override val modificationTime: Long,
     override val hasVersion: Boolean,
     override val type: FileTypeInfo,

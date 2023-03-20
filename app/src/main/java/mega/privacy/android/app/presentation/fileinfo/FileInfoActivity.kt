@@ -32,7 +32,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.activities.contract.DeleteVersionsHistoryActivityContract
@@ -47,7 +46,6 @@ import mega.privacy.android.app.databinding.ActivityFileInfoBinding
 import mega.privacy.android.app.databinding.DialogLinkBinding
 import mega.privacy.android.app.interfaces.ActionBackupListener
 import mega.privacy.android.app.interfaces.SnackbarShower
-import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.FileContactListActivity
 import mega.privacy.android.app.main.adapters.MegaFileInfoSharedContactAdapter
 import mega.privacy.android.app.main.adapters.MegaFileInfoSharedContactAdapter.MegaFileInfoSharedContactAdapterListener
@@ -75,9 +73,7 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SHARE_FOL
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle
-import mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon
 import mega.privacy.android.app.utils.MegaNodeUtil.handleLocationClick
-import mega.privacy.android.app.utils.MegaNodeUtil.isEmptyFolder
 import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShare
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
@@ -86,6 +82,8 @@ import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.node.NodeId
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
@@ -146,7 +144,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     }
 
     private var progressDialog: Pair<AlertDialog, FileInfoJobInProgressState?>? = null
-    private var publicLink = false
     private val density by lazy { outMetrics.density }
     private var from = 0
     private var adapterType = 0
@@ -196,7 +193,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     }
     private var actionMode: ActionMode? = null
     private var bottomSheetDialogFragment: FileContactsListBottomSheetDialogFragment? = null
-    private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<MegaNode>
+    private lateinit var selectContactForShareFolderLauncher: ActivityResultLauncher<NodeId>
     private lateinit var versionHistoryLauncher: ActivityResultLauncher<Long>
     private lateinit var copyLauncher: ActivityResultLauncher<LongArray>
     private lateinit var moveLauncher: ActivityResultLauncher<LongArray>
@@ -318,8 +315,11 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             nodeSaver.restoreState(this)
         }
 
-        //view
+        //setup view
         setupView()
+        setupViewListeners()
+
+        //update view
         collectUIState()
     }
 
@@ -349,6 +349,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
             previousVersionsSize = viewState.folderVersionsSizeInBytesString
         )
         updateAvailableOffline(
+            visible = viewState.isAvailableOfflineAvailable,
             enabled = viewState.isAvailableOfflineEnabled,
             available = viewState.isAvailableOffline,
         )
@@ -356,8 +357,13 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         updateOutShares(viewState)
         updateLocation(viewState.nodeLocationInfo)
         updateContactShareBottomSheet(viewState)
-
-        refreshProperties()
+        updateCreationTime(viewState)
+        updateIcon(viewState)
+        updateProperties(viewState)
+        updateTakenDown(
+            isTakenDown = viewState.typedNode?.isTakenDown == true,
+            isFile = viewState.typedNode is TypedFileNode
+        )
     }
 
     private fun updateLocation(locationInfo: LocationInfo?) {
@@ -441,16 +447,20 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         }
     }
 
-    private fun updateAvailableOffline(enabled: Boolean, available: Boolean) =
+    private fun updateAvailableOffline(visible: Boolean, enabled: Boolean, available: Boolean) =
         with(bindingContent) {
-            bindingContent.filePropertiesSwitch.isChecked = available
-            filePropertiesSwitch.isEnabled = enabled
-            filePropertiesAvailableOfflineText.setTextColor(
-                ContextCompat.getColor(
-                    this@FileInfoActivity,
-                    if (enabled) R.color.grey_087_white_087 else R.color.grey_700_026_grey_300_026
+            bindingContent.availableOfflineLayout.isVisible = visible
+            bindingContent.availableOfflineSeparator.isVisible = visible
+            if (visible) {
+                bindingContent.filePropertiesSwitch.isChecked = available
+                filePropertiesSwitch.isEnabled = enabled
+                filePropertiesAvailableOfflineText.setTextColor(
+                    ContextCompat.getColor(
+                        this@FileInfoActivity,
+                        if (enabled) R.color.grey_087_white_087 else R.color.grey_700_026_grey_300_026
+                    )
                 )
-            )
+            }
         }
 
     private fun updateContactShareBottomSheet(viewState: FileInfoViewState) =
@@ -585,6 +595,61 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         }
     }
 
+    private fun updateCreationTime(viewState: FileInfoViewState) {
+        bindingContent.filePropertiesInfoDataAdded.text = viewState.creationTimeText
+        bindingContent.filePropertiesModifiedLayout.isVisible =
+            viewState.modificationTimeText != null
+        bindingContent.filePropertiesInfoDataModified.text = viewState.modificationTimeText
+    }
+
+    private fun updateIcon(viewState: FileInfoViewState) {
+        viewState.iconResource?.let {
+            binding.fileInfoToolbarIcon.setImageResource(it)
+            binding.fileInfoToolbarIcon.isVisible = true
+        } ?: run {
+            binding.fileInfoToolbarIcon.isVisible = false
+        }
+    }
+
+    private fun updateProperties(viewState: FileInfoViewState) {
+        bindingContent.apply {
+            Timber.d("refreshProperties")
+            val isVisible =
+                viewState.typedNode?.isTakenDown == false && viewState.typedNode.isExported
+            dividerLinkLayout.isVisible = isVisible
+            filePropertiesLinkLayout.isVisible = isVisible
+            filePropertiesCopyLayout.isVisible = isVisible
+            if (isVisible) {
+                filePropertiesLinkText.text = viewModel.node.publicLink
+                filePropertiesLinkDate.text = getString(
+                    R.string.general_date_label, TimeUtils.formatLongDateTime(
+                        viewModel.node.publicLinkCreationTime
+                    )
+                )
+            }
+            (viewState.typedNode as? TypedFileNode)?.let { fileNode ->
+                Timber.d("Node is FILE")
+                filePropertiesInfoMenuSize.text =
+                    getString(R.string.file_properties_info_size_file)
+                filePropertiesInfoDataSize.text = Util.getSizeString(fileNode.size)
+            }
+        }
+    }
+
+    private fun updateTakenDown(isTakenDown: Boolean, isFile: Boolean) {
+        bindingContent.warningBannerLayout.isVisible = isTakenDown
+        if (isTakenDown) {
+            bindingContent.takenDownFileWarningBanner.text =
+                underlineText(
+                    if (isFile) {
+                        R.string.cloud_drive_info_taken_down_file_warning
+                    } else {
+                        R.string.cloud_drive_info_taken_down_folder_warning
+                    }
+                )
+        }
+    }
+
     private fun showProgressDialog(message: String, progress: FileInfoJobInProgressState? = null) {
         progressDialog?.first?.dismiss()
         progressDialog = Pair(
@@ -624,19 +689,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         }
 
         with(bindingContent) {
-            //Available Offline Layout
-            availableOfflineLayout.isVisible = true
-
-            //Share with Layout
-            filePropertiesSharedLayout.setOnClickListener {
-                viewModel.expandOutSharesClick()
-            }
-            filePropertiesSharedInfoButton.setOnClickListener {
-                viewModel.expandOutSharesClick()
-            }
-            filePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
-                viewModel.availableOfflineChanged(checked, WeakReference(this@FileInfoActivity))
-            }
             //Owner Layout
             val ownerString = "(${getString(R.string.file_properties_owner)})"
             filePropertiesOwnerLabelOwner.text = ownerString
@@ -648,13 +700,33 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 filePropertiesOwnerInfo.maxWidth = Util.dp2px(MAX_WIDTH_FILENAME_PORT_2)
             }
 
-            //Folder Versions Layout
-            filePropertiesFolderVersionsLayout.isVisible = false
-            filePropertiesFolderCurrentVersionsLayout.isVisible = false
-            filePropertiesFolderPreviousVersionsLayout.isVisible = false
-
             //Content Layout
             filePropertiesLinkButton.text = getString(R.string.context_copy)
+
+            val listView = fileInfoContactListView
+            listView.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
+            listView.addItemDecoration(SimpleDividerItemDecoration(this@FileInfoActivity))
+            val mLayoutManager = LinearLayoutManager(this@FileInfoActivity)
+            listView.layoutManager = mLayoutManager
+
+            //setup adapter
+            listView.adapter = adapter
+        }
+    }
+
+    private fun setupViewListeners() {
+        with(bindingContent) {
+            //Share with Layout
+            filePropertiesSharedLayout.setOnClickListener {
+                viewModel.expandOutSharesClick()
+            }
+            filePropertiesSharedInfoButton.setOnClickListener {
+                viewModel.expandOutSharesClick()
+            }
+            filePropertiesSwitch.setOnCheckedChangeListener { _: CompoundButton, checked: Boolean ->
+                viewModel.availableOfflineChanged(checked, WeakReference(this@FileInfoActivity))
+            }
+
             filePropertiesLinkButton.setOnClickListener {
                 Timber.d("Copy link button")
                 val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
@@ -666,44 +738,26 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                     -1
                 )
             }
-
-            val listView = fileInfoContactListView
-            listView.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
-            listView.addItemDecoration(SimpleDividerItemDecoration(this@FileInfoActivity))
-            val mLayoutManager = LinearLayoutManager(this@FileInfoActivity)
-            listView.layoutManager = mLayoutManager
-
             moreButton.setOnClickListener {
                 val i = Intent(this@FileInfoActivity, FileContactListActivity::class.java)
-                i.putExtra(Constants.NAME, viewModel.node.handle)
+                i.putExtra(Constants.NAME, viewModel.typedNode.id.longValue)
                 startActivity(i)
             }
-
-            //setup adapter
-            listView.adapter = adapter
-
             filePropertiesInfoDataLocation.setOnClickListener {
                 viewModel.uiState.value.nodeLocationInfo?.let { locationInfo ->
                     handleLocationClick(this@FileInfoActivity, adapterType, locationInfo)
                 }
             }
-
-            if (viewModel.node.isFolder) {
-                filePropertiesCreatedLayout.isVisible = false
-                if (isEmptyFolder(viewModel.node)) {
-                    availableOfflineLayout.isVisible = false
-                    availableOfflineSeparator.isVisible = false
-                }
-            } else {
-                filePropertiesCreatedLayout.isVisible = true
-            }
-            // If the Node belongs to Backups or has no versions, then hide
-            // the Versions layout
             filePropertiesTextNumberVersions.setOnClickListener {
-                versionHistoryLauncher.launch(viewModel.node.handle)
+                versionHistoryLauncher.launch(viewModel.typedNode.id.longValue)
+            }
+            takenDownFileWarningBanner.setOnClickListener {
+                redirectToTakedownPolicy()
+            }
+            takenDownFileWarningClose.setOnClickListener {
+                bindingContent.warningBannerLayout.isVisible = false
             }
         }
-        setIconResource()
     }
 
     /**
@@ -777,7 +831,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 if (showTakenDownNodeActionNotAvailableDialog(viewModel.node, this)) {
                     return false
                 }
-                LinksUtil.showGetLinkActivity(this, viewModel.node.handle)
+                LinksUtil.showGetLinkActivity(this, viewModel.typedNode.id.longValue)
             }
             R.id.cab_menu_file_info_remove_link -> {
                 if (showTakenDownNodeActionNotAvailableDialog(viewModel.node, this)) {
@@ -811,8 +865,8 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                     }.setNegativeButton(getString(R.string.general_cancel), null)
                     .show()
             }
-            R.id.cab_menu_file_info_copy -> copyLauncher.launch(longArrayOf(viewModel.node.handle))
-            R.id.cab_menu_file_info_move -> moveLauncher.launch(longArrayOf(viewModel.node.handle))
+            R.id.cab_menu_file_info_copy -> copyLauncher.launch(longArrayOf(viewModel.typedNode.id.longValue))
+            R.id.cab_menu_file_info_move -> moveLauncher.launch(longArrayOf(viewModel.typedNode.id.longValue))
             R.id.cab_menu_file_info_rename -> {
                 showRenameNodeDialog(this, viewModel.node, this, null)
             }
@@ -854,10 +908,10 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 }
                 result?.let {
                     val contactsData = ArrayList<String>().apply { addAll(result) }
-                    if (viewModel.node.isFolder) {
+                    if (viewModel.uiState.value.typedNode is TypedFolderNode) {
                         if (fileBackupManager?.shareFolder(
                                 nodeController,
-                                longArrayOf(viewModel.node.handle),
+                                longArrayOf(viewModel.typedNode.id.longValue),
                                 contactsData,
                                 MegaShare.ACCESS_READ
                             ) != true
@@ -882,7 +936,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 if (!viewModel.checkAndHandleIsDeviceConnected()) {
                     return@registerForActivityResult
                 }
-                if (result == viewModel.node.handle) {
+                if (result == viewModel.typedNode.id.longValue) {
                     viewModel.deleteHistoryVersions()
                 }
             }
@@ -921,93 +975,8 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
      * Starts a new Intent to share the folder to different contacts
      */
     private fun shareFolder() {
-        selectContactForShareFolderLauncher.launch(viewModel.node)
-    }
-
-    private fun refreshProperties() {
-        Timber.d("refreshProperties")
-        if (!viewModel.node.isTakenDown && viewModel.node.isExported) {
-            publicLink = true
-            bindingContent.dividerLinkLayout.isVisible = true
-            bindingContent.filePropertiesLinkLayout.isVisible = true
-            bindingContent.filePropertiesCopyLayout.isVisible = true
-            bindingContent.filePropertiesLinkText.text = viewModel.node.publicLink
-            bindingContent.filePropertiesLinkDate.text = getString(
-                R.string.general_date_label, TimeUtils.formatLongDateTime(
-                    viewModel.node.publicLinkCreationTime
-                )
-            )
-        } else {
-            publicLink = false
-            bindingContent.dividerLinkLayout.isVisible = false
-            bindingContent.filePropertiesLinkLayout.isVisible = false
-            bindingContent.filePropertiesCopyLayout.isVisible = false
-        }
-
-        if (viewModel.node.isFile) {
-            Timber.d("Node is FILE")
-            bindingContent.filePropertiesSharedLayout.isVisible = false
-            bindingContent.dividerSharedLayout.isVisible = false
-            bindingContent.filePropertiesInfoMenuSize.text =
-                getString(R.string.file_properties_info_size_file)
-            bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(viewModel.node.size)
-            if (viewModel.node.isTakenDown) {
-                bindingContent.takenDownFileWarningBanner.text =
-                    underlineText(R.string.cloud_drive_info_taken_down_file_warning)
-                bindingContent.takenDownFileWarningBanner.setOnClickListener {
-                    redirectToTakedownPolicy()
-                }
-                bindingContent.warningBannerLayout.isVisible = true
-                bindingContent.takenDownFileWarningClose.setOnClickListener {
-                    bindingContent.warningBannerLayout.isVisible = false
-                }
-            }
-            if (viewModel.node.creationTime != 0L) {
-                try {
-                    bindingContent.filePropertiesInfoDataAdded.text =
-                        TimeUtils.formatLongDateTime(
-                            viewModel.node.creationTime
-                        )
-                } catch (ex: Exception) {
-                    bindingContent.filePropertiesInfoDataAdded.text = ""
-                }
-                if (viewModel.node.modificationTime != 0L) {
-                    try {
-                        bindingContent.filePropertiesInfoDataCreated.text =
-                            TimeUtils.formatLongDateTime(
-                                viewModel.node.modificationTime
-                            )
-                    } catch (ex: Exception) {
-                        bindingContent.filePropertiesInfoDataCreated.text = ""
-                    }
-                } else {
-                    try {
-                        bindingContent.filePropertiesInfoDataCreated.text =
-                            TimeUtils.formatLongDateTime(
-                                viewModel.node.creationTime
-                            )
-                    } catch (ex: Exception) {
-                        bindingContent.filePropertiesInfoDataCreated.text = ""
-                    }
-                }
-            } else {
-                bindingContent.filePropertiesInfoDataAdded.text = ""
-                bindingContent.filePropertiesInfoDataCreated.text = ""
-            }
-        } else if (viewModel.node.isFolder) {
-            Timber.d("Node is FOLDER")
-            setIconResource()
-            if (viewModel.node.isTakenDown) {
-                bindingContent.takenDownFileWarningBanner.text =
-                    underlineText(R.string.cloud_drive_info_taken_down_folder_warning)
-                bindingContent.takenDownFileWarningBanner.setOnClickListener {
-                    redirectToTakedownPolicy()
-                }
-                bindingContent.warningBannerLayout.isVisible = true
-                bindingContent.takenDownFileWarningClose.setOnClickListener {
-                    bindingContent.warningBannerLayout.isVisible = false
-                }
-            }
+        viewModel.uiState.value.typedNode?.let {
+            selectContactForShareFolderLauncher.launch(it.id)
         }
     }
 
@@ -1172,18 +1141,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         } catch (e: NullPointerException) {
             Timber.e(e, "Invalidate error")
         }
-    }
-
-    private fun setIconResource() {
-        val resource = if (viewModel.node.isFolder) {
-            getFolderIcon(
-                viewModel.node,
-                if (adapterType == Constants.OUTGOING_SHARES_ADAPTER) DrawerItem.SHARED_ITEMS else DrawerItem.CLOUD_DRIVE
-            )
-        } else {
-            MimeTypeThumbnail.typeForName(viewModel.node.name).iconResourceId
-        }
-        binding.fileInfoToolbarIcon.setImageResource(resource)
     }
 
     private fun redirectToTakedownPolicy() {

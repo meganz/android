@@ -2,9 +2,12 @@ package mega.privacy.android.app.presentation.fileinfo
 
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.node.TypedFileNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import nz.mega.sdk.MegaShare
@@ -29,6 +32,7 @@ import nz.mega.sdk.MegaShare
  * @param accessPermission the [AccessPermission] the user has to this node
  * @param outShareContactShowOptions the contact selected to show related options
  * @param outShareContactsSelected a list of contacts selected to batch modify
+ * @param iconResource the icon resource that represents this node
  */
 data class FileInfoViewState(
     val typedNode: TypedNode? = null,
@@ -49,6 +53,7 @@ data class FileInfoViewState(
     val accessPermission: AccessPermission = AccessPermission.UNKNOWN,
     val outShareContactShowOptions: MegaShare? = null,
     val outShareContactsSelected: List<String> = emptyList(),
+    val iconResource: Int? = null,
 ) {
 
     /**
@@ -74,21 +79,21 @@ data class FileInfoViewState(
     /**
      * computed utility field to get the folder's previous versions size string
      */
-    val folderVersionsSizeInBytesString: String by lazy {
+    val folderVersionsSizeInBytesString: String by lazy(LazyThreadSafetyMode.NONE) {
         Util.getSizeString(folderTreeInfo?.sizeOfPreviousVersionsInBytes ?: 0)
     }
 
     /**
      * computed utility field to get the folder's current version size string
      */
-    val folderCurrentVersionSizeInBytesString: String by lazy {
+    val folderCurrentVersionSizeInBytesString: String by lazy(LazyThreadSafetyMode.NONE) {
         Util.getSizeString(folderTreeInfo?.totalCurrentSizeInBytes ?: 0)
     }
 
     /**
      * computed utility field to get the folder content string. Ex "2 folders . 5 files"
      */
-    val folderContentInfoString by lazy {
+    val folderContentInfoString by lazy(LazyThreadSafetyMode.NONE) {
         folderTreeInfo?.let {
             TextUtil.getFolderInfo(
                 it.numberOfFolders - 1, //-1 because we don't want to count the folder itself
@@ -100,7 +105,7 @@ data class FileInfoViewState(
     /**
      * computed utility field to get the folder content total size, including current and previous versions.
      */
-    val sizeString by lazy {
+    val sizeString by lazy(LazyThreadSafetyMode.NONE) {
         folderTreeInfo?.let {
             Util.getSizeString(it.totalCurrentSizeInBytes + it.sizeOfPreviousVersionsInBytes)
         } //file size should be also returned
@@ -109,7 +114,7 @@ data class FileInfoViewState(
     /**
      * the limited amount of outshares to be shown
      */
-    val outSharesCoerceMax by lazy {
+    val outSharesCoerceMax by lazy(LazyThreadSafetyMode.NONE) {
         outShares.takeIf { it.size <= MAX_NUMBER_OF_CONTACTS_IN_LIST }
             ?: (outShares.take(MAX_NUMBER_OF_CONTACTS_IN_LIST))
     }
@@ -132,10 +137,39 @@ data class FileInfoViewState(
     /**
      * label for the owner of this node in case it's an incoming shared node
      */
-    val ownerLabel by lazy {
+    val ownerLabel by lazy(LazyThreadSafetyMode.NONE) {
         inShareOwnerContactItem?.contactData?.alias
             ?: inShareOwnerContactItem?.contactData?.fullName
             ?: inShareOwnerContactItem?.email
+    }
+
+    /**
+     * returns if the available offline should be available (visible)
+     */
+    val isAvailableOfflineAvailable by lazy(LazyThreadSafetyMode.NONE) {
+        if (typedNode is TypedFolderNode) {
+            (folderTreeInfo?.numberOfFiles ?: 0) > 0
+        } else {
+            true
+        }
+    }
+
+    /**
+     * Creation time of the node as string
+     */
+    val creationTimeText by lazy(LazyThreadSafetyMode.NONE) {
+        typedNode?.creationTime?.let {
+            TimeUtils.formatLongDateTime(it)
+        }
+    }
+
+    /**
+     * Modification time of the node as string
+     */
+    val modificationTimeText by lazy(LazyThreadSafetyMode.NONE) {
+        (typedNode as? TypedFileNode)?.modificationTime?.let {
+            TimeUtils.formatLongDateTime(it)
+        }
     }
 
     companion object {
