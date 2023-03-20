@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.presentation.testpassword.model.PasswordState
 import mega.privacy.android.app.presentation.testpassword.model.TestPasswordUIState
 import mega.privacy.android.domain.usecase.BlockPasswordReminder
 import mega.privacy.android.domain.usecase.IsCurrentPassword
@@ -42,7 +43,11 @@ class TestPasswordViewModel @Inject constructor(
      */
     fun checkForCurrentPassword(password: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isCurrentPassword = isCurrentPassword(password)) }
+            val isCurrentPassword =
+                if (isCurrentPassword(password)) PasswordState.True else PasswordState.False
+            _uiState.update {
+                it.copy(isCurrentPassword = isCurrentPassword)
+            }
         }
     }
 
@@ -71,9 +76,9 @@ class TestPasswordViewModel @Inject constructor(
         runCatching {
             block()
         }.onSuccess {
-            _uiState.update { it.copy(isPasswordReminderNotified = true) }
+            _uiState.update { it.copy(isPasswordReminderNotified = PasswordState.True) }
         }.onFailure { e ->
-            _uiState.update { it.copy(isPasswordReminderNotified = false) }
+            _uiState.update { it.copy(isPasswordReminderNotified = PasswordState.False) }
             Timber.e("Error: MegaRequest.TYPE_SET_ATTR_USER | MegaApiJava.USER_ATTR_PWD_REMINDER ${e.message}")
         }
     }
@@ -83,7 +88,18 @@ class TestPasswordViewModel @Inject constructor(
      */
     fun resetCurrentPasswordState() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isCurrentPassword = false) }
+            _uiState.update { it.copy(isCurrentPassword = PasswordState.Initial) }
+        }
+    }
+
+    /**
+     * /**
+     * Resets [uiState] isPasswordReminderNotified state to default
+    */
+     */
+    fun resetPasswordReminderState() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isPasswordReminderNotified = PasswordState.Initial) }
         }
     }
 }

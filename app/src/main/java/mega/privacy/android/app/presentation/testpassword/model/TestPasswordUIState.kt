@@ -8,8 +8,28 @@ package mega.privacy.android.app.presentation.testpassword.model
  * @param isTestPasswordMode ui state to check whether screen is currently on test password mode layout
  */
 data class TestPasswordUIState(
-    val isCurrentPassword: Boolean = false,
-    val isPasswordReminderNotified: Boolean = false,
+    val isCurrentPassword: PasswordState = PasswordState.Initial,
+    val isPasswordReminderNotified: PasswordState = PasswordState.Initial,
     val isUIEnabled: Boolean = true,
-    val isTestPasswordMode: Boolean = false
+    val isTestPasswordMode: Boolean = false,
 )
+
+/**
+ * Password State Holder to handle password related state with 3 types of state
+ */
+enum class PasswordState {
+    /**
+     * Initial state
+     */
+    Initial,
+
+    /**
+     * Success state and returns true
+     */
+    True,
+
+    /**
+     * Error state and returns false
+     */
+    False
+}

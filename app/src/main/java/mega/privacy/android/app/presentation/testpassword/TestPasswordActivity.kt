@@ -12,6 +12,7 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -19,6 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityTestPasswordBinding
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.controllers.AccountController
@@ -26,6 +28,8 @@ import mega.privacy.android.app.main.controllers.AccountController.Companion.log
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
+import mega.privacy.android.app.presentation.testpassword.model.PasswordState
+import mega.privacy.android.app.presentation.testpassword.model.TestPasswordUIState
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -50,6 +54,8 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
     @ApplicationScope
     @Inject
     lateinit var sharingScope: CoroutineScope
+
+    private val viewModel: TestPasswordViewModel by viewModels()
 
     /**
      * Checks whether screen is in Logout Mode
@@ -92,7 +98,36 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
         }
         isLogout = intent.getBooleanExtra("logout", false)
 
+        collectUIState()
         bindView()
+    }
+
+    private fun collectUIState() {
+        collectFlow(viewModel.uiState) {
+            handleCheckPasswordState(it)
+            handleNotifiedPasswordReminderState(it)
+        }
+    }
+
+    private fun handleCheckPasswordState(uiState: TestPasswordUIState) {
+        if (uiState.isCurrentPassword != PasswordState.Initial) {
+            showError(uiState.isCurrentPassword)
+            viewModel.resetCurrentPasswordState()
+        }
+    }
+
+    private fun handleNotifiedPasswordReminderState(uiState: TestPasswordUIState) {
+        if (uiState.isPasswordReminderNotified != PasswordState.Initial) {
+            numRequests--
+
+            if (uiState.isPasswordReminderNotified == PasswordState.True) {
+                if (dismissPasswordReminder && isLogout && numRequests <= 0) {
+                    logout(this, megaApi, sharingScope)
+                }
+            }
+
+            viewModel.resetPasswordReminderState()
+        }
     }
 
     private fun bindView() {
@@ -127,7 +162,7 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
                 onBackupRecoveryClick()
             }
             testPasswordConfirmButton.setOnClickListener {
-                showError(megaApi.checkPassword(testPasswordEdittext.text.toString()))
+                viewModel.checkForCurrentPassword(testPasswordEdittext.text.toString())
             }
             testPasswordDismissButton.setOnClickListener {
                 onBackPressedDispatcher.onBackPressed()
@@ -158,9 +193,7 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
             testPasswordEdittext.background.clearColorFilter()
             testPasswordEdittext.setOnEditorActionListener { _: TextView?, actionId: Int, _: KeyEvent? ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    val password = testPasswordEdittext.getText().toString()
-                    passwordCorrect = megaApi.checkPassword(password)
-                    showError(passwordCorrect)
+                    viewModel.checkForCurrentPassword(testPasswordEdittext.text.toString())
                     return@setOnEditorActionListener true
                 }
                 false
@@ -237,47 +270,51 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
         }
     }
 
-    private fun showError(correct: Boolean) {
+    private fun showError(state: PasswordState) {
         Util.hideKeyboard(this, 0)
         val icon: Drawable?
         with(binding) {
-            if (correct) {
-                testPasswordTextLayout.error = getString(R.string.test_pwd_accepted)
-                testPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
-                testPasswordTextLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium)
-                icon = ContextCompat.getDrawable(activity, R.drawable.ic_accept_test)
-                icon?.colorFilter = PorterDuffColorFilter(
-                    ContextCompat.getColor(activity, R.color.green_500_green_400),
-                    PorterDuff.Mode.SRC_ATOP
-                )
-                testPasswordTextErrorIcon.setImageDrawable(icon)
-                testPasswordBackupButton.setTextColor(
-                    getThemeColor(activity, R.attr.colorSecondary)
-                )
-                testPasswordEdittext.isEnabled = false
-                passwordReminderSucceeded()
-            } else {
-                counter++
-                testPasswordTextLayout.error = getString(R.string.test_pwd_wrong)
-                testPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
-                testPasswordTextLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error)
-                icon = ContextCompat.getDrawable(activity, R.drawable.ic_input_warning)
-                icon?.colorFilter = PorterDuffColorFilter(
-                    ContextCompat.getColor(activity, R.color.red_600_red_300),
-                    PorterDuff.Mode.SRC_ATOP
-                )
-                testPasswordTextErrorIcon.setImageDrawable(icon)
-                testPasswordBackupButton.setTextColor(
-                    ContextCompat.getColor(
-                        activity,
-                        R.color.red_600_red_300
+            when (state) {
+                PasswordState.Initial -> return@with
+                PasswordState.True -> {
+                    testPasswordTextLayout.error = getString(R.string.test_pwd_accepted)
+                    testPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
+                    testPasswordTextLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Medium)
+                    icon = ContextCompat.getDrawable(activity, R.drawable.ic_accept_test)
+                    icon?.colorFilter = PorterDuffColorFilter(
+                        ContextCompat.getColor(activity, R.color.green_500_green_400),
+                        PorterDuff.Mode.SRC_ATOP
                     )
-                )
-                if (counter == 3) {
-                    val intent = Intent(activity, ChangePasswordActivity::class.java)
-                    intent.putExtra(ChangePasswordActivity.KEY_IS_LOGOUT, isLogout)
-                    startActivity(intent)
-                    onBackPressedDispatcher.onBackPressed()
+                    testPasswordTextErrorIcon.setImageDrawable(icon)
+                    testPasswordBackupButton.setTextColor(
+                        getThemeColor(activity, R.attr.colorSecondary)
+                    )
+                    testPasswordEdittext.isEnabled = false
+                    passwordReminderSucceeded()
+                }
+                PasswordState.False -> {
+                    counter++
+                    testPasswordTextLayout.error = getString(R.string.test_pwd_wrong)
+                    testPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
+                    testPasswordTextLayout.setErrorTextAppearance(R.style.TextAppearance_InputHint_Error)
+                    icon = ContextCompat.getDrawable(activity, R.drawable.ic_input_warning)
+                    icon?.colorFilter = PorterDuffColorFilter(
+                        ContextCompat.getColor(activity, R.color.red_600_red_300),
+                        PorterDuff.Mode.SRC_ATOP
+                    )
+                    testPasswordTextErrorIcon.setImageDrawable(icon)
+                    testPasswordBackupButton.setTextColor(
+                        ContextCompat.getColor(
+                            activity,
+                            R.color.red_600_red_300
+                        )
+                    )
+                    if (counter == 3) {
+                        val intent = Intent(activity, ChangePasswordActivity::class.java)
+                        intent.putExtra(ChangePasswordActivity.KEY_IS_LOGOUT, isLogout)
+                        startActivity(intent)
+                        onBackPressedDispatcher.onBackPressed()
+                    }
                 }
             }
             testPasswordTextErrorIcon.visibility = View.VISIBLE
@@ -325,7 +362,7 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
         shouldBlockPasswordReminder()
         enableDismissPasswordReminder()
         incrementRequests()
-        megaApi.passwordReminderDialogSucceeded(this)
+        viewModel.notifyPasswordReminderSucceed()
         if (isLogout) {
             disableUI()
         } else {
@@ -341,14 +378,14 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
             }
         }
         incrementRequests()
-        megaApi.passwordReminderDialogSkipped(this)
+        viewModel.notifyPasswordReminderSkipped()
         shouldBlockPasswordReminder()
     }
 
     private fun shouldBlockPasswordReminder() {
         if (binding.passwordReminderCheckbox.isChecked) {
             incrementRequests()
-            megaApi.passwordReminderDialogBlocked(this)
+            viewModel.notifyPasswordReminderBlocked()
         }
     }
 
@@ -403,19 +440,7 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
      * onRequestFinish
      */
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
-        if (request.type == MegaRequest.TYPE_SET_ATTR_USER) {
-            if (request.paramType == MegaApiJava.USER_ATTR_PWD_REMINDER) {
-                numRequests--
-                if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_ENOENT) {
-                    Timber.d("New value of attribute USER_ATTR_PWD_REMINDER: ${request.text}")
-                    if (dismissPasswordReminder && isLogout && numRequests <= 0) {
-                        logout(this, megaApi, sharingScope)
-                    }
-                } else {
-                    Timber.e("Error: MegaRequest.TYPE_SET_ATTR_USER | MegaApiJava.USER_ATTR_PWD_REMINDER ${e.errorString}")
-                }
-            }
-        } else if (request.type == MegaRequest.TYPE_LOGOUT) {
+        if (request.type == MegaRequest.TYPE_LOGOUT) {
             Timber.d("END logout sdk request - wait chat logout")
         }
     }

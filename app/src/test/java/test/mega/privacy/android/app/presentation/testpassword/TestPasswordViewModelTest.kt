@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.testpassword.TestPasswordViewModel
+import mega.privacy.android.app.presentation.testpassword.model.PasswordState
 import mega.privacy.android.domain.usecase.BlockPasswordReminder
 import mega.privacy.android.domain.usecase.IsCurrentPassword
 import mega.privacy.android.domain.usecase.NotifyPasswordChecked
@@ -17,7 +18,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import kotlin.random.Random
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class TestPasswordViewModelTest {
@@ -42,18 +42,21 @@ internal class TestPasswordViewModelTest {
     }
 
     @Test
-    fun `test that checkForCurrentPassword should update state according to isCurrentPassword`() =
-        runTest {
-            val mockIsCurrentPassword = Random.nextBoolean()
+    fun `test that checkForCurrentPassword should update state according to isCurrentPassword`() {
+        fun verify(isCurrentPassword: Boolean, expected: PasswordState) = runTest {
             val mockPassword = "password"
-            whenever(isCurrentPassword(mockPassword)).thenReturn(mockIsCurrentPassword)
+            whenever(isCurrentPassword(mockPassword)).thenReturn(isCurrentPassword)
 
             underTest.checkForCurrentPassword(mockPassword)
 
             underTest.uiState.test {
-                assertThat(awaitItem().isCurrentPassword).isEqualTo(mockIsCurrentPassword)
+                assertThat(awaitItem().isCurrentPassword).isEqualTo(expected)
             }
         }
+
+        verify(true, PasswordState.True)
+        verify(false, PasswordState.False)
+    }
 
     @Test
     fun `test that notifyPasswordReminderSkipped should update state to true when no errors detected`() =
@@ -61,7 +64,7 @@ internal class TestPasswordViewModelTest {
             underTest.notifyPasswordReminderSkipped()
 
             underTest.uiState.test {
-                assertThat(awaitItem().isPasswordReminderNotified).isEqualTo(true)
+                assertThat(awaitItem().isPasswordReminderNotified).isEqualTo(PasswordState.True)
             }
         }
 
@@ -71,7 +74,7 @@ internal class TestPasswordViewModelTest {
             underTest.notifyPasswordReminderBlocked()
 
             underTest.uiState.test {
-                assertThat(awaitItem().isPasswordReminderNotified).isEqualTo(true)
+                assertThat(awaitItem().isPasswordReminderNotified).isEqualTo(PasswordState.True)
             }
         }
 
@@ -81,7 +84,7 @@ internal class TestPasswordViewModelTest {
             underTest.notifyPasswordReminderSucceed()
 
             underTest.uiState.test {
-                assertThat(awaitItem().isPasswordReminderNotified).isEqualTo(true)
+                assertThat(awaitItem().isPasswordReminderNotified).isEqualTo(PasswordState.True)
             }
         }
 
@@ -93,24 +96,40 @@ internal class TestPasswordViewModelTest {
             underTest.notifyPasswordReminderSkipped()
 
             underTest.uiState.test {
-                assertThat(awaitItem().isPasswordReminderNotified).isEqualTo(false)
+                assertThat(awaitItem().isPasswordReminderNotified).isEqualTo(PasswordState.False)
             }
         }
 
     @Test
-    fun `test that isCurrentPassword should reset to false when resetCurrentPassword is called`() =
+    fun `test that isCurrentPassword should reset to false when resetCurrentPasswordState is called`() =
         runTest {
             val mockPassword = "password"
             whenever(isCurrentPassword(mockPassword)).thenReturn(true)
 
             underTest.checkForCurrentPassword(mockPassword)
             underTest.uiState.test {
-                assertThat(awaitItem().isCurrentPassword).isEqualTo(true)
+                assertThat(awaitItem().isCurrentPassword).isNotEqualTo(PasswordState.Initial)
             }
 
             underTest.resetCurrentPasswordState()
             underTest.uiState.test {
-                assertThat(awaitItem().isCurrentPassword).isEqualTo(false)
+                assertThat(awaitItem().isCurrentPassword).isEqualTo(PasswordState.Initial)
+            }
+        }
+
+    @Test
+    fun `test that isPasswordReminderNotified should reset to false when resetPasswordReminderState is called`() =
+        runTest {
+            val mockPassword = "password"
+
+            underTest.notifyPasswordReminderSkipped()
+            underTest.uiState.test {
+                assertThat(awaitItem().isPasswordReminderNotified).isNotEqualTo(PasswordState.Initial)
+            }
+
+            underTest.resetPasswordReminderState()
+            underTest.uiState.test {
+                assertThat(awaitItem().isPasswordReminderNotified).isEqualTo(PasswordState.Initial)
             }
         }
 }
