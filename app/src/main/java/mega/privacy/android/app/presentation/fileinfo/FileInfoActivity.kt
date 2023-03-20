@@ -65,6 +65,11 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmD
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.FROM_INCOMING_SHARES
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FIRST_LEVEL
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM
+import mega.privacy.android.app.utils.Constants.OUTGOING_SHARES_ADAPTER
 import mega.privacy.android.app.utils.Constants.TAKEDOWN_URL
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.LinksUtil
@@ -86,7 +91,6 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -121,7 +125,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
 
     private lateinit var binding: ActivityFileInfoBinding
     private val bindingContent get() = binding.contentFileInfoActivity
-    private var firstIncomingLevel = true
     private val nodeAttacher = MegaAttacher(this)
     private val nodeSaver = NodeSaver(
         this, this, this,
@@ -145,7 +148,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
 
     private var progressDialog: Pair<AlertDialog, FileInfoJobInProgressState?>? = null
     private val density by lazy { outMetrics.density }
-    private var from = 0
     private var adapterType = 0
     private val adapter: MegaFileInfoSharedContactAdapter by lazy {
         MegaFileInfoSharedContactAdapter(
@@ -305,10 +307,11 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         viewModel.tempInit(getNodeFromExtras() ?: run {
             finish()
             return
-        })
+        }, getOriginFromExtras())
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         initFileBackupManager()
-        adapterType = intent.getIntExtra("adapterType", Constants.FILE_BROWSER_ADAPTER)
+        adapterType =
+            intent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FILE_BROWSER_ADAPTER)
 
         savedInstanceState?.apply {
             nodeAttacher.restoreState(this)
@@ -484,8 +487,8 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 node = state.typedNode,
                 isInInbox = state.isNodeInInbox,
                 isInRubbish = state.isNodeInRubbish,
-                fromIncomingShares = from == Constants.FROM_INCOMING_SHARES,
-                firstIncomingLevel = firstIncomingLevel,
+                fromIncomingShares = state.origin.fromInShares,
+                firstIncomingLevel = state.origin == FileInfoOrigin.IncomingSharesFirstLevel,
                 nodeAccess = state.accessPermission,
             )
         } else {
@@ -661,20 +664,32 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         )
     }
 
-    private fun getNodeFromExtras(): MegaNode? {
-        val extras = intent.extras
-        return if (extras != null) {
-            from = extras.getInt("from")
-            if (from == Constants.FROM_INCOMING_SHARES) {
-                firstIncomingLevel = extras.getBoolean(Constants.INTENT_EXTRA_KEY_FIRST_LEVEL)
-            }
+    private fun getNodeFromExtras() =
+        intent.extras?.let { extras ->
             val handleNode = extras.getLong("handle", -1)
             Timber.d("Handle of the selected node: %s", handleNode)
             megaApi.getNodeByHandle(handleNode)
 
-        } else {
+        } ?: run {
             Timber.w("Extras is NULL")
             null
+        }
+
+    private fun getOriginFromExtras(): FileInfoOrigin {
+        return when {
+            intent.extras?.getInt(INTENT_EXTRA_KEY_FROM) == FROM_INCOMING_SHARES -> {
+                if (intent.extras?.getBoolean(INTENT_EXTRA_KEY_FIRST_LEVEL) == true) {
+                    FileInfoOrigin.IncomingSharesFirstLevel
+                } else {
+                    FileInfoOrigin.IncomingSharesOtherLevel
+                }
+            }
+            intent.extras?.getInt(INTENT_EXTRA_KEY_ADAPTER_TYPE) == OUTGOING_SHARES_ADAPTER -> {
+                FileInfoOrigin.OutgoingShares
+            }
+            else -> {
+                FileInfoOrigin.Other
+            }
         }
     }
 

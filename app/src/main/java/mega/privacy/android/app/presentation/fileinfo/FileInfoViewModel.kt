@@ -15,6 +15,7 @@ import mega.privacy.android.app.domain.usecase.CheckNameCollision
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
+import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.node.model.getIcon
@@ -132,8 +133,12 @@ class FileInfoViewModel @Inject constructor(
         message = "This initial setup will be removed once MegaNode is not needed",
         replaceWith = ReplaceWith("setNode(handleNode: Long)")
     )
-    fun tempInit(node: MegaNode) {
+    fun tempInit(node: MegaNode, origin: FileInfoOrigin) {
+        Timber.d("FileInfo tempInit $origin")
         this.node = node
+        _uiState.update {
+            it.copy(origin = origin)
+        }
         setNode(node.handle)
     }
 
@@ -497,7 +502,7 @@ class FileInfoViewModel @Inject constructor(
             val isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue)
             uiState.copy(
                 typedNode = typedNode,
-                iconResource = typedNode.getIcon(),
+                iconResource = typedNode.getIcon(getDrawerItemForIcon()),
                 isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
                 isNodeInRubbish = isNodeInRubbish,
                 jobInProgressState = null,
@@ -531,10 +536,18 @@ class FileInfoViewModel @Inject constructor(
             typedNode = getNodeById(typedNode.id)
             it.copy(
                 typedNode = typedNode,
-                iconResource = typedNode.getIcon(),
+                iconResource = typedNode.getIcon(getDrawerItemForIcon()),
             )
         }
     }
+
+    private fun getDrawerItemForIcon() =
+        if (_uiState.value.origin != FileInfoOrigin.Other) {
+            DrawerItem.SHARED_ITEMS
+        } else {
+            //not relevant for the icon which one exactly, not SHARED_ITEMS
+            DrawerItem.HOMEPAGE
+        }
 
     private fun updatePreview() {
         viewModelScope.launch {

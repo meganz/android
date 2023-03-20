@@ -15,6 +15,7 @@ import nz.mega.sdk.MegaShare
 /**
  * Represents the view state of the File info screen
  * @param typedNode for this screen
+ * @param origin which origin the info screen was opened
  * @param oneOffViewEvent one-off events to be consumed by the view
  * @param jobInProgressState indicates if there are any job in progress that needs to be notified
  * @param historyVersions the num of history versions that this file contains, 0 if it's not a file or doesn't contain history versions
@@ -36,6 +37,7 @@ import nz.mega.sdk.MegaShare
  */
 data class FileInfoViewState(
     val typedNode: TypedNode? = null,
+    val origin: FileInfoOrigin = FileInfoOrigin.Other,
     val oneOffViewEvent: FileInfoOneOffViewEvent? = null,
     val jobInProgressState: FileInfoJobInProgressState? = FileInfoJobInProgressState.InitialLoading,
     val historyVersions: Int = 0,
