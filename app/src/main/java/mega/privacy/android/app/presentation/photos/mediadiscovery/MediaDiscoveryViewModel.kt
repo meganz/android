@@ -76,8 +76,10 @@ class MediaDiscoveryViewModel @Inject constructor(
 
             monitorMediaDiscoveryView().collectLatest { mediaDiscoveryViewSettings ->
                 _state.update {
-                    it.copy(mediaDiscoveryViewSettings = mediaDiscoveryViewSettings
-                        ?: MediaDiscoveryViewSettings.INITIAL.ordinal)
+                    it.copy(
+                        mediaDiscoveryViewSettings = mediaDiscoveryViewSettings
+                            ?: MediaDiscoveryViewSettings.INITIAL.ordinal
+                    )
                 }
             }
         }
@@ -138,6 +140,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         _state.update {
             it.copy(
                 uiPhotoList = uiPhotoList,
+                shouldBack = uiPhotoList.isEmpty(),
                 yearsCardList = yearsCardList,
                 monthsCardList = monthsCardList,
                 daysCardList = daysCardList,

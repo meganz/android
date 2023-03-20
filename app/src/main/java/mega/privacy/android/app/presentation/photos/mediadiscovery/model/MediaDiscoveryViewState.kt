@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
  * @property scrollStartIndex the start index of scroll
  * @property scrollStartOffset the start offset of scroll
  * @property mediaDiscoveryViewSettings media discovery dialog view settings
+ * @property shouldBack handle empty state, when no photos then back to file list page, eg, delete.
  */
 data class MediaDiscoveryViewState(
     val uiPhotoList: List<UIPhoto> = emptyList(),
@@ -34,5 +35,6 @@ data class MediaDiscoveryViewState(
     val daysCardList: List<DateCard> = emptyList(),
     val scrollStartIndex: Int = 0,
     val scrollStartOffset: Int = 0,
-    val mediaDiscoveryViewSettings: Int? = null
+    val mediaDiscoveryViewSettings: Int? = null,
+    val shouldBack: Boolean = false,
 )

@@ -11,6 +11,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,6 +27,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -43,10 +45,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
@@ -193,10 +195,21 @@ class MediaDiscoveryFragment : Fragment() {
     }
 
     @Composable
+    private fun Back() {
+        val onBackPressedDispatcher =
+            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+        LaunchedEffect(key1 = true) {
+            onBackPressedDispatcher?.onBackPressed()
+        }
+    }
+
+    @Composable
     fun MDContentBody(
         viewModel: MediaDiscoveryViewModel = viewModel(),
     ) {
         val uiState by viewModel.state.collectAsStateWithLifecycle()
+        if (uiState.shouldBack)
+            Back()
 
         val lazyGridState: LazyGridState =
             rememberSaveable(
@@ -216,8 +229,10 @@ class MediaDiscoveryFragment : Fragment() {
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 if (uiState.mediaDiscoveryViewSettings == MediaDiscoveryViewSettings.INITIAL.ordinal
-                    && arguments?.getBoolean(INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON,
-                        false) == false
+                    && arguments?.getBoolean(
+                        INTENT_KEY_OPEN_MEDIA_DISCOVERY_BY_MD_ICON,
+                        false
+                    ) == false
                 ) {
                     MediaDiscoveryDialog()
                 }
@@ -392,17 +407,21 @@ class MediaDiscoveryFragment : Fragment() {
             putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, nodeName)
             putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FROM_MEDIA_DISCOVERY)
-            putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                mediaDiscoveryViewModel.getNodeParentHandle(nodeHandle))
+            putExtra(
+                Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+                mediaDiscoveryViewModel.getNodeParentHandle(nodeHandle)
+            )
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
         startActivity(
             mediaDiscoveryViewModel.isLocalFile(nodeHandle)?.let { localPath ->
                 File(localPath).let { mediaFile ->
                     kotlin.runCatching {
-                        FileProvider.getUriForFile(requireActivity(),
+                        FileProvider.getUriForFile(
+                            requireActivity(),
                             AUTHORITY_STRING_FILE_PROVIDER,
-                            mediaFile)
+                            mediaFile
+                        )
                     }.onFailure {
                         Uri.fromFile(mediaFile)
                     }.map { mediaFileUri ->
