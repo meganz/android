@@ -41,9 +41,12 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
         versionName rootProject.appVersion
 
-        if (buildTypes.debug) {
+        if (isDebugBuild(gradle.startParameter.taskNames)) {
+            println("Create DEBUG build using static versionCode")
             versionCode 9999
+            versionNameSuffix "(9999_debug)"
         } else {
+            println("Create NORMAL build using dynamic versionCode")
             versionCode readVersionCode()
             versionNameSuffix "${readVersionNameChannel()}(${readVersionCode()}${readVersionNameTag()})(${getAppGitHash()})"
         }

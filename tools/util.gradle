@@ -265,6 +265,24 @@ Long getNocturnTimeout() {
     return defaultTimeout
 }
 
+/**
+ * Check gradle command parameter to decide whether it is debug build.
+ * @param taskNames list of gradle parameters, e.g. ["clean", "app:assembleGmsDebug"]
+ * @return whether user wants to create a DEBUG build.
+ */
+boolean isDebugBuild(List<String> taskNames) {
+    def debugBuild = false
+    taskNames
+            .collect { it.toLowerCase() }
+            .forEach { name ->
+                if (!name.contains("clean") && name.contains("debug")) {
+
+                    debugBuild =  true
+                }
+            }
+    return debugBuild
+}
+
 ext {
     readVersionCode = this.&readVersionCode
     readVersionNameTag = this.&readVersionNameTag
@@ -281,4 +299,5 @@ ext {
     shouldActivateGreeter = this.&shouldActivateGreeter
     shouldActivateNocturn = this.&shouldActivateNocturn
     getNocturnTimeout = this.&getNocturnTimeout
+    isDebugBuild = this.&isDebugBuild
 }
