@@ -9,8 +9,7 @@
         android:icon="@drawable/ic_options"
         android:orderInCategory="100"
         android:title="Slideshow options"
-        android:visible="false"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always"
-        tools:visible="true" />
+        tools:visible="true"/>
 </menu>

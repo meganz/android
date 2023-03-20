@@ -25,12 +25,6 @@ class SlideshowSettingsFragment : Fragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
-
-    companion object {
-        @JvmStatic
-        fun getInstance(): SlideshowSettingsFragment = SlideshowSettingsFragment()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         imageViewerActivity = activity as ImageViewerActivity

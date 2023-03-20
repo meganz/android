@@ -24,9 +24,6 @@
         android:name="mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowFragment"
         android:label="@string/action_slideshow"
         tools:layout="@layout/fragment_image_slideshow" >
-        <action
-            android:id="@+id/action_image_slideshow_to_slideshow_settings"
-            app:destination="@id/slideshow_settings" />
     </fragment>
 
     <fragment
@@ -37,5 +34,9 @@
     <fragment
         android:id="@+id/new_slideshow"
         android:name="mega.privacy.android.app.presentation.slideshow.SlideshowFragment"
-        android:label="@string/action_slideshow"/>
+        android:label="@string/action_slideshow">
+        <action
+            android:id="@+id/action_new_slideshow_to_slideshow_settings"
+            app:destination="@id/slideshow_settings" />
+    </fragment>
 </navigation>

@@ -2,6 +2,9 @@ package mega.privacy.android.app.presentation.slideshow
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.core.tween
@@ -34,10 +37,14 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -100,7 +107,36 @@ class SlideshowFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupObserver()
+        setupMenu()
     }
+
+    private fun setupMenu() {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.fragment_image_slideshow, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle the menu selection
+                return when (menuItem.itemId) {
+                    R.id.action_options -> {
+                        getNavController()?.navigate(
+                            SlideshowFragmentDirections.actionNewSlideshowToSlideshowSettings()
+                        )
+                        true
+                    }
+                    else -> true
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+    }
+
+    private fun getNavController(): NavController? =
+        activity?.let {
+            it.supportFragmentManager
+                .findFragmentById(R.id.images_nav_host_fragment) as NavHostFragment
+        }?.navController
 
     private fun setupObserver() {
         imageViewerViewModel.images.observe(viewLifecycleOwner) { items ->
