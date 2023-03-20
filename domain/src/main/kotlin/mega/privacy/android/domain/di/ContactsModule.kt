@@ -23,6 +23,8 @@ import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.account.DefaultUpdateCurrentUserName
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.contact.DefaultGetContactFromChat
+import mega.privacy.android.domain.usecase.contact.ApplyContactUpdateForUser
+import mega.privacy.android.domain.usecase.contact.DefaultApplyContactUpdatesForUser
 import mega.privacy.android.domain.usecase.contact.DefaultReloadContactDatabase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
 import mega.privacy.android.domain.usecase.contact.GetContactFromChat
@@ -36,6 +38,7 @@ import mega.privacy.android.domain.usecase.contact.GetUserLastName
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
 import mega.privacy.android.domain.usecase.contact.InviteContact
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
+import mega.privacy.android.domain.usecase.contact.SetUserAlias
 
 /**
  * Contacts module.
@@ -54,6 +57,9 @@ internal abstract class ContactsModule {
 
     @Binds
     abstract fun bindGetContactFromUserEmail(implementation: DefaultGetContactFromChat): GetContactFromChat
+
+    @Binds
+    abstract fun bindDefaultApplyContactUpdatesForUser(implementation: DefaultApplyContactUpdatesForUser): ApplyContactUpdateForUser
 
     companion object {
         @Provides
@@ -151,5 +157,9 @@ internal abstract class ContactsModule {
         @Provides
         fun provideGetContactItemFromUserEmail(contactsRepository: ContactsRepository): GetContactFromEmail =
             GetContactFromEmail(contactsRepository::getContactItemFromUserEmail)
+
+        @Provides
+        fun provideSetUserAlias(contactsRepository: ContactsRepository): SetUserAlias =
+            SetUserAlias(contactsRepository::setUserAlias)
     }
 }

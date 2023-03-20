@@ -693,4 +693,13 @@ interface MegaLocalStorageGateway {
         path: String,
         searchQuery: String?,
     ): List<OfflineInformation>
+
+    /**
+     * Set contact nick name
+     *
+     * @param nickName nick name
+     * @param handle user handle
+     * @return [Int] the number of rows effected
+     */
+    suspend fun setContactNickName(nickName: String, handle: Long): Int
 }

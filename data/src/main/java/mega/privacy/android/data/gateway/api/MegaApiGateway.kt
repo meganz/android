@@ -2059,4 +2059,13 @@ interface MegaApiGateway {
      * @param listener    MegaRequestListener to track this request
      */
     fun successPasswordReminderDialog(listener: MegaRequestListenerInterface)
+
+    /**
+     * Set user Alias Name
+     *
+     * @param userHandle User Handle
+     * @param name updated nick name
+     * @param listener mega request listener interface
+     */
+    fun setUserAlias(userHandle: Long, name: String?, listener: MegaRequestListenerInterface)
 }

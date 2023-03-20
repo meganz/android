@@ -15,10 +15,12 @@ class DefaultGetContactFromChat @Inject constructor(
      * invoke
      *
      * @param chatId chat id of selected chat
+     * @param skipCache If true, force read from backend, refresh cache and return.
+     *                  If false, use value in cache
      * @return [ContactItem] which contains contact information of selected user
      */
-    override suspend fun invoke(chatId: Long): ContactItem? {
+    override suspend fun invoke(chatId: Long, skipCache: Boolean): ContactItem? {
         val handle = contactsRepository.getUserEmailFromChat(chatId)
-        return handle?.let { getContactFromEmail(it) }
+        return handle?.let { getContactFromEmail(it, skipCache) }
     }
 }

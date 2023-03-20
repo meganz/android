@@ -31,17 +31,17 @@ class DefaultGetContactFromChatTest {
             on { email }.thenReturn(testEmail)
         }
         whenever(repository.getUserEmailFromChat(any())).thenReturn(testEmail)
-        whenever(getContactFromEmail(testEmail)).thenReturn(mockContact)
-        val contact = underTest(chatId = 123456789)
-        verify(getContactFromEmail, times(1)).invoke(any())
+        whenever(getContactFromEmail(testEmail, true)).thenReturn(mockContact)
+        val contact = underTest(chatId = 123456789, true)
+        verify(getContactFromEmail, times(1)).invoke(any(), any())
         assertEquals(testEmail, contact?.email)
     }
 
     @Test
     fun `test that when invalid chat is given nothing is returned`() = runTest {
         whenever(repository.getUserEmailFromChat(any())).thenReturn(null)
-        val contact = underTest(chatId = -1L)
-        verify(getContactFromEmail, times(0)).invoke(any())
+        val contact = underTest(chatId = -1L, skipCache = true)
+        verify(getContactFromEmail, times(0)).invoke(any(), any())
         assertNull(contact?.email)
     }
 }

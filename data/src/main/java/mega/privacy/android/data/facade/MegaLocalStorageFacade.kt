@@ -400,6 +400,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
         searchQuery: String?,
     ): List<OfflineInformation> = dbHandler.getOfflineInformationList(path, searchQuery)
 
+    override suspend fun setContactNickName(nickName: String, handle: Long) =
+        dbHandler.setContactNickname(nickname = nickName, handle = handle)
 
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200

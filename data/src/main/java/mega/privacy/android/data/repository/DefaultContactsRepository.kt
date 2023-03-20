@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.constant.FileConstant
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.findItemByHandle
@@ -192,9 +193,9 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun getContactData(contactItem: ContactItem): ContactData =
         withContext(ioDispatcher) {
             val email = contactItem.email
-            val fullName = getFullName(contactItem.handle)
-            val alias = getAlias(contactItem.handle)
-            val avatarUri = getAvatarUri(email, "${email}.jpg")
+            val fullName = runCatching { getUserFullName(contactItem.handle) }.getOrNull()
+            val alias = runCatching { getUserAlias(contactItem.handle) }.getOrNull()
+            val avatarUri = getAvatarUri(email)
 
             contactDataMapper(fullName, alias, avatarUri)
         }
@@ -206,18 +207,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 getContactItem(it, skipCache)
             }
         }
-
-    private suspend fun getFullName(handle: Long): String? =
-        runCatching { getUserFullName(handle) }.fold(
-            onSuccess = { fullName -> fullName },
-            onFailure = { null }
-        )
-
-    private suspend fun getAlias(handle: Long): String? =
-        runCatching { getUserAlias(handle) }.fold(
-            onSuccess = { alias -> alias },
-            onFailure = { null }
-        )
 
     override suspend fun getUserAlias(handle: Long): String =
         withContext(ioDispatcher) {
@@ -240,16 +229,30 @@ internal class DefaultContactsRepository @Inject constructor(
             }
         }
 
-    private suspend fun getAvatarUri(email: String, avatarFileName: String): String? =
+    override suspend fun getAvatarUri(email: String): String? =
         runCatching {
             val avatarFile =
-                cacheFolderGateway.getCacheFile(CacheFolderConstant.AVATAR_FOLDER, avatarFileName)
+                cacheFolderGateway.getCacheFile(
+                    CacheFolderConstant.AVATAR_FOLDER,
+                    email + FileConstant.JPG_EXTENSION
+                )
 
             getContactAvatar(email, avatarFile?.absolutePath ?: return@runCatching null)
         }.fold(
             onSuccess = { avatar -> avatar },
             onFailure = { null }
         )
+
+    override suspend fun deleteAvatar(email: String) {
+        withContext(ioDispatcher) {
+            val avatarFile =
+                cacheFolderGateway.getCacheFile(
+                    CacheFolderConstant.AVATAR_FOLDER,
+                    email + FileConstant.JPG_EXTENSION
+                )
+            avatarFile?.delete()
+        }
+    }
 
     private suspend fun getContactAvatar(
         email: String,
@@ -409,7 +412,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 }
 
                 if (changes.contains(UserChanges.Firstname) || changes.contains(UserChanges.Lastname)) {
-                    val fullName = getFullName(megaUser.handle)
+                    val fullName = runCatching { getUserFullName(megaUser.handle) }.getOrNull()
                     updatedContact?.contactData?.copy(fullName = fullName)?.let { contactData ->
                         updatedContact = updatedContact?.copy(contactData = contactData)
                     }
@@ -420,7 +423,7 @@ internal class DefaultContactsRepository @Inject constructor(
                 }
 
                 if (changes.contains(UserChanges.Avatar)) {
-                    val avatarUri = getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
+                    val avatarUri = getAvatarUri(megaUser.email)
                     updatedContact?.contactData?.copy(avatarUri = avatarUri)?.let { contactData ->
                         updatedContact = updatedContact?.copy(contactData = contactData)
                     }
@@ -440,15 +443,15 @@ internal class DefaultContactsRepository @Inject constructor(
         val fullName: String?
         val alias: String?
         if (skipCache) {
-            fullName = getFullName(megaUser.handle)
-            alias = getAlias(megaUser.handle)
+            fullName = runCatching { getUserFullName(megaUser.handle) }.getOrNull()
+            alias = runCatching { getUserAlias(megaUser.handle) }.getOrNull()
         } else {
             fullName = megaChatApiGateway.getUserFullNameFromCache(megaUser.handle)
             alias = megaChatApiGateway.getUserAliasFromCache(megaUser.handle)
         }
         val status = megaChatApiGateway.getUserOnlineStatus(megaUser.handle)
         val avatarUri = if (skipCache) {
-            getAvatarUri(megaUser.email, "${megaUser.email}.jpg")
+            getAvatarUri(megaUser.email)
         } else {
             cacheFolderGateway.getCacheFile(
                 folderName = CacheFolderConstant.AVATAR_FOLDER,
@@ -591,7 +594,9 @@ internal class DefaultContactsRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.getContact(userEmail)?.let { user ->
                 val userCredentials = getUserCredentials(user)
-                val name = getAlias(user.handle) ?: getFullName(user.handle) ?: userEmail
+                val name = runCatching { getUserAlias(user.handle) }.getOrNull()
+                    ?: runCatching { getUserFullName(user.handle, skipCache = false) }.getOrNull()
+                    ?: userEmail
 
                 contactCredentialsMapper(
                     userCredentials,
@@ -733,9 +738,26 @@ internal class DefaultContactsRepository @Inject constructor(
             chatRoom?.getPeerHandle(0)?.toBase64Handle()
         }
 
-    override suspend fun getContactItemFromUserEmail(email: String) = withContext(ioDispatcher) {
-        megaApiGateway.getContact(email)?.let {
-            getContactItem(it, true)
+    override suspend fun getContactItemFromUserEmail(email: String, skipCache: Boolean) =
+        withContext(ioDispatcher) {
+            megaApiGateway.getContact(email)?.let {
+                getContactItem(it, skipCache)
+            }
+        }
+
+    override suspend fun setUserAlias(name: String?, userHandle: Long) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine<String> { continuation ->
+            val listener = continuation.getRequestListener {
+                return@getRequestListener it.text
+            }
+            megaApiGateway.setUserAlias(
+                userHandle = userHandle,
+                name = name,
+                listener = listener
+            )
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }.also {
+            localStorageGateway.setContactNickName(it, userHandle)
         }
     }
 }

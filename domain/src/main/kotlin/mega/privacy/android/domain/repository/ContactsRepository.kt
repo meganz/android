@@ -297,7 +297,32 @@ interface ContactsRepository {
      * Get contact item from user email
      *
      * @param email user email
+     * @param skipCache If true, force read from backend, refresh cache and return.
+     *                  If false, use value in cache
      * @return [ContactItem]
      */
-    suspend fun getContactItemFromUserEmail(email: String): ContactItem?
+    suspend fun getContactItemFromUserEmail(email: String, skipCache: Boolean): ContactItem?
+
+    /**
+     * Set user alias
+     *
+     * @param name new nick name
+     * @param userHandle user handle
+     */
+    suspend fun setUserAlias(name: String?, userHandle: Long): String?
+
+    /**
+     * Get the alias of the given user if any
+     *
+     * @param email User email.
+     * @return User alias.
+     */
+    suspend fun getAvatarUri(email: String): String?
+
+    /**
+     * Deletes Avatar file from cache if exists
+     *
+     * @param email email id of the user
+     */
+    suspend fun deleteAvatar(email: String)
 }

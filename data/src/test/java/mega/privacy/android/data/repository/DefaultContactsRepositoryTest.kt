@@ -982,7 +982,7 @@ class DefaultContactsRepositoryTest {
             null
         )
 
-        val contact = underTest.getContactItemFromUserEmail(userEmail)
+        val contact = underTest.getContactItemFromUserEmail(userEmail, skipCache = true)
         assertEquals(contact, expectedContact)
     }
 }

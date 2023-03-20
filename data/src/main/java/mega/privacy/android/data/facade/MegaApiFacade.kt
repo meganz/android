@@ -1056,4 +1056,10 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun successPasswordReminderDialog(listener: MegaRequestListenerInterface) =
         megaApi.passwordReminderDialogSucceeded(listener)
+
+    override fun setUserAlias(
+        userHandle: Long,
+        name: String?,
+        listener: MegaRequestListenerInterface,
+    ) = megaApi.setUserAlias(userHandle, name, listener)
 }
