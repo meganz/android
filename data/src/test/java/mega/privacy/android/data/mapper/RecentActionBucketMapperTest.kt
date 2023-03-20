@@ -3,18 +3,21 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.data.mapper.recentactions.toRecentActionBucket
+import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
+import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapperImpl
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaNodeList
 import nz.mega.sdk.MegaRecentActionBucket
+import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecentActionBucketMapperTest {
+    private lateinit var underTest: RecentActionBucketMapper
 
     private val expectedName = "testName"
     private val expectedSize = 1000L
@@ -39,9 +42,14 @@ class RecentActionBucketMapperTest {
         on { nodes }.thenReturn(megaNodeList)
     }
 
+    @Before
+    fun setUp() {
+        underTest = RecentActionBucketMapperImpl()
+    }
+
     @Test
-    fun `test that mapper returns correct value `() = runTest {
-        val actual = toRecentActionBucket(
+    fun `test that mapper returns correct value`() = runTest {
+        val actual = underTest.invoke(
             recentActionBucket,
             thumbnailPath = { null },
             hasVersion = { false },
