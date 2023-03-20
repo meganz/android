@@ -22,7 +22,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.FragmentCreateAccountBinding
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.ColorUtils.resetEditTextUnderlineColor
 import mega.privacy.android.app.utils.ColorUtils.setEditTextUnderlineColor
@@ -100,10 +99,10 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
             val text = binding.createAccountEmailText.text
             return when {
                 text.isNullOrEmpty() -> {
-                    requireContext().getFormattedStringOrDefault(R.string.error_enter_email)
+                    getString(R.string.error_enter_email)
                 }
                 Constants.EMAIL_ADDRESS.matcher(text.toString()).matches().not() -> {
-                    requireContext().getFormattedStringOrDefault(R.string.error_invalid_email)
+                    getString(R.string.error_invalid_email)
                 }
                 else -> {
                     null
@@ -112,24 +111,24 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
         }
     private val usernameError: String?
         get() = if (binding.createAccountNameText.text.isNullOrEmpty()) {
-            requireContext().getFormattedStringOrDefault(R.string.error_enter_username)
+            getString(R.string.error_enter_username)
         } else {
             null
         }
     private val userLastnameError: String?
         get() = if (binding.createAccountLastNameText.text.isNullOrEmpty()) {
-            requireContext().getFormattedStringOrDefault(R.string.error_enter_userlastname)
+            getString(R.string.error_enter_userlastname)
         } else {
             null
         }
     private val passwordError: String?
         get() = when {
             binding.createAccountPasswordText.text.isNullOrEmpty() -> {
-                requireContext().getFormattedStringOrDefault(R.string.error_enter_password)
+                getString(R.string.error_enter_password)
             }
             !passwdValid -> {
                 binding.containerPasswdElements.isVisible = false
-                requireContext().getFormattedStringOrDefault(R.string.error_password)
+                getString(R.string.error_password)
             }
             else -> {
                 null
@@ -141,10 +140,10 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
             val confirm = binding.createAccountPasswordTextConfirm.text.toString()
             return when {
                 confirm.isEmpty() -> {
-                    requireContext().getFormattedStringOrDefault(R.string.error_enter_password)
+                    getString(R.string.error_enter_password)
                 }
                 password != confirm -> {
-                    requireContext().getFormattedStringOrDefault(R.string.error_passwords_dont_match)
+                    getString(R.string.error_passwords_dont_match)
                 }
                 else -> {
                     null
@@ -241,13 +240,13 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
         }
 
         tos.apply {
-            text = applyUnderlinedFormat(requireContext().getFormattedStringOrDefault(R.string.tos))
+            text = applyUnderlinedFormat(getString(R.string.tos))
             setOnClickListener {
                 Timber.d("Show ToS")
                 openLink(TOS)
             }
         }
-        var textToShowTOP = requireContext().getFormattedStringOrDefault(R.string.top)
+        var textToShowTOP = getString(R.string.top)
         try {
             textToShowTOP = textToShowTOP.replace("[B]", "<font color=\'#00BFA5\'>")
                 .replace("[/B]", "</font>")
@@ -263,7 +262,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
         }
 
         buttonCreateAccountCreate.apply {
-            text = requireContext().getFormattedStringOrDefault(R.string.create_account)
+            text = getString(R.string.create_account)
             setOnClickListener {
                 binding.createAccountEmailText.removeLeadingAndTrailingSpaces()
                 submitForm()
@@ -271,7 +270,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
         }
 
         buttonLoginCreate.apply {
-            text = requireContext().getFormattedStringOrDefault(R.string.login_text)
+            text = getString(R.string.login_text)
             setOnClickListener {
                 loginActivity?.showFragment(Constants.LOGIN_FRAGMENT)
             }
@@ -316,11 +315,10 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
             shapePasswdFourth.background = shapeDrawable
             shapePasswdFifth.background = shapeDrawable
             passwordType.apply {
-                text = requireContext().getFormattedStringOrDefault(R.string.pass_very_weak)
+                text = getString(R.string.pass_very_weak)
                 setTextColor(veryWeakColor)
             }
-            passwordAdviceText.text =
-                requireContext().getFormattedStringOrDefault(R.string.passwd_weak)
+            passwordAdviceText.text = getString(R.string.passwd_weak)
             passwdValid = false
             createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
             setEditTextUnderlineColor(createAccountPasswordText, R.color.red_600_red_300)
@@ -331,11 +329,10 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
             shapePasswdFourth.background = shapeDrawable
             shapePasswdFifth.background = shapeDrawable
             passwordType.apply {
-                text = requireContext().getFormattedStringOrDefault(R.string.pass_weak)
+                text = getString(R.string.pass_weak)
                 setTextColor(weakColor)
             }
-            passwordAdviceText.text =
-                requireContext().getFormattedStringOrDefault(R.string.passwd_weak)
+            passwordAdviceText.text = getString(R.string.passwd_weak)
             passwdValid = true
             createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak)
             setEditTextUnderlineColor(createAccountPasswordText, R.color.yellow_600_yellow_300)
@@ -346,11 +343,10 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
             shapePasswdFourth.background = shapeDrawable
             shapePasswdFifth.background = shapeDrawable
             passwordType.apply {
-                text = requireContext().getFormattedStringOrDefault(R.string.pass_medium)
+                text = getString(R.string.pass_medium)
                 setTextColor(mediumColor)
             }
-            passwordAdviceText.text =
-                requireContext().getFormattedStringOrDefault(R.string.passwd_medium)
+            passwordAdviceText.text = getString(R.string.passwd_medium)
             passwdValid = true
             createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
             setEditTextUnderlineColor(createAccountPasswordText, R.color.green_500_green_400)
@@ -361,11 +357,10 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
             shapePasswdFourth.background = goodDrawable
             shapePasswdFifth.background = shapeDrawable
             passwordType.apply {
-                text = requireContext().getFormattedStringOrDefault(R.string.pass_good)
+                text = getString(R.string.pass_good)
                 setTextColor(goodColor)
             }
-            passwordAdviceText.text =
-                requireContext().getFormattedStringOrDefault(R.string.passwd_good)
+            passwordAdviceText.text = getString(R.string.passwd_good)
             passwdValid = true
             createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good)
             setEditTextUnderlineColor(createAccountPasswordText, R.color.lime_green_500_200)
@@ -376,11 +371,10 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
             shapePasswdFourth.background = strongDrawable
             shapePasswdFifth.background = strongDrawable
             passwordType.apply {
-                text = requireContext().getFormattedStringOrDefault(R.string.pass_strong)
+                text = getString(R.string.pass_strong)
                 setTextColor(strongColor)
             }
-            passwordAdviceText.text =
-                requireContext().getFormattedStringOrDefault(R.string.passwd_strong)
+            passwordAdviceText.text = getString(R.string.passwd_strong)
             passwdValid = true
             createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Strong)
             setEditTextUnderlineColor(createAccountPasswordText, R.color.dark_blue_500_200)
@@ -398,9 +392,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
         binding.createAccountEmailText.hideKeyboard()
 
         if (!Util.isOnline(requireContext())) {
-            loginActivity?.showSnackbar(
-                requireContext().getFormattedStringOrDefault(R.string.error_server_connection_problem)
-            )
+            loginActivity?.showSnackbar(getString(R.string.error_server_connection_problem))
             return
         }
 
@@ -473,15 +465,11 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                 false
             }
             !createAccountChkTOS.isChecked -> {
-                loginActivity?.showSnackbar(
-                    requireContext().getFormattedStringOrDefault(R.string.create_account_no_terms)
-                )
+                loginActivity?.showSnackbar(getString(R.string.create_account_no_terms))
                 false
             }
             !checkboxTop.chkTop.isChecked -> {
-                loginActivity?.showSnackbar(
-                    requireContext().getFormattedStringOrDefault(R.string.create_account_no_top)
-                )
+                loginActivity?.showSnackbar(getString(R.string.create_account_no_top))
                 false
             }
             else -> {
@@ -497,52 +485,53 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
     override fun onRequestFinish(
         api: MegaApiJava, request: MegaRequest,
         e: MegaError,
-    ) = with(binding) {
+    ) {
         Timber.d("onRequestFinish")
-        if (!isAdded) return@with
+        if (!isAdded) return
 
-        if (e.errorCode != MegaError.API_OK) {
-            Timber.w("ERROR CODE: ${e.errorCode} ERROR MESSAGE: ${e.errorString}")
-            if (e.errorCode == MegaError.API_EEXIST) {
-                loginActivity?.showSnackbar(
-                    requireContext().getFormattedStringOrDefault(R.string.error_email_registered)
-                )
+        with(binding) {
 
-                createAccountCreateLayout.isVisible = true
-                createAccountCreatingLayout.isVisible = false
-                createAccountCreatingText.isVisible = false
-                createAccountProgressBar.isVisible = false
-            } else {
-                val message = e.errorString
-                loginActivity?.apply {
-                    showSnackbar(message)
-                    showFragment(Constants.LOGIN_FRAGMENT)
+            if (e.errorCode != MegaError.API_OK) {
+                Timber.w("ERROR CODE: ${e.errorCode} ERROR MESSAGE: ${e.errorString}")
+                if (e.errorCode == MegaError.API_EEXIST) {
+                    loginActivity?.showSnackbar(getString(R.string.error_email_registered))
+
+                    createAccountCreateLayout.isVisible = true
+                    createAccountCreatingLayout.isVisible = false
+                    createAccountCreatingText.isVisible = false
+                    createAccountProgressBar.isVisible = false
+                } else {
+                    val message = e.errorString
+                    loginActivity?.apply {
+                        showSnackbar(message)
+                        showFragment(Constants.LOGIN_FRAGMENT)
+                    }
+                    createAccountCreateLayout.isVisible = true
+                    createAccountCreatingLayout.isVisible = false
+                    createAccountCreatingText.isVisible = false
+                    createAccountProgressBar.isVisible = false
                 }
-                createAccountCreateLayout.isVisible = true
-                createAccountCreatingLayout.isVisible = false
-                createAccountCreatingText.isVisible = false
-                createAccountProgressBar.isVisible = false
-            }
-        } else {
-            dbH.clearEphemeral()
-            val ephemeral = EphemeralCredentials(
-                request.email,
-                request.password,
-                request.sessionKey,
-                request.name,
-                request.text
-            )
-            dbH.saveEphemeral(ephemeral)
-
-            if (createAccountEmailText.text != null && createAccountNameText.text != null
-                && createAccountLastNameText.text != null && createAccountPasswordText.text != null
-            ) {
-                (requireActivity() as LoginActivity?)?.setTemporalDataForAccountCreation(
-                    createAccountEmailText.text.toString().lowercase().trim { it <= ' ' },
-                    createAccountNameText.text.toString(),
-                    createAccountLastNameText.text.toString(),
-                    createAccountPasswordText.text.toString()
+            } else {
+                dbH.clearEphemeral()
+                val ephemeral = EphemeralCredentials(
+                    request.email,
+                    request.password,
+                    request.sessionKey,
+                    request.name,
+                    request.text
                 )
+                dbH.saveEphemeral(ephemeral)
+
+                if (createAccountEmailText.text != null && createAccountNameText.text != null
+                    && createAccountLastNameText.text != null && createAccountPasswordText.text != null
+                ) {
+                    (requireActivity() as LoginActivity?)?.setTemporalDataForAccountCreation(
+                        createAccountEmailText.text.toString().lowercase().trim { it <= ' ' },
+                        createAccountNameText.text.toString(),
+                        createAccountLastNameText.text.toString(),
+                        createAccountPasswordText.text.toString()
+                    )
+                }
             }
         }
     }
