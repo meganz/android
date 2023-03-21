@@ -786,6 +786,65 @@ interface MegaApiGateway {
     )
 
     /**
+     * Move a transfer to the top of the transfer queue
+     * <p>
+     * If the transfer is successfully moved, onTransferUpdate will be called
+     * for the corresponding listeners of the moved transfer and the new priority
+     * of the transfer will be available using MegaTransfer::getPriority
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_MOVE_TRANSFER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getTransferTag - Returns the tag of the transfer to move
+     * - MegaRequest::getFlag - Returns true (it means that it's an automatic move)
+     * - MegaRequest::getNumber - Returns MegaTransfer::MOVE_TYPE_TOP
+     *
+     * @param transferTag Tag of the transfer to move
+     * @param listener    MegaRequestListener to track this request
+     */
+    fun moveTransferToFirstByTag(transferTag: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Move a transfer to the top of the transfer queue
+     * <p>
+     * If the transfer is successfully moved, onTransferUpdate will be called
+     * for the corresponding listeners of the moved transfer and the new priority
+     * of the transfer will be available using MegaTransfer::getPriority
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_MOVE_TRANSFER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getTransferTag - Returns the tag of the transfer to move
+     * - MegaRequest::getFlag - Returns true (it means that it's an automatic move)
+     * - MegaRequest::getNumber - Returns MegaTransfer::MOVE_TYPE_TOP
+     *
+     * @param transferTag Tag of the transfer to move
+     * @param listener    MegaRequestListener to track this request
+     */
+    fun moveTransferToLastByTag(transferTag: Int, listener: MegaRequestListenerInterface)
+
+    /**
+     * Move a transfer before another one in the transfer queue
+     * <p>
+     * If the transfer is successfully moved, onTransferUpdate will be called
+     * for the corresponding listeners of the moved transfer and the new priority
+     * of the transfer will be available using MegaTransfer::getPriority
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_MOVE_TRANSFER
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getTransferTag - Returns the tag of the transfer to move
+     * - MegaRequest::getFlag - Returns false (it means that it's a manual move)
+     * - MegaRequest::getNumber - Returns the tag of the transfer with the target position
+     *
+     * @param transferTag     Tag of the transfer to move
+     * @param prevTransferTag Tag of the transfer with the target position
+     * @param listener        MegaRequestListener to track this request
+     */
+    fun moveTransferBeforeByTag(
+        transferTag: Int,
+        prevTransferTag: Int,
+        listener: MegaRequestListenerInterface,
+    )
+
+    /**
      * Gets all contacts of this MEGA account.
      *
      * @return List of [MegaUser] with all the contacts.

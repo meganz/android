@@ -127,4 +127,26 @@ interface TransferRepository {
      * Checks if exist ongoing transfers.
      */
     suspend fun ongoingTransfersExist(): Boolean
+
+    /**
+     * Move transfer to first by tag
+     *
+     * @param transferTag
+     */
+    suspend fun moveTransferToFirstByTag(transferTag: Int)
+
+    /**
+     * Move transfer to last by tag
+     *
+     * @param transferTag
+     */
+    suspend fun moveTransferToLastByTag(transferTag: Int)
+
+    /**
+     * Move transfer before by tag
+     *
+     * @param transferTag
+     * @param prevTransferTag
+     */
+    suspend fun moveTransferBeforeByTag(transferTag: Int, prevTransferTag: Int)
 }

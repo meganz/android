@@ -506,6 +506,22 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferToFirst(transfer, listener)
 
+    override fun moveTransferToLastByTag(
+        transferTag: Int,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.moveTransferToLastByTag(transferTag, listener)
+
+    override fun moveTransferBeforeByTag(
+        transferTag: Int,
+        prevTransferTag: Int,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.moveTransferBeforeByTag(transferTag, prevTransferTag, listener)
+
+    override fun moveTransferToFirstByTag(
+        transferTag: Int,
+        listener: MegaRequestListenerInterface
+    ) = megaApi.moveTransferToFirstByTag(transferTag, listener)
+
     override suspend fun isBusinessAccountActive(): Boolean = megaApi.isBusinessAccountActive
 
     companion object {

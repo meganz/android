@@ -10,6 +10,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -227,4 +228,29 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override suspend fun ongoingTransfersExist(): Boolean =
         megaApiGateway.numberOfPendingUploads > 0 || megaApiGateway.numberOfPendingDownloads > 0
+
+    override suspend fun moveTransferToFirstByTag(transferTag: Int) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("moveTransferToFirstByTag") { }
+            megaApiGateway.moveTransferToFirstByTag(transferTag, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun moveTransferToLastByTag(transferTag: Int) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener("moveTransferToLastByTag") { }
+            megaApiGateway.moveTransferToLastByTag(transferTag, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
+
+    override suspend fun moveTransferBeforeByTag(transferTag: Int, prevTransferTag: Int) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("moveTransferBeforeByTag") { }
+                megaApiGateway.moveTransferBeforeByTag(transferTag, prevTransferTag, listener)
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+            }
+        }
 }

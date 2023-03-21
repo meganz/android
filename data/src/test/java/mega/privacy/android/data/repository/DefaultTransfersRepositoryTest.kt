@@ -187,4 +187,138 @@ class DefaultTransfersRepositoryTest {
 
             underTest.cancelTransferByTag(transferTag)
         }
+
+    @Test
+    fun `test that moveTransferToFirstByTag returns success when MegaApi returns API_OK`() =
+        runTest {
+            val transferTag = 1000
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.moveTransferToFirstByTag(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.moveTransferToFirstByTag(transferTag)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that moveTransferToFirstByTag finishes with general MegaException when MegaApi returns error other than API_OK`() =
+        runTest {
+            val transferTag = 1000
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EFAILED)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.moveTransferToFirstByTag(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.moveTransferToFirstByTag(transferTag)
+        }
+
+    @Test
+    fun `test that moveTransferToLastByTag returns success when MegaApi returns API_OK`() =
+        runTest {
+            val transferTag = 1000
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.moveTransferToLastByTag(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.moveTransferToLastByTag(transferTag)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that moveTransferToLastByTag finishes with general MegaException when MegaApi returns error other than API_OK`() =
+        runTest {
+            val transferTag = 1000
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EFAILED)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.moveTransferToLastByTag(any(), any())).thenAnswer {
+                ((it.arguments[1]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.moveTransferToLastByTag(transferTag)
+        }
+
+    @Test
+    fun `test that moveTransferBeforeByTag returns success when MegaApi returns API_OK`() =
+        runTest {
+            val transferTag = 1000
+            val previousTransferTag = 1001
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_OK)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.moveTransferBeforeByTag(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.moveTransferBeforeByTag(transferTag, previousTransferTag)
+        }
+
+    @Test(expected = MegaException::class)
+    fun `test that moveTransferBeforeByTag finishes with general MegaException when MegaApi returns error other than API_OK`() =
+        runTest {
+            val transferTag = 1000
+            val previousTransferTag = 1001
+
+            val megaError = mock<MegaError> {
+                on { errorCode }.thenReturn(MegaError.API_EFAILED)
+            }
+
+            val megaRequest = mock<MegaRequest>()
+
+            whenever(megaApiGateway.moveTransferBeforeByTag(any(), any(), any())).thenAnswer {
+                ((it.arguments[2]) as OptionalMegaRequestListenerInterface).onRequestFinish(
+                    mock(),
+                    megaRequest,
+                    megaError,
+                )
+            }
+
+            underTest.moveTransferBeforeByTag(transferTag, previousTransferTag)
+        }
 }
