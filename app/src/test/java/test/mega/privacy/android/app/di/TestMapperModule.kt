@@ -5,9 +5,6 @@ import dagger.Provides
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import mega.privacy.android.app.data.mapper.DataMapper
-import mega.privacy.android.app.data.mapper.PushMessageMapper
-
 import mega.privacy.android.app.di.MapperModule
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
@@ -31,12 +28,6 @@ import org.mockito.kotlin.mock
 object TestMapperModule {
 
     val sortOrderIntMapper = mock<SortOrderIntMapper>()
-
-    @Provides
-    fun provideDataMapper(): DataMapper = mock()
-
-    @Provides
-    fun providePushMessageMapper(): PushMessageMapper = mock()
 
     @Provides
     fun provideRepeatModeMapper(): RepeatModeMapper = mock()

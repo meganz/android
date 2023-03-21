@@ -9,7 +9,7 @@ import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.data.extensions.enqueuePushMessage
 import mega.privacy.android.app.data.extensions.enqueueUniqueWorkNewToken
-import mega.privacy.android.app.data.mapper.DataMapper
+import mega.privacy.android.data.mapper.pushmessage.DataMapper
 import mega.privacy.android.app.utils.Constants.DEVICE_ANDROID
 import mega.privacy.android.domain.entity.pushes.MegaRemoteMessage
 import timber.log.Timber

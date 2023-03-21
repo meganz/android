@@ -5,10 +5,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
-import mega.privacy.android.app.data.mapper.DataMapper
-import mega.privacy.android.app.data.mapper.PushMessageMapper
-import mega.privacy.android.app.data.mapper.toData
-import mega.privacy.android.app.data.mapper.toPushMessage
 import mega.privacy.android.app.mediaplayer.mapper.PlaylistItemMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatModeMapper
 import mega.privacy.android.app.mediaplayer.mapper.RepeatToggleModeMapper
@@ -45,18 +41,6 @@ class MapperModule {
      */
     @Provides
     fun provideFavouriteMapper(): FavouriteMapper = ::toFavourite
-
-    /**
-     * Provide data mapper
-     */
-    @Provides
-    fun provideDataMapper(): DataMapper = ::toData
-
-    /**
-     * Provide push message mapper
-     */
-    @Provides
-    fun providePushMessageMapper(): PushMessageMapper = ::toPushMessage
 
     /**
      * Provide the RepeatModeMapper

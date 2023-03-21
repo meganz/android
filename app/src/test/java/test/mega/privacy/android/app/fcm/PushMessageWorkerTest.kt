@@ -18,7 +18,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.app.data.mapper.PushMessageMapper
+import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
 import mega.privacy.android.app.fcm.PushMessageWorker
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.exception.EmptyFolderException
