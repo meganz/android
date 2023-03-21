@@ -98,8 +98,6 @@ import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapperImpl
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapperImpl
-import mega.privacy.android.data.mapper.recentactions.RecentActionsMapper
-import mega.privacy.android.data.mapper.recentactions.RecentActionsMapperImpl
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapperImpl
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
@@ -242,9 +240,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindNodeShareKeyResultMapper(implementation: NodeShareKeyResultMapperImpl): NodeShareKeyResultMapper
-
-    @Binds
-    abstract fun bindRecentActionsMapper(implementation: RecentActionsMapperImpl): RecentActionsMapper
 
     @Binds
     abstract fun bindRecentActionBucketMapper(implementation: RecentActionBucketMapperImpl): RecentActionBucketMapper
