@@ -510,13 +510,6 @@ object MegaNodeUtil {
      * @return The icon of the folder to be displayed.
      */
     @JvmStatic
-    @Deprecated(
-        message = "MegaNode is not in our domain, we should use the function with [TypedFolderNode] parameter",
-        replaceWith = ReplaceWith(
-            expression = "mega.privacy.android.app.presentation.node.model.mapper.getFolderIcon"
-        ),
-        level = DeprecationLevel.WARNING
-    )
     fun getFolderIcon(node: MegaNode, drawerItem: DrawerItem): Int {
         return if (node.isInShare) {
             R.drawable.ic_folder_incoming
@@ -534,8 +527,17 @@ object MegaNodeUtil {
             }
         } else if (isOutShare(node)) {
             R.drawable.ic_folder_outgoing
-        } else if (!isRootBackupFolder(node) && isDeviceBackupFolder(node)) {
+        } else if (isRootBackupFolder(node)) {
+            R.drawable.ic_folder_list
+        } else if (isDeviceBackupFolder(node)) {
             getMyBackupSubFolderIcon(node)
+        } else if (isSubRootBackupFolder(node)) {
+            val nodeType = checkBackupNodeTypeByHandle(MegaApplication.getInstance().megaApi, node)
+            if (nodeType == BACKUP_FOLDER_CHILD || nodeType == BACKUP_FOLDER) {
+                R.drawable.ic_folder_list
+            } else {
+                R.drawable.ic_folder_list
+            }
         } else {
             R.drawable.ic_folder_list
         }

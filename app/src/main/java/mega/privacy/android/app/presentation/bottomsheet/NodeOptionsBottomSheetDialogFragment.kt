@@ -47,7 +47,6 @@ import mega.privacy.android.app.presentation.search.SearchViewModel
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FROM
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -864,19 +863,19 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 )
             } else if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.OUTGOING_TAB) {
                 fileInfoIntent.putExtra(
-                    Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                    "adapterType",
                     Constants.OUTGOING_SHARES_ADAPTER
                 )
             }
         } else if (drawerItem === DrawerItem.INBOX) {
             if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
-                fileInfoIntent.putExtra(INTENT_EXTRA_KEY_FROM, Constants.FROM_INBOX)
+                fileInfoIntent.putExtra("from", Constants.FROM_INBOX)
             }
         } else if (drawerItem === DrawerItem.SEARCH && nodeController.nodeComesFromIncoming(
                 node
             )
         ) {
-            fileInfoIntent.putExtra(INTENT_EXTRA_KEY_FROM, Constants.FROM_INCOMING_SHARES)
+            fileInfoIntent.putExtra("from", Constants.FROM_INCOMING_SHARES)
             val dBT = nodeController.getIncomingLevel(node)
             fileInfoIntent.putExtra(
                 Constants.INTENT_EXTRA_KEY_FIRST_LEVEL,
