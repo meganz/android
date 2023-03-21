@@ -81,14 +81,10 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
-import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
-import mega.privacy.android.data.mapper.contact.ContactCredentialsMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapperImpl
-import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
-import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapperImpl
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -246,12 +242,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindNodeShareKeyResultMapper(implementation: NodeShareKeyResultMapperImpl): NodeShareKeyResultMapper
-
-    @Binds
-    abstract fun bindContactCredentialsMapper(implementation: ContactCredentialsMapperImpl): ContactCredentialsMapper
-
-    @Binds
-    abstract fun bindMyAccountCredentialsMapper(implementation: MyAccountCredentialsMapperImpl): MyAccountCredentialsMapper
 
     @Binds
     abstract fun bindRecentActionsMapper(implementation: RecentActionsMapperImpl): RecentActionsMapper

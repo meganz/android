@@ -21,7 +21,7 @@ class FetchNodesUpdateMapperImplTest {
 
     @Before
     fun setUp() {
-        underTest = FetchNodesUpdateMapperImpl()
+        underTest = FetchNodesUpdateMapper()
     }
 
     @Test

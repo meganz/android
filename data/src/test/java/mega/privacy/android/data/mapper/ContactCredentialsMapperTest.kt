@@ -2,7 +2,6 @@ package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
-import mega.privacy.android.data.mapper.contact.ContactCredentialsMapperImpl
 import mega.privacy.android.domain.entity.contacts.AccountCredentials.ContactCredentials
 import org.junit.Before
 import org.junit.Test
@@ -16,7 +15,7 @@ class ContactCredentialsMapperTest {
 
     @Before
     fun setUp() {
-        underTest = ContactCredentialsMapperImpl()
+        underTest = ContactCredentialsMapper()
     }
 
     @Test
