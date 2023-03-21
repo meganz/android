@@ -1101,7 +1101,7 @@ class LoginFragment : Fragment() {
         if (loginActivity.intent.getStringExtra(Constants.EXTRA_CONFIRMATION) == null
             && !uiState.isAccountConfirmed
         ) {
-            if (getChatManagement().isPendingJoinLink) {
+            if (getChatManagement().isPendingJoinLink()) {
                 LoginActivity.isBackFromLoginPage = false
                 getChatManagement().pendingJoinLink = null
             }
@@ -1212,7 +1212,7 @@ class LoginFragment : Fragment() {
         } else {
             Timber.d("Go to ChooseAccountFragment")
             viewModel.updateIsAccountConfirmed(false)
-            if (getChatManagement().isPendingJoinLink) {
+            if (getChatManagement().isPendingJoinLink()) {
                 LoginActivity.isBackFromLoginPage = false
                 val intent = Intent(requireContext(), ManagerActivity::class.java)
                 intent.action = Constants.ACTION_JOIN_OPEN_CHAT_LINK

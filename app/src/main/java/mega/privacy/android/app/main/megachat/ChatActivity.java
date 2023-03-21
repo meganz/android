@@ -1544,9 +1544,9 @@ public class ChatActivity extends PasscodeActivity
                         boolean onlyMeInTheCall = result.component2();
                         boolean waitingForOthers = result.component3();
                         long millisecondsOnlyMeInCallDialog =
-                                TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().millisecondsOnlyMeInCallDialog);
+                                TimeUnit.MILLISECONDS.toSeconds(MegaApplication.getChatManagement().getMillisecondsOnlyMeInCallDialog());
 
-                        boolean hideDialogCall = MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored || !onlyMeInTheCall || (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0);
+                        boolean hideDialogCall = MegaApplication.getChatManagement().getHasEndCallDialogBeenIgnored() || !onlyMeInTheCall || (waitingForOthers && millisecondsOnlyMeInCallDialog <= 0);
 
                         if (hideDialogCall) {
                             hideDialogCall();
@@ -4358,7 +4358,7 @@ public class ChatActivity extends PasscodeActivity
                 })
                 .setNegativeButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call), (dialog, which) -> {
                     MegaApplication.getChatManagement().stopCounterToFinishCall();
-                    MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true;
+                    MegaApplication.getChatManagement().setHasEndCallDialogBeenIgnored(true);
                     hideDialogCall();
                 })
                 .setOnDismissListener(dialog -> isOnlyMeInCallDialogShown = false)
