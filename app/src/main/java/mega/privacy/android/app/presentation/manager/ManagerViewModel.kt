@@ -52,8 +52,6 @@ import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
-import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
@@ -61,11 +59,13 @@ import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
-import mega.privacy.android.domain.usecase.account.Check2FADialog
+import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
-import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
+import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import nz.mega.sdk.MegaNode
@@ -131,7 +131,7 @@ class ManagerViewModel @Inject constructor(
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
     monitorFinishActivity: MonitorFinishActivity,
-    private val check2FADialog: Check2FADialog,
+    private val requireTwoFactorAuthenticationUseCase: RequireTwoFactorAuthenticationUseCase,
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val setLatestTargetPath: SetLatestTargetPath,
     private val monitorSecurityUpgradeInApp: MonitorSecurityUpgradeInApp,
@@ -483,7 +483,7 @@ class ManagerViewModel @Inject constructor(
      */
     fun checkToShow2FADialog(newAccount: Boolean, firstLogin: Boolean) {
         viewModelScope.launch {
-            val result = check2FADialog(newAccount = newAccount, firstLogin = firstLogin)
+            val result = requireTwoFactorAuthenticationUseCase(newAccount = newAccount, firstLogin = firstLogin)
             _state.update { it.copy(show2FADialog = result) }
         }
     }

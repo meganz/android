@@ -1,6 +1,6 @@
-package mega.privacy.android.app.domain.usecase.environment
+package mega.privacy.android.domain.usecase.environment
 
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.repository.EnvironmentRepository
 import org.junit.Before
@@ -8,14 +8,14 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 
-class IsFirstLaunchTest {
-    private lateinit var underTest: IsFirstLaunch
+class IsFirstLaunchUseCaseTest {
+    private lateinit var underTest: IsFirstLaunchUseCase
 
     private val environmentRepository = mock<EnvironmentRepository>()
 
     @Before
     fun setUp() {
-        underTest = IsFirstLaunch(environmentRepository = environmentRepository)
+        underTest = IsFirstLaunchUseCase(environmentRepository = environmentRepository)
     }
 
     @Test
@@ -24,7 +24,7 @@ class IsFirstLaunchTest {
             onBlocking { getIsFirstLaunch() }.thenReturn(true)
         }
 
-        assertThat(underTest()).isTrue()
+        Truth.assertThat(underTest()).isTrue()
     }
 
     @Test
@@ -33,7 +33,7 @@ class IsFirstLaunchTest {
             onBlocking { getIsFirstLaunch() }.thenReturn(false)
         }
 
-        assertThat(underTest()).isFalse()
+        Truth.assertThat(underTest()).isFalse()
     }
 
     @Test
@@ -42,6 +42,6 @@ class IsFirstLaunchTest {
             onBlocking { getIsFirstLaunch() }.thenReturn(null)
         }
 
-        assertThat(underTest()).isTrue()
+        Truth.assertThat(underTest()).isTrue()
     }
 }

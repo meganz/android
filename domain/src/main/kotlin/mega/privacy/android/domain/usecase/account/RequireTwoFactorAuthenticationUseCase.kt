@@ -6,14 +6,14 @@ import javax.inject.Inject
 /**
  * Checks if 2FA alert dialog should be shown to the user
  */
-class DefaultCheck2FADialog @Inject constructor(
+class RequireTwoFactorAuthenticationUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-) : Check2FADialog {
+) {
 
     /**
      * Use-case returns true only for the second launch after sign up
      */
-    override suspend fun invoke(newAccount: Boolean, firstLogin: Boolean) = when {
+    suspend operator fun invoke(newAccount: Boolean, firstLogin: Boolean) = when {
         newAccount -> {
             accountRepository.update2FADialogPreference(true)
             false

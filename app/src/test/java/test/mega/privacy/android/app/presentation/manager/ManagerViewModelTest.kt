@@ -45,7 +45,7 @@ import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
-import mega.privacy.android.domain.usecase.account.Check2FADialog
+import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -135,7 +135,7 @@ class ManagerViewModelTest {
             canRequestOptInVerification = false
         )
     )
-    private val check2FADialog = mock<Check2FADialog>()
+    private val requireTwoFactorAuthenticationUseCase = mock<RequireTwoFactorAuthenticationUseCase>()
     private val setLatestTargetPath = mock<SetLatestTargetPath>()
 
     @get:Rule
@@ -171,7 +171,7 @@ class ManagerViewModelTest {
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
             monitorFinishActivity = { monitorFinishActivity },
             monitorVerificationStatus = { monitorVerificationStatus },
-            check2FADialog = check2FADialog,
+            requireTwoFactorAuthenticationUseCase = requireTwoFactorAuthenticationUseCase,
             setLatestTargetPath = setLatestTargetPath,
             monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
             listenToNewMedia = mock()
@@ -383,7 +383,7 @@ class ManagerViewModelTest {
 
     @Test
     fun `test when check2FADialog returns false show2FADialog flow updated to false`() = runTest {
-        whenever(check2FADialog(newAccount = false, firstLogin = true)).thenReturn(false)
+        whenever(requireTwoFactorAuthenticationUseCase(newAccount = false, firstLogin = true)).thenReturn(false)
         underTest.checkToShow2FADialog(newAccount = false, firstLogin = true)
         underTest.state.map { it }.distinctUntilChanged().test {
             assertThat(awaitItem().show2FADialog).isFalse()
@@ -392,7 +392,7 @@ class ManagerViewModelTest {
 
     @Test
     fun `test when check2FADialog returns true show2FADialog flow updated to true`() = runTest {
-        whenever(check2FADialog(newAccount = false, firstLogin = true)).thenReturn(true)
+        whenever(requireTwoFactorAuthenticationUseCase(newAccount = false, firstLogin = true)).thenReturn(true)
         underTest.checkToShow2FADialog(newAccount = false, firstLogin = true)
         testScheduler.advanceUntilIdle()
         underTest.state.map { it }.distinctUntilChanged().test {
