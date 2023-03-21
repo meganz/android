@@ -2,7 +2,6 @@ package mega.privacy.android.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
-import mega.privacy.android.data.mapper.chat.ChatRequestMapperImpl
 import mega.privacy.android.domain.entity.ChatPeer
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.ChatRequestType
@@ -27,7 +26,7 @@ class ChatRequestMapperTest {
 
     @Before
     fun setUp() {
-        underTest = ChatRequestMapperImpl()
+        underTest = ChatRequestMapper()
     }
 
     @Test

@@ -1,11 +1,12 @@
 package mega.privacy.android.data.mapper.chat
 
 import mega.privacy.android.domain.entity.user.UserLastGreen
+import javax.inject.Inject
 
 /**
  * Mapper to convert data into [UserLastGreen].
  */
-internal fun interface UserLastGreenMapper {
+internal class UserLastGreenMapper @Inject constructor() {
 
     /**
      * Invoke.
@@ -14,5 +15,5 @@ internal fun interface UserLastGreenMapper {
      * @param lastGreen User last green.
      * @return [UserLastGreen]
      */
-    operator fun invoke(handle: Long, lastGreen: Int): UserLastGreen
+    operator fun invoke(handle: Long, lastGreen: Int) = UserLastGreen(handle, lastGreen)
 }

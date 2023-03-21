@@ -81,14 +81,6 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
-import mega.privacy.android.data.mapper.chat.ChatRequestMapper
-import mega.privacy.android.data.mapper.chat.ChatRequestMapperImpl
-import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
-import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapperImpl
-import mega.privacy.android.data.mapper.chat.OnlineStatusMapper
-import mega.privacy.android.data.mapper.chat.OnlineStatusMapperImpl
-import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
-import mega.privacy.android.data.mapper.chat.UserLastGreenMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapperImpl
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
@@ -275,18 +267,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindMyAccountCredentialsMapper(implementation: MyAccountCredentialsMapperImpl): MyAccountCredentialsMapper
-
-    @Binds
-    abstract fun bindMegaChatPeerListMapper(implementation: MegaChatPeerListMapperImpl): MegaChatPeerListMapper
-
-    @Binds
-    abstract fun bindUserLastGreenMapper(implementation: UserLastGreenMapperImpl): UserLastGreenMapper
-
-    @Binds
-    abstract fun bindOnlineStatusMapper(implementation: OnlineStatusMapperImpl): OnlineStatusMapper
-
-    @Binds
-    abstract fun bindChatRequestMapper(implementation: ChatRequestMapperImpl): ChatRequestMapper
 
     @Binds
     abstract fun bindRecentActionsMapper(implementation: RecentActionsMapperImpl): RecentActionsMapper

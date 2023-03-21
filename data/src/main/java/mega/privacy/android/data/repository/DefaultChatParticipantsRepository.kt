@@ -6,7 +6,7 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.data.mapper.chat.OnlineStatusMapperImpl.Companion.userStatus
+import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
 import mega.privacy.android.data.mapper.userPermission
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant

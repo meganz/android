@@ -32,7 +32,7 @@ import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper
-import mega.privacy.android.data.mapper.chat.OnlineStatusMapperImpl.Companion.userStatus
+import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
 import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
