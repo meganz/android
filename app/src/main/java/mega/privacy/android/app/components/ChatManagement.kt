@@ -23,8 +23,10 @@ import mega.privacy.android.app.meeting.listeners.DisableAudioVideoCallListener
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.VideoCaptureUtils
+import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.meeting.HangChatCall
+import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatCall
@@ -36,17 +38,19 @@ import javax.inject.Singleton
 /**
  * Class for chat management
  *
- * @property applicationScope       [CoroutineScope]
- * @property hangChatCall           [HangChatCall]
- * @property rtcAudioManagerGateway [RTCAudioManagerGateway]
- * @property megaChatApi            [MegaChatApiAndroid]
+ * @property applicationScope               [CoroutineScope]
+ * @property hangChatCall                   [HangChatCall]
+ * @property sendStatisticsMeetingsUseCase  [SendStatisticsMeetingsUseCase]
+ * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
+ * @property megaChatApi                    [MegaChatApiAndroid]
  */
 @Singleton
 class ChatManagement @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val hangChatCall: HangChatCall,
+    private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
-    private val megaChatApi: MegaChatApiAndroid
+    private val megaChatApi: MegaChatApiAndroid,
 ) {
     private val chatRoomListener: ChatRoomListener = ChatRoomListener()
     private val app: MegaApplication = getInstance()
@@ -128,8 +132,7 @@ class ChatManagement @Inject constructor(
      *
      * @param chatId The chat ID.
      */
-    private fun closeChatRoom(chatId: Long) =
-        megaChatApi.closeChatRoom(chatId, chatRoomListener)
+    private fun closeChatRoom(chatId: Long) = megaChatApi.closeChatRoom(chatId, chatRoomListener)
 
     /**
      * Check if there is a pending join link
@@ -481,7 +484,12 @@ class ChatManagement @Inject constructor(
                             Pair.create(chatId, false)
                         )
                         applicationScope.launch {
-                            hangChatCall(call.callId)
+                            kotlin.runCatching {
+                                hangChatCall(call.callId)
+                                sendStatisticsMeetingsUseCase(EndedEmptyCallTimeout())
+                            }.onFailure { exception ->
+                                Timber.e(exception.message)
+                            }.onSuccess { Timber.d("Call hung up due to timeout") }
                         }
                     }
                 }
@@ -675,5 +683,4 @@ class ChatManagement @Inject constructor(
             }
         }
     }
-
 }

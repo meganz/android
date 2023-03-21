@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.calls.SettingsCallsViewModel
 import mega.privacy.android.domain.entity.CallsSoundNotifications
+import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 import org.junit.After
@@ -38,6 +39,8 @@ class SettingsCallsViewModelTest {
 
     private val scheduler = TestCoroutineScheduler()
 
+    private val sendStatisticsMeetings = mock<SendStatisticsMeetingsUseCase>()
+
     private val standardDispatcher = StandardTestDispatcher(scheduler)
 
     @Before
@@ -46,6 +49,7 @@ class SettingsCallsViewModelTest {
         underTest = SettingsCallsViewModel(
             getCallsSoundNotifications = getCallsSoundNotifications,
             setCallsSoundNotifications = setCallsSoundNotifications,
+            sendStatisticsMeetingsUseCase = sendStatisticsMeetings,
             ioDispatcher = standardDispatcher
         )
     }

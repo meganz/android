@@ -1,7 +1,5 @@
 package mega.privacy.android.app.presentation.chat.groupInfo
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -25,12 +23,15 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.groupInfo.model.GroupInfoState
+import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
+import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
@@ -39,13 +40,15 @@ import javax.inject.Inject
 /**
  * GroupChatInfoActivity view model.
  *
- * @property setOpenInvite               [SetOpenInvite]
- * @property startChatCall               [StartChatCall]
- * @property getChatRoomUseCase          [GetChatRoomUseCase]
- * @property passcodeManagement          [PasscodeManagement]
- * @property chatApiGateway              [MegaChatApiGateway]
- * @property cameraGateway               [CameraGateway]
- * @property chatManagement              [ChatManagement]
+ * @property setOpenInvite                  [SetOpenInvite]
+ * @property startChatCall                  [StartChatCall]
+ * @property getChatRoomUseCase             [GetChatRoomUseCase]
+ * @property passcodeManagement             [PasscodeManagement]
+ * @property chatApiGateway                 [MegaChatApiGateway]
+ * @property cameraGateway                  [CameraGateway]
+ * @property chatManagement                 [ChatManagement]
+ * @property endCallUseCase                 [EndCallUseCase]
+ * @property sendStatisticsMeetingsUseCase  [SendStatisticsMeetingsUseCase]
  * @property state                       Current view state as [GroupInfoState]
  */
 @HiltViewModel
@@ -58,6 +61,8 @@ class GroupChatInfoViewModel @Inject constructor(
     private val chatApiGateway: MegaChatApiGateway,
     private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
+    private val endCallUseCase: EndCallUseCase,
+    private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
 ) : BaseRxViewModel() {
 
     /**
@@ -89,6 +94,21 @@ class GroupChatInfoViewModel @Inject constructor(
         super.onCleared()
         LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
             .removeObserver(openInviteChangeObserver)
+    }
+
+    /**
+     * Sets chat id
+     *
+     * @param newChatId   Chat id.
+     */
+    fun setChatId(newChatId: Long) {
+        if (newChatId != chatApiGateway.getChatInvalidHandle() && newChatId != state.value.chatId) {
+            _state.update {
+                it.copy(
+                    chatId = newChatId
+                )
+            }
+        }
     }
 
     /**
@@ -143,10 +163,12 @@ class GroupChatInfoViewModel @Inject constructor(
     private fun startCall(chatId: Long, video: Boolean, audio: Boolean) {
         if (chatApiGateway.getChatCall(chatId) != null) {
             Timber.d("There is a call, open it")
-            CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,
+            CallUtil.openMeetingInProgress(
+                MegaApplication.getInstance().applicationContext,
                 chatId,
                 true,
-                passcodeManagement)
+                passcodeManagement
+            )
             return
         }
 
@@ -174,12 +196,33 @@ class GroupChatInfoViewModel @Inject constructor(
                         }
                     }
 
-                    openMeetingWithAudioOrVideo(MegaApplication.getInstance().applicationContext,
+                    openMeetingWithAudioOrVideo(
+                        MegaApplication.getInstance().applicationContext,
                         resultChatId,
                         audioEnable,
                         videoEnable,
-                        passcodeManagement)
+                        passcodeManagement
+                    )
                 }
+            }
+        }
+    }
+
+    /**
+     * End for all the current call
+     */
+    fun endCallForAll() {
+        endCallUseCase.endCallForAllWithChatId(_state.value.chatId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(onError = { error ->
+                Timber.e(error.stackTraceToString())
+            })
+            .addTo(composite)
+
+        viewModelScope.launch {
+            kotlin.runCatching {
+                sendStatisticsMeetingsUseCase(EndCallForAll())
             }
         }
     }

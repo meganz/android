@@ -56,15 +56,19 @@ import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
+import mega.privacy.android.domain.entity.statistics.EndCallForAll
+import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.SetOpenInvite
+import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaChatCall.*
-import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
 import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatCall.*
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaChatVideoListenerInterface
 import nz.mega.sdk.MegaHandleList
@@ -90,6 +94,7 @@ import javax.inject.Inject
  * @property megaChatApiGateway             [MegaChatApiGateway]
  * @property passcodeManagement             [PasscodeManagement]
  * @property chatManagement                 [ChatManagement]
+ * @property sendStatisticsMeetingsUseCase  [SendStatisticsMeetingsUseCase]
  * @property state                       Current view state as [InMeetingState]
  */
 @HiltViewModel
@@ -107,6 +112,7 @@ class InMeetingViewModel @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
+    private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     monitorConnectivity: MonitorConnectivity,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
@@ -483,6 +489,12 @@ class InMeetingViewModel @Inject constructor(
             _showOnlyMeBanner.value = false
             _showWaitingForOthersBanner.value = true
         }
+
+        viewModelScope.launch {
+            kotlin.runCatching {
+                sendStatisticsMeetingsUseCase(StayOnCallEmptyCall())
+            }
+        }
     }
 
     /**
@@ -493,6 +505,12 @@ class InMeetingViewModel @Inject constructor(
         _showOnlyMeBanner.value = false
         _showWaitingForOthersBanner.value = false
         hangCall()
+
+        viewModelScope.launch {
+            kotlin.runCatching {
+                sendStatisticsMeetingsUseCase(EndCallEmptyCall())
+            }
+        }
     }
 
     /**
@@ -2530,6 +2548,12 @@ class InMeetingViewModel @Inject constructor(
     fun endCallForAll() {
         callLiveData.value?.let { call ->
             endCallForAll(call.chatid)
+        }
+
+        viewModelScope.launch {
+            kotlin.runCatching {
+                sendStatisticsMeetingsUseCase(EndCallForAll())
+            }
         }
     }
 

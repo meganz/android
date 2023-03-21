@@ -140,12 +140,17 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
     var isChatOpen = false
     var chatLink: String? = null
-    var chat: MegaChatRoom? = null
     var chatC: ChatController? = null
     var chatHandle: Long = 0
     var selectedHandleParticipant: Long = 0
     var participantsCount: Long = 0
     var endCallForAllShouldBeVisible = false
+
+    var chat: MegaChatRoom? = null
+        set(value) {
+            value?.let { viewModel.setChatId(it.chatId) }
+            field = value
+        }
 
     private var groupChatInfoActivity: GroupChatInfoActivity? = null
     private var permissionsDialog: AlertDialog? = null
@@ -815,21 +820,10 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
             .setPositiveButton(R.string.meetings_chat_screen_dialog_positive_button_end_call_for_all) { _: DialogInterface?, _: Int ->
                 dismissAlertDialogIfExists(endCallForAllDialog)
-                endCallForAll()
+                viewModel.endCallForAll()
             }
             .show()
     }
-
-    /**
-     * Method to end call for all
-     */
-    private fun endCallForAll() =
-        chat?.let { chatRoom ->
-            endCallUseCase.endCallForAllWithChatId(chatRoom.chatId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({}) { error: Throwable -> Timber.e("Error $error") }
-        }
 
     /**
      * Sends a broadcast to leave the chat from Chat activity and finishes.

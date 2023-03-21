@@ -3,6 +3,9 @@ package mega.privacy.android.app.presentation.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -20,6 +23,7 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.model.ChatState
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isPast
+import mega.privacy.android.app.usecase.call.EndCallUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.StorageState
@@ -27,6 +31,9 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
+import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
+import mega.privacy.android.domain.entity.statistics.EndCallForAll
+import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
@@ -34,6 +41,7 @@ import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
 import timber.log.Timber
@@ -55,6 +63,8 @@ import javax.inject.Inject
  * @property getScheduledMeetingByChat          [GetScheduledMeetingByChat]
  * @property getChatCall                        [GetChatCall]
  * @property monitorChatCallUpdates             [MonitorChatCallUpdates]
+ * @property endCallUseCase                     [EndCallUseCase]
+ * @property sendStatisticsMeetingsUseCase      [SendStatisticsMeetingsUseCase]
  * @property isConnected True if the app has some network connection, false otherwise.
  */
 @HiltViewModel
@@ -74,6 +84,8 @@ class ChatViewModel @Inject constructor(
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCall: GetChatCall,
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val endCallUseCase: EndCallUseCase,
+    private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
 ) : ViewModel() {
 
     /**
@@ -370,5 +382,61 @@ class ChatViewModel @Inject constructor(
         }
 
         answerCall(chatId, video, audio)
+    }
+
+    /**
+     * Control when Stay on call option is chosen
+     */
+    fun checkStayOnCall() {
+        MegaApplication.getChatManagement().stopCounterToFinishCall()
+        MegaApplication.getChatManagement().hasEndCallDialogBeenIgnored = true
+
+        viewModelScope.launch {
+            kotlin.runCatching {
+                sendStatisticsMeetingsUseCase(StayOnCallEmptyCall())
+            }
+        }
+    }
+
+    /**
+     * Control when End call now option is chosen
+     */
+    fun checkEndCall() {
+        MegaApplication.getChatManagement().stopCounterToFinishCall()
+
+        chatApiGateway.getChatCall(_state.value.chatId)?.let { call ->
+            endCallUseCase.hangCall(call.callId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(onError = { error ->
+                    Timber.e(error.stackTraceToString())
+                })
+        }
+
+        viewModelScope.launch {
+            kotlin.runCatching {
+                sendStatisticsMeetingsUseCase(EndCallEmptyCall())
+            }
+        }
+    }
+
+    /**
+     * End for all the current call
+     */
+    fun endCallForAll() {
+        endCallUseCase.run {
+            endCallForAllWithChatId(_state.value.chatId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(onError = { error ->
+                    Timber.e(error.stackTraceToString())
+                })
+        }
+
+        viewModelScope.launch {
+            kotlin.runCatching {
+                sendStatisticsMeetingsUseCase(EndCallForAll())
+            }
+        }
     }
 }

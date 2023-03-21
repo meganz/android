@@ -231,7 +231,6 @@ import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -3777,23 +3776,9 @@ public class ChatActivity extends PasscodeActivity
                 .setNegativeButton(R.string.meetings_chat_screen_dialog_negative_button_end_call_for_all, (dialogInterface, i) -> AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog))
                 .setPositiveButton(R.string.meetings_chat_screen_dialog_positive_button_end_call_for_all, (dialogInterface, i) -> {
                     AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog);
-                    endCallForAll();
+                    viewModel.endCallForAll();
                 })
                 .show();
-    }
-
-    /**
-     * Method to end call for all
-     */
-    private void endCallForAll() {
-        if (chatRoom == null)
-            return;
-
-        endCallUseCase.endCallForAllWithChatId(chatRoom.getChatId())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> {
-                }, (error) -> Timber.e("Error " + error));
     }
 
     private boolean checkPermissions(int requestCode, String... permissions) {
@@ -4344,21 +4329,11 @@ public class ChatActivity extends PasscodeActivity
                         StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call))
                 .setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
                 .setPositiveButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call), (dialog, which) -> {
-                    MegaApplication.getChatManagement().stopCounterToFinishCall();
+                    viewModel.checkEndCall();
                     hideDialogCall();
-                    MegaChatCall call = megaChatApi.getChatCall(chatRoom.getChatId());
-
-                    if (call != null) {
-                        endCallUseCase.hangCall(call.getCallId())
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe(() -> {
-                                }, (error) -> Timber.e("Error " + error));
-                    }
                 })
                 .setNegativeButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call), (dialog, which) -> {
-                    MegaApplication.getChatManagement().stopCounterToFinishCall();
-                    MegaApplication.getChatManagement().setHasEndCallDialogBeenIgnored(true);
+                    viewModel.checkStayOnCall();
                     hideDialogCall();
                 })
                 .setOnDismissListener(dialog -> isOnlyMeInCallDialogShown = false)
