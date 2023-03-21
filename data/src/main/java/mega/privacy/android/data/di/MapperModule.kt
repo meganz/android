@@ -43,7 +43,6 @@ import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
-import mega.privacy.android.data.mapper.MegaTransferMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
@@ -62,7 +61,6 @@ import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
-import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserSetMapper
@@ -161,8 +159,6 @@ import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionOptionList
 import mega.privacy.android.data.mapper.toSubscriptionStatus
-import mega.privacy.android.data.mapper.toTransferEventModel
-import mega.privacy.android.data.mapper.toTransferModel
 import mega.privacy.android.data.mapper.toUserAlert
 import mega.privacy.android.data.mapper.toUserSet
 import mega.privacy.android.data.mapper.toVideo
@@ -324,27 +320,10 @@ internal abstract class MapperModule {
         fun provideStartScreenMapper(): StartScreenMapper = { StartScreen(it) }
 
         /**
-         * Provide mega transfer mapper
-         */
-        @Provides
-        fun provideMegaTransferMapper(): MegaTransferMapper = ::toTransferModel
-
-        /**
          * Provide mega exception mapper
          */
         @Provides
         fun provideMegaExceptionMapper(): MegaExceptionMapper = ::toMegaExceptionModel
-
-        /**
-         * Provide transfer event mapper
-         */
-        @Provides
-        fun provideTransferEventMapper(
-            exceptionMapper: MegaExceptionMapper,
-            transferMapper: MegaTransferMapper,
-        ): TransferEventMapper = { event ->
-            toTransferEventModel(event, transferMapper, exceptionMapper)
-        }
 
         /**
          * Provide images mapper

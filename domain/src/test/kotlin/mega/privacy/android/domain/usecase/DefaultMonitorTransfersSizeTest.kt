@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.math.BigInteger
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -30,7 +31,15 @@ internal class DefaultMonitorTransfersSizeTest {
         transferredBytes = 2000L,
         totalBytes = 1000L,
         tag = 1,
-        isFinished = false
+        isFinished = false,
+        fileName = "fileName",
+        isStreamingTransfer = false,
+        isFolderTransfer = false,
+        notificationNumber = 1L,
+        priority = BigInteger.ONE,
+        handle = 1L,
+        speed = 1L,
+        appData = ""
     )
 
     @Before
