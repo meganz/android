@@ -91,12 +91,6 @@ import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapperImpl
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
-import mega.privacy.android.data.mapper.login.AccountSessionMapper
-import mega.privacy.android.data.mapper.login.AccountSessionMapperImpl
-import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapper
-import mega.privacy.android.data.mapper.login.FetchNodesUpdateMapperImpl
-import mega.privacy.android.data.mapper.login.UserCredentialsMapper
-import mega.privacy.android.data.mapper.login.UserCredentialsMapperImpl
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
@@ -251,16 +245,7 @@ internal abstract class MapperModule {
     abstract fun bindCombinedChatRoomMapper(implementation: CombinedChatRoomMapperImpl): CombinedChatRoomMapper
 
     @Binds
-    abstract fun bindFetchNodesUpdateMapper(implementation: FetchNodesUpdateMapperImpl): FetchNodesUpdateMapper
-
-    @Binds
     abstract fun bindNodeShareKeyResultMapper(implementation: NodeShareKeyResultMapperImpl): NodeShareKeyResultMapper
-
-    @Binds
-    abstract fun bindUserCredentialsMapper(implementation: UserCredentialsMapperImpl): UserCredentialsMapper
-
-    @Binds
-    abstract fun bindAccountSessionMapper(implementation: AccountSessionMapperImpl): AccountSessionMapper
 
     @Binds
     abstract fun bindContactCredentialsMapper(implementation: ContactCredentialsMapperImpl): ContactCredentialsMapper

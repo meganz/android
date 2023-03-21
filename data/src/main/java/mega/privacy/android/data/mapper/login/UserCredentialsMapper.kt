@@ -1,11 +1,12 @@
 package mega.privacy.android.data.mapper.login
 
 import mega.privacy.android.domain.entity.user.UserCredentials
+import javax.inject.Inject
 
 /**
  * Mapper to convert data into [UserCredentials]
  */
-internal fun interface UserCredentialsMapper {
+internal class UserCredentialsMapper @Inject constructor() {
 
     /**
      * Invoke.
@@ -22,5 +23,11 @@ internal fun interface UserCredentialsMapper {
         firstName: String?,
         lastName: String?,
         myHandle: String?,
-    ): UserCredentials
+    ) = UserCredentials(
+        email = email,
+        session = session,
+        firstName = firstName,
+        lastName = lastName,
+        myHandle = myHandle
+    )
 }
