@@ -47,8 +47,8 @@ internal fun NodeGridViewItem(
     modifier: Modifier,
     nodeUIItem: NodeUIItem,
     onMenuClick: () -> Unit,
-    onItemClicked: (NodeId) -> Unit,
-    onLongClick: (NodeId) -> Unit,
+    onItemClicked: (NodeUIItem) -> Unit,
+    onLongClick: (NodeUIItem) -> Unit,
 ) {
     if (nodeUIItem.node is FolderNode) {
         Row(
@@ -61,8 +61,8 @@ internal fun NodeGridViewItem(
                     shape = RoundedCornerShape(5.dp)
                 )
                 .combinedClickable(
-                    onClick = { onItemClicked(nodeUIItem.id) },
-                    onLongClick = { onLongClick(nodeUIItem.id) }
+                    onClick = { onItemClicked(nodeUIItem) },
+                    onLongClick = { onLongClick(nodeUIItem) }
                 )
                 .padding(horizontal = 16.dp)
                 .alpha(if (nodeUIItem.isInvisible) 0f else 1f),
@@ -98,8 +98,8 @@ internal fun NodeGridViewItem(
                     shape = RoundedCornerShape(16.dp)
                 )
                 .combinedClickable(
-                    onClick = { onItemClicked(nodeUIItem.id) },
-                    onLongClick = { onLongClick(nodeUIItem.id) }
+                    onClick = { onItemClicked(nodeUIItem) },
+                    onLongClick = { onLongClick(nodeUIItem) }
                 )
         ) {
             Box(contentAlignment = Alignment.TopStart) {

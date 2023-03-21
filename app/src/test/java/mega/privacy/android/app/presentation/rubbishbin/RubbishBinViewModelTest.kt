@@ -10,7 +10,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -32,6 +35,8 @@ class RubbishBinViewModelTest {
     private val getRubbishBinChildrenNode = mock<GetRubbishBinChildrenNode>()
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private val getRubbishBinParentNodeHandle = mock<GetParentNodeHandle>()
+    private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
+    private val getNodeByHandle = mock<GetNodeByHandle>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -46,7 +51,9 @@ class RubbishBinViewModelTest {
         underTest = RubbishBinViewModel(
             getRubbishBinChildrenNode = getRubbishBinChildrenNode,
             monitorNodeUpdates = monitorNodeUpdates,
-            getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle
+            getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle,
+            getRubbishBinChildren = getRubbishBinChildren,
+            getNodeByHandle = getNodeByHandle
         )
     }
 
@@ -89,6 +96,9 @@ class RubbishBinViewModelTest {
                     mock(),
                     mock()
                 )
+            )
+            whenever(getRubbishBinChildren(newValue)).thenReturn(
+                listOf(mock(), mock())
             )
             val update = mapOf<Node, List<NodeChanges>>(
                 mock<Node>() to emptyList(),
@@ -153,5 +163,100 @@ class RubbishBinViewModelTest {
             underTest.setRubbishBinHandle(newValue)
             underTest.onBackPressed()
             verify(getRubbishBinChildrenNode, times(1)).invoke(newValue)
+        }
+
+    @Test
+    fun `test when when nodeUIItem is long clicked, then it updates selected item by 1`() =
+        runTest {
+            val nodesListItem1 = mock<Node>()
+            val nodesListItem2 = mock<Node>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(mock(), mock())
+            )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.selectedNodes).isEqualTo(1)
+            }
+        }
+
+    @Test
+    fun `test that when item is clicked and some items are already selected on list then checked index gets decremented by 1`() =
+        runTest {
+            val nodesListItem1 = mock<Node>()
+            val nodesListItem2 = mock<Node>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(mock(), mock())
+            )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.onItemClicked(
+                NodeUIItem(
+                    nodesListItem2,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.selectedNodes).isEqualTo(0)
+            }
+        }
+
+    @Test
+    fun `test that when selected item gets clicked then checked index gets incremented by 1`() =
+        runTest {
+            val nodesListItem1 = mock<Node>()
+            val nodesListItem2 = mock<Node>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(mock(), mock())
+            )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.onItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.selectedNodes).isEqualTo(2)
+            }
         }
 }

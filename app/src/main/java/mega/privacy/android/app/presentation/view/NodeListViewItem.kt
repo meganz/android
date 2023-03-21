@@ -50,14 +50,14 @@ internal fun NodeListViewItem(
     nodeUIItem: NodeUIItem,
     stringUtilWrapper: StringUtilWrapper,
     onMenuClick: () -> Unit,
-    onItemClicked: (NodeId) -> Unit,
-    onLongClick: (NodeId) -> Unit,
+    onItemClicked: (NodeUIItem) -> Unit,
+    onLongClick: (NodeUIItem) -> Unit,
 ) {
     Column(
         modifier = modifier
             .combinedClickable(
-                onClick = { onItemClicked(nodeUIItem.id) },
-                onLongClick = { onLongClick(nodeUIItem.id) }
+                onClick = { onItemClicked(nodeUIItem) },
+                onLongClick = { onLongClick(nodeUIItem) }
             )
 
             .fillMaxWidth()

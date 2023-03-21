@@ -20,7 +20,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * This method will return different type of folder icons based on their type
@@ -64,8 +63,8 @@ private fun NodeGridView(
     modifier: Modifier,
     nodeUIItems: List<NodeUIItem>,
     onMenuClick: () -> Unit,
-    onItemClicked: (NodeId) -> Unit,
-    onLongClick: (NodeId) -> Unit,
+    onItemClicked: (NodeUIItem) -> Unit,
+    onLongClick: (NodeUIItem) -> Unit,
     spanCount: Int = 2,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
@@ -125,8 +124,8 @@ private fun NodeListView(
     nodeUIItemList: List<NodeUIItem>,
     stringUtilWrapper: StringUtilWrapper,
     onMenuClick: () -> Unit,
-    onItemClicked: (NodeId) -> Unit,
-    onLongClick: (NodeId) -> Unit,
+    onItemClicked: (NodeUIItem) -> Unit,
+    onLongClick: (NodeUIItem) -> Unit,
     sortOrder: String,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
@@ -180,8 +179,8 @@ fun NodesView(
     nodeUIItems: List<NodeUIItem>,
     stringUtilWrapper: StringUtilWrapper,
     onMenuClick: () -> Unit,
-    onItemClicked: (NodeId) -> Unit,
-    onLongClick: (NodeId) -> Unit,
+    onItemClicked: (NodeUIItem) -> Unit,
+    onLongClick: (NodeUIItem) -> Unit,
     sortOrder: String,
     isListView: Boolean,
     onSortOrderClick: () -> Unit,
