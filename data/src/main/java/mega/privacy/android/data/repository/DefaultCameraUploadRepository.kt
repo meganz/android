@@ -102,11 +102,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun setPrimarySyncHandle(primaryHandle: Long) = withContext(ioDispatcher) {
-        localStorageGateway.setCamSyncHandle(primaryHandle)
+        localStorageGateway.setPrimarySyncHandle(primaryHandle)
     }
 
     override suspend fun setSecondarySyncHandle(secondaryHandle: Long) = withContext(ioDispatcher) {
-        localStorageGateway.setCamSyncSecondaryHandle(secondaryHandle)
+        localStorageGateway.setSecondarySyncHandle(secondaryHandle)
     }
 
     override suspend fun isSyncByWifi() = withContext(ioDispatcher) {
@@ -453,7 +453,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         }
     }
 
-    override suspend fun getUserAttribute() = withContext(ioDispatcher) {
+    override suspend fun getCameraUploadsSyncHandles() = withContext(ioDispatcher) {
         val request = suspendCancellableCoroutine { continuation ->
             val listener = OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request: MegaRequest, error: MegaError ->

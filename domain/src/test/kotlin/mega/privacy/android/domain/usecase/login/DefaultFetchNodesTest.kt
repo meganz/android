@@ -5,11 +5,13 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import mega.privacy.android.domain.repository.LoginRepository
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.setting.ResetChatSettings
 import org.junit.Before
 import org.junit.Test
@@ -23,12 +25,14 @@ class DefaultFetchNodesTest {
 
     private lateinit var underTest: FetchNodes
 
+    private val establishCameraUploadsSyncHandles = mock<EstablishCameraUploadsSyncHandles>()
     private val loginRepository = mock<LoginRepository>()
     private val resetChatSettings = mock<ResetChatSettings>()
 
     @Before
     fun setUp() {
         underTest = DefaultFetchNodes(
+            establishCameraUploadsSyncHandles = establishCameraUploadsSyncHandles,
             loginRepository = loginRepository,
             resetChatSettings = resetChatSettings,
             loginMutex = mock()
@@ -86,4 +90,18 @@ class DefaultFetchNodesTest {
 
         verify(loginRepository).fetchNodesFlow()
     }
+
+    @Test
+    fun `test that successfully fetching all the nodes invokes establishCameraUploadsSyncHandles`() =
+        runTest {
+            val expectedUpdate = FetchNodesUpdate(Progress(1F), mock())
+            whenever(loginRepository.fetchNodesFlow()).thenReturn(flowOf(expectedUpdate))
+
+            underTest.invoke().test {
+                assertThat(awaitItem()).isEqualTo(expectedUpdate)
+                cancelAndIgnoreRemainingEvents()
+            }
+
+            verify(establishCameraUploadsSyncHandles).invoke()
+        }
 }

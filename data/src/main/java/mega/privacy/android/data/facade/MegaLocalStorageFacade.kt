@@ -35,14 +35,18 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getMegaHandleSecondaryFolder(): Long? =
         dbHandler.preferences?.megaHandleSecondaryFolder?.toLongOrNull()
 
-    override suspend fun setCamSyncHandle(primaryHandle: Long) {
-        dbHandler.preferences?.camSyncHandle = primaryHandle.toString()
-        setPrimaryFolderHandle(primaryHandle)
+    override suspend fun setPrimarySyncHandle(primaryHandle: Long) {
+        with(dbHandler) {
+            preferences?.camSyncHandle = primaryHandle.toString()
+            setCamSyncHandle(primaryHandle)
+        }
     }
 
-    override suspend fun setCamSyncSecondaryHandle(secondaryHandle: Long) {
-        dbHandler.preferences?.megaHandleSecondaryFolder = secondaryHandle.toString()
-        setSecondaryFolderHandle(secondaryHandle)
+    override suspend fun setSecondarySyncHandle(secondaryHandle: Long) {
+        with(dbHandler) {
+            preferences?.megaHandleSecondaryFolder = secondaryHandle.toString()
+            setSecondaryFolderHandle(secondaryHandle)
+        }
     }
 
     override suspend fun getCloudSortOrder(): Int =
@@ -285,14 +289,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         path?.let { it ->
             dbHandler.setCamSyncLocalPath(it)
         }
-    }
-
-    private fun setPrimaryFolderHandle(primaryHandle: Long) {
-        dbHandler.setCamSyncHandle(primaryHandle)
-    }
-
-    private fun setSecondaryFolderHandle(secondaryHandle: Long) {
-        dbHandler.setSecondaryFolderHandle(secondaryHandle)
     }
 
     override suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean) {

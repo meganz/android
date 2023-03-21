@@ -6,7 +6,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
-import mega.privacy.android.app.domain.usecase.GetCameraUploadAttributes
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
@@ -97,6 +97,7 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
@@ -316,7 +317,7 @@ object TestCameraUploadUseCases {
     fun provideResetMediaUploadTimeStamps() = mock<ResetMediaUploadTimeStamps>()
 
     @Provides
-    fun provideGetCameraUploadAttributes() = mock<GetCameraUploadAttributes>()
+    fun provideGetCameraUploadsSyncHandles() = mock<GetCameraUploadsSyncHandles>()
 
     @Provides
     fun provideSetupPrimaryFolder() = mock<SetupPrimaryFolder>()
@@ -428,4 +429,7 @@ object TestCameraUploadUseCases {
     @Provides
     fun provideMonitorCameraUploadsProgress() =
         mock<MonitorCameraUploadProgress>()
+
+    @Provides
+    fun provideEstablishCameraUploadsSyncHandles() = mock<EstablishCameraUploadsSyncHandles>()
 }

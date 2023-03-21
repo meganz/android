@@ -470,9 +470,14 @@ interface CameraUploadRepository {
     suspend fun convertBase64ToHandle(base64: String): Long
 
     /**
-     * Get user attributes as a pair of primary and secondary handles
+     * Retrieves the Camera Uploads Sync Handles from the API
+     *
+     * @return A potentially nullable [Pair] of Camera Uploads Sync Handles
+     *
+     * [Pair.first] represents the Primary Folder Sync Handle for the Camera Uploads folder
+     * [Pair.second] represents the Secondary Folder Sync Handle for the Media Uploads folder
      */
-    suspend fun getUserAttribute(): Pair<Long, Long>?
+    suspend fun getCameraUploadsSyncHandles(): Pair<Long, Long>?
 
     /**
      * monitor upload service pause State

@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -58,11 +59,13 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorFinishActivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -98,6 +101,7 @@ import javax.inject.Inject
  * @property getUnverifiedIncomingShares
  * @property getUnverifiedOutgoingShares
  * @property monitorVerificationStatus
+ * @property monitorUserUpdates
  *
  * @param monitorNodeUpdates
  * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
@@ -136,6 +140,8 @@ class ManagerViewModel @Inject constructor(
     private val setLatestTargetPath: SetLatestTargetPath,
     private val monitorSecurityUpgradeInApp: MonitorSecurityUpgradeInApp,
     private val listenToNewMedia: ListenToNewMedia,
+    private val monitorUserUpdates: MonitorUserUpdates,
+    private val establishCameraUploadsSyncHandles: EstablishCameraUploadsSyncHandles,
 ) : ViewModel() {
 
     /**
@@ -182,7 +188,7 @@ class ManagerViewModel @Inject constructor(
                 isFirstLogin,
                 monitorVerificationStatus()
                     .onEach {
-                            Timber.d("Verification status returned: $it")
+                        Timber.d("Verification status returned: $it")
                     },
                 flowOf(
                     getUnverifiedIncomingShares(order) +
@@ -229,6 +235,17 @@ class ManagerViewModel @Inject constructor(
         }
         viewModelScope.launch {
             listenToNewMedia()
+        }
+        viewModelScope.launch {
+            monitorUserUpdates()
+                .filter { it == UserChanges.CameraUploadsFolder }
+                .collect {
+                    Timber.d(
+                        "The Camera Uploads Sync Handles have been changed in the API + " +
+                                "Refresh the Sync Handles"
+                    )
+                    establishCameraUploadsSyncHandles()
+                }
         }
     }
 
@@ -383,7 +400,7 @@ class ManagerViewModel @Inject constructor(
      * Set first login status
      */
     fun setIsFirstLogin(newIsFirstLogin: Boolean) {
-        savedStateHandle[Companion.isFirstLoginKey] = newIsFirstLogin
+        savedStateHandle[isFirstLoginKey] = newIsFirstLogin
     }
 
     /**

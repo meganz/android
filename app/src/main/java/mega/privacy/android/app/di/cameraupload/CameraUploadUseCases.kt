@@ -26,7 +26,7 @@ import mega.privacy.android.app.domain.usecase.DefaultIsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolder
-import mega.privacy.android.app.domain.usecase.GetCameraUploadAttributes
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
@@ -160,6 +160,8 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraUploadsSyncHandles
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
@@ -524,11 +526,15 @@ abstract class CameraUploadUseCases {
             IsNodeInRubbishOrDeleted(nodeRepository::isNodeInRubbishOrDeleted)
 
         /**
-         * Provide the [GetCameraUploadAttributes] implementation
+         * Provide the [GetCameraUploadsSyncHandles] implementation
+         *
+         * @param cameraUploadRepository [CameraUploadRepository]
+         *
+         * @return [GetCameraUploadsSyncHandles]
          */
         @Provides
-        fun provideGetCameraUploadAttributes(cameraUploadRepository: CameraUploadRepository): GetCameraUploadAttributes =
-            GetCameraUploadAttributes(cameraUploadRepository::getUserAttribute)
+        fun provideGetCameraUploadsSyncHandles(cameraUploadRepository: CameraUploadRepository): GetCameraUploadsSyncHandles =
+            GetCameraUploadsSyncHandles(cameraUploadRepository::getCameraUploadsSyncHandles)
 
         /**
          * Provide the [MonitorBatteryInfo] implementation
@@ -669,6 +675,16 @@ abstract class CameraUploadUseCases {
         fun provideSetVideoCompressionSizeLimit(repository: CameraUploadRepository): SetVideoCompressionSizeLimit =
             SetVideoCompressionSizeLimit(repository::setVideoCompressionSizeLimit)
     }
+
+    /**
+     * Provides the [EstablishCameraUploadsSyncHandles] implementation
+     *
+     * @param implementation [DefaultEstablishCameraUploadsSyncHandles]
+     *
+     * @return [EstablishCameraUploadsSyncHandles]
+     */
+    @Binds
+    abstract fun bindEstablishCameraUploadsSyncHandles(implementation: DefaultEstablishCameraUploadsSyncHandles): EstablishCameraUploadsSyncHandles
 
     /**
      * Provides the [CheckEnableCameraUploadsStatus] implementation

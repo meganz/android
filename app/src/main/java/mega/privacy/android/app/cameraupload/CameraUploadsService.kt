@@ -39,7 +39,6 @@ import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.CopyNode
-import mega.privacy.android.app.domain.usecase.GetCameraUploadAttributes
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
@@ -116,7 +115,6 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
-import mega.privacy.android.domain.usecase.ResetCameraUploadTimelines
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
@@ -128,6 +126,7 @@ import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
 import nz.mega.sdk.MegaApiAndroid
@@ -424,12 +423,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     lateinit var isNodeInRubbishOrDeleted: IsNodeInRubbishOrDeleted
 
     /**
-     * Reset camera upload timelines
-     */
-    @Inject
-    lateinit var resetCameraUploadTimelines: ResetCameraUploadTimelines
-
-    /**
      * Monitor charging stop status
      */
     @Inject
@@ -490,10 +483,10 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     lateinit var setupSecondaryFolder: SetupSecondaryFolder
 
     /**
-     * Get Camera Upload Attributes
+     * Establish Camera Uploads Sync Handles
      */
     @Inject
-    lateinit var getCameraUploadAttributes: GetCameraUploadAttributes
+    lateinit var establishCameraUploadsSyncHandles: EstablishCameraUploadsSyncHandles
 
     /**
      * Reset Total Uploads
@@ -894,14 +887,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             StartCameraUploadsState.MISSING_USER_ATTRIBUTE -> {
                 Timber.w("Handle the missing Camera Uploads user attribute")
                 runCatching {
-                    getCameraUploadAttributes()?.let {
-                        // received handles from API, update local handles
-                        handleAttributeHandles(it)
-                    } ?: run {
-                        // no handles from API, invalidate local handles to establish folders
-                        setPrimarySyncHandle(MegaApiJava.INVALID_HANDLE)
-                        setSecondarySyncHandle(MegaApiJava.INVALID_HANDLE)
-                    }
+                    establishCameraUploadsSyncHandles()
                     missingAttributesChecked = true
                 }
                     .onSuccess { startWorker() }
@@ -916,21 +902,6 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
             }
 
             else -> Unit
-        }
-    }
-
-    private suspend fun handleAttributeHandles(handles: Pair<Long, Long>) {
-        handles.first.let { primary ->
-            if (!isNodeInRubbishOrDeleted(primary)) {
-                resetCameraUploadTimelines(primary, false)
-                setPrimarySyncHandle(primary)
-            }
-        }
-        handles.second.let { secondary ->
-            if (!isNodeInRubbishOrDeleted(secondary)) {
-                resetCameraUploadTimelines(secondary, true)
-                setSecondarySyncHandle(secondary)
-            }
         }
     }
 

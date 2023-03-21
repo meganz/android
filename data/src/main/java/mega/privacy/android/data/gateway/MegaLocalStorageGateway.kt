@@ -28,12 +28,12 @@ interface MegaLocalStorageGateway {
     /**
      * Set Camera Uploads Primary handle
      */
-    suspend fun setCamSyncHandle(primaryHandle: Long)
+    suspend fun setPrimarySyncHandle(primaryHandle: Long)
 
     /**
      * Set Camera Uploads Secondary handle
      */
-    suspend fun setCamSyncSecondaryHandle(secondaryHandle: Long)
+    suspend fun setSecondarySyncHandle(secondaryHandle: Long)
 
     /**
      * Get cloud sort order

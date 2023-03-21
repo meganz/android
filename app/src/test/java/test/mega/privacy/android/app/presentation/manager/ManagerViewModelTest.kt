@@ -10,6 +10,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
@@ -44,9 +46,11 @@ import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
 import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -57,6 +61,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -85,12 +90,12 @@ class ManagerViewModelTest {
         onBlocking { invoke() }.thenReturn(
             MutableStateFlow(
                 StorageStateEvent(
-                    0L,
-                    "",
-                    0L,
-                    "",
-                    EventType.Storage,
-                    StorageState.Unknown
+                    handle = 0L,
+                    eventString = "",
+                    number = 0L,
+                    text = "",
+                    type = EventType.Storage,
+                    storageState = StorageState.Unknown,
                 )
             )
         )
@@ -108,8 +113,22 @@ class ManagerViewModelTest {
     private val getFeatureFlagValue =
         mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(false) }
     private val shareDataList = listOf(
-        ShareData("user", 8766L, 0, 987654678L, true, false),
-        ShareData("user", 8766L, 0, 987654678L, true, false)
+        ShareData(
+            user = "user",
+            nodeHandle = 8766L,
+            access = 0,
+            timeStamp = 987654678L,
+            isPending = true,
+            isVerified = false,
+        ),
+        ShareData(
+            user = "user",
+            nodeHandle = 8766L,
+            access = 0,
+            timeStamp = 987654678L,
+            isPending = true,
+            isVerified = false,
+        )
     )
     private val getUnverifiedOutgoingShares = mock<GetUnverifiedOutgoingShares> {
         onBlocking {
@@ -132,11 +151,14 @@ class ManagerViewModelTest {
     private val monitorVerificationStatus = MutableStateFlow<VerificationStatus>(
         UnVerified(
             canRequestUnblockSms = false,
-            canRequestOptInVerification = false
+            canRequestOptInVerification = false,
         )
     )
-    private val requireTwoFactorAuthenticationUseCase = mock<RequireTwoFactorAuthenticationUseCase>()
+    private val requireTwoFactorAuthenticationUseCase =
+        mock<RequireTwoFactorAuthenticationUseCase>()
     private val setLatestTargetPath = mock<SetLatestTargetPath>()
+    private val monitorUserUpdates = mock<MonitorUserUpdates>()
+    private val establishCameraUploadsSyncHandles = mock<EstablishCameraUploadsSyncHandles>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -174,7 +196,9 @@ class ManagerViewModelTest {
             requireTwoFactorAuthenticationUseCase = requireTwoFactorAuthenticationUseCase,
             setLatestTargetPath = setLatestTargetPath,
             monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
-            listenToNewMedia = mock()
+            listenToNewMedia = mock(),
+            monitorUserUpdates = monitorUserUpdates,
+            establishCameraUploadsSyncHandles = establishCameraUploadsSyncHandles,
         )
     }
 
@@ -286,7 +310,7 @@ class ManagerViewModelTest {
                         modificationTime = 1L,
                         status = ContactRequestStatus.Unresolved,
                         isOutgoing = false,
-                        isAutoAccepted = false
+                        isAutoAccepted = false,
                     )
                 )
             )
@@ -383,7 +407,12 @@ class ManagerViewModelTest {
 
     @Test
     fun `test when check2FADialog returns false show2FADialog flow updated to false`() = runTest {
-        whenever(requireTwoFactorAuthenticationUseCase(newAccount = false, firstLogin = true)).thenReturn(false)
+        whenever(
+            requireTwoFactorAuthenticationUseCase(
+                newAccount = false,
+                firstLogin = true
+            )
+        ).thenReturn(false)
         underTest.checkToShow2FADialog(newAccount = false, firstLogin = true)
         underTest.state.map { it }.distinctUntilChanged().test {
             assertThat(awaitItem().show2FADialog).isFalse()
@@ -392,7 +421,12 @@ class ManagerViewModelTest {
 
     @Test
     fun `test when check2FADialog returns true show2FADialog flow updated to true`() = runTest {
-        whenever(requireTwoFactorAuthenticationUseCase(newAccount = false, firstLogin = true)).thenReturn(true)
+        whenever(
+            requireTwoFactorAuthenticationUseCase(
+                newAccount = false,
+                firstLogin = true
+            )
+        ).thenReturn(true)
         underTest.checkToShow2FADialog(newAccount = false, firstLogin = true)
         testScheduler.advanceUntilIdle()
         underTest.state.map { it }.distinctUntilChanged().test {
@@ -407,7 +441,7 @@ class ManagerViewModelTest {
             monitorVerificationStatus.emit(
                 UnVerified(
                     canRequestUnblockSms = false,
-                    canRequestOptInVerification = expectedCanVerify
+                    canRequestOptInVerification = expectedCanVerify,
                 )
             )
             testScheduler.advanceUntilIdle()
@@ -433,5 +467,20 @@ class ManagerViewModelTest {
             underTest.state.test {
                 assertThat(awaitItem().canVerifyPhoneNumber).isFalse()
             }
+        }
+
+    @Test
+    fun `test that the camera uploads sync handles are established when receiving an update to change the camera uploads folders`() =
+        runTest {
+            val userUpdates = listOf(
+                UserChanges.Birthday,
+                UserChanges.CameraUploadsFolder,
+                UserChanges.Country,
+            )
+
+            whenever(monitorUserUpdates()).thenReturn(userUpdates.asFlow())
+            testScheduler.advanceUntilIdle()
+
+            verify(establishCameraUploadsSyncHandles).invoke()
         }
 }
