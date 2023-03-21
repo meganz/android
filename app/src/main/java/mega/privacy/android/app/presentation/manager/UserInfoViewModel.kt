@@ -212,7 +212,11 @@ internal class UserInfoViewModel @Inject constructor(
      */
     fun refreshContactDatabase(isForce: Boolean) {
         applicationScope.launch {
-            reloadContactDatabase(isForce)
+            runCatching {
+                reloadContactDatabase(isForce)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 }
