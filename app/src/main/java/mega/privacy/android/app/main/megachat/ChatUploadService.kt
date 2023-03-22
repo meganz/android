@@ -333,8 +333,6 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
                     if (transfer.isVoiceClipTransfer()) {
                         voiceClipsInProgress++
-                    } else {
-                        transfersManagement.checkIfTransferIsPaused(transfer)
                     }
                 }
             }

@@ -1182,12 +1182,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             for (i in 0 until it.numDownloads) {
                 val tag: Int = it.getDownloadTag(i)
                 transfersInProgress.add(tag)
-                transfersManagement.checkIfTransferIsPaused(tag)
             }
             for (i in 0 until it.numUploads) {
                 val tag: Int = it.getUploadTag(i)
                 transfersInProgress.add(it.getUploadTag(i))
-                transfersManagement.checkIfTransferIsPaused(tag)
             }
         }
         if (!viewModel.isConnected) {
@@ -8816,12 +8814,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             MegaRequest.TYPE_PAUSE_TRANSFER -> {
                 Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER")
                 if (e.errorCode == MegaError.API_OK) {
-                    val transferTag: Int = request.transferTag
-                    if (request.flag) {
-                        transfersManagement.addPausedTransfers(transferTag)
-                    } else {
-                        transfersManagement.removePausedTransfers(transferTag)
-                    }
                     if (isTransfersInProgressAdded) {
                         transfersFragment?.changeStatusButton(request.transferTag)
                     }
@@ -8835,7 +8827,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             MegaRequest.TYPE_CANCEL_TRANSFER -> {
                 if (e.errorCode == MegaError.API_OK) {
-                    transfersManagement.removePausedTransfers(request.transferTag)
                     updateTransfersWidget()
                     supportInvalidateOptionsMenu()
                 } else {
@@ -8856,7 +8847,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         playTransfersMenuIcon?.isVisible = false
                         cancelAllTransfersMenuItem?.isVisible = false
                     }
-                    transfersManagement.resetPausedTransfers()
                 } else {
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,

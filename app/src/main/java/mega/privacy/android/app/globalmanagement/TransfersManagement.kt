@@ -51,7 +51,6 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import nz.mega.sdk.MegaTransfer.STAGE_TRANSFERRING_FILES
 import nz.mega.sdk.MegaTransfer.STATE_COMPLETED
-import nz.mega.sdk.MegaTransfer.STATE_PAUSED
 import timber.log.Timber
 import java.util.Collections
 import javax.inject.Inject
@@ -199,8 +198,6 @@ class TransfersManagement @Inject constructor(
     var hasResumeTransfersWarningAlreadyBeenShown = false
     var shouldShowNetworkWarning = false
 
-    private val pausedTransfers = ArrayList<String>()
-
     private val scanningTransfers =
         Collections.synchronizedCollection(ArrayList<ScanningTransferData>())
     private var scanningTransfersToken: MegaCancelToken? = null
@@ -223,65 +220,11 @@ class TransfersManagement @Inject constructor(
         isTransferOverQuotaBannerShown = false
         hasResumeTransfersWarningAlreadyBeenShown = false
         shouldShowNetworkWarning = false
-        pausedTransfers.clear()
         scanningTransfers.clear()
         scanningTransfersToken = null
         isProcessingFolders = false
         isProcessingTransfers = false
         shouldBreakTransfersProcessing = false
-    }
-
-    /**
-     * Removes a resumed transfer.
-     *
-     * @param transferTag   tag of the resumed transfer
-     */
-    fun removePausedTransfers(transferTag: Int) {
-        pausedTransfers.remove(transferTag.toString())
-    }
-
-    /**
-     * Adds a paused transfer.
-     *
-     * @param transferTag   tag of the paused transfer
-     */
-    fun addPausedTransfers(transferTag: Int) {
-        val tag = transferTag.toString()
-
-        if (!pausedTransfers.contains(tag)) {
-            pausedTransfers.add(tag)
-        }
-    }
-
-    /**
-     * Checks if a transfer is paused.
-     * If so, adds it to the paused transfers list.
-     * If not, do nothing.
-     *
-     * @param transferTag Identifier of the MegaTransfer to check.
-     */
-    fun checkIfTransferIsPaused(transferTag: Int) {
-        checkIfTransferIsPaused(megaApi.getTransferByTag(transferTag))
-    }
-
-    /**
-     * Checks if a transfer is paused.
-     * If so, adds it to the paused transfers list.
-     * If not, do nothing.
-     *
-     * @param transfer MegaTransfer to check.
-     */
-    fun checkIfTransferIsPaused(transfer: MegaTransfer?) {
-        if (transfer?.state == STATE_PAUSED) {
-            addPausedTransfers(transfer.tag)
-        }
-    }
-
-    /**
-     * Clears the paused transfers list.
-     */
-    fun resetPausedTransfers() {
-        pausedTransfers.clear()
     }
 
     /**

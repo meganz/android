@@ -371,8 +371,6 @@ public class UploadService extends Service {
                             continue;
                         }
 
-                        transfersManagement.checkIfTransferIsPaused(transfer);
-
                         if (!transfer.isFolderTransfer() && transfer.getAppData() == null) {
                             mapProgressFileTransfers.put(transfer.getTag(), transfer);
                         }

@@ -374,7 +374,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 val transfer =
                     megaApi.getTransferByTag(transferData.getDownloadTag(i)) ?: continue
                 if (!transfer.isVoiceClipTransfer() && !transfer.isBackgroundTransfer()) {
-                    transfersManagement.checkIfTransferIsPaused(transfer)
                     transfersCount++
                 }
             }
