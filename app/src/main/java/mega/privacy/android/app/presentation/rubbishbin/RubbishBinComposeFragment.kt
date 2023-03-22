@@ -58,20 +58,24 @@ class RubbishBinComposeFragment : Fragment() {
                     nodeUIItems = emptyList(),
                     stringUtilWrapper = stringUtilWrapper,
                     onMenuClick = { },
-                    onItemClicked = { nodeUiItem: NodeUIItem ->
-                        viewModel.onItemClicked(nodeUIItem = nodeUiItem)
+                    onItemClicked = {
+                        viewModel.onItemClicked(nodeUIItem = it)
                     },
-                    onLongClick = { nodeUiItem: NodeUIItem ->
-                        viewModel.onLongItemClicked(nodeUIItem = nodeUiItem)
+                    onLongClick = {
+                        viewModel.onLongItemClicked(nodeUIItem = it)
                     },
                     sortOrder = sortOrderViewModel.order.first.name,
                     isListView = isList,
                     onSortOrderClick = { },
-                    onChangeViewTypeClick = { })
+                    onChangeViewTypeClick = { },
+                )
             }
         }
     }
 
+    /**
+     * On back pressed from [ManagerActivity]
+     */
     fun onBackPressed() {
 
     }

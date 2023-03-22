@@ -239,11 +239,12 @@ class RubbishBinViewModel @Inject constructor(
      * Select all [NodeUIItem]
      */
     fun selectAllNodes() {
+        val selectedNodeList = selectAllNodesUiList()
         _state.update {
             it.copy(
-                nodeList = selectAllNodesUiList(),
+                nodeList = selectedNodeList,
                 isInSelection = true,
-                selectedNodes = _state.value.nodeList.size
+                selectedNodes = selectedNodeList.size
             )
         }
     }
