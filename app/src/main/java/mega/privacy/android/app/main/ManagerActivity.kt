@@ -73,6 +73,7 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavOptions
@@ -97,6 +98,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.BusinessExpiredAlertActivity
 import mega.privacy.android.app.DownloadService
@@ -229,6 +231,7 @@ import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFr
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment
+import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinViewModel
 import mega.privacy.android.app.presentation.search.SearchFragment
@@ -341,6 +344,7 @@ import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaAchievementsDetails
@@ -586,6 +590,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     // Fragments
     private var fileBrowserFragment: FileBrowserFragment? = null
     private var rubbishBinFragment: RubbishBinFragment? = null
+    private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
     private var syncFragment: SyncFragment? = null
     private var inboxFragment: InboxFragment? = null
     private var incomingSharesFragment: MegaNodeBaseFragment? = null
@@ -2574,6 +2579,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
+    private fun isRubbishBinComposeEnabled(): Boolean {
+        return isFeatureEnabled(AppFeatures.RubbishBinCompose)
+    }
+
     /**
      * Checks if some business warning has to be shown due to the status of the account.
      *
@@ -4231,16 +4240,22 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             DrawerItem.RUBBISH_BIN -> {
                 showHideBottomNavigationView(true)
                 appBarLayout.visibility = View.VISIBLE
-                rubbishBinFragment =
-                    supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN.tag) as? RubbishBinFragment
-                        ?: RubbishBinFragment.newInstance()
+                lifecycleScope.launch {
+                    if (isRubbishBinComposeEnabled()) {
+                        rubbishBinComposeFragment = getRubbishBinComposeFragment() ?: RubbishBinComposeFragment.newInstance()
+                        rubbishBinComposeFragment?.let {replaceFragment(it, FragmentTag.RUBBISH_BIN_COMPOSE.tag) }
+                    } else {
+                        rubbishBinFragment = getRubbishBinFragment() ?: RubbishBinFragment.newInstance()
+                        rubbishBinFragment?.let { replaceFragment(it, FragmentTag.RUBBISH_BIN.tag) }
+                    }
+                    setBottomNavigationMenuItemChecked(NO_BNV)
 
-                setBottomNavigationMenuItemChecked(NO_BNV)
-                rubbishBinFragment?.let { replaceFragment(it, FragmentTag.RUBBISH_BIN.tag) }
-                if (openFolderRefresh) {
-                    onNodesCloudDriveUpdate()
-                    openFolderRefresh = false
+                    if (openFolderRefresh) {
+                        onNodesCloudDriveUpdate()
+                        openFolderRefresh = false
+                    }
                 }
+
                 supportInvalidateOptionsMenu()
                 setToolbarTitle()
                 showFabButton()
@@ -4554,8 +4569,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
             }
             DrawerItem.RUBBISH_BIN -> {
-                rubbishBinFragment =
-                    supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN.tag) as? RubbishBinFragment
+                rubbishBinFragment = getRubbishBinFragment()
                 if (rubbishBinFragment != null) {
                     rubbishBinFragment?.checkScroll()
                 }
@@ -4886,9 +4900,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 DrawerItem.RUBBISH_BIN -> {
                     moreMenuItem.isVisible = !isFirstNavigationLevel
-                    if (getRubbishBinFragment() != null &&
-                        (rubbishBinFragment?.getItemCount() ?: 0) > 0
-                    ) {
+                    if (rubbishBinViewModel.state.value.nodes.isNotEmpty()) {
                         clearRubbishBinMenuItem?.isVisible = isFirstNavigationLevel
                         searchMenuItem?.isVisible = true
                     }
@@ -5060,9 +5072,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             }
                         }
                     } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
-                        rubbishBinFragment =
-                            supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN.tag) as? RubbishBinFragment
+                        rubbishBinFragment = getRubbishBinFragment()
                         rubbishBinFragment?.onBackPressed()
+                        rubbishBinComposeFragment = getRubbishBinComposeFragment()
+                        rubbishBinComposeFragment?.onBackPressed()
                     } else if (drawerItem === DrawerItem.SHARED_ITEMS) {
                         if (tabItemShares === SharesTab.INCOMING_TAB && isIncomingAdded) {
                             incomingSharesFragment?.onBackPressed()
@@ -5168,8 +5181,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     DrawerItem.CLOUD_DRIVE -> if (isCloudAdded) {
                         fileBrowserFragment?.selectAll()
                     }
-                    DrawerItem.RUBBISH_BIN -> if (getRubbishBinFragment() != null) {
-                        rubbishBinFragment?.selectAll()
+                    DrawerItem.RUBBISH_BIN -> {
+                        if (getRubbishBinFragment() != null) {
+                            getRubbishBinFragment()?.selectAll()
+                        }
+                        if (getRubbishBinComposeFragment() != null) {
+                            rubbishBinViewModel.selectAllNodes()
+                        }
                     }
                     DrawerItem.SHARED_ITEMS -> when (tabItemShares) {
                         SharesTab.INCOMING_TAB -> if (isIncomingAdded) {
@@ -5386,8 +5404,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else if (drawerItem === DrawerItem.SYNC) {
             backToDrawerItem(bottomNavigationCurrentItem)
         } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
-            rubbishBinFragment = supportFragmentManager
-                .findFragmentByTag(FragmentTag.RUBBISH_BIN.tag) as? RubbishBinFragment
+            rubbishBinFragment = getRubbishBinFragment()
             if (rubbishBinFragment == null || rubbishBinFragment?.onBackPressed() == 0) {
                 backToDrawerItem(bottomNavigationCurrentItem)
             }
@@ -6301,8 +6318,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun showClearRubbishBinDialog() {
         Timber.d("showClearRubbishBinDialog")
-        rubbishBinFragment =
-            supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN.tag) as? RubbishBinFragment
+        rubbishBinFragment = getRubbishBinFragment()
         if (rubbishBinFragment != null) {
             if (rubbishBinFragment?.isVisible == true) {
                 rubbishBinFragment?.notifyDataSetChanged()
@@ -9057,8 +9073,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun onNodesCloudDriveUpdate() {
         Timber.d("onNodesCloudDriveUpdate")
-        rubbishBinFragment =
-            supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN.tag) as? RubbishBinFragment
+        rubbishBinFragment = getRubbishBinFragment()
         rubbishBinFragment?.hideMultipleSelect()
         refreshRubbishBin()
         pagerOfflineFragment?.refreshNodes()
@@ -10111,6 +10126,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun getRubbishBinFragment(): RubbishBinFragment? {
         return (supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN.tag) as? RubbishBinFragment).also {
             rubbishBinFragment = it
+        }
+    }
+
+    private fun getRubbishBinComposeFragment(): RubbishBinComposeFragment? {
+        return (supportFragmentManager.findFragmentByTag(FragmentTag.RUBBISH_BIN_COMPOSE.tag) as? RubbishBinComposeFragment).also {
+            rubbishBinComposeFragment = it
         }
     }
 

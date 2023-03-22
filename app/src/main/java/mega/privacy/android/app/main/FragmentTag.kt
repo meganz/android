@@ -22,7 +22,8 @@ internal enum class FragmentTag {
     LINKS,
     MEDIA_DISCOVERY,
     ALBUM_CONTENT,
-    PHOTOS_FILTER;
+    PHOTOS_FILTER,
+    RUBBISH_BIN_COMPOSE;
 
     val tag: String
         get() = when (this) {
@@ -46,5 +47,6 @@ internal enum class FragmentTag {
             MEDIA_DISCOVERY -> "mediaDiscoveryFragment"
             ALBUM_CONTENT -> "fragmentAlbumContent"
             PHOTOS_FILTER -> "fragmentPhotosFilter"
+            RUBBISH_BIN_COMPOSE -> "rubbishBinComposeFragment"
         }
 }

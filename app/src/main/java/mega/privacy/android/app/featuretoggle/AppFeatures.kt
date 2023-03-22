@@ -75,8 +75,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * App Test toggle
      */
-    AppTest("This is a test toggle. It does nothing", false);
+    AppTest("This is a test toggle. It does nothing", false),
 
+    /**
+     * To switch into new RubbishBin Compose UI
+     */
+    RubbishBinCompose("Enable compose for RubbishBin", false);
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

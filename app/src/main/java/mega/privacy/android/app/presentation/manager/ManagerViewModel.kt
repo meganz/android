@@ -252,7 +252,8 @@ class ManagerViewModel @Inject constructor(
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
             AppFeatures.AndroidSync.takeIf { getFeatureFlagValue(it) },
-            AppFeatures.MonitorPhoneNumber.takeIf { getFeatureFlagValue(it) }
+            AppFeatures.MonitorPhoneNumber.takeIf { getFeatureFlagValue(it) },
+            AppFeatures.RubbishBinCompose.takeIf { getFeatureFlagValue(it) }
         )
     }
 

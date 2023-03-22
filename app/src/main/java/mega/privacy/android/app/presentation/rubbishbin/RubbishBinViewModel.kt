@@ -234,4 +234,26 @@ class RubbishBinViewModel @Inject constructor(
             )
         }
     }
+
+    /**
+     * Select all [NodeUIItem]
+     */
+    fun selectAllNodes() {
+        _state.update {
+            it.copy(
+                nodeList = selectAllNodesUiList(),
+                isInSelection = true,
+                selectedNodes = _state.value.nodeList.size
+            )
+        }
+    }
+
+    /**
+     * Returns list of all selected Nodes
+     */
+    private fun selectAllNodesUiList(): List<NodeUIItem> {
+        return _state.value.nodeList.map {
+            it.copy(isSelected = true)
+        }
+    }
 }

@@ -119,7 +119,7 @@ class RubbishBinFragment : Fragment() {
      * If "true", the contents are displayed in a List View-like manner
      * If "false", the contents are displayed in a Grid View-like manner
      */
-    private val isList: Boolean
+    private val isList
         get() = (requireActivity() as ManagerActivity).isList
 
     override fun onCreateView(
