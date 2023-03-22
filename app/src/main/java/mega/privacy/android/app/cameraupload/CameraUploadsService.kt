@@ -651,11 +651,8 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      */
     override fun onCreate() {
         super.onCreate()
-        coroutineScope = CoroutineScope(ioDispatcher)
+        createDefaultNotificationPendingIntent()
         startForegroundNotification()
-        monitorChargingStoppedStatus()
-        monitorBatteryLevelStatus()
-        monitorUploadPauseStatus()
     }
 
     /**
@@ -699,26 +696,31 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         Timber.d("Starting CameraUpload service (flags: %d, startId: %d)", flags, startId)
-        startForegroundNotification()
-        initService()
 
         when (intent?.action) {
             ACTION_STOP -> {
-                Timber.d("Stop all Camera Uploads Transfers")
-                val aborted = intent.getBooleanExtra(EXTRA_ABORTED, false)
-                coroutineScope?.launch {
-                    endService(
-                        cancelMessage = "Camera Upload Stop Intent Action - Stop Camera Upload",
-                        aborted = aborted
-                    )
+                Timber.d("Received Stop CU service command")
+                if (coroutineScope?.isActive == true) {
+                    Timber.d("active process, stop service")
+                    coroutineScope?.launch {
+                        val aborted = intent.getBooleanExtra(EXTRA_ABORTED, false)
+                        endService(
+                            cancelMessage = "Camera Upload Stop Intent Action - Stop Camera Upload",
+                            aborted = aborted
+                        )
+                    }
                 }
-
-
             }
-
             else -> {
-                Timber.d("Start Service")
-                coroutineScope?.launch { startWorker() }
+                Timber.d("Received Start CU service command")
+                if (coroutineScope?.isActive != true) {
+                    Timber.d("No active process, start service")
+                    coroutineScope = CoroutineScope(ioDispatcher)
+                    coroutineScope?.launch {
+                        initService()
+                        startWorker()
+                    }
+                }
             }
         }
 
@@ -1298,7 +1300,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
      *
      * @param globalTransfer [GlobalTransfer.OnTransferFinish]
      */
-    private fun onTransferFinished(globalTransfer: GlobalTransfer.OnTransferFinish) {
+    private suspend fun onTransferFinished(globalTransfer: GlobalTransfer.OnTransferFinish) {
         val transfer = globalTransfer.transfer
         val error = globalTransfer.error
 
@@ -1308,9 +1310,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
                     "Image Size: ${transfer.transferredBytes}"
         )
         try {
-            coroutineScope?.launch {
-                transferFinished(transfer, error)
-            }
+            transferFinished(transfer, error)
         } catch (th: Throwable) {
             Timber.e(th)
             th.printStackTrace()
@@ -1409,7 +1409,7 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
 
     private suspend fun onQueueComplete() {
         Timber.d("Stopping foreground!")
-        coroutineScope?.launch { resetTotalUploads() }
+        resetTotalUploads()
         totalUploaded = 0
         totalToUpload = 0
         reportUploadFinish()
@@ -1545,30 +1545,33 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
         } ?: throw Exception("Failed to create secondary upload folder")
     }
 
-    private fun initService() {
-        registerNetworkTypeChangeReceiver()
+    private suspend fun initService() {
+        // Start monitoring external events
         startWakeAndWifiLocks()
+        registerNetworkTypeChangeReceiver()
+        monitorChargingStoppedStatus()
+        monitorBatteryLevelStatus()
+        monitorUploadPauseStatus()
+        cameraServiceIpChangeHandler.start()
 
+        // Reset properties
         lastUpdated = 0
         totalUploaded = 0
         totalToUpload = 0
         missingAttributesChecked = false
 
-        cameraServiceIpChangeHandler.start()
-        // end new logic
-        createDefaultNotificationPendingIntent()
+        // Display notification
+        startForegroundNotification()
 
-        coroutineScope?.launch {
-            runCatching { createTempRootFolder() }.onFailure {
+        // Create temp root folder
+        runCatching { tempRoot = createCameraUploadTemporaryRootDirectory() }
+            .onFailure {
                 Timber.w("Root path doesn't exist")
                 endService(aborted = true)
             }
-            clearSyncRecords()
-        }
-    }
 
-    private suspend fun createTempRootFolder() {
-        tempRoot = createCameraUploadTemporaryRootDirectory()
+        // Clear sync records if needed
+        clearSyncRecords()
     }
 
     /**
@@ -1951,11 +1954,9 @@ class CameraUploadsService : LifecycleService(), OnNetworkTypeChangeCallback {
     /**
      * Compression successful
      */
-    private fun onCompressSuccessful(record: SyncRecord) {
-        coroutineScope?.launch {
-            Timber.d("Compression successfully for file with timestamp: %s", record.timestamp)
-            setSyncRecordPendingByPath(record.localPath, record.isSecondary)
-        }
+    private suspend fun onCompressSuccessful(record: SyncRecord) {
+        Timber.d("Compression successfully for file with timestamp: %s", record.timestamp)
+        setSyncRecordPendingByPath(record.localPath, record.isSecondary)
     }
 
     /**

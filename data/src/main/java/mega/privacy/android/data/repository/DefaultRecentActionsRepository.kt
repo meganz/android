@@ -14,7 +14,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRecentActionBucket
-import nz.mega.sdk.MegaRecentActionBucketList
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,13 +33,9 @@ internal class DefaultRecentActionsRepository @Inject constructor(
 
     override suspend fun getRecentActions() = withContext(ioDispatcher) {
         runCatching {
-            val megaRecentActions = recentActionsMapper(
-                getMegaRecentAction(),
-                ::copyRecentActionBucket)
-
-            val list = (megaRecentActions.indices).map {
+            val list = getMegaRecentAction().map {
                 recentActionBucketMapper.invoke(
-                    megaRecentActions[it],
+                    it,
                     cacheFolderGateway::getThumbnailCacheFilePath,
                     megaApiGateway::hasVersion,
                     megaApiGateway::getNumChildFolders,
@@ -57,9 +52,9 @@ internal class DefaultRecentActionsRepository @Inject constructor(
         return@withContext emptyList<RecentActionBucketUnTyped>()
     }
 
-    private suspend fun getMegaRecentAction(): MegaRecentActionBucketList? =
+    private suspend fun getMegaRecentAction(): List<MegaRecentActionBucket> =
         withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
+            val result = suspendCoroutine { continuation ->
                 megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES,
                     OptionalMegaRequestListenerInterface(
                         onRequestFinish = { request: MegaRequest, error: MegaError ->
@@ -71,6 +66,10 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                         }
                     ))
             }
+            return@withContext recentActionsMapper(
+                result,
+                this@DefaultRecentActionsRepository::copyRecentActionBucket
+            )
         }
 
 

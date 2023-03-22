@@ -50,6 +50,12 @@ const val INTENT_EXTRA_CU_DESTINATION_HANDLE_TO_CHANGE = "PRIMARY_HANDLE"
 internal class CameraUploadMediaFacade @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : CameraUploadMediaGateway {
+    companion object {
+        /**
+         * Debug flag if need to set a limit of files retrieved from media cursor
+         */
+        private const val SET_LIMITATION = true
+    }
 
     override suspend fun getMediaQueue(
         uri: Uri,
@@ -139,10 +145,11 @@ internal class CameraUploadMediaFacade @Inject constructor(
             args.putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, this)
             args.putString(ContentResolver.QUERY_ARG_OFFSET, "0")
             args.putString(ContentResolver.QUERY_ARG_SQL_SELECTION, selectionQuery)
-            args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, pageSize.toString())
+            if (SET_LIMITATION)
+                args.putString(ContentResolver.QUERY_ARG_SQL_LIMIT, pageSize.toString())
             context.contentResolver?.query(uri, projection, args, null)
         } else {
-            val mediaOrderPreR = "$this LIMIT 0,$pageSize"
+            val mediaOrderPreR = if (SET_LIMITATION) "$this LIMIT 0,$pageSize" else null
             context.contentResolver?.query(
                 uri,
                 projection,
