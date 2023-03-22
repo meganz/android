@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -439,7 +439,7 @@
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">รายการ %d ไม่ได้ถูกคัดลอก</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Rubbish bin emptied</string>
+    <string name="rubbish_bin_emptied">เคลียร์ถังขยะเสร็จแล้ว</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">พบข้อผิดพลาด ถังขยะยังไม่ได้ทำการล้างข้อมูล</string>
     <!-- dialog cancel subscriptions -->
@@ -502,8 +502,6 @@
     <string name="my_account_change_password_newPassword1">รหัสผ่านใหม่</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">ยืนยันรหัสผ่านใหม่</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">ขณะนี้คุณยังไม่มีการตั้งค่าวิธีการชำระเงินในแผนนี้ กรุณาเลือกหนึ่งรายการ</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -611,7 +609,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">รหัสไม่ถูกต้อง กรุณาลองใหม่หรือส่งอีกครั้ง</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Your phone number has been verified</string>
+    <string name="verify_account_successfully">หมายเลขโทรศัพท์ของคุณถูกตรวจสอบเรียบร้อยแล้ว</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>พื้นที่เก็บข้อมูลภายใน</item>
@@ -803,10 +801,6 @@
     <string name="invalid_string">ไม่ถูกต้อง</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">กรอกข้อมูลไม่ถูกต้อง</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">ที่อยู่อีเมลไม่ถูกต้อง</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">กรุณาตรวจสอบที่อยู่อีเมลและลองอีกครั้ง</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">รีเซ็ตรหัสผ่าน</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -940,7 +934,7 @@
         <item quantity="other">ส่งคำเชิญ %d รายการแล้ว</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d invite requests sent but %2$d requests weren’t sent.</string>
+    <string name="number_no_invite_contact_request">ส่งคำขอเชิญ %1$d รายการแล้ว แต่มีอีก %2$d รายการที่ยังไม่ได้ส่ง</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (ฉัน)</string>
     <!-- button -->
@@ -994,7 +988,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">ล้างประวัติการแชทแล้ว</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">An error has occurred. The chat history hasn’t been cleared</string>
+    <string name="clear_history_error">เกิดข้อผิดพลาด ประวัติแชทยังไม่ถูกล้างออก</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">เพิ่มผู้เข้าร่วม</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1064,9 +1058,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">ผู้เข้าร่วมการสนทนานี้อยู่ในกลุ่มแล้ว</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d participants were invited</string>
+    <string name="number_correctly_add_participant">เชิญผู้เข้าร่วม %d คนแล้ว</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d participants were invited but %2$d participants were not invited.</string>
+    <string name="number_no_add_participant_request">เชิญผู้เข้าร่วม %1$d คนแล้ว แต่มีอีก %2$d คนที่ยังไม่ได้เชิญ</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] เข้าร่วมกลุ่มแชทตามคำเชิญจาก [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1108,7 +1102,7 @@
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">พบข้อผิดพลาดในแชท</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Chat couldn’t be opened</string>
+    <string name="chat_error_open_message">ไม่สามารถเปิดแชทได้</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d ผู้ติดต่อ</item>
@@ -1325,7 +1319,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">เกิดข้อผิดพลาดระหว่างเปลี่ยนชื่อ</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Your name has been updated</string>
+    <string name="success_changing_user_attributes">ชื่อของคุณได้รับการอัปเดตแล้ว</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">เพิ่มผู้เข้าร่วมแล้ว</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1561,9 +1555,9 @@
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">QR code reset</string>
+    <string name="qrcode_reset_successfully">รีเซ็ตคิวอาร์โค้ดแล้ว</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">QR code deleted</string>
+    <string name="qrcode_delete_successfully">คิวอาร์โค้ดถูกนำออกแล้ว</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">คิวอาร์โค้ดไม่ถูกรีเซ็ตเนื่องจากข้อผิดพลาด กรุณาลองอีกครั้ง</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1581,7 +1575,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">เกิดข้อผิดพลาดขณะพยายามดาวน์โหลดไฟล์คิวอาร์โค้ด บางทีไฟล์อาจจะไม่มีอยู่ กรุณาลองใหม่อีกครั้งในภายหลัง</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">The QR Code has been downloaded to %s</string>
+    <string name="success_download_qr">ดาวน์โหลดคิวอาร์โค้ดไปที่ %s แล้ว</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">ยังไม่ได้ส่งคำเชิญ</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1741,8 +1735,7 @@
     <string name="messages_forwarded_success">ส่งข้อความแล้ว</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Error. %1$d message not forwarded</item>
-        <item quantity="other">Error. %1$d messages not forwarded</item>
+        <item quantity="other">พบข้อผิดพลาด มีข้อความ %1$d รายการที่ไม่สามารถส่งต่อได้</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1827,7 +1820,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">พิมพ์</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Recovery key has been saved</string>
+    <string name="save_MK_confirmation">บันทึกคีย์การกู้คืนแล้ว</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(รอดำเนินการ)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1979,7 +1972,7 @@
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">จัดเก็บแชท</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Archived (%d)</string>
+    <string name="archived_chats_show_option">แชทที่จัดเก็บ (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">จัดเก็บแชท</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
@@ -1989,13 +1982,13 @@
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">ยกเลิกจัดเก็บ</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">%s was archived</string>
+    <string name="success_archive_chat">จัดเก็บแชท %s แล้ว</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
+    <string name="error_archive_chat">พบข้อผิดพลาด %s ยังไม่ได้ถูกจัดเก็บแชท ลองใหม่อีกครั้ง</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">%s was unarchived</string>
+    <string name="success_unarchive_chat">ยกเลิกจัดเก็บแชท %s แล้ว</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
+    <string name="error_unarchive_chat">พบข้อผิดพลาด ไม่สามารถยกเลิกการจัดเก็บแชท %s ลองใหม่อีกครั้ง</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">แชทที่ไม่ได้ใช้งาน</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2031,7 +2024,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">คุณกำลังจะลบประวัติเวอร์ชันของไฟล์ทั้งหมด ไฟล์ใด ๆ ที่แชร์ให้กับคุณจากผู้ติดต่อจะต้องถูกลบทิ้งด้วย\n\nโปรดทราบว่าไฟล์ปัจจุบันจะไม่ถูกลบ</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">File versions deleted</string>
+    <string name="success_delete_versions">ลบเวอร์ชันไฟล์แล้ว</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">เกิดข้อผิดพลาดขณะพยายามลบไฟล์เวอร์ชันก่อนหน้าทั้งหมดของคุณ กรุณาลองอีกครั้งในภายหลัง</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2130,8 +2123,6 @@
     <string name="settings_compression_queue_subtitle">ขนาดต่ำสุดคือ %1$s และขนาดสูงสุดคือ %2$s</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">ลบไฟล์ที่เก่ากว่า</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d วัน</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">แจ้งให้ฉันทราบเมื่อขนาดใหญ่กว่า</string>
     <!-- Title of compression queue size option in settings -->
@@ -2485,7 +2476,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">เนื้อหาไม่ได้ถูกส่งไปยังแชท %d</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">New group chat created</string>
+    <string name="new_group_chat_created">สร้างแชทกลุ่มใหม่แล้ว</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">กำลังเตรียมการไฟล์</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2502,8 +2493,7 @@
     <string name="version_history_deleted_erroneously">เวอร์ชันก่อนหน้านี้ไม่ถูกลบ</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">%d version deleted</item>
-        <item quantity="other">%d versions deleted</item>
+        <item quantity="other">ลบออก %d เวอร์ชันแล้ว</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2596,9 +2586,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">ไม่มีลิงก์แชท</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Chat link deleted</string>
+    <string name="chat_link_deleted">ลบลิงก์แชทออกแล้ว</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Version restored</string>
+    <string name="version_restored">กู้คืนเวอร์ชันไฟล์แล้ว</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">แตะค้างไว้เพื่อบันทึก</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2756,7 +2746,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">คุณไม่มีสิทธิ์ในการแก้ไขไฟล์นี้ คุณต้องการสร้างไฟล์ใหม่หรือไม่</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Version was created as a new file</string>
+    <string name="version_as_new_file_created">สร้างเวอร์ชันเป็นไฟล์ใหม่แล้ว</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">เมื่อ %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2783,8 +2773,6 @@
     <string name="label_storage_over_quota">เกินโควต้าพื้นที่จัดเก็บ</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">รับโควต้าการถ่ายโอนเพิ่มขึ้น</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">ไม่มีโฟลเดอร์นี้</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">ไม่พบไฟล์ในคลาวด์ไดร์ฟของคุณ</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2834,7 +2822,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">กำลังออก&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Phone number removed</string>
+    <string name="remove_phone_number_success">นำหมายเลขโทรศัพท์ออกแล้ว</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">ไม่สามารถลบหมายเลขโทรศัพท์ของคุณได้</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -2982,9 +2970,9 @@
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">คัดลอกรหัสผ่านไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
-    <string name="link_and_key_sent">Link and key sent</string>
+    <string name="link_and_key_sent">ส่งลิงก์และคีย์แล้ว</string>
     <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
-    <string name="link_and_password_sent">Link and password sent</string>
+    <string name="link_and_password_sent">ส่งลิงก์และรหัสผ่านแล้ว</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">อัปเกรดเป็น Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3161,23 +3149,19 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to Rubbish bin</item>
-        <item quantity="other">%d items moved to Rubbish bin</item>
+        <item quantity="other">%d รายการถูกย้ายไปที่ถังขยะแล้ว</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item wasn’t moved to the Rubbish bin</item>
-        <item quantity="other">%d items weren’t moved to Rubbish bin</item>
+        <item quantity="other">%d รายการไม่ได้ถูกย้ายไปที่ถังขยะ</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item restored</item>
-        <item quantity="other">%d items restored</item>
+        <item quantity="other">กู้คืน %d รายการแล้ว</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item wasn’t restored</item>
-        <item quantity="other">%d items weren’t restored</item>
+        <item quantity="other">มี %d รายการที่ไม่ได้กู้คืน</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">ยืนยันการเปลี่ยน</string>
@@ -3223,13 +3207,11 @@
     <string name="action_copy_all">คัดลอกทั้งหมด</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link sent</item>
-        <item quantity="other">Links sent</item>
+        <item quantity="other">ลิงก์ถูกส่งแล้ว</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Copied link to clipboard</item>
-        <item quantity="other">Copied links to clipboard</item>
+        <item quantity="other">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3402,7 +3384,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">คุณเคยเชิญ %1$s แล้ว</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invite sent. See Sent requests.</string>
+    <string name="contact_invited">ส่งคำเชิญแล้ว ดูได้ที่คำขอที่ส่งแล้ว</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">ไฟล์พร้อมใช้งานออฟไลน์แล้ว</string>
     <!-- Message when file removed from offline. -->
@@ -3560,15 +3542,14 @@
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
     <string name="meeting_call_screen_one_participant_left_call">%1$s วางสายแล้ว</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left the call</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s และ %2$s วางสายแล้ว</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="other">%1$s และคนอื่น ๆ อีก %2$d คน เข้าร่วมสายแล้ว</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left the call</item>
-        <item quantity="other">%1$s and %2$d others left the call</item>
+        <item quantity="other">%1$s และคนอื่น ๆ อีก %2$d คน วางสายแล้ว</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">ลบอย่างถาวร</string>
@@ -3956,22 +3937,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">แสดงน้อยลง</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">ตรวจสอบผู้ติดต่อ</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">เราปกป้องข้อมูลของคุณด้วยกระบวนการเข้ารหัส zero-knowledge และเพื่อความปลอดภัยมากยิ่งขึ้น เราขอให้คุณตรวจสอบผู้ติดต่อที่คุณแชร์ข้อมูลอยู่ด้วยนั้น ก่อนที่จะให้สิทธิ์ในการเข้าถึงโฟลเดอร์ที่แชร์ได้</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">เราปกป้องข้อมูลของคุณด้วยกระบวนการเข้ารหัส zero-knowledge และเพื่อความปลอดภัยมากยิ่งขึ้น เราขอให้คุณตรวจสอบผู้ติดต่อที่คุณได้รับข้อมูลอยู่ด้วยนั้น ก่อนที่จะให้สิทธิ์ในการเข้าถึงโฟลเดอร์ที่แชร์ได้</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">ในการตรวจสอบผู้ติดต่อของคุณ ตรวจสอบให้แน่ใจว่าข้อมูลประจำตัวที่แสดงด้านบนตรงกับข้อมูลประจำตัวของคุณ คุณสามารถขอให้ผู้ติดต่อของคุณให้ข้อมูลประจำตัวแก่คุณได้</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[โฟลเดอร์ที่ไม่ได้ถอดรหัส]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">หากต้องการเข้าถึงโฟลเดอร์ที่แชร์ บุคคลที่แชร์โฟลเดอร์กับคุณควรมีการตรวจสอบด้วย</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">ตรวจสอบ %s</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">ข้อมูลประจำตัวของคุณ</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">กำลังเตรียมไฟล์เพื่อแสดงตัวอย่าง</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4065,9 +4038,9 @@
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] ตั้งแต่ [B]%2$s จนถึง %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Every day effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">ทุกวัน มีผล [A]%1$s[/A] ตั้งแต่ [B]%2$s จนถึง %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Every day effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">ทุกวัน มีผลตั้งแต่ [A]%1$s จนถึง %2$s[/A] ตั้งแต่ [B]%3$s จนถึง %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="other">%1$s ทุก %2$d สัปดาห์ มีผลตั้งแต่ [A]%3$s จนถึง %4$s[/A] ตั้งแต่ [B]%5$s จนถึง %6$s[/B]</item>
@@ -4078,13 +4051,11 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="other">%1$s และ %2$s ทุก %3$d สัปดาห์ มีผลตั้งแต่ [A]%4$s จนถึง %5$s[/A] ตั้งแต่ [B]%6$s จนถึง %7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="other">%1$s และ %2$s ทุก %3$d สัปดาห์ มีผล [A]%4$s[/A] ตั้งแต่ [B]%5$s จนถึง %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
@@ -4435,23 +4406,81 @@
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">อาทิตย์</string>
     <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <string name="photos_album_selection_dialog_title">เลือกเพิ่มไม่ได้แล้ว</string>
     <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="photos_album_selection_dialog_body">คุณสามารถเพิ่มรายการลงในอัลบั้มได้ครั้งละไม่เกิน 150 รายการ</string>
+    <!--  -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">ไม่สามารถตรวจสอบผู้ติดต่อได้</string>
+    <!--  -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">คุณไม่สามารถตรวจสอบ %s ได้เนื่องจากไม่ได้อยู่ในรายชื่อผู้ติดต่อของคุณ รอให้พวกเขาตอบรับคำเชิญของคุณก่อน</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">เริ่ม</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_camelcase_ok">ตกลง</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">ไฟล์นี้ถูกลบออกตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">โฟลเดอร์นี้ถูกลบออกตาม[A]นโยบายแนวทางการลบเนื้อหา[/A]ของเรา</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">เข้าร่วม</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
     <string name="meetings_chat_room_start_scheduled_meeting_option">เริ่มการประชุม</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">เข้าร่วมการประชุม</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="other">ส่งคำเชิญ %1$d รายการแล้ว&#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="other">แต่ยังมีอีก %1$d คำขอที่ยังไม่ได้ส่ง</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="other">คัดลอก %1$d รายการแล้ว</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="other">มี %1$d รายการที่คัดลอกไม่ได้</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="other">คัดลอก %1$d รายการแล้ว&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="other">และมีอีก %1$d รายการที่คัดลอกไม่ได้</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="other">%1$d วัน</item>
+    </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">คำบรรยาย</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">ปิด</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">เพิ่มคำบรรยาย&#8230;</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">ตัวเลือกการนำเสนอภาพนิ่ง</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">ความเร็วการนำเสนอภาพนิ่ง</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">ช้า (8 วิ)</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">ปกติ (4 วิ)</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">เร็ว (2 วิ)</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">ลำดับการนำเสนอภาพนิ่ง</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">สลับ</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">เล่นซํ้า</string>
 </resources>

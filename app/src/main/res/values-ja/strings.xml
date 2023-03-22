@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -502,8 +502,6 @@
     <string name="my_account_change_password_newPassword1">新しいパスワード</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">新しいパスワードを確認</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">現在、このプランにはお支払い方法が設定されておりません。1つ選択してください。</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">リンクをクリップボードにコピーしました</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -803,10 +801,6 @@
     <string name="invalid_string">エラー</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">入力が無効です</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">メールアドレスが無効です</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">メールアドレスをご確認の上、再度お試しください。</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">パスワードをリセット</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -2129,8 +2123,6 @@
     <string name="settings_compression_queue_subtitle">最小サイズは%1$sで、最大サイズは%2$sです。</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">以下の日数が経過したファイルを削除</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d日</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">以下のサイズを超えたら通知を受けます</string>
     <!-- Title of compression queue size option in settings -->
@@ -2781,8 +2773,6 @@
     <string name="label_storage_over_quota">ストレージ容量が超過しました</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">転送容量を増やす</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">フォルダが存在しません。</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">クラウドドライブにファイルが見つかりません。</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -3947,22 +3937,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">表示を減らす</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">連絡先の認証</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">当社はゼロ知識暗号化でデータを保護します。セキュリティを強化するため、連絡先が共有フォルダにアクセスする前に、情報を共有する連絡先を認証するようお願いしています。</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">当社はゼロ知識暗号化でデータを保護します。セキュリティを強化するため、あなたが共有フォルダにアクセスする前に、あなたが情報を受け取る連絡先を認証するようお願いしています。</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">連絡先を認証するには、上記の資格情報がアカウントの資格情報と一致していることを確認してください。連絡先に資格情報を共有するように依頼できます。</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[未復号フォルダ]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">共有フォルダにアクセスするには、あなたと共有した人もあなたを承認する必要があります。</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">%sさんを承認</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">あなたの資格情報</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">プレビュー用にファイルを準備しています</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4427,7 +4409,9 @@
     <string name="photos_album_selection_dialog_title">これ以上選択できません</string>
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">一度に最大150個のアイテムのみをアルバムに追加できます。</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">連絡先を認証できません</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">連絡先リストにないため、%sを認証できません。相手側が最初にあなたの招待を受け入れるのを待ちます。</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">開始</string>
@@ -4443,4 +4427,60 @@
     <string name="meetings_chat_room_start_scheduled_meeting_option">ミーティング開始</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">ミーティングに参加</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="other">%1$d件の招待要求が送信されました。&#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="other">ただし、%1$d件の要求は送信されませんでした。</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="other">%1$d個の項目をコピーしました</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="other">%1$d個の項目はコピーできませんでした</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="other">%1$d個の項目をコピーしましたが、&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="other">%1$d個の項目はコピーできませんでした</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="other">%1$d日</item>
+    </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">字幕</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">オフ</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">字幕を追加&#8230;</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">スライドショーのオプション</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">スライドショーの速度</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">遅い（8 秒）</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">通常（4秒）</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">早い（2秒）</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">スライドショーの順番</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">シャッフル</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">リピート</string>
 </resources>

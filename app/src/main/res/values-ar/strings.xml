@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">برو لايت Pro&#160;Lite</string>
@@ -422,7 +422,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">تم إعادة إرسال الطلب</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">تم إرسال الطلب إلى %s. عرض في صفحة الطلبات المرسلة.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">تم حذف جهة الاتصال</string>
     <!-- error message -->
@@ -438,17 +438,17 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">خطأ، لم يتم إنشاء المجلد</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Renamed</string>
+    <string name="context_correctly_renamed">تمت إعادة التسمية</string>
     <!-- error message -->
     <string name="context_no_renamed">خطأ. لم يتم إعادة التسمية</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copied</string>
+    <string name="context_correctly_copied">تم النسخ</string>
     <!-- error message -->
     <string name="context_no_copied">خطأ. لم يتم النسخ</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">الرجاء اختيار وجهة المجلد</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Moved</string>
+    <string name="context_correctly_moved">تم النقل</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="zero">تم نقل %d عنصر</item>
@@ -461,7 +461,7 @@
     <!-- success message when moving a node -->
     <string name="number_incorrectly_moved">%d items weren’t moved</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Moved to Rubbish bin</string>
+    <string name="context_correctly_moved_to_rubbish">نقل إلى سلة المحذوفات</string>
     <!-- error message -->
     <string name="context_no_moved">خطأ. لم يتم النقل</string>
     <!-- success message when sharing a folder -->
@@ -477,25 +477,25 @@
     <!-- success message when moving a node -->
     <string name="number_correctly_removed">%d items removed from MEGA</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d items weren’t removed</string>
+    <string name="number_no_removed">لم تتم إزالة  %d عنصر</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d folders left</string>
+    <string name="number_correctly_leaved">تمت مغادرة %d ملف</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">تم مغادرة المشاركة</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d folders weren’t left</string>
+    <string name="number_no_leaved">لم يتم مغادرة %d ملف</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d items copied</string>
+    <string name="number_correctly_copied">تم نسخ %d ملف</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d عناصر لم يتم نسخها</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Rubbish bin emptied</string>
+    <string name="rubbish_bin_emptied">سلة المحذوفات تم إفراغها بنجاح</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">حدث خطأ. لم يتم إفراغ سلة المحذوفات</string>
     <!-- dialog cancel subscriptions -->
     <string name="dialog_cancel_subscriptions">أنت على وشك إلغاء اشتراكك بميغا MEGA. فضلاً أخبرنا إن كان هناك أي شيء نستطيع فعله لنساعد بتغيير رأيك.</string>
     <!-- hint cancel subscriptions dialog -->
-    <string name="hint_cancel_subscriptions">اكتب رأيك هنا</string>
+    <string name="hint_cancel_subscriptions">اكتب ملاحظاتك هنا</string>
     <!-- send cancel subscriptions dialog -->
     <string name="send_cancel_subscriptions">إرسال</string>
     <!-- confirmation cancel subscriptions dialog -->
@@ -557,8 +557,6 @@
     <string name="my_account_change_password_newPassword1">كلمة المرور جديدة</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">تأكيد كلمة المرور الجديدة</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">لا توجد طريقة دفع محددة لهذه الباقة حاليًا. يرجى اختيار واحدة.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">تم النسخ الى حافظة النصوص</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -666,7 +664,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">رمز خاطئ. يرجى المحاولة مرة أخرى أو إعادة الإرسال.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Your phone number has been verified</string>
+    <string name="verify_account_successfully">تم التحقق من رقم هاتفك</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>ذاكرة داخلية</item>
@@ -735,7 +733,7 @@
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
         <item quantity="zero">%1$d محاولة فاشلة لإدخال رمز المرور</item>
-        <item quantity="one">1 محاولة فاشلة لإدخال رمز المرور</item>
+        <item quantity="one">%1$d محاولة فاشلة لإدخال رمز المرور</item>
         <item quantity="two">%1$d محاولتان فاشلتان لإدخال رمز المرور</item>
         <item quantity="few">%1$d محاولات فاشلة لإدخال رمز المرور</item>
         <item quantity="many">%1$d محاولة فاشلة لإدخال رمز المرور</item>
@@ -863,10 +861,6 @@
     <string name="invalid_string">غير صحيح</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">ادخال غير صالح</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">عنوان بريد إلكتروني غير صالح</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">يرجى التحقق من عنوان البريد الإلكتروني والمحاولة مرة أخرى.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">إعادة تعيين كلمة المرور</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -971,7 +965,7 @@
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
         <item quantity="zero">%1$d عنصر</item>
-        <item quantity="one">1 عنصر</item>
+        <item quantity="one">%1$d عنصر</item>
         <item quantity="two">%1$d عنصرين</item>
         <item quantity="few">%1$d عناصر</item>
         <item quantity="many">%1$d عنصر</item>
@@ -1020,7 +1014,7 @@
         <item quantity="other">تم ارسال %d دعوة</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d invite requests sent but %2$d requests weren’t sent.</string>
+    <string name="number_no_invite_contact_request">تم إرسال %1$d طلب دعوة و لكن لم يتم إرسال %2$d طلب دعوة.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (أنا)</string>
     <!-- button -->
@@ -1089,7 +1083,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">تم مسح سجل المحادثة</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">An error has occurred. The chat history hasn’t been cleared</string>
+    <string name="clear_history_error">حدث خطأ. لم يتم محو سجل المحادثة</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">إضافة مشاركين</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1159,9 +1153,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">المشارك موجود بالفعل في المجموعة</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d participants were invited</string>
+    <string name="number_correctly_add_participant">تمت دعوة %d مشاركين</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d participants were invited but %2$d participants were not invited.</string>
+    <string name="number_no_add_participant_request">تمت دعوة %1$d مشارك ولكن لم تتم دعوة%2$d مشارك.</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] انضم للمجموعة عبر دعوة من [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1203,7 +1197,7 @@
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">خطأ في المحادثة</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Chat couldn’t be opened</string>
+    <string name="chat_error_open_message">تعذر فتح المحادثة</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="zero">%1$d جهة اتصال</item>
@@ -1339,7 +1333,7 @@
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
         <item quantity="zero">تم ترفيع %1$d ملف بالفعل</item>
-        <item quantity="one">تتم ترفيع 1 ملف بالفعل</item>
+        <item quantity="one">تتم ترفيع %1$d ملف بالفعل</item>
         <item quantity="two">تم ترفيع %1$d ملفين بالفعل</item>
         <item quantity="few">تم ترفيع %1$d ملفات بالفعل</item>
         <item quantity="many">تم ترفيع %1$d ملفاً بالفعل</item>
@@ -1495,7 +1489,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">حدث خطأ أثناء تغيير الاسم</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Your name has been updated</string>
+    <string name="success_changing_user_attributes">تم تحديث اسمك</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">تم إضافة مشارك</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1659,11 +1653,11 @@
     <!-- Settings preference title for help centre -->
     <string name="settings_help_centre">مركز المساعدة</string>
     <!-- Settings preference title for send feedback -->
-    <string name="settings_help_preference">أرسل رأيك</string>
+    <string name="settings_help_preference">أرسل ملاحظاتك</string>
     <!-- mail subject -->
-    <string name="setting_feedback_subject">آراء من الأندرويد Android</string>
+    <string name="setting_feedback_subject">ملاحظات الأندرويد Android</string>
     <!-- mail body -->
-    <string name="setting_feedback_body">يرجى إعطاء رأيك هنا:</string>
+    <string name="setting_feedback_body">يرجى إعطاء ملاحظاتك هنا:</string>
     <!-- mail body -->
     <string name="settings_feedback_body_device_model">نموذج الجهاز</string>
     <!-- mail body -->
@@ -1718,7 +1712,7 @@
     <!-- Label to show rate the app -->
     <string name="rate_the_app_panel">نعم، قم بتقييم التطبيق</string>
     <!-- Label to show send feedback -->
-    <string name="send_feedback_panel">لا، أرسل الرأي</string>
+    <string name="send_feedback_panel">لا، أرسل الملاحظات</string>
     <!-- Message to show when users deny to permit the permissions to read and write on external storage on setting default download location -->
     <string name="download_requires_permission">يحتاج ميغا MEGA إلى أذونات القراءة والكتابة إلى وحدة التخزين الخارجية لتنزيل الملفات هناك.</string>
     <!-- Default download location is on old sd card, but currently the user installed a new SD card, need user to reset download location. -->
@@ -1746,9 +1740,9 @@
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">تم النسخ الى حافظة النصوص</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">QR code reset</string>
+    <string name="qrcode_reset_successfully">إعادة تعيين رمز الاستجابة السريعة QR</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">QR code deleted</string>
+    <string name="qrcode_delete_successfully">تم مسح رمز الاستجابة السريعة QR</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">لم يتم إعادة تعيين رمز الاستجابة السريعة QR لحدوث خطأ. يرجى المحاولة مرة أخرى.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1766,7 +1760,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">حدث خطأ أثناء محاولة تنزيل ملف رمز الاستجابة السريعة QR. ربما الملف غير موجود. الرجاء المحاولة في وقت لاحق.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">The QR Code has been downloaded to %s</string>
+    <string name="success_download_qr">تم تنزيل ملف رمز الاستجابة السريعة QR الى %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">لم يتم إرسال الدعوة</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1946,8 +1940,12 @@
     <string name="messages_forwarded_success">تمت إعادة توجيه الرسائل</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Error. %1$d message not forwarded</item>
-        <item quantity="other">Error. %1$d messages not forwarded</item>
+        <item quantity="zero">خطأ. لم يتم إعادة توجيه %1$d رسالة</item>
+        <item quantity="one">خطأ. لم يتم إعادة توجيه %1$d رسالة</item>
+        <item quantity="two">خطأ. لم يتم إعادة توجيه %1$d رسالتين</item>
+        <item quantity="few">خطأ. لم يتم إعادة توجيه %1$d رسائل</item>
+        <item quantity="many">خطأ. لم يتم إعادة توجيه %1$d رسالة</item>
+        <item quantity="other">خطأ. لم يتم إعادة توجيه %1$d رسالة</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -2052,7 +2050,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">اطبع</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Recovery key has been saved</string>
+    <string name="save_MK_confirmation">تم حفظ مفتاح الاستعادة</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(قيد الانتظار)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -2224,11 +2222,11 @@
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">اعادة من الارشفة</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">%s was archived</string>
+    <string name="success_archive_chat">تمت أرشفة %s</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
+    <string name="error_archive_chat">خطأ. لم يتم أرشفة %s . حاول مرة أخرى.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">%s was unarchived</string>
+    <string name="success_unarchive_chat">تمت إعادة %s من الأرشفة</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
     <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
@@ -2256,7 +2254,7 @@
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
         <item quantity="zero">%1$dنسخة معدلة للملف، تستهلك اجمالي %2$s</item>
-        <item quantity="one">1 نسخة معدلة للملف، تستهلك اجمالي %2$s</item>
+        <item quantity="one">%1$d نسخة معدلة للملف، تستهلك اجمالي %2$s</item>
         <item quantity="two">%1$d نسختين معدلتين للملف، تستهلك اجمالي %2$s</item>
         <item quantity="few">%1$d نسخ معدلة للملف، تستهلك اجمالي %2$s</item>
         <item quantity="many">%1$d نسخة معدلة للملف، تستهلك اجمالي %2$s</item>
@@ -2271,7 +2269,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">انت بصدد حذف كل النسخ المعدلة لكل الملفات. أي نسخة معدلة لملف مشارك معك من جهة اتصال يجب ان يحذف من قبله. \n\nيرجى الملاحظة انه لن يتم حذف النسخ الحالية للملفات.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">File versions deleted</string>
+    <string name="success_delete_versions">حذف نسخ الملف</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">حدث خطأ خلال عملية حذف النسخ المعدلة القديمة للملفات. يرجى إعادة المحاولة.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2375,8 +2373,6 @@
     <string name="settings_compression_queue_subtitle">الحجم الأدنى هو %1$s والحجم الأقصى هو%2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">أزل الملفات الأقدم من</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d يوم</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">أرسل لي إشعاراً عندما يكون الحجم أكبر من</string>
     <!-- Title of compression queue size option in settings -->
@@ -2810,7 +2806,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">لم يتم ارسال المحتوى إلى %d محادثات</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">New group chat created</string>
+    <string name="new_group_chat_created">تم إنشاء محادثة جماعية جديدة</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">جاري تحضير الملفات</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2926,9 +2922,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">لا يوجد رابط محادثة متاح.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Chat link deleted</string>
+    <string name="chat_link_deleted">تم حذف رابط المحادثة</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Version restored</string>
+    <string name="version_restored">تمت استعادة النسخة</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">انقر مع الاستمرار للتسجيل</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2942,7 +2938,7 @@
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
         <item quantity="zero">%d ملف تم تنزيله بالفعل.</item>
-        <item quantity="one">1 ملف تم تنزيله بالفعل.</item>
+        <item quantity="one">%d ملف تم تنزيله بالفعل.</item>
         <item quantity="two">%d ملفان تم تنزيلهما بالفعل.</item>
         <item quantity="few">%d ملفات تم تنزيلهم بالفعل.</item>
         <item quantity="many">%d ملفاً تم تنزيلهم بالفعل.</item>
@@ -2951,7 +2947,7 @@
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
         <item quantity="zero">%d ملف قيد الانتظار.</item>
-        <item quantity="one">1 ملف قيد الانتظار.</item>
+        <item quantity="one">%d ملف قيد الانتظار.</item>
         <item quantity="two">%d ملفان قيد الانتظار.</item>
         <item quantity="few">%d ملفات قيد الانتظار.</item>
         <item quantity="many">%d ملفاً قيد الانتظار.</item>
@@ -3111,7 +3107,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">ليس لديك الأذونات الصحيحة لتعديل هذا الملف. هل ترغب في إنشاء ملف جديد؟</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Version was created as a new file</string>
+    <string name="version_as_new_file_created">تم إنشاء النسخة كملف جديد.</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">في %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -3143,8 +3139,6 @@
     <string name="label_storage_over_quota">تم تجاوز مساحة التخزين المتاحة</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">الحصول على المزيد من حجم التراسل المتاح</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">المجلد غير موجود.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">لا يمكن العثور على الملف في سواقتك السحابية.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -3171,7 +3165,7 @@
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
         <item quantity="zero">%d يوم</item>
-        <item quantity="one">1 يوم</item>
+        <item quantity="one">%d يوم</item>
         <item quantity="two">%d يومان</item>
         <item quantity="few">%d أيام</item>
         <item quantity="many">%d يوماً</item>
@@ -3204,7 +3198,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">جاري المغادرة&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Phone number removed</string>
+    <string name="remove_phone_number_success">تم حذف رقم الهاتف</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">فشل في إزالة رقم هاتفك.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3340,7 +3334,7 @@
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
         <item quantity="zero">%1$d ساعة</item>
-        <item quantity="one">1 ساعة</item>
+        <item quantity="one">%1$d ساعة</item>
         <item quantity="two">%1$d ساعتان</item>
         <item quantity="few">%1$d ساعات</item>
         <item quantity="many">%1$d ساعة</item>
@@ -3349,7 +3343,7 @@
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
         <item quantity="zero">%1$d أسبوع</item>
-        <item quantity="one">1 أسبوع</item>
+        <item quantity="one">%1$d أسبوع</item>
         <item quantity="two">%1$d أسبوعان</item>
         <item quantity="few">%1$d أسابيع</item>
         <item quantity="many">%1$d أسبوعاً</item>
@@ -3358,7 +3352,7 @@
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
         <item quantity="zero">%1$d شهر</item>
-        <item quantity="one">1 شهر</item>
+        <item quantity="one">%1$d شهر</item>
         <item quantity="two">%1$d شهران</item>
         <item quantity="few">%1$d أشهر</item>
         <item quantity="many">%1$d شهراً</item>
@@ -3387,9 +3381,9 @@
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">تم نسخ كلمة المرور إلى الحافظة</string>
     <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
-    <string name="link_and_key_sent">Link and key sent</string>
+    <string name="link_and_key_sent">تم إرسال الرابط والمفتاح</string>
     <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
-    <string name="link_and_password_sent">Link and password sent</string>
+    <string name="link_and_password_sent">تم إرسال الرابط وكلمة المرور.</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">قم بالترقية إلى برو Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3525,7 +3519,7 @@
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
         <item quantity="zero">جاري الترفيع، %1$d ملف معلق</item>
-        <item quantity="one">جاري الترفيع، 1 ملف معلق</item>
+        <item quantity="one">جاري الترفيع، %1$d ملف معلق</item>
         <item quantity="two">جاري الترفيع، %1$d ملفان معلقان</item>
         <item quantity="few">جاري الترفيع، %1$d ملفات معلقة</item>
         <item quantity="many">جاري الترفيع، %1$d ملف معلق</item>
@@ -3548,7 +3542,7 @@
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
         <item quantity="zero">قد تم تنزيل 1 ملف. %d ملف قيد الانتظار.</item>
-        <item quantity="one">تم تنزيل 1 ملف بالفعل. 1 ملف قيد الانتظار.</item>
+        <item quantity="one">تم تنزيل 1 ملف بالفعل. %d ملف قيد الانتظار.</item>
         <item quantity="two">قد تم تنزيل 1 ملف. %d ملفان قيد الانتظار.</item>
         <item quantity="few">قد تم تنزيل 1 ملف. %d ملفات قيد الانتظار.</item>
         <item quantity="many">قد تم تنزيل 1 ملف. %d ملفاً قيد الانتظار.</item>
@@ -3557,7 +3551,7 @@
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
         <item quantity="zero">قد تم تنزيل %d ملف. 1 ملف قيد الانتظار.</item>
-        <item quantity="one">تم تنزيل 1 ملف. 1 ملف قيد الانتظار.</item>
+        <item quantity="one">تم تنزيل %d ملف. 1 ملف قيد الانتظار.</item>
         <item quantity="two">قد تم تنزيل %d ملفين. 1 ملف قيد الانتظار.</item>
         <item quantity="few">قد تم تنزيل %d ملفات. 1 ملف قيد الانتظار.</item>
         <item quantity="many">قد تم تنزيل %d ملفاً. 1 ملف قيد الانتظار.</item>
@@ -3575,7 +3569,7 @@
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
         <item quantity="zero">تم نقل %d عنصر إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً</item>
-        <item quantity="one">تم نقل 1 عنصر واحد إلى سلة المحذوفات ولكن لم يتم نقل العنصر الآخر. حاول مرة أخرى في وقت لاحق.</item>
+        <item quantity="one">تم نقل %d عنصر واحد إلى سلة المحذوفات ولكن لم يتم نقل العنصر الآخر. حاول مرة أخرى في وقت لاحق.</item>
         <item quantity="two">تم نقل %d عنصرين إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً</item>
         <item quantity="few">تم نقل %d عناصر إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً</item>
         <item quantity="many">تم نقل %d عنصراً إلى سلة المحذوفات ولكن لم يتم نقل 1 عنصر واحد. حاول مرة أخرى لاحقاً</item>
@@ -3593,7 +3587,7 @@
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
         <item quantity="zero">%d عنصر تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
-        <item quantity="one">تمت استعادة 1 عنصر واحد ولكن لم تتم استعادة العنصر الآخر. حاول مرة أخرى لاحقاً.</item>
+        <item quantity="one">تمت استعادة %d عنصر واحد ولكن لم تتم استعادة العنصر الآخر. حاول مرة أخرى لاحقاً.</item>
         <item quantity="two">%d عنصرين تمت استعادتهما ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
         <item quantity="few">%d عناصر تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
         <item quantity="many">%d عنصراً تمت استعادتهم ولكن لم تتم استعادة 1 عنصر واحد. حاول مرة لاحقاً.</item>
@@ -3601,22 +3595,22 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to Rubbish bin</item>
+        <item quantity="one">%d item moved to Rubbish bin</item>
         <item quantity="other">%d items moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item wasn’t moved to the Rubbish bin</item>
+        <item quantity="one">%d item wasn’t moved to the Rubbish bin</item>
         <item quantity="other">%d items weren’t moved to Rubbish bin</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item restored</item>
+        <item quantity="one">%d item restored</item>
         <item quantity="other">%d items restored</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item wasn’t restored</item>
+        <item quantity="one">%d item wasn’t restored</item>
         <item quantity="other">%d items weren’t restored</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
@@ -3648,7 +3642,7 @@
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
         <item quantity="zero">%1$d وسيلة تواصل</item>
-        <item quantity="one">1 وسيلة تواصل</item>
+        <item quantity="one">%1$d وسيلة تواصل</item>
         <item quantity="two">%1$d وسيلتا تواصل</item>
         <item quantity="few">%1$d وسائل التواصل</item>
         <item quantity="many">%1$d وسيلة تواصل</item>
@@ -4014,7 +4008,7 @@
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="zero">انضم %1$s و %2$d آخر</item>
-        <item quantity="one">انضم %1$s و 1 آخر</item>
+        <item quantity="one">انضم %1$s و %2$d آخر</item>
         <item quantity="two">انضم %1$s و %2$d آخران</item>
         <item quantity="few">انضم %1$s و %2$d آخرون</item>
         <item quantity="many">انضم %1$s و %2$d آخرون</item>
@@ -4022,7 +4016,7 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left the call</item>
+        <item quantity="one">%1$s and %2$d other left the call</item>
         <item quantity="other">%1$s and %2$d others left the call</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
@@ -4221,7 +4215,7 @@
     <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
     <plurals name="num_folders_num_files_2">
         <item quantity="zero">%1$d ملف</item>
-        <item quantity="one">1 ملف</item>
+        <item quantity="one">%1$d ملف</item>
         <item quantity="two">%1$d ملفان</item>
         <item quantity="few">%1$d ملفات</item>
         <item quantity="many">%1$d ملفاً</item>
@@ -4447,22 +4441,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">مشاهدة أقل</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">التحقق من جهة الاتصال</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">نحن نحمي بياناتك عن طريق تشفير المعرفة الصفرية. لضمان أمان إضافي نطلب منك التحقق من جهات الاتصال التي تشارك المعلومات معها قبل أن يتمكنوا من الوصول إلى المجلدات المشاركة.</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">نحن نحمي بياناتك عن طريق تشفير المعرفة الصفرية. لضمان أمان إضافي نطلب منك التحقق من جهات الاتصال التي تستقبل المعلومات منها قبل أن تتمكن من الوصول إلى المجلدات المشاركة.</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">للتحقق من جهة الاتصال الخاصة بك، تأكد من أن بيانات الاعتماد التي تراها أعلاه تطابق بيانات اعتماد حسابهم. يمكنك أن تطلب منهم مشاركة بيانات اعتمادهم معك.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[مجلد غير مشفر]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">للوصول إلى المجلد المشارك يجب على الشخص الذي شاركه معك التحقق منك أيضًا.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">تحقق من %s</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">بيانات الاعتماد الخاصة بك</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">تحضير الملف للعرض</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4522,7 +4508,7 @@
     <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
     <string name="dialog_negative_button_do_not_allow">لا تسمح</string>
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
-    <string name="meetings_list_recurring_meeting_occurrences_option">Occurrences</string>
+    <string name="meetings_list_recurring_meeting_occurrences_option">التكرارات</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
     <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">يتكرر يومياً</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
@@ -4558,7 +4544,7 @@
     <!-- Select album cover -->
     <string name="photos_album_select_cover">اختر غلاف الألبوم</string>
     <!-- Album cover updated -->
-    <string name="photos_album_cover_updated">Album cover updated</string>
+    <string name="photos_album_cover_updated">تم تحديث غلاف الألبوم</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
@@ -5019,7 +5005,9 @@
     <string name="photos_album_selection_dialog_title">Cannot select more</string>
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
+    <!--  -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">لا يمكن التحقق من جهة الاتصال</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">بدء</string>
@@ -5035,4 +5023,67 @@
     <string name="meetings_chat_room_start_scheduled_meeting_option">ابدأ الاجتماع</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">أنضم إلى الاجتماع</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="one">%1$d invite request sent.&#160;</item>
+        <item quantity="other">%1$d invite requests sent.&#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="one">However, %1$d request wasn’t sent.</item>
+        <item quantity="other">However, %1$d requests weren’t sent.</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="one">Copied %1$d item</item>
+        <item quantity="other">Copied %1$d items</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="one">Couldn’t copy %1$d item</item>
+        <item quantity="other">Couldn’t copy %1$d items</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="one">Copied %1$d item,&#160;</item>
+        <item quantity="other">Copied %1$d items,&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="one">couldn’t copy %1$d item</item>
+        <item quantity="other">couldn’t copy %1$d items</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">ملف ترجمة Subtitles</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">ايقاف</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Add subtitles&#8230;</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">خيارات عرض الشرائح</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">سرعة عرض الشرائح</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">بطيئة (8 ثوان)</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">عادية (4 ثوان)</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">سريعة (2 ثانية)</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">ترتيب عرض الشرائح</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">عشوائي</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">تكراري</string>
 </resources>

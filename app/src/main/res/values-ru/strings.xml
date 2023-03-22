@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -451,7 +451,7 @@
     <!-- error message -->
     <string name="context_no_removed_shared">Ошибка. Не удалось удалить</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Удаленный</string>
+    <string name="context_correctly_removed">Удалённый</string>
     <!-- error message -->
     <string name="context_no_removed">Ошибка. Не удалено</string>
     <!-- success message when moving a node -->
@@ -535,8 +535,6 @@
     <string name="my_account_change_password_newPassword1">Новый пароль</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Подтверждение нового пароля</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">В настоящее время для этого плана не задан способ оплаты. Пожалуйста, выберите способ.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Ссылка скопирована в буфер обмена</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -712,7 +710,7 @@
     <string name="pin_lock_enter">Ввод</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="one">1 неудачная попытка ввода пароля</item>
+        <item quantity="one">%1$d неудачная попытка ввода пароля</item>
         <item quantity="few">%1$d неудачные попытки ввода пароля</item>
         <item quantity="many">%1$d неудачных попыток ввода пароля</item>
         <item quantity="other">%1$d неудачные попытки ввода пароля</item>
@@ -839,10 +837,6 @@
     <string name="invalid_string">Неверно</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Неправильный формат</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Неверный адрес электронной почты</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Пожалуйста, проверьте свою электронную почту и попробуйте снова.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Сброс пароля</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -944,7 +938,7 @@
     <string name="confirm_email_explanation">Проверьте электронную почту и перейдите по ссылке для подтверждения аккаунта.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
-        <item quantity="one">1 элемент</item>
+        <item quantity="one">%1$d элемент</item>
         <item quantity="few">%1$d элемента</item>
         <item quantity="many">%1$d элементов</item>
         <item quantity="other">%1$d элемента</item>
@@ -1290,7 +1284,7 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
-        <item quantity="one">1 файл уже загружен</item>
+        <item quantity="one">%1$d файл уже загружен</item>
         <item quantity="few">%1$d файла уже загружены</item>
         <item quantity="many">%1$d файлов уже загружено</item>
         <item quantity="other">%1$d файла уже загружено</item>
@@ -2163,7 +2157,7 @@
     <string name="settings_file_management_file_versions_title">Версии файлов</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">1 версия файлов, занимающая %2$s</item>
+        <item quantity="one">%1$d версия файлов, занимающая %2$s</item>
         <item quantity="few">%1$d версии файлов, занимающие %2$s</item>
         <item quantity="many">%1$d версий файлов, занимающих %2$s</item>
         <item quantity="other">%1$d версии файлов, занимающие %2$s</item>
@@ -2279,8 +2273,6 @@
     <string name="settings_compression_queue_subtitle">Минимальный размер — %1$s, максимум %2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">Удалять файлы старше</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d д.</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">Сообщать, когда размер больше</string>
     <!-- Title of compression queue size option in settings -->
@@ -2813,14 +2805,14 @@
     <string name="invite_contact_action_button">Пригласить друзей&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">1 файл уже скачан.</item>
+        <item quantity="one">%d файл уже скачан.</item>
         <item quantity="few">%d файла уже скачано.</item>
         <item quantity="many">%d файлов уже скачано.</item>
         <item quantity="other">%d файла уже скачано.</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">1 файл в ожидании.</item>
+        <item quantity="one">%d файл в ожидании.</item>
         <item quantity="few">%d файла в ожидании.</item>
         <item quantity="many">%d файлов в ожидании.</item>
         <item quantity="other">%d файла в ожидании.</item>
@@ -2973,7 +2965,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">У вас нет необходимых прав для изменения этого файла. Хотите создать новый файл?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Версия была успешно как новый файл</string>
+    <string name="version_as_new_file_created">Версия была создана как новый файл</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">%1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -3003,8 +2995,6 @@
     <string name="label_storage_over_quota">Превышен лимит хранения данных</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Увеличить лимит передачи данных</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">Папка не существует.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">Файл не может быть найден в Облачном диске.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -3028,7 +3018,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]Вы должны действовать немедленно, чтобы спасти свои данные.[/B]</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
-        <item quantity="one">1 день</item>
+        <item quantity="one">%d день</item>
         <item quantity="few">%d дня</item>
         <item quantity="many">%d дней</item>
         <item quantity="other">%d дня</item>
@@ -3187,21 +3177,21 @@
     <string name="retention_time_picker_year">год</string>
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
-        <item quantity="one">1 час</item>
+        <item quantity="one">%1$d час</item>
         <item quantity="few">%1$d часа</item>
         <item quantity="many">%1$d часов</item>
         <item quantity="other">%1$d часа</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
-        <item quantity="one">1 неделя</item>
+        <item quantity="one">%1$d неделя</item>
         <item quantity="few">%1$d недели</item>
         <item quantity="many">%1$d недель</item>
         <item quantity="other">%1$d недели</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
-        <item quantity="one">1 месяц</item>
+        <item quantity="one">%1$d месяц</item>
         <item quantity="few">%1$d месяца</item>
         <item quantity="many">%1$d месяцев</item>
         <item quantity="other">%1$d месяца</item>
@@ -3366,7 +3356,7 @@
     <string name="years_view_button">Годы</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
-        <item quantity="one">Загрузка, 1 файл ожидает обработки</item>
+        <item quantity="one">Загрузка, %1$d файл ожидает обработки</item>
         <item quantity="few">Загрузка, %1$d файла ожидает обработки</item>
         <item quantity="many">Загрузка, %1$d файлов ожидает обработки</item>
         <item quantity="other">Загрузка, %1$d файла ожидает обработки</item>
@@ -3387,14 +3377,14 @@
     <string name="warning_share_owner_storage_quota">Файл не может быть отправлен, поскольку получатель превысил лимит хранения данных.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 файл уже скачан. 1 файл в ожидании.</item>
+        <item quantity="one">1 файл уже скачан. %d файл в ожидании.</item>
         <item quantity="few">1 файл уже скачан. %d файла в ожидании.</item>
         <item quantity="many">1 файл уже скачан. %d файлов в ожидании.</item>
         <item quantity="other">1 файл уже скачан. %d файла в ожидании.</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 файл уже скачан. 1 файл в ожидании.</item>
+        <item quantity="one">%d файл уже скачан. 1 файл в ожидании.</item>
         <item quantity="few">%d файла уже скачано. 1 файл в ожидании.</item>
         <item quantity="many">%d файлов уже скачано. 1 файл в ожидании.</item>
         <item quantity="other">%d файла уже скачано. 1 файл в ожидании.</item>
@@ -3408,7 +3398,7 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 элемент перемещён в Корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="one">%d элемент перемещён в Корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
         <item quantity="few">%d элемента перемещено в Корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
         <item quantity="many">%d элементов перемещено в Корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
         <item quantity="other">%d элемента перемещено в Корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
@@ -3422,35 +3412,35 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 элемент восстановлен, но ещё один не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="one">%d элемент восстановлен, но ещё один не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="few">%d элемента восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="many">%d элементов восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="other">%d элемента восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 элемент перемещён в Корзину</item>
+        <item quantity="one">%d элемент перемещён в Корзину</item>
         <item quantity="few">%d элемента перемещены в Корзину</item>
         <item quantity="many">%d элементов перемещено в Корзину</item>
         <item quantity="other">%d элемента перемещено в Корзину</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 элемент не перемещён в Корзину</item>
+        <item quantity="one">%d элемент не перемещён в Корзину</item>
         <item quantity="few">%d элемента не перемещены в Корзину</item>
         <item quantity="many">%d элементов не перемещено в Корзину</item>
         <item quantity="other">%d элемента не перемещено в Корзину</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 элемент восстановлен</item>
+        <item quantity="one">%d элемент восстановлен</item>
         <item quantity="few">%d элемента восстановлено</item>
         <item quantity="many">%d элементов восстановлено</item>
         <item quantity="other">%d элемента восстановлено</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 элемент не был удалён</item>
+        <item quantity="one">%d элемент не был удалён</item>
         <item quantity="few">%d элемента не было удалено</item>
         <item quantity="many">%d элементов не было удалено</item>
         <item quantity="other">%d элемента не было удалено</item>
@@ -3483,7 +3473,7 @@
     <string name="title_user_purchased_subscription">Ожидание подтверждения</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
-        <item quantity="one">1 контакт</item>
+        <item quantity="one">%1$d контакт</item>
         <item quantity="few">%1$d контакта</item>
         <item quantity="many">%1$d контактов</item>
         <item quantity="other">%1$d контакта</item>
@@ -3849,14 +3839,14 @@
     <string name="meeting_call_screen_two_participants_left_call">%1$s и %2$s покинули звонок</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s и ещё 1 присоединились</item>
+        <item quantity="one">%1$s и ещё %2$d присоединились</item>
         <item quantity="few">%1$s и ещё %2$d присоединились</item>
         <item quantity="many">%1$s и ещё %2$d присоединились</item>
         <item quantity="other">%1$s и ещё %2$d присоединились</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s и ещё 1 покинули звонок</item>
+        <item quantity="one">%1$s и ещё %2$d покинули звонок</item>
         <item quantity="few">%1$s и ещё %2$d покинули звонок</item>
         <item quantity="many">%1$s и ещё %2$d покинули звонок</item>
         <item quantity="other">%1$s и ещё %2$d покинули звонок</item>
@@ -4054,7 +4044,7 @@
     </plurals>
     <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
     <plurals name="num_folders_num_files_2">
-        <item quantity="one">1 файл</item>
+        <item quantity="one">%1$d файл</item>
         <item quantity="few">%1$d файла</item>
         <item quantity="many">%1$d файлов</item>
         <item quantity="other">%1$d файла</item>
@@ -4271,22 +4261,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Показать меньше</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Подтверждение контакта</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">Мы защищаем ваши данные с помощью шифрования с нулевым разглашением. Чтобы обеспечить дополнительную безопасность, мы просим вас подтвердить контакты, с которыми вы делитесь информацией, прежде чем они смогут получить доступ к общим папкам.</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">Мы защищаем ваши данные с помощью шифрования с нулевым разглашением. Чтобы обеспечить дополнительную безопасность, мы просим вас подтвердить контакты, от которых вы получаете информацию, прежде чем вы сможете получить доступ к общим папкам.</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">Чтобы подтвердить контакт, убедитесь, что учётные данные, которые вы видите выше, соответствуют его учётным данным. Вы можете попросить его поделиться с вами своими учётными данными.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Нерасшифрованная папка]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">Чтобы общая папка стала доступной, человек, который поделился ею с вами, также должен подтвердить вас.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Подтвердить %s</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Ваши учётные данные</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Подготовка файла к превью</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4991,7 +4973,9 @@
     <string name="photos_album_selection_dialog_title">Нельзя выбрать больше</string>
     <!-- Album selection dialog body -->
     <string name="photos_album_selection_dialog_body">За один раз вы можете добавить в альбом до 150 элементов.</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">Не удаётся подтвердить контакт</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">Вы не можете подтвердить %s, так как его нет в вашем списке контактов. Подождите, пока он сначала примет приглашение.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Начать</string>
@@ -5007,4 +4991,81 @@
     <string name="meetings_chat_room_start_scheduled_meeting_option">Начать встречу</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">Присоединиться к встрече</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="one">Отправлено %1$d приглашение.&#160;</item>
+        <item quantity="few">Отправлено %1$d приглашения.&#160;</item>
+        <item quantity="many">Отправлено %1$d приглашений.&#160;</item>
+        <item quantity="other">Отправлено %1$d приглашения.&#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="one">%1$d не удалось отправить.</item>
+        <item quantity="few">%1$d не удалось отправить.</item>
+        <item quantity="many">%1$d не удалось отправить.</item>
+        <item quantity="other">%1$d не удалось отправить.</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="one">Скопирован %1$d элемент</item>
+        <item quantity="few">Скопировано %1$d элемента</item>
+        <item quantity="many">Скопировано %1$d элементов</item>
+        <item quantity="other">Скопировано %1$d элемента</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="one">%1$d элемент не удалось скопировать</item>
+        <item quantity="few">%1$d элемента не удалось скопировать</item>
+        <item quantity="many">%1$d элементов не удалось скопировать</item>
+        <item quantity="other">%1$d элемента не удалось скопировать</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="one">Скопирован %1$d элемент,&#160;</item>
+        <item quantity="few">Скопировано %1$d элемента,&#160;</item>
+        <item quantity="many">Скопировано %1$d элементов,&#160;</item>
+        <item quantity="other">Скопировано %1$d элемента,&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="one">%1$d не удалось скопировать</item>
+        <item quantity="few">%1$d не удалось скопировать</item>
+        <item quantity="many">%1$d не удалось скопировать</item>
+        <item quantity="other">%1$d не удалось скопировать</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+        <item quantity="other">%1$d дня</item>
+    </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">Субтитры</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">Выкл</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Добавить субтитры&#8230;</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">Настройки слайд-шоу</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">Скорость слайд-шоу</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">Медленное (8&#160;с.)</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">Нормальное (4&#160;с.)</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">Быстрое (2&#160;с.)</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">Порядок слайд-шоу</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">Перемешивать</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">Повтор</string>
 </resources>

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -377,7 +377,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Permintaan terkirim kembali</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">Permintaan telah dikirim ke %s. Lihat di tab permintaan Terkirim.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Kontak telah dihapus</string>
     <!-- error message -->
@@ -393,25 +393,25 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Terjadi Kesalahan. Folder tidak terbuat</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Renamed</string>
+    <string name="context_correctly_renamed">Nama terganti</string>
     <!-- error message -->
     <string name="context_no_renamed">Terjadi kesalahan. Belum ubah nama</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copied</string>
+    <string name="context_correctly_copied">Disalin</string>
     <!-- error message -->
     <string name="context_no_copied">Terjadi kesalahan. Belum tersalin</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Silahkan pilih folder tujuan</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Moved</string>
+    <string name="context_correctly_moved">Dipindahkan</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="other">Memindahkan %d barang</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d items weren’t moved</string>
+    <string name="number_incorrectly_moved">%d barang tidak dipindahkan</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Moved to Rubbish bin</string>
+    <string name="context_correctly_moved_to_rubbish">Dipindahkan ke tempat sampah</string>
     <!-- error message -->
     <string name="context_no_moved">Terjadi kesalahan. Belum dipindahkan</string>
     <!-- success message when sharing a folder -->
@@ -425,21 +425,21 @@
     <!-- error message -->
     <string name="context_no_removed">Terjadi kesalahan. Hapus gagal</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d items removed from MEGA</string>
+    <string name="number_correctly_removed">%d item dihapus dari MEGA</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d items weren’t removed</string>
+    <string name="number_no_removed">%d item tidak dihapus</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d folders left</string>
+    <string name="number_correctly_leaved">%d folder tersisa</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">Berbagi ditinggalkan</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d folders weren’t left</string>
+    <string name="number_no_leaved">%d folder tidak tersisa</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d items copied</string>
+    <string name="number_correctly_copied">%d item disalin</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d item belum disalin</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Rubbish bin emptied</string>
+    <string name="rubbish_bin_emptied">Sampah dikosongkan dengan sukses</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">Terjadi kesalahan. Tempat Sampah belum dikosongkan</string>
     <!-- dialog cancel subscriptions -->
@@ -502,8 +502,6 @@
     <string name="my_account_change_password_newPassword1">Kata sandi baru</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Konfirmasi kata sandi baru</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Tidak ada metode pembayaran yang ditetapkan untuk paket ini saat ini. Silahkan pilih satu.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Tautan disalin ke papan klip</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -611,7 +609,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">Salah kode. Silakan coba lagi atau kirim ulang.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Your phone number has been verified</string>
+    <string name="verify_account_successfully">Nomor telepon anda telah diverifikasi</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>Penyimpanan internal</item>
@@ -772,7 +770,7 @@
     <!-- Action of a button to save something -->
     <string name="save_action">Simpan</string>
     <!-- Alert message when the master key has been successfully copied to the ClipBoard -->
-    <string name="copy_MK_confirmation">Recovery key copied to clipboard. Save it to a safe place where you can easily access later.</string>
+    <string name="copy_MK_confirmation">Kunci pemulihan disalin ke papan klip. Simpan ke tempat yang aman di mana anda dapat dengan mudah mengaksesnya nanti.</string>
     <!-- Button to change the password -->
     <string name="change_pass">Ganti</string>
     <!-- Positive button to perform a general action -->
@@ -803,10 +801,6 @@
     <string name="invalid_string">Tidak benar</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Input tidak valid</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Alamat e-mail anda salah</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Harap cek alamat e-mail dan coba kembali.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Ubah sandi</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -940,7 +934,7 @@
         <item quantity="other">%d undangan terkirim</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d invite requests sent but %2$d requests weren’t sent.</string>
+    <string name="number_no_invite_contact_request">%1$d permintaan undangan dikirim tapi %2$d permintaan tidak dikirim.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Saya)</string>
     <!-- button -->
@@ -994,7 +988,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">Riwayat obrolan telah dihapus</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">An error has occurred. The chat history hasn’t been cleared</string>
+    <string name="clear_history_error">Sebuah kesalahan telah terjadi. Riwayat obrolan belum dihapus</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Tambahkan peserta</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1064,9 +1058,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">Peserta sudah masuk dalam obrolan grup ini</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d participants were invited</string>
+    <string name="number_correctly_add_participant">%d peserta diundang</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d participants were invited but %2$d participants were not invited.</string>
+    <string name="number_no_add_participant_request">%1$d peserta diundang tapi %2$d peserta tidak diundang.</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] bergabung dengan obrolan grup melalui undangan dari [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1108,7 +1102,7 @@
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chat Error</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Chat couldn’t be opened</string>
+    <string name="chat_error_open_message">Obrolan tidak dapat dibuka</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d kontak</item>
@@ -1325,7 +1319,7 @@
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">Terjadi kesalahan saat mengganti namanya</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Your name has been updated</string>
+    <string name="success_changing_user_attributes">Nama anda telah diperbarui</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Peserta ditambahkan</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1561,9 +1555,9 @@
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">Tautan disalin ke papan klip</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">QR code reset</string>
+    <string name="qrcode_reset_successfully">Atur ulang kode QR</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">QR code deleted</string>
+    <string name="qrcode_delete_successfully">Kode QR dihapus</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">Kode QR tidak diatur ulang karena kesalahan. Tolong, coba lagi.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1581,7 +1575,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">Terjadi kesalahan saat mencoba mengunduh file QR. Mungkin file itu tidak ada. Silakan, coba lagi nanti.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">The QR Code has been downloaded to %s</string>
+    <string name="success_download_qr">Kode QR telah diunduh ke %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Undangan tidak terkirim</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1741,8 +1735,7 @@
     <string name="messages_forwarded_success">Pesan diteruskan</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Error. %1$d message not forwarded</item>
-        <item quantity="other">Error. %1$d messages not forwarded</item>
+        <item quantity="other">Kesalahan. %1$d pesan tidak diteruskan</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1827,7 +1820,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">Cetak</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Recovery key has been saved</string>
+    <string name="save_MK_confirmation">Kunci pemulihan telah disimpan</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Tertunda)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1979,7 +1972,7 @@
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">Diarsipkan</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Archived (%d)</string>
+    <string name="archived_chats_show_option">Diarsipkan (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">Arsipkan</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
@@ -1989,13 +1982,13 @@
     <!-- Confirmation button of the dialog to unarchive a chat -->
     <string name="general_unarchive">Batalkan pengarsipan</string>
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
-    <string name="success_archive_chat">%s was archived</string>
+    <string name="success_archive_chat">%s telah diarsipkan</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
+    <string name="error_archive_chat">Kesalahan. %s tidak diarsipkan. Coba lagi.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
-    <string name="success_unarchive_chat">%s was unarchived</string>
+    <string name="success_unarchive_chat">%s telah tidak diarsipkan</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
+    <string name="error_unarchive_chat">Kesalahan. %s telah tidak diarsipkan. Coba lagi.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Obrolan tidak aktif</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2031,7 +2024,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">Anda akan menghapus riwayat versi semua file. Versi file apa pun yang dibagikan kepada anda dari kontak harus dihapus oleh mereka.\n\nHarap dicatat bahwa file saat ini tidak akan dihapus.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">File versions deleted</string>
+    <string name="success_delete_versions">Versi file dihapus</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">Terjadi kesalahan saat mencoba menghapus semua versi lama file anda, silakan coba lagi nanti.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2130,8 +2123,6 @@
     <string name="settings_compression_queue_subtitle">Ukuran minimum adalah %1$s dan ukuran maksimum adalah %2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">Hapus file lebih lama dari</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d hari</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">Beritahu saya bila ukurannya lebih besar dari</string>
     <!-- Title of compression queue size option in settings -->
@@ -2485,7 +2476,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">Konten tidak dikirim ke %d obrolan</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">New group chat created</string>
+    <string name="new_group_chat_created">Obrolan grup baru dibuat</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">Mempersiapkan file</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2502,8 +2493,7 @@
     <string name="version_history_deleted_erroneously">Versi lama tidak dihapus.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">%d version deleted</item>
-        <item quantity="other">%d versions deleted</item>
+        <item quantity="other">%d versi dihapus</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2596,9 +2586,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Tautan obrolan tidak tersedia.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Chat link deleted</string>
+    <string name="chat_link_deleted">Tautan obrolan dihapus</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Version restored</string>
+    <string name="version_restored">Versi dipulihkan</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Ketuk dan tahan untuk merekam</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2756,7 +2746,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">Anda tidak memiliki izin yang benar untuk mengubah file ini. Apakah anda ingin membuat file baru?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Version was created as a new file</string>
+    <string name="version_as_new_file_created">Versi dibuat sebagai file baru</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">pada %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2783,8 +2773,6 @@
     <string name="label_storage_over_quota">Kuota penyimpanan terlewati</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Dapatkan kuota transfer lebih</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">Folder tidak ada.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">File tidak dapat ditemukan di Cloud drive anda.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2834,7 +2822,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Keluar&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Phone number removed</string>
+    <string name="remove_phone_number_success">Nomor telepon dihapus</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Gagal menghapus nomor telepon anda.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -2982,9 +2970,9 @@
     <!-- Confirmation shown informing a password link it’s copied to the clipboard -->
     <string name="password_copied_clipboard">Sandi Disalin ke Papan Klip</string>
     <!-- Message displayed to inform that a link and its decryption key have been sent separately to a chat -->
-    <string name="link_and_key_sent">Link and key sent</string>
+    <string name="link_and_key_sent">Tautan dan kunci terkirim</string>
     <!-- Message displayed to inform that a link and its password have been sent separately to a chat -->
-    <string name="link_and_password_sent">Link and password sent</string>
+    <string name="link_and_password_sent">Tautan dan kata sandi dikirim</string>
     <!-- Title of a warning recommending upgrade to Pro -->
     <string name="upgrade_pro">Tingkatkan ke Pro</string>
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
@@ -3161,23 +3149,19 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to Rubbish bin</item>
-        <item quantity="other">%d items moved to Rubbish bin</item>
+        <item quantity="other">%d item dipindahkan ke Sampah</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item wasn’t moved to the Rubbish bin</item>
-        <item quantity="other">%d items weren’t moved to Rubbish bin</item>
+        <item quantity="other">%d item tidak dipindahkan ke Sampah</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item restored</item>
-        <item quantity="other">%d items restored</item>
+        <item quantity="other">%d item dipulihkan</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item wasn’t restored</item>
-        <item quantity="other">%d items weren’t restored</item>
+        <item quantity="other">%d item tidak dipulihkan</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Tetap ganti</string>
@@ -3223,13 +3207,11 @@
     <string name="action_copy_all">Salin semua</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link sent</item>
-        <item quantity="other">Links sent</item>
+        <item quantity="other">Tautan dikirim</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Copied link to clipboard</item>
-        <item quantity="other">Copied links to clipboard</item>
+        <item quantity="other">Tautan disalin ke papan klip</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3402,7 +3384,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Anda sudah mengundang %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invite sent. See Sent requests.</string>
+    <string name="contact_invited">Undangan terkirim. Lihat Permintaan terkirim.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">File tersedia Offline</string>
     <!-- Message when file removed from offline. -->
@@ -3560,15 +3542,14 @@
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
     <string name="meeting_call_screen_one_participant_left_call">%1$s meninggalkan panggilan</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left the call</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s dan %2$s meninggalkan panggilan</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="other">%1$s dan %2$d lainnya bergabung</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left the call</item>
-        <item quantity="other">%1$s and %2$d others left the call</item>
+        <item quantity="other">%1$s dan %2$d yang lain meninggalkan panggilan</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Hapus secara permanen</string>
@@ -3912,8 +3893,7 @@
     <string name="photos_album_selection_title">Tambahkan item ke “%s”</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %1$d item to “%2$s“</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
+        <item quantity="other">Menambahkan %1$d barang ke “%2$s”</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]Album[/A] [B]kosong[/B]</string>
@@ -3957,22 +3937,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Lihat lebih sedikit</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Verifikasi kontak</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">Kami melindungi data anda dengan enkripsi tanpa pengetahuan. Untuk memastikan keamanan ekstra, kami meminta anda untuk memverifikasi kontak yang anda bagikan informasi sebelum mereka dapat mengakses folder bersama.</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">Kami melindungi data anda dengan enkripsi tanpa pengetahuan. Untuk memastikan keamanan ekstra, kami meminta anda memverifikasi kontak tempat anda menerima informasi sebelum anda dapat mengakses folder bersama.</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">Untuk memverifikasi kontak anda, pastikan kredensial yang anda lihat di atas cocok dengan kredensial akun mereka. Anda dapat meminta mereka untuk membagikan kredensial mereka dengan anda.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Folder tidak terdekripsi]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">Untuk mengakses folder bersama, orang yang membagikannya dengan anda juga harus memverifikasi anda.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verifikasi %s</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Kredensial anda</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Mempersiapkan file untuk pratinjau</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -3991,43 +3963,42 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">Jangan berikan</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="other">Menghapus %1$d barang dari “%2$s”</item>
     </plurals>
     <!-- Label to describe one off meetings -->
-    <string name="meetings_list_one_off_meeting_label">One-off meeting</string>
+    <string name="meetings_list_one_off_meeting_label">Pertemuan satu kali</string>
     <!--Title of playback position dialog that is displayed when video has playback position history. -->
     <string name="video_playback_position_dialog_title">Lanjutkan video?</string>
     <!--Message of playback position dialog that is displayed when video has playback position history. %1$s is placeholder of filename, %2$s is placeholder of time-->
-    <string name="video_playback_position_dialog_message">%1$s will resume from %2$s</string>
+    <string name="video_playback_position_dialog_message">%1$s akan dilanjutkan dari %2$s</string>
     <!--Resume of playback position dialog for playing video from the playback position history. -->
     <string name="video_playback_position_dialog_resume_button">Lanjutkan</string>
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">Restart</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
-    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]invited you to a meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]mengundang anda ke pertemuan yang dijadwalkan untuk: [/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s cancelled[/A][B] the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s dibatalkan [/A][B] pertemuan yang dijadwalkan untuk: [/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s diperbarui [/A][B] nama pertemuan dari “%s” ke [/B]“[A]%s[/A]”</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s updated[/A][B] the meeting date[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s diperbarui [/A][B] tanggal pertemuan [/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s updated[/A][B] the meeting time[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s diperbarui [/A][B] waktu pertemuan [/B]</string>
     <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s updated[/A][B] the meeting description[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s diperbarui [/A][B] deskripsi pertemuan [/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the details of the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s diperbarui [/A][B]rincian pertemuan yang dijadwalkan untuk:[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">Akses ditolak</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
-    <string name="dialog_content_media_permissions_denied">You denied MEGA access to your device’s storage and media files. If you’d like to continue sharing, allow MEGA permission.</string>
+    <string name="dialog_content_media_permissions_denied">Anda menolak akses MEGA ke penyimpanan dan file media perangkat anda. Jika anda ingin terus berbagi, izinkan MEGA.</string>
     <!-- Positive action button of the dialog when permission is denied and it's required to upload content. Clicking it will redirect to settings screen of device -->
-    <string name="dialog_positive_button_allow_permission">Allow permission</string>
+    <string name="dialog_positive_button_allow_permission">Berikan izin</string>
     <!-- Negative action button of the dialog when permission is denied and it's required to upload content. Clicking it will close the dialog -->
-    <string name="dialog_negative_button_do_not_allow">Don’t allow</string>
+    <string name="dialog_negative_button_do_not_allow">Jangan izinkan</string>
     <!-- Option of a recurring meeting in meeting list to view occurrences -->
-    <string name="meetings_list_recurring_meeting_occurrences_option">Occurrences</string>
+    <string name="meetings_list_recurring_meeting_occurrences_option">Kejadian</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs daily -->
     <string name="meetings_recurring_meeting_info_occurs_daily_subtitle">Terjadi harian</string>
     <!-- Subtitle of recurring meeting info screen when the recurrence occurs weekly -->
@@ -4037,418 +4008,342 @@
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
     <string name="meetings_recurring_meeting_info_see_more_occurrences_button">Lihat lebih banyak</string>
     <!-- Label for scheduled monthly meetings -->
-    <string name="meetings_list_scheduled_meeting_monthly_label">%s monthly</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%s bulanan</string>
     <!-- Label for scheduled daily meetings -->
-    <string name="meetings_list_scheduled_meeting_daily_label">%s daily</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%s harian</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]invited you to a recurring meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]mengundang anda ke rapat berulang yang dijadwalkan untuk:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s updated[/A][B] the recurring meeting description[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s diperbarui[/A][B] deskripsi pertemuan berulang[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s updated[/A][B] the details of the recurring meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s diperbarui[/A][B] rincian rapat rutin yang dijadwalkan untuk:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s updated[/A][B] an occurrence to:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s diperbarui[/A][B] kejadian untuk:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s updated[/A][B] the recurring meeting time[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s diperbarui[/A][B] waktu pertemuan berulang[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting frequency change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s dibatalkan[/A][B] pertemuan dan segala kejadiannya[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s cancelled[/A][B] the occurrence scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s dibatalkan[/A][B] kejadian yang dijadwalkan untuk:[/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_message">Tautan ini belum dibuat dengan akun yang anda masuki saat ini. Masuk ke akun yang terkait dengan tautan ini untuk memverifikasi alamat email anda.</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_title">Tidak dapat memperbarui alamat email</string>
     <!-- Select album cover -->
     <string name="photos_album_select_cover">Pilih sampul album</string>
     <!-- Album cover updated -->
-    <string name="photos_album_cover_updated">Album cover updated</string>
+    <string name="photos_album_cover_updated">Sampul album diperbarui</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
-    <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] dari [B]%2$s ke %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Every day effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Setiap hari efektif [A]%1$s[/A] dari [B]%2$s ke %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Every day effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Setiap hari efektif [A]%1$s hingga %2$s[/A] dari [B]%3$s ke %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
-        <item quantity="one">%1$s every week effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s every %2$d weeks effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="other">%1$s setiap %2$d minggu efektif [A]%3$s hingga %4$s[/A] dari [B]%5$s ke %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting without ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever">
-        <item quantity="one">%1$s every week effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">%1$s every %2$d weeks effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">%1$s setiap %2$d minggu efektif [A]%3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="other">%1$s dan %2$s setiap %3$d minggu efektif [A]%4$s hingga %5$s[/A] dari [B]%6$s ke %7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="other">%1$s dan %2$s setiap %3$d minggu efektif [A]%4$s[/A] dari [B]%5$s ke %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
-        <item quantity="one">Day %1$d of every month effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">Day %1$d of every %2$d months effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="other">Hari %1$d dari setiap %2$d bulan efektif [A]%3$s hingga %4$s[/A] dari [B]%5$s ke %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting without ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_forever">
-        <item quantity="one">Day %1$d of every month effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Day %1$d of every %2$d months effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Hari %1$d dari setiap %2$d bulan efektif [A]%3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_first">
-        <item quantity="one">First Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Senin pertama dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_first">
-        <item quantity="one">First Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Senin pertama dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_second">
-        <item quantity="one">Second Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Senin kedua dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_second">
-        <item quantity="one">Second Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Senin kedua dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_third">
-        <item quantity="one">Third Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Senin ketiga dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_third">
-        <item quantity="one">Third Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Senin ketiga dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fourth">
-        <item quantity="one">Fourth Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Senin keempat dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fourth">
-        <item quantity="one">Fourth Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Senin keempat dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_fifth">
-        <item quantity="one">Fifth Monday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Monday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Senin kelima dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Monday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Monday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_monday_fifth">
-        <item quantity="one">Fifth Monday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Monday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Senin kelima dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_first">
-        <item quantity="one">First Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Selasa pertama dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_first">
-        <item quantity="one">First Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Selasa pertama dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_second">
-        <item quantity="one">Second Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Selasa kedua dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_second">
-        <item quantity="one">Second Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Selasa kedua dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_third">
-        <item quantity="one">Third Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Selasa ketiga dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_third">
-        <item quantity="one">Third Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Selasa ketiga dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fourth">
-        <item quantity="one">Fourth Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Selasa keempat dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fourth">
-        <item quantity="one">Fourth Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Selasa keempat dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Tuesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_tuesday_fifth">
-        <item quantity="one">Fifth Tuesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Tuesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Selasa kelima dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Tuesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Tuesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_tuesday_fifth">
-        <item quantity="one">Fifth Tuesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Tuesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Selasa kelima dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_first">
-        <item quantity="one">First Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Rabu pertama dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_first">
-        <item quantity="one">First Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Rabu pertama dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_second">
-        <item quantity="one">Second Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Rabu kedua dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_second">
-        <item quantity="one">Second Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Rabu kedua dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_third">
-        <item quantity="one">Third Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Rabu ketiga dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_third">
-        <item quantity="one">Third Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Rabu ketiga dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fourth">
-        <item quantity="one">Fourth Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Rabu keempat dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fourth">
-        <item quantity="one">Fourth Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Rabu keempat dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fifth">
-        <item quantity="one">Fifth Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Rabu kelima dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fifth">
-        <item quantity="one">Fifth Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Rabu kelima dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_first">
-        <item quantity="one">First Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Kamis pertama dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_first">
-        <item quantity="one">First Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Kamis pertama dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_second">
-        <item quantity="one">Second Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Kamis kedua dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_second">
-        <item quantity="one">Second Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Kamis kedua dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_third">
-        <item quantity="one">Third Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Kamis ketiga dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_third">
-        <item quantity="one">Third Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Kamis ketiga dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fourth">
-        <item quantity="one">Fourth Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Kamis keempat dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fourth">
-        <item quantity="one">Fourth Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Kamis keempat dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fifth">
-        <item quantity="one">Fifth Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Kamis kelima dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fifth">
-        <item quantity="one">Fifth Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Kamis kelima dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_first">
-        <item quantity="one">First Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Jumat pertama dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_first">
-        <item quantity="one">First Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Jumat pertama dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_second">
-        <item quantity="one">Second Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Jumat kedua dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_second">
-        <item quantity="one">Second Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Jumat kedua dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_third">
-        <item quantity="one">Third Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Jumat ketiga dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_third">
-        <item quantity="one">Third Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Jumat ketiga dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fourth">
-        <item quantity="one">Fourth Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Jumat keempat dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fourth">
-        <item quantity="one">Fourth Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Jumat keempat dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fifth">
-        <item quantity="one">Fifth Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Jumat kelima dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fifth">
-        <item quantity="one">Fifth Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Jumat kelima dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_first">
-        <item quantity="one">First Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Sabtu pertama dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_first">
-        <item quantity="one">First Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Sabtu pertama dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_second">
-        <item quantity="one">Second Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Sabtu kedua dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_second">
-        <item quantity="one">Second Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Sabtu kedua dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_third">
-        <item quantity="one">Third Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Sabtu ketiga dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_third">
-        <item quantity="one">Third Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Sabtu ketiga dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fourth">
-        <item quantity="one">Fourth Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Sabtu keempat dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fourth">
-        <item quantity="one">Fourth Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Sabtu keempat dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fifth">
-        <item quantity="one">Fifth Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Sabtu kelima dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fifth">
-        <item quantity="one">Fifth Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Sabtu kelima dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_first">
-        <item quantity="one">First Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Minggu pertama dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_first">
-        <item quantity="one">First Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Minggu pertama dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_second">
-        <item quantity="one">Second Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Minggu kedua dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_second">
-        <item quantity="one">Second Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Minggu kedua dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_third">
-        <item quantity="one">Third Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Minggu ketiga dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_third">
-        <item quantity="one">Third Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Minggu ketiga dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fourth">
-        <item quantity="one">Fourth Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Minggu keempat dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fourth">
-        <item quantity="one">Fourth Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Minggu keempat dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fifth">
-        <item quantity="one">Fifth Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="other">Minggu kelima dari setiap %1$d bulan efektif [A]%2$s hingga %3$s[/A] dari [B]%4$s ke %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fifth">
-        <item quantity="one">Fifth Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="other">Minggu kelima dari setiap %1$d bulan efektif [A]%2$s[/A] dari [B]%3$s ke %4$s[/B]</item>
     </plurals>
     <!-- In app notification description text representing the meeting repeats every Monday -->
     <string name="notification_scheduled_meeting_week_day_mon">Sen</string>
@@ -4465,11 +4360,11 @@
     <!-- In app notification description text representing the meeting repeats every Sunday -->
     <string name="notification_scheduled_meeting_week_day_sun">Min</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
-    <string name="meetings_one_off_occurrence_info_today">Today, %1$s from %2$s to %3$s</string>
+    <string name="meetings_one_off_occurrence_info_today">Hari ini, %1$s dari %2$s ke %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
-    <string name="meetings_one_off_occurrence_info_tomorrow">Tomorrow, %1$s from %2$s to %3$s</string>
+    <string name="meetings_one_off_occurrence_info_tomorrow">Besok, %1$s dari %2$s ke %3$s</string>
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s updated[/A][B] the recurring meeting date[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s diperbarui[/A][B] tanggal pertemuan berulang[/B]</string>
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">Peningkatan keamanan</string>
     <!-- This is the body of upgrade security dialog -->
@@ -4480,8 +4375,7 @@
     </plurals>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
-        <item quantity="one">[Undecrypted file]</item>
-        <item quantity="other">[Undecrypted files]</item>
+        <item quantity="other">[File tidak terdekripsi]</item>
     </plurals>
     <!-- In app notification description text representing the meeting repeats every Monday. This text is used at the start of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_start_mon">Sen</string>
@@ -4512,23 +4406,81 @@
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">Min</string>
     <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <string name="photos_album_selection_dialog_title">Tidak dapat memilih lebih banyak</string>
     <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="photos_album_selection_dialog_body">Anda hanya dapat menambahkan hingga 150 item sekaligus ke album.</string>
+    <!--  -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Tidak dapat memverifikasi kontak</string>
+    <!--  -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Anda tidak dapat memverifikasi %s karena mereka tidak ada dalam daftar kontak anda. Tunggu mereka menerima undangan anda terlebih dahulu.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Mulai</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_camelcase_ok">Ok</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">File ini telah diturunkan sesuai dengan kami [A]Kebijakan Panduan Penghapusan[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">Folder ini telah diturunkan sesuai dengan kami [A]Kebijakan Panduan Penghapusan[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Gabung</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
     <string name="meetings_chat_room_start_scheduled_meeting_option">Mulai pertemuan</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">Gabung rapat</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="other">%1$d permintaan undangan dikirim.&#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="other">Namun, %1$d permintaan tidak dikirim.</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="other">Menyalin %1$d barang</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="other">Tidak dapat menyalin %1$d barang</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="other">Menyalin %1$d barang,&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="other">tidak dapat menyalin %1$d barang</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="other">%1$d hari</item>
+    </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">Subtitle</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">Mati</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Tambahkan subtitle&#8230;</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">Opsi tayangan slide</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">Kecepatan tayangan slide</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">Lambat (8 detik)</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">Biasa (4 detik)</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">Cepat (2 detik)</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">Urutan tayangan slide</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">Acak</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">Ulang</string>
 </resources>

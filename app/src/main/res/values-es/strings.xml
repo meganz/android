@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -524,8 +524,6 @@
     <string name="my_account_change_password_newPassword1">Nueva contraseña</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Confirma tu nueva contraseña</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">No hay ningún método de pago asociado. Por favor, selecciona uno.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Enlace copiado al portapapeles</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -701,7 +699,7 @@
     <string name="pin_lock_enter">Entrar</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="one">1 intento fallido</item>
+        <item quantity="one">%1$d intento fallido</item>
         <item quantity="many">%1$d de intentos fallidos</item>
         <item quantity="other">%1$d intentos fallidos</item>
     </plurals>
@@ -827,10 +825,6 @@
     <string name="invalid_string">Incorrecto</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Entrada inválida</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Correo electrónico no válido</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Por favor, comprueba la dirección de correo electrónico y vuelve a intentarlo.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Restablecer la contraseña</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -931,7 +925,7 @@
     <string name="confirm_email_explanation">Ve a la bandeja de entrada de tu correo electrónico y pulsa en el enlace para confirmar tu cuenta.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
-        <item quantity="one">1 elemento</item>
+        <item quantity="one">%1$d elemento</item>
         <item quantity="many">%1$d de elementos</item>
         <item quantity="other">%1$d elementos</item>
     </plurals>
@@ -1266,7 +1260,7 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
-        <item quantity="one">1 archivo ya subido</item>
+        <item quantity="one">%1$d archivo ya subido</item>
         <item quantity="many">%1$d de archivos ya subidos</item>
         <item quantity="other">%1$d archivos ya subidos</item>
     </plurals>
@@ -2115,7 +2109,7 @@
     <string name="settings_file_management_file_versions_title">Versiones de archivos</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">1 versión de archivo, con un total de %2$s</item>
+        <item quantity="one">%1$d versión de archivo, con un total de %2$s</item>
         <item quantity="many">%1$d de versiones de archivo, con un total de %2$s</item>
         <item quantity="other">%1$d versiones de archivo, con un total de %2$s</item>
     </plurals>
@@ -2229,8 +2223,6 @@
     <string name="settings_compression_queue_subtitle">El tamaño mínimo es %1$s y el tamaño máximo es %2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">Eliminar archivos con más de</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d días</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">Avisar si el tamaño es superior a</string>
     <!-- Title of compression queue size option in settings -->
@@ -2745,13 +2737,13 @@
     <string name="invite_contact_action_button">Invita a un amigo a través de&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">1 archivo descargado anteriormente.</item>
+        <item quantity="one">%d archivo descargado anteriormente.</item>
         <item quantity="many">%d de archivos descargados anteriormente.</item>
         <item quantity="other">%d archivos descargados anteriormente.</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">1 archivo pendiente.</item>
+        <item quantity="one">%d archivo pendiente.</item>
         <item quantity="many">%d de archivos pendientes.</item>
         <item quantity="other">%d archivos pendientes.</item>
     </plurals>
@@ -2929,8 +2921,6 @@
     <string name="label_storage_over_quota">Cuota de almacenamiento agotada</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Obtén más cuota de transferencia</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">La carpeta no existe.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">No se ha podido encontrar el archivo en tu Nube.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2953,7 +2943,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]Debe actuar de inmediato para conservar tus datos.[/B]</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
-        <item quantity="one">1 día</item>
+        <item quantity="one">%d día</item>
         <item quantity="many">%d de días</item>
         <item quantity="other">%d días</item>
     </plurals>
@@ -3107,19 +3097,19 @@
     <string name="retention_time_picker_year">año</string>
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
-        <item quantity="one">1 hora</item>
+        <item quantity="one">%1$d hora</item>
         <item quantity="many">%1$d horas</item>
         <item quantity="other">%1$d horas</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
-        <item quantity="one">1 semana</item>
+        <item quantity="one">%1$d semana</item>
         <item quantity="many">%1$d de semanas</item>
         <item quantity="other">%1$d semanas</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
-        <item quantity="one">1 mes</item>
+        <item quantity="one">%1$d mes</item>
         <item quantity="many">%1$d meses</item>
         <item quantity="other">%1$d meses</item>
     </plurals>
@@ -3283,7 +3273,7 @@
     <string name="years_view_button">Años</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
-        <item quantity="one">Subida en curso, 1 archivo pendiente</item>
+        <item quantity="one">Subida en curso, %1$d archivo pendiente</item>
         <item quantity="many">Subida en curso, %1$d de archivos pendientes</item>
         <item quantity="other">Subida en curso, %1$d archivos pendientes</item>
     </plurals>
@@ -3303,13 +3293,13 @@
     <string name="warning_share_owner_storage_quota">El archivo no se puede enviar porque el destinatario ha superado su límite de almacenamiento.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 archivo descargado anteriormente. 1 archivo pendiente.</item>
+        <item quantity="one">1 archivo descargado anteriormente. %d archivo pendiente.</item>
         <item quantity="many">1 archivo descargado anteriormente. %d de archivos pendientes.</item>
         <item quantity="other">1 archivo descargado anteriormente. %d archivos pendientes.</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 archivo descargado anteriormente. 1 archivo pendiente.</item>
+        <item quantity="one">%d archivo descargado anteriormente. 1 archivo pendiente.</item>
         <item quantity="many">%d archivos descargados anteriormente. 1 archivo pendiente.</item>
         <item quantity="other">%d archivos descargados anteriormente. 1 archivo pendiente.</item>
     </plurals>
@@ -3321,7 +3311,7 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">Se ha movido 1 elemento a la Papelera pero el otro no se ha podido mover. Inténtalo más tarde.</item>
+        <item quantity="one">Se ha movido %d elemento a la Papelera pero el otro no se ha podido mover. Inténtalo más tarde.</item>
         <item quantity="many">Se han movido %d elementos a la Papelera pero 1 elemento no se ha podido mover. Inténtalo más tarde.</item>
         <item quantity="other">Se han movido %d elementos a la Papelera pero 1 elemento no se ha podido mover. Inténtalo más tarde.</item>
     </plurals>
@@ -3333,31 +3323,31 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">Se ha restaurado 1 elemento pero el otro no se ha podido restaurar. Inténtalo más tarde.</item>
+        <item quantity="one">Se ha restaurado %d elemento pero el otro no se ha podido restaurar. Inténtalo más tarde.</item>
         <item quantity="many">Se han restaurado %d elementos pero 1 elemento no se ha podido restaurar. Inténtalo más tarde.</item>
         <item quantity="other">Se han restaurado %d elementos pero 1 elemento no se ha podido restaurar. Inténtalo más tarde.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 elemento movido a la Papelera</item>
+        <item quantity="one">%d elemento movido a la Papelera</item>
         <item quantity="many">%d de elementos movidos a la Papelera</item>
         <item quantity="other">%d elementos movidos a la Papelera</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">No se ha podido mover 1 elemento a la Papelera</item>
+        <item quantity="one">No se ha podido mover %d elemento a la Papelera</item>
         <item quantity="many">No se han podido mover %d elementos a la Papelera</item>
         <item quantity="other">No se han podido mover %d elementos a la Papelera</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">Se ha restaurado 1 elemento</item>
+        <item quantity="one">Se ha restaurado %d elemento</item>
         <item quantity="many">Se han restaurado %d de elementos</item>
         <item quantity="other">Se han restaurado %d elementos</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">No se ha podido restaurar 1 elemento</item>
+        <item quantity="one">No se ha podido restaurar %d elemento</item>
         <item quantity="many">No se han podido restaurar %d de elementos</item>
         <item quantity="other">No se han podido restaurar %d elementos</item>
     </plurals>
@@ -3389,7 +3379,7 @@
     <string name="title_user_purchased_subscription">Esperando confirmación</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
-        <item quantity="one">1 conexión</item>
+        <item quantity="one">%1$d conexión</item>
         <item quantity="many">%1$d de conexiones</item>
         <item quantity="other">%1$d conexiones</item>
     </plurals>
@@ -3751,13 +3741,13 @@
     <string name="meeting_call_screen_two_participants_left_call">%1$s y %2$s han abandonado la llamada</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s y otro más se han unido</item>
+        <item quantity="one">%1$s y %2$d otro más se han unido</item>
         <item quantity="many">%1$s y otros %2$d se han unido</item>
         <item quantity="other">%1$s y otros %2$d se han unido</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s y 1 más han abandonado la llamada</item>
+        <item quantity="one">%1$s y %2$d más han abandonado la llamada</item>
         <item quantity="many">%1$s y otros %2$d han abandonado la llamada</item>
         <item quantity="other">%1$s y otros %2$d han abandonado la llamada</item>
     </plurals>
@@ -3953,7 +3943,7 @@
     </plurals>
     <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
     <plurals name="num_folders_num_files_2">
-        <item quantity="one">1 archivo</item>
+        <item quantity="one">%1$d archivo</item>
         <item quantity="many">%1$dde archivos</item>
         <item quantity="other">%1$d archivos</item>
     </plurals>
@@ -4163,22 +4153,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Ver menos</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Verificación de contacto</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">Protegemos tus datos con cifrado de conocimiento cero. Para garantizar una mayor seguridad, te pedimos que verifiques los contactos con los que compartes información antes de que puedan acceder a las carpetas compartidas.</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">Protegemos tus datos con cifrado de conocimiento cero. Para garantizar una mayor seguridad, te pedimos que verifiques los contactos de los que recibes información antes de que puedas acceder a las carpetas compartidas.</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">Para verificar tu contacto, asegúrate de que las credenciales que ves arriba coincidan con las credenciales de su cuenta. Puedes pedirle que comparta sus credenciales contigo.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Carpeta no descifrada]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">Para acceder a la carpeta compartida, la persona que la ha compartido contigo también debe verificar tus credenciales.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verificar %s</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Tus credenciales</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparando archivo para vista previa</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4800,23 +4782,95 @@
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">dom</string>
     <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <string name="photos_album_selection_dialog_title">No es posible seleccionar más elementos</string>
     <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="photos_album_selection_dialog_body">Puedes añadir un máximo de 150 elementos a la vez a un álbum.</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">No se puede verificar el contacto</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">No se puede verificar %s porque no está en tu lista de contactos. Espera a que acepte tu invitación primero.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Empezar</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_camelcase_ok">Aceptar</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">Este archivo ha sido retirado de acuerdo con nuestra [A]Política de notificación y retirada[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">Esta carpeta ha sido retirada de acuerdo con nuestra [A]Política de notificación y retirada[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Únete</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
     <string name="meetings_chat_room_start_scheduled_meeting_option">Empezar reunión</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">Unirse a la reunión</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="one">Se ha enviado %1$d invitación.&#160;</item>
+        <item quantity="many">Se han enviado %1$d de invitaciones.&#160;</item>
+        <item quantity="other">Se han enviado %1$d invitaciones.&#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="one">Sin embargo, no se ha podido enviar %1$d invitación.</item>
+        <item quantity="many">Sin embargo, no se han podido enviar %1$d de invitaciones.</item>
+        <item quantity="other">Sin embargo, no se han podido enviar %1$d invitaciones.</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="one">Se ha copiado %1$d elemento</item>
+        <item quantity="many">Se ha copiado %1$d de elementos</item>
+        <item quantity="other">Se han copiado %1$d elementos</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="one">No se ha podido copiar %1$d elemento</item>
+        <item quantity="many">No se han podido copiar %1$d de elementos</item>
+        <item quantity="other">No se han podido copiar %1$d elementos</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="one">Se ha copiado %1$d elemento,&#160;</item>
+        <item quantity="many">Se ha copiado %1$d de elementos,&#160;</item>
+        <item quantity="other">Se han copiado %1$d elementos,&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="one">no se ha podido copiar %1$d elemento</item>
+        <item quantity="many">no se han podido copiar %1$d de elementos</item>
+        <item quantity="other">no se han podido copiar %1$d elementos</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="one">%1$d día</item>
+        <item quantity="many">%1$d de días</item>
+        <item quantity="other">%1$d días</item>
+    </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">Subtítulos</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">Desactivados</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Añadir subtítulos...</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">Opciones de la presentación</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">Velocidad de la presentación:</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">Lento (8s)</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">Normal (4s)</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">Rápido (2s)</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">Orden de la presentación</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">Aleatorio</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">Repetir</string>
 </resources>

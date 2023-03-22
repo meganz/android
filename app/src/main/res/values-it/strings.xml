@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -524,8 +524,6 @@
     <string name="my_account_change_password_newPassword1">Nuova password</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Conferma la nuova password</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Non c\’è un metodo di pagamento impostato al momento per questo piano. Per favore, selezionane uno.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Link copiato negli appunti</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -701,7 +699,7 @@
     <string name="pin_lock_enter">Entra</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="one">1 tentativo fallito del passcode</item>
+        <item quantity="one">%1$d tentativo fallito del passcode</item>
         <item quantity="many">%1$d tentativi falliti del passcode</item>
         <item quantity="other">%1$d tentativi falliti del passcode</item>
     </plurals>
@@ -827,10 +825,6 @@
     <string name="invalid_string">Sbagliato</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Input non valido</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Indirizzo e-mail non valido</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Ti preghiamo di controllare l’indirizzo e-mail e riprovare.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Reset della password</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -931,7 +925,7 @@
     <string name="confirm_email_explanation">Per favore, controlla la tua e-mail e poi tocca sul link per confermare il tuo account.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
-        <item quantity="one">1 oggetto</item>
+        <item quantity="one">%1$d oggetto</item>
         <item quantity="many">%1$d oggetti</item>
         <item quantity="other">%1$d oggetti</item>
     </plurals>
@@ -1266,7 +1260,7 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
-        <item quantity="one">1 file già caricato</item>
+        <item quantity="one">%1$d file già caricato</item>
         <item quantity="many">%1$d file già caricati</item>
         <item quantity="other">%1$d file già caricati</item>
     </plurals>
@@ -2086,11 +2080,11 @@
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
     <string name="success_archive_chat">%s è stata archiviata</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
+    <string name="error_archive_chat">Errore. %s non è stata archiviata. Riprova.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
     <string name="success_unarchive_chat">%s è stata estratta dall\’archivio</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
+    <string name="error_unarchive_chat">Errore. %s non è stata estratta dall\’archivio. Riprova.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Chat inattiva</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2229,8 +2223,6 @@
     <string name="settings_compression_queue_subtitle">La grandezza minima è %1$s e la grandezza massima è %2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">Rimuovi file più vecchi di</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d giorni</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">Notificami quando la grandezza è più grande di</string>
     <!-- Title of compression queue size option in settings -->
@@ -2745,13 +2737,13 @@
     <string name="invite_contact_action_button">Invita un amico tramite&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">1 file già scaricato.</item>
+        <item quantity="one">%d file già scaricato.</item>
         <item quantity="many">%d file già scaricati.</item>
         <item quantity="other">%d file già scaricati.</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">1 file in attesa.</item>
+        <item quantity="one">%d file in attesa.</item>
         <item quantity="many">%d file in attesa.</item>
         <item quantity="other">%d file in attesa.</item>
     </plurals>
@@ -2929,8 +2921,6 @@
     <string name="label_storage_over_quota">Quota di archiviazione superata</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Ottieni più quota di trasferimento</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">La cartella non esiste.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">Non è stato possibile trovare il file nel tuo Cloud drive.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2953,7 +2943,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]Devi agire immediatamente per salvare i tuoi dati.[/B]</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
-        <item quantity="one">1 giorno</item>
+        <item quantity="one">%d giorno</item>
         <item quantity="many">%d giorni</item>
         <item quantity="other">%d giorni</item>
     </plurals>
@@ -3107,19 +3097,19 @@
     <string name="retention_time_picker_year">anno</string>
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
-        <item quantity="one">1 ora</item>
+        <item quantity="one">%1$d ora</item>
         <item quantity="many">%1$d ore</item>
         <item quantity="other">%1$d ore</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
-        <item quantity="one">1 settimana</item>
+        <item quantity="one">%1$d settimana</item>
         <item quantity="many">%1$d settimane</item>
         <item quantity="other">%1$d settimane</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
-        <item quantity="one">1 mese</item>
+        <item quantity="one">%1$d mese</item>
         <item quantity="many">%1$d mesi</item>
         <item quantity="other">%1$d mesi</item>
     </plurals>
@@ -3283,7 +3273,7 @@
     <string name="years_view_button">Anni</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
-        <item quantity="one">Caricamento in corso, 1 file in attesa</item>
+        <item quantity="one">Caricamento in corso, %1$d file in attesa</item>
         <item quantity="many">Caricamento in corso, %1$d file in attesa</item>
         <item quantity="other">Caricamento in corso, %1$d file in attesa</item>
     </plurals>
@@ -3303,13 +3293,13 @@
     <string name="warning_share_owner_storage_quota">Il file non può essere inviato in quanto l\’utente destinatario ha superato il limite dello spazio di archiviazione.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 file già scaricato. 1 file in attesa.</item>
+        <item quantity="one">1 file già scaricato. %d file in attesa.</item>
         <item quantity="many">1 file già scaricato. %d file in attesa.</item>
         <item quantity="other">1 file già scaricato. %d file in attesa.</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 file già scaricato. 1 file in attesa.</item>
+        <item quantity="one">%d file già scaricato. 1 file in attesa.</item>
         <item quantity="many">%d file già scaricati. 1 file in attesa.</item>
         <item quantity="other">%d file già scaricati. 1 file in attesa.</item>
     </plurals>
@@ -3321,7 +3311,7 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 oggetto spostato nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
+        <item quantity="one">%d oggetto spostato nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
         <item quantity="many">%d di oggetti spostati nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
         <item quantity="other">%d oggetti spostati nel Cestino e 1 oggetto non spostato. Riprova più tardi.</item>
     </plurals>
@@ -3333,31 +3323,31 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 oggetto ripristinato e 1 oggetto non ripristinato. Riprova più tardi.</item>
+        <item quantity="one">%d oggetto ripristinato e 1 oggetto non ripristinato. Riprova più tardi.</item>
         <item quantity="many">%d oggetti ripristinati e 1 oggetto non ripristinato. Riprova più tardi.</item>
         <item quantity="other">%d oggetti ripristinati e 1 oggetto non ripristinato. Riprova più tardi.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 oggetto spostato nel Cestino</item>
+        <item quantity="one">%d oggetto spostato nel Cestino</item>
         <item quantity="many">%d di oggetti spostati nel Cestino</item>
         <item quantity="other">%d oggetti spostati nel Cestino</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 oggetto non è stato spostato nel Cestino</item>
+        <item quantity="one">%d oggetto non è stato spostato nel Cestino</item>
         <item quantity="many">%d di oggetti non sono stati spostati nel Cestino</item>
         <item quantity="other">%d oggetti non sono stati spostati nel Cestino</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 oggetto ripristinato</item>
+        <item quantity="one">%d oggetto ripristinato</item>
         <item quantity="many">%d di oggetti ripristinati</item>
         <item quantity="other">%d oggetti ripristinati</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 oggetto non è stato ripristinato</item>
+        <item quantity="one">%d oggetto non è stato ripristinato</item>
         <item quantity="many">%d di oggetti non sono stati ripristinati</item>
         <item quantity="other">%d oggetti non sono stati ripristinati</item>
     </plurals>
@@ -3389,7 +3379,7 @@
     <string name="title_user_purchased_subscription">In attesa della conferma</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
-        <item quantity="one">1 connessione</item>
+        <item quantity="one">%1$d connessione</item>
         <item quantity="many">%1$d connessioni</item>
         <item quantity="other">%1$d connessioni</item>
     </plurals>
@@ -3751,13 +3741,13 @@
     <string name="meeting_call_screen_two_participants_left_call">%1$s e %2$s hanno lasciato la chiamata</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s e 1 altro utente sono in chiamata</item>
+        <item quantity="one">%1$s e %2$d altro utente sono in chiamata</item>
         <item quantity="many">%1$s e altri %2$d utenti sono in chiamata</item>
         <item quantity="other">%1$s e altri %2$d utenti sono in chiamata</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s e 1 altro hanno lasciato la chiamata</item>
+        <item quantity="one">%1$s e %2$d altro hanno lasciato la chiamata</item>
         <item quantity="many">%1$s e altri %2$d utenti hanno lasciato la chiamata</item>
         <item quantity="other">%1$s e altri %2$d utenti hanno lasciato la chiamata</item>
     </plurals>
@@ -3953,7 +3943,7 @@
     </plurals>
     <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
     <plurals name="num_folders_num_files_2">
-        <item quantity="one">1 file</item>
+        <item quantity="one">%1$d file</item>
         <item quantity="many">%1$d di file</item>
         <item quantity="other">%1$d file</item>
     </plurals>
@@ -4163,22 +4153,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Vedi meno</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Verifica del contatto</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">Proteggiamo i tuoi dati tramite criptazione a conoscenza zero. Per assicurare una sicurezza extra, ti chiediamo di verificare i contatti con cui condividi informazioni prima che possano accedere alle cartelle condivise.</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">Proteggiamo i tuoi dati tramite criptazione a conoscenza zero. Per assicurare una sicurezza extra, ti chiediamo di verificare i contatti che ti condividono informazioni prima che tu possa accedere alle cartelle condivise.</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">Per verificare il tuo contatto, assicurati che le credenziali che vedi qui sopra siano le stesse credenziali dell\’account. Puoi chiedere di condividere queste credenziali con te.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Cartella non decriptata]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">Per accedere alla cartella condivisa, la persona che la ha condivisa con te deve verificarti.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Verifica %s</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Le tue credenziali</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Preparando il file per l\’anteprima</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4473,223 +4455,267 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fourth">
-        <item quantity="one">Fourth Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quarto mercoledì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quarto mercoledì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quarto mercoledì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fourth">
-        <item quantity="one">Fourth Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quarto mercoledì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quarto mercoledì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quarto mercoledì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Wednesday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_wednesday_fifth">
-        <item quantity="one">Fifth Wednesday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Wednesday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quinto mercoledì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quinto mercoledì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quinto mercoledì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Wednesday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Wednesday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_wednesday_fifth">
-        <item quantity="one">Fifth Wednesday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Wednesday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quinto mercoledì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quinto mercoledì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quinto mercoledì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_first">
-        <item quantity="one">First Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il primo giovedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il primo giovedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il primo giovedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_first">
-        <item quantity="one">First Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il primo giovedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il primo giovedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il primo giovedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_second">
-        <item quantity="one">Second Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il secondo giovedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il secondo giovedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il secondo giovedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_second">
-        <item quantity="one">Second Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il secondo giovedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il secondo giovedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il secondo giovedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_third">
-        <item quantity="one">Third Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il terzo giovedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il terzo giovedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il terzo giovedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_third">
-        <item quantity="one">Third Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il terzo giovedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il terzo giovedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il terzo giovedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fourth">
-        <item quantity="one">Fourth Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quarto giovedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quarto giovedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quarto giovedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fourth">
-        <item quantity="one">Fourth Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quarto giovedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quarto giovedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quarto giovedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Thursday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_thursday_fifth">
-        <item quantity="one">Fifth Thursday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Thursday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quinto giovedì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quinto giovedì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quinto giovedì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Thursday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Thursday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_thursday_fifth">
-        <item quantity="one">Fifth Thursday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Thursday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quinto giovedì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quinto giovedì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quinto giovedì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_first">
-        <item quantity="one">First Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il primo venerdì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il primo venerdì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il primo venerdì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_first">
-        <item quantity="one">First Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il primo venerdì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il primo venerdì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il primo venerdì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_second">
-        <item quantity="one">Second Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il secondo venerdì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il secondo venerdì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il secondo venerdì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_second">
-        <item quantity="one">Second Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il secondo venerdì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il secondo venerdì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il secondo venerdì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_third">
-        <item quantity="one">Third Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il terzo venerdì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il terzo venerdì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il terzo venerdì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_third">
-        <item quantity="one">Third Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il terzo venerdì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il terzo venerdì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il terzo venerdì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fourth">
-        <item quantity="one">Fourth Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quarto venerdì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quarto venerdì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quarto venerdì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fourth">
-        <item quantity="one">Fourth Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quarto venerdì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quarto venerdì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quarto venerdì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Friday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_friday_fifth">
-        <item quantity="one">Fifth Friday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Friday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quinto venerdì di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quinto venerdì di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quinto venerdì di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Friday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Friday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_friday_fifth">
-        <item quantity="one">Fifth Friday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Friday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quinto venerdì di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quinto venerdì di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quinto venerdì di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_first">
-        <item quantity="one">First Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il primo sabato di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il primo sabato di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il primo sabato di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_first">
-        <item quantity="one">First Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il primo sabato di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il primo sabato di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il primo sabato di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_second">
-        <item quantity="one">Second Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il secondo sabato di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il secondo sabato di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il secondo sabato di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_second">
-        <item quantity="one">Second Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il secondo sabato di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il secondo sabato di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il secondo sabato di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_third">
-        <item quantity="one">Third Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il terzo sabato di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il terzo sabato di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il terzo sabato di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_third">
-        <item quantity="one">Third Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il terzo sabato di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il terzo sabato di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il terzo sabato di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fourth">
-        <item quantity="one">Fourth Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quarto sabato di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quarto sabato di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quarto sabato di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fourth">
-        <item quantity="one">Fourth Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quarto sabato di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quarto sabato di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quarto sabato di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Saturday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_saturday_fifth">
-        <item quantity="one">Fifth Saturday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Saturday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">Il quinto sabato di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">Il quinto sabato di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">Il quinto sabato di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Saturday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Saturday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_saturday_fifth">
-        <item quantity="one">Fifth Saturday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Saturday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">Il quinto sabato di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">Il quinto sabato di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">Il quinto sabato di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_first">
-        <item quantity="one">First Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">First Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">La prima domenica di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">La prima domenica di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">La prima domenica di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_first">
-        <item quantity="one">First Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">First Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">La prima domenica di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">La prima domenica di ogni %1$d di mesi a partire daò [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">La prima domenica di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_second">
-        <item quantity="one">Second Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Second Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">La seconda domenica di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">La seconda domenica di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">La seconda domenica di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on second Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Second Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_second">
-        <item quantity="one">Second Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Second Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">La seconda domenica di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">La seconda domenica di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">La seconda domenica di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_third">
-        <item quantity="one">Third Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Third Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">La terza domenica di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">La terza domenica di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">La terza domenica di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on third Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Third Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_third">
-        <item quantity="one">Third Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Third Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">La terza domenica di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">La terza domenica di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">La terza domenica di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fourth">
-        <item quantity="one">Fourth Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fourth Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">La quarta domenica di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">La quarta domenica di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">La quarta domenica di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fourth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fourth">
-        <item quantity="one">Fourth Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fourth Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">La quarta domenica di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">La quarta domenica di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">La quarta domenica di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fifth Sunday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_sunday_fifth">
-        <item quantity="one">Fifth Sunday of every month effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Fifth Sunday of every %1$d months effective [A]%2$s until %3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="one">La quinta domenica di ogni mese a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="many">La quinta domenica di ogni %1$d di mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
+        <item quantity="other">La quinta domenica di ogni %1$d mesi a partire dal [A]%2$s fino al %3$s[/A] dalle [B]%4$s alle %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on fourth Sunday without ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Fifth Sunday of every 2 months, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_forever_sunday_fifth">
-        <item quantity="one">Fifth Sunday of every month effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
-        <item quantity="other">Fifth Sunday of every %1$d months effective [A]%2$s[/A] from [B]%3$s to %4$s[/B]</item>
+        <item quantity="one">La quinta domenica di ogni mese a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="many">La quinta domenica di ogni %1$d di mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
+        <item quantity="other">La quinta domenica di ogni %1$d mesi a partire dal [A]%2$s[/A] dalle [B]%3$s alle %4$s[/B]</item>
     </plurals>
     <!-- In app notification description text representing the meeting repeats every Monday -->
     <string name="notification_scheduled_meeting_week_day_mon">Lun</string>
@@ -4706,11 +4732,11 @@
     <!-- In app notification description text representing the meeting repeats every Sunday -->
     <string name="notification_scheduled_meeting_week_day_sun">Dom</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
-    <string name="meetings_one_off_occurrence_info_today">Today, %1$s from %2$s to %3$s</string>
+    <string name="meetings_one_off_occurrence_info_today">Oggi, %1$s dalle %2$s alle %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
-    <string name="meetings_one_off_occurrence_info_tomorrow">Tomorrow, %1$s from %2$s to %3$s</string>
+    <string name="meetings_one_off_occurrence_info_tomorrow">Domani, %1$s dalle %2$s alle %3$s</string>
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s updated[/A][B] the recurring meeting date[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s ha aggiornato[/A][B] la data del meeting ricorrente[/B]</string>
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">Aggiornamento di sicurezza</string>
     <!-- This is the body of upgrade security dialog -->
@@ -4756,23 +4782,95 @@
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">dom</string>
     <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <string name="photos_album_selection_dialog_title">Impossibile selezionare di più</string>
     <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
-    <string name="shared_items_contact_not_in_contact_list_dialog_title">Cannot verify contact</string>
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="photos_album_selection_dialog_body">Puoi aggiungere solo fino a 150 oggetti alla volta ad un album.</string>
+    <!--  -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_title">Impossibile verificare il contatto</string>
+    <!--  -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Non puoi verificare %s perché non è nella tua lista dei contatti. Attendi che accetti prima il tuo invito.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Inizia</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_camelcase_ok">Ok</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">Questo file è stato rimosso seguendo la nostra [A]Politica sulla chiusura[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">Questa cartella è stata rimossa seguendo la nostra [A]Politica sulla chiusura[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Unisciti</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
     <string name="meetings_chat_room_start_scheduled_meeting_option">Inizia il meeting</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">Unisciti al meeting</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="one">%1$d richiesta di invito spedita.&#160;</item>
+        <item quantity="many">%1$d di richieste di invito spedite.&#160;</item>
+        <item quantity="other">%1$d richieste di invito spedite.&#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="one">Ciononostante, %1$d richiesta non è stata spedita.</item>
+        <item quantity="many">Ciononostante, %1$d di richieste non sono state spedite.</item>
+        <item quantity="other">Ciononostante, %1$d richieste non sono state spedite.</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="one">%1$d oggetto copiato</item>
+        <item quantity="many">%1$d di oggetti copiati</item>
+        <item quantity="other">%1$d oggetti copiati</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="one">Impossibile copiare %1$d oggetto</item>
+        <item quantity="many">Impossibile copiare %1$d di oggetti</item>
+        <item quantity="other">Impossibile copiare %1$d oggetti</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="one">%1$d oggetto copiato,&#160;</item>
+        <item quantity="many">%1$d di oggetti copiati,&#160;</item>
+        <item quantity="other">%1$d oggetti copiati,&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="one">impossibile copiare %1$d oggetto</item>
+        <item quantity="many">impossibile copiare %1$d oggetti</item>
+        <item quantity="other">impossibile copiare %1$d oggetti</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="one">%1$d giorno</item>
+        <item quantity="many">%1$d di giorni</item>
+        <item quantity="other">%1$d giorni</item>
+    </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">Sottotitoli</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">Off</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Aggiungi sottotitoli&#8230;</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">Opzioni della presentazione</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">Velocità della presentazione</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">Lenta (8s)</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">Normale (4s)</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">Veloce (2s)</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">Ordine di presentazione</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">Casuale</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">Ripeti</string>
 </resources>

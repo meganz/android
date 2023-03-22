@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -377,7 +377,7 @@
     <!-- success message when reinvite a contact -->
     <string name="context_contact_invitation_resent">Thư mời đã được gửi lại lần nữa</string>
     <!-- success message when sending a contact request -->
-    <string name="context_contact_request_sent">Request sent to %s. View in Sent requests tab.</string>
+    <string name="context_contact_request_sent">Lời&#160;mời đã được gửi tới %s. Vào tab Gửi&#160;Đi để xem các yêu&#160;cầu đã gửi.</string>
     <!-- success message when removing a contact -->
     <string name="context_contact_removed">Đã xóa tên liên lạc</string>
     <!-- error message -->
@@ -393,25 +393,25 @@
     <!-- error message when creating a folder -->
     <string name="context_folder_no_created">Lỗi. Không tạo được thư mục</string>
     <!-- success message when renaming a node -->
-    <string name="context_correctly_renamed">Renamed</string>
+    <string name="context_correctly_renamed">Đã đổi tên</string>
     <!-- error message -->
     <string name="context_no_renamed">Lỗi. Chưa đặt lại tên được</string>
     <!-- success message when copying a node -->
-    <string name="context_correctly_copied">Copied</string>
+    <string name="context_correctly_copied">Đã sao&#160;chép</string>
     <!-- error message -->
     <string name="context_no_copied">Lỗi. Chưa sao chép được</string>
     <!-- message that appears when a user tries to move/copy/upload a file but doesn’t choose a destination folder -->
     <string name="context_no_destination_folder">Xin chọn thư mục đích</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved">Moved</string>
+    <string name="context_correctly_moved">Đã di&#160;chuyển</string>
     <!-- success message when moving a node (file/folder) -->
     <plurals name="number_correctly_moved">
         <item quantity="other">Đã di chuyển %d mục</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d items weren’t moved</string>
+    <string name="number_incorrectly_moved">Đã không di&#160;chuyển được %d mục</string>
     <!-- success message when moving a node -->
-    <string name="context_correctly_moved_to_rubbish">Moved to Rubbish bin</string>
+    <string name="context_correctly_moved_to_rubbish">Đã chuyển vào Thùng&#160;Rác</string>
     <!-- error message -->
     <string name="context_no_moved">Lỗi. Chưa di chuyển được</string>
     <!-- success message when sharing a folder -->
@@ -425,21 +425,21 @@
     <!-- error message -->
     <string name="context_no_removed">Lỗi. Chưa xóa được</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d items removed from MEGA</string>
+    <string name="number_correctly_removed">%d mục đã loại&#160;khỏi MEGA</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">%d items weren’t removed</string>
+    <string name="number_no_removed">Đã không loại&#160;bỏ được %d mục</string>
     <!-- Success message when left shared folders -->
-    <string name="number_correctly_leaved">%d folders left</string>
+    <string name="number_correctly_leaved">Đã rời&#160;khỏi %d thư&#160;mục</string>
     <!-- Message shown when a share has been left -->
     <string name="share_left">Đã rời khỏi chia sẻ</string>
     <!-- error message when moving a node -->
-    <string name="number_no_leaved">%d folders weren’t left</string>
+    <string name="number_no_leaved">Đã không rời&#160;khỏi được %d thư&#160;mục</string>
     <!-- success message when sending multiple files -->
-    <string name="number_correctly_copied">%d items copied</string>
+    <string name="number_correctly_copied">%d mục đã được sao&#160;chép</string>
     <!-- error message when sending multiple files -->
     <string name="number_no_copied">%d tệp tin chưa được sao chép</string>
     <!-- success message when emptying the RB -->
-    <string name="rubbish_bin_emptied">Rubbish bin emptied</string>
+    <string name="rubbish_bin_emptied">Thùng&#160;Rác đã được dọn</string>
     <!-- error message when emptying the RB -->
     <string name="rubbish_bin_no_emptied">Lỗi phát sinh. Không dọn được Thùng Rác</string>
     <!-- dialog cancel subscriptions -->
@@ -502,8 +502,6 @@
     <string name="my_account_change_password_newPassword1">Mật khẩu mới</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Nhập lại mật khẩu mới</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Chưa có phương thức thanh toán nào được chọn để mua gói này. Xin chọn ra một mục.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Đã sao&#160;chép đường liên&#160;kết vào bảng&#160;nhớ&#160;tạm</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -611,7 +609,7 @@
     <!-- error message that will show to user when user entered invalid verification code -->
     <string name="verify_account_error_invalid_code">Mã không đúng. Xin thử lại hoặc lấy cái mới.</string>
     <!-- verify phone number successfully -->
-    <string name="verify_account_successfully">Your phone number has been verified</string>
+    <string name="verify_account_successfully">Số điện&#160;thoại của bạn đã được xác&#160;thực</string>
     <!-- If the user has an internal storage and an external SD card, it has to be set on the settings screen, external storage option -->
     <string-array name="settings_storage_download_location_array">
         <item>Bộ nhớ nội bộ</item>
@@ -684,7 +682,7 @@
     <!-- Error message when not typing the Passcode code correctly -->
     <string name="pin_lock_alert">Tài khoản sẽ đăng xuất và tất cả tệp tin lưu về ngoại tuyến sẽ xóa khỏi máy sau 10 lần nhập sai mã</string>
     <!-- Error message when not typing the Passcode correctly (two times) -->
-    <string name="pin_lock_not_match">Hai mã mới nhập không khớp. Thử lại.</string>
+    <string name="pin_lock_not_match">Các mật&#160;mã mới nhập không khớp. Thử lại.</string>
     <!-- Title of the screen to unlock screen with Passcode -->
     <string name="unlock_pin_title">Nhập mật mã của bạn</string>
     <!-- Title of the screen to unlock screen with Passcode in second round -->
@@ -750,9 +748,9 @@
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_free">Tài khoản miễn phí</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro1">Tài khoản hạng Pro&#160;I</string>
+    <string name="my_account_pro1">Tài&#160;khoản hạng Pro&#160;I</string>
     <!-- Label in My Account section to show user account type -->
-    <string name="my_account_pro2">Tài khoản hạng Pro&#160;II</string>
+    <string name="my_account_pro2">Tài&#160;khoản hạng Pro&#160;II</string>
     <!-- Label in My Account section to show user account type -->
     <string name="my_account_pro3">Tài khoản hạng Pro&#160;II</string>
     <!-- Type of account info added to the feedback email sent to support -->
@@ -803,10 +801,6 @@
     <string name="invalid_string">Xin nhập mật khẩu</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Nhập liệu không hợp lệ</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Địa chỉ e-mail không phù hợp</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Xin vui lòng kiểm tra địa chỉ e-mail và thử lại.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Đặt lại mật khẩu</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -814,11 +808,11 @@
     <!-- Text of the alert when the pass has been correctly changed -->
     <string name="pass_changed_alert">Bạn vừa đổi mật khẩu.</string>
     <!-- Title of the dialog to park an account -->
-    <string name="park_account_dialog_title">Thay mới tài khoản</string>
+    <string name="park_account_dialog_title">Đặt thay&#160;mới tài&#160;khoản</string>
     <!-- Button to park an account -->
-    <string name="park_account_button">Thay Thế Mới</string>
+    <string name="park_account_button">Đặt thay mới</string>
     <!-- Text shown in the last alert dialog to park an account -->
-    <string name="park_account_text_last_step">Đây là bước cuối cùng để đặt mới tài khoản, xin tạo một mật khẩu ở dưới đây. Mọi dữ liệu từ tài khoản cũ sẽ được bảo lưu trong 60 ngày. Trong thời gian đó nếu khách hàng nhớ ra lại mật khẩu của tài khoản cũ, xin vui lòng liên hệ support&#64;mega.nz</string>
+    <string name="park_account_text_last_step">Đây là bước cuối&#160;cùng để đặt thay&#160;mới tài&#160;khoản, xin tạo một mật&#160;khẩu ở dưới đây. Mọi dữ&#160;liệu từ tài&#160;khoản cũ sẽ được bảo&#160;lưu trong 60&#160;ngày. Trong thời&#160;gian đó nếu nhớ ra lại mật&#160;khẩu của tài&#160;khoản cũ, xin vui&#160;lòng liên&#160;hệ support&#64;mega.nz</string>
     <!-- Title of the screen to write the new password after opening the recovery link -->
     <string name="title_enter_new_password">Nhập mật khẩu mới</string>
     <!-- Message when the user tries to open a recovery pass link and it has expired -->
@@ -856,7 +850,7 @@
     <!-- Text of the alert dialog to inform the user that have to check the email to validate his new email -->
     <string name="email_verification_text_change_mail">Địa chỉ e-mail của bạn cần phải được xác minh. Vui lòng kiểm tra hộp thư e-mail để thực hiện bước kế tiếp.</string>
     <!-- Confirmation before deleting the avatar of the user’s profile -->
-    <string name="confirmation_delete_avatar">Xóa ảnh đại diện?</string>
+    <string name="confirmation_delete_avatar">Xóa ảnh đại&#160;diện?</string>
     <!-- Title of the Dialog to edit the profile attributes of the user’s account -->
     <string name="title_edit_profile_info">Sửa</string>
     <!-- Alert Dialog to get link -->
@@ -866,7 +860,7 @@
     <!-- Subtitle of the dialog to get link -->
     <string name="subtitle_set_expiry_date">(Chỉ cho hạng Pro)</string>
     <!-- Alert Dialog to get link with password -->
-    <string name="set_password_protection_dialog">Đặt mật khẩu</string>
+    <string name="set_password_protection_dialog">Đặt mật&#160;khẩu</string>
     <!-- Hint of the dialog to get link with password -->
     <string name="hint_set_password_protection_dialog">Nhập mật khẩu</string>
     <!-- Hint of the confirmation dialog to get link with password -->
@@ -940,7 +934,7 @@
         <item quantity="other">%d lời mời đã được gửi đi</item>
     </plurals>
     <!-- error message when reinviting multiple contacts -->
-    <string name="number_no_invite_contact_request">%1$d invite requests sent but %2$d requests weren’t sent.</string>
+    <string name="number_no_invite_contact_request">%1$d lời&#160;mời đã được gửi đi nhưng còn lại %2$d lời&#160;mời không gửi được.</string>
     <!-- Word next to own user’s message in chat screen -->
     <string name="chat_me_text_bracket">%1s (Tôi)</string>
     <!-- button -->
@@ -994,7 +988,7 @@
     <!-- Message show when the history of a chat has been successfully deleted -->
     <string name="clear_history_success">Lịch sử tin nhắn chát đã được dọn sạch</string>
     <!-- Message show when the history of a chat hasn’t been successfully deleted -->
-    <string name="clear_history_error">An error has occurred. The chat history hasn’t been cleared</string>
+    <string name="clear_history_error">Có lỗi phát&#160;sinh. Lịch&#160;sử cuộc chát chưa xóa sạch được</string>
     <!-- Menu item to add participants to a chat -->
     <string name="add_participants_menu_item">Thêm thành viên</string>
     <!-- Menu item to remove a participants from a chat -->
@@ -1040,7 +1034,7 @@
     <!-- Label for the option of the sliding panel to start a one to one chat -->
     <string name="group_chat_start_conversation_label">Bắt đầu cuộc chát</string>
     <!-- Label for the option of the sliding panel to edit the profile -->
-    <string name="group_chat_edit_profile_label">Sửa trang cá nhân</string>
+    <string name="group_chat_edit_profile_label">Sửa hồ&#160;sơ cá&#160;nhân</string>
     <!-- Title of the section to leave a group content in the Contact Properties screen -->
     <string name="title_properties_chat_leave_chat">Rời nhóm</string>
     <!-- Label for participants of a group chat -->
@@ -1064,9 +1058,9 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error_already_exists">Thành viên này đã có mặt trong nhóm chát này rồi</string>
     <!-- success message when inviting multiple contacts to a group chat -->
-    <string name="number_correctly_add_participant">%d participants were invited</string>
+    <string name="number_correctly_add_participant">%d thành&#160;viên đã được mời</string>
     <!-- error message when inviting multiple contacts to a group chat -->
-    <string name="number_no_add_participant_request">%1$d participants were invited but %2$d participants were not invited.</string>
+    <string name="number_no_add_participant_request">Lời&#160;mời đã được gửi tới %1$d thành&#160;viên nhưng còn lại %2$d thành&#160;viên không mời được.</string>
     <!-- chat message when a participant was added to a group chat -->
     <string name="message_add_participant">[A]%1$s[/A][B] vừa gia nhập nhóm chát từ lời mời của [/B][C]%2$s[/C]</string>
     <!-- chat message when a participant was removed from a group chat -->
@@ -1108,7 +1102,7 @@
     <!-- Title of the error dialog when opening a chat -->
     <string name="chat_error_open_title">Chát lỗi</string>
     <!-- Message of the error dialog when opening a chat -->
-    <string name="chat_error_open_message">Chat couldn’t be opened</string>
+    <string name="chat_error_open_message">Cuộc chát không&#160;thể mở được</string>
     <!-- Title of the contact list -->
     <plurals name="general_selection_num_contacts">
         <item quantity="other">%1$d tên liên lạc</item>
@@ -1140,7 +1134,7 @@
     <!-- More button in contact info page -->
     <string name="label_more">Thêm nữa</string>
     <!-- Title of the section about the storage space in the storage tab in My Account Section -->
-    <string name="storage_space">Lưu Trữ</string>
+    <string name="storage_space">Lưu trữ</string>
     <!-- Confirmation message before removing something from the Offline section. -->
     <string name="confirmation_delete_from_save_for_offline">Xóa khỏi Lưu Ngoại Tuyến?</string>
     <!-- Label for the option of action menu to change the chat status -->
@@ -1279,7 +1273,7 @@
     <!-- Button to resend the create account email to a new email address in case the previous email address was misspelled -->
     <string name="confirm_email_misspelled_resend">Gửi lại</string>
     <!-- Text shown after the confirmation email has been sent to the new email address -->
-    <string name="confirm_email_misspelled_email_sent">E-mail đã được gửi</string>
+    <string name="confirm_email_misspelled_email_sent">Email đã được gửi</string>
     <!-- text_copyright_alert_title -->
     <string name="copyright_alert_title">Thông báo mới về luật bản quyền</string>
     <!-- text_copyright_alert_first_paragraph -->
@@ -1313,19 +1307,19 @@
     <!--  -->
     <string name="camera_uploads_upload_videos">Cho&#160;phép video được tải&#160;lên</string>
     <!-- Message when an user avatar has been changed successfully -->
-    <string name="success_changing_user_avatar">Đã cập nhật ảnh đại diện</string>
+    <string name="success_changing_user_avatar">Đã cập&#160;nhật ảnh đại&#160;diện</string>
     <!-- Message when an error ocurred when changing an user avatar -->
     <string name="error_changing_user_avatar_image_not_available">Lỗi. Hình ảnh vừa chọn không còn tồn tại</string>
     <!-- Message when an error ocurred when changing an user avatar -->
-    <string name="error_changing_user_avatar">Thay đổi ảnh đại diện bị lỗi</string>
+    <string name="error_changing_user_avatar">Lỗi phát&#160;sinh khi thay&#160;đổi ảnh đại&#160;diện</string>
     <!-- Message when an user avatar has been deleted successfully -->
-    <string name="success_deleting_user_avatar">Đã xóa ảnh đại diện</string>
+    <string name="success_deleting_user_avatar">Đã xóa ảnh đại&#160;diện</string>
     <!-- Message when an error ocurred when deleting an user avatar -->
-    <string name="error_deleting_user_avatar">Xóa ảnh đại diện bị lỗi</string>
+    <string name="error_deleting_user_avatar">Lỗi phát&#160;sinh khi xóa ảnh đại&#160;diện</string>
     <!-- Message when an error ocurred when changing an user attribute -->
     <string name="error_changing_user_attributes">Thay đổi tên gặp lỗi</string>
     <!-- Message when an user attribute has been changed successfully -->
-    <string name="success_changing_user_attributes">Your name has been updated</string>
+    <string name="success_changing_user_attributes">Tên của bạn đã được cập&#160;nhật</string>
     <!-- Message show when a participant has been successfully invited to a group chat -->
     <string name="add_participant_success">Đã thêm thành viên</string>
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
@@ -1561,9 +1555,9 @@
     <!-- Text shown when it has been copied the QR code link -->
     <string name="qrcode_link_copied">Đã sao&#160;chép đường liên&#160;kết vào bảng&#160;nhớ&#160;tạm</string>
     <!-- Text shown when it has been reseted the QR code successfully -->
-    <string name="qrcode_reset_successfully">QR code reset</string>
+    <string name="qrcode_reset_successfully">Mã&#160;QR đã được đặt lại</string>
     <!-- Text shown when it has been deleted the QR code successfully -->
-    <string name="qrcode_delete_successfully">QR code deleted</string>
+    <string name="qrcode_delete_successfully">Mã QR đã xóa</string>
     <!-- Text shown when it has not been reseted the QR code successfully -->
     <string name="qrcode_reset_not_successfully">Không đặt được lại mã ảnh QR vì xảy ra lỗi. Xin thử lại.</string>
     <!-- Text shown when it has not been delete the QR code successfully -->
@@ -1581,7 +1575,7 @@
     <!-- Text shown when it tries to download to File System the QR and occurs an error to process the action -->
     <string name="error_download_qr">Lỗi phát sinh trong quá trình tải về tệp tin ảnh mã QR. Có thể tệp tin không còn tồn tại nữa. Xin thử lại sau.</string>
     <!-- Text shown when it tries to download to File System the QR and the action has success -->
-    <string name="success_download_qr">The QR Code has been downloaded to %s</string>
+    <string name="success_download_qr">Mã&#160;QR đã được tải&#160;xuống vào vị&#160;trí %s</string>
     <!-- Title of dialog shown when a contact request has not been sent with QR code -->
     <string name="invite_not_sent">Lời mời chưa được gửi</string>
     <!-- Text of dialog shown when a contact request has not been sent with QR code -->
@@ -1593,7 +1587,7 @@
     <!-- Text of alert dialog informing that the qr is generating -->
     <string name="generatin_qr">Đang tạo ra mã QR&#8230;</string>
     <!-- Title of QR code scan menu item -->
-    <string name="menu_item_scan_code">Quét mã QR</string>
+    <string name="menu_item_scan_code">Quét mã&#160;QR</string>
     <!-- get the contact link and copy it -->
     <string name="button_copy_link">Sao chép đường liên kết</string>
     <!-- Create QR code -->
@@ -1613,7 +1607,7 @@
     <!-- Text of the empty screen when there are not elements in Saved for Offline -->
     <string name="context_empty_offline">[B]Không có tệp tin nào trong [/B][A]Lưu về Ngoại Tuyến[/A]</string>
     <!-- Text of the empty screen when there are not contacts. No dot at the end because is for an empty state. The format placeholders are to showing it in different colors. -->
-    <string name="context_empty_contacts">z[B]Không có tên [/B][A]liên lạc[/A]</string>
+    <string name="context_empty_contacts">[B]Không có [/B][A]tên liên&#160;lạc[/A]</string>
     <!-- Message shown when the user has no chats -->
     <string name="recent_chat_empty">[A]Không có[/A] [B]cuộc trò chuyện[/B] nào</string>
     <!-- Message shown when the chat is section is loading the conversations -->
@@ -1741,8 +1735,7 @@
     <string name="messages_forwarded_success">Tin nhắn đã được chuyển đi</string>
     <!-- Error message if any of the forwarded messages fails, message items -->
     <plurals name="messages_forwarded_partial_error">
-        <item quantity="one">Error. %1$d message not forwarded</item>
-        <item quantity="other">Error. %1$d messages not forwarded</item>
+        <item quantity="other">Lỗi. %1$d tin&#160;nhắn chưa được chuyển&#160;tiếp</item>
     </plurals>
     <!-- Error non existing resource after forwarding one or several messages to several chats, message items -->
     <plurals name="messages_forwarded_error_not_available">
@@ -1827,7 +1820,7 @@
     <!-- Menu option to print the recovery key from Offline section -->
     <string name="context_option_print">In</string>
     <!-- Message when the recovery key has been successfully saved on the filesystem -->
-    <string name="save_MK_confirmation">Recovery key has been saved</string>
+    <string name="save_MK_confirmation">Chìa&#160;Khóa Phục&#160;Hồi đã không lưu&#160;lại được</string>
     <!-- label to indicate that a share is still pending on outgoing shares of a node -->
     <string name="pending_outshare_indicator">(Đang chờ)</string>
     <!-- Title of the dialog to disable the rich links previews on chat -->
@@ -1835,7 +1828,7 @@
     <!-- Button to allow the rich links previews on chat -->
     <string name="button_always_rich_links">Luôn Luôn Thực Hiện</string>
     <!-- Button do not allow now the rich links previews on chat -->
-    <string name="button_not_now_rich_links">Không Phải Lúc Này</string>
+    <string name="button_not_now_rich_links">Không phải lúc này</string>
     <!-- Button do not allow the rich links previews on chat -->
     <string name="button_never_rich_links">Không bao giờ</string>
     <!-- Title of the dialog to enable the rich links previews on chat -->
@@ -1991,11 +1984,11 @@
     <!-- Message shown when a chat is successfully archived, it shows the name of the chat -->
     <string name="success_archive_chat">%s đã được bảo&#160;lưu</string>
     <!-- Error message shown when a chat has not be archived, it shows the name of the chat -->
-    <string name="error_archive_chat">Error. %s wasn’t archived. Try again.</string>
+    <string name="error_archive_chat">Lỗi. %s chưa được bảo&#160;lưu. Thử lại.</string>
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
     <string name="success_unarchive_chat">%s đã được ra khỏi bảo&#160;lưu</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
+    <string name="error_unarchive_chat">Lỗi. %s chưa chuyển khỏi bảo&#160;lưu được. Thử lại.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">Cuộc chát không hoạt động đã lâu</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2031,7 +2024,7 @@
     <!-- Text of the dialog to delete all the file versions of the account -->
     <string name="text_confirmation_dialog_delete_versions">Việc này sẽ xóa đi tất cả các lịch sử phiên bản cũ của tệp tin có trong tài khoản. Các phiên bản tệp tin được chia sẻ người khác cần phải được thực hiện từ phía chủ sở hữu các tệp tin đó.\n\nXin nhớ rằng đây chỉ xóa phiên bản chứ không phải tệp tin.</string>
     <!-- success message when deleting all the versions of the account -->
-    <string name="success_delete_versions">File versions deleted</string>
+    <string name="success_delete_versions">Đã xóa các phiên&#160;bản tệp&#160;tin</string>
     <!-- error message when deleting all the versions of the account -->
     <string name="error_delete_versions">Lỗi phát sinh khi dọn dẹp tất cả các phiên bản cũ của tệp tin, xin thử lại sau.</string>
     <!-- Title of the option to enable or disable file versioning on Settings section -->
@@ -2130,8 +2123,6 @@
     <string name="settings_compression_queue_subtitle">Kích thước tối thiểu là %1$s và kích thước tối đa là %2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">Dọn dữ liệu tồn đọng hơn</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d ngày</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">Nhắc cho tôi biết khi kích thước của tệp tin lớn hơn</string>
     <!-- Title of compression queue size option in settings -->
@@ -2189,7 +2180,7 @@
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
     <string name="invite_not_sent_already_sent">Lời mời đã được gửi tới tên liên lạc %s trước đây rồi. Theo dõi tình trạng của lời mời trong tab Yêu Cầu Gửi Đi.</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
-    <string name="save_qr_cloud_drive">Đang lưu %s vào Ổ Mây&#8230;</string>
+    <string name="save_qr_cloud_drive">Đang lưu %s vào Ổ&#160;Mây&#8230;</string>
     <!-- General label for files -->
     <string name="general_files">Tệp tin</string>
     <!-- Item menu option upon right click on one or multiple files -->
@@ -2355,7 +2346,7 @@
     <!-- the meaning of the asterisk in monthly* and annually* payment -->
     <string name="upgrade_comment">* Các gói đăng ký dịch vụ tự định kỳ đều có thể hủy bỏ bất cứ khi nào khách hành muốn, trước ngày đầu chu kỳ.</string>
     <!-- Message shown when a call starts. -->
-    <string name="call_started_messages">Cuộc Gọi Đã Bắt Đầu</string>
+    <string name="call_started_messages">Cuộc gọi đã bắt&#160;đầu</string>
     <!-- Title of the dialog to inform about a SSL error -->
     <string name="ssl_error_dialog_title">Chìa&#160;khóa&#160;SSL bị lỗi</string>
     <!-- Text of the dialog to inform about a SSL error -->
@@ -2485,7 +2476,7 @@
     <!-- Alert shown when some content have not been sent because of any error occurs -->
     <string name="content_not_send">Nội dung chưa được gửi tới %d cuộc chát thành công</string>
     <!-- Label shown when a new group chat has been created correctly -->
-    <string name="new_group_chat_created">New group chat created</string>
+    <string name="new_group_chat_created">Nhóm chát mới đã được tạo</string>
     <!-- Alert shown when some content is sharing with chats and they are processing -->
     <string name="preparing_chats">Đang chuẩn bị cho tệp tin</string>
     <!-- Label indicating some content has been sent as message -->
@@ -2502,8 +2493,7 @@
     <string name="version_history_deleted_erroneously">Không xóa được các phiên bản cũ.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">%d version deleted</item>
-        <item quantity="other">%d versions deleted</item>
+        <item quantity="other">%d phiên&#160;bản đã được xóa</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -2596,9 +2586,9 @@
     <!-- In some cases, a user may try to get the link for a chat room, but if such is not set by an operator - it would say ‘not link available’ and not auto create it. -->
     <string name="no_chat_link_available">Không có liên kết chát nào cả.</string>
     <!-- Alert shown when it has been deleted successfully a chat link -->
-    <string name="chat_link_deleted">Chat link deleted</string>
+    <string name="chat_link_deleted">Đường liên&#160;kết chát đã xóa</string>
     <!-- Message shown when it restored successfully a file version -->
-    <string name="version_restored">Version restored</string>
+    <string name="version_restored">Phiên&#160;bản đã hồi&#160;phục</string>
     <!-- Text to inform that to make a recording you have to keep pressed the record button more than one second -->
     <string name="recording_less_than_second">Chạm và giữ để ghi âm</string>
     <!-- label shown when slide to cancel a voice messages -->
@@ -2738,7 +2728,7 @@
     <!-- Button to update a nickname for a user -->
     <string name="edit_nickname">Sửa biệt danh</string>
     <!-- Label showing that a nickname has been added -->
-    <string name="snackbar_nickname_added">Đã thêm biêt danh</string>
+    <string name="snackbar_nickname_added">Đã thêm biệt&#160;danh</string>
     <!-- Label showing that a nickname has been added -->
     <string name="snackbar_nickname_removed">Đã xóa biệt danh</string>
     <!-- title of a dialog to edit or remove the nickname -->
@@ -2756,7 +2746,7 @@
     <!-- Confirmation dialog shown to user when they try to revert a node in an incoming ReadWrite share. -->
     <string name="alert_not_enough_permissions_revert">Bạn không có quyền hạn phù hợp để sửa đổi tệp tin này. Bạn có muốn tạo một tệp tin mới không?</string>
     <!-- Text shown when the creation of a version as a new file was successful -->
-    <string name="version_as_new_file_created">Version was created as a new file</string>
+    <string name="version_as_new_file_created">Phiên&#160;bản đã được chuyển&#160;thành một tệp&#160;tin mới toàn vẹn</string>
     <!-- Label indicating a date. Keep the placeholder, is to set the date. -->
     <string name="general_date_label">vào ngày %1$s</string>
     <!-- Confirmation before removing the outgoing shares of several folders. Please keep the placeholder is to set the number of folders -->
@@ -2768,7 +2758,7 @@
     <!-- Text asking confirmation for download location -->
     <string name="confirmation_download_location">Luôn lưu các mục tải về vào vị trí này?</string>
     <!-- Action to show any file in its location -->
-    <string name="view_in_folder_label">Xem trong thư mục</string>
+    <string name="view_in_folder_label">Xem trong thư&#160;mục chứa</string>
     <!-- Title of a screen to browse files -->
     <string name="browse_files_label">Duyệt tệp tin</string>
     <!-- Title of the File Provider activity -->
@@ -2783,8 +2773,6 @@
     <string name="label_storage_over_quota">Vượt mức giới hạn lưu trữ</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Tăng hạn mức truyền tải</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">Thư mục không tồn tại.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">Tệp tin không có tìm thấy trong Ổ Mây của bạn.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2834,7 +2822,7 @@
     <!-- Info message displayed when the user is leaving a chat conversation -->
     <string name="leaving_label">Đang rời khỏi&#8230;</string>
     <!-- Text show in a snackbar when phone has successfully reset. -->
-    <string name="remove_phone_number_success">Phone number removed</string>
+    <string name="remove_phone_number_success">Số điện&#160;thoại đã loại&#160;bỏ</string>
     <!-- Text show in a snackbar when reset phone number failed. -->
     <string name="remove_phone_number_fail">Việc xóa số điện thoại bị thất bại.</string>
     <!-- Text hint shown in the global search box which sits on the top of the Homepage screen -->
@@ -3110,7 +3098,7 @@
     <!-- Text to show as subtitle of Enable camera uploads screen -->
     <string name="enable_cu_subtitle">Tự động sao lưu dự phòng hình ảnh và videos của bạn lên Ổ Mây.</string>
     <!-- Text of a button on Camera Uploads section to show all the content of the section-->
-    <string name="all_view_button">Tất Cả</string>
+    <string name="all_view_button">Tất cả</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by days-->
     <string name="days_view_button">Ngày</string>
     <!-- Text of a button on Camera Uploads section to show the content of the section organized by months-->
@@ -3161,23 +3149,19 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item moved to Rubbish bin</item>
-        <item quantity="other">%d items moved to Rubbish bin</item>
+        <item quantity="other">%d mục đã chuyển vào Thùng&#160;Rác</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item wasn’t moved to the Rubbish bin</item>
-        <item quantity="other">%d items weren’t moved to Rubbish bin</item>
+        <item quantity="other">%d mục đã chưa chuyển được vào Thùng&#160;Rác</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item restored</item>
-        <item quantity="other">%d items restored</item>
+        <item quantity="other">%d mục đã được khôi&#160;phục</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item wasn’t restored</item>
-        <item quantity="other">%d items weren’t restored</item>
+        <item quantity="other">%d mục đã chưa được khôi&#160;phục</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">Vẫn cứ đổi</string>
@@ -3227,8 +3211,7 @@
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Copied link to clipboard</item>
-        <item quantity="other">Copied links to clipboard</item>
+        <item quantity="other">Đã sao&#160;chép các đường liên&#160;kết vào bảng&#160;nhớ&#160;tạm</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3237,15 +3220,15 @@
     <!-- Ask for confirmation before clear offline files -->
     <string name="clear_offline_confirmation">Dọn tất cả các tệp ngoại tuyến?</string>
     <!-- Item menu option upon right click on meeting. -->
-    <string name="context_meeting">Gọi họp mặt</string>
+    <string name="context_meeting">Họp mặt</string>
     <!-- Menu option that allows the user to start/join meeting. -->
     <string name="start_join_meeting">Lập/Vào cuộc họp mặt</string>
     <!-- Label that create a meeting -->
     <string name="new_meeting">Cuộc meeting mới</string>
     <!-- Label that join a meeting -->
-    <string name="join_meeting">Tham gia họp mặt</string>
+    <string name="join_meeting">Tham&#160;gia cuộc&#160;họp</string>
     <!-- Button that create a meeting -->
-    <string name="btn_start_meeting">Bắt đầu cuộc meeting</string>
+    <string name="btn_start_meeting">Bắt&#160;đầu cuộc&#160;họp</string>
     <!-- Button that join a meeting as guest -->
     <string name="btn_join_meeting_as_guest">Tham gia với tư cách khách</string>
     <!-- Hint shown to guide user on meeting name -->
@@ -3291,7 +3274,7 @@
     <!-- The message alert user to pick new moderator on assign moderator page-->
     <string name="pick_new_moderator_message">Xin chọn một hoặc vài thành viên làm người chủ trì mới.</string>
     <!-- The title of dialog for changing meeting name-->
-    <string name="change_meeting_name">Đổi tên cuộc họp mặt</string>
+    <string name="change_meeting_name">Đổi tên cuộc&#160;họp</string>
     <!-- The literal meeting link text-->
     <string name="meeting_link">Đường liên kết họp mặt</string>
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
@@ -3373,7 +3356,7 @@
     <!-- Homepage section. -->
     <string name="home_section">Trang Chủ</string>
     <!-- Action button which allows to show the recent activity. -->
-    <string name="show_activity_action">Hiện hoạt động</string>
+    <string name="show_activity_action">Hiện hoạt&#160;động</string>
     <!-- Text informing the recent activity is hidden. -->
     <string name="recents_activity_hidden">Hoạt động [B]gần đây[/B] bị ẩn</string>
     <!-- Label indicating video original quality -->
@@ -3401,7 +3384,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">Bạn đã gửi cho %1$s rồi</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invite sent. See Sent requests.</string>
+    <string name="contact_invited">Lời&#160;mời đã được gửi. Xem các yêu&#160;cầu gửi&#160;đi.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">Tệp đã được lưu về Ngoại Tuyến</string>
     <!-- Message when file removed from offline. -->
@@ -3559,15 +3542,14 @@
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
     <string name="meeting_call_screen_one_participant_left_call">%1$s đã rời khỏi cuộc gọi</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left the call</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$svà %2$s đã rời khỏi cuội&#160;gọi</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="other">%1$s và %2$d người khác đã tham gia</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and 1 other left the call</item>
-        <item quantity="other">%1$s and %2$d others left the call</item>
+        <item quantity="other">%1$svà %2$d người khác đã rời khỏi cuội&#160;gọi</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Xóa vĩnh viễn</string>
@@ -3766,7 +3748,7 @@
     <!-- Label of transfer quota in upgrade/choose account page. Placeholder is to display the amount of transfer quota, e.g. for LITE ‘1TB Transfer quota’. -->
     <string name="account_upgrade_transfer_quota_label">[A]%1$s[/A] truyền tải</string>
     <!-- Label of storage in My account section. -->
-    <string name="account_storage_label">Lưu Trữ</string>
+    <string name="account_storage_label">Lưu trữ</string>
     <!-- Label to indicate the limited bandwidth of the free accounts. Placeholders are to display "Limited" in a different colour. -->
     <string name="account_choose_free_limited_transfer_quota">Băng thông truyền tải [A]bị giới hạn[/A]</string>
     <!-- Name of hots or hosts in the meeting info bottom panel -->
@@ -3794,7 +3776,7 @@
     <!-- Text that indicates that there’s no favourite to show. The format placeholders are to showing it in different colors. -->
     <string name="homepage_empty_hint_favourites">[B]Không có[/B] [A]mục ưa thích[/A] [B]nào[/B]</string>
     <!--Action text to start a meeting from Meeting screen empty view-->
-    <string name="meetings_list_empty_action">Lập một cuộc họp</string>
+    <string name="meetings_list_empty_action">Bắt&#160;đầu một cuộc&#160;họp</string>
     <!--Description text from Meeting screen empty view-->
     <string name="meetings_list_empty_description">Nói chuyện an toàn và riêng tư vớI gọi thoại hay gọi video với bạn bè và đồng nghiệp trên toàn cầu.</string>
     <!--Action text to start a conversation from Recent Chat screen empty view-->
@@ -3804,7 +3786,7 @@
     <!-- Action to indicate immediate meeting creation -->
     <string name="action_start_meeting_now">Bắt đầu cuộc họp ngay</string>
     <!-- Label for call option on settings -->
-    <string name="settings_calls_preferences">Gọi Điện</string>
+    <string name="settings_calls_preferences">Gọi điện</string>
     <!-- Label for the sound notifications option on calls settings -->
     <string name="settings_calls_preferences_sound_notifications">Âm thanh thông báo</string>
     <!-- Text for the sound notifications option on calls settings -->
@@ -3860,21 +3842,21 @@
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">Chạm để mở</string>
     <!-- Label that schedule a meeting -->
-    <string name="chat_schedule_meeting">Đặt hẹn cuộc họp</string>
+    <string name="chat_schedule_meeting">Đặt&#160;lịch cuộc&#160;họp</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite monthly plan. -->
-    <string name="upgrade_account_successful_pro_lite_monthly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;Lite hằng tháng</string>
+    <string name="upgrade_account_successful_pro_lite_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;Lite hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro Lite yearly plan. -->
-    <string name="upgrade_account_successful_pro_lite_yearly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;Lite thường niên</string>
+    <string name="upgrade_account_successful_pro_lite_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;Lite thường&#160;niên</string>
     <!-- Message informing the account was successfully subscribed to the Pro I monthly plan. -->
-    <string name="upgrade_account_successful_pro_1_monthly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;I hằng tháng</string>
+    <string name="upgrade_account_successful_pro_1_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;I hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro I yearly plan. -->
-    <string name="upgrade_account_successful_pro_1_yearly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;I thường niên</string>
+    <string name="upgrade_account_successful_pro_1_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;I thường&#160;niên</string>
     <!-- Message informing the account was successfully subscribed to the Pro II monthly plan. -->
-    <string name="upgrade_account_successful_pro_2_monthly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;II hằng tháng</string>
+    <string name="upgrade_account_successful_pro_2_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;II hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro II yearly plan. -->
-    <string name="upgrade_account_successful_pro_2_yearly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;II thường niên</string>
+    <string name="upgrade_account_successful_pro_2_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;II thường&#160;niên</string>
     <!-- Message informing the account was successfully subscribed to the Pro III monthly plan. -->
-    <string name="upgrade_account_successful_pro_3_monthly">Cảm ơn quý khách đã mua gói đăng ký dịch vụ Pro&#160;III hằng tháng</string>
+    <string name="upgrade_account_successful_pro_3_monthly">Cảm&#160;ơn quý&#160;khách đã mua gói đăng&#160;ký dịch&#160;vụ Pro&#160;III hằng tháng</string>
     <!-- Message informing the account was successfully subscribed to the Pro III yearly plan. -->
     <string name="upgrade_account_successful_pro_3_yearly">Cảm&#160;ơn quý&#160;khách đã mua gói Pro&#160;III thường&#160;niên</string>
     <!-- Title of the option to allow non-hosts add participants to the chat in Group info, Group call screen and Meeting screen -->
@@ -3955,22 +3937,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Ẩn đi bớt</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Xác thực liên lạc</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
-    <string name="shared_items_verify_credentials_header_outgoing">Chúng&#160;tôi bảo&#160;vệ dữ&#160;liệu của bạn bằng thuật&#160;toán mã&#160;hóa vô&#160;nhận&#160;thức. Để đảm&#160;bảo an&#160;toàn hơn, chúng&#160;tôi yêu&#160;cầu bạn xác&#160;thực các tên liên&#160;lạc mà bạn chia&#160;sẻ thông&#160;tin trước khi họ được cấp&#160;quyền truy&#160;cập vào các thư&#160;mục chia&#160;sẻ.</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">Chúng&#160;tôi bảo&#160;vệ dữ&#160;liệu của bạn bằng thuật&#160;toán mã&#160;hóa vô&#160;nhận&#160;thức. Để đảm&#160;bảo an&#160;toàn hơn, chúng&#160;tôi yêu&#160;cầu bạn xác&#160;thực các tên liên&#160;lạc mà bạn có nhận thông&#160;tin trước khi bạn truy&#160;cập vào các thư&#160;mục chia&#160;sẻ.</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">Để xác thực tên liên lạc, đảm bảo rằng chứng thực bạn thấy dưới đây trùng khớp với chứng thực tài khoản của họ. Bạn có thể hỏi người đó chia sẻ chứng thực cho bạn.</string>
+    <string name="shared_items_verify_credentials_header_outgoing">Chúng&#160;tôi bảo&#160;vệ dữ&#160;liệu của bạn bằng thuật&#160;toán mã&#160;hóa vô&#160;kiến&#160;thức. Để đảm&#160;bảo an&#160;toàn hơn, chúng&#160;tôi yêu&#160;cầu bạn xác&#160;thực các tên liên&#160;lạc mà bạn chia&#160;sẻ thông&#160;tin trước khi họ được cấp&#160;quyền truy&#160;cập vào các thư&#160;mục chia&#160;sẻ.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[thư mục chưa giải mã]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">Để có thể truy cập thư mục này, người chia sẻ thư mục này cho bạn cũng cần phải xác thực bạn.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">Xác thực %s</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Chứng thực của bạn</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Đang chuẩn bị tệp để xem trước</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4064,9 +4038,9 @@
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
     <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] từ [B]%2$s đến %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Every day effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Mỗi ngày, có hiệu&#160;lực từ [A]%1$s[/A] từ [B]%2$s đến %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Every day effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Mỗi ngày, có hiệu&#160;lực từ [A]%1$s cho đến %2$s[/A] từ [B]%3$s đến %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="other">%1$s mỗi %2$d tuần, có hiệu&#160;lực từ [A]%3$s cho đến %4$s[/A] từ [B]%5$s đến %6$s[/B]</item>
@@ -4077,13 +4051,11 @@
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="other">%1$s và %2$s mỗi %3$d tuần, có hiệu&#160;lực từ [A]%4$s cho đến %5$s[/A] từ [B]%6$s đến %7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="other">%1$s và %2$s mỗi %3$d tuần, có hiệu&#160;lực từ [A]%4$s[/A] từ [B]%5$s đến %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
@@ -4420,37 +4392,95 @@
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used at the start of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_start_sun">CN</string>
     <!-- In app notification description text representing the meeting repeats every Monday. This text is used in the middle of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_middle_mon">thứ2</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_mon">Thứ2</string>
     <!-- In app notification description text representing the meeting repeats every Tuesday. This text is used in the middle of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_middle_tue">thứ3</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_tue">Thứ3</string>
     <!-- In app notification description text representing the meeting repeats every Wednesday. This text is used in the middle of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_middle_wed">thứ4</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_wed">Thứ4</string>
     <!-- In app notification description text representing the meeting repeats every Thursday. This text is used in the middle of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_middle_thu">thứ5</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_thu">Thứ5</string>
     <!-- In app notification description text representing the meeting repeats every Friday. This text is used in the middle of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_middle_fri">thứ6</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_fri">Thứ6</string>
     <!-- In app notification description text representing the meeting repeats every Saturday. This text is used in the middle of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">thứ7</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sat">Thứ7</string>
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
-    <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">cn</string>
+    <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">CN</string>
     <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <string name="photos_album_selection_dialog_title">Không&#160;thể chọn thêm được</string>
     <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="photos_album_selection_dialog_body">Bạn chỉ có&#160;thể chọn mỗi&#160;lần lên tới 150&#160;mục để thêm vào một album.</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">Không&#160;thể xác&#160;thực tên liên&#160;lạc</string>
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <!--  -->
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">Bạn không&#160;thể xác&#160;thực %s vì họ không&#160;có trong sổ liên&#160;lạc của bạn. Hãy chờ đến khi họ chấp&#160;nhận lời&#160;mời của bạn trước.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Bắt&#160;đầu</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_camelcase_ok">Ok</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">Tệp&#160;tin này đã bị tháo&#160;gỡ theo quy&#160;định có trong [A]Chính&#160;Sách Xử&#160;Lý Gỡ&#160;Bỏ Nội&#160;Dung[/A] của MEGA.</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">Thư&#160;mục này đã bị tháo&#160;gỡ theo quy&#160;định có trong [A]Chính&#160;Sách Xử&#160;Lý Gỡ&#160;Bỏ Nội&#160;Dung[/A] của MEGA.</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Tham gia</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
-    <string name="meetings_chat_room_start_scheduled_meeting_option">Bắt đầu cuộc họp</string>
+    <string name="meetings_chat_room_start_scheduled_meeting_option">Bắt&#160;đầu cuộc&#160;họp</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">Tham&#160;gia cuộc&#160;họp</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="other">%1$d yêu&#160;cầu lời&#160;mời đã được gửi.&#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="other">Tuy&#160;nhiên, có %1$d yêu&#160;cầu không gửi đi được.</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="other">Đã sao&#160;chép %1$d mục</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="other">Đã không sao&#160;chép được %1$d mục</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="other">Đã sao&#160;chép %1$d mục,&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="other">không sao&#160;chép được %1$d mục</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="other">%1$d ngày</item>
+    </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">Tệp phụ đề</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">Tắt</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Thêm phụ&#160;đề&#8230;</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">Tùy&#160;chọn trình&#160;chiếu</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">Tốc&#160;độ trình&#160;chiếu</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">Chậm (8giây)</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">Thường (4giây)</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">Nhanh (2giây)</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">Thứ&#160;tự trình&#160;chiếu</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">Xáo trộn</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">Lặp lại</string>
 </resources>

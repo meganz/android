@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ImpliedQuantity, ExtraTranslation, MissingTranslation">
     <!-- PRO Lite account -->
     <string name="prolite_account">Pro&#160;Lite</string>
@@ -513,8 +513,6 @@
     <string name="my_account_change_password_newPassword1">Nieuw wachtwoord</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword2">Bevestig nieuw wachtwoord</string>
-    <!-- choose the payment method option when no method is available -->
-    <string name="no_available_payment_method">Er is momenteel geen betalingsmethode ingesteld voor dit plan. Selecteer er één alstublieft.</string>
     <!-- the user can get the link and it’s copied to the clipboard -->
     <string name="file_properties_get_link">Link gekopieerd naar klembord</string>
     <!-- alert when clicking a newsignup link being logged -->
@@ -690,7 +688,7 @@
     <string name="pin_lock_enter">Enter</string>
     <!-- Error message when not typing the Passcode code correctly. Plural. The placeholder indicates the number of failed attempts. E.g. 7 failed passcode attempts -->
     <plurals name="passcode_lock_alert_attempts">
-        <item quantity="one">1 mislukte poging tot toegangscode</item>
+        <item quantity="one">%1$d mislukte poging tot toegangscode</item>
         <item quantity="other">%1$d mislukte toegangscode pogingen</item>
     </plurals>
     <!-- Error message when not typing the Passcode code correctly -->
@@ -815,10 +813,6 @@
     <string name="invalid_string">Onjuist</string>
     <!-- Text of the toast when the user enters invalid text which is neither a valid phone number nor a valid email -->
     <string name="invalid_input">Ongeldige invoer</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_title">Ongeldig e-mailadres</string>
-    <!-- Title of the alert dialog when the user tries to recover the pass of a non existing account -->
-    <string name="invalid_email_text">Controleer het e-mail adres en probeer opnieuw.</string>
     <!-- Title of the dialog to write the Recovery Key after opening the recovery link -->
     <string name="title_dialog_insert_MK">Wachtwoord resetten</string>
     <!-- Text of the dialog to write the Recovery Key after opening the recovery link -->
@@ -918,7 +912,7 @@
     <string name="confirm_email_explanation">Check uw e-mail en tik op de link om uw account te bevestigen.</string>
     <!-- Plural of items which contains a folder. 2 items -->
     <plurals name="general_num_items">
-        <item quantity="one">1 item</item>
+        <item quantity="one">%1$d item</item>
         <item quantity="other">%1$d items</item>
     </plurals>
     <!-- Error message shown when opening a file or folder link which account has been removed due to ToS/AUP violation -->
@@ -1242,7 +1236,7 @@
     </plurals>
     <!-- Text of the notification shown when the upload service has finished, Plural -->
     <plurals name="upload_service_notification_already_uploaded">
-        <item quantity="one">1 bestand al geüpload</item>
+        <item quantity="one">%1$d bestand al geüpload</item>
         <item quantity="other">%1$d bestanden al geüpload</item>
     </plurals>
     <!-- label for the total file size of multiple files and/or folders (no need to put the colon punctuation in the translation) -->
@@ -2067,7 +2061,7 @@
     <string name="settings_file_management_file_versions_title">Bestandsversies</string>
     <!-- Settings preference subtitle to show file versions info of the account -->
     <plurals name="settings_file_management_file_versions_subtitle">
-        <item quantity="one">1 bestandversie, gebruikt een totaal van %2$s</item>
+        <item quantity="one">%1$d bestandversie, gebruikt een totaal van %2$s</item>
         <item quantity="other">%1$d bestandsversies, gebruiken een totaal van %2$s</item>
     </plurals>
     <!-- Title of the section File management on Settings section -->
@@ -2179,8 +2173,6 @@
     <string name="settings_compression_queue_subtitle">De minimale grootte is %1$s en de maximale grootte is %2$s.</string>
     <!-- Title of Rubbish bin scheduler option in settings to set up the number of days of the rubbish bin scheduler -->
     <string name="settings_rb_scheduler_select_days_title">Verwijder bestanden ouder dan</string>
-    <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
-    <string name="settings_rb_scheduler_select_days_subtitle">%d dagen</string>
     <!-- Title of popup that userd to set compression queue size (in MB) in settings -->
     <string name="settings_video_compression_queue_size_popup_title">Laat me weten wanneer de grootte groter is dan</string>
     <!-- Title of compression queue size option in settings -->
@@ -2677,12 +2669,12 @@
     <string name="invite_contact_action_button">Een vriend uitnodigen via&#8230;</string>
     <!-- Message displayed when multiple download starts and all files has already been downloaded before. Placeholder: number of files -->
     <plurals name="file_already_downloaded">
-        <item quantity="one">1 bestand al gedownload.</item>
+        <item quantity="one">%d bestand al gedownload.</item>
         <item quantity="other">%d bestanden al gedownload.</item>
     </plurals>
     <!-- When a multiple download is started, some of the files could have already been downloaded before. This message shows the number of files that are pending. Placeholder: number of files -->
     <plurals name="file_pending_download">
-        <item quantity="one">1 bestand wachtend.</item>
+        <item quantity="one">%d bestand wachtend.</item>
         <item quantity="other">%d bestanden wachtend.</item>
     </plurals>
     <!-- Title of the login screen -->
@@ -2855,8 +2847,6 @@
     <string name="label_storage_over_quota">Opslag tegoed overschreden</string>
     <!-- Label indicating the action ‘upgrate account’ to get more transfer quota -->
     <string name="label_get_more_transfer_quota">Neem meer overdracht tegoed</string>
-    <!-- Warning show to the user when a folder does not exist -->
-    <string name="warning_folder_not_exists">De map bestaat niet.</string>
     <!-- Warning show to the user when a node does not exist in cloud -->
     <string name="warning_node_not_exists_in_cloud">Het bestand kon niet gevonden worden in uw Cloud schijf.</string>
     <!-- Header text of the Over Disk Quota Paywall warning -->
@@ -2878,7 +2868,7 @@
     <string name="over_disk_quota_paywall_deletion_warning_no_time_left">[B]U moet onmiddellijk handelen om uw gegevens te bewaren. [/B]</string>
     <!-- Time in days (plural). The placeholder is for the time value, please adjust the position based on linguistics -->
     <plurals name="label_time_in_days_full">
-        <item quantity="one">1 dag</item>
+        <item quantity="one">%d dag</item>
         <item quantity="other">%d dagen</item>
     </plurals>
     <!-- Time in hours. The placeholder is for the time value, please adjust the position based on linguistics -->
@@ -3027,17 +3017,17 @@
     <string name="retention_time_picker_year">jaar</string>
     <!-- Text on the label indicating that That the oldest messages of several hours will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_hours">
-        <item quantity="one">1 uur</item>
+        <item quantity="one">%1$d uur</item>
         <item quantity="other">%1$d uren</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several weeks will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_weeks">
-        <item quantity="one">1 week</item>
+        <item quantity="one">%1$d week</item>
         <item quantity="other">%1$d weken</item>
     </plurals>
     <!-- Text on the label indicating that That the oldest messages of several months will be automatically deleted. -->
     <plurals name="subtitle_properties_manage_chat_label_months">
-        <item quantity="one">1 maand</item>
+        <item quantity="one">%1$d maand</item>
         <item quantity="other">%1$d maanden</item>
     </plurals>
     <!-- Title indicating the select mode is enabled and ready to select transfers on Transfers section, In progress tab -->
@@ -3200,7 +3190,7 @@
     <string name="years_view_button">Jaren</string>
     <!-- Text to show on Camera Uploads section, indicating the upload progress. The placeholder %1$d is for set the number of pending uploads. E.g.: "Upload in progress, 300 files pending". -->
     <plurals name="cu_upload_progress">
-        <item quantity="one">Upload in behandeling, 1 bestand wachtend</item>
+        <item quantity="one">Upload in behandeling, %1$d bestand wachtend</item>
         <item quantity="other">Upload in behandeling, %1$d bestanden wachtend</item>
     </plurals>
     <!-- Text to show as production api server option -->
@@ -3219,12 +3209,12 @@
     <string name="warning_share_owner_storage_quota">Het bestand kan niet worden verstuurd omdat de doelgebruiker zijn opslagtegoed heeft overschreden.</string>
     <!-- Message displayed when multiple download starts and 1 file has already been downloaded before and 1 or multiple files are being downloaded. Placeholder: number of files -->
     <plurals name="file_already_downloaded_and_files_pending_download">
-        <item quantity="one">1 bestand al gedownload. 1 bestand in afwachting.</item>
+        <item quantity="one">1 bestand al gedownload. %d bestand in afwachting.</item>
         <item quantity="other">1 bestand al gedownload. %d bestanden in afwachting.</item>
     </plurals>
     <!-- Message displayed when multiple download starts and 1 or multiple files have already been downloaded before and 1 file is being downloaded. Placeholder: number of files -->
     <plurals name="files_already_downloaded_and_file_pending_download">
-        <item quantity="one">1 bestand al gedownload. 1 bestand in afwachting.</item>
+        <item quantity="one">%d bestand al gedownload. 1 bestand in afwachting.</item>
         <item quantity="other">%d bestanden al gedownload. 1 bestand in afwachting.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
@@ -3234,7 +3224,7 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item verplaatst naar de Prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
+        <item quantity="one">%d item verplaatst naar de Prullenbak maar de andere was niet verplaatst. Probeer later nogmaals.</item>
         <item quantity="other">%d items verplaatst naar de Prullenbak maar 1 item was niet verplaatst. Probeer later nogmaals.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
@@ -3244,27 +3234,27 @@
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item hersteld maar de andere was niet hersteld. Probeer later nogmaals.</item>
+        <item quantity="one">%d item hersteld maar de andere was niet hersteld. Probeer later nogmaals.</item>
         <item quantity="other">%d items hersteld maar 1 item was niet hersteld. Probeer later nogmaals.</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">1 item verplaatst naar Prullenbak</item>
+        <item quantity="one">%d item verplaatst naar Prullenbak</item>
         <item quantity="other">%d items verplaatst naar Prullenbak</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 item was niet verplaatst naar de Prullenbak</item>
+        <item quantity="one">%d item was niet verplaatst naar de Prullenbak</item>
         <item quantity="other">%d items waren niet verplaatst naar de Prullenbak</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">1 item hersteld</item>
+        <item quantity="one">%d item hersteld</item>
         <item quantity="other">%d items hersteld</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 item was niet hersteld</item>
+        <item quantity="one">%d item was niet hersteld</item>
         <item quantity="other">%d items waren niet hersteld</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
@@ -3295,7 +3285,7 @@
     <string name="title_user_purchased_subscription">Wachtend op bevestiging</string>
     <!-- Number of social connections, showing the number of contacts the user has. E.g.: 37 connections -->
     <plurals name="my_account_connections">
-        <item quantity="one">1 verbinding</item>
+        <item quantity="one">%1$d verbinding</item>
         <item quantity="other">%1$d verbindingen</item>
     </plurals>
     <!-- Section name for the “Recently Added Contacts” section. Preferably one word. -->
@@ -3653,12 +3643,12 @@
     <string name="meeting_call_screen_two_participants_left_call">%1$s en %2$s hebben de oproep verlaten</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
-        <item quantity="one">%1$s en 1 ander zijn aangesloten</item>
-        <item quantity="other">%1$sen %2$danderen zijn aangesloten</item>
+        <item quantity="one">%1$s en %2$d ander zijn aangesloten</item>
+        <item quantity="other">%1$s en %2$d anderen zijn aangesloten</item>
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s en 1 ander hebben de oproep verlaten</item>
+        <item quantity="one">%1$s en %2$d ander hebben de oproep verlaten</item>
         <item quantity="other">%1$s en %2$d anderen hebben de oproep verlaten</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
@@ -3852,7 +3842,7 @@
     </plurals>
     <!-- Second part of string, which indicates the content of a folder is some folders and some files. The full string is '%1$d folders · %2$d files'. The string was split in 2 for pluralization. -->
     <plurals name="num_folders_num_files_2">
-        <item quantity="one">1 bestand</item>
+        <item quantity="one">%1$d bestand</item>
         <item quantity="other">%1$d bestanden</item>
     </plurals>
     <!-- Label of storage in upgrade/choose account page. Placeholder is to display the amount of storage space, e.g. for LITE ‘400GB Storage’. -->
@@ -4055,22 +4045,14 @@
     </plurals>
     <!-- Title of option to show less participants in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_see_less_participants_label">Minder weergeven</string>
-    <!--Title of the fingerprint verification screen-->
-    <string name="shared_items_verify_credentials_contact_verification_title">Contact verificatie</string>
     <!--Header message located at the top of contact's name and email address that needs to be verified when user shares folder with someone-->
     <string name="shared_items_verify_credentials_header_outgoing">We beschermen uw gegevens met zero-knowledge codering. Om extra veiligheid te garanderen, vragen we u om de contacten met wie u informatie deelt te verifiëren voordat ze toegang krijgen tot de gedeelde mappen.</string>
-    <!--Header message located at the top of contact's name and email address that needs to be verified when user receives the folder-->
-    <string name="shared_items_verify_credentials_header_incoming">We beschermen uw gegevens met zero-knowledge codering. Om extra veiligheid te garanderen, vragen we u om de contacten van wie u informatie ontvangt te verifiëren voordat u oegang krijgt tot de gedeelde mappen.</string>
-    <!--Header message located at the top of "My credentials" section-->
-    <string name="shared_items_verify_credentials_information">Om uw contactpersoon te verifiëren, moet u ervoor zorgen dat de inloggegevens die u hierboven ziet, overeenkomen met de inloggegevens van hun account. U kunt hen vragen om hun inloggegevens met u te delen.</string>
     <!--Undecrypted folder label-->
     <string name="shared_items_verify_credentials_undecrypted_folder">[Ongecodeerde map]</string>
     <!--Yellow banner message in Verification screen that will be shown to the receiver if the owner of the folder haven't verified them yet.-->
     <string name="shared_items_verify_credentials_verify_person_banner_label">Om toegang te krijgen tot de gedeelde map, moet de persoon die deze met u heeft gedeeld, u ook verifiëren.</string>
     <!--Name of the action on menu where %s will be replaced by the contact name that needs to be verified-->
     <string name="shared_items_bottom_sheet_menu_verify_user">%sverifiëren</string>
-    <!--My credentials header on contact verification screen-->
-    <string name="shared_items_verify_credentials_my_credentials">Uw gegevens</string>
     <!-- Context of snackbar when downloading the file that needs to be downloaded for previewing. -->
     <string name="cloud_drive_snackbar_preparing_file_for_preview_context">Bestand voorbereiden als voorbeeld</string>
     <!-- Note for each achievement, which shows how many days left before achievement will expire. -->
@@ -4612,23 +4594,88 @@
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">Zo</string>
     <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <string name="photos_album_selection_dialog_title">Kan niet meer selecteren</string>
     <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="photos_album_selection_dialog_body">U kunt maximaal 150 items tegelijk aan een album toevoegen.</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">Kan contact niet verifiëren</string>
+    <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_content">U kunt %s niet verifiëren omdat ze niet in u contactenlijst staan. Wacht tot ze eerst uw uitnodiging accepteren.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">Starten</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_camelcase_ok">OK</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">Dit bestand is verwijderd in overeenstemming met ons [A]Verwijderingsbeleid[/A].</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">Deze map is verwijderd in overeenstemming met ons [A]Verwijderingsbeleid[/A].</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">Aansluiten</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
     <string name="meetings_chat_room_start_scheduled_meeting_option">Begin vergadering</string>
     <!-- Option of a scheduled meeting in chat room to join the meeting -->
     <string name="meetings_chat_room_join_scheduled_meeting_option">Vergadering aansluiten</string>
+    <!-- first part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_sent">
+        <item quantity="one">%1$d uitnodiging verzoek verstuurd.&#160;</item>
+        <item quantity="other">%1$d uitnodiging verzoeken verstuurd. &#160;</item>
+    </plurals>
+    <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
+    <plurals name="contact_snackbar_invite_contact_requests_not_sent">
+        <item quantity="one">Maar, %1$d verzoek was niet verstuurd.</item>
+        <item quantity="other">Maar, %1$d verzoeken waren niet verstuurd.</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
+    <plurals name="general_copy_snackbar_success">
+        <item quantity="one">%1$d item gekopieerd</item>
+        <item quantity="other">%1$d items gekopieerd</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request failed -->
+    <plurals name="general_copy_snackbar_fail">
+        <item quantity="one">Kon %1$d item niet kopieren</item>
+        <item quantity="other">Kon %1$d items niet kopieren</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_success">
+        <item quantity="one">%1$d item gekopieerd,&#160;</item>
+        <item quantity="other">%1$d items gekopieerd,&#160;</item>
+    </plurals>
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
+    <plurals name="general_copy_snackbar_concat_fail">
+        <item quantity="one">kon %1$d item niet kopieren</item>
+        <item quantity="other">kon %1$d items niet kopieren</item>
+    </plurals>
+    <!-- The string is used to determine how old in days files should be to be removed. The string is always used in the context of phrase: Remove files older than x days. The placeholder %1$d will be replaced with number of days. The minimum of days is 7. -->
+    <plurals name="settings_file_management_remove_files_older_than_days">
+        <item quantity="one">%1$d dag</item>
+        <item quantity="other">%1$d dagen</item>
+    </plurals>
+    <!-- The title for enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_title">Ondertiteling</string>
+    <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_off">Uit</string>
+    <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Ondertiteling toevoegen...</string>
+    <!-- Slideshow settings page title -->
+    <string name="slideshow_settings_page_title">Opties voor diavoorstelling</string>
+    <!-- Slideshow speed preference -->
+    <string name="slideshow_setting_speed">Diavoorstelling snelheid</string>
+    <!-- Slideshow speed slow -->
+    <string name="slideshow_speed_slow">Langzaam (8s)</string>
+    <!-- Slideshow speed normal -->
+    <string name="slideshow_speed_normal">Normaal (4s)</string>
+    <!-- Slideshow speed fast -->
+    <string name="slideshow_speed_fast">Snel (2s)</string>
+    <!-- Slideshow order preference -->
+    <string name="slideshow_settings_order">Volgorde diavoorstelling</string>
+    <!-- Slideshow order shuffle -->
+    <string name="slideshow_order_shuffle">Shuffle</string>
+    <!-- Slideshow repeat preference -->
+    <string name="slideshow_setting_repeat">Herhalen</string>
 </resources>
