@@ -2,12 +2,12 @@ package mega.privacy.android.app.presentation.extensions
 
 import mega.privacy.android.app.di.notification.getMonitorStorageStateEvent
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 
 /**
- * Extension function to get the value of state flow from [MonitorStorageStateEvent]
+ * Extension function to get the value of state flow from [MonitorStorageStateEventUseCase]
  */
-internal fun MonitorStorageStateEvent.getState(): StorageState =
+internal fun MonitorStorageStateEventUseCase.getState(): StorageState =
     invoke().value.storageState
 
 /**

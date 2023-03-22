@@ -29,7 +29,7 @@ import mega.privacy.android.app.featuretoggle.QAFeatures
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
@@ -48,7 +48,7 @@ class FeatureFlagDialogFragment : DialogFragment() {
     lateinit var getThemeMode: GetThemeMode
 
     @Inject
-    lateinit var getFeatureFlag: GetFeatureFlagValue
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
         MaterialAlertDialogBuilder(requireContext()).setView(
@@ -57,7 +57,7 @@ class FeatureFlagDialogFragment : DialogFragment() {
                     val mode by getThemeMode()
                         .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                     AndroidTheme(isDark = mode.isDarkMode()) {
-                        FeatureFlagBody { getFeatureFlag(QAFeatures.QATest) }
+                        FeatureFlagBody { getFeatureFlagUseCase(QAFeatures.QATest) }
                     }
                 }
             }

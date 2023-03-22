@@ -514,7 +514,7 @@ public class Util {
     /**
      * Check if device connect to network
      *
-     * @deprecated use MonitorConnectivity instead
+     * @deprecated use MonitorConnectivityUseCase instead
      */
     @Deprecated
     static public boolean isOnline(Context context) {
@@ -943,7 +943,7 @@ public class Util {
      *
      * @param megaApi
      * @return true if exist ongoing transfers, false otherwise
-     * @deprecated In favour of {@link mega.privacy.android.domain.usecase.transfer.OngoingTransfersExist} use case.
+     * @deprecated In favour of {@link mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase} use case.
      */
     @Deprecated
     public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {

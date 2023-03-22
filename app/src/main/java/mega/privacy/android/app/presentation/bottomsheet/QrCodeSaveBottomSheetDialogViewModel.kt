@@ -3,7 +3,7 @@ package mega.privacy.android.app.presentation.bottomsheet
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import javax.inject.Inject
 
 /**
@@ -11,11 +11,11 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class QrCodeSaveBottomSheetDialogViewModel @Inject constructor(
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
 ) : ViewModel() {
 
     /**
      * Get latest value of [StorageState]
      */
-    fun getStorageState() = monitorStorageStateEvent.getState()
+    fun getStorageState() = monitorStorageStateEventUseCase.getState()
 }

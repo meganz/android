@@ -17,7 +17,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
-import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinish
+import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -41,7 +41,7 @@ import javax.inject.Inject
  * @property pushNotificationSettingManagement [PushNotificationSettingManagement]
  * @property applicationScope [CoroutineScope]
  * @property getFullAccountInfo [GetFullAccountInfo]
- * @property broadcastFetchNodesFinish [BroadcastFetchNodesFinish]
+ * @property broadcastFetchNodesFinishUseCase [BroadcastFetchNodesFinishUseCase]
  */
 class BackgroundRequestListener @Inject constructor(
     private val application: Application,
@@ -53,7 +53,7 @@ class BackgroundRequestListener @Inject constructor(
     private val pushNotificationSettingManagement: PushNotificationSettingManagement,
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFullAccountInfo: GetFullAccountInfo,
-    private val broadcastFetchNodesFinish: BroadcastFetchNodesFinish,
+    private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -150,7 +150,7 @@ class BackgroundRequestListener @Inject constructor(
 
     private fun handleFetchNodeRequest(e: MegaError) {
         Timber.d("TYPE_FETCH_NODES")
-        applicationScope.launch { broadcastFetchNodesFinish() }
+        applicationScope.launch { broadcastFetchNodesFinishUseCase() }
 
         if (e.errorCode == MegaError.API_OK) {
             askForFullAccountInfo()
@@ -176,7 +176,7 @@ class BackgroundRequestListener @Inject constructor(
         request: MegaRequest,
         api: MegaApiJava,
     ) {
-        Timber.d("Logout finished: %s(%d)", e.errorString, e.errorCode)
+        Timber.d("LogoutUseCase finished: %s(%d)", e.errorString, e.errorCode)
         if (e.errorCode == MegaError.API_OK) {
             Timber.d("END logout sdk request - wait chat logout")
             MegaApplication.isLoggingOut = false

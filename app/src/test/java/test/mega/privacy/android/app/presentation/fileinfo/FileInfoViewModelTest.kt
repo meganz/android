@@ -48,10 +48,10 @@ import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
@@ -88,8 +88,8 @@ internal class FileInfoViewModelTest {
     private lateinit var underTest: FileInfoViewModel
 
     private val fileUtilWrapper: FileUtilWrapper = mock()
-    private val monitorStorageStateEvent: MonitorStorageStateEvent = mock()
-    private val monitorConnectivity: MonitorConnectivity = mock()
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val getFileHistoryNumVersions: GetFileHistoryNumVersions = mock()
     private val isNodeInInbox: IsNodeInInbox = mock()
     private val isNodeInRubbish: IsNodeInRubbish = mock()
@@ -140,8 +140,8 @@ internal class FileInfoViewModelTest {
         underTest = FileInfoViewModel(
             tempMegaNodeRepository = megaNodeRepository,
             fileUtilWrapper = fileUtilWrapper,
-            monitorStorageStateEvent = monitorStorageStateEvent,
-            monitorConnectivity = monitorConnectivity,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             getFileHistoryNumVersions = getFileHistoryNumVersions,
             isNodeInInbox = isNodeInInbox,
             isNodeInRubbish = isNodeInRubbish,
@@ -172,7 +172,7 @@ internal class FileInfoViewModelTest {
     private suspend fun initDefaultMockBehaviour() {
         whenever(node.handle).thenReturn(NODE_HANDLE)
         whenever(typedFileNode.id).thenReturn(nodeId)
-        whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(true))
+        whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(true))
         whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
         whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
@@ -278,7 +278,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test NotConnected event is launched if not connected while moving`() =
         runTest {
-            whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(false))
+            whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(false))
             underTest.moveNodeCheckingCollisions(parentId)
             Truth.assertThat(underTest.uiState.value.oneOffViewEvent)
                 .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
@@ -288,7 +288,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test NotConnected event is launched if not connected while copying`() =
         runTest {
-            whenever(monitorConnectivity.invoke()).thenReturn(MutableStateFlow(false))
+            whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(false))
             underTest.copyNodeCheckingCollisions(parentId)
             Truth.assertThat(underTest.uiState.value.oneOffViewEvent)
                 .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
@@ -772,7 +772,7 @@ internal class FileInfoViewModelTest {
             1L, "", 1L, "", EventType.Storage,
             state,
         )
-        whenever(monitorStorageStateEvent.invoke()).thenReturn(MutableStateFlow(storageStateEvent))
+        whenever(monitorStorageStateEventUseCase.invoke()).thenReturn(MutableStateFlow(storageStateEvent))
     }
 
     @Suppress("UNCHECKED_CAST")

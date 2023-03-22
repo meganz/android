@@ -199,4 +199,11 @@ interface NodeRepository {
      * @return a suspending lambda to add permissions to the node
      */
     suspend fun createShareKey(node: TypedNode): (suspend (AccessPermission, userEmail: String) -> Unit)?
+
+    /**
+     * Get root node.
+     *
+     * @return The node if found else null
+     */
+    suspend fun getRootNode(): Node?
 }

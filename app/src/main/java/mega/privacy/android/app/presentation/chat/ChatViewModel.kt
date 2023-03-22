@@ -35,8 +35,8 @@ import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
@@ -50,7 +50,7 @@ import javax.inject.Inject
 /**
  * View Model for [mega.privacy.android.app.main.megachat.ChatActivity]
  *
- * @property monitorStorageStateEvent           [MonitorStorageStateEvent]
+ * @property monitorStorageStateEventUseCase    [MonitorStorageStateEventUseCase]
  * @property startChatCall                      [StartChatCall]
  * @property chatApiGateway                     [MegaChatApiGateway]
  * @property answerChatCall                     [AnswerChatCall]
@@ -69,10 +69,10 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val startChatCall: StartChatCall,
     private val chatApiGateway: MegaChatApiGateway,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val answerChatCall: AnswerChatCall,
     private val passcodeManagement: PasscodeManagement,
     private val cameraGateway: CameraGateway,
@@ -99,19 +99,19 @@ class ChatViewModel @Inject constructor(
     val state: StateFlow<ChatState> = _state
 
     /**
-     * Get latest [StorageState] from [MonitorStorageStateEvent] use case.
+     * Get latest [StorageState] from [MonitorStorageStateEventUseCase] use case.
      * @return the latest [StorageState]
      */
-    fun getStorageState(): StorageState = monitorStorageStateEvent.getState()
+    fun getStorageState(): StorageState = monitorStorageStateEventUseCase.getState()
 
     /**
      * Monitor connectivity event
      */
     val monitorConnectivityEvent =
-        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
+        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.Eagerly)
 
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     /**
      * Call button clicked

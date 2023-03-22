@@ -14,7 +14,7 @@ import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ import javax.inject.Inject
 class NodeOptionsViewModel @Inject constructor(
     private val createShareKey: CreateShareKey,
     private val getNodeByHandle: GetNodeByHandle,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -41,7 +41,7 @@ class NodeOptionsViewModel @Inject constructor(
                     .map { getNodeByHandle(it) },
                 savedStateHandle.getStateFlow(SHARE_DATA_KEY, null),
                 shareKeyCreated,
-                monitorConnectivity()
+                monitorConnectivityUseCase()
             ) { node: MegaNode?, shareData: NodeShareInformation?, shareKeyCreated: Boolean?, isOnline: Boolean ->
                 { state: NodeBottomSheetUIState ->
                     state.copy(

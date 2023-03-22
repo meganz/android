@@ -33,7 +33,7 @@ import mega.privacy.android.domain.usecase.CreateAlbum
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
@@ -55,7 +55,7 @@ class AlbumsViewModel @Inject constructor(
     private val getAlbumPhotos: GetAlbumPhotos,
     private val getProscribedAlbumNames: GetProscribedAlbumNames,
     private val uiAlbumMapper: UIAlbumMapper,
-    private var getFeatureFlag: GetFeatureFlagValue,
+    private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
     private val removeFavourites: RemoveFavourites,
     private val getNodeListByIds: GetNodeListByIds,
     private val createAlbum: CreateAlbum,
@@ -121,7 +121,7 @@ class AlbumsViewModel @Inject constructor(
     private fun loadUserAlbums() {
         albumJob?.cancel()
         albumJob = viewModelScope.launch {
-            if (!getFeatureFlag(AppFeatures.UserAlbums)) return@launch
+            if (!getFeatureFlagUseCase(AppFeatures.UserAlbums)) return@launch
 
             getUserAlbums()
                 .catch { exception -> Timber.e(exception) }

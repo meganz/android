@@ -17,7 +17,7 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -33,7 +33,7 @@ class NodeOptionsViewModelTest {
     private val getNodeByHandle =
         mock<GetNodeByHandle> { onBlocking { invoke(any()) }.thenReturn(null) }
     private val createShareKey = mock<CreateShareKey>()
-    private val monitorConnectivity = mock<MonitorConnectivity> {
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
         onBlocking { invoke() }.thenReturn(
             MutableStateFlow(true)
         )
@@ -62,7 +62,7 @@ class NodeOptionsViewModelTest {
         underTest = NodeOptionsViewModel(
             createShareKey = createShareKey,
             getNodeByHandle = getNodeByHandle,
-            monitorConnectivity = monitorConnectivity,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             savedStateHandle = savedStateHandle
         )
     }

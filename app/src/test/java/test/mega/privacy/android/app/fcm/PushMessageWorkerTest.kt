@@ -25,8 +25,8 @@ import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.SessionNotRetrievedException
 import mega.privacy.android.domain.usecase.PushReceived
 import mega.privacy.android.domain.usecase.RetryPendingConnections
-import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
-import mega.privacy.android.domain.usecase.login.InitialiseMegaChat
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.domain.usecase.login.InitialiseMegaChatUseCase
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -50,11 +50,11 @@ class PushMessageWorkerTest {
     private lateinit var workExecutor: WorkManagerTaskExecutor
     private lateinit var workDatabase: WorkDatabase
 
-    private val backgroundFastLogin = mock<BackgroundFastLogin>()
+    private val backgroundFastLoginUseCase = mock<BackgroundFastLoginUseCase>()
     private val pushReceived = mock<PushReceived>()
     private val retryPendingConnections = mock<RetryPendingConnections>()
     private val pushMessageMapper = mock<PushMessageMapper>()
-    private val initialiseMegaChat = mock<InitialiseMegaChat>()
+    private val initialiseMegaChatUseCase = mock<InitialiseMegaChatUseCase>()
     private val ioDispatcher = UnconfinedTestDispatcher()
 
 
@@ -89,25 +89,25 @@ class PushMessageWorkerTest {
                     override fun isEnqueuedInForeground(workSpecId: String): Boolean = true
                 }, workExecutor)
             ),
-            backgroundFastLogin = backgroundFastLogin,
+            backgroundFastLoginUseCase = backgroundFastLoginUseCase,
             pushReceived = pushReceived,
             retryPendingConnections = retryPendingConnections,
             pushMessageMapper = pushMessageMapper,
-            initialiseMegaChat = initialiseMegaChat,
+            initialiseMegaChatUseCase = initialiseMegaChatUseCase,
             ioDispatcher = ioDispatcher
         )
     }
 
     @Test
     fun `test that doWork returns failure if fast login failed`() = runTest {
-        whenever(backgroundFastLogin()).thenThrow(SessionNotRetrievedException::class.java)
+        whenever(backgroundFastLoginUseCase()).thenThrow(SessionNotRetrievedException::class.java)
         val result = underTest.doWork()
         assertThat(result).isEqualTo(ListenableWorker.Result.failure())
     }
 
     @Test
     fun `test that retryPendingConnections is invoked if fast login success`() = runTest {
-        whenever(backgroundFastLogin()).thenReturn("good_session")
+        whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
         whenever(pushMessageMapper(any())).thenReturn(mock())
 
         underTest.doWork()
@@ -117,35 +117,35 @@ class PushMessageWorkerTest {
     @Test
     fun `test that MegaChat is initialised if rootNode exists and retryPendingConnections raises ChatNotInitializedException`() =
         runTest {
-            whenever(backgroundFastLogin()).thenReturn("good_session")
+            whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
             whenever(pushMessageMapper(any())).thenReturn(mock())
             whenever(retryPendingConnections(any())).thenThrow(ChatNotInitializedErrorStatus())
 
             underTest.doWork()
-            verify(initialiseMegaChat).invoke("good_session")
+            verify(initialiseMegaChatUseCase).invoke("good_session")
         }
 
     @Test
     fun `test that initialiseMegaChat is not invoked if rootNode exists and retryPendingConnections raises exception other than ChatNotInitializedException`() =
         runTest {
-            whenever(backgroundFastLogin()).thenReturn("good_session")
+            whenever(backgroundFastLoginUseCase()).thenReturn("good_session")
             whenever(pushMessageMapper(any())).thenReturn(mock())
             whenever(retryPendingConnections(any())).thenThrow(
                 EmptyFolderException()
             )
 
             underTest.doWork()
-            verifyNoInteractions(initialiseMegaChat)
+            verifyNoInteractions(initialiseMegaChatUseCase)
         }
 
     @Test
     fun `test that doWork returns failure if rootNode exists and retryPendingConnections raises ChatNotInitializedException and initialiseMegaChat fails`() =
         runTest {
             val sessionId = "good_session"
-            whenever(backgroundFastLogin()).thenReturn(sessionId)
+            whenever(backgroundFastLoginUseCase()).thenReturn(sessionId)
             whenever(pushMessageMapper(any())).thenReturn(mock())
             whenever(retryPendingConnections(any())).thenThrow(ChatNotInitializedErrorStatus())
-            whenever(initialiseMegaChat(sessionId)).thenThrow(ChatNotInitializedErrorStatus())
+            whenever(initialiseMegaChatUseCase(sessionId)).thenThrow(ChatNotInitializedErrorStatus())
 
             val result = underTest.doWork()
             assertThat(result).isEqualTo(ListenableWorker.Result.failure())

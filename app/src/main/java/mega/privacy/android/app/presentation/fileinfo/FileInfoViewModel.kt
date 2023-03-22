@@ -49,10 +49,10 @@ import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
@@ -78,8 +78,8 @@ import javax.inject.Inject
 class FileInfoViewModel @Inject constructor(
     private val tempMegaNodeRepository: MegaNodeRepository, //a temp use of MegaApiAndroid, just while migrating to use-cases only, to easily remove things from the activity
     private val fileUtilWrapper: FileUtilWrapper,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFileHistoryNumVersions: GetFileHistoryNumVersions,
     private val isNodeInInbox: IsNodeInInbox,
     private val isNodeInRubbish: IsNodeInRubbish,
@@ -283,7 +283,7 @@ class FileInfoViewModel @Inject constructor(
         activity: WeakReference<Activity>,
     ) {
         if (availableOffline == _uiState.value.isAvailableOffline) return
-        if (availableOffline && monitorStorageStateEvent.getState() == StorageState.PayWall) {
+        if (availableOffline && monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
             updateState { it.copy(oneOffViewEvent = FileInfoOneOffViewEvent.OverDiskQuota) }
             return
         }
@@ -636,7 +636,7 @@ class FileInfoViewModel @Inject constructor(
      * Is connected
      */
     private val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     /**
      * Performs a job setting [progressState] state while in progress

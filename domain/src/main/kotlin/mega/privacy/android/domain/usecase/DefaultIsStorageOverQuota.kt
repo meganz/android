@@ -1,16 +1,17 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import javax.inject.Inject
 
 /**
  * Default is storage over quota
  *
- * @property monitorStorageStateEvent
+ * @property monitorStorageStateEventUseCase
  */
 class DefaultIsStorageOverQuota @Inject constructor(
-    private val monitorStorageStateEvent: MonitorStorageStateEvent
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase
 ) : IsStorageOverQuota {
     override suspend fun invoke() =
-        monitorStorageStateEvent().value.storageState == StorageState.PayWall
+        monitorStorageStateEventUseCase().value.storageState == StorageState.PayWall
 }

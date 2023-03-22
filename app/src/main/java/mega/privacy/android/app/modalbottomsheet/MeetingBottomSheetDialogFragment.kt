@@ -17,7 +17,7 @@ import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.databinding.BottomSheetMeetingSimpleBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,7 +37,7 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
     }
 
     @Inject
-    lateinit var getFeatureFlag: GetFeatureFlagValue
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     private val showSimpleList by lazy { arguments?.getBoolean(SHOW_SIMPLE_LIST) ?: false }
     private var listener: MeetingBottomSheetDialogActionListener? = null
@@ -52,7 +52,7 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
             binding.btnJoinMeeting.setOnClickListener(this)
 
             activity?.lifecycleScope?.launch {
-                val scheduleMeetingEnabled = getFeatureFlag(AppFeatures.ScheduleMeeting)
+                val scheduleMeetingEnabled = getFeatureFlagUseCase(AppFeatures.ScheduleMeeting)
                 binding.dividerSchedule.isVisible = scheduleMeetingEnabled
                 binding.btnScheduleMeeting.isVisible = scheduleMeetingEnabled
                 binding.btnScheduleMeeting.setOnClickListener(this@MeetingBottomSheetDialogFragment)

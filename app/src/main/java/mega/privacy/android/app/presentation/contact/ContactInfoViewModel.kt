@@ -30,9 +30,9 @@ import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -42,21 +42,21 @@ import javax.inject.Inject
 /**
  * View Model for [mega.privacy.android.app.main.ContactInfoActivity]
  *
- * @property monitorStorageStateEvent [MonitorStorageStateEvent]
- * @property monitorConnectivity      [MonitorConnectivity]
- * @property startChatCall            [StartChatCall]
- * @property getChatRoomUseCase       [GetChatRoomUseCase]
- * @property passcodeManagement       [PasscodeManagement]
- * @property chatApiGateway           [MegaChatApiGateway]
- * @property cameraGateway            [CameraGateway]
- * @property chatManagement           [ChatManagement]
- * @property areCredentialsVerified   [AreCredentialsVerified]
- * @property monitorContactUpdates    [MonitorContactUpdates]
+ * @property monitorStorageStateEventUseCase [MonitorStorageStateEventUseCase]
+ * @property monitorConnectivityUseCase      [MonitorConnectivityUseCase]
+ * @property startChatCall                   [StartChatCall]
+ * @property getChatRoomUseCase              [GetChatRoomUseCase]
+ * @property passcodeManagement              [PasscodeManagement]
+ * @property chatApiGateway                  [MegaChatApiGateway]
+ * @property cameraGateway                   [CameraGateway]
+ * @property chatManagement                  [ChatManagement]
+ * @property areCredentialsVerified          [AreCredentialsVerified]
+ * @property monitorContactUpdates           [MonitorContactUpdates]
  */
 @HiltViewModel
 class ContactInfoViewModel @Inject constructor(
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val startChatCall: StartChatCall,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val passcodeManagement: PasscodeManagement,
@@ -117,17 +117,17 @@ class ContactInfoViewModel @Inject constructor(
     }
 
     /**
-     * Get latest [StorageState] from [MonitorStorageStateEvent] use case.
+     * Get latest [StorageState] from [MonitorStorageStateEventUseCase] use case.
      * @return the latest [StorageState]
      */
-    fun getStorageState(): StorageState = monitorStorageStateEvent.getState()
+    fun getStorageState(): StorageState = monitorStorageStateEventUseCase.getState()
 
     /**
      * Is online
      *
      * @return
      */
-    fun isOnline(): Boolean = monitorConnectivity().value
+    fun isOnline(): Boolean = monitorConnectivityUseCase().value
 
     /**
      * Get chat id

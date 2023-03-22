@@ -27,23 +27,23 @@ import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetPreference
-import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
-import mega.privacy.android.domain.usecase.MonitorConnectivity
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
-import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -54,8 +54,8 @@ class SettingsViewModel @Inject constructor(
     private val refreshPasscodeLockPreference: RefreshPasscodeLockPreference,
     areSdkLogsEnabled: AreSdkLogsEnabled,
     areChatLogsEnabled: AreChatLogsEnabled,
-    private val isCameraSyncEnabled: IsCameraSyncEnabled,
-    private val rootNodeExists: RootNodeExists,
+    private val isCameraSyncEnabledUseCase: IsCameraSyncEnabledUseCase,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val isMultiFactorAuthAvailable: IsMultiFactorAuthAvailable,
     private val monitorAutoAcceptQRLinks: MonitorAutoAcceptQRLinks,
     private val startScreen: MonitorStartScreenPreference,
@@ -65,7 +65,7 @@ class SettingsViewModel @Inject constructor(
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val toggleAutoAcceptQRLinks: ToggleAutoAcceptQRLinks,
     private val fetchMultiFactorAuthSetting: FetchMultiFactorAuthSetting,
-    monitorConnectivity: MonitorConnectivity,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val requestAccountDeletion: RequestAccountDeletion,
     private val isChatLoggedIn: IsChatLoggedIn,
     private val setSdkLogsEnabled: SetSdkLogsEnabled,
@@ -86,7 +86,7 @@ class SettingsViewModel @Inject constructor(
     private val state = MutableStateFlow(initialiseState())
     val uiState: StateFlow<SettingsState> = state
     private val online =
-        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
+        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
     private val sdkLogsEnabled =
         areSdkLogsEnabled().stateIn(viewModelScope, SharingStarted.Eagerly, false)
     private val chatLogsEnabled =
@@ -115,7 +115,7 @@ class SettingsViewModel @Inject constructor(
     val passcodeLock: Boolean
         get() = refreshPasscodeLockPreference()
     val isCamSyncEnabled: Boolean
-        get() = isCameraSyncEnabled()
+        get() = isCameraSyncEnabledUseCase()
 
 
     init {
@@ -139,7 +139,7 @@ class SettingsViewModel @Inject constructor(
                         { state: SettingsState -> state.copy(multiFactorAuthChecked = enabled) }
                     },
                 online
-                    .map { it && rootNodeExists() }
+                    .map { it && rootNodeExistsUseCase() }
                     .map { online ->
                         { state: SettingsState ->
                             state.copy(

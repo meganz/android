@@ -49,7 +49,7 @@ import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaUser
@@ -70,7 +70,7 @@ class MyAccountFragment : Fragment(), Scrollable {
     lateinit var megaApi: MegaApiAndroid
 
     @Inject
-    lateinit var getFeatureFlagValue: GetFeatureFlagValue
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel: MyAccountViewModel by activityViewModels()
 
@@ -106,7 +106,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         super.onViewCreated(view, savedInstanceState)
 
         lifecycleScope.launch {
-            val monitorPhoneFlagEnabled = getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)
+            val monitorPhoneFlagEnabled = getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)
             setupView(monitorPhoneFlagEnabled)
             setupObservers(monitorPhoneFlagEnabled)
         }

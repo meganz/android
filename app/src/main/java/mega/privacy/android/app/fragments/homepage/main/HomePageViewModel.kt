@@ -17,8 +17,8 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.usecase.call.GetCallUseCase
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.Constants.EVENT_NOTIFICATION_COUNT_CHANGE
-import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.login.MonitorLogout
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.login.MonitorLogoutUseCase
 import nz.mega.sdk.MegaBanner
 import timber.log.Timber
 import javax.inject.Inject
@@ -27,8 +27,8 @@ import javax.inject.Inject
 class HomePageViewModel @Inject constructor(
     private val repository: HomepageRepository,
     getCallUseCase: GetCallUseCase,
-    monitorConnectivity: MonitorConnectivity,
-    private val monitorLogout: MonitorLogout,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val monitorLogoutUseCase: MonitorLogoutUseCase,
 ) : BaseRxViewModel() {
 
     private val _notificationCount = MutableLiveData<Int>()
@@ -46,7 +46,7 @@ class HomePageViewModel @Inject constructor(
     /**
      * Is network connected state
      */
-    val isConnected = monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+    val isConnected = monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val notificationCountObserver = androidx.lifecycle.Observer<Int> {
         _notificationCount.value = it
@@ -73,7 +73,7 @@ class HomePageViewModel @Inject constructor(
             )
             .addTo(composite)
 
-        viewModelScope.launch { monitorLogout().collect { repository.logout() } }
+        viewModelScope.launch { monitorLogoutUseCase().collect { repository.logout() } }
     }
 
     override fun onCleared() {

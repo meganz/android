@@ -31,7 +31,7 @@ import mega.privacy.android.app.utils.Constants.USER_HANDLES
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatPeerList
@@ -54,7 +54,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
     private val megaApi = app.megaApi
     private val megaChatApi = app.megaChatApi
 
-    val monitorStorageStateEvent: MonitorStorageStateEvent = getMonitorStorageStateEvent()
+    val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = getMonitorStorageStateEvent()
 
     /**
      * Record if an attach is ongoing.
@@ -91,7 +91,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
             return
         }
 
-        if (monitorStorageStateEvent.getState() == StorageState.PayWall) {
+        if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
             AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
             return
         }
@@ -428,7 +428,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         forceNonChatSnackbar: Boolean = false,
         attachNodeToChatListener: AttachNodeToChatListener? = null
     ) {
-        if (monitorStorageStateEvent.getState() == StorageState.PayWall) {
+        if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
             AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
             return
         }

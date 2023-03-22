@@ -28,7 +28,7 @@ import mega.privacy.android.domain.entity.SubmitIssueRequest
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmail
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SubmitIssue
 import javax.inject.Inject
 
@@ -40,7 +40,7 @@ import javax.inject.Inject
  * @property submitIssue
  * @property ioDispatcher
  *
- * @param monitorConnectivity
+ * @param monitorConnectivityUseCase
  * @param savedStateHandle
  *
  * @property state current view state
@@ -52,7 +52,7 @@ class ReportIssueViewModel @Inject constructor(
     private val submitIssue: SubmitIssue,
     private val getSupportEmail: GetSupportEmail,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    monitorConnectivity: MonitorConnectivity,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -79,7 +79,7 @@ class ReportIssueViewModel @Inject constructor(
     )
 
     private val isConnected =
-        monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+        monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private var submitReportJob: Job? = null
 

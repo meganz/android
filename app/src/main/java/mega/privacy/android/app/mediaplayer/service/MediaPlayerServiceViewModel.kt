@@ -137,7 +137,7 @@ import mega.privacy.android.domain.usecase.MegaApiHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiHttpServerSetMaxBufferSize
 import mega.privacy.android.domain.usecase.MegaApiHttpServerStart
 import mega.privacy.android.domain.usecase.MegaApiHttpServerStop
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimes
 import mega.privacy.android.domain.usecase.SavePlaybackTimes
 import mega.privacy.android.domain.usecase.TrackPlaybackPosition
@@ -162,7 +162,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val playlistItemMapper: PlaylistItemMapper,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val trackPlaybackPositionUseCase: TrackPlaybackPosition,
     private val monitorPlaybackTimesUseCase: MonitorPlaybackTimes,
     private val savePlaybackTimesUseCase: SavePlaybackTimes,
@@ -736,7 +736,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
             }
         }
 
-        if (nodesWithoutThumbnail.isNotEmpty() && monitorConnectivity().value) {
+        if (nodesWithoutThumbnail.isNotEmpty() && monitorConnectivityUseCase().value) {
             sharingScope.launch(ioDispatcher) {
                 nodesWithoutThumbnail.map {
                     if (isMegaApiFolder(type = type)) {

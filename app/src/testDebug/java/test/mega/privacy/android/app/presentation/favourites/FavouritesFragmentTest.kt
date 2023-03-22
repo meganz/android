@@ -25,6 +25,7 @@ import mega.privacy.android.app.presentation.favourites.adapter.FavouritesViewHo
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import org.hamcrest.Matcher
@@ -40,7 +41,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import test.mega.privacy.android.app.di.TestInitialiseUseCases
 import test.mega.privacy.android.app.di.TestMapperModule
 import test.mega.privacy.android.app.di.TestSortOrderUseCases
 import test.mega.privacy.android.app.di.TestWrapperModule
@@ -53,6 +53,12 @@ import test.mega.privacy.android.app.testFragment
 class FavouritesFragmentTest {
     @get: Rule
     val hiltRule = HiltAndroidRule(this)
+
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
+        on { invoke() }.thenReturn(
+            MutableStateFlow(true)
+        )
+    }
 
     @Before
     fun setUp() {
@@ -115,7 +121,7 @@ class FavouritesFragmentTest {
     @Test
     fun test_that_clicked_three_dot_and_the_snack_bar_shows_error_message_when_offline() {
         val connected = MutableStateFlow(true)
-        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(connected)
+        whenever(monitorConnectivityUseCase()).thenReturn(connected)
         launchFragmentInHiltContainer<FavouritesFragment>()
 
         val threeDotClicked = object : ViewAction {

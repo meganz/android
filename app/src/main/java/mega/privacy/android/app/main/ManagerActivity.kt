@@ -344,7 +344,6 @@ import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaAchievementsDetails
@@ -2491,7 +2490,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             viewModel.monitorFinishActivityEvent,
             Lifecycle.State.CREATED
         ) { finish: Boolean ->
-            Timber.d("MonitorFinishActivity flow collected with Finish %s", finish)
+            Timber.d("MonitorFinishActivityUseCase flow collected with Finish %s", finish)
             if (finish) {
                 finish()
             }

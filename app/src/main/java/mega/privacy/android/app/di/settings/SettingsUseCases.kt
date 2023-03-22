@@ -18,10 +18,8 @@ import mega.privacy.android.domain.usecase.DefaultRefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.DefaultToggleAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
-import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
-import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
@@ -30,12 +28,13 @@ import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
-import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 
 /**
  * Settings use cases module
@@ -126,10 +125,6 @@ abstract class SettingsUseCases {
         @Provides
         fun provideFetchAutoAcceptQRLinks(settingsRepository: SettingsRepository): FetchAutoAcceptQRLinks =
             FetchAutoAcceptQRLinks(settingsRepository::fetchContactLinksOption)
-
-        @Provides
-        fun provideIsCameraSyncEnabled(settingsRepository: SettingsRepository): IsCameraSyncEnabled =
-            IsCameraSyncEnabled(settingsRepository::isCameraSyncPreferenceEnabled)
 
         @Provides
         fun provideSetCameraUploadsByWifi(settingsRepository: SettingsRepository): SetCameraUploadsByWifi =

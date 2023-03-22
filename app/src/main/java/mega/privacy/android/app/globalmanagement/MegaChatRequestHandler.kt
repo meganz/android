@@ -17,7 +17,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.BroadcastFinishActivity
+import mega.privacy.android.domain.usecase.login.BroadcastFinishActivityUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -54,7 +54,7 @@ class MegaChatRequestHandler @Inject constructor(
     private val passcodeManagement: PasscodeManagement,
     private val transfersManagement: TransfersManagement,
     private val chatRequestMapper: ChatRequestMapper,
-    private val broadcastFinishActivity: BroadcastFinishActivity,
+    private val broadcastFinishActivityUseCase: BroadcastFinishActivityUseCase,
 ) : MegaChatRequestListenerInterface {
     private var isLoggingRunning = false
 
@@ -112,7 +112,7 @@ class MegaChatRequestHandler @Inject constructor(
                 logoutConfirmed(application, sharingScope)
                 //Need to finish ManagerActivity to avoid unexpected behaviours after forced logouts.
                 sharingScope.launch {
-                    broadcastFinishActivity()
+                    broadcastFinishActivityUseCase()
                 }
                 if (isLoggingRunning) {
                     Timber.d("Already in Login Activity, not necessary to launch it again")

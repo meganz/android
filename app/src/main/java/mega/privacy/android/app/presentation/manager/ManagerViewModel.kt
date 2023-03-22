@@ -49,16 +49,16 @@ import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasInboxChildren
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.MonitorFinishActivity
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
@@ -85,19 +85,19 @@ import javax.inject.Inject
  * @property hasInboxChildren
  * @property sendStatisticsMediaDiscovery
  * @property savedStateHandle
- * @property monitorStorageStateEvent
+ * @property monitorStorageStateEventUseCase
  * @property monitorViewType
  * @property getPrimarySyncHandle
  * @property getSecondarySyncHandle
  * @property checkCameraUpload
  * @property getCloudSortOrder
- * @property monitorConnectivity
+ * @property monitorConnectivityUseCase
  * @property broadcastUploadPauseState
  * @property getExtendedAccountDetail
  * @property getPricing
  * @property getFullAccountInfo
  * @property getActiveSubscription
- * @property getFeatureFlagValue
+ * @property getFeatureFlagValueUseCase
  * @property getUnverifiedIncomingShares
  * @property getUnverifiedOutgoingShares
  * @property monitorVerificationStatus
@@ -106,7 +106,7 @@ import javax.inject.Inject
  * @param monitorNodeUpdates
  * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
  * @param monitorContactRequestUpdates
- * @param monitorFinishActivity
+ * @param monitorFinishActivityUseCase
  */
 @HiltViewModel
 class ManagerViewModel @Inject constructor(
@@ -119,22 +119,22 @@ class ManagerViewModel @Inject constructor(
     private val hasInboxChildren: HasInboxChildren,
     private val sendStatisticsMediaDiscovery: SendStatisticsMediaDiscovery,
     private val savedStateHandle: SavedStateHandle,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorViewType: MonitorViewType,
     private val getPrimarySyncHandle: GetPrimarySyncHandle,
     private val getSecondarySyncHandle: GetSecondarySyncHandle,
     private val checkCameraUpload: CheckCameraUpload,
     private val getCloudSortOrder: GetCloudSortOrder,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val broadcastUploadPauseState: BroadcastUploadPauseState,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getPricing: GetPricing,
     private val getFullAccountInfo: GetFullAccountInfo,
     private val getActiveSubscription: GetActiveSubscription,
-    private val getFeatureFlagValue: GetFeatureFlagValue,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val getUnverifiedIncomingShares: GetUnverifiedIncomingShares,
     private val getUnverifiedOutgoingShares: GetUnverifiedOutgoingShares,
-    monitorFinishActivity: MonitorFinishActivity,
+    monitorFinishActivityUseCase: MonitorFinishActivityUseCase,
     private val requireTwoFactorAuthenticationUseCase: RequireTwoFactorAuthenticationUseCase,
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val setLatestTargetPath: SetLatestTargetPath,
@@ -163,18 +163,18 @@ class ManagerViewModel @Inject constructor(
      * Monitor connectivity event
      */
     val monitorConnectivityEvent =
-        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
+        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.Eagerly)
 
     /**
      * Monitor Finish Activity event
      */
-    val monitorFinishActivityEvent = monitorFinishActivity()
+    val monitorFinishActivityEvent = monitorFinishActivityUseCase()
 
     /**
      * Is network connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     private val isFirstLogin = savedStateHandle.getStateFlow(
         key = isFirstLoginKey,
@@ -251,9 +251,9 @@ class ManagerViewModel @Inject constructor(
 
     private suspend fun getEnabledFeatures(): Set<Feature> {
         return setOfNotNull(
-            AppFeatures.AndroidSync.takeIf { getFeatureFlagValue(it) },
-            AppFeatures.MonitorPhoneNumber.takeIf { getFeatureFlagValue(it) },
-            AppFeatures.RubbishBinCompose.takeIf { getFeatureFlagValue(it) }
+            AppFeatures.AndroidSync.takeIf { getFeatureFlagValueUseCase(it) },
+            AppFeatures.MonitorPhoneNumber.takeIf { getFeatureFlagValueUseCase(it) },
+            AppFeatures.RubbishBinCompose.takeIf { getFeatureFlagValueUseCase(it) }
         )
     }
 
@@ -416,7 +416,7 @@ class ManagerViewModel @Inject constructor(
     /**
      * Get latest [StorageState]
      */
-    fun getStorageState() = monitorStorageStateEvent.getState()
+    fun getStorageState() = monitorStorageStateEventUseCase.getState()
 
     /**
      * Get Cloud Sort Order

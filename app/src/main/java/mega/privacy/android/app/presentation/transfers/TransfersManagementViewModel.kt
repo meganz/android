@@ -24,7 +24,7 @@ import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
 import javax.inject.Inject
 
@@ -46,7 +46,7 @@ class TransfersManagementViewModel @Inject constructor(
     private val isCompletedTransfersEmpty: IsCompletedTransfersEmpty,
     private val areAllTransfersPaused: AreAllTransfersPaused,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    monitorConnectivity: MonitorConnectivity,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersSize: MonitorTransfersSize,
 ) : ViewModel() {
     private val transfersInfo: MutableLiveData<TransfersInfo> = MutableLiveData()
@@ -57,7 +57,7 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * is network connected
      */
-    val online = monitorConnectivity().stateIn(viewModelScope, SharingStarted.Lazily, false)
+    val online = monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     init {
         viewModelScope.launch {

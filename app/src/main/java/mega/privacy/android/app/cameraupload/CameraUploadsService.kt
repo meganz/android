@@ -100,10 +100,10 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.GetSession
+import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.HasPreferences
+import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
@@ -112,7 +112,7 @@ import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
@@ -126,7 +126,7 @@ import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
-import mega.privacy.android.domain.usecase.login.BackgroundFastLogin
+import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -197,10 +197,10 @@ class CameraUploadsService : LifecycleService() {
     lateinit var isSecondaryFolderEnabled: IsSecondaryFolderEnabled
 
     /**
-     * HasPreferences
+     * HasPreferencesUseCase
      */
     @Inject
-    lateinit var hasPreferences: HasPreferences
+    lateinit var hasPreferencesUseCase: HasPreferencesUseCase
 
     /**
      * IsCameraUploadSyncEnabled
@@ -400,7 +400,7 @@ class CameraUploadsService : LifecycleService() {
      * Monitor connectivity
      */
     @Inject
-    lateinit var monitorConnectivity: MonitorConnectivity
+    lateinit var monitorConnectivityUseCase: MonitorConnectivityUseCase
 
     /**
      * Monitor battery level
@@ -412,13 +412,13 @@ class CameraUploadsService : LifecycleService() {
      * Background Fast Login
      */
     @Inject
-    lateinit var backgroundFastLogin: BackgroundFastLogin
+    lateinit var backgroundFastLoginUseCase: BackgroundFastLoginUseCase
 
     /**
      * Get Session
      */
     @Inject
-    lateinit var getSession: GetSession
+    lateinit var getSessionUseCase: GetSessionUseCase
 
     /**
      * Is Node In Rubbish or deleted
@@ -622,7 +622,7 @@ class CameraUploadsService : LifecycleService() {
 
     private fun monitorConnectivityStatus() {
         coroutineScope?.launch {
-            monitorConnectivity().collect {
+            monitorConnectivityUseCase().collect {
                 if (!it || isWifiNotSatisfied()) {
                     endService(
                         cancelMessage = "Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload",
@@ -891,23 +891,23 @@ class CameraUploadsService : LifecycleService() {
     }
 
     /**
-     * Checks if the user is logged in by calling [getSession] and checking whether the
+     * Checks if the user is logged in by calling [getSessionUseCase] and checking whether the
      * session exists or not
      *
      * @return true if the user session exists, and false if otherwise
      */
     private suspend fun isUserLoggedIn(): Boolean =
-        getSession().orEmpty().isNotBlank().also {
+        getSessionUseCase().orEmpty().isNotBlank().also {
             if (!it) Timber.w("No user session currently exists")
         }
 
     /**
-     * Checks if the Preferences from [hasPreferences] exist
+     * Checks if the Preferences from [hasPreferencesUseCase] exist
      *
      * @return true if it exists, and false if otherwise
      */
     private suspend fun preferencesExist(): Boolean =
-        hasPreferences().also {
+        hasPreferencesUseCase().also {
             if (!it) Timber.w("Preferences not defined, so not enabled")
         }
 
@@ -1428,7 +1428,7 @@ class CameraUploadsService : LifecycleService() {
         // Legacy support: isLoggingIn needs to be set in order to inform other parts of the
         // app that a Login Procedure is occurring
         MegaApplication.isLoggingIn = true
-        val result = runCatching { backgroundFastLogin() }
+        val result = runCatching { backgroundFastLoginUseCase() }
         MegaApplication.isLoggingIn = false
 
         if (result.isSuccess) {

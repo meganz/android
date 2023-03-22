@@ -3,8 +3,8 @@ package mega.privacy.android.app.presentation.provider
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import javax.inject.Inject
 
 /**
@@ -12,18 +12,18 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class FileProviderViewModel @Inject constructor(
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     /**
      * Get latest value of [StorageState]
      */
-    fun getStorageState() = monitorStorageStateEvent.getState()
+    fun getStorageState() = monitorStorageStateEventUseCase.getState()
 
     /**
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 }

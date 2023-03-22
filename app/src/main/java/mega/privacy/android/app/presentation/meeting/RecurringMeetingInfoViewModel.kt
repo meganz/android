@@ -19,7 +19,7 @@ import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 /**
  * RecurringMeetingInfoActivity view model.
- * @property monitorConnectivity                                    [MonitorConnectivity]
+ * @property monitorConnectivityUseCase                                    [MonitorConnectivityUseCase]
  * @property getScheduledMeetingByChat                              [GetScheduledMeetingByChat]
  * @property fetchScheduledMeetingOccurrencesByChat                 [FetchScheduledMeetingOccurrencesByChat]
  * @property fetchNumberOfScheduledMeetingOccurrencesByChat        [FetchNumberOfScheduledMeetingOccurrencesByChat]
@@ -41,7 +41,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class RecurringMeetingInfoViewModel @Inject constructor(
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val fetchScheduledMeetingOccurrencesByChat: FetchScheduledMeetingOccurrencesByChat,
     private val fetchNumberOfScheduledMeetingOccurrencesByChat: FetchNumberOfScheduledMeetingOccurrencesByChat,
@@ -60,13 +60,13 @@ class RecurringMeetingInfoViewModel @Inject constructor(
      * Monitor connectivity event
      */
     val monitorConnectivityEvent =
-        monitorConnectivity().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
      * Is network connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     /**
      * Sets chat id

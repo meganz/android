@@ -16,7 +16,7 @@ import mega.privacy.android.domain.entity.verification.Unblock
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.repository.VerificationRepository
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -26,7 +26,7 @@ import org.mockito.kotlin.stub
 class DefaultMonitorVerificationStatusTest {
     private lateinit var underTest: MonitorVerificationStatus
     private val monitorVerifiedPhoneNumber = mock<MonitorVerifiedPhoneNumber>()
-    private val monitorStorageStateEvent = mock<MonitorStorageStateEvent> {
+    private val monitorStorageStateEventUseCase = mock<MonitorStorageStateEventUseCase> {
         on { invoke() }.thenReturn(
             MutableStateFlow(
                 StorageStateEvent(
@@ -51,7 +51,7 @@ class DefaultMonitorVerificationStatusTest {
     fun setUp() {
         underTest = DefaultMonitorVerificationStatus(
             monitorVerifiedPhoneNumber = monitorVerifiedPhoneNumber,
-            monitorStorageStateEvent = monitorStorageStateEvent,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             verificationRepository = verificationRepository,
         )
     }
@@ -97,7 +97,7 @@ class DefaultMonitorVerificationStatusTest {
                 })
             }
 
-            monitorStorageStateEvent.stub {
+            monitorStorageStateEventUseCase.stub {
                 on { invoke() }.thenReturn(
                     MutableStateFlow(
                         StorageStateEvent(

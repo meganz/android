@@ -82,7 +82,7 @@ import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
-import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -138,7 +138,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     lateinit var getDownloadCount: GetNumPendingDownloadsNonBackground
 
     @Inject
-    lateinit var rootNodeExists: RootNodeExists
+    lateinit var rootNodeExistsUseCase: RootNodeExistsUseCase
 
     @Inject
     lateinit var broadcastTransferOverQuota: BroadcastTransferOverQuota
@@ -496,7 +496,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         val credentials = dbH.credentials
         if (credentials != null) {
             val gSession = credentials.session
-            if (!rootNodeExists()) {
+            if (!rootNodeExistsUseCase()) {
                 isLoggingIn = MegaApplication.isLoggingIn
                 if (!isLoggingIn) {
                     isLoggingIn = true

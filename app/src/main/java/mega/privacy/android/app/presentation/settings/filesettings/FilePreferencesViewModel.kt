@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FilePreferencesViewModel @Inject constructor(
     private val getFolderVersionInfo: GetFolderVersionInfo,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getFileVersionsOption: GetFileVersionsOption,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val enableFileVersionsOption: EnableFileVersionsOption,
@@ -38,13 +38,13 @@ class FilePreferencesViewModel @Inject constructor(
      * Monitor connectivity event
      */
     val monitorConnectivityEvent =
-        monitorConnectivity().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     init {
         viewModelScope.launch {

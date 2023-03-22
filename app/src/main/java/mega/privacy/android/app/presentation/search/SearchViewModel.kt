@@ -21,7 +21,7 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.model.SearchState
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
-import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -33,7 +33,7 @@ import javax.inject.Inject
  * ViewModel associated to SearchFragment
  *
  * @param monitorNodeUpdates Monitor global node updates
- * @param rootNodeExists Check if the root node exists
+ * @param rootNodeExistsUseCase Check if the root node exists
  * @param searchNodes Perform a search request
  * @param getCloudSortOrder Get the Cloud Sort Order
  * @param getSearchParentNodeHandle Get parent node for current node
@@ -41,7 +41,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
-    private val rootNodeExists: RootNodeExists,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getRootFolder: GetRootFolder,
     private val searchNodes: SearchNodes,
     private val getCloudSortOrder: GetCloudSortOrder,
@@ -174,7 +174,7 @@ class SearchViewModel @Inject constructor(
         linksParentHandle: Long,
         isFirstNavigationLevel: Boolean,
     ) = viewModelScope.launch {
-        if (!rootNodeExists()) {
+        if (!rootNodeExistsUseCase()) {
             Timber.e("Root node is null.")
             return@launch
         }

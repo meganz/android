@@ -67,7 +67,7 @@ import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.showSoftKeyboard
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.exception.ChangeEmailException
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaChatApi
 import timber.log.Timber
 import java.io.File
@@ -114,7 +114,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     private var deletePhotoDialog: AlertDialog? = null
 
     @Inject
-    lateinit var getFeatureFlagValue: GetFeatureFlagValue
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -123,7 +123,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         setContentView(binding.root)
 
         lifecycleScope.launch {
-            val monitorPhoneNumberEnabled = getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)
+            val monitorPhoneNumberEnabled = getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)
             setupView(monitorPhoneNumberEnabled)
             setupObservers(monitorPhoneNumberEnabled)
         }

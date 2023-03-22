@@ -17,9 +17,9 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -36,8 +36,8 @@ import org.mockito.kotlin.whenever
 @ExperimentalCoroutinesApi
 class ContactInfoViewModelTest {
     private lateinit var underTest: ContactInfoViewModel
-    private lateinit var monitorStorageStateEvent: MonitorStorageStateEvent
-    private lateinit var monitorConnectivity: MonitorConnectivity
+    private lateinit var monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase
+    private lateinit var monitorConnectivityUseCase: MonitorConnectivityUseCase
     private lateinit var startChatCall: StartChatCall
     private lateinit var getChatRoomUseCase: GetChatRoomUseCase
     private lateinit var passcodeManagement: PasscodeManagement
@@ -67,8 +67,8 @@ class ContactInfoViewModelTest {
 
     private fun initViewModel() {
         underTest = ContactInfoViewModel(
-            monitorStorageStateEvent,
-            monitorConnectivity,
+            monitorStorageStateEventUseCase,
+            monitorConnectivityUseCase,
             startChatCall,
             getChatRoomUseCase,
             passcodeManagement,
@@ -83,8 +83,8 @@ class ContactInfoViewModelTest {
     }
 
     private fun initMock() {
-        monitorStorageStateEvent = mock()
-        monitorConnectivity = mock()
+        monitorStorageStateEventUseCase = mock()
+        monitorConnectivityUseCase = mock()
         startChatCall = mock()
         getChatRoomUseCase = mock()
         passcodeManagement = mock()

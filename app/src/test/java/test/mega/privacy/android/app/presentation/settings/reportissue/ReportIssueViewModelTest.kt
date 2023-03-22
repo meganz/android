@@ -28,7 +28,7 @@ import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.GetSupportEmail
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SubmitIssue
 import org.junit.After
 import org.junit.Before
@@ -59,8 +59,8 @@ class ReportIssueViewModelTest {
     private val savedStateHandle = SavedStateHandle(mapOf())
 
 
-    private val monitorConnectivity =
-        mock<MonitorConnectivity> { on { invoke() }.thenReturn(MutableStateFlow(true)) }
+    private val monitorConnectivityUseCase =
+        mock<MonitorConnectivityUseCase> { on { invoke() }.thenReturn(MutableStateFlow(true)) }
 
     private val scheduler = TestCoroutineScheduler()
 
@@ -76,7 +76,7 @@ class ReportIssueViewModelTest {
             areChatLogsEnabled = areChatLogsEnabled,
             savedStateHandle = savedStateHandle,
             ioDispatcher = StandardTestDispatcher(),
-            monitorConnectivity = monitorConnectivity,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             getSupportEmail = getSupportEmail,
         )
     }
@@ -208,7 +208,7 @@ class ReportIssueViewModelTest {
     @Test
     fun `test that connection error is returned if attempting to submit and no internet available`() =
         runTest {
-            whenever(monitorConnectivity()).thenReturn(MutableStateFlow(false))
+            whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(false))
 
             underTest.state.map { it.error }.distinctUntilChanged()
                 .test {

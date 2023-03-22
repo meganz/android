@@ -19,7 +19,7 @@ import mega.privacy.android.app.utils.Constants.EVENT_NODES_CHANGE
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
@@ -38,7 +38,7 @@ class AudioViewModel @Inject constructor(
     private val repository: TypedFilesRepository,
     private val getCloudSortOrder: GetCloudSortOrder,
     monitorNodeUpdates: MonitorNodeUpdates,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel(), SearchCallback.Data {
 
     private var _query = MutableLiveData<String>()
@@ -71,7 +71,7 @@ class AudioViewModel @Inject constructor(
      * Is network connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     val items: LiveData<List<NodeItem>> = _query.switchMap {
         if (forceUpdate || repository.fileNodeItems.value == null) {

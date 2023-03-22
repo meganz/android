@@ -20,14 +20,14 @@ import mega.privacy.android.domain.usecase.ChangePassword
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetPasswordStrength
 import mega.privacy.android.domain.usecase.IsCurrentPassword
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetPassword
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ChangePasswordViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isCurrentPassword: IsCurrentPassword,
     private val getPasswordStrength: GetPasswordStrength,
     private val changePassword: ChangePassword,
@@ -68,7 +68,7 @@ internal class ChangePasswordViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isUserLoggedIn = getRootFolder() != null) }
 
-            monitorConnectivity().collect { isConnected ->
+            monitorConnectivityUseCase().collect { isConnected ->
                 _uiState.update { it.copy(isConnectedToNetwork = isConnected) }
             }
         }

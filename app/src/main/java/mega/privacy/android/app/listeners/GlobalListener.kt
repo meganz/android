@@ -46,7 +46,7 @@ import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdate
+import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -77,7 +77,7 @@ class GlobalListener @Inject constructor(
     private val getPricing: GetPricing,
     private val getNumberOfSubscription: GetNumberOfSubscription,
     private val setSecurityUpgradeInApp: SetSecurityUpgradeInApp,
-    private val broadcastAccountUpdate: BroadcastAccountUpdate,
+    private val broadcastAccountUpdateUseCase: BroadcastAccountUpdateUseCase,
 ) : MegaGlobalListenerInterface {
 
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser?>?) {
@@ -143,7 +143,7 @@ class GlobalListener @Inject constructor(
         Timber.d("onAccountUpdate")
 
         applicationScope.launch {
-            broadcastAccountUpdate()
+            broadcastAccountUpdateUseCase()
             getPaymentMethod(true)
             getPricing(true)
             dbH.resetExtendedAccountDetailsTimestamp()

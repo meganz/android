@@ -6,7 +6,7 @@ import android.os.Bundle
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,7 +16,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class ActivityLifecycleHandler @Inject constructor(
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
 ) : Application.ActivityLifecycleCallbacks {
     // The current App Activity
     private var currentActivity: Activity? = null
@@ -45,7 +45,7 @@ class ActivityLifecycleHandler @Inject constructor(
         currentActivity = activity
         if (++activityReferences == 1 && !isActivityChangingConfigurations) {
             Timber.i("App enters foreground")
-            if (monitorStorageStateEvent.getState() == StorageState.PayWall) {
+            if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
                 showOverDiskQuotaPaywallWarning()
             }
         }

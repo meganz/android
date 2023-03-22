@@ -20,7 +20,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetMyCredentials
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import org.junit.After
@@ -96,8 +96,8 @@ class AuthenticityCredentialsViewModelTest {
         onBlocking { invoke(userEmail) }.thenReturn(Unit)
     }
 
-    private val monitorConnectivity =
-        mock<MonitorConnectivity> { on { invoke() }.thenReturn(MutableStateFlow(true)) }
+    private val monitorConnectivityUseCase =
+        mock<MonitorConnectivityUseCase> { on { invoke() }.thenReturn(MutableStateFlow(true)) }
 
     @Before
     fun setUp() {
@@ -108,7 +108,7 @@ class AuthenticityCredentialsViewModelTest {
             getMyCredentials = getMyCredentials,
             verifyCredentials = verifyCredentials,
             resetCredentials = resetCredentials,
-            monitorConnectivity = monitorConnectivity,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
         )
     }
 
@@ -166,7 +166,7 @@ class AuthenticityCredentialsViewModelTest {
 
     @Test
     fun `test that action clicked show error if there is no internet connection`() = runTest {
-        whenever(monitorConnectivity()).thenReturn(MutableStateFlow(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(false))
 
         underTest.state.map { it.error }.distinctUntilChanged()
             .test {
@@ -178,7 +178,7 @@ class AuthenticityCredentialsViewModelTest {
 
     @Test
     fun `test that error shown updates error`() = runTest {
-        whenever(monitorConnectivity()).thenReturn(MutableStateFlow(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(false))
 
         underTest.apply {
             state.map { it.error }.distinctUntilChanged()

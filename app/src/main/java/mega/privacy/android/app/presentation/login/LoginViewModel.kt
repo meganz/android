@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.getState
@@ -31,29 +32,28 @@ import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
 import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
-import mega.privacy.android.domain.usecase.CancelTransfers
 import mega.privacy.android.domain.usecase.ClearPsa
-import mega.privacy.android.domain.usecase.GetAccountCredentials
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
-import mega.privacy.android.domain.usecase.GetSession
-import mega.privacy.android.domain.usecase.HasCameraSyncEnabled
-import mega.privacy.android.domain.usecase.HasPreferences
-import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
-import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
-import mega.privacy.android.domain.usecase.QuerySignupLink
-import mega.privacy.android.domain.usecase.RootNodeExists
-import mega.privacy.android.domain.usecase.SaveAccountCredentials
-import mega.privacy.android.domain.usecase.login.DisableChatApi
-import mega.privacy.android.domain.usecase.login.FastLogin
-import mega.privacy.android.domain.usecase.login.FetchNodes
-import mega.privacy.android.domain.usecase.login.LocalLogout
-import mega.privacy.android.domain.usecase.login.Login
-import mega.privacy.android.domain.usecase.login.LoginWith2FA
-import mega.privacy.android.domain.usecase.login.MonitorAccountUpdate
-import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinish
-import mega.privacy.android.domain.usecase.setting.ResetChatSettings
-import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExist
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.login.DisableChatApiUseCase
+import mega.privacy.android.domain.usecase.login.FastLoginUseCase
+import mega.privacy.android.domain.usecase.login.FetchNodesUseCase
+import mega.privacy.android.domain.usecase.login.GetAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.login.GetSessionUseCase
+import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
+import mega.privacy.android.domain.usecase.login.LoginUseCase
+import mega.privacy.android.domain.usecase.login.LoginWith2FAUseCase
+import mega.privacy.android.domain.usecase.login.MonitorAccountUpdateUseCase
+import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
+import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
+import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
+import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
 import javax.inject.Inject
 
 /**
@@ -63,28 +63,28 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
-    private val monitorConnectivity: MonitorConnectivity,
-    private val rootNodeExistsUseCase: RootNodeExists,
-    private val getFeatureFlagValue: GetFeatureFlagValue,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
     private val loggingSettings: LegacyLoggingSettings,
-    private val resetChatSettings: ResetChatSettings,
-    private val saveAccountCredentials: SaveAccountCredentials,
-    private val getAccountCredentials: GetAccountCredentials,
-    private val getSession: GetSession,
-    private val hasPreferences: HasPreferences,
-    private val hasCameraSyncEnabled: HasCameraSyncEnabled,
-    private val isCameraSyncEnabled: IsCameraSyncEnabled,
-    private val querySignupLink: QuerySignupLink,
-    private val cancelTransfers: CancelTransfers,
-    private val localLogout: LocalLogout,
-    private val login: Login,
-    private val loginWith2FA: LoginWith2FA,
-    private val fastLogin: FastLogin,
-    private val fetchNodes: FetchNodes,
-    private val ongoingTransfersExist: OngoingTransfersExist,
-    private val monitorFetchNodesFinish: MonitorFetchNodesFinish,
-    private val monitorAccountUpdate: MonitorAccountUpdate,
+    private val resetChatSettingsUseCase: ResetChatSettingsUseCase,
+    private val saveAccountCredentialsUseCase: SaveAccountCredentialsUseCase,
+    private val getAccountCredentialsUseCase: GetAccountCredentialsUseCase,
+    private val getSessionUseCase: GetSessionUseCase,
+    private val hasPreferencesUseCase: HasPreferencesUseCase,
+    private val hasCameraSyncEnabledUseCase: HasCameraSyncEnabledUseCase,
+    private val isCameraSyncEnabledUseCase: IsCameraSyncEnabledUseCase,
+    private val querySignupLinkUseCase: QuerySignupLinkUseCase,
+    private val cancelTransfersUseCase: CancelTransfersUseCase,
+    private val localLogoutUseCase: LocalLogoutUseCase,
+    private val loginUseCase: LoginUseCase,
+    private val loginWith2FAUseCase: LoginWith2FAUseCase,
+    private val fastLoginUseCase: FastLoginUseCase,
+    private val fetchNodesUseCase: FetchNodesUseCase,
+    private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
+    private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
+    private val monitorAccountUpdateUseCase: MonitorAccountUpdateUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -93,13 +93,13 @@ class LoginViewModel @Inject constructor(
     /**
      * Get latest value of StorageState.
      */
-    fun getStorageState() = monitorStorageStateEvent.getState()
+    fun getStorageState() = monitorStorageStateEventUseCase.getState()
 
     /**
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     /**
      * Checks if root node exists.
@@ -114,7 +114,7 @@ class LoginViewModel @Inject constructor(
     fun setupInitialState() {
         viewModelScope.launch {
             merge(
-                flowOf(getSession()).map { session ->
+                flowOf(getSessionUseCase()).map { session ->
                     { state: LoginState ->
                         state.copy(
                             intentState = LoginIntentState.ReadyForInitialSetup,
@@ -127,13 +127,13 @@ class LoginViewModel @Inject constructor(
                         )
                     }
                 },
-                flowOf(hasPreferences()).map { hasPreferences ->
+                flowOf(hasPreferencesUseCase()).map { hasPreferences ->
                     { state: LoginState -> state.copy(hasPreferences = hasPreferences) }
                 },
-                flowOf(hasCameraSyncEnabled()).map { hasCameraSyncEnabled ->
+                flowOf(hasCameraSyncEnabledUseCase()).map { hasCameraSyncEnabled ->
                     { state: LoginState -> state.copy(hasCUSetting = hasCameraSyncEnabled) }
                 },
-                flowOf(isCameraSyncEnabled()).map { isCameraSyncEnabled ->
+                flowOf(isCameraSyncEnabledUseCase()).map { isCameraSyncEnabled ->
                     { state: LoginState -> state.copy(isCUSettingEnabled = isCameraSyncEnabled) }
                 }
             ).collect {
@@ -141,13 +141,13 @@ class LoginViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch { resetChatSettings() }
+        viewModelScope.launch { resetChatSettingsUseCase() }
         monitorFetchNodes()
         monitorAccountUpdates()
     }
 
     private fun monitorFetchNodes() = viewModelScope.launch {
-        monitorFetchNodesFinish().collectLatest {
+        monitorFetchNodesFinishUseCase().collectLatest {
             with(state.value.pendingAction) {
                 when (this) {
                     ACTION_FORCE_RELOAD_ACCOUNT -> {
@@ -163,7 +163,7 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun monitorAccountUpdates() = viewModelScope.launch {
-        monitorAccountUpdate().collectLatest {
+        monitorAccountUpdateUseCase().collectLatest {
             if (state.value.isPendingToShowFragment == LoginFragmentType.ConfirmEmail) {
                 _state.update { it.copy(isPendingToShowFragment = LoginFragmentType.Login) }
             }
@@ -222,8 +222,8 @@ class LoginViewModel @Inject constructor(
             )
         }
         viewModelScope.launch {
-            localLogout(
-                DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi },
+            localLogoutUseCase(
+                DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi },
                 ClearPsa { PsaManager::stopChecking }
             )
             _state.update { it.copy(isLocalLogoutInProgress = false) }
@@ -248,7 +248,7 @@ class LoginViewModel @Inject constructor(
      * Updates email and session values in state.
      */
     fun updateEmailAndSession(): Boolean = runBlocking {
-        getAccountCredentials()?.let { credentials ->
+        getAccountCredentialsUseCase()?.let { credentials ->
             val accountSession = state.value.accountSession
             _state.update {
                 it.copy(
@@ -298,7 +298,7 @@ class LoginViewModel @Inject constructor(
     fun saveCredentials() = viewModelScope.launch {
         _state.update {
             it.copy(
-                accountSession = saveAccountCredentials(),
+                accountSession = saveAccountCredentialsUseCase(),
                 isAlreadyLoggedIn = true
             )
         }
@@ -310,7 +310,7 @@ class LoginViewModel @Inject constructor(
      * @param activity Required [Activity]
      */
     fun checkAndUpdateKarereLogs(activity: Activity) = viewModelScope.launch {
-        if (!getFeatureFlagValue(AppFeatures.PermanentLogging)) {
+        if (!getFeatureFlagValueUseCase(AppFeatures.PermanentLogging)) {
             if (loggingSettings.areKarereLogsEnabled()) {
                 loggingSettings.setStatusLoggerKarere(activity, false)
             } else {
@@ -325,7 +325,7 @@ class LoginViewModel @Inject constructor(
      * @param activity Required [Activity]
      */
     fun checkAndUpdateSDKLogs(activity: Activity) = viewModelScope.launch {
-        if (!getFeatureFlagValue(AppFeatures.PermanentLogging)) {
+        if (!getFeatureFlagValueUseCase(AppFeatures.PermanentLogging)) {
             if (loggingSettings.areSDKLogsEnabled()) {
                 loggingSettings.setStatusLoggerSDK(activity, false)
             } else {
@@ -338,7 +338,7 @@ class LoginViewModel @Inject constructor(
      * Checks a signup link.
      */
     fun checkSignupLink(link: String) = viewModelScope.launch {
-        val result = runCatching { querySignupLink(link) }
+        val result = runCatching { querySignupLinkUseCase(link) }
         _state.update { state ->
             state.copy(
                 querySignupLinkResult = result,
@@ -350,7 +350,7 @@ class LoginViewModel @Inject constructor(
     /**
      * Cancels all transfers, uploads and downloads.
      */
-    fun launchCancelTransfers() = viewModelScope.launch { cancelTransfers() }
+    fun launchCancelTransfers() = viewModelScope.launch { cancelTransfersUseCase() }
 
     /**
      * Login.
@@ -367,10 +367,10 @@ class LoginViewModel @Inject constructor(
                 val password = typedPassword ?: this.password ?: return@launch
 
                 runCatching {
-                    login(
+                    loginUseCase(
                         email,
                         password,
-                        DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
+                        DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
                     ).collectLatest { status -> status.checkStatus(email, password) }
                 }.onFailure { exception ->
                     if (exception !is LoginException) return@onFailure
@@ -401,11 +401,11 @@ class LoginViewModel @Inject constructor(
 
         with(state.value) {
             runCatching {
-                loginWith2FA(
+                loginWith2FAUseCase(
                     accountSession?.email ?: return@launch,
                     password ?: return@launch,
                     pin2FA,
-                    DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
+                    DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
                 ).collectLatest { status ->
                     status.checkStatus()
                 }
@@ -434,10 +434,10 @@ class LoginViewModel @Inject constructor(
     fun performFastLogin(refreshChatUrl: Boolean) = viewModelScope.launch {
         MegaApplication.isLoggingIn = true
         runCatching {
-            fastLogin(
+            fastLoginUseCase(
                 state.value.accountSession?.session ?: return@launch,
                 refreshChatUrl,
-                DisableChatApi { MegaApplication.getInstance()::disableMegaChatApi }
+                DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
             ).collectLatest { status -> status.checkStatus() }
         }.onFailure { exception ->
             if (exception !is LoginException) return@onFailure
@@ -513,7 +513,7 @@ class LoginViewModel @Inject constructor(
         }
 
         runCatching {
-            fetchNodes().collectLatest { update ->
+            fetchNodesUseCase().collectLatest { update ->
                 if (update.progress?.floatValue == 1F) {
                     MegaApplication.isLoggingIn = false
                     _state.update {
@@ -546,11 +546,11 @@ class LoginViewModel @Inject constructor(
      * Checks if there are ongoing transfers.
      */
     fun checkOngoingTransfers() = viewModelScope.launch {
-        _state.update { state -> state.copy(ongoingTransfersExist = ongoingTransfersExist()) }
+        _state.update { state -> state.copy(ongoingTransfersExist = ongoingTransfersExistUseCase()) }
     }
 
     /**
-     * Sets to null ongoingTransfersExist in state.
+     * Sets to null ongoingTransfersExistUseCase in state.
      */
     fun resetOngoingTransfers() =
         _state.update { state -> state.copy(ongoingTransfersExist = null) }

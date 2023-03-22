@@ -43,7 +43,7 @@ import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastFailedTransfer
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaCancelToken
@@ -67,7 +67,7 @@ class TransfersManagement @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val activityLifecycleHandler: ActivityLifecycleHandler,
     private val dbH: DatabaseHandler,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val broadcastFailedTransfer: BroadcastFailedTransfer,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) {
@@ -265,7 +265,7 @@ class TransfersManagement @Inject constructor(
      * @return True if it is on storage over quota, false otherwise.
      */
     fun isStorageOverQuota(): Boolean =
-        monitorStorageStateEvent.getState() == StorageState.Red
+        monitorStorageStateEventUseCase.getState() == StorageState.Red
 
 
     /**

@@ -25,7 +25,7 @@ import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactData
 import mega.privacy.android.domain.usecase.GetVisibleContacts
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
@@ -63,7 +63,7 @@ class StartConversationViewModel @Inject constructor(
     private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val addNewContacts: AddNewContacts,
     private val requestLastGreen: RequestLastGreen,
-    monitorConnectivity: MonitorConnectivity,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -71,7 +71,7 @@ class StartConversationViewModel @Inject constructor(
     val state: StateFlow<StartConversationState> = _state
 
     private val isConnected =
-        monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+        monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     internal val searchExpandedKey = "SEARCH_EXPANDED"
     internal val typedSearchKey = "TYPED_SEARCH"

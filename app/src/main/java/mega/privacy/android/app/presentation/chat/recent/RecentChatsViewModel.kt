@@ -12,7 +12,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetLastContactPermissionDismissedTime
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetLastContactPermissionDismissedTime
 import javax.inject.Inject
 
@@ -30,7 +30,7 @@ class RecentChatsViewModel @Inject constructor(
     private val getLastContactPermissionDismissedTime: GetLastContactPermissionDismissedTime,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val timeWrapper: TimeWrapper,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(RecentChatsState())
 
@@ -43,7 +43,7 @@ class RecentChatsViewModel @Inject constructor(
      * Is network connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     init {
         viewModelScope.launch(ioDispatcher) {

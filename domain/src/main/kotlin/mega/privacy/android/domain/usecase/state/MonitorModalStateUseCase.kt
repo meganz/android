@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.state.ModalState
 import mega.privacy.android.domain.entity.verification.UnVerified
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
@@ -17,13 +17,13 @@ import javax.inject.Inject
  * Monitor modal state use case
  *
  * @property monitorVerificationStatus
- * @property monitorStorageStateEvent
+ * @property monitorStorageStateEventUseCase
  * @property isFirstLaunchUseCase
  * @property requireTwoFactorAuthenticationUseCase
  */
 class MonitorModalStateUseCase @Inject constructor(
     private val monitorVerificationStatus: MonitorVerificationStatus,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val requireTwoFactorAuthenticationUseCase: RequireTwoFactorAuthenticationUseCase,
 ) {
@@ -48,7 +48,7 @@ class MonitorModalStateUseCase @Inject constructor(
         return combine(
             monitorVerificationStatus()
                 .map { it is UnVerified && it.canRequestOptInVerification },
-            monitorStorageStateEvent().map { it.storageState },
+            monitorStorageStateEventUseCase().map { it.storageState },
             firsLoginState,
             askPermissionState,
             newAccountState,

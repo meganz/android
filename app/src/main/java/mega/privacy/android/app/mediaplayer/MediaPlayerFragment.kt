@@ -55,7 +55,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIS
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.isVisible
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.defaultSharedPreferences
 import timber.log.Timber
@@ -88,10 +88,10 @@ class MediaPlayerFragment : Fragment() {
     private var currentMediaPlayerMediaId: String? = null
 
     /**
-     * GetFeatureFlagValue injection
+     * GetFeatureFlagValueUseCase injection
      */
     @Inject
-    lateinit var getFeatureFlagValue: GetFeatureFlagValue
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val connection = object : ServiceConnection {
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -374,7 +374,7 @@ class MediaPlayerFragment : Fragment() {
                     viewLifecycleOwner.lifecycleScope.launch {
                         setupSubtitleButton(
                             // Add feature flag, and will be removed after the feature is finished.
-                            isShow = getFeatureFlagValue(feature = AppFeatures.AddSubtitle),
+                            isShow = getFeatureFlagValueUseCase(feature = AppFeatures.AddSubtitle),
                             viewModel.subtitleShownState != SUBTITLE_STATUS_HIDDEN
                         ) {
                             when (viewModel.subtitleShownState) {

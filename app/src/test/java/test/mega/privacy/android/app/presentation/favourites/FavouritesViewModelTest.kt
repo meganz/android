@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
 import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -86,7 +86,7 @@ class FavouritesViewModelTest {
 
     private val connectedFlow = MutableStateFlow(false)
 
-    private val monitorConnectivity = mock<MonitorConnectivity> {
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
         on { invoke() }.thenReturn(connectedFlow)
     }
 
@@ -103,7 +103,7 @@ class FavouritesViewModelTest {
             fetchNode = fetchNodeWrapper,
             mapOrder = mapFavouriteSortOrder,
             headerMapper = ::toHeader,
-            monitorConnectivity = monitorConnectivity,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             isAvailableOffline = isAvailableOffline
         )
     }

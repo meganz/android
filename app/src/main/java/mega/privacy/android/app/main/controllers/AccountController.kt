@@ -73,7 +73,7 @@ import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.PushesRepository
-import mega.privacy.android.domain.usecase.login.BroadcastLogout
+import mega.privacy.android.domain.usecase.login.BroadcastLogoutUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaError
@@ -118,7 +118,7 @@ class AccountController @Inject constructor(
 
         fun billingRepository(): BillingRepository
 
-        fun broadcastLogout(): BroadcastLogout
+        fun broadcastLogout(): BroadcastLogoutUseCase
     }
 
     fun existsAvatar(): Boolean {
@@ -326,9 +326,9 @@ class AccountController @Inject constructor(
         }
 
         @Deprecated(
-            message = "It has been deprecated in favour of LocalLogoutApp",
+            message = "It has been deprecated in favour of LocalLogoutAppUseCase",
             replaceWith = ReplaceWith(
-                expression = "mega.privacy.android.domain.usecase.LocalLogoutApp"
+                expression = "mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase"
             )
         )
         @JvmStatic

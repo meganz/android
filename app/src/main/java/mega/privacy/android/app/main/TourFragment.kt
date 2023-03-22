@@ -38,7 +38,7 @@ import mega.privacy.android.app.meeting.fragments.PasteMeetingLinkGuestDialogFra
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.account.SetSecureFlag
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
@@ -57,7 +57,7 @@ class TourFragment : Fragment() {
     private lateinit var joinMeetingAsGuestLauncher: ActivityResultLauncher<String>
 
     @Inject
-    lateinit var getFeatureFlagValue: GetFeatureFlagValue
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     @Inject
     lateinit var setSecureFlag: SetSecureFlag
@@ -154,7 +154,7 @@ class TourFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            setSecureFlag(getFeatureFlagValue(AppFeatures.SetSecureFlag))
+            setSecureFlag(getFeatureFlagValueUseCase(AppFeatures.SetSecureFlag))
         }
     }
 

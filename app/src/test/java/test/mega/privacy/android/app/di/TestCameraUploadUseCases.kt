@@ -54,9 +54,9 @@ import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.HasCameraSyncEnabled
+import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.HasCredentials
-import mega.privacy.android.domain.usecase.HasPreferences
+import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
@@ -134,10 +134,10 @@ object TestCameraUploadUseCases {
     fun provideHasCredentials() = mock<HasCredentials>()
 
     @Provides
-    fun provideHasPreferences() = mock<HasPreferences>()
+    fun provideHasPreferencesUseCase() = mock<HasPreferencesUseCase>()
 
     @Provides
-    fun provideHasCameraSyncEnabled() = mock<HasCameraSyncEnabled>()
+    fun provideHasCameraSyncEnabledUseCase() = mock<HasCameraSyncEnabledUseCase>()
 
     @Provides
     fun provideIsCameraUploadSyncEnabled() = mock<IsCameraUploadSyncEnabled>()

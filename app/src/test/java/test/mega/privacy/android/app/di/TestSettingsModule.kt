@@ -22,7 +22,7 @@ import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetSupportEmail
-import mega.privacy.android.domain.usecase.IsCameraSyncEnabled
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
@@ -99,7 +99,7 @@ object TestSettingsModule {
         mock { on { invoke() }.thenReturn(flowOf(true)) }
 
     @Provides
-    fun provideIsCameraSyncEnabled(): IsCameraSyncEnabled = mock()
+    fun provideIsCameraSyncEnabledUseCase(): IsCameraSyncEnabledUseCase = mock()
 
     @Provides
     fun provideIsMultiFactorAuthAvailable(): IsMultiFactorAuthAvailable =

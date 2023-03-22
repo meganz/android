@@ -28,7 +28,7 @@ import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
@@ -56,7 +56,7 @@ import javax.inject.Inject
  * @property getUploadOption Retrieves the upload option of Camera Uploads
  * @property getUploadVideoQuality Retrieves the Video Quality of Videos to be uploaded
  * @property isCameraUploadByWifi Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
- * @property monitorConnectivity Monitor the device online status
+ * @property monitorConnectivityUseCase Monitor the device online status
  * @property resetCameraUploadTimeStamps Reset the Primary and Secondary Timestamps
  * @property resetMediaUploadTimeStamps Reset the Secondary Timestamps
  * @property restorePrimaryTimestamps Restore the Primary Timestamps
@@ -80,7 +80,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val getUploadOption: GetUploadOption,
     private val getUploadVideoQuality: GetUploadVideoQuality,
     private val isCameraUploadByWifi: IsCameraUploadByWifi,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
@@ -106,13 +106,13 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Monitor connectivity event
      */
     val monitorConnectivityEvent =
-        monitorConnectivity().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     init {
         initializeSettings()

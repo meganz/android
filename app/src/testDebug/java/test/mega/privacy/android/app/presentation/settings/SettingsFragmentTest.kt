@@ -37,6 +37,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserId
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Before
@@ -44,10 +45,10 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.RecyclerViewAssertions
 import test.mega.privacy.android.app.TEST_USER_ACCOUNT
-import test.mega.privacy.android.app.di.TestInitialiseUseCases
 import test.mega.privacy.android.app.di.TestSettingsModule
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 
@@ -58,6 +59,8 @@ class SettingsFragmentTest {
 
     @get:Rule(order = 0)
     var hiltRule = HiltAndroidRule(this)
+
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
 
     private val idlingResource = CountingIdlingResource("IdleCounter")
     private val hide = MutableStateFlow(false)
@@ -181,7 +184,7 @@ class SettingsFragmentTest {
     @Test
     fun test_that_activated_delete_has_100_percent_alpha() {
         whenever(TestSettingsModule.canDeleteAccount(TEST_USER_ACCOUNT)).thenReturn(true)
-        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(MutableStateFlow(true))
+        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(true))
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
@@ -198,7 +201,7 @@ class SettingsFragmentTest {
     @Test
     fun test_that_deactivated_delete_has_50_percent_alpha() {
         whenever(TestSettingsModule.canDeleteAccount(TEST_USER_ACCOUNT)).thenReturn(true)
-        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(MutableStateFlow(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(false))
         launchFragmentInHiltContainer<SettingsFragment>()
 
         onPreferences()
@@ -237,7 +240,7 @@ class SettingsFragmentTest {
     fun test_that_correct_fields_are_disable_when_offline() {
         whenever(TestSettingsModule.canDeleteAccount(TEST_USER_ACCOUNT)).thenReturn(true)
         whenever(TestSettingsModule.isMultiFactorAuthAvailable()).thenReturn(true)
-        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(MutableStateFlow(false))
+        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(false))
         launchFragmentInHiltContainer<SettingsFragment>()
 
 

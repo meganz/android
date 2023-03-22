@@ -13,8 +13,6 @@ import mega.privacy.android.data.qualifier.FeatureFlagPriorityKey
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValuePriority
 import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
-import mega.privacy.android.domain.usecase.DefaultGetFeatureFlagValue
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 
 /**
  * Feature flag module
@@ -23,14 +21,6 @@ import mega.privacy.android.domain.usecase.GetFeatureFlagValue
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class FeatureFlagModule {
-
-    /**
-     * Bind get feature flag value
-     *
-     * @param useCase
-     */
-    @Binds
-    abstract fun bindGetFeatureFlagValue(useCase: DefaultGetFeatureFlagValue): GetFeatureFlagValue
 
     /**
      * Provide feature flag value provider

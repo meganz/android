@@ -16,7 +16,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetMyCredentials
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import javax.inject.Inject
@@ -38,14 +38,14 @@ class AuthenticityCredentialsViewModel @Inject constructor(
     private val getMyCredentials: GetMyCredentials,
     private val verifyCredentials: VerifyCredentials,
     private val resetCredentials: ResetCredentials,
-    monitorConnectivity: MonitorConnectivity,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AuthenticityCredentialsState())
     val state: StateFlow<AuthenticityCredentialsState> = _state
 
     private val isConnected =
-        monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+        monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     init {
         viewModelScope.launch {

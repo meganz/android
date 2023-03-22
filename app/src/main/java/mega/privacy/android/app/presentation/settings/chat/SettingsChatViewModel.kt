@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.settings.chat.model.SettingsChatState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatImageQuality
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import javax.inject.Inject
 
 /**
@@ -24,7 +24,7 @@ import javax.inject.Inject
 class SettingsChatViewModel @Inject constructor(
     private val getChatImageQuality: GetChatImageQuality,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsChatState())
@@ -34,13 +34,13 @@ class SettingsChatViewModel @Inject constructor(
      * Monitor connectivity event
      */
     val monitorConnectivityEvent =
-        monitorConnectivity().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     init {
         viewModelScope.launch(ioDispatcher) {

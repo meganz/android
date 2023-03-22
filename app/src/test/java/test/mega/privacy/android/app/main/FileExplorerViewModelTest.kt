@@ -21,7 +21,7 @@ class FileExplorerViewModelTest {
     fun setUp() {
         underTest = FileExplorerViewModel(
             ioDispatcher = StandardTestDispatcher(),
-            monitorStorageStateEvent = mock(),
+            monitorStorageStateEventUseCase = mock(),
             getLatestTargetPath = getLatestTargetPath
         )
     }

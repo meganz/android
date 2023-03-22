@@ -340,4 +340,10 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getInvalidHandle(): Long {
         return megaApiGateway.getInvalidHandle()
     }
+
+    override suspend fun getRootNode() = withContext(ioDispatcher) {
+        megaApiGateway.getRootNode()?.let {
+            convertToUnTypedNode(it)
+        }
+    }
 }

@@ -13,7 +13,7 @@ import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
 import org.junit.Before
@@ -37,7 +37,7 @@ class MonitorModalStateUseCaseTest {
         on { storageState }.thenReturn(StorageState.Unknown)
     }
 
-    private val monitorStorageState = mock<MonitorStorageStateEvent> {
+    private val monitorStorageState = mock<MonitorStorageStateEventUseCase> {
         onBlocking { invoke() }.thenReturn(
             MutableStateFlow(storageStateEvent)
         )
@@ -58,7 +58,7 @@ class MonitorModalStateUseCaseTest {
     fun setUp() {
         underTest = MonitorModalStateUseCase(
             monitorVerificationStatus = { monitorVerificationStatus },
-            monitorStorageStateEvent = monitorStorageState,
+            monitorStorageStateEventUseCase = monitorStorageState,
             isFirstLaunchUseCase = isFirstLaunchUseCase,
             requireTwoFactorAuthenticationUseCase = requiresTwoFactorAuthentication,
         )

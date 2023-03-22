@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.filesettings.FilePreferencesViewModel
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderVersionInfo
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
@@ -30,7 +30,7 @@ internal class FilePreferencesViewModelTest {
     private lateinit var underTest: FilePreferencesViewModel
 
     private val getFolderVersionInfo: GetFolderVersionInfo = mock()
-    private val monitorConnectivity: MonitorConnectivity = mock()
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
     private val getFileVersionsOption: GetFileVersionsOption = mock {
         on { runBlocking { invoke(any()) } }.thenReturn(false)
     }
@@ -54,7 +54,7 @@ internal class FilePreferencesViewModelTest {
     private fun initViewModel() {
         underTest = FilePreferencesViewModel(
             getFolderVersionInfo,
-            monitorConnectivity,
+            monitorConnectivityUseCase,
             getFileVersionsOption,
             monitorUserUpdates,
             enableFileVersionsOption

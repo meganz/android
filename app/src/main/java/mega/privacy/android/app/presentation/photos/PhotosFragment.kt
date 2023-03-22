@@ -104,7 +104,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
@@ -146,7 +146,7 @@ class PhotosFragment : Fragment() {
     lateinit var albumsLazyGridState: LazyGridState
 
     @Inject
-    lateinit var getFeatureFlag: GetFeatureFlagValue
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -167,7 +167,7 @@ class PhotosFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
                     val usePhotosCompose by produceState(initialValue = false) {
-                        value = getFeatureFlag(AppFeatures.PhotosCompose)
+                        value = getFeatureFlagUseCase(AppFeatures.PhotosCompose)
                     }
                     if (usePhotosCompose) {
                         val animatedNavController = rememberAnimatedNavController()
@@ -483,7 +483,7 @@ class PhotosFragment : Fragment() {
             deleteAlbums = ::deleteAlbums,
             lazyGridState = albumsLazyGridState,
         ) {
-            getFeatureFlag(AppFeatures.UserAlbums)
+            getFeatureFlagUseCase(AppFeatures.UserAlbums)
         }
 
     @Composable

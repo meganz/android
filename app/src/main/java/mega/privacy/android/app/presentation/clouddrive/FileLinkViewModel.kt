@@ -2,7 +2,7 @@ package mega.privacy.android.app.presentation.clouddrive
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import javax.inject.Inject
 
 /**
@@ -10,11 +10,11 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class FileLinkViewModel @Inject constructor(
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : ViewModel() {
     /**
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 }

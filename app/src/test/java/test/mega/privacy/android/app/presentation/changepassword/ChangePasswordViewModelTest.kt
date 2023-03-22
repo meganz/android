@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.ChangePassword
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetPasswordStrength
 import mega.privacy.android.domain.usecase.IsCurrentPassword
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetPassword
 import org.junit.After
 import org.junit.Before
@@ -37,7 +37,7 @@ import kotlin.random.Random
 internal class ChangePasswordViewModelTest {
     private lateinit var underTest: ChangePasswordViewModel
     private val testFlow = MutableStateFlow(false)
-    private val monitorConnectivity = mock<MonitorConnectivity> {
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
         onBlocking { invoke() }.thenReturn(testFlow)
     }
     private val savedStateHandle = SavedStateHandle()
@@ -54,7 +54,7 @@ internal class ChangePasswordViewModelTest {
 
         underTest = ChangePasswordViewModel(
             savedStateHandle = savedStateHandle,
-            monitorConnectivity = monitorConnectivity,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             isCurrentPassword = isCurrentPassword,
             getPasswordStrength = getPasswordStrength,
             changePassword = changePassword,

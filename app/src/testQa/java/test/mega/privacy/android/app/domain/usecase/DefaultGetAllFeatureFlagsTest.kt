@@ -11,7 +11,7 @@ import mega.privacy.android.app.domain.repository.QARepository
 import mega.privacy.android.app.domain.usecase.DefaultGetAllFeatureFlags
 import mega.privacy.android.app.domain.usecase.GetAllFeatureFlags
 import mega.privacy.android.domain.entity.Feature
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -22,13 +22,14 @@ import org.mockito.kotlin.whenever
 class DefaultGetAllFeatureFlagsTest {
 
     lateinit var underTest: GetAllFeatureFlags
-    private val getFeatureFlagValue = mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(false)}
+    private val getFeatureFlagValueUseCase =
+        mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(false) }
     private val qaRepository = mock<QARepository>()
 
     @Before
     fun setUp() {
         underTest = DefaultGetAllFeatureFlags(
-            getFeatureFlagValue = getFeatureFlagValue,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             qaRepository = qaRepository
         )
     }
@@ -67,7 +68,7 @@ class DefaultGetAllFeatureFlagsTest {
         val feature = mock<Feature> { on { name }.thenReturn(featureName) }
         val expectedValue = true
         whenever(qaRepository.getAllFeatures()).thenReturn(listOf(feature))
-        whenever(getFeatureFlagValue(feature)).thenReturn(expectedValue)
+        whenever(getFeatureFlagValueUseCase(feature)).thenReturn(expectedValue)
         whenever(qaRepository.monitorLocalFeatureFlags()).thenReturn(flowOf(emptyMap()))
 
         underTest().test {
@@ -105,10 +106,16 @@ class DefaultGetAllFeatureFlagsTest {
             defaultValueFeature,
         )
         whenever(qaRepository.getAllFeatures()).thenReturn(features)
-        whenever(getFeatureFlagValue(defaultValueFeature)).thenReturn(
-            expectedValue)
-        whenever(qaRepository.monitorLocalFeatureFlags()).thenReturn(flowOf(mapOf(
-            localValueFeatureName to expectedValue)))
+        whenever(getFeatureFlagValueUseCase(defaultValueFeature)).thenReturn(
+            expectedValue
+        )
+        whenever(qaRepository.monitorLocalFeatureFlags()).thenReturn(
+            flowOf(
+                mapOf(
+                    localValueFeatureName to expectedValue
+                )
+            )
+        )
 
         underTest().test {
             val map = awaitItem()
@@ -129,7 +136,7 @@ class DefaultGetAllFeatureFlagsTest {
 
         val localFlow = MutableStateFlow<Map<String, Boolean>>(emptyMap())
         whenever(qaRepository.getAllFeatures()).thenReturn(listOf(feature))
-        whenever(getFeatureFlagValue(feature)).thenReturn(expectedValue)
+        whenever(getFeatureFlagValueUseCase(feature)).thenReturn(expectedValue)
         whenever(qaRepository.monitorLocalFeatureFlags()).thenReturn(localFlow)
 
         underTest().test {

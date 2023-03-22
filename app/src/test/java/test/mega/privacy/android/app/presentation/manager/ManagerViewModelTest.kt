@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -41,16 +42,17 @@ import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
-import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
+import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -86,7 +88,7 @@ class ManagerViewModelTest {
         )
     )
     private val getInboxNode = mock<GetInboxNode> { onBlocking { invoke() }.thenReturn(null) }
-    private val monitorStorageState = mock<MonitorStorageStateEvent> {
+    private val monitorStorageState = mock<MonitorStorageStateEventUseCase> {
         onBlocking { invoke() }.thenReturn(
             MutableStateFlow(
                 StorageStateEvent(
@@ -109,9 +111,9 @@ class ManagerViewModelTest {
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder =
         mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC) }
-    private val monitorConnectivity = mock<MonitorConnectivity>()
-    private val getFeatureFlagValue =
-        mock<GetFeatureFlagValue> { onBlocking { invoke(any()) }.thenReturn(false) }
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val getFeatureFlagValueUseCase =
+        mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(false) }
     private val shareDataList = listOf(
         ShareData(
             user = "user",
@@ -147,7 +149,14 @@ class ManagerViewModelTest {
         }.thenReturn(shareDataList)
     }
     private val initialFinishActivityValue = false
-    private val monitorFinishActivity = MutableStateFlow(initialFinishActivityValue)
+    private val monitorFinishActivity = mock<MonitorFinishActivityUseCase> {
+        onBlocking { invoke() }.thenReturn(
+            flowOf(
+                initialFinishActivityValue,
+                !initialFinishActivityValue
+            )
+        )
+    }
     private val monitorVerificationStatus = MutableStateFlow<VerificationStatus>(
         UnVerified(
             canRequestUnblockSms = false,
@@ -176,22 +185,22 @@ class ManagerViewModelTest {
             sendStatisticsMediaDiscovery = sendStatisticsMediaDiscovery,
             savedStateHandle = savedStateHandle,
             getInboxNode = getInboxNode,
-            monitorStorageStateEvent = monitorStorageState,
+            monitorStorageStateEventUseCase = monitorStorageState,
             monitorViewType = monitorViewType,
             getPrimarySyncHandle = getPrimarySyncHandle,
             getSecondarySyncHandle = getSecondarySyncHandle,
             checkCameraUpload = checkCameraUpload,
             getCloudSortOrder = getCloudSortOrder,
-            monitorConnectivity = monitorConnectivity,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             broadcastUploadPauseState = mock(),
             getExtendedAccountDetail = mock(),
             getPricing = mock(),
             getFullAccountInfo = mock(),
             getActiveSubscription = mock(),
-            getFeatureFlagValue = getFeatureFlagValue,
+            getFeatureFlagValueUseCase = getFeatureFlagValueUseCase,
             getUnverifiedIncomingShares = getUnverifiedIncomingShares,
             getUnverifiedOutgoingShares = getUnverifiedOutgoingShares,
-            monitorFinishActivity = { monitorFinishActivity },
+            monitorFinishActivityUseCase = monitorFinishActivity,
             monitorVerificationStatus = { monitorVerificationStatus },
             requireTwoFactorAuthenticationUseCase = requireTwoFactorAuthenticationUseCase,
             setLatestTargetPath = setLatestTargetPath,
@@ -398,8 +407,9 @@ class ManagerViewModelTest {
     fun `test that monitor finish activity events are returned`() =
         runTest {
             underTest.monitorFinishActivityEvent.distinctUntilChanged().test {
+                whenever(monitorFinishActivity()).thenReturn(flowOf(!initialFinishActivityValue))
                 assertThat(awaitItem()).isEqualTo(initialFinishActivityValue)
-                monitorFinishActivity.emit(!initialFinishActivityValue)
+                monitorFinishActivity()
                 assertThat(awaitItem()).isEqualTo(!initialFinishActivityValue)
                 cancelAndIgnoreRemainingEvents()
             }

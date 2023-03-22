@@ -78,7 +78,7 @@ import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRe
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -91,7 +91,7 @@ class SettingsFragment :
     lateinit var additionalPreferences: Set<@JvmSuppressWildcards PreferenceResource>
 
     @Inject
-    lateinit var getFeatureFlag: GetFeatureFlagValue
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     private var numberOfClicksKarere = 0
     private var numberOfClicksAppVersion = 0
@@ -416,7 +416,7 @@ class SettingsFragment :
 
     private fun toggleLogger() {
         viewLifecycleOwner.lifecycleScope.launch {
-            if (!getFeatureFlag(AppFeatures.PermanentLogging)) {
+            if (!getFeatureFlagUseCase(AppFeatures.PermanentLogging)) {
                 if (viewModel.disableLogger()) {
                     view?.let {
                         Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT)
@@ -438,7 +438,7 @@ class SettingsFragment :
 
     private fun toggleChatLogger() {
         viewLifecycleOwner.lifecycleScope.launch {
-            if (!getFeatureFlag(AppFeatures.PermanentLogging)) {
+            if (!getFeatureFlagUseCase(AppFeatures.PermanentLogging)) {
                 if (viewModel.disableChatLogger()) {
                     view?.let {
                         Snackbar.make(it, R.string.settings_disable_logs, Snackbar.LENGTH_SHORT)

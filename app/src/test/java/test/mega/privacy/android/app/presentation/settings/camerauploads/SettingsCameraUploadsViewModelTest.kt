@@ -99,7 +99,7 @@ class SettingsCameraUploadsViewModelTest {
             getUploadOption = getUploadOption,
             getUploadVideoQuality = getUploadVideoQuality,
             isCameraUploadByWifi = isCameraUploadByWifi,
-            monitorConnectivity = mock(),
+            monitorConnectivityUseCase = mock(),
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
             resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             restorePrimaryTimestamps = restorePrimaryTimestamps,

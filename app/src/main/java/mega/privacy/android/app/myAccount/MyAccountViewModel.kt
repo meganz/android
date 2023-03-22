@@ -80,7 +80,7 @@ import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
@@ -138,7 +138,7 @@ import javax.inject.Inject
  * @property updateCurrentUserName
  * @property getCurrentUserEmail
  * @property monitorVerificationStatus
- * @property getFeatureFlagValue
+ * @property getFeatureFlagValueUseCase
  */
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
@@ -172,7 +172,7 @@ class MyAccountViewModel @Inject constructor(
     private val updateCurrentUserName: UpdateCurrentUserName,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorVerificationStatus: MonitorVerificationStatus,
-    private val getFeatureFlagValue: GetFeatureFlagValue,
+    private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -227,7 +227,7 @@ class MyAccountViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch {
-            if (getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)) {
+            if (getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)) {
                 monitorVerificationStatus().collect { status ->
                     _state.update {
                         it.copy(
@@ -1053,7 +1053,7 @@ class MyAccountViewModel @Inject constructor(
      */
     fun resetPhoneNumber(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
         resetJob = viewModelScope.launch {
-            if (getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)) {
+            if (getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)) {
                 runCatching { resetSMSVerifiedPhoneNumber() }
                     .onSuccess {
                         getUserData(isModify, snackbarShower, action)

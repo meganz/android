@@ -32,7 +32,7 @@ import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
 import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import nz.mega.sdk.MegaApiAndroid
 import java.io.File
 import java.util.concurrent.Callable
@@ -48,7 +48,7 @@ class TrackInfoViewModel @Inject constructor(
     private val dbHandler: LegacyDatabaseHandler,
     @ApplicationContext private val context: Context,
     private val offlineThumbnailFileWrapper: GetOfflineThumbnailFileWrapper,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
 ) : BaseRxViewModel() {
     private val _metadata = MutableLiveData<Pair<Metadata, String>>()
     val metadata: LiveData<Pair<Metadata, String>> = _metadata
@@ -254,5 +254,5 @@ class TrackInfoViewModel @Inject constructor(
     /**
      * Get latest value of [StorageState]
      */
-    fun getStorageState() = monitorStorageStateEvent.getState()
+    fun getStorageState() = monitorStorageStateEventUseCase.getState()
 }

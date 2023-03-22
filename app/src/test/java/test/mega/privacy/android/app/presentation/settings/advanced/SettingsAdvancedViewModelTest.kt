@@ -16,8 +16,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedViewModel
 import mega.privacy.android.domain.usecase.IsUseHttpsEnabled
-import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetUseHttps
 import org.junit.After
 import org.junit.Before
@@ -32,9 +32,9 @@ class SettingsAdvancedViewModelTest {
 
     private val isUseHttpsEnabled = mock<IsUseHttpsEnabled>()
 
-    private val rootNodeExists = mock<RootNodeExists>()
+    private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
 
-    private val monitorConnectivity = mock<MonitorConnectivity> {
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
         on { invoke() }.thenReturn(
             MutableStateFlow(true)
         )
@@ -49,8 +49,8 @@ class SettingsAdvancedViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
         underTest = SettingsAdvancedViewModel(
             isUseHttpsEnabled = isUseHttpsEnabled,
-            rootNodeExists = rootNodeExists,
-            monitorConnectivity = monitorConnectivity,
+            rootNodeExistsUseCase = rootNodeExistsUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             setUseHttps = setUseHttps,
             ioDispatcher = StandardTestDispatcher()
         )
@@ -88,8 +88,8 @@ class SettingsAdvancedViewModelTest {
     @Test
     fun `test that checkbox is enabled if network connected and root node exists`() = runTest {
         whenever(isUseHttpsEnabled()).thenReturn(true)
-        whenever(monitorConnectivity()).thenReturn(MutableStateFlow(true))
-        whenever(rootNodeExists()).thenReturn(true)
+        whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(true))
+        whenever(rootNodeExistsUseCase()).thenReturn(true)
 
         underTest.state.map { it.useHttpsEnabled }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
@@ -101,8 +101,8 @@ class SettingsAdvancedViewModelTest {
     fun `test that checkbox becomes not enabled if network is lost`() = runTest {
         val monitorConnectivityStateFlow = MutableStateFlow(true)
         whenever(isUseHttpsEnabled()).thenReturn(true)
-        whenever(monitorConnectivity()).thenReturn(monitorConnectivityStateFlow)
-        whenever(rootNodeExists()).thenReturn(true)
+        whenever(monitorConnectivityUseCase()).thenReturn(monitorConnectivityStateFlow)
+        whenever(rootNodeExistsUseCase()).thenReturn(true)
         underTest.state.map { it.useHttpsEnabled }.distinctUntilChanged().test {
             assertThat(awaitItem()).isFalse()
             assertThat(awaitItem()).isTrue()

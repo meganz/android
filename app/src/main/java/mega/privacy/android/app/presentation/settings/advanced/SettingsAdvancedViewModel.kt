@@ -12,12 +12,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.app.presentation.settings.advanced.model.SettingsAdvancedState
+import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.IsUseHttpsEnabled
-import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.SetUseHttps
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import javax.inject.Inject
 
 /**
@@ -25,8 +25,8 @@ import javax.inject.Inject
  *
  *
  * @param isUseHttpsEnabled use case to check current status of the preference
- * @param rootNodeExists use case to determine if the root node exists
- * @param monitorConnectivity use case to monitor connectivity
+ * @param rootNodeExistsUseCase use case to determine if the root node exists
+ * @param monitorConnectivityUseCase use case to monitor connectivity
  * @param ioDispatcher coroutine dispatcher for io code
  *
  * @property setUseHttps use case that is called when the preference is updated
@@ -37,8 +37,8 @@ import javax.inject.Inject
 class SettingsAdvancedViewModel @Inject constructor(
     private val setUseHttps: SetUseHttps,
     isUseHttpsEnabled: IsUseHttpsEnabled,
-    rootNodeExists: RootNodeExists,
-    monitorConnectivity: MonitorConnectivity,
+    rootNodeExistsUseCase: RootNodeExistsUseCase,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     @IoDispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -49,7 +49,7 @@ class SettingsAdvancedViewModel @Inject constructor(
         viewModelScope.launch(ioDispatcher) {
             merge(
                 checkPreferenceCheckedState(isUseHttpsEnabled),
-                checkPreferenceEnabledState(monitorConnectivity, rootNodeExists),
+                checkPreferenceEnabledState(monitorConnectivityUseCase, rootNodeExistsUseCase),
             ).collect {
                 _state.update(it)
             }
@@ -57,11 +57,11 @@ class SettingsAdvancedViewModel @Inject constructor(
     }
 
     private suspend fun checkPreferenceEnabledState(
-        monitorConnectivity: MonitorConnectivity,
-        rootNodeExists: RootNodeExists,
+        monitorConnectivityUseCase: MonitorConnectivityUseCase,
+        rootNodeExistsUseCase: RootNodeExistsUseCase,
     ) = combine(
-        monitorConnectivity(),
-        flowOf(rootNodeExists())
+        monitorConnectivityUseCase(),
+        flowOf(rootNodeExistsUseCase())
     ) { online, exists ->
         online && exists
     }.map { enabled ->

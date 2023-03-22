@@ -29,7 +29,7 @@ import mega.privacy.android.app.utils.CallUtil.openMeetingWithAudioOrVideo
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -54,7 +54,7 @@ import javax.inject.Inject
 @HiltViewModel
 class GroupChatInfoViewModel @Inject constructor(
     private val setOpenInvite: SetOpenInvite,
-    monitorConnectivity: MonitorConnectivity,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val startChatCall: StartChatCall,
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val passcodeManagement: PasscodeManagement,
@@ -76,7 +76,7 @@ class GroupChatInfoViewModel @Inject constructor(
     val state: StateFlow<GroupInfoState> = _state
 
     private val isConnected =
-        monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+        monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val openInviteChangeObserver =
         Observer<MegaChatRoom> { chat ->

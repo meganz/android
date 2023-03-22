@@ -26,7 +26,7 @@ import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactData
 import mega.privacy.android.domain.usecase.GetVisibleContacts
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
@@ -87,7 +87,7 @@ class StartConversationViewModelTest {
         onBlocking { invoke(mock()) }.thenReturn(mock())
     }
 
-    private val monitorConnectivity = mock<MonitorConnectivity> {
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
         on { invoke() }.thenReturn(MutableStateFlow(true))
     }
 
@@ -137,7 +137,7 @@ class StartConversationViewModelTest {
             monitorOnlineStatusUpdates = monitorOnlineStatusUpdates,
             monitorContactRequestUpdates = monitorContactRequestUpdates,
             addNewContacts = addNewContacts,
-            monitorConnectivity = monitorConnectivity,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
             savedStateHandle = savedStateHandle,
             requestLastGreen = mock()
         )
@@ -285,7 +285,7 @@ class StartConversationViewModelTest {
     @Test
     fun `test that connection error is returned if attempting to start a conversation and no internet available`() =
         runTest {
-            whenever(monitorConnectivity()).thenReturn(MutableStateFlow(true))
+            whenever(monitorConnectivityUseCase()).thenReturn(MutableStateFlow(true))
 
             underTest.state.map { it.error }.distinctUntilChanged()
                 .test {

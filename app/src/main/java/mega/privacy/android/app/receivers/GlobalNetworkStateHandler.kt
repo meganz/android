@@ -9,7 +9,7 @@ import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiAndroid
 import timber.log.Timber
@@ -23,11 +23,11 @@ class GlobalNetworkStateHandler @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val application: Application,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) {
     init {
         applicationScope.launch {
-            monitorConnectivity().collectLatest { isConnected ->
+            monitorConnectivityUseCase().collectLatest { isConnected ->
                 if (isConnected) {
                     Timber.d("Network state: CONNECTED")
                     val previousIP = (application as MegaApplication).localIpAddress

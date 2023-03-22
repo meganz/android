@@ -17,7 +17,7 @@ import mega.privacy.android.app.usecase.exception.BreakTransfersProcessingExcept
 import mega.privacy.android.app.usecase.exception.OverDiskQuotaPaywallMegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import java.io.File
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ import javax.inject.Inject
  */
 class UploadUseCase @Inject constructor(
     private val transfersManagement: TransfersManagement,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
 ) {
     /**
      * Uploads a file.
@@ -47,7 +47,7 @@ class UploadUseCase @Inject constructor(
         lastModified: Long,
         parentHandle: Long
     ): Completable = Completable.create { emitter ->
-        if (monitorStorageStateEvent.getState() == StorageState.PayWall) {
+        if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning()
             emitter.onError(OverDiskQuotaPaywallMegaException(""))
             return@create

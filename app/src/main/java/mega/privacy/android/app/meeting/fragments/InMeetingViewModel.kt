@@ -59,7 +59,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -113,7 +113,7 @@ class InMeetingViewModel @Inject constructor(
     private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
-    monitorConnectivity: MonitorConnectivity,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : BaseRxViewModel(), EditChatRoomNameListener.OnEditedChatRoomNameCallback,
     GetUserEmailListener.OnUserEmailUpdateCallback {
 
@@ -180,7 +180,7 @@ class InMeetingViewModel @Inject constructor(
     val showAssignModeratorBottomPanel: LiveData<Boolean> = _showAssignModeratorBottomPanel
 
     private val isConnected =
-        monitorConnectivity().stateIn(viewModelScope, SharingStarted.Eagerly, false)
+        monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     /**
      * Participant in carousel clicked

@@ -70,7 +70,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -293,7 +293,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     lateinit var passCodeFacade: PasscodeCheck
 
     @Inject
-    lateinit var getFeatureFlag: GetFeatureFlagValue
+    lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     private val nodeHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE) }
     private val nodeOfflineHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE) }
@@ -555,7 +555,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             }
             R.id.action_slideshow -> {
                 lifecycleScope.launch {
-                    val enabled = getFeatureFlag(AppFeatures.SlideShowCompose)
+                    val enabled = getFeatureFlagUseCase(AppFeatures.SlideShowCompose)
                     if (enabled)
                         getNavController().navigate(ImageViewerFragmentDirections.actionViewerToNewSlideshow())
                     else

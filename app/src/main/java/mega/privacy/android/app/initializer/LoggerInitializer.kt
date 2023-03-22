@@ -13,7 +13,7 @@ import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.EnableLogAllToConsole
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.InitialiseLogging
 
 /**
@@ -44,7 +44,7 @@ class LoggerInitializer : Initializer<Unit> {
          * Get feature flag value
          *
          */
-        fun getFeatureFlagValue(): GetFeatureFlagValue
+        fun getFeatureFlagValue(): GetFeatureFlagValueUseCase
 
         /**
          * App scope

@@ -42,7 +42,7 @@ import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.presentation.verification.model.SmsVerificationTextState
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.usecase.GetFeatureFlagValue
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -78,7 +78,7 @@ class SMSVerificationTextActivity : PasscodeActivity(),
     private val resendTimeLimit = 30 * 1000
 
     @Inject
-    lateinit var getFeatureFlagValue: GetFeatureFlagValue
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
     private var monitorPhoneFlagEnabled = false
     private var legacyListener: MegaRequestListenerInterface? = null
 
@@ -361,7 +361,7 @@ class SMSVerificationTextActivity : PasscodeActivity(),
     private fun monitorPinResult() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                monitorPhoneFlagEnabled = getFeatureFlagValue(AppFeatures.MonitorPhoneNumber)
+                monitorPhoneFlagEnabled = getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)
                 if (monitorPhoneFlagEnabled) {
                     viewModel.state.collect { state ->
                         when (state) {

@@ -52,7 +52,7 @@ import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.QueryChatLink
@@ -91,7 +91,7 @@ import javax.inject.Inject
  * @property openOrStartCall                [OpenOrStartCall]
  * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
  * @property monitorScheduledMeetingUpdates [MonitorScheduledMeetingUpdates]
- * @property monitorConnectivity            [MonitorConnectivity]
+ * @property monitorConnectivityUseCase            [MonitorConnectivityUseCase]
  * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
  * @property cameraGateway                  [CameraGateway]
  * @property deviceGateway                  [DeviceGateway]
@@ -121,7 +121,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val startConversation: StartConversation,
     private val openOrStartCall: OpenOrStartCall,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
     private val cameraGateway: CameraGateway,
@@ -140,13 +140,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Monitor connectivity event
      */
     val monitorConnectivityEvent =
-        monitorConnectivity().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.WhileSubscribed())
 
     /**
      * Is network connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     /**
      * Observe changes in Chat notifications

@@ -27,7 +27,7 @@ import mega.privacy.android.domain.usecase.GetAllFavorites
 import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
 import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import javax.inject.Inject
 
@@ -42,7 +42,7 @@ import javax.inject.Inject
  * @property fetchNode
  * @property mapOrder
  * @property headerMapper
- * @property monitorConnectivity
+ * @property monitorConnectivityUseCase
  * @property isAvailableOffline
  */
 @HiltViewModel
@@ -55,7 +55,7 @@ class FavouritesViewModel @Inject constructor(
     private val fetchNode: FetchNodeWrapper,
     private val mapOrder: MapFavouriteSortOrder,
     private val headerMapper: HeaderMapper,
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isAvailableOffline: IsAvailableOffline,
 ) : ViewModel() {
 
@@ -79,7 +79,7 @@ class FavouritesViewModel @Inject constructor(
                 query,
                 getAllFavorites(),
                 selected,
-                monitorConnectivity(),
+                monitorConnectivityUseCase(),
                 ::mapToFavourite).collectLatest { newState ->
                 _state.update { newState }
             }

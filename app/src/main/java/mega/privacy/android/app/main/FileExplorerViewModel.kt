@@ -21,7 +21,7 @@ import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FileExplorerViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val getLatestTargetPath: GetLatestTargetPath,
 ) : ViewModel() {
 
@@ -53,7 +53,7 @@ class FileExplorerViewModel @Inject constructor(
      * Storage state
      */
     val storageState: StorageState
-        get() = monitorStorageStateEvent.getState()
+        get() = monitorStorageStateEventUseCase.getState()
 
     /**
      * Notifies observers about filesInfo changes.

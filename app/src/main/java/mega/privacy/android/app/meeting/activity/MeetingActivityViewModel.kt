@@ -53,10 +53,9 @@ import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.CheckChatLink
-import mega.privacy.android.domain.usecase.MonitorConnectivity
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRequest
@@ -86,7 +85,7 @@ class MeetingActivityViewModel @Inject constructor(
     private val cameraGateway: CameraGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
     private val checkChatLink: CheckChatLink,
-    monitorConnectivity: MonitorConnectivity,
+    monitorConnectivityUseCase: MonitorConnectivityUseCase,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
@@ -129,7 +128,7 @@ class MeetingActivityViewModel @Inject constructor(
      * Monitor connectivity event
      */
     val monitorConnectivityEvent =
-        monitorConnectivity().shareIn(viewModelScope, SharingStarted.Eagerly)
+        monitorConnectivityUseCase().shareIn(viewModelScope, SharingStarted.Eagerly)
 
     private val _currentChatId: MutableLiveData<Long> =
         MutableLiveData<Long>(MEGACHAT_INVALID_HANDLE)

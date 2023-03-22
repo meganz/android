@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.settings.advanced.SettingsAdvancedFragment
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matcher
 import org.junit.Before
@@ -21,10 +23,10 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.RecyclerViewAssertions
-import test.mega.privacy.android.app.di.TestInitialiseUseCases
 import test.mega.privacy.android.app.di.TestSettingsAdvancedUseCases
 import test.mega.privacy.android.app.launchFragmentInHiltContainer
 import test.mega.privacy.android.app.presentation.settings.onPreferences
@@ -35,6 +37,9 @@ class SettingsAdvancedFragmentTest {
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
+
+    private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
+    private val rootNodeExistsUseCase = mock<RootNodeExistsUseCase>()
 
     @Before
     fun setUp() {
@@ -168,8 +173,8 @@ class SettingsAdvancedFragmentTest {
         isOnline: StateFlow<Boolean> = MutableStateFlow(true),
         rootNodeExists: Boolean = true,
     ) {
-        whenever(TestInitialiseUseCases.monitorConnectivity()).thenReturn(isOnline)
-        runBlocking { whenever(TestInitialiseUseCases.rootNodeExists()).thenReturn(rootNodeExists) }
+        whenever(monitorConnectivityUseCase()).thenReturn(isOnline)
+        runBlocking { whenever(rootNodeExistsUseCase()).thenReturn(rootNodeExists) }
     }
 
     private fun verifyPreference(enabled: Matcher<View>?): ViewInteraction? {

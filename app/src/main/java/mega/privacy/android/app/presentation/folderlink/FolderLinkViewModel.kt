@@ -14,19 +14,19 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
+import mega.privacy.android.app.presentation.copynode.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.errorDialogContentId
 import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.usecase.CopyNodeUseCase
-import mega.privacy.android.app.presentation.copynode.CopyRequestResult
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.HasCredentials
-import mega.privacy.android.domain.usecase.MonitorConnectivity
-import mega.privacy.android.domain.usecase.RootNodeExists
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolder
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
@@ -37,14 +37,14 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class FolderLinkViewModel @Inject constructor(
-    private val monitorConnectivity: MonitorConnectivity,
+    private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorViewType: MonitorViewType,
     private val loginToFolder: LoginToFolder,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
     private val hasCredentials: HasCredentials,
-    private val rootNodeExists: RootNodeExists,
+    private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val setViewType: SetViewType,
 ) : ViewModel() {
 
@@ -62,7 +62,7 @@ class FolderLinkViewModel @Inject constructor(
      * Is connected
      */
     val isConnected: Boolean
-        get() = monitorConnectivity().value
+        get() = monitorConnectivityUseCase().value
 
     /**
      * Determine whether to show data in list or grid view
@@ -197,7 +197,7 @@ class FolderLinkViewModel @Inject constructor(
             val hasCredentials = hasCredentials()
             _state.update {
                 it.copy(
-                    shouldLogin = (hasCredentials && !rootNodeExists()),
+                    shouldLogin = (hasCredentials && !rootNodeExistsUseCase()),
                     hasDbCredentials = hasCredentials
                 )
             }

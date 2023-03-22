@@ -12,24 +12,24 @@ import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.repository.VerificationRepository
-import mega.privacy.android.domain.usecase.MonitorStorageStateEvent
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import javax.inject.Inject
 
 /**
  * Default monitor verification status
  *
  * @property monitorVerifiedPhoneNumber
- * @property monitorStorageStateEvent
+ * @property monitorStorageStateEventUseCase
  * @property verificationRepository
  */
 class DefaultMonitorVerificationStatus @Inject constructor(
     private val monitorVerifiedPhoneNumber: MonitorVerifiedPhoneNumber,
-    private val monitorStorageStateEvent: MonitorStorageStateEvent,
+    private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val verificationRepository: VerificationRepository,
 ) : MonitorVerificationStatus {
     override fun invoke(): Flow<VerificationStatus> {
         return combine(
-            monitorStorageStateEvent()
+            monitorStorageStateEventUseCase()
                 .map { it.storageState == StorageState.PayWall },
             monitorVerifiedPhoneNumber(),
         ) { isPaywall, verifiedPhoneNumber ->
