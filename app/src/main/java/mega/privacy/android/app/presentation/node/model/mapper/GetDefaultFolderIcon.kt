@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.favourites.model.mapper
+package mega.privacy.android.app.presentation.node.model.mapper
 
 import androidx.annotation.DrawableRes
 import mega.privacy.android.app.R
@@ -10,7 +10,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
  * Get folder icon drawable
  */
 @DrawableRes
-internal fun getFolderIcon(
+internal fun getDefaultFolderIcon(
     folderNode: TypedFolderNode,
 ) = with(folderNode) {
     when {

@@ -1,4 +1,4 @@
-package mega.privacy.android.app.presentation.fileinfo
+package mega.privacy.android.app.presentation.fileinfo.model
 
 import android.content.Context
 import androidx.annotation.StringRes

@@ -1,21 +1,21 @@
-package test.mega.privacy.android.app.presentation.favourites.model.mapper
+package test.mega.privacy.android.app.presentation.node.model.mapper
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.favourites.model.mapper.getFolderIcon
+import mega.privacy.android.app.presentation.node.model.mapper.getDefaultFolderIcon
 import mega.privacy.android.domain.entity.DeviceType
 import mega.privacy.android.domain.entity.FolderType
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-class GetFolderIconTest {
+class GetDefaultFolderIconTest {
     @Test
     fun `test that folders in the rubbish bin returns folder icon`() {
         val folderNode = mock<TypedFolderNode> { on { isInRubbishBin }.thenReturn(true) }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.ic_folder_list)
@@ -26,7 +26,7 @@ class GetFolderIconTest {
         val folderNode = mock<TypedFolderNode> { on { isIncomingShare }.thenReturn(true) }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.ic_folder_incoming)
@@ -39,7 +39,7 @@ class GetFolderIconTest {
         }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.ic_folder_camera_uploads_list)
@@ -52,7 +52,7 @@ class GetFolderIconTest {
         }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.ic_folder_chat_list)
@@ -63,7 +63,7 @@ class GetFolderIconTest {
         val folderNode = mock<TypedFolderNode> { on { isShared }.thenReturn(true) }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.ic_folder_outgoing)
@@ -74,7 +74,7 @@ class GetFolderIconTest {
         val folderNode = mock<TypedFolderNode> { on { isPendingShare }.thenReturn(true) }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.ic_folder_outgoing)
@@ -87,7 +87,7 @@ class GetFolderIconTest {
         }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.backup)
@@ -100,7 +100,7 @@ class GetFolderIconTest {
         }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.pc_win)
@@ -113,7 +113,7 @@ class GetFolderIconTest {
         }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.pc_linux)
@@ -126,7 +126,7 @@ class GetFolderIconTest {
         }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.pc_mac)
@@ -139,7 +139,7 @@ class GetFolderIconTest {
         }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.ex_drive)
@@ -152,7 +152,7 @@ class GetFolderIconTest {
         }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.pc)
@@ -165,7 +165,7 @@ class GetFolderIconTest {
         }
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.ic_folder_backup)
@@ -176,7 +176,7 @@ class GetFolderIconTest {
         val folderNode = mock<TypedFolderNode>()
 
         assertThat(
-            getFolderIcon(
+            getDefaultFolderIcon(
                 folderNode = folderNode,
             )
         ).isEqualTo(R.drawable.ic_folder_list)

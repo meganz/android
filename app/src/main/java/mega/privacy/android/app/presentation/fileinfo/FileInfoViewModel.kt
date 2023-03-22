@@ -17,7 +17,11 @@ import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
-import mega.privacy.android.app.presentation.node.model.getIcon
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOrigin
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -132,8 +136,12 @@ class FileInfoViewModel @Inject constructor(
         message = "This initial setup will be removed once MegaNode is not needed",
         replaceWith = ReplaceWith("setNode(handleNode: Long)")
     )
-    fun tempInit(node: MegaNode) {
+    fun tempInit(node: MegaNode, origin: FileInfoOrigin) {
+        Timber.d("FileInfo tempInit $origin")
         this.node = node
+        _uiState.update {
+            it.copy(origin = origin)
+        }
         setNode(node.handle)
     }
 
@@ -497,7 +505,7 @@ class FileInfoViewModel @Inject constructor(
             val isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue)
             uiState.copy(
                 typedNode = typedNode,
-                iconResource = typedNode.getIcon(),
+                iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
                 isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
                 isNodeInRubbish = isNodeInRubbish,
                 jobInProgressState = null,
@@ -531,7 +539,7 @@ class FileInfoViewModel @Inject constructor(
             typedNode = getNodeById(typedNode.id)
             it.copy(
                 typedNode = typedNode,
-                iconResource = typedNode.getIcon(),
+                iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
             )
         }
     }

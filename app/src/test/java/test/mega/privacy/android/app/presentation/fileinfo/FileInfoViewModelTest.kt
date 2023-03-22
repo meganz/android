@@ -1,4 +1,4 @@
-package test.mega.privacy.android.app.fileinfo
+package test.mega.privacy.android.app.presentation.fileinfo
 
 import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
@@ -23,9 +23,9 @@ import mega.privacy.android.app.domain.usecase.offline.SetNodeAvailableOffline
 import mega.privacy.android.app.domain.usecase.shares.GetOutShares
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.presentation.fileinfo.FileInfoJobInProgressState
-import mega.privacy.android.app.presentation.fileinfo.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository

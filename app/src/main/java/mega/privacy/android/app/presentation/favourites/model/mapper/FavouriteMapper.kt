@@ -4,6 +4,7 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFolder
+import mega.privacy.android.app.presentation.node.model.mapper.getDefaultFolderIcon
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.domain.entity.AudioFileTypeInfo
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -77,7 +78,7 @@ private fun TypedFolderNode.createFolder(
     isAvailableOffline: Boolean,
     isSelected: Boolean,
 ) = FavouriteFolder(
-    icon = getFolderIcon(this),
+    icon = getDefaultFolderIcon(this),
     labelColour = MegaNodeUtil.getNodeLabelColor(label),
     showLabel = label != MegaNode.NODE_LBL_UNKNOWN,
     node = node,

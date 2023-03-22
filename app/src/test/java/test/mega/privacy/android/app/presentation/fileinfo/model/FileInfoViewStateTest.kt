@@ -1,8 +1,8 @@
-package test.mega.privacy.android.app.fileinfo
+package test.mega.privacy.android.app.presentation.fileinfo.model
 
 import com.google.common.truth.Truth
-import mega.privacy.android.app.presentation.fileinfo.FileInfoViewState
-import mega.privacy.android.app.presentation.fileinfo.FileInfoViewState.Companion.MAX_NUMBER_OF_CONTACTS_IN_LIST
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState.Companion.MAX_NUMBER_OF_CONTACTS_IN_LIST
 import nz.mega.sdk.MegaShare
 import org.junit.Test
 import org.junit.runner.RunWith

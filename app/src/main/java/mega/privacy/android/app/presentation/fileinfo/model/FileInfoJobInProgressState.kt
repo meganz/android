@@ -1,9 +1,10 @@
-package mega.privacy.android.app.presentation.fileinfo
+package mega.privacy.android.app.presentation.fileinfo.model
 
 import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
 import mega.privacy.android.app.usecase.exception.MegaException
+import mega.privacy.android.domain.exception.ShareAccessNotSetException
 import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import nz.mega.sdk.MegaError
 
@@ -101,24 +102,38 @@ sealed class FileInfoJobInProgressState(
     /**
      * Permission for outgoing shares of the node will be changed
      */
-    sealed class ChangeSharePermission(@StringRes progressMessage: Int?) :
+    sealed class ChangeSharePermission(
+        @StringRes progressMessage: Int?,
+        @StringRes successMessage: Int?,
+        @StringRes failMessage: Int?,
+    ) :
         FileInfoJobInProgressState(
             progressMessage = progressMessage,
-            successMessage = null,
-            failMessage = null,
+            successMessage = successMessage,
+            failMessage = failMessage,
         ) {
         /**
          * Permission will be changed or set
          */
         object Set : ChangeSharePermission(
             progressMessage = R.string.context_permissions_changing_folder,
-        )
+            successMessage = R.string.context_permissions_changed,
+            failMessage = null
+        ) {
+            override fun customErrorMessage(context: Context, exception: Throwable?) =
+                context.getString(
+                    R.string.number_permission_incorrectly_changed_from_shared,
+                    (exception as? ShareAccessNotSetException)?.totalNotSet ?: 1
+                )
+        }
 
         /**
          * Permission will be removed
          */
         object Remove : ChangeSharePermission(
             progressMessage = R.string.context_removing_contact_folder,
+            successMessage = R.string.context_share_correctly_removed,
+            failMessage = R.string.context_no_removed_shared,
         )
     }
 }
