@@ -19,8 +19,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
 import mega.privacy.android.app.fragments.managerFragments.actionMode.TransfersActionBarCallBack
-import mega.privacy.android.app.interfaces.MoveTransferInterface
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.adapters.MegaTransfersAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
@@ -28,7 +26,6 @@ import mega.privacy.android.app.main.adapters.SelectModeInterface
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
@@ -37,8 +34,6 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import javax.inject.Inject
@@ -48,7 +43,7 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
-    TransfersActionBarCallBack.TransfersActionCallback, MoveTransferInterface {
+    TransfersActionBarCallBack.TransfersActionCallback {
 
     /**
      * MegaApiAndroid injection
@@ -204,12 +199,6 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
 
     override fun hideTabs(hide: Boolean) =
         (requireActivity() as ManagerActivity).hideTabs(hide, TransfersTab.PENDING_TAB)
-
-    override fun movementFailed(transferTag: Int) =
-        finishMovement(success = false, transferTag = transferTag)
-
-    override fun movementSuccess(transferTag: Int) =
-        finishMovement(success = true, transferTag = transferTag)
 
     override fun destroyActionMode() {
         actionMode?.finish()
@@ -414,21 +403,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
      * @param newPosition The new position on the list.
      */
     private fun startMovementRequest(transfer: MegaTransfer, newPosition: Int) {
-        viewModel.moveTransfer(transfer,
-            newPosition,
-            OptionalMegaRequestListenerInterface(onRequestFinish = { megaRequest, megaError ->
-                if (megaRequest.type == MegaRequest.TYPE_MOVE_TRANSFER) {
-                    if (megaError.errorCode != MegaError.API_OK) {
-                        Timber.e("Error changing transfer priority: ${
-                            StringResourcesUtils.getTranslatedErrorString(megaError)
-                        }")
-                        this.movementFailed(megaRequest.transferTag)
-                    } else {
-                        this.movementSuccess(megaRequest.transferTag)
-                    }
-                }
-            }))
-
+        viewModel.moveTransfer(transfer, newPosition)
     }
 
     private fun enableDragAndDrop() {
@@ -437,20 +412,6 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
 
     private fun disableDragAndDrop() =
         itemTouchHelper?.attachToRecyclerView(null)
-
-
-    /**
-     * Updates the UI in consequence after a transfer movement.
-     * The update depends on if the movement finished with or without success.
-     * If it finished with success, simply update the transfer in the transfers list and in adapter.
-     * If not, reverts the movement, leaving the transfer in the same position it has before made the change.
-     *
-     * @param success     True if the movement finished with success, false otherwise.
-     * @param transferTag Identifier of the transfer.
-     */
-    private fun finishMovement(success: Boolean, transferTag: Int) {
-        viewModel.activeTransferFinishMovement(success, transferTag)
-    }
 
     companion object {
 

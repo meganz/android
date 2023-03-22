@@ -15,13 +15,15 @@ import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.globalmanagement.TransfersManagement
-import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
+import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.MoveTransferToFirstByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.MoveTransferToLastByTagUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -39,6 +41,9 @@ class TransfersViewModel @Inject constructor(
     private val dbH: LegacyDatabaseHandler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorFailedTransfer: MonitorFailedTransfer,
+    private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
+    private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
+    private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -71,7 +76,8 @@ class TransfersViewModel @Inject constructor(
         viewModelScope.launch {
             _activeState.update {
                 ActiveTransfersState.GetMoreQuotaViewVisibility(
-                    transfersManagement.isOnTransferOverQuota())
+                    transfersManagement.isOnTransferOverQuota()
+                )
             }
         }
     }
@@ -194,9 +200,11 @@ class TransfersViewModel @Inject constructor(
                             }
                         }
                         _activeState.update {
-                            ActiveTransfersState.TransferMovementFinishedUpdated(success = success,
+                            ActiveTransfersState.TransferMovementFinishedUpdated(
+                                success = success,
                                 pos = transferPosition,
-                                newTransfers = activeTransfers)
+                                newTransfers = activeTransfers
+                            )
                         }
                     } else {
                         Timber.w("The transfer doesn't exist.")
@@ -317,8 +325,10 @@ class TransfersViewModel @Inject constructor(
                 if (index != INVALID_POSITION) {
                     completedTransfers.removeAt(index)
                     _completedState.update {
-                        CompletedTransfersState.TransferRemovedUpdated(index,
-                            completedTransfers.toList())
+                        CompletedTransfersState.TransferRemovedUpdated(
+                            index,
+                            completedTransfers.toList()
+                        )
                     }
                 }
             }.onFailure { exception ->
@@ -386,25 +396,21 @@ class TransfersViewModel @Inject constructor(
      *
      * @param transfer    MegaTransfer to change its priority.
      * @param newPosition The new position on the list.
-     * @param optionalMegaRequestListenerInterface [OptionalMegaRequestListenerInterface]
      */
     fun moveTransfer(
         transfer: MegaTransfer,
         newPosition: Int,
-        optionalMegaRequestListenerInterface: OptionalMegaRequestListenerInterface,
-    ) = viewModelScope.launch(ioDispatcher) {
-        when (newPosition) {
-            0 -> {
-                megaApiGateway.moveTransferToFirst(transfer, optionalMegaRequestListenerInterface)
-            }
-            activeTransfers.size - 1 -> {
-                megaApiGateway.moveTransferToLast(transfer, optionalMegaRequestListenerInterface)
-            }
-            else -> {
-                megaApiGateway.moveTransferBefore(transfer = transfer,
-                    prevTransfer = activeTransfers[newPosition + 1],
-                    listener = optionalMegaRequestListenerInterface)
+    ) = viewModelScope.launch {
+        val result = runCatching {
+            when (newPosition) {
+                0 -> moveTransferToFirstByTagUseCase(tag = transfer.tag)
+                activeTransfers.lastIndex -> moveTransferToLastByTagUseCase(tag = transfer.tag)
+                else -> moveTransferBeforeByTagUseCase(
+                    tag = transfer.tag,
+                    prevTag = activeTransfers[newPosition + 1].tag,
+                )
             }
         }
+        activeTransferFinishMovement(result.isSuccess, transfer.tag)
     }
 }
