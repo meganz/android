@@ -13,6 +13,7 @@ import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
+import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
@@ -54,6 +55,7 @@ class DefaultCameraUploadRepositoryTest {
     private val megaApiGateway = mock<MegaApiGateway>()
     private val fileAttributeGateway = mock<FileAttributeGateway>()
     private val cameraUploadMediaGateway = mock<CameraUploadMediaGateway>()
+    private val workerGateway = mock<WorkerGateway>()
     private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
     private val cameraUploadsHandlesMapper = mock<CameraUploadsHandlesMapper>()
@@ -85,6 +87,7 @@ class DefaultCameraUploadRepositoryTest {
             cacheGateway = mock(),
             fileAttributeGateway = fileAttributeGateway,
             cameraUploadMediaGateway = cameraUploadMediaGateway,
+            workerGateway = workerGateway,
             syncRecordTypeIntMapper = syncRecordTypeIntMapper,
             mediaStoreFileTypeUriMapper = mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper = cameraUploadsHandlesMapper,
@@ -546,6 +549,42 @@ class DefaultCameraUploadRepositoryTest {
             val actual = underTest.getPhotoGPSCoordinates("")
             assertThat(actual).isEqualTo(result)
         }
+    }
+
+    @Test
+    fun `test camera upload job is fired if sync is enabled`() = runTest {
+        underTest.fireCameraUploadJob()
+        verify(workerGateway, times(1)).fireCameraUploadJob()
+    }
+
+    @Test
+    fun `test stop camera upload job is fired if sync is enabled`() = runTest {
+        underTest.fireStopCameraUploadJob()
+        verify(workerGateway, times(1)).fireStopCameraUploadJob()
+    }
+
+    @Test
+    fun `test schedule camera upload job is fired if sync is enabled`() = runTest {
+        underTest.scheduleCameraUploadJob()
+        verify(workerGateway, times(1)).scheduleCameraUploadJob()
+    }
+
+    @Test
+    fun `test restart camera upload job is fired`() = runTest {
+        underTest.fireRestartCameraUploadJob()
+        verify(workerGateway, times(1)).fireRestartCameraUploadJob()
+    }
+
+    @Test
+    fun `test reschedule camera upload job is fired`() = runTest {
+        underTest.rescheduleCameraUpload()
+        verify(workerGateway, times(1)).rescheduleCameraUpload()
+    }
+
+    @Test
+    fun `test stop camera upload and heart beat sync workers is fired`() = runTest {
+        underTest.stopCameraUploadSyncHeartbeatWorkers()
+        verify(workerGateway, times(1)).stopCameraUploadSyncHeartbeatWorkers()
     }
 
     @Test

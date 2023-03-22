@@ -16,6 +16,7 @@ import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
+import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
@@ -63,6 +64,7 @@ import kotlin.coroutines.Continuation
  * @property ioDispatcher [CoroutineDispatcher]
  * @property appEventGateway [AppEventGateway]
  * @property broadcastReceiverGateway [BroadcastReceiverGateway]
+ * @property workerGateway [WorkerGateway]
  * @property videoQualityMapper [VideoQualityMapper]
  * @property syncStatusIntMapper [SyncStatusIntMapper]
  * @property cameraUploadsHandlesMapper [CameraUploadsHandlesMapper]
@@ -79,6 +81,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val mediaStoreFileTypeUriMapper: MediaStoreFileTypeUriMapper,
     private val appEventGateway: AppEventGateway,
     private val broadcastReceiverGateway: BroadcastReceiverGateway,
+    private val workerGateway: WorkerGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
@@ -206,10 +209,13 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             when (type) {
                 SyncTimeStamp.PRIMARY_PHOTO -> localStorageGateway.getPhotoTimeStamp()
                     ?.toLongOrNull()
+
                 SyncTimeStamp.PRIMARY_VIDEO -> localStorageGateway.getVideoTimeStamp()
                     ?.toLongOrNull()
+
                 SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.getSecondaryPhotoTimeStamp()
                     ?.toLongOrNull()
+
                 SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.getSecondaryVideoTimeStamp()
                     ?.toLongOrNull()
             }
@@ -225,6 +231,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                     SyncTimeStamp.SECONDARY_PHOTO -> localStorageGateway.setSecondaryPhotoTimeStamp(
                         timeStamp
                     )
+
                     SyncTimeStamp.SECONDARY_VIDEO -> localStorageGateway.setSecondaryVideoTimeStamp(
                         timeStamp
                     )
@@ -462,10 +469,12 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                             // camera upload handles can be retrieved
                             continuation.resumeWith(Result.success(request))
                         }
+
                         MegaError.API_ENOENT -> {
                             // camera upload handles do not exist
                             continuation.resumeWith(Result.success(null))
                         }
+
                         else -> {
                             continuation.failWithError(error)
                         }
@@ -549,6 +558,30 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                 }
             }
         }
+
+    override suspend fun fireCameraUploadJob() = withContext(ioDispatcher) {
+        workerGateway.fireCameraUploadJob()
+    }
+
+    override suspend fun fireStopCameraUploadJob(aborted: Boolean) = withContext(ioDispatcher) {
+        workerGateway.fireStopCameraUploadJob(aborted)
+    }
+
+    override suspend fun scheduleCameraUploadJob() = withContext(ioDispatcher) {
+        workerGateway.scheduleCameraUploadJob()
+    }
+
+    override suspend fun fireRestartCameraUploadJob() = withContext(ioDispatcher) {
+        workerGateway.fireRestartCameraUploadJob()
+    }
+
+    override suspend fun rescheduleCameraUpload() = withContext(ioDispatcher) {
+        workerGateway.rescheduleCameraUpload()
+    }
+
+    override suspend fun stopCameraUploadSyncHeartbeatWorkers() = withContext(ioDispatcher) {
+        workerGateway.stopCameraUploadSyncHeartbeatWorkers()
+    }
 
     @Deprecated(
         "Function related to statistics will be reviewed in future updates to\n" +
