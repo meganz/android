@@ -39,8 +39,8 @@ import mega.privacy.android.domain.usecase.GetChatRoomByUser
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.contact.ApplyContactUpdateForUser
-import mega.privacy.android.domain.usecase.contact.GetContactFromChat
+import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
 import mega.privacy.android.domain.usecase.contact.SetUserAlias
@@ -66,9 +66,9 @@ import javax.inject.Inject
  * @property getChatRoom                        [GetChatRoom]
  * @property getUserOnlineStatusByHandle        [GetUserOnlineStatusByHandle]
  * @property getChatRoomByUser                  [GetChatRoomByUser]
- * @property getContactFromChat                 [GetContactFromChat]
+ * @property getContactFromChatUseCase          [GetContactFromChatUseCase]
  * @property getContactFromEmail                [GetContactFromEmail]
- * @property applyContactUpdateForUser          [ApplyContactUpdateForUser]
+ * @property applyContactUpdatesUseCase         [ApplyContactUpdatesUseCase]
  * @property setUserAlias                       [SetUserAlias]
  */
 @HiltViewModel
@@ -86,9 +86,9 @@ class ContactInfoViewModel @Inject constructor(
     private val requestLastGreen: RequestLastGreen,
     private val getChatRoom: GetChatRoom,
     private val getChatRoomByUser: GetChatRoomByUser,
-    private val getContactFromChat: GetContactFromChat,
+    private val getContactFromChatUseCase: GetContactFromChatUseCase,
     private val getContactFromEmail: GetContactFromEmail,
-    private val applyContactUpdateForUser: ApplyContactUpdateForUser,
+    private val applyContactUpdatesUseCase: ApplyContactUpdatesUseCase,
     private val setUserAlias: SetUserAlias,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
@@ -136,7 +136,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     private fun getContactUpdates() = viewModelScope.launch {
         monitorContactUpdates().collectLatest { updates ->
-            val userInfo = state.value.contactItem?.let { applyContactUpdateForUser(it, updates) }
+            val userInfo = state.value.contactItem?.let { applyContactUpdatesUseCase(it, updates) }
             if (updates.changes.containsValue(listOf(UserChanges.Avatar))) {
                 updateAvatar(userInfo)
             } else {
@@ -305,7 +305,7 @@ class ContactInfoViewModel @Inject constructor(
         } else {
             runCatching {
                 chatRoom = getChatRoom(chatHandle)
-                userInfo = getContactFromChat(chatHandle, isOnline())
+                userInfo = getContactFromChatUseCase(chatHandle, isOnline())
             }
         }
 

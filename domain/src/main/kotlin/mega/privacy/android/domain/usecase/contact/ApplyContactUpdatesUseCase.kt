@@ -10,9 +10,9 @@ import javax.inject.Inject
 /**
  * Use-case applies the global contact updates
  */
-class DefaultApplyContactUpdatesForUser @Inject constructor(
+class ApplyContactUpdatesUseCase @Inject constructor(
     private val contactsRepository: ContactsRepository,
-) : ApplyContactUpdateForUser {
+) {
 
     /**
      * Invoke
@@ -21,7 +21,7 @@ class DefaultApplyContactUpdatesForUser @Inject constructor(
      * @param userUpdate global update received
      * @return [ContactItem] updated contact item
      */
-    override suspend fun invoke(contactItem: ContactItem, userUpdate: UserUpdate): ContactItem {
+    suspend operator fun invoke(contactItem: ContactItem, userUpdate: UserUpdate): ContactItem {
         val selectedUserChange = userUpdate.changes[UserId(contactItem.handle)] ?: emptyList()
         var updatedContact = contactItem
         if (userUpdate.changes.containsValue(listOf(UserChanges.Alias))) {

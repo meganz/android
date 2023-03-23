@@ -14,12 +14,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetContactFromChatTest {
+class GetContactFromChatUseCaseTest {
     private val repository: ContactsRepository = mock()
     private val getContactFromEmail: GetContactFromEmail = mock()
 
     private val underTest by lazy(LazyThreadSafetyMode.NONE) {
-        DefaultGetContactFromChat(
+        GetContactFromChatUseCase(
             repository, getContactFromEmail,
         )
     }

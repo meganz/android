@@ -22,12 +22,8 @@ import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.account.DefaultUpdateCurrentUserName
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
-import mega.privacy.android.domain.usecase.contact.DefaultGetContactFromChat
-import mega.privacy.android.domain.usecase.contact.ApplyContactUpdateForUser
-import mega.privacy.android.domain.usecase.contact.DefaultApplyContactUpdatesForUser
 import mega.privacy.android.domain.usecase.contact.DefaultReloadContactDatabase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
-import mega.privacy.android.domain.usecase.contact.GetContactFromChat
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
 import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
@@ -54,12 +50,6 @@ internal abstract class ContactsModule {
 
     @Binds
     abstract fun bindResetContactDatabase(implementation: DefaultReloadContactDatabase): ReloadContactDatabase
-
-    @Binds
-    abstract fun bindGetContactFromUserEmail(implementation: DefaultGetContactFromChat): GetContactFromChat
-
-    @Binds
-    abstract fun bindDefaultApplyContactUpdatesForUser(implementation: DefaultApplyContactUpdatesForUser): ApplyContactUpdateForUser
 
     companion object {
         @Provides

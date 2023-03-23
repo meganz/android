@@ -28,8 +28,8 @@ import mega.privacy.android.domain.usecase.GetChatRoomByUser
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
-import mega.privacy.android.domain.usecase.contact.ApplyContactUpdateForUser
-import mega.privacy.android.domain.usecase.contact.GetContactFromChat
+import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
+import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
 import mega.privacy.android.domain.usecase.contact.SetUserAlias
@@ -61,9 +61,9 @@ class ContactInfoViewModelTest {
     private lateinit var requestLastGreen: RequestLastGreen
     private lateinit var getChatRoom: GetChatRoom
     private lateinit var getContactFromEmail: GetContactFromEmail
-    private lateinit var getContactFromChat: GetContactFromChat
+    private lateinit var getContactFromChatUseCase: GetContactFromChatUseCase
     private lateinit var getChatRoomByUser: GetChatRoomByUser
-    private lateinit var applyContactUpdateForUser: ApplyContactUpdateForUser
+    private lateinit var applyContactUpdatesUseCase: ApplyContactUpdatesUseCase
     private lateinit var setUserAlias: SetUserAlias
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
@@ -123,9 +123,9 @@ class ContactInfoViewModelTest {
             requestLastGreen,
             getChatRoom,
             getChatRoomByUser,
-            getContactFromChat,
+            getContactFromChatUseCase,
             getContactFromEmail,
-            applyContactUpdateForUser,
+            applyContactUpdatesUseCase,
             setUserAlias,
             standardDispatcher,
         )
@@ -145,9 +145,9 @@ class ContactInfoViewModelTest {
         requestLastGreen = mock()
         getChatRoom = mock()
         getChatRoomByUser = mock()
-        getContactFromChat = mock()
+        getContactFromChatUseCase = mock()
         getContactFromEmail = mock()
-        applyContactUpdateForUser = mock()
+        applyContactUpdatesUseCase = mock()
         setUserAlias = mock()
     }
 
@@ -215,7 +215,12 @@ class ContactInfoViewModelTest {
         runTest {
             whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
             whenever(getChatRoom(testHandle)).thenReturn(chatRoom)
-            whenever(getContactFromChat(testHandle, skipCache = true)).thenReturn(contactItem)
+            whenever(
+                getContactFromChatUseCase(
+                    testHandle,
+                    skipCache = true
+                )
+            ).thenReturn(contactItem)
             underTest.updateContactInfo(testHandle)
             underTest.state.test {
                 val nextState = awaitItem()

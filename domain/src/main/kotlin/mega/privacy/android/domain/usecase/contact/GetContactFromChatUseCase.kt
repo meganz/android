@@ -7,10 +7,10 @@ import javax.inject.Inject
 /**
  * Get contact info from chat id
  */
-class DefaultGetContactFromChat @Inject constructor(
+class GetContactFromChatUseCase @Inject constructor(
     private val contactsRepository: ContactsRepository,
     private val getContactFromEmail: GetContactFromEmail,
-) : GetContactFromChat {
+) {
     /**
      * invoke
      *
@@ -19,7 +19,7 @@ class DefaultGetContactFromChat @Inject constructor(
      *                  If false, use value in cache
      * @return [ContactItem] which contains contact information of selected user
      */
-    override suspend fun invoke(chatId: Long, skipCache: Boolean): ContactItem? {
+    suspend operator fun invoke(chatId: Long, skipCache: Boolean): ContactItem? {
         val handle = contactsRepository.getUserEmailFromChat(chatId)
         return handle?.let { getContactFromEmail(it, skipCache) }
     }

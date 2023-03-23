@@ -17,7 +17,7 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultApplyContactUpdatesForUserTest {
+class ApplyContactUpdatesUseCaseTest {
     private val repository = mock<ContactsRepository>()
     private val userId = UserId(123456L)
     private lateinit var userUpdate: UserUpdate
@@ -37,7 +37,7 @@ class DefaultApplyContactUpdatesForUserTest {
         status = UserStatus.Online,
         lastSeen = 0,
     )
-    private val underTest = DefaultApplyContactUpdatesForUser(repository)
+    private val underTest = ApplyContactUpdatesUseCase(repository)
 
 
     @Test
