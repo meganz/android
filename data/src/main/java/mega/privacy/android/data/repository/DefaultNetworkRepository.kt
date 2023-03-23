@@ -107,4 +107,10 @@ internal class DefaultNetworkRepository @Inject constructor(
     override fun setUseHttps(enabled: Boolean) = megaApi.setUseHttpsOnly(enabled)
 
     override fun isMeteredConnection() = connectivityManager?.isActiveNetworkMetered
+
+    override fun isOnWifi(): Boolean {
+        connectivityManager ?: return false
+        val capabilities = connectivityManager.getActiveNetworkCapabilities()
+        return capabilities != null && capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+    }
 }

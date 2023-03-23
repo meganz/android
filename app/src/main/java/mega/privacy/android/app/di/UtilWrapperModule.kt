@@ -13,14 +13,11 @@ import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.cameraupload.CameraUploadsService
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeLocationInfo
 import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
-import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
@@ -28,14 +25,15 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
-import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilFacade
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadServiceWrapper
+import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.wrapper.JobUtilWrapper
+import mega.privacy.android.domain.entity.BackupState
 
 /**
  * Util wrapper module
@@ -60,15 +58,6 @@ abstract class UtilWrapperModule {
     abstract fun bindGetNodeLocation(implementation: DefaultGetNodeLocationInfo): GetNodeLocationInfo
 
     companion object {
-
-        @Provides
-        fun provideIsOnWifiWrapper(): IsOnWifiWrapper {
-            return object : IsOnWifiWrapper {
-                override fun isOnWifi(context: Context): Boolean {
-                    return Util.isOnWifi(context)
-                }
-            }
-        }
 
         @Provides
         fun provideGetFullPathFileWrapper(): GetFullPathFileWrapper {

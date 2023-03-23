@@ -24,7 +24,6 @@ import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
-import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
@@ -249,9 +248,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideIsLocalSecondaryFolderSet() = mock<IsLocalSecondaryFolderSet>()
-
-    @Provides
-    fun provideIsWifiNotSatisfied() = mock<IsWifiNotSatisfied>()
 
     @Provides
     fun provideGetSyncFileUploadUris() = mock<GetSyncFileUploadUris>()

@@ -11,7 +11,6 @@ import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.app.utils.wrapper.GetDocumentFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetFullPathFileWrapper
 import mega.privacy.android.app.utils.wrapper.GetOfflineThumbnailFileWrapper
-import mega.privacy.android.app.utils.wrapper.IsOnWifiWrapper
 import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.app.utils.wrapper.TimeWrapper
 import mega.privacy.android.data.wrapper.AvatarWrapper
@@ -27,7 +26,6 @@ import org.mockito.kotlin.mock
 )
 object TestWrapperModule {
 
-    val isOnWifiWrapper = mock<IsOnWifiWrapper>()
     val getFullPathWrapper = mock<GetFullPathFileWrapper>()
     val getDocumentFileWrapper = mock<GetDocumentFileWrapper>()
     val cameraUploadSyncManagerWrapper = mock<CameraUploadSyncManagerWrapper>()
@@ -38,9 +36,6 @@ object TestWrapperModule {
     val fetchNodeWrapper = mock<FetchNodeWrapper>()
     val timeWrapper = mock<TimeWrapper>()
     val avatarWrapper = mock<AvatarWrapper>()
-
-    @Provides
-    fun provideIsOnWifiWrapper(): IsOnWifiWrapper = isOnWifiWrapper
 
     @Provides
     fun provideGetFullPathFileWrapper(): GetFullPathFileWrapper = getFullPathWrapper

@@ -49,7 +49,6 @@ import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
-import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
@@ -114,6 +113,7 @@ import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
+import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
@@ -217,10 +217,10 @@ class CameraUploadsService : LifecycleService() {
     lateinit var isCameraUploadByWifi: IsCameraUploadByWifi
 
     /**
-     * IsWifiNotSatisfied
+     * IsWifiNotSatisfied Use Case
      */
     @Inject
-    lateinit var isWifiNotSatisfied: IsWifiNotSatisfied
+    lateinit var isWifiNotSatisfiedUseCase: IsWifiNotSatisfiedUseCase
 
     /**
      * DeleteSyncRecord
@@ -631,7 +631,7 @@ class CameraUploadsService : LifecycleService() {
     private fun monitorConnectivityStatus() {
         coroutineScope?.launch {
             monitorConnectivityUseCase().collect {
-                if (!it || isWifiNotSatisfied()) {
+                if (!it || isWifiNotSatisfiedUseCase()) {
                     endService(
                         cancelMessage = "Camera Upload by Wifi only but Mobile Network - Cancel Camera Upload",
                         aborted = true
@@ -940,12 +940,12 @@ class CameraUploadsService : LifecycleService() {
         }
 
     /**
-     * Checks if the Wi-Fi constraint from the negated [isWifiNotSatisfied] is satisfied
+     * Checks if the Wi-Fi constraint from the negated [isWifiNotSatisfiedUseCase] is satisfied
      *
      * @return true if the Wi-Fi constraint is satisfied, and false if otherwise
      */
     private suspend fun isWifiConstraintSatisfied(): Boolean =
-        !isWifiNotSatisfied().also {
+        !isWifiNotSatisfiedUseCase().also {
             if (it) Timber.w("Cannot start, Wi-Fi required")
         }
 

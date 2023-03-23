@@ -22,7 +22,6 @@ import mega.privacy.android.app.domain.usecase.DefaultGetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
-import mega.privacy.android.app.domain.usecase.DefaultIsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolder
@@ -43,7 +42,6 @@ import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
-import mega.privacy.android.app.domain.usecase.IsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
@@ -799,12 +797,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindIsLocalSecondaryFolderSet(isLocalSecondaryFolderSet: DefaultIsLocalSecondaryFolderSet): IsLocalSecondaryFolderSet
-
-    /**
-     * Provide the [IsWifiNotSatisfied] implementation
-     */
-    @Binds
-    abstract fun bindIsWifiNotSatisfied(isWifiNotSatisfied: DefaultIsWifiNotSatisfied): IsWifiNotSatisfied
 
     /**
      * Provide the [GetSyncFileUploadUris] implementation

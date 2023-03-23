@@ -35,4 +35,11 @@ interface NetworkRepository {
      * @return [Boolean]
      */
     fun isMeteredConnection(): Boolean?
+
+    /**
+     * Is Currently on WIFI
+     *
+     * @return [Boolean]
+     */
+    fun isOnWifi(): Boolean
 }
