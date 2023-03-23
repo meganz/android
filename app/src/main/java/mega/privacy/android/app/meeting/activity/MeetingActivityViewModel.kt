@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Build
+import android.util.Pair
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -53,8 +54,8 @@ import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.CheckChatLink
+import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -176,7 +177,7 @@ class MeetingActivityViewModel @Inject constructor(
         }
 
     private val linkRecoveredObserver =
-        Observer<android.util.Pair<Long, String>> { chatAndLink ->
+        Observer<Pair<Long, String>> { chatAndLink ->
             _currentChatId.value?.let {
                 if (chatAndLink.first == it) {
                     if (!chatAndLink.second.isNullOrEmpty()) {
@@ -257,9 +258,8 @@ class MeetingActivityViewModel @Inject constructor(
             )
             .addTo(composite)
 
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_LINK_RECOVERED)
-            .observeForever(linkRecoveredObserver as Observer<Any>)
+        LiveEventBus.get<Pair<Long, String>>(EVENT_LINK_RECOVERED)
+            .observeForever(linkRecoveredObserver)
 
         // Show the default avatar (the Alphabet avatar) above all, then load the actual avatar
         showDefaultAvatar().invokeOnCompletion {
@@ -651,9 +651,8 @@ class MeetingActivityViewModel @Inject constructor(
         LiveEventBus.get(EVENT_MEETING_CREATED, Long::class.java)
             .removeObserver(meetingCreatedObserver)
 
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_LINK_RECOVERED)
-            .removeObserver(linkRecoveredObserver as Observer<Any>)
+        LiveEventBus.get<Pair<Long, String>>(EVENT_LINK_RECOVERED)
+            .removeObserver(linkRecoveredObserver)
     }
 
     fun inviteToChat(context: Context, requestCode: Int, resultCode: Int, intent: Intent?) {

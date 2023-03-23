@@ -6,8 +6,9 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
 import mega.privacy.android.app.constants.EventConstants
-
-import nz.mega.sdk.*
+import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatCall
+import nz.mega.sdk.MegaChatSession
 import javax.inject.Inject
 
 /**
@@ -83,14 +84,12 @@ class GetSessionStatusChangesUseCase @Inject constructor(
                     }
                 }
 
-            @Suppress("UNCHECKED_CAST")
-            LiveEventBus.get(EventConstants.EVENT_SESSION_STATUS_CHANGE)
-                .observeForever(sessionStatusObserver as Observer<Any>)
+            LiveEventBus.get<Pair<MegaChatCall?, MegaChatSession>>(EventConstants.EVENT_SESSION_STATUS_CHANGE)
+                .observeForever(sessionStatusObserver)
 
             emitter.setCancellable {
-                @Suppress("UNCHECKED_CAST")
-                LiveEventBus.get(EventConstants.EVENT_SESSION_STATUS_CHANGE)
-                    .removeObserver(sessionStatusObserver as Observer<Any>)
+                LiveEventBus.get<Pair<MegaChatCall?, MegaChatSession>>(EventConstants.EVENT_SESSION_STATUS_CHANGE)
+                    .removeObserver(sessionStatusObserver)
 
             }
         }, BackpressureStrategy.LATEST)

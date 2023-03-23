@@ -42,7 +42,6 @@ import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ScheduledMeetingChanges
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.usecase.CreateChatLink
-import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
@@ -52,9 +51,6 @@ import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
 import mega.privacy.android.domain.usecase.MonitorChatListItemUpdates
 import mega.privacy.android.domain.usecase.MonitorChatRoomUpdates
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
-import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.QueryChatLink
 import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
@@ -62,6 +58,10 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
+import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -156,7 +156,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     }
 
     init {
-        LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
+        LiveEventBus.get<Any>(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
             .observeForever(chatNotificationsObserver)
     }
 
@@ -166,7 +166,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
 
-        LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
+        LiveEventBus.get<Any>(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
             .removeObserver(chatNotificationsObserver)
     }
 

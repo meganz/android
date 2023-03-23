@@ -172,19 +172,16 @@ class IndividualCallFragment : MeetingBaseFragment() {
     private fun initLiveEventBus() {
         LiveEventBus.get(EVENT_LOCAL_AVFLAGS_CHANGE, MegaChatCall::class.java)
             .observeSticky(this, localAVFlagsObserver)
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_REMOTE_AVFLAGS_CHANGE)
-            .observeSticky(this, remoteAVFlagsObserver as Observer<Any>)
+        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AVFLAGS_CHANGE)
+            .observeSticky(this, remoteAVFlagsObserver)
 
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EventConstants.EVENT_SESSION_ON_HIRES_CHANGE)
-            .observe(this, sessionHiResObserver as Observer<Any>)
+        LiveEventBus.get<Pair<Long, MegaChatSession>>(EventConstants.EVENT_SESSION_ON_HIRES_CHANGE)
+            .observe(this, sessionHiResObserver)
 
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
             .observe(this, callOnHoldObserver)
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE)
-            .observe(this, sessionOnHoldObserver as Observer<Any>)
+        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_SESSION_ON_HOLD_CHANGE)
+            .observe(this, sessionOnHoldObserver)
     }
 
     override fun onCreateView(

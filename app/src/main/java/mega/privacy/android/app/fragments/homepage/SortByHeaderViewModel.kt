@@ -138,9 +138,8 @@ class SortByHeaderViewModel @Inject constructor(
 
     init {
         // Use "sticky" to observe the value set in ManagerActivity onCreate()
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_ORDER_CHANGE)
-            .observeStickyForever(orderChangeObserver as Observer<Any>)
+        LiveEventBus.get<Triple<SortOrder, SortOrder, SortOrder>>(EVENT_ORDER_CHANGE)
+            .observeStickyForever(orderChangeObserver)
 
         viewModelScope.launch {
             _cameraSortOrder.value = getCameraSortOrder()
@@ -249,9 +248,8 @@ class SortByHeaderViewModel @Inject constructor(
      * onCleared()
      */
     override fun onCleared() {
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_ORDER_CHANGE)
-            .removeObserver(orderChangeObserver as Observer<Any>)
+        LiveEventBus.get<Triple<SortOrder, SortOrder, SortOrder>>(EVENT_ORDER_CHANGE)
+            .removeObserver(orderChangeObserver)
     }
 
     companion object {

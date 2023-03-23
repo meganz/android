@@ -35,7 +35,6 @@ import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.qrcode.QRCodeActivity
@@ -50,6 +49,7 @@ import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
@@ -80,7 +80,6 @@ import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetails
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
@@ -90,6 +89,7 @@ import mega.privacy.android.domain.usecase.account.ChangeEmail
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
@@ -684,7 +684,7 @@ class MyAccountViewModel @Inject constructor(
                         purchases = false,
                         transactions = false
                     )
-                    LiveEventBus.get(EVENT_REFRESH).post(true)
+                    LiveEventBus.get<Boolean>(EVENT_REFRESH).post(true)
                 }
             }
             TAKE_PICTURE_PROFILE_CODE -> addProfileAvatar(null)

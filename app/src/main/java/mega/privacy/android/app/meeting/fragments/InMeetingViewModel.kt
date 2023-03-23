@@ -53,19 +53,26 @@ import mega.privacy.android.app.usecase.call.GetNetworkChangesUseCase
 import mega.privacy.android.app.usecase.call.GetParticipantsChangesUseCase
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.AVATAR_CHANGE
+import mega.privacy.android.app.utils.Constants.INVALID_POSITION
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.NAME_CHANGE
+import mega.privacy.android.app.utils.Constants.TYPE_JOIN
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
-import nz.mega.sdk.MegaChatCall.*
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_CONNECTING
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_INITIAL
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_IN_PROGRESS
+import nz.mega.sdk.MegaChatCall.CALL_STATUS_JOINING
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoom.PRIV_MODERATOR
@@ -274,7 +281,7 @@ class InMeetingViewModel @Inject constructor(
     }
 
     private val waitingForOthersBannerObserver =
-        Observer<android.util.Pair<Long, Boolean>> { result ->
+        Observer<Pair<Long, Boolean>> { result ->
             val chatId: Long = result.first
             val onlyMeInTheCall: Boolean = result.second
             if (currentChatId == chatId) {
@@ -346,9 +353,8 @@ class InMeetingViewModel @Inject constructor(
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .observeForever(noOutgoingCallObserver)
 
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
-            .observeForever(waitingForOthersBannerObserver as Observer<Any>)
+        LiveEventBus.get<Pair<Long, Boolean>>(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
+            .observeForever(waitingForOthersBannerObserver)
 
         LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
             .observeForever(openInviteChangeObserver)
@@ -2048,9 +2054,8 @@ class InMeetingViewModel @Inject constructor(
         LiveEventBus.get(EventConstants.EVENT_NOT_OUTGOING_CALL, Long::class.java)
             .removeObserver(noOutgoingCallObserver)
 
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
-            .removeObserver(waitingForOthersBannerObserver as Observer<Any>)
+        LiveEventBus.get<Pair<Long, Boolean>>(EventConstants.EVENT_UPDATE_WAITING_FOR_OTHERS)
+            .removeObserver(waitingForOthersBannerObserver)
 
         LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
             .removeObserver(openInviteChangeObserver)

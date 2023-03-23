@@ -46,7 +46,6 @@ kotlin-ktx = { module = "androidx.core:core-ktx", version.ref = "kotlin-ktx" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-liveeventbus = { module = "com.jeremyliao:live-event-bus-x", version.ref = "liveeventbus" }
 logging-logback = { module = "com.github.tony19:logback-android", version.ref = "logging-logback" }
 logging-slf4j = { module = "org.slf4j:slf4j-api", version.ref = "logging-slf4j" }
 logging-timber = { module = "com.jakewharton.timber:timber", version.ref = "logging-timber" }

@@ -1043,7 +1043,8 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             DrawerItem.INBOX -> (requireActivity() as ManagerActivity).onNodesInboxUpdate()
             DrawerItem.SHARED_ITEMS -> (requireActivity() as ManagerActivity).refreshSharesFragments()
             DrawerItem.SEARCH -> (requireActivity() as ManagerActivity).onNodesSearchUpdate()
-            DrawerItem.HOMEPAGE -> LiveEventBus.get(Constants.EVENT_NODES_CHANGE).post(false)
+            DrawerItem.HOMEPAGE -> LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE)
+                .post(false)
             else -> {}
         }
     }

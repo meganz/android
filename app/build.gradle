@@ -228,6 +228,7 @@ dependencies {
     implementation project(':data')
     debugImplementation project(':nocturn')
     qaImplementation project(':screenshot')
+    implementation project(':liveeventbus-x')
 
     // Jetbrains
     implementation lib.anko.commons
@@ -324,7 +325,6 @@ dependencies {
     implementation lib.bundles.logging
 
     // Other libs
-    implementation lib.liveeventbus
     implementation lib.bannerviewpager
     implementation lib.parallaxscroll
     implementation lib.vdurmont.emoji

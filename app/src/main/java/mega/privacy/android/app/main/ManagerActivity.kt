@@ -196,7 +196,6 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
-import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
@@ -5330,7 +5329,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         } else if (drawerItem === DrawerItem.SEARCH) {
             refreshSearch()
         } else if (drawerItem === DrawerItem.HOMEPAGE) {
-            LiveEventBus.get(Constants.EVENT_NODES_CHANGE).post(false)
+            LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE).post(false)
         }
         viewModel.checkCameraUploadFolder(true, null)
         refreshRubbishBin()
@@ -7243,7 +7242,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         ?.let { fileBrowserViewModel.setBrowserParentHandle(it) }
                 }
                 onNodesSharedUpdate()
-                LiveEventBus.get(Constants.EVENT_NODES_CHANGE).post(false)
+                LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE).post(false)
                 Util.showSnackbar(
                     this@ManagerActivity,
                     resources.getString(R.string.file_removed_offline)
@@ -9308,7 +9307,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 onNodesSearchUpdate()
                 refreshSharesFragments()
                 sharesPageAdapter.notifyDataSetChanged()
-                LiveEventBus.get(Constants.EVENT_NODES_CHANGE).post(false)
+                LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE).post(false)
                 if (isTransfersInProgressAdded) {
                     transfersFragment?.transferFinish(transfer.tag)
                 }

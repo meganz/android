@@ -36,7 +36,6 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatSession
 import org.jetbrains.anko.displayMetrics
 import timber.log.Timber
-import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -126,9 +125,8 @@ class MakeModeratorFragment : MeetingBaseFragment() {
      */
     private fun initLiveEvent() {
         //Sessions Level
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EventConstants.EVENT_SESSION_STATUS_CHANGE)
-            .observe(this, sessionStatusObserver as Observer<Any>)
+        LiveEventBus.get<Pair<MegaChatCall?, MegaChatSession>>(EventConstants.EVENT_SESSION_STATUS_CHANGE)
+            .observe(this, sessionStatusObserver)
 
         LiveEventBus.get(EventConstants.EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observe(this, callStatusObserver)

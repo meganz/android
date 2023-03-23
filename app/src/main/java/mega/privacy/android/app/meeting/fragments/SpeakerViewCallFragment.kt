@@ -158,9 +158,8 @@ class SpeakerViewCallFragment : MeetingBaseFragment(),
     }
 
     private fun initLiveEventBus() {
-        @Suppress("UNCHECKED_CAST")
-        LiveEventBus.get(EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
-            .observeSticky(this, remoteAudioLevelObserver as Observer<Any>)
+        LiveEventBus.get<Pair<Long, MegaChatSession>>(EVENT_REMOTE_AUDIO_LEVEL_CHANGE)
+            .observeSticky(this, remoteAudioLevelObserver)
     }
 
     private fun observeViewModel() {

@@ -31,12 +31,12 @@ import com.google.firebase.perf.FirebasePerformance
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.PageImageViewerBinding
-import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
 import mega.privacy.android.app.utils.ContextUtils.getScreenSize
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
 import mega.privacy.android.app.utils.PerformanceRequestListener
 import mega.privacy.android.app.utils.view.MultiTapGestureListener
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import timber.log.Timber
 import javax.inject.Inject
 
