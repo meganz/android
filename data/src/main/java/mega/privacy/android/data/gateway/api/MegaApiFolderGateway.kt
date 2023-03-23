@@ -146,4 +146,12 @@ interface MegaApiFolderGateway {
      * @return children nodes list
      */
     suspend fun getChildrenByNode(parentNode: MegaNode, order: Int? = null): List<MegaNode>
+
+    /**
+     * Get the parent node of a MegaNode
+     *
+     * @param node
+     * @return the parent node of the node, null if node doesn't exist
+     */
+    suspend fun getParentNode(node: MegaNode): MegaNode?
 }

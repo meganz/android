@@ -76,4 +76,7 @@ internal class MegaApiFolderFacade @Inject constructor(
             megaApiFolder.getChildren(parentNode)
         else
             megaApiFolder.getChildren(parentNode, order)
+
+    override suspend fun getParentNode(node: MegaNode): MegaNode? =
+        megaApiFolder.getParentNode(node)
 }

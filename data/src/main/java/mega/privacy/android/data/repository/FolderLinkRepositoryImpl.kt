@@ -11,6 +11,7 @@ import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.exception.SynchronisationException
@@ -93,6 +94,13 @@ class FolderLinkRepositoryImpl @Inject constructor(
 
     override suspend fun getRootNode(): UnTypedNode? = withContext(ioDispatcher) {
         megaApiFolderGateway.getRootNode()?.let { convertToUntypedNode(it) }
+    }
+
+    @Throws(SynchronisationException::class)
+    override suspend fun getParentNode(nodeId: NodeId): UnTypedNode = withContext(ioDispatcher) {
+        megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue)?.let { node ->
+            megaApiFolderGateway.getParentNode(node)?.let { convertToUntypedNode(it) }
+        } ?: throw SynchronisationException("Non null node found be null when fetched from api")
     }
 
     @Throws(SynchronisationException::class)

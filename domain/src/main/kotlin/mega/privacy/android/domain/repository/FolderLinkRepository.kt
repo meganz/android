@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import mega.privacy.android.domain.entity.folderlink.FetchNodeRequestResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 
 /**
@@ -29,6 +30,13 @@ interface FolderLinkRepository {
      * Get the root node
      */
     suspend fun getRootNode(): UnTypedNode?
+
+    /**
+     * Get the parent node
+     *
+     * @param nodeId Handle of the node of which to get the parent
+     */
+    suspend fun getParentNode(nodeId: NodeId): UnTypedNode?
 
     /**
      * Get children nodes by handle
