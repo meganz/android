@@ -48,6 +48,7 @@ dependencies {
     implementation platform(androidx.compose.bom)
     implementation androidx.bundles.compose.bom
     implementation lib.showkase
+    implementation lib.compose.state.events
     kapt lib.showkase.processor
 
     testImplementation testlib.junit

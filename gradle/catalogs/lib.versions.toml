@@ -20,6 +20,7 @@ rx-java = "3.0.4"
 rx-kotlin = "3.0.1"
 showkase = '1.0.0-beta13'
 simplestorage = "1.1.0"
+compose-state-events = "1.2.3"
 
 [libraries]
 anko-commons = { module = "org.jetbrains.anko:anko-commons", version.ref = "anko" }
@@ -65,6 +66,7 @@ showkase-screenshot-test = { module = "com.airbnb.android:showkase-screenshot-te
 simplestorage = { module = "com.anggrayudi:storage", version.ref = "simplestorage" }
 stickyheader = 'com.brandongogetap:stickyheaders:0.6.1'
 vdurmont-emoji = 'com.vdurmont:emoji-java:4.0.0'
+compose-state-events = { module = "com.github.leonard-palm:compose-state-events", version.ref = "compose-state-events" }
 
 
 [bundles]

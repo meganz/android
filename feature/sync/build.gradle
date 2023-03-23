@@ -64,6 +64,7 @@ dependencies {
     implementation androidx.compose.activity
     implementation platform(androidx.compose.bom)
     implementation androidx.bundles.compose.bom
+    implementation lib.compose.state.events
     implementation google.hilt.android
     kapt google.hilt.android.compiler
     kapt androidx.hilt.compiler

@@ -59,6 +59,7 @@ dependencies {
     implementation google.accompanist.systemui
     implementation androidx.lifecycle.runtime
     implementation lib.showkase
+    implementation lib.compose.state.events
     kapt lib.showkase.processor
 
     testImplementation testlib.junit
