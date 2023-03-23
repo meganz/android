@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.IBinder
 import android.os.StatFs
 import androidx.core.app.NotificationCompat
-import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.LifecycleService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
@@ -23,6 +22,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -85,6 +88,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
+import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.BroadcastCameraUploadProgress
@@ -93,6 +97,7 @@ import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectory
+import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
 import mega.privacy.android.domain.usecase.DeleteCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
@@ -134,7 +139,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import java.io.File
-import java.io.IOException
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -149,9 +154,6 @@ class CameraUploadsService : LifecycleService() {
         private const val LOCAL_FOLDER_REMINDER_PRIMARY = 1908
         private const val LOCAL_FOLDER_REMINDER_SECONDARY = 1909
         private const val OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "OVER_QUOTA_NOTIFICATION"
-        private const val ERROR_NOT_ENOUGH_SPACE = "ERROR_NOT_ENOUGH_SPACE"
-        private const val ERROR_CREATE_FILE_IO_ERROR = "ERROR_CREATE_FILE_IO_ERROR"
-        private const val ERROR_SOURCE_FILE_NOT_EXIST = "SOURCE_FILE_NOT_EXIST"
         private const val LOW_BATTERY_LEVEL = 20
         private const val notificationId = Constants.NOTIFICATION_CAMERA_UPLOADS
         private const val notificationChannelId = Constants.NOTIFICATION_CHANNEL_CAMERA_UPLOADS_ID
@@ -551,6 +553,12 @@ class CameraUploadsService : LifecycleService() {
      */
     @Inject
     lateinit var broadcastCameraUploadProgress: BroadcastCameraUploadProgress
+
+    /**
+     * Create temporary file and remove coordinates
+     */
+    @Inject
+    lateinit var createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase
 
     /**
      * Coroutine Scope for camera upload work
@@ -1093,6 +1101,19 @@ class CameraUploadsService : LifecycleService() {
         }
     }
 
+    private fun showNotEnoughStorageNotification() {
+        val title = getString(R.string.title_out_of_space)
+        val message = getString(R.string.error_not_enough_free_space)
+        val intent = Intent(this, ManagerActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+        showNotification(title, message, pendingIntent, true)
+    }
+
     private suspend fun startParallelUpload(
         finalList: List<SyncRecord>,
         isCompressedVideo: Boolean,
@@ -1113,46 +1134,42 @@ class CameraUploadsService : LifecycleService() {
         for (file in finalList) {
             val isSecondary = file.isSecondary
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
-
             if (file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_PHOTO) && !file.isCopyOnly) {
                 if (!areLocationTagsEnabled()) {
-                    var newPath = createTempFile(file)
-                    // IOException occurs.
-                    if (ERROR_CREATE_FILE_IO_ERROR == newPath) continue
-
-                    // Only retry for 60 seconds
-                    var counter = 60
-                    while (ERROR_NOT_ENOUGH_SPACE == newPath && counter != 0) {
-                        counter--
-                        try {
-                            Timber.d("Waiting for disk space to process")
-                            delay(1000)
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
+                    var shouldContinue = false
+                    flowOf(
+                        createTempFileAndRemoveCoordinatesUseCase(
+                            tempRoot,
+                            file
+                        )
+                    ).retryWhen { cause, attempt ->
+                        if (cause is NotEnoughStorageException) {
+                            if (attempt >= 60) {
+                                @Suppress("DEPRECATION")
+                                if (megaApi.numPendingUploads == 0) {
+                                    showNotEnoughStorageNotification()
+                                    Timber.w("Stop service due to out of space issue")
+                                    endService(aborted = true)
+                                } else {
+                                    // we will not be retying again and skip the current record
+                                    Timber.d("Stop retrying for $file")
+                                    shouldContinue = true
+                                    return@retryWhen false
+                                }
+                            }
+                            Timber.d("Waiting for disk space to process for $file")
+                            // total delay (1 second times 60 attempts) = 60 seconds
+                            delay(TimeUnit.SECONDS.toMillis(1))
+                            return@retryWhen true
+                        } else {
+                            // not storage exception, no need to retry
+                            return@retryWhen false
                         }
-
-                        //show no space notification
-                        @Suppress("DEPRECATION")
-                        if (megaApi.numPendingUploads == 0) {
-                            Timber.w("Stop service due to out of space issue")
-                            endService(aborted = true)
-                            val title = getString(R.string.title_out_of_space)
-                            val message = getString(R.string.error_not_enough_free_space)
-                            val intent = Intent(this, ManagerActivity::class.java)
-                            val pendingIntent = PendingIntent.getActivity(
-                                this,
-                                0,
-                                intent,
-                                PendingIntent.FLAG_IMMUTABLE
-                            )
-                            showNotification(title, message, pendingIntent, true)
-                            return
-                        }
-                        newPath = createTempFile(file)
-                    }
-                    if (newPath != file.newPath) {
-                        file.newPath = newPath
-                    }
+                    }.catch {
+                        Timber.e("Temporary File creation exception$it")
+                        shouldContinue = true
+                    }.collect()
+                    if (shouldContinue) continue
                 } else {
                     // Set as don't remove GPS
                     file.newPath = file.localPath
@@ -1893,17 +1910,8 @@ class CameraUploadsService : LifecycleService() {
      */
     private suspend fun onInsufficientSpace() {
         Timber.w("Insufficient space for video compression.")
-        showOutOfSpaceNotification()
         endService(aborted = true)
-    }
-
-    private fun showOutOfSpaceNotification() {
-        val intent = Intent(this, ManagerActivity::class.java)
-        val pendingIntent =
-            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        val title = resources.getString(R.string.title_out_of_space)
-        val message = resources.getString(R.string.message_out_of_space)
-        showNotification(title, message, pendingIntent, true)
+        showOutOfSpaceNotification()
     }
 
     /**
@@ -2147,52 +2155,12 @@ class CameraUploadsService : LifecycleService() {
         notificationManager?.notify(Constants.NOTIFICATION_STORAGE_OVERQUOTA, builder.build())
     }
 
-    private fun removeGPSCoordinates(filePath: String?) {
-        try {
-            filePath?.let {
-                val exif = ExifInterface(it)
-                exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, "0/1,0/1,0/1000")
-                exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, "0")
-                exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, "0/1,0/1,0/1000")
-                exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, "0")
-                exif.setAttribute(ExifInterface.TAG_GPS_ALTITUDE, "0/1,0/1,0/1000")
-                exif.setAttribute(ExifInterface.TAG_GPS_ALTITUDE_REF, "0")
-                exif.saveAttributes()
-            }
-        } catch (e: IOException) {
-            Timber.e(e)
-            e.printStackTrace()
-        }
-    }
-
-    private fun createTempFile(file: SyncRecord): String? {
-        val srcFile = file.localPath?.let { File(it) }
-        if (srcFile != null && !srcFile.exists()) {
-            Timber.d(ERROR_SOURCE_FILE_NOT_EXIST)
-            return ERROR_SOURCE_FILE_NOT_EXIST
-        }
-
-        try {
-            val stat = StatFs(tempRoot)
-            val availableFreeSpace = stat.availableBytes.toDouble()
-            if (srcFile != null && availableFreeSpace <= srcFile.length()) {
-                Timber.d(ERROR_NOT_ENOUGH_SPACE)
-                return ERROR_NOT_ENOUGH_SPACE
-            }
-        } catch (ex: Exception) {
-            ex.printStackTrace()
-            Timber.e(ex)
-        }
-        val destPath = file.newPath
-        val destFile = destPath?.let { File(it) }
-        try {
-            FileUtil.copyFile(srcFile, destFile)
-            removeGPSCoordinates(destPath)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Timber.e(e)
-            return ERROR_CREATE_FILE_IO_ERROR
-        }
-        return destPath
+    private fun showOutOfSpaceNotification() {
+        val intent = Intent(this, ManagerActivity::class.java)
+        val pendingIntent =
+            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val title = resources.getString(R.string.title_out_of_space)
+        val message = resources.getString(R.string.message_out_of_space)
+        showNotification(title, message, pendingIntent, true)
     }
 }

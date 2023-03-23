@@ -26,7 +26,6 @@ import mega.privacy.android.app.domain.usecase.DefaultIsWifiNotSatisfied
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.DefaultSetupDefaultSecondaryFolder
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
@@ -67,7 +66,6 @@ import mega.privacy.android.domain.usecase.CompressVideos
 import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectory
-import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinates
 import mega.privacy.android.domain.usecase.DefaultBackupTimeStampsAndFolderHandle
 import mega.privacy.android.domain.usecase.DefaultCheckCameraUpload
 import mega.privacy.android.domain.usecase.DefaultCheckEnableCameraUploadsStatus
@@ -75,7 +73,6 @@ import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressVideos
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultCreateCameraUploadTemporaryRootDirectory
-import mega.privacy.android.domain.usecase.DefaultCreateTempFileAndRemoveCoordinates
 import mega.privacy.android.domain.usecase.DefaultDeleteCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadsInDatabase
@@ -160,6 +157,7 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
+import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
@@ -937,12 +935,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindRestoreSecondaryTimestamps(defaultRestoreSecondaryTimestamps: DefaultRestoreSecondaryTimestamps): RestoreSecondaryTimestamps
-
-    /**
-     * provide [CreateTempFileAndRemoveCoordinates]
-     */
-    @Binds
-    abstract fun bindCreateTempFileAndRemoveCoordinates(createTempFileAndRemoveCoordinates: DefaultCreateTempFileAndRemoveCoordinates): CreateTempFileAndRemoveCoordinates
 
     /**
      * Provide the [ResetTotalUploads] implementation

@@ -76,7 +76,7 @@ interface FileSystemRepository {
      * @param syncRecord
      */
     @Throws(IOException::class)
-    suspend fun createTempFile(root: String, syncRecord: SyncRecord): String?
+    suspend fun createTempFile(root: String, syncRecord: SyncRecord): String
 
     /**
      * remove GPS CoOrdinates from the file
