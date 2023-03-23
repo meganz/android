@@ -41,7 +41,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultLoginRepositoryTestUseCase {
+class DefaultLoginRepositoryTest {
 
     private lateinit var underTest: DefaultLoginRepository
 

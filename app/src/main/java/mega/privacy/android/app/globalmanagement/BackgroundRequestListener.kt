@@ -176,7 +176,7 @@ class BackgroundRequestListener @Inject constructor(
         request: MegaRequest,
         api: MegaApiJava,
     ) {
-        Timber.d("LogoutUseCase finished: %s(%d)", e.errorString, e.errorCode)
+        Timber.d("Logout finished: %s(%d)", e.errorString, e.errorCode)
         if (e.errorCode == MegaError.API_OK) {
             Timber.d("END logout sdk request - wait chat logout")
             MegaApplication.isLoggingOut = false

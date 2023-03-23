@@ -2489,7 +2489,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             viewModel.monitorFinishActivityEvent,
             Lifecycle.State.CREATED
         ) { finish: Boolean ->
-            Timber.d("MonitorFinishActivityUseCase flow collected with Finish %s", finish)
+            Timber.d("MonitorFinishActivity flow collected with Finish %s", finish)
             if (finish) {
                 finish()
             }
