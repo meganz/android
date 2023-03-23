@@ -7,27 +7,31 @@ import android.view.ViewGroup;
 
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.ContactInfoActivity;
+import mega.privacy.android.app.presentation.contact.ContactInfoViewModel;
 
 import static mega.privacy.android.app.utils.Constants.*;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModelProvider;
 
 public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private String nickname;
     private ContactInfoActivity contactInfoActivity = null;
 
+    private ContactInfoViewModel viewModel;
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         contentView = View.inflate(getContext(), R.layout.bottom_sheet_nickname, null);
         itemsLayout = contentView.findViewById(R.id.items_layout);
-
+        viewModel = new ViewModelProvider(requireActivity()).get(ContactInfoViewModel.class);
         if (savedInstanceState != null) {
             nickname = savedInstanceState.getString(EXTRA_USER_NICKNAME, null);
         } else if (requireActivity() instanceof ContactInfoActivity) {
             contactInfoActivity = ((ContactInfoActivity) requireActivity());
-            nickname = contactInfoActivity.getNickname();
+            nickname = viewModel.getNickName();
         }
 
         return contentView;
@@ -49,7 +53,7 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
                 break;
 
             case R.id.remove_nickname_layout:
-                contactInfoActivity.addNickname(null, null);
+                viewModel.updateNickName(null);
                 break;
         }
 

@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
@@ -23,6 +24,7 @@ import mega.privacy.android.app.main.ContactFileBaseFragment
 import mega.privacy.android.app.main.ContactFileListActivity
 import mega.privacy.android.app.main.ContactInfoActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
+import mega.privacy.android.app.presentation.contact.ContactInfoViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
@@ -46,11 +48,12 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     private var _binding: FragmentContactSharedFolderListBinding? = null
     private val binding: FragmentContactSharedFolderListBinding
         get() = _binding!!
-    val parentHandleStack = Stack<Long>()
+    private val parentHandleStack = Stack<Long>()
     private lateinit var moreButton: Button
     private lateinit var listView: RecyclerView
 
     private val handler = Handler(Looper.getMainLooper())
+    private val viewModel by activityViewModels<ContactInfoViewModel>()
     private val contactInfoActivity: ContactInfoActivity
         get() = (requireActivity() as ContactInfoActivity)
 
@@ -168,7 +171,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
         if (megaApi.getNodeByHandle(parentHandle) == null) {
             handle = -1
             this.parentHandle = -1
-            contactInfoActivity.setParentHandle(handle)
+            viewModel.setParentHandle(handle)
             adapter.parentHandle = handle
             val fullList = megaApi.getInShares(contact)
             setNodes(getNodeListToBeDisplayed(fullList))
@@ -334,7 +337,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                         }
                     }
 
-                    if (!contactInfoActivity.isEmptyParentHandleStack) {
+                    if (!isEmptyParentHandleStack()) {
                         showTrash = true
                     }
                     selected.forEach {
@@ -435,11 +438,11 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     }
 
     override fun activateActionMode() {
-        Timber.d("activateActionMode");
+        Timber.d("activateActionMode")
         if (adapter?.isMultipleSelect == false) {
-            adapter?.isMultipleSelect = true;
+            adapter?.isMultipleSelect = true
             actionMode =
-                (requireActivity() as AppCompatActivity).startSupportActionMode(ActionBarCallBack());
+                (requireActivity() as AppCompatActivity).startSupportActionMode(ActionBarCallBack())
         }
     }
 

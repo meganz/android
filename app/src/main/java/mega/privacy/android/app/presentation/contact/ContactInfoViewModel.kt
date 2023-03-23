@@ -8,6 +8,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -23,35 +24,52 @@ import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contact.model.ContactInfoState
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
+import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.chat.ChatRoom
+import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.entity.user.UserId
-import mega.privacy.android.domain.usecase.AreCredentialsVerified
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetChatRoomByUser
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.RequestLastGreen
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.contact.ApplyContactUpdateForUser
+import mega.privacy.android.domain.usecase.contact.GetContactFromChat
+import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
+import mega.privacy.android.domain.usecase.contact.SetUserAlias
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
+import java.io.File
 import javax.inject.Inject
 
 /**
  * View Model for [mega.privacy.android.app.main.ContactInfoActivity]
  *
- * @property monitorStorageStateEventUseCase [MonitorStorageStateEventUseCase]
- * @property monitorConnectivityUseCase      [MonitorConnectivityUseCase]
- * @property startChatCall                   [StartChatCall]
- * @property getChatRoomUseCase              [GetChatRoomUseCase]
- * @property passcodeManagement              [PasscodeManagement]
- * @property chatApiGateway                  [MegaChatApiGateway]
- * @property cameraGateway                   [CameraGateway]
- * @property chatManagement                  [ChatManagement]
- * @property areCredentialsVerified          [AreCredentialsVerified]
- * @property monitorContactUpdates           [MonitorContactUpdates]
+ * @property monitorStorageStateEventUseCase    [MonitorStorageStateEventUseCase]
+ * @property monitorConnectivityUseCase         [MonitorConnectivityUseCase]
+ * @property startChatCall                      [StartChatCall]
+ * @property getChatRoomUseCase                 [GetChatRoomUseCase]
+ * @property passcodeManagement                 [PasscodeManagement]
+ * @property chatApiGateway                     [MegaChatApiGateway]
+ * @property cameraGateway                      [CameraGateway]
+ * @property chatManagement                     [ChatManagement]
+ * @property monitorContactUpdates              [MonitorContactUpdates]
+ * @property requestLastGreen                   [RequestLastGreen]
+ * @property getChatRoom                        [GetChatRoom]
+ * @property getUserOnlineStatusByHandle        [GetUserOnlineStatusByHandle]
+ * @property getChatRoomByUser                  [GetChatRoomByUser]
+ * @property getContactFromChat                 [GetContactFromChat]
+ * @property getContactFromEmail                [GetContactFromEmail]
+ * @property applyContactUpdateForUser          [ApplyContactUpdateForUser]
+ * @property setUserAlias                       [SetUserAlias]
  */
 @HiltViewModel
 class ContactInfoViewModel @Inject constructor(
@@ -63,10 +81,16 @@ class ContactInfoViewModel @Inject constructor(
     private val chatApiGateway: MegaChatApiGateway,
     private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
-    private val areCredentialsVerified: AreCredentialsVerified,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val getUserOnlineStatusByHandle: GetUserOnlineStatusByHandle,
     private val requestLastGreen: RequestLastGreen,
+    private val getChatRoom: GetChatRoom,
+    private val getChatRoomByUser: GetChatRoomByUser,
+    private val getContactFromChat: GetContactFromChat,
+    private val getContactFromEmail: GetContactFromEmail,
+    private val applyContactUpdateForUser: ApplyContactUpdateForUser,
+    private val setUserAlias: SetUserAlias,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
     /**
@@ -79,40 +103,60 @@ class ContactInfoViewModel @Inject constructor(
      */
     val state: StateFlow<ContactInfoState> = _state
 
+    /**
+     * Parent Handle
+     */
+    var parentHandle: Long? = null
+
+    /**
+     * Checks if contact info launched from contacts screen
+     */
+    val isFromContacts: Boolean
+        get() = state.value.isFromContacts
+
+    /**
+     * User status
+     */
+    val userStatus: UserStatus
+        get() = state.value.userStatus
+
+
+    /**
+     * Nick name
+     */
+    val nickName: String?
+        get() = state.value.contactItem?.contactData?.alias
+
     init {
         getContactUpdates()
     }
 
     /**
-     * Sets the initial data of the contact.
-     *
-     * @param email The contact's email.
+     * Monitors contact changes.
      */
-    fun setupData(handle: Long, email: String) {
-        _state.update { it.copy(userId = UserId(handle), email = email) }
-        checkCredentials()
-    }
-
-    private fun checkCredentials() = state.value.email?.let { email ->
-        viewModelScope.launch {
-            _state.update { it.copy(areCredentialsVerified = areCredentialsVerified(email)) }
+    private fun getContactUpdates() = viewModelScope.launch {
+        monitorContactUpdates().collectLatest { updates ->
+            val userInfo = state.value.contactItem?.let { applyContactUpdateForUser(it, updates) }
+            if (updates.changes.containsValue(listOf(UserChanges.Avatar))) {
+                updateAvatar(userInfo)
+            } else {
+                _state.update { it.copy(contactItem = userInfo) }
+            }
         }
     }
 
     /**
-     * Monitors contact changes.
+     * Refreshes user info
+     *
+     * User online status, Credential verification, User info change will be updated
      */
-    private fun getContactUpdates() {
-        viewModelScope.launch {
-            monitorContactUpdates().collectLatest { updates ->
-                val contactUpdates = updates.changes.values.map {
-                    it.contains(UserChanges.AuthenticationInformation)
-                }
-
-                if (contactUpdates.isNotEmpty()) {
-                    checkCredentials()
-                }
-            }
+    fun refreshUserInfo() = viewModelScope.launch {
+        val email = state.value.email ?: return@launch
+        runCatching {
+            getContactFromEmail(email, isOnline())
+        }.onSuccess {
+            _state.update { state -> state.copy(contactItem = it) }
+            it?.handle?.let { handle -> runCatching { requestLastGreen(handle) } }
         }
     }
 
@@ -136,16 +180,12 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun getChatRoomId(userHandle: Long): LiveData<Long> {
         val result = MutableLiveData<Long>()
-        getChatRoomUseCase.get(userHandle)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
+        getChatRoomUseCase.get(userHandle).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
                 onSuccess = { chatId ->
                     result.value = chatId
-                },
-                onError = Timber::e
-            )
-            .addTo(composite)
+                }, onError = Timber::e
+            ).addTo(composite)
         return result
     }
 
@@ -211,10 +251,9 @@ class ContactInfoViewModel @Inject constructor(
     /**
      * Gets user online status by user handle
      * Requests for lastGreen
-     *
-     * @param handle is the user handle for selected user
      */
-    fun getUserStatusAndRequestForLastGreen(handle: Long) = viewModelScope.launch {
+    fun getUserStatusAndRequestForLastGreen() = viewModelScope.launch {
+        val handle = state.value.contactItem?.handle ?: return@launch
         runCatching { getUserOnlineStatusByHandle(handle) }.onSuccess { status ->
             if (status.isAwayOrOffline()) {
                 requestLastGreen(handle)
@@ -241,6 +280,88 @@ class ContactInfoViewModel @Inject constructor(
                     userStatus = status,
                 )
             }
+        }
+    }
+
+    /**
+     * Method to get chat room and contact info
+     *
+     * @param chatHandle chat handle of selected chat
+     * @param email email id of selected user
+     */
+    fun updateContactInfo(chatHandle: Long, email: String? = null) = viewModelScope.launch {
+        val isFromContacts = chatHandle == -1L
+        var userInfo: ContactItem? = null
+        var chatRoom: ChatRoom? = null
+        if (isFromContacts) {
+            runCatching {
+                email?.let { mail -> getContactFromEmail(mail, isOnline()) }
+            }.onSuccess { contact ->
+                userInfo = contact
+                chatRoom = runCatching {
+                    contact?.handle?.let { getChatRoomByUser(it) }
+                }.getOrNull()
+            }
+        } else {
+            runCatching {
+                chatRoom = getChatRoom(chatHandle)
+                userInfo = getContactFromChat(chatHandle, isOnline())
+            }
+        }
+
+        _state.update {
+            it.copy(
+                isFromContacts = isFromContacts,
+                lastGreen = userInfo?.lastSeen ?: 0,
+                userStatus = userInfo?.status ?: UserStatus.Invalid,
+                contactItem = userInfo,
+                chatRoom = chatRoom,
+            )
+        }
+        updateAvatar(userInfo)
+    }
+
+    private fun updateAvatar(userInfo: ContactItem?) = viewModelScope.launch(ioDispatcher) {
+        val avatarFile = userInfo?.contactData?.avatarUri?.let { File(it) }
+        val avatar = AvatarUtil.getAvatarBitmap(avatarFile)
+        _state.update { it.copy(avatar = avatar) }
+    }
+
+    /**
+     * Sets parent handle
+     *
+     * @param handle parent handle
+     */
+    fun setParentHandle(handle: Long) {
+        parentHandle = handle
+    }
+
+    /**
+     * Method to update the nick name of the user
+     *
+     * @param newNickname new nick name given by the user
+     */
+    fun updateNickName(newNickname: String?) = viewModelScope.launch {
+        val handle = state.value.contactItem?.handle
+        if (handle == null || (nickName != null && nickName == newNickname)) return@launch
+        runCatching {
+            setUserAlias(newNickname, handle)
+        }.onSuccess { alias ->
+            _state.update {
+                it.copy(
+                    snackBarMessage = alias?.let { R.string.snackbar_nickname_added }
+                        ?: run { R.string.snackbar_nickname_removed },
+                )
+            }
+        }
+    }
+
+    /**
+     * on Consume Snack Bar Message event
+     */
+    fun onConsumeSnackBarMessageEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(snackBarMessage = null) }
         }
     }
 }

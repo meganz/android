@@ -54,15 +54,10 @@ import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.components.twemoji.EmojiEditText
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
-import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
@@ -71,7 +66,6 @@ import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.listeners.CreateChatListener
-import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.ContactController
@@ -90,16 +84,14 @@ import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivi
 import mega.privacy.android.app.presentation.contact.ContactInfoViewModel
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.model.ContactInfoState
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
-import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
+import mega.privacy.android.app.presentation.copynode.CopyRequestResult
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.presentation.copynode.CopyRequestResult
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
@@ -111,7 +103,6 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
@@ -141,7 +132,6 @@ import nz.mega.sdk.MegaSetElement
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -202,7 +192,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private var user: MegaUser? = null
     private var chatHandle: Long = 0
     private var chat: MegaChatRoom? = null
-    private var fromContacts = true
 
     private var drawableShare: Drawable? = null
     private var drawableSend: Drawable? = null
@@ -215,7 +204,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private var contactInfoActivity: ContactInfoActivity? = null
     private var selectedNode: MegaNode? = null
     private var moveToRubbish = false
-    private var parentHandle: Long = 0
     private var bottomSheetDialogFragment: ContactFileListBottomSheetDialogFragment? = null
     private var contactNicknameBottomSheetDialogFragment: ContactNicknameBottomSheetDialogFragment? =
         null
@@ -229,19 +217,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             statusDialog?.dismiss()
         }
     }
-    private val userNameReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val userHandle = user?.handle
-            val extraUserHandle = intent.getLongExtra(EXTRA_USER_HANDLE, MegaApiJava.INVALID_HANDLE)
-            if (intent.action == null || userHandle == null || extraUserHandle != userHandle) {
-                return
-            }
-            if (intent.action == ACTION_UPDATE_NICKNAME || intent.action == ACTION_UPDATE_FIRST_NAME || intent.action == ACTION_UPDATE_LAST_NAME) {
-                checkNickname(userHandle)
-                updateAvatar()
-            }
-        }
-    }
+
     private val callStatusObserver = Observer { call: MegaChatCall ->
         when (call.status) {
             MegaChatCall.CALL_STATUS_CONNECTING, MegaChatCall.CALL_STATUS_IN_PROGRESS, MegaChatCall.CALL_STATUS_DESTROYED, MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_USER_NO_PRESENT -> {
@@ -251,7 +227,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 ) {
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
-                        getFormattedStringOrDefault(R.string.call_error_too_many_participants),
+                        getString(R.string.call_error_too_many_participants),
                         MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                     )
                 }
@@ -304,7 +280,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             for (updatedUser in users) {
                 if (updatedUser.handle == user?.handle) {
                     user = updatedUser
-                    contentContactProperties.emailText.text = updatedUser.email
                     break
                 }
             }
@@ -317,7 +292,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
             sharedFoldersFragment?.let {
                 if (it.isVisible) {
-                    it.setNodes(parentHandle)
+                    viewModel.parentHandle?.let { handle -> it.setNodes(handle) }
                 }
             }
             val nodes = megaApi.getInShares(user)
@@ -352,7 +327,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     val intent = Intent(this@ContactInfoActivity, ChatActivity::class.java)
                         .setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
                         .putExtra(Constants.CHAT_ID, request.chatHandle)
-                    if (!fromContacts) {
+                    if (!viewModel.isFromContacts) {
                         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     }
                     this@ContactInfoActivity.startActivity(intent)
@@ -361,7 +336,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     Timber.d("ERROR WHEN CREATING CHAT ${e.errorString}")
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
-                        getFormattedStringOrDefault(R.string.create_chat_error),
+                        getString(R.string.create_chat_error),
                         -1
                     )
                 }
@@ -422,16 +397,16 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         } else if (moveToRubbish) {
             Timber.d("Finish move to Rubbish!")
             val errorText = if (error.errorCode == MegaError.API_OK) {
-                getFormattedStringOrDefault(R.string.context_correctly_moved_to_rubbish)
+                getString(R.string.context_correctly_moved_to_rubbish)
             } else {
-                getFormattedStringOrDefault(R.string.context_no_moved)
+                getString(R.string.context_no_moved)
             }
             showSnackbar(Constants.SNACKBAR_TYPE, errorText, -1)
         } else {
             val errorText = if (error.errorCode == MegaError.API_OK) {
-                getFormattedStringOrDefault(R.string.context_correctly_moved)
+                getString(R.string.context_correctly_moved)
             } else {
-                getFormattedStringOrDefault(R.string.context_no_moved)
+                getString(R.string.context_no_moved)
             }
             showSnackbar(Constants.SNACKBAR_TYPE, errorText, -1)
         }
@@ -448,9 +423,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         sharedFoldersFragment?.let {
             if (!it.isVisible) return
             val message = if (e.errorCode == MegaError.API_OK) {
-                getFormattedStringOrDefault(R.string.context_folder_created)
+                getString(R.string.context_folder_created)
             } else {
-                getFormattedStringOrDefault(R.string.context_folder_no_created)
+                getString(R.string.context_folder_no_created)
             }
             showSnackbar(Constants.SNACKBAR_TYPE, message, -1)
             it.setNodes()
@@ -567,9 +542,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         if (extras != null) {
             setUpViews()
             getContactData(extras)
-            user?.let {
-                viewModel.setupData(it.handle, it.email)
-            }
             updateUI()
             checkScreenRotationToShowCall()
             updateViewBasedOnNetworkAvailability()
@@ -595,14 +567,14 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 if (!viewModel.isOnline()) {
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
-                        getFormattedStringOrDefault(R.string.error_server_connection_problem),
+                        getString(R.string.error_server_connection_problem),
                         -1
                     )
                 } else {
                     statusDialog =
                         createProgressDialog(
                             this,
-                            getFormattedStringOrDefault(R.string.context_copying)
+                            getString(R.string.context_copying)
                         )
                     val copyHandles = result?.first
                     val toHandle = result?.second
@@ -665,17 +637,17 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     val parent = megaApi.getNodeByHandle(folderHandle)
                     if (parent?.isFolder == true) {
                         val dialogBuilder = MaterialAlertDialogBuilder(this)
-                        dialogBuilder.setTitle(getFormattedStringOrDefault(R.string.file_properties_shared_folder_permissions))
+                        dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions))
                         val items = arrayOf<CharSequence>(
-                            getFormattedStringOrDefault(R.string.file_properties_shared_folder_read_only),
-                            getFormattedStringOrDefault(
+                            getString(R.string.file_properties_shared_folder_read_only),
+                            getString(
                                 R.string.file_properties_shared_folder_read_write
                             ),
-                            getFormattedStringOrDefault(R.string.file_properties_shared_folder_full_access)
+                            getString(R.string.file_properties_shared_folder_full_access)
                         )
                         dialogBuilder.setSingleChoiceItems(items, -1) { _, item ->
                             statusDialog = createProgressDialog(
-                                this, getFormattedStringOrDefault(
+                                this, getString(
                                     R.string.context_sharing_folder
                                 )
                             )
@@ -688,7 +660,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 } else {
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
-                        getFormattedStringOrDefault(R.string.error_server_connection_problem),
+                        getString(R.string.error_server_connection_problem),
                         -1
                     )
                 }
@@ -717,13 +689,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             retentionTimeReceiver,
             IntentFilter(ACTION_UPDATE_RETENTION_TIME)
         )
-        val userNameUpdateFilter =
-            IntentFilter(BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE).apply {
-                addAction(ACTION_UPDATE_NICKNAME)
-                addAction(ACTION_UPDATE_FIRST_NAME)
-                addAction(ACTION_UPDATE_LAST_NAME)
-            }
-        registerReceiver(userNameReceiver, userNameUpdateFilter)
         registerReceiver(
             destroyActionModeReceiver,
             IntentFilter(BROADCAST_ACTION_DESTROY_ACTION_MODE)
@@ -734,38 +699,20 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         chatHandle = extras.getLong(Constants.HANDLE, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
         isChatOpen = extras.getBoolean(Constants.ACTION_CHAT_OPEN, false)
         val userEmailExtra = extras.getString(Constants.NAME)
+        viewModel.updateContactInfo(chatHandle, userEmailExtra)
         if (chatHandle != -1L) {
             Timber.d("From chat!!")
-            fromContacts = false
             chat = megaChatApi.getChatRoom(chatHandle)
             val userHandle = (chat ?: return).getPeerHandle(0)
             val userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle)
             user = megaApi.getContact(userHandleEncoded)
-            user?.let {
-                checkNickname(it.handle)
-            } ?: run {
-                var fullName: String? = ""
-                val title = ChatUtil.getTitleChat(chat)
-                if (!title.isNullOrEmpty()) {
-                    fullName = title
-                } else if (userEmailExtra != null) {
-                    fullName = userEmailExtra
-                }
-                withoutNickname(fullName)
-            }
         } else {
             Timber.d("From contacts!!")
-            fromContacts = true
             user = megaApi.getContact(userEmailExtra)
             chat = user?.let {
-                checkNickname(it.handle)
                 megaChatApi.getChatRoomByUser(it.handle)
-            } ?: run {
-                withoutNickname(userEmailExtra)
-                null
             }
         }
-
     }
 
     private fun setUpViews() {
@@ -823,9 +770,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun modifyNickName() {
-        if (contentContactProperties.nicknameText.text == getFormattedStringOrDefault(R.string.add_nickname)) {
+        if (contentContactProperties.nicknameText.text == getString(R.string.add_nickname)) {
             showConfirmationSetNickname(null)
-        } else if (user != null && !contactNicknameBottomSheetDialogFragment.isBottomSheetDialogShown()) {
+        } else if (contentContactProperties.emailText.text.isNotEmpty() && !contactNicknameBottomSheetDialogFragment.isBottomSheetDialogShown()) {
             contactNicknameBottomSheetDialogFragment =
                 ContactNicknameBottomSheetDialogFragment().apply {
                     show(
@@ -847,19 +794,14 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun updateViewBasedOnNetworkAvailability() {
         if (viewModel.isOnline()) {
             Timber.d("online -- network connection")
-            setAvatar()
             with(contentContactProperties) {
                 user?.let {
                     val nodes = megaApi.getInShares(it)
                     setFoldersButtonText(nodes)
-                    emailText.text = user?.email
                     updateShareContactLayoutVisibility(shouldShow = true)
                     updateSharedFolderLayoutVisibility(shouldShow = true)
                     updateChatOptionsLayoutVisibility(shouldShow = true)
                 } ?: run {
-                    if (chat != null) {
-                        emailText.text = user?.email
-                    }
                     updateShareContactLayoutVisibility(shouldShow = false)
                     updateSharedFolderLayoutVisibility(shouldShow = false)
                     updateChatOptionsLayoutVisibility(shouldShow = false)
@@ -868,13 +810,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
         } else {
             Timber.d("OFFLINE -- NO network connection")
-            with(contentContactProperties) {
-                setOfflineAvatar()
-                emailText.text = user?.email
-                updateShareContactLayoutVisibility(shouldShow = false)
-                updateSharedFolderLayoutVisibility(shouldShow = false)
-                updateChatOptionsLayoutVisibility(shouldShow = true)
-            }
+            updateShareContactLayoutVisibility(shouldShow = false)
+            updateSharedFolderLayoutVisibility(shouldShow = false)
+            updateChatOptionsLayoutVisibility(shouldShow = true)
         }
     }
 
@@ -920,17 +858,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    private fun getParticipantEmail(): String? {
-        return ChatController(this@ContactInfoActivity).getParticipantEmail(
-            (chat ?: return null).getPeerHandle(0)
-        )
-    }
-
     private fun contactPropertiesClicked() {
         val intentManageChat = Intent(this, ManageChatHistoryActivity::class.java).apply {
-            putExtra(Constants.EMAIL, user?.email)
+            putExtra(Constants.EMAIL, contentContactProperties.emailText.text)
             putExtra(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
-            putExtra(Constants.IS_FROM_CONTACTS, fromContacts)
+            putExtra(Constants.IS_FROM_CONTACTS, viewModel.isFromContacts)
         }
         startActivity(intentManageChat)
     }
@@ -950,7 +882,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             showOverDiskQuotaPaywallWarning()
             return
         }
-        if (user == null) {
+        if (contentContactProperties.emailText.text.isNullOrEmpty()) {
             Timber.d("Selected contact NULL")
             return
         }
@@ -970,7 +902,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun verifyCredentialsClicked() {
         val intent = Intent(this, AuthenticityCredentialsActivity::class.java)
-        intent.putExtra(Constants.EMAIL, (user ?: return).email)
+        intent.putExtra(Constants.EMAIL, contentContactProperties.emailText.text)
         startActivity(intent)
     }
 
@@ -1001,35 +933,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 }
             }
         }
-    }
-
-    private fun checkNickname(contactHandle: Long) {
-        val contactDB = ContactUtil.getContactDB(contactHandle) ?: return
-        val fullName =
-            ContactUtil.buildFullName(contactDB.name, contactDB.lastName, contactDB.mail)
-        val nicknameText = contactDB.nickname
-        if (nicknameText.isNullOrEmpty()) {
-            withoutNickname(fullName)
-        } else {
-            withNickname(fullName, nicknameText)
-        }
-    }
-
-    private fun withoutNickname(name: String?) {
-        collapsingAppBar.firstLineToolbar.text = name
-        contentContactProperties.nameText.isVisible = false
-        contentContactProperties.nicknameText.text =
-            getFormattedStringOrDefault(R.string.add_nickname)
-        setDefaultAvatar()
-    }
-
-    private fun withNickname(name: String, nickname: String) {
-        collapsingAppBar.firstLineToolbar.text = nickname
-        contentContactProperties.nameText.text = name
-        contentContactProperties.nameText.isVisible = true
-        contentContactProperties.nicknameText.text =
-            getFormattedStringOrDefault(R.string.edit_nickname)
-        setDefaultAvatar()
     }
 
     /**
@@ -1064,7 +967,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             R.color.white
         )
         if (viewModel.isOnline()) {
-            sendFileMenuItem?.isVisible = fromContacts
+            sendFileMenuItem?.isVisible = viewModel.isFromContacts
         } else {
             Timber.d("Hide all - no network connection")
             shareMenuItem?.isVisible = false
@@ -1096,7 +999,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                             )
                         )
                         setColorFilter(isDark = false)
-                        visibilityStateIcon(viewModel.state.value.userStatus)
+                        visibilityStateIcon(viewModel.userStatus)
                     } else if (stateToolbar == State.COLLAPSED) {
                         firstLineToolbar.setTextColor(
                             ContextCompat.getColor(
@@ -1111,7 +1014,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                             )
                         )
                         setColorFilter(isDark = true)
-                        visibilityStateIcon(viewModel.state.value.userStatus)
+                        visibilityStateIcon(viewModel.userStatus)
                     }
                 }
             })
@@ -1158,7 +1061,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 if (!viewModel.isOnline()) {
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
-                        getFormattedStringOrDefault(R.string.error_server_connection_problem),
+                        getString(R.string.error_server_connection_problem),
                         -1
                     )
                     return true
@@ -1200,7 +1103,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 megaChatApi.createChat(false, peers, megaChatRequestListenerInterface)
             } else {
                 Timber.d("There is already a chat, open it!")
-                if (fromContacts) {
+                if (viewModel.isFromContacts) {
                     val intentOpenChat = Intent(this, ChatActivity::class.java)
                     intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
                     intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
@@ -1238,8 +1141,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Start call
      */
     private fun startCall() {
-        user?.let {
-            viewModel.getChatRoomId(it.handle).observe(this) { chatId -> startCallWithChat(chatId) }
+        user?.handle?.let {
+            viewModel.getChatRoomId(it).observe(this) { chatId -> startCallWithChat(chatId) }
         }
     }
 
@@ -1254,15 +1157,36 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             if (contactInfoState.error != null) {
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
-                    getFormattedStringOrDefault(R.string.call_error),
+                    getString(R.string.call_error),
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
             } else if (contactInfoState.isCallStarted == true) {
                 enableCallLayouts(true)
             }
-            updateVerifyCredentialsLayout(contactInfoState.areCredentialsVerified)
+            contactInfoState.snackBarMessage?.let {
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    getString(it),
+                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                )
+                viewModel.onConsumeSnackBarMessageEvent()
+            }
+            updateVerifyCredentialsLayout(contactInfoState)
             updateUserStatusChanges(contactInfoState)
+            updateBasicInfo(contactInfoState)
         }
+    }
+
+    private fun updateBasicInfo(contactInfoState: ContactInfoState) = with(contactInfoState) {
+        contentContactProperties.emailText.text = contactInfoState.email
+        collapsingAppBar.firstLineToolbar.text = primaryDisplayName
+        contentContactProperties.nameText.apply {
+            text = secondaryDisplayName
+            isVisible = !secondaryDisplayName.isNullOrEmpty()
+        }
+        contentContactProperties.nicknameText.text =
+            getString(contactInfoState.modifyNickNameTextId)
+        updateAvatar(contactInfoState.avatar)
     }
 
     private fun updateUserStatusChanges(contactInfoState: ContactInfoState) {
@@ -1271,7 +1195,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         collapsingAppBar.secondLineToolbar.apply {
             if (contactInfoState.userStatus.isValid()) {
                 isVisible = true
-                text = getFormattedStringOrDefault(contactInfoState.userStatus.text)
+                text = getString(contactInfoState.userStatus.text)
             } else isVisible = false
         }
         visibilityStateIcon(contactInfoState.userStatus)
@@ -1311,25 +1235,15 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         } ?: run {
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
-                getFormattedStringOrDefault(R.string.error_sharing_folder),
+                getString(R.string.error_sharing_folder),
                 -1
             )
             Timber.w("Error sharing folder")
         }
     }
 
-    private fun setAvatar() {
-        Timber.d("setAvatar")
-        user?.let {
-            val avatar = buildAvatarFile(this, "${it.email}.jpg")
-            if (avatar?.exists() == true) {
-                setProfileAvatar(avatar)
-            }
-        }
-    }
-
     private fun setOfflineAvatar() {
-        val userEmail = getParticipantEmail() ?: return
+        val userEmail = contentContactProperties.emailText.text ?: return
         Timber.d("setOfflineAvatar")
         val avatar = buildAvatarFile(this, "$userEmail.jpg")
         if (avatar?.exists() == true) {
@@ -1343,31 +1257,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                         val colorBackground = AvatarUtil.getDominantColor(it)
                         collapsingAppBar.imageLayout.setBackgroundColor(colorBackground)
                     }
-                }
-            }
-        }
-    }
-
-    private fun setProfileAvatar(avatar: File) {
-        Timber.d("setProfileAvatar")
-        val imBitmap: Bitmap?
-        if (avatar.length() > 0) {
-            val bOpts = BitmapFactory.Options()
-            imBitmap = BitmapFactory.decodeFile(avatar.absolutePath, bOpts)
-            if (imBitmap == null) {
-                avatar.delete()
-                user?.let {
-                    val avatarFile = buildAvatarFile(this, it.email)
-                    if (avatarFile?.exists() == true) {
-                        megaApi.getUserAvatar(user, avatarFile.absolutePath, this)
-                    }
-                }
-
-            } else {
-                collapsingAppBar.toolbarImage.setImageBitmap(imBitmap)
-                if (!imBitmap.isRecycled) {
-                    val colorBackground = AvatarUtil.getDominantColor(imBitmap)
-                    collapsingAppBar.imageLayout.setBackgroundColor(colorBackground)
                 }
             }
         }
@@ -1423,11 +1312,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             imeOptions = EditorInfo.IME_ACTION_DONE
             inputType = InputType.TYPE_CLASS_TEXT
             Util.showKeyboardDelayed(this)
-            setImeActionLabel(
-                getFormattedStringOrDefault(R.string.add_nickname),
-                EditorInfo.IME_ACTION_DONE
-            )
-            hint = alias ?: getFormattedStringOrDefault(R.string.nickname_title)
+            setImeActionLabel(getString(R.string.add_nickname), EditorInfo.IME_ACTION_DONE)
+            hint = alias ?: getString(R.string.nickname_title)
             alias?.let {
                 setText(alias)
                 setSelection(this.length())
@@ -1449,23 +1335,20 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
 
         val builder = MaterialAlertDialogBuilder(this)
-            .setTitle(
-                if (alias == null) getFormattedStringOrDefault(R.string.add_nickname) else getFormattedStringOrDefault(
-                    R.string.edit_nickname
-                )
-            )
-            .setPositiveButton(getFormattedStringOrDefault(R.string.button_set)) { _, _ ->
+            .setTitle(getString(viewModel.nickName?.let { R.string.add_nickname }
+                ?: run { R.string.edit_nickname }))
+            .setPositiveButton(getString(R.string.button_set)) { _, _ ->
                 val name = emojiEditText.text.toString()
                 if (TextUtil.isTextEmpty(name)) {
                     Timber.w("Input is empty")
-                    emojiEditText.error = getFormattedStringOrDefault(R.string.invalid_string)
+                    emojiEditText.error = getString(R.string.invalid_string)
                     emojiEditText.requestFocus()
                 } else {
-                    addNickname(alias, name)
+                    viewModel.updateNickName(name)
                     setNicknameDialog?.dismiss()
                 }
             }
-        builder.setNegativeButton(getFormattedStringOrDefault(R.string.general_cancel)) { _, _ -> setNicknameDialog?.dismiss() }
+        builder.setNegativeButton(getString(R.string.general_cancel)) { _, _ -> setNicknameDialog?.dismiss() }
         builder.setView(layout)
         setNicknameDialog = builder.create().apply {
             show()
@@ -1476,20 +1359,25 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    /**
-     * Method responsible for adding nick name
-     */
-    fun addNickname(oldNickname: String?, newNickname: String?) {
-        if (oldNickname != null && oldNickname == newNickname) return
-        //Update the new nickname
-        megaApi.setUserAlias((user ?: return).handle, newNickname, SetAttrUserListener(this))
+    private fun updateAvatar(avatar: Bitmap?) {
+        if (avatar == null) {
+            setDefaultAvatar()
+        } else {
+            if (viewModel.isOnline()) {
+                setAvatar(avatar)
+            } else if (chat != null) {
+                setOfflineAvatar()
+            }
+        }
     }
 
-    private fun updateAvatar() {
-        if (viewModel.isOnline()) {
-            setAvatar()
-        } else if (chat != null) {
-            setOfflineAvatar()
+    private fun setAvatar(imBitmap: Bitmap?) {
+        imBitmap?.let {
+            collapsingAppBar.toolbarImage.setImageBitmap(it)
+            if (!it.isRecycled) {
+                val colorBackground = AvatarUtil.getDominantColor(it)
+                collapsingAppBar.imageLayout.setBackgroundColor(colorBackground)
+            }
         }
     }
 
@@ -1497,13 +1385,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun showConfirmationRemoveContact() {
         Timber.d("showConfirmationRemoveContact")
         MaterialAlertDialogBuilder(this)
-            .setTitle(
-                getQuantityStringOrDefault(
-                    R.plurals.title_confirmation_remove_contact,
-                    1
-                )
-            )
-            .setMessage(getQuantityStringOrDefault(R.plurals.confirmation_remove_contact, 1))
+            .setTitle(resources.getQuantityString(R.plurals.title_confirmation_remove_contact, 1))
+            .setMessage(resources.getQuantityString(R.plurals.confirmation_remove_contact, 1))
             .setPositiveButton(R.string.general_remove) { _, _ ->
                 ContactController(this@ContactInfoActivity).removeContact(user)
             }
@@ -1528,7 +1411,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         unregisterReceiver(chatRoomMuteUpdateReceiver)
         unregisterReceiver(retentionTimeReceiver)
         unregisterReceiver(manageShareReceiver)
-        unregisterReceiver(userNameReceiver)
         unregisterReceiver(destroyActionModeReceiver)
         nodeSaver.destroy()
     }
@@ -1539,9 +1421,15 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     override fun onResume() {
         super.onResume()
         checkScreenRotationToShowCall()
-        user?.let {
-            viewModel.getUserStatusAndRequestForLastGreen(it.handle)
-        }
+        viewModel.getUserStatusAndRequestForLastGreen()
+    }
+
+    /**
+     * onStart lifecycle callback
+     */
+    override fun onStart() {
+        super.onStart()
+        viewModel.refreshUserInfo()
     }
 
     private fun sharedFolderClicked() {
@@ -1558,7 +1446,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             if (sharedFoldersFragment == null) {
                 supportFragmentManager.commitNow {
                     sharedFoldersFragment = ContactSharedFolderFragment().apply {
-                        setUserEmail(user?.email)
+                        setUserEmail(contentContactProperties.emailText.text.toString())
                         replace(
                             R.id.fragment_container_shared_folders,
                             this,
@@ -1671,12 +1559,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     fun getSelectedNode(): MegaNode? = selectedNode
 
     /**
-     * Returns the current set nick name of user
-     */
-    val nickname: String
-        get() = ContactUtil.getNicknameContact(user!!.handle)
-
-    /**
      * Method responsible for downloading file
      */
     fun downloadFile(nodes: List<MegaNode>) {
@@ -1734,9 +1616,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         Timber.d("askConfirmationMoveToRubbish")
         if (!handleList.isNullOrEmpty()) {
             val message = if (handleList.size > 1) {
-                getFormattedStringOrDefault(R.string.confirmation_move_to_rubbish_plural)
+                getString(R.string.confirmation_move_to_rubbish_plural)
             } else {
-                getFormattedStringOrDefault(R.string.confirmation_move_to_rubbish)
+                getString(R.string.confirmation_move_to_rubbish)
             }
             MaterialAlertDialogBuilder(this)
                 .setMessage(message)
@@ -1750,19 +1632,13 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    /**
-     * Returns true when parent stack is empty
-     */
-    val isEmptyParentHandleStack: Boolean
-        get() = sharedFoldersFragment?.isEmptyParentHandleStack() ?: true
-
     private fun moveToTrash(handleList: ArrayList<Long>?) {
         Timber.d("moveToTrash: ")
         moveToRubbish = true
         if (!viewModel.isOnline()) {
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
-                getFormattedStringOrDefault(R.string.error_server_connection_problem),
+                getString(R.string.error_server_connection_problem),
                 -1
             )
             return
@@ -1795,17 +1671,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    /**
-     * Sets the parent handle globally
-     */
-    fun setParentHandle(parentHandle: Long) {
-        this.parentHandle = parentHandle
-    }
-
     private fun setFoldersButtonText(nodes: ArrayList<MegaNode>?) {
         if (nodes != null) {
             contentContactProperties.apply {
-                shareFoldersButton.text = getQuantityStringOrDefault(
+                shareFoldersButton.text = resources.getQuantityString(
                     R.plurals.num_folders_with_parameter,
                     nodes.size,
                     nodes.size
@@ -1828,13 +1697,13 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     /**
      * Updates the "Verify credentials" view.
      *
-     * @param verified True if contact credentials are verified, false otherwise.
+     * @param state [ContactInfoState].
      */
-    private fun updateVerifyCredentialsLayout(verified: Boolean) {
+    private fun updateVerifyCredentialsLayout(state: ContactInfoState) {
         contentContactProperties.apply {
-            if (user != null) {
+            if (!state.email.isNullOrEmpty()) {
                 verifyCredentialsLayout.isVisible = true
-                if (verified) {
+                if (state.areCredentialsVerified) {
                     verifyCredentialsInfo.setText(R.string.label_verified)
                     verifyCredentialsInfoIcon.isVisible = true
                 } else {
@@ -1911,9 +1780,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ next: GetChatChangesUseCase.Result? ->
                 if (next is GetChatChangesUseCase.Result.OnChatOnlineStatusUpdate) {
-                    user?.let {
-                        viewModel.getUserStatusAndRequestForLastGreen(it.handle)
-                    }
+                    viewModel.getUserStatusAndRequestForLastGreen()
                 }
                 if (next is GetChatChangesUseCase.Result.OnChatConnectionStateUpdate) {
                     val chatId = next.chatid

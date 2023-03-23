@@ -729,8 +729,9 @@ internal class DefaultContactsRepository @Inject constructor(
 
     private fun Long.toBase64Handle(): String = megaApiGateway.userHandleToBase64(this)
 
-    override suspend fun getUserOnlineStatusByHandle(handle: Long) =
+    override suspend fun getUserOnlineStatusByHandle(handle: Long) = withContext(ioDispatcher) {
         userStatus[megaChatApiGateway.getUserOnlineStatus(handle)] ?: UserStatus.Invalid
+    }
 
     override suspend fun getUserEmailFromChat(handle: Long) =
         withContext(ioDispatcher) {
