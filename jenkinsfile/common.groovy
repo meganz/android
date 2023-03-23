@@ -56,11 +56,11 @@ void fetchSdkSubmodules() {
                     cd sdk/src/main/jni/mega/sdk
                     git fetch
                     git checkout ${SDK_BRANCH}
-                    git pull
+                    git pull || true
                     cd ../../megachat/sdk
                     git fetch
                     git checkout ${MEGACHAT_BRANCH}
-                    git pull
+                    git pull || true
                     cd ${WORKSPACE}
                 """
             }
