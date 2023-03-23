@@ -425,7 +425,7 @@ private fun MaxSelectionDialog(
                 onClick = onDialogDismissed,
             ) {
                 Text(
-                    text = stringResource(id = R.string.general_camelcase_ok),
+                    text = stringResource(id = R.string.general_ok),
                     style = MaterialTheme.typography.button,
                     color = if (!MaterialTheme.colors.isLight) colorResource(id = R.color.teal_200) else colorResource(
                         id = R.color.teal_300
