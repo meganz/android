@@ -150,6 +150,7 @@ class BackgroundRequestListener @Inject constructor(
 
     private fun handleFetchNodeRequest(e: MegaError) {
         Timber.d("TYPE_FETCH_NODES")
+        MegaApplication.isLoggingIn = false
         applicationScope.launch { broadcastFetchNodesFinishUseCase() }
 
         if (e.errorCode == MegaError.API_OK) {

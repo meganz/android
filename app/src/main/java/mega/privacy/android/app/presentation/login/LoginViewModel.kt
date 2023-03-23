@@ -151,7 +151,6 @@ class LoginViewModel @Inject constructor(
             with(state.value.pendingAction) {
                 when (this) {
                     ACTION_FORCE_RELOAD_ACCOUNT -> {
-                        MegaApplication.isLoggingIn = false
                         _state.update { it.copy(isPendingToFinishActivity = true) }
                     }
                     ACTION_OPEN_APP -> {
@@ -208,7 +207,6 @@ class LoginViewModel @Inject constructor(
      * Stops logging in.
      */
     fun stopLogin() {
-        MegaApplication.isLoggingIn = false
         _state.update {
             it.copy(
                 pressedBackWhileLogin = true,
@@ -227,6 +225,7 @@ class LoginViewModel @Inject constructor(
                 ClearPsa { PsaManager::stopChecking }
             )
             _state.update { it.copy(isLocalLogoutInProgress = false) }
+            MegaApplication.isLoggingIn = false
         }
     }
 
@@ -373,8 +372,8 @@ class LoginViewModel @Inject constructor(
                         DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
                     ).collectLatest { status -> status.checkStatus(email, password) }
                 }.onFailure { exception ->
-                    if (exception !is LoginException) return@onFailure
                     MegaApplication.isLoggingIn = false
+                    if (exception !is LoginException) return@onFailure
 
                     if (exception is LoginMultiFactorAuthRequired) {
                         _state.update {
@@ -410,8 +409,8 @@ class LoginViewModel @Inject constructor(
                     status.checkStatus()
                 }
             }.onFailure { exception ->
-                if (exception !is LoginException) return@onFailure
                 MegaApplication.isLoggingIn = false
+                if (exception !is LoginException) return@onFailure
 
                 if (exception is LoginWrongMultiFactorAuth) {
                     _state.update {
@@ -440,8 +439,8 @@ class LoginViewModel @Inject constructor(
                 DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
             ).collectLatest { status -> status.checkStatus() }
         }.onFailure { exception ->
-            if (exception !is LoginException) return@onFailure
             MegaApplication.isLoggingIn = false
+            if (exception !is LoginException) return@onFailure
             exception.loginFailed()
         }
     }
@@ -527,9 +526,9 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }.onFailure {
+            MegaApplication.isLoggingIn = false
             if (it !is FetchNodesException) return@launch
 
-            MegaApplication.isLoggingIn = false
             _state.update { state ->
                 state.copy(
                     isLoginInProgress = false,
