@@ -21,6 +21,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -33,6 +34,7 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.VersionsFileActivity
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.openWith
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setNodeThumbnail
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.showCannotOpenFileDialog
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel.Companion.MODE_KEY
@@ -977,14 +979,22 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun onOpenWithClicked(node: MegaNode) {
-        onNodeTapped(
-            requireActivity(),
-            node,
-            (requireActivity() as ManagerActivity)::saveNodeByOpenWith,
-            (requireActivity() as ManagerActivity),
-            (requireActivity() as ManagerActivity),
-            true
-        )
+        if (nodeOptionsViewModel.isFilePreviewOnline(node = node)) {
+            openWith(
+                context = requireActivity(),
+                node = node,
+                (requireActivity() as ManagerActivity)::saveNodeByOpenWith
+            )
+        } else {
+            onNodeTapped(
+                requireActivity(),
+                node,
+                (requireActivity() as ManagerActivity)::saveNodeByOpenWith,
+                (requireActivity() as ManagerActivity),
+                (requireActivity() as ManagerActivity),
+                true
+            )
+        }
         dismissAllowingStateLoss()
     }
 

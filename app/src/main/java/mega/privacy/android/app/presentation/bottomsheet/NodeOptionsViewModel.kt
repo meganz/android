@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
@@ -78,6 +79,16 @@ class NodeOptionsViewModel @Inject constructor(
         shareKeyCreated.tryEmit(null)
     }
 
+    /**
+     * Detect the file whether could be previewed directly
+     *
+     * @param node MegaNode
+     * @return true is that the file could be previewed directly, otherwise is false
+     */
+    fun isFilePreviewOnline(node: MegaNode): Boolean =
+        MimeTypeList.typeForName(node.name).let {
+            it.isAudio || it.isVideoMimeType
+        }
 
     companion object {
         const val MODE_KEY = "MODE"
