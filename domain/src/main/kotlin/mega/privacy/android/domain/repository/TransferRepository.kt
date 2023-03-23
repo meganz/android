@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 
 /**
@@ -149,4 +150,11 @@ interface TransferRepository {
      * @param prevTransferTag
      */
     suspend fun moveTransferBeforeByTag(transferTag: Int, prevTransferTag: Int)
+
+    /**
+     * Get transfer by tag
+     *
+     * @param transferTag
+     */
+    suspend fun getTransferByTag(transferTag: Int): Transfer?
 }

@@ -17,6 +17,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
+import mega.privacy.android.data.mapper.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -41,6 +42,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val dbH: DatabaseHandler,
     private val transferEventMapper: TransferEventMapper,
+    private val transferMapper: TransferMapper,
     private val appEventGateway: AppEventGateway,
 ) : TransfersRepository, TransferRepository {
 
@@ -253,4 +255,8 @@ internal class DefaultTransfersRepository @Inject constructor(
                 continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
             }
         }
+
+    override suspend fun getTransferByTag(transferTag: Int) = withContext(ioDispatcher) {
+        megaApiGateway.getTransfersByTag(transferTag)?.let { transferMapper(it) }
+    }
 }

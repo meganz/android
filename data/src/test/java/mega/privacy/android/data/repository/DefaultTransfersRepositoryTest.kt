@@ -11,11 +11,14 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
+import mega.privacy.android.data.mapper.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
+import nz.mega.sdk.MegaTransfer
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -36,6 +39,7 @@ class DefaultTransfersRepositoryTest {
     private val transferEventMapper = mock<TransferEventMapper>()
     private val cancelToken = mock<MegaCancelToken>()
     private val appEventGateway: AppEventGateway = mock()
+    private val transferMapper: TransferMapper = mock()
 
     @Before
     fun setUp() {
@@ -45,6 +49,7 @@ class DefaultTransfersRepositoryTest {
             dbH = databaseHandler,
             transferEventMapper = transferEventMapper,
             appEventGateway = appEventGateway,
+            transferMapper = transferMapper
         )
     }
 
@@ -321,4 +326,21 @@ class DefaultTransfersRepositoryTest {
 
             underTest.moveTransferBeforeByTag(transferTag, previousTransferTag)
         }
+
+    @Test
+    fun `test that getTransferByTag return value when call api returns object`() = runTest {
+        val transferTag = 1
+        val megaTransfer = mock<MegaTransfer>()
+        val transfer = mock<Transfer>()
+        whenever(megaApiGateway.getTransfersByTag(transferTag)).thenReturn(megaTransfer)
+        whenever(transferMapper(megaTransfer)).thenReturn(transfer)
+        assertThat(underTest.getTransferByTag(transferTag)).isEqualTo(transfer)
+    }
+
+    @Test
+    fun `test that getTransferByTag return null when call api returns null`() = runTest {
+        val transferTag = 1
+        whenever(megaApiGateway.getTransfersByTag(transferTag)).thenReturn(null)
+        assertThat(underTest.getTransferByTag(transferTag)).isNull()
+    }
 }
