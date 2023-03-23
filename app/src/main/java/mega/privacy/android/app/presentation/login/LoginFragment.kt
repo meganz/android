@@ -930,24 +930,6 @@ class LoginFragment : Fragment() {
         viewModel.performLogin(typedEmail, typedPassword)
     }
 
-    /**
-     * Returns to login form page.
-     */
-    private fun backToLoginForm() = with(binding) {
-        showLoginScreen()
-
-        //reset 2fa page
-        login2fa.isVisible = false
-        progressbarVerify2fa.isVisible = false
-        pinFirstLogin.setText("")
-        pinSecondLogin.setText("")
-        pinThirdLogin.setText("")
-        pinFourthLogin.setText("")
-        pinFifthLogin.setText("")
-        pinSixthLogin.setText("")
-        loginEmailText.requestFocus()
-    }
-
     private fun showLoginInProgress() = with(binding) {
         loginLoggingInText.isVisible = true
         loginFetchNodesText.isVisible = false
@@ -1372,7 +1354,6 @@ class LoginFragment : Fragment() {
             .setCancelable(true)
             .setMessage(getString(R.string.confirm_cancel_login))
             .setPositiveButton(getString(R.string.general_positive_button)) { _, _ ->
-                backToLoginForm()
                 viewModel.stopLogin()
             }.setNegativeButton(getString(R.string.general_negative_button), null)
             .show()

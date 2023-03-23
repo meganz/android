@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.login
 
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.sync.Mutex
@@ -63,6 +64,10 @@ class DefaultLogin @Inject constructor(
 
                 loginMutex.unlock()
                 throw it
+            }
+
+            awaitClose {
+                loginMutex.unlock()
             }
         }
 }
