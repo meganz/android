@@ -3,10 +3,8 @@ package mega.privacy.android.app.presentation.meeting
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,7 +19,6 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
 import mega.privacy.android.app.components.ChatManagement
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
@@ -58,6 +55,7 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.chat.MonitorMutedChatsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
@@ -91,8 +89,9 @@ import javax.inject.Inject
  * @property openOrStartCall                [OpenOrStartCall]
  * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
  * @property monitorScheduledMeetingUpdates [MonitorScheduledMeetingUpdates]
- * @property monitorConnectivityUseCase            [MonitorConnectivityUseCase]
+ * @property monitorConnectivityUseCase     [MonitorConnectivityUseCase]
  * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
+ * @property monitorMutedChats              [MonitorMutedChatsUseCase]
  * @property cameraGateway                  [CameraGateway]
  * @property deviceGateway                  [DeviceGateway]
  * @property state                          Current view state as [ScheduledMeetingInfoState]
@@ -124,6 +123,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
+    private val monitorMutedChats: MonitorMutedChatsUseCase,
     private val cameraGateway: CameraGateway,
     private val deviceGateway: DeviceGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
@@ -148,26 +148,8 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     val isConnected: Boolean
         get() = monitorConnectivityUseCase().value
 
-    /**
-     * Observe changes in Chat notifications
-     */
-    private val chatNotificationsObserver = Observer<Any> {
-        updateDndSeconds(state.value.chatId)
-    }
-
     init {
-        LiveEventBus.get<Any>(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
-            .observeForever(chatNotificationsObserver)
-    }
-
-    /**
-     * onCleared()
-     */
-    override fun onCleared() {
-        super.onCleared()
-
-        LiveEventBus.get<Any>(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
-            .removeObserver(chatNotificationsObserver)
+        monitorMutedChatsUpdates()
     }
 
     /**
@@ -232,6 +214,15 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                 }
             }
         }
+
+    /**
+     * Monitor muted chats updates
+     */
+    private fun monitorMutedChatsUpdates() = viewModelScope.launch {
+        monitorMutedChats().collectLatest {
+            updateDndSeconds(state.value.chatId)
+        }
+    }
 
     /**
      * Load all chat participants
