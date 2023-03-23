@@ -1,12 +1,14 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
+import mega.privacy.android.domain.repository.NodeRepository
+import javax.inject.Inject
 
 /**
  * Use case for loading offline nodes
  *
  */
-fun interface LoadOfflineNodes {
+class LoadOfflineNodesUseCase @Inject constructor(private val nodeRepository: NodeRepository) {
 
     /**
      * Invoke
@@ -17,5 +19,5 @@ fun interface LoadOfflineNodes {
     suspend operator fun invoke(
         path: String,
         searchQuery: String?,
-    ): List<OfflineNodeInformation>
+    ): List<OfflineNodeInformation> = nodeRepository.loadOfflineNodes(path, searchQuery)
 }

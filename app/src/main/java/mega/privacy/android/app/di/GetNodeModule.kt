@@ -14,8 +14,6 @@ import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.data.repository.MegaNodeRepository
-import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.LoadOfflineNodes
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandleChangingName
 import mega.privacy.android.domain.usecase.filenode.DefaultDeleteNodeVersionsByHandle
@@ -155,13 +153,5 @@ abstract class GetNodeModule {
         @Provides
         fun provideCreateShareKey(megaNodeRepository: MegaNodeRepository): CreateShareKey =
             CreateShareKey(megaNodeRepository::createShareKey)
-
-        /**
-         * Provides [LoadOfflineNodes] implementation
-         *@return [LoadOfflineNodes]
-         */
-        @Provides
-        fun provideLoadOfflineNodes(nodeRepository: NodeRepository): LoadOfflineNodes =
-            LoadOfflineNodes(nodeRepository::loadOfflineNodes)
     }
 }
