@@ -1,7 +1,11 @@
 package mega.privacy.android.domain.entity.chat
 
+import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.EndCallReason
+import mega.privacy.android.domain.entity.meeting.NetworkQualityType
+import mega.privacy.android.domain.entity.meeting.TermCodeType
 
 /**
  * Chat call
@@ -44,14 +48,14 @@ data class ChatCall(
     val duration: Long? = null,
     val numParticipants: Int? = null,
     val changes: ChatCallChanges? = null,
-    val endCallReason: Int? = null,
-    val callCompositionChange: Int? = null,
+    val endCallReason: EndCallReason? = null,
+    val callCompositionChange: CallCompositionChanges? = null,
     val peeridCallCompositionChange: Long? = null,
-    val peerIdParticipants: List<Long>? = null,
-    val moderators: List<Long>? = null,
-    val sessionsClientid: List<Long>? = null,
-    val networkQuality: Int? = null,
-    val termCode: Int? = null,
+    val peerIdParticipants: List<Long>? = emptyList(),
+    val moderators: List<Long>? = emptyList(),
+    val sessionsClientid: List<Long>? = emptyList(),
+    val networkQuality: NetworkQualityType? = null,
+    val termCode: TermCodeType? = null,
     val initialTimestamp: Long? = null,
     val finalTimestamp: Long? = null,
     val isAudioDetected: Boolean = false,

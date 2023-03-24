@@ -2,8 +2,12 @@ package mega.privacy.android.data.mapper.meeting
 
 import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.EndCallReason
+import mega.privacy.android.domain.entity.meeting.NetworkQualityType
+import mega.privacy.android.domain.entity.meeting.TermCodeType
 import nz.mega.sdk.MegaChatCall
 import javax.inject.Inject
 
@@ -27,14 +31,14 @@ internal class ChatCallMapper @Inject constructor(
         duration = megaChatCall.duration,
         numParticipants = megaChatCall.numParticipants,
         changes = callChanges[megaChatCall.changes],
-        endCallReason = megaChatCall.endCallReason,
-        callCompositionChange = megaChatCall.callCompositionChange,
+        endCallReason = endCallReason[megaChatCall.endCallReason],
+        callCompositionChange = callCompositionChanges[megaChatCall.callCompositionChange],
         peeridCallCompositionChange = megaChatCall.peeridCallCompositionChange,
         peerIdParticipants = handleListMapper(megaChatCall.peeridParticipants),
         moderators = handleListMapper(megaChatCall.moderators),
         sessionsClientid = handleListMapper(megaChatCall.sessionsClientid),
-        networkQuality = megaChatCall.networkQuality,
-        termCode = megaChatCall.termCode,
+        networkQuality = networkQuality[megaChatCall.networkQuality],
+        termCode = termCode[megaChatCall.termCode],
         initialTimestamp = megaChatCall.initialTimeStamp,
         finalTimestamp = megaChatCall.finalTimeStamp,
         isAudioDetected = megaChatCall.isAudioDetected,
@@ -60,6 +64,33 @@ internal class ChatCallMapper @Inject constructor(
             MegaChatCall.CALL_STATUS_IN_PROGRESS to ChatCallStatus.InProgress,
             MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION to ChatCallStatus.TerminatingUserParticipation,
             MegaChatCall.CALL_STATUS_DESTROYED to ChatCallStatus.Destroyed
+        )
+
+        internal val endCallReason = mapOf(
+            MegaChatCall.END_CALL_REASON_INVALID to EndCallReason.Invalid,
+            MegaChatCall.END_CALL_REASON_ENDED to EndCallReason.Ended,
+            MegaChatCall.END_CALL_REASON_REJECTED to EndCallReason.Rejected,
+            MegaChatCall.END_CALL_REASON_NO_ANSWER to EndCallReason.NoAnswer,
+            MegaChatCall.END_CALL_REASON_FAILED to EndCallReason.Failed,
+            MegaChatCall.END_CALL_REASON_CANCELLED to EndCallReason.Cancelled,
+            MegaChatCall.END_CALL_REASON_BY_MODERATOR to EndCallReason.ByModerator
+        )
+
+        internal val callCompositionChanges = mapOf(
+            MegaChatCall.PEER_REMOVED to CallCompositionChanges.Removed,
+            MegaChatCall.NO_COMPOSITION_CHANGE to CallCompositionChanges.NoChange,
+            MegaChatCall.PEER_ADDED to CallCompositionChanges.Added,
+        )
+
+        internal val termCode = mapOf(
+            MegaChatCall.TERM_CODE_INVALID to TermCodeType.Invalid,
+            MegaChatCall.TERM_CODE_HANGUP to TermCodeType.Hangup,
+            MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS to TermCodeType.TooManyParticipants,
+        )
+
+        internal val networkQuality = mapOf(
+            MegaChatCall.NETWORK_QUALITY_BAD to NetworkQualityType.Bad,
+            MegaChatCall.NETWORK_QUALITY_GOOD to NetworkQualityType.Good,
         )
 
         internal val callChanges = mapOf(
