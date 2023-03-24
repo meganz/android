@@ -31,8 +31,6 @@ import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
-import mega.privacy.android.data.mapper.HandleListMapper
-import mega.privacy.android.data.mapper.HandleListMapperImpl
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
@@ -206,12 +204,6 @@ internal abstract class MapperModule {
      */
     @Binds
     abstract fun bindsPasswordStrengthMapper(implementation: PasswordStrengthMapperImpl): PasswordStrengthMapper
-
-    /**
-     * Provides Handle list Mapper
-     */
-    @Binds
-    abstract fun bindHandleListMapper(implementation: HandleListMapperImpl): HandleListMapper
 
     @Binds
     abstract fun bindChatScheduledMeetingOccurrMapper(implementation: ChatScheduledMeetingOccurrMapperImpl): ChatScheduledMeetingOccurrMapper

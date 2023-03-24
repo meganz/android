@@ -6,12 +6,12 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 
-class HandleListMapperImplTest {
+class HandleListMapperTest {
     private lateinit var underTest: HandleListMapper
 
     @Before
     fun setUp() {
-        underTest = HandleListMapperImpl()
+        underTest = HandleListMapper()
     }
 
     @Test
