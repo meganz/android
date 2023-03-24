@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Button
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -82,21 +82,24 @@ private fun getFolderPicker(
  * UI of Sync screen
  */
 @Composable
-fun SyncView(
+private fun SyncView(
     state: SyncState,
     syncClicked: () -> Unit,
     removeClicked: () -> Unit,
     chooseLocalFolderClicked: () -> Unit,
     remoteFolderSelected: (RemoteFolder) -> Unit,
 ) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
                 text = "Device local storage path:",
                 Modifier.padding(bottom = 4.dp),
                 fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colors.onBackground,
             )
             Text(
                 state.selectedLocalFolder.ifBlank {
@@ -104,15 +107,20 @@ fun SyncView(
                 },
                 Modifier
                     .clickable { chooseLocalFolderClicked() }
-                    .background(Color.White),
+                    .background(MaterialTheme.colors.background),
+                color = MaterialTheme.colors.onBackground,
             )
 
             Spacer(modifier = Modifier.padding(16.dp))
 
-            Text(text = "MEGA storage path:",
+            Text(
+                text = "MEGA storage path:",
                 Modifier.padding(bottom = 4.dp),
-                fontWeight = FontWeight.Bold)
-            RemoteFoldersDropDownMenu(state.selectedMegaFolder,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colors.onBackground,
+            )
+            RemoteFoldersDropDownMenu(
+                state.selectedMegaFolder,
                 state.rootMegaRemoteFolders,
                 onFolderSelected = {
                     remoteFolderSelected(it)
@@ -121,7 +129,10 @@ fun SyncView(
             Spacer(modifier = Modifier.padding(16.dp))
 
             if (state.status in LOADING..RUNNING) {
-                Text(text = "The folders are paired successfully", color = Color.Black)
+                Text(
+                    text = "The folders are paired successfully",
+                    color = MaterialTheme.colors.onBackground
+                )
                 Button(onClick = removeClicked) {
                     Text(text = "Remove folder pair")
                 }
@@ -139,7 +150,7 @@ fun SyncView(
  * Dropdown menu for selecting a remote folder.
  */
 @Composable
-fun RemoteFoldersDropDownMenu(
+private fun RemoteFoldersDropDownMenu(
     currentFolder: RemoteFolder?,
     folders: List<RemoteFolder>,
     onFolderSelected: (RemoteFolder) -> Unit,
@@ -148,22 +159,26 @@ fun RemoteFoldersDropDownMenu(
     val selectorText = currentFolder?.name ?: "Click to choose"
 
     Box(modifier = Modifier.wrapContentSize(Alignment.TopStart)) {
-        Text(selectorText, modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = {
-                expanded = true
-            }))
-        DropdownMenu(expanded = expanded,
+        Text(
+            selectorText, modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = {
+                    expanded = true
+                }), color = MaterialTheme.colors.onBackground
+        )
+        DropdownMenu(
+            expanded = expanded,
             onDismissRequest = { expanded = false },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)) {
+                .height(300.dp)
+        ) {
             folders.forEach { folder ->
                 DropdownMenuItem(onClick = {
                     onFolderSelected(folder)
                     expanded = false
                 }) {
-                    Text(text = folder.name)
+                    Text(text = folder.name, color = MaterialTheme.colors.onBackground)
                 }
             }
         }
@@ -173,7 +188,7 @@ fun RemoteFoldersDropDownMenu(
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun SyncViewPreview() {
+private fun SyncViewPreview() {
     AndroidTheme(isDark = false) {
         SyncView(
             state = SyncState(),
