@@ -90,8 +90,6 @@ import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
-import mega.privacy.android.data.mapper.meeting.ChatCallMapper
-import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapperImpl
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
@@ -208,12 +206,6 @@ internal abstract class MapperModule {
      */
     @Binds
     abstract fun bindsPasswordStrengthMapper(implementation: PasswordStrengthMapperImpl): PasswordStrengthMapper
-
-    /**
-     * Provides Chat call Mapper
-     */
-    @Binds
-    abstract fun bindChatCallMapper(implementation: ChatCallMapperImpl): ChatCallMapper
 
     /**
      * Provides Handle list Mapper
