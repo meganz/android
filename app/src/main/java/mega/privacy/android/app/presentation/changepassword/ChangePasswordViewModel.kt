@@ -16,12 +16,12 @@ import mega.privacy.android.app.presentation.changepassword.model.ChangePassword
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.ChangePassword
+import mega.privacy.android.domain.usecase.ChangePasswordUseCase
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
-import mega.privacy.android.domain.usecase.GetPasswordStrength
+import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.ResetPassword
+import mega.privacy.android.domain.usecase.ResetPasswordUseCase
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,9 +29,9 @@ internal class ChangePasswordViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val isCurrentPasswordUseCase: IsCurrentPasswordUseCase,
-    private val getPasswordStrength: GetPasswordStrength,
-    private val changePassword: ChangePassword,
-    private val resetPassword: ResetPassword,
+    private val getPasswordStrengthUseCase: GetPasswordStrengthUseCase,
+    private val changePasswordUseCase: ChangePasswordUseCase,
+    private val resetPasswordUseCase: ResetPasswordUseCase,
     private val getRootFolder: GetRootFolder,
     private val multiFactorAuthSetting: FetchMultiFactorAuthSetting,
 ) : ViewModel() {
@@ -87,7 +87,7 @@ internal class ChangePasswordViewModel @Inject constructor(
             }
 
             runCatching {
-                resetPassword(
+                resetPasswordUseCase(
                     link = linkToReset,
                     newPassword = newPassword,
                     masterKey = masterKey
@@ -142,7 +142,7 @@ internal class ChangePasswordViewModel @Inject constructor(
      * when user has passed the multi-factor auth check, this method trigger changing the user's password
      */
     private suspend fun onExecuteChangePassword(newPassword: String) {
-        changePassword(newPassword).also { isSuccess ->
+        changePasswordUseCase(newPassword).also { isSuccess ->
             _uiState.update {
                 if (isSuccess) {
                     it.copy(
@@ -176,7 +176,7 @@ internal class ChangePasswordViewModel @Inject constructor(
                 val isCurrentPassword =
                     if (password.length > MIN_PASSWORD_CHAR) isCurrentPasswordUseCase(password) else false
                 val passwordStrengthLevel =
-                    if (password.length > MIN_PASSWORD_CHAR) getPasswordStrength(password = password) else PasswordStrength.VERY_WEAK
+                    if (password.length > MIN_PASSWORD_CHAR) getPasswordStrengthUseCase(password = password) else PasswordStrength.VERY_WEAK
 
                 if (password.isBlank()) {
                     it.copy(passwordStrength = PasswordStrength.INVALID)
@@ -257,7 +257,7 @@ internal class ChangePasswordViewModel @Inject constructor(
         return when {
             password.isEmpty() -> R.string.error_enter_password
             isCurrentPasswordUseCase(password) -> R.string.error_same_password
-            getPasswordStrength(password) <= PasswordStrength.VERY_WEAK -> R.string.error_password
+            getPasswordStrengthUseCase(password) <= PasswordStrength.VERY_WEAK -> R.string.error_password
             else -> null
         }
     }

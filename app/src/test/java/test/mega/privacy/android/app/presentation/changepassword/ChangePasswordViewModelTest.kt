@@ -19,12 +19,12 @@ import mega.privacy.android.app.presentation.changepassword.ChangePasswordViewMo
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.exception.MegaException
-import mega.privacy.android.domain.usecase.ChangePassword
+import mega.privacy.android.domain.usecase.ChangePasswordUseCase
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
-import mega.privacy.android.domain.usecase.GetPasswordStrength
+import mega.privacy.android.domain.usecase.GetPasswordStrengthUseCase
 import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.ResetPassword
+import mega.privacy.android.domain.usecase.ResetPasswordUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -41,10 +41,10 @@ internal class ChangePasswordViewModelTest {
         onBlocking { invoke() }.thenReturn(testFlow)
     }
     private val savedStateHandle = SavedStateHandle()
-    private val changePassword = mock<ChangePassword>()
-    private val getPasswordStrength = mock<GetPasswordStrength>()
+    private val changePasswordUseCase = mock<ChangePasswordUseCase>()
+    private val getPasswordStrengthUseCase = mock<GetPasswordStrengthUseCase>()
     private val isCurrentPasswordUseCase = mock<IsCurrentPasswordUseCase>()
-    private val resetPassword = mock<ResetPassword>()
+    private val resetPasswordUseCase = mock<ResetPasswordUseCase>()
     private val multiFactorAuthSetting = mock<FetchMultiFactorAuthSetting>()
     private val getRootFolder = mock<GetRootFolder>()
 
@@ -56,9 +56,9 @@ internal class ChangePasswordViewModelTest {
             savedStateHandle = savedStateHandle,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
             isCurrentPasswordUseCase = isCurrentPasswordUseCase,
-            getPasswordStrength = getPasswordStrength,
-            changePassword = changePassword,
-            resetPassword = resetPassword,
+            getPasswordStrengthUseCase = getPasswordStrengthUseCase,
+            changePasswordUseCase = changePasswordUseCase,
+            resetPasswordUseCase = resetPasswordUseCase,
             getRootFolder = getRootFolder,
             multiFactorAuthSetting = multiFactorAuthSetting
         )
@@ -71,7 +71,7 @@ internal class ChangePasswordViewModelTest {
 
     @Test
     fun `test that when user resets password successfully should return no error code`() = runTest {
-        whenever(resetPassword(any(), any(), any())).thenReturn(true)
+        whenever(resetPasswordUseCase(any(), any(), any())).thenReturn(true)
 
         underTest.onExecuteResetPassword("")
 
@@ -93,7 +93,7 @@ internal class ChangePasswordViewModelTest {
         savedStateHandle[IntentConstants.EXTRA_MASTER_KEY] = fakeMasterKey
 
         whenever(
-            resetPassword(
+            resetPasswordUseCase(
                 link = fakeLink,
                 newPassword = fakePassword,
                 masterKey = fakeMasterKey
@@ -213,7 +213,7 @@ internal class ChangePasswordViewModelTest {
     fun `test that when checking password strength then passwordStrengthLevel state should be updated and isCurrentPassword should be should also be updated`() =
         runTest {
             val fakePassword = "password"
-            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
+            whenever(getPasswordStrengthUseCase(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
             whenever(isCurrentPasswordUseCase(fakePassword)).thenReturn(true)
 
             underTest.checkPasswordStrength(fakePassword)
@@ -229,7 +229,7 @@ internal class ChangePasswordViewModelTest {
     fun `test that when checking password strength and password is blank should return invisible state`() =
         runTest {
             val fakePassword = ""
-            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
+            whenever(getPasswordStrengthUseCase(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
             whenever(isCurrentPasswordUseCase(fakePassword)).thenReturn(true)
 
             underTest.checkPasswordStrength(fakePassword)
@@ -363,7 +363,7 @@ internal class ChangePasswordViewModelTest {
         runTest {
             val fakePassword = "password"
             val fakeConfirmPassword = "password"
-            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
+            whenever(getPasswordStrengthUseCase(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
             whenever(isCurrentPasswordUseCase(fakePassword)).thenReturn(false)
 
             underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
@@ -381,7 +381,7 @@ internal class ChangePasswordViewModelTest {
         runTest {
             val fakePassword = "password"
             val fakeConfirmPassword = "password"
-            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
+            whenever(getPasswordStrengthUseCase(fakePassword)).thenReturn(PasswordStrength.MEDIUM)
             whenever(isCurrentPasswordUseCase(fakePassword)).thenReturn(true)
 
             underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
@@ -399,7 +399,7 @@ internal class ChangePasswordViewModelTest {
         runTest {
             val fakePassword = "password"
             val fakeConfirmPassword = "password"
-            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.VERY_WEAK)
+            whenever(getPasswordStrengthUseCase(fakePassword)).thenReturn(PasswordStrength.VERY_WEAK)
             whenever(isCurrentPasswordUseCase(fakePassword)).thenReturn(false)
 
             underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
@@ -417,7 +417,7 @@ internal class ChangePasswordViewModelTest {
         runTest {
             val fakePassword = "password"
             val fakeConfirmPassword = ""
-            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.STRONG)
+            whenever(getPasswordStrengthUseCase(fakePassword)).thenReturn(PasswordStrength.STRONG)
             whenever(isCurrentPasswordUseCase(fakePassword)).thenReturn(false)
 
             underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
@@ -435,7 +435,7 @@ internal class ChangePasswordViewModelTest {
         runTest {
             val fakePassword = "password"
             val fakeConfirmPassword = "password1237123891"
-            whenever(getPasswordStrength(fakePassword)).thenReturn(PasswordStrength.STRONG)
+            whenever(getPasswordStrengthUseCase(fakePassword)).thenReturn(PasswordStrength.STRONG)
             whenever(isCurrentPasswordUseCase(fakePassword)).thenReturn(false)
 
             underTest.validateAllPasswordOnSave(fakePassword, fakeConfirmPassword)
@@ -463,7 +463,7 @@ internal class ChangePasswordViewModelTest {
         isSuccessChangePassword: Boolean,
         expected: Boolean,
     ) = runTest {
-        whenever(changePassword(any())).thenReturn(isSuccessChangePassword)
+        whenever(changePasswordUseCase(any())).thenReturn(isSuccessChangePassword)
         whenever(multiFactorAuthSetting()).thenReturn(false)
 
         underTest.onUserClickChangePassword("")
