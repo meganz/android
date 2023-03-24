@@ -672,9 +672,12 @@ class CameraUploadsService : LifecycleService() {
      */
     override fun onDestroy() {
         Timber.d("Service destroys.")
-        super.onDestroy()
         stopActiveHeartbeat()
+        stopWakeAndWifiLocks()
         coroutineScope?.cancel()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        cancelNotification()
+        super.onDestroy()
     }
 
     /**
@@ -704,6 +707,8 @@ class CameraUploadsService : LifecycleService() {
                             aborted = aborted
                         )
                     }
+                } else {
+                    finishService()
                 }
             }
             else -> {
@@ -1589,7 +1594,6 @@ class CameraUploadsService : LifecycleService() {
         aborted: Boolean = false,
     ) {
         Timber.d("Finish Camera upload process.")
-        stopWakeAndWifiLocks()
 
         if (coroutineScope?.isActive == true) {
             sendStatusToBackupCenter(aborted = aborted)
@@ -1599,8 +1603,13 @@ class CameraUploadsService : LifecycleService() {
             coroutineScope?.cancel(CancellationException(cancelMessage))
         }
 
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        cancelNotification()
+        finishService()
+    }
+
+    /**
+     *  Stop the service
+     */
+    private fun finishService() {
         stopSelf()
     }
 
