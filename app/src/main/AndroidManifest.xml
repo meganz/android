@@ -498,13 +498,15 @@
 
         <service
             android:name=".main.megachat.ChatUploadService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
         <service
             android:name=".meeting.CallService"
             android:exported="false" />
         <service
             android:name=".DownloadService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
         <service
             android:name=".meeting.CallNotificationIntentService"
             android:exported="false" />
@@ -513,13 +515,16 @@
             android:exported="false" />
         <service
             android:name=".UploadService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
         <service
             android:name=".mediaplayer.service.AudioPlayerService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
         <service
             android:name=".mediaplayer.service.VideoPlayerService"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
         <service
             android:name=".cameraupload.CameraUploadsService"
             android:exported="false"
