@@ -342,6 +342,8 @@ import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import nz.mega.sdk.MegaAccountDetails
@@ -9151,13 +9153,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      *
      * @param mT the transfer to pause
      */
-    fun pauseIndividualTransfer(mT: MegaTransfer?) {
+    fun pauseIndividualTransfer(mT: Transfer?) {
         if (mT == null) {
             Timber.w("Transfer object is null.")
             return
         }
-        Timber.d("Resume transfer - Node handle: %s", mT.nodeHandle)
-        megaApi.pauseTransfer(mT, mT.state != MegaTransfer.STATE_PAUSED, this)
+        Timber.d("Resume transfer - Node handle: %s", mT.handle)
+        megaApi.pauseTransferByTag(mT.tag, mT.transferState != TransferState.STATE_PAUSED, this)
     }
 
     /**
@@ -9181,8 +9183,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     /**
      * Shows a warning to ensure if it is sure of cancel selected transfers.
      */
-    fun showConfirmationCancelSelectedTransfers(selectedTransfers: List<MegaTransfer?>?) {
-        if (selectedTransfers == null || selectedTransfers.isEmpty()) {
+    fun showConfirmationCancelSelectedTransfers(selectedTransfers: List<Transfer>) {
+        if (selectedTransfers.isEmpty()) {
             return
         }
         val builder = MaterialAlertDialogBuilder(this)
@@ -9196,8 +9198,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 R.string.button_continue
             ) { _: DialogInterface?, _: Int ->
                 for (transfer in selectedTransfers) {
-                    megaApi.cancelTransfer(
-                        transfer,
+                    megaApi.cancelTransferByTag(
+                        transfer.tag,
                         object : OptionalMegaRequestListenerInterface() {
                         })
                 }

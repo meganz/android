@@ -9,7 +9,7 @@ import javax.inject.Inject
 /**
  * [MegaTransfer] to [Transfer] mapper
  */
-internal class TransferMapper @Inject constructor() {
+class TransferMapper @Inject constructor() {
     operator fun invoke(transfer: MegaTransfer) = Transfer(
         tag = transfer.tag,
         transferType = mapTransferType(transfer.type),

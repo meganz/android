@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main.managerSections
 
+import mega.privacy.android.domain.entity.transfer.Transfer
 import nz.mega.sdk.MegaTransfer
 
 /**
@@ -19,7 +20,7 @@ sealed class ActiveTransfersState {
      *
      * @property newTransfers  [MegaTransfer] List
      */
-    data class TransfersUpdated(val newTransfers: List<MegaTransfer>) :
+    data class TransfersUpdated(val newTransfers: List<Transfer>) :
         ActiveTransfersState()
 
     /**
@@ -31,8 +32,8 @@ sealed class ActiveTransfersState {
      */
     data class TransferUpdated(
         val index: Int,
-        val updatedTransfer: MegaTransfer,
-        val newTransfers: List<MegaTransfer>,
+        val updatedTransfer: Transfer,
+        val newTransfers: List<Transfer>,
     ) :
         ActiveTransfersState()
 
@@ -46,7 +47,7 @@ sealed class ActiveTransfersState {
     data class TransferMovementFinishedUpdated(
         val success: Boolean,
         val pos: Int,
-        val newTransfers: List<MegaTransfer>,
+        val newTransfers: List<Transfer>,
     ) :
         ActiveTransfersState()
 
@@ -57,8 +58,8 @@ sealed class ActiveTransfersState {
      * @property newTransfers updated [MegaTransfer] List
      */
     data class TransferStartUpdated(
-        val updatedTransfer: MegaTransfer,
-        val newTransfers: List<MegaTransfer>,
+        val updatedTransfer: Transfer,
+        val newTransfers: List<Transfer>,
     ) : ActiveTransfersState()
 
     /**
@@ -67,7 +68,7 @@ sealed class ActiveTransfersState {
      * @property index the index of finished transfer
      * @property newTransfers updated [MegaTransfer] List
      */
-    data class TransferFinishedUpdated(val index: Int, val newTransfers: List<MegaTransfer>) :
+    data class TransferFinishedUpdated(val index: Int, val newTransfers: List<Transfer>) :
         ActiveTransfersState()
 
     /**
@@ -76,7 +77,7 @@ sealed class ActiveTransfersState {
      * @property index index of status changed item
      * @property transfer status changed item
      */
-    data class TransferChangeStatusUpdated(val index: Int, val transfer: MegaTransfer) :
+    data class TransferChangeStatusUpdated(val index: Int, val transfer: Transfer) :
         ActiveTransfersState()
 
     /**

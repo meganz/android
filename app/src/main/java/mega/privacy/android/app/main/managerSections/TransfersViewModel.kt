@@ -13,13 +13,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
-import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
-import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToFirstByTagUseCase
@@ -36,7 +37,6 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class TransfersViewModel @Inject constructor(
-    private val megaApiGateway: MegaApiGateway,
     private val transfersManagement: TransfersManagement,
     private val dbH: LegacyDatabaseHandler,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
@@ -44,6 +44,7 @@ class TransfersViewModel @Inject constructor(
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
+    private val getTransferByTagUseCase: GetTransferByTagUseCase
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -66,7 +67,7 @@ class TransfersViewModel @Inject constructor(
      */
     val completedState = _completedState.asStateFlow()
 
-    private var activeTransfers = mutableListOf<MegaTransfer>()
+    private var activeTransfers = mutableListOf<Transfer>()
     private var completedTransfers = mutableListOf<AndroidCompletedTransfer?>()
 
     /**
@@ -98,14 +99,12 @@ class TransfersViewModel @Inject constructor(
                 activeTransfers.clear()
                 activeTransfers.addAll(
                     transfersInProgress.map { tag ->
-                        megaApiGateway.getTransfersByTag(tag)
+                        getTransferByTagUseCase(tag)
                     }.filter { transfer ->
                         transfer != null && !transfer.isStreamingTransfer && !transfer.isBackgroundTransfer()
                     }.filterNotNull()
                 )
-                activeTransfers.sortWith { t1: MegaTransfer, t2: MegaTransfer ->
-                    t1.priority.compareTo(t2.priority)
-                }
+                activeTransfers.sortBy { it.priority }
                 _activeState.update {
                     ActiveTransfersState.TransfersUpdated(activeTransfers)
                 }
@@ -141,8 +140,11 @@ class TransfersViewModel @Inject constructor(
      * @param pos the item position
      * @param transfer updated item
      */
-    fun updateActiveTransfer(pos: Int, transfer: MegaTransfer) {
+    fun updateActiveTransfer(pos: Int, transfer: Transfer) {
         activeTransfers[pos] = transfer
+        _activeState.update {
+            ActiveTransfersState.TransferUpdated(pos, transfer, activeTransfers.toList())
+        }
     }
 
     /**
@@ -152,7 +154,7 @@ class TransfersViewModel @Inject constructor(
      * @param targetPos the target position
      * @return new [MegaTransfer] list
      */
-    fun activeTransfersSwap(currentPos: Int, targetPos: Int): List<MegaTransfer> {
+    fun activeTransfersSwap(currentPos: Int, targetPos: Int): List<Transfer> {
         Collections.swap(activeTransfers, currentPos, targetPos)
         return activeTransfers
     }
@@ -163,7 +165,7 @@ class TransfersViewModel @Inject constructor(
      * @param transfer The MegaTransfer to update.
      * @return The position of the updated transfer if success, INVALID_POSITION otherwise.
      */
-    fun getUpdatedTransferPosition(transfer: MegaTransfer): Int {
+    fun getUpdatedTransferPosition(transfer: Transfer): Int {
         try {
             val index = activeTransfers.indexOfFirst {
                 it.tag == transfer.tag
@@ -189,15 +191,13 @@ class TransfersViewModel @Inject constructor(
      */
     fun activeTransferFinishMovement(success: Boolean, transferTag: Int) =
         viewModelScope.launch(ioDispatcher) {
-            megaApiGateway.getTransfersByTag(transferTag).let { transfer ->
-                if (transfer != null && transfer.state >= MegaTransfer.STATE_COMPLETING) {
+            getTransferByTagUseCase(transferTag).let { transfer ->
+                if (transfer != null && transfer.transferState >= TransferState.STATE_COMPLETING) {
                     val transferPosition = getUpdatedTransferPosition(transfer)
                     if (transferPosition != INVALID_POSITION) {
                         activeTransfers[transferPosition] = transfer
                         if (!success) {
-                            activeTransfers.sortWith { t1: MegaTransfer, t2: MegaTransfer ->
-                                t1.priority.compareTo(t2.priority)
-                            }
+                            activeTransfers.sortBy { it.priority }
                         }
                         _activeState.update {
                             ActiveTransfersState.TransferMovementFinishedUpdated(
@@ -220,11 +220,9 @@ class TransfersViewModel @Inject constructor(
      *
      * @param transfer transfer to add
      */
-    fun activeTransferStart(transfer: MegaTransfer) {
+    fun activeTransferStart(transfer: Transfer) {
         activeTransfers.add(transfer)
-        activeTransfers.sortWith { t1: MegaTransfer, t2: MegaTransfer ->
-            t1.priority.compareTo(t2.priority)
-        }
+        activeTransfers.sortBy { it.priority }
         _activeState.update {
             ActiveTransfersState.TransferStartUpdated(transfer, activeTransfers)
         }
@@ -258,7 +256,7 @@ class TransfersViewModel @Inject constructor(
             transfer.tag == tag
         }
         if (index != INVALID_POSITION) {
-            megaApiGateway.getTransfersByTag(tag)?.let { transfer ->
+            getTransferByTagUseCase(tag)?.let { transfer ->
                 Timber.d("The transfer with index : $index has been paused/resumed, left: ${activeTransfers.size}")
                 updateActiveTransfer(index, transfer)
                 _activeState.update {
@@ -398,7 +396,7 @@ class TransfersViewModel @Inject constructor(
      * @param newPosition The new position on the list.
      */
     fun moveTransfer(
-        transfer: MegaTransfer,
+        transfer: Transfer,
         newPosition: Int,
     ) = viewModelScope.launch {
         val result = runCatching {

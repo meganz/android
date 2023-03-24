@@ -31,8 +31,10 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.data.mapper.TransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
+import mega.privacy.android.domain.entity.transfer.Transfer
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaTransfer
@@ -59,6 +61,12 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     @Inject
     @MegaApiFolder
     lateinit var megaApiFolder: MegaApiAndroid
+
+    /**
+     * Transfer mapper
+     */
+    @Inject
+    lateinit var transferMapper: TransferMapper // will remove after refactor done
 
     private var adapter: MegaTransfersAdapter? = null
 
@@ -120,12 +128,11 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
      *
      * @param transfer transfer to update
      */
-    fun transferUpdate(transfer: MegaTransfer?) =
-        transfer?.let {
+    fun transferUpdate(transfer: MegaTransfer) =
+        transferMapper(transfer).let {
             viewModel.getUpdatedTransferPosition(it).let { transferPosition ->
                 if (transferPosition != INVALID_POSITION) {
                     viewModel.updateActiveTransfer(transferPosition, it)
-                    adapter?.updateProgress(transferPosition, it)
                 }
             }
         }
@@ -154,7 +161,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
             if (viewModel.getActiveTransfers().isEmpty()) {
                 requireActivity().invalidateOptionsMenu()
             }
-            viewModel.activeTransferStart(transfer)
+            viewModel.activeTransferStart(transferMapper(transfer))
         }
     }
 
@@ -180,7 +187,8 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     override fun cancelTransfers() {
         adapter?.run {
             (requireActivity() as ManagerActivity).showConfirmationCancelSelectedTransfers(
-                getSelectedTransfers())
+                getSelectedTransfers()
+            )
         }
     }
 
@@ -312,7 +320,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
         object : ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
             private var addElevation = true
             private var resetElevation = false
-            private var draggedTransfer: MegaTransfer? = null
+            private var draggedTransfer: Transfer? = null
             private var newPosition = 0
 
             override fun onMove(
@@ -403,7 +411,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
      * @param transfer    MegaTransfer to change its priority.
      * @param newPosition The new position on the list.
      */
-    private fun startMovementRequest(transfer: MegaTransfer, newPosition: Int) {
+    private fun startMovementRequest(transfer: Transfer, newPosition: Int) {
         viewModel.moveTransfer(transfer, newPosition)
     }
 

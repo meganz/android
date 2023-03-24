@@ -19,13 +19,11 @@ import mega.privacy.android.app.utils.Constants.THUMB_CORNER_RADIUS_DP
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.entity.transfer.TransferType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransfer.STATE_ACTIVE
-import nz.mega.sdk.MegaTransfer.STATE_COMPLETING
-import nz.mega.sdk.MegaTransfer.STATE_PAUSED
-import nz.mega.sdk.MegaTransfer.STATE_QUEUED
-import nz.mega.sdk.MegaTransfer.STATE_RETRYING
 import nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD
 import nz.mega.sdk.MegaTransfer.TYPE_UPLOAD
 import timber.log.Timber
@@ -36,7 +34,7 @@ import kotlin.math.roundToLong
  */
 class MegaTransfersAdapter(
     private val context: Context,
-    transfers: List<MegaTransfer>,
+    transfers: List<Transfer>,
     private val listView: RecyclerView,
     private val selectModeInterface: SelectModeInterface,
     private val transfersViewModel: TransfersViewModel,
@@ -44,7 +42,7 @@ class MegaTransfersAdapter(
     private val megaApiFolder: MegaApiAndroid,
 ) : RecyclerView.Adapter<TransferViewHolder>(), RotatableAdapter {
 
-    private var transferList: List<MegaTransfer>
+    private var transferList: List<Transfer>
 
     private var multipleSelect: Boolean = false
 
@@ -59,7 +57,7 @@ class MegaTransfersAdapter(
      *
      * @param transfers [MegaTransfer] list
      */
-    fun setTransfers(transfers: List<MegaTransfer>) {
+    fun setTransfers(transfers: List<Transfer>) {
         transferList = transfers
         notifyDataSetChanged()
     }
@@ -107,15 +105,19 @@ class MegaTransfersAdapter(
         }
         holder.textViewFileName.text = transfer.fileName
         val isItemChecked = isItemChecked(position)
-        when (transfer.type) {
-            TYPE_DOWNLOAD -> {
-                holder.progressText.setTextColor(ContextCompat.getColor(context,
-                    R.color.green_500_green_400))
-                holder.document = transfer.nodeHandle
+        when (transfer.transferType) {
+            TransferType.TYPE_DOWNLOAD -> {
+                holder.progressText.setTextColor(
+                    ContextCompat.getColor(
+                        context,
+                        R.color.green_500_green_400
+                    )
+                )
+                holder.document = transfer.handle
                 if (!isItemChecked) {
                     holder.iconDownloadUploadView.setImageResource(R.drawable.ic_download_transfers)
-                    val nodeFromMegaApi = megaApi.getNodeByHandle(transfer.nodeHandle)
-                    val nodeFromMegaApiFolder = megaApiFolder.getNodeByHandle(transfer.nodeHandle)
+                    val nodeFromMegaApi = megaApi.getNodeByHandle(transfer.handle)
+                    val nodeFromMegaApiFolder = megaApiFolder.getNodeByHandle(transfer.handle)
                     // If node that gets from MegaApi is null, getting the node from megaApiFolder
                     val node = nodeFromMegaApi ?: nodeFromMegaApiFolder
                     if (node != null) {
@@ -123,11 +125,13 @@ class MegaTransfersAdapter(
                             ThumbnailUtils.getThumbnailFromCache(node) ?: let {
                                 ThumbnailUtils.getThumbnailFromFolder(node, context) ?: let {
                                     try {
-                                        ThumbnailUtils.getThumbnailFromMegaTransfer(node,
+                                        ThumbnailUtils.getThumbnailFromMegaTransfer(
+                                            node,
                                             context,
                                             holder,
                                             megaApi,
-                                            this)
+                                            this
+                                        )
                                     } catch (e: Exception) {
                                         Timber.e(e, "Exception getting thumbnail")
                                         null
@@ -137,10 +141,13 @@ class MegaTransfersAdapter(
                         } else {
                             null
                         }?.let { thumbnail ->
-                            holder.thumbnailIcon.setImageBitmap(ThumbnailUtils.getRoundedBitmap(
-                                context,
-                                thumbnail,
-                                Util.dp2px(THUMB_CORNER_RADIUS_DP)))
+                            holder.thumbnailIcon.setImageBitmap(
+                                ThumbnailUtils.getRoundedBitmap(
+                                    context,
+                                    thumbnail,
+                                    Util.dp2px(THUMB_CORNER_RADIUS_DP)
+                                )
+                            )
                             holder.thumbnailIcon.isVisible = true
                             holder.defaultIcon.isVisible = false
                         } ?: showDefaultIcon(
@@ -156,7 +163,7 @@ class MegaTransfersAdapter(
                     }
                 }
             }
-            TYPE_UPLOAD -> {
+            TransferType.TYPE_UPLOAD -> {
                 if (!isItemChecked) {
                     holder.iconDownloadUploadView.setImageResource(R.drawable.ic_upload_transfers)
                     showDefaultIcon(
@@ -165,6 +172,7 @@ class MegaTransfersAdapter(
                     )
                 }
             }
+            TransferType.NONE -> {}
         }
 
         holder.iconDownloadUploadView.isVisible = !isItemChecked
@@ -187,12 +195,12 @@ class MegaTransfersAdapter(
             holder.progressText.text = getProgress(transfer)
             holder.speedText.text = context.getString(R.string.transfer_paused)
 
-            if (!isMultipleSelect() && transfer.state == STATE_PAUSED) {
+            if (!isMultipleSelect() && transfer.transferState == TransferState.STATE_PAUSED) {
                 holder.optionPause.setImageResource(R.drawable.ic_play_grey)
             }
         } else {
-            when (transfer.state) {
-                STATE_PAUSED -> {
+            when (transfer.transferState) {
+                TransferState.STATE_PAUSED -> {
                     holder.progressText.text = getProgress(transfer)
                     holder.speedText.text = context.getString(R.string.transfer_paused)
                     holder.speedText.isVisible = true
@@ -201,7 +209,7 @@ class MegaTransfersAdapter(
                         holder.optionPause.setImageResource(R.drawable.ic_play_grey)
                     }
                 }
-                STATE_ACTIVE -> {
+                TransferState.STATE_ACTIVE -> {
                     holder.progressText.text = getProgress(transfer)
                     holder.speedText.text = Util.getSpeedString(
                         if (Util.isOnline(context))
@@ -210,26 +218,31 @@ class MegaTransfersAdapter(
                             0
                     )
                 }
-                STATE_COMPLETING,
-                STATE_RETRYING,
-                STATE_QUEUED,
+                TransferState.STATE_COMPLETING,
+                TransferState.STATE_RETRYING,
+                TransferState.STATE_QUEUED,
                 -> {
                     when {
-                        (transfer.type == TYPE_DOWNLOAD && transfersViewModel.isOnTransferOverQuota())
-                                || (transfer.type == TYPE_UPLOAD && getStorageState() == StorageState.Red)
+                        (transfer.transferType == TransferType.TYPE_DOWNLOAD && transfersViewModel.isOnTransferOverQuota())
+                                || (transfer.transferType == TransferType.TYPE_UPLOAD && getStorageState() == StorageState.Red)
                         -> {
-                            holder.progressText.setTextColor(ContextCompat.getColor(context,
-                                R.color.orange_400_orange_300))
-                            holder.progressText.text = String.format("%s %s",
+                            holder.progressText.setTextColor(
+                                ContextCompat.getColor(
+                                    context,
+                                    R.color.orange_400_orange_300
+                                )
+                            )
+                            holder.progressText.text = String.format(
+                                "%s %s",
                                 getProgress(transfer),
-                                if (transfer.type == TYPE_DOWNLOAD)
+                                if (transfer.transferType == TransferType.TYPE_DOWNLOAD)
                                     context.getString(R.string.label_transfer_over_quota)
                                 else
                                     context.getString(R.string.label_storage_over_quota)
                             )
                             holder.speedText.isVisible = false
                         }
-                        transfer.state == STATE_QUEUED -> {
+                        transfer.transferState == TransferState.STATE_QUEUED -> {
                             holder.progressText.isVisible = false
                             holder.speedText.isVisible = false
                             holder.imageViewCompleted.isVisible = true
@@ -241,7 +254,7 @@ class MegaTransfersAdapter(
                             holder.progressText.text = getProgress(transfer)
                             holder.speedText.text =
                                 context.getString(
-                                    if (transfer.state == STATE_COMPLETING)
+                                    if (transfer.transferState == TransferState.STATE_COMPLETING)
                                         R.string.transfer_completing
                                     else
                                         R.string.transfer_retrying
@@ -292,7 +305,7 @@ class MegaTransfersAdapter(
      * @param transfers Updated list of transfers.
      * @param position Position of the transfer in the adapter.
      */
-    fun addItemData(transfers: List<MegaTransfer>, position: Int) {
+    fun addItemData(transfers: List<Transfer>, position: Int) {
         transferList = transfers
         notifyItemInserted(position)
     }
@@ -303,7 +316,7 @@ class MegaTransfersAdapter(
      * @param transfer updated transfer item
      * @param position position of the transfer in the adapter.
      */
-    fun updateItemState(transfer: MegaTransfer, position: Int) {
+    fun updateItemState(transfer: Transfer, position: Int) {
         transferList = transferList.toMutableList().also { transfers ->
             transfers[position] = transfer
         }
@@ -319,7 +332,7 @@ class MegaTransfersAdapter(
      * @param transfers Updated list of transfers.
      * @param position Item to remove.
      */
-    fun removeItemData(transfers: List<MegaTransfer>, position: Int) {
+    fun removeItemData(transfers: List<Transfer>, position: Int) {
         transferList = transfers
 
         if (isItemChecked(position)) {
@@ -347,7 +360,7 @@ class MegaTransfersAdapter(
      * @param oldPosition Old position of the transfer.
      * @param newPosition New position of the transfer.
      */
-    fun moveItemData(transfers: List<MegaTransfer>, oldPosition: Int, newPosition: Int) {
+    fun moveItemData(transfers: List<Transfer>, oldPosition: Int, newPosition: Int) {
         transferList = transfers
         notifyItemMoved(oldPosition, newPosition)
     }
@@ -358,7 +371,7 @@ class MegaTransfersAdapter(
      * @param position Position of the transfer in the adapter.
      * @param transfer Transfer to which the progress has to be updated.
      */
-    fun updateProgress(position: Int, transfer: MegaTransfer) {
+    fun updateProgress(position: Int, transfer: Transfer) {
         (listView.findViewHolderForLayoutPosition(position) as? TransferViewHolder)?.let { holder ->
             if (!holder.progressText.isVisible) {
                 holder.progressText.isVisible = true
@@ -376,7 +389,8 @@ class MegaTransfersAdapter(
                 Util.getSpeedString(
                     if (Util.isOnline(context))
                         transfer.speed
-                    else 0)
+                    else 0
+                )
             }
         } ?: notifyItemChanged(position)
     }
@@ -434,8 +448,8 @@ class MegaTransfersAdapter(
      *
      * @return selected [MegaTransfer] list
      */
-    fun getSelectedTransfers(): List<MegaTransfer>? = selectedItems?.let {
-        mutableListOf<MegaTransfer>().let { selectedTransfers ->
+    fun getSelectedTransfers(): List<Transfer> = selectedItems?.let {
+        mutableListOf<Transfer>().let { selectedTransfers ->
             for (i in 0 until it.size()) {
                 if (!it.valueAt(i)) {
                     continue
@@ -449,7 +463,7 @@ class MegaTransfersAdapter(
             }
             selectedTransfers
         }
-    }
+    }.orEmpty()
 
     /**
      * Get the selected items count
@@ -458,7 +472,7 @@ class MegaTransfersAdapter(
      */
     fun getSelectedItemsCount() = selectedItems?.size() ?: 0
 
-    private fun getTransferItem(position: Int): MegaTransfer? =
+    private fun getTransferItem(position: Int): Transfer? =
         if (position >= 0 && position < transferList.size) {
             transferList[position]
         } else {
@@ -489,7 +503,7 @@ class MegaTransfersAdapter(
      * @param transfer transfer to get the progress
      * @return The progress of the transfer.
      */
-    private fun getProgress(transfer: MegaTransfer) =
+    private fun getProgress(transfer: Transfer) =
         context.getString(
             R.string.progress_size_indicator,
             if (transfer.totalBytes > 0L) (100.0 * transfer.transferredBytes / transfer.totalBytes).roundToLong() else 0L,
