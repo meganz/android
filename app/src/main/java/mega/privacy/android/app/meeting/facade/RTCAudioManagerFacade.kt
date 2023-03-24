@@ -1,11 +1,13 @@
 package mega.privacy.android.app.meeting.facade
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
+import androidx.core.content.ContextCompat
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.interfaces.OnProximitySensorListener
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
@@ -59,16 +61,21 @@ class RTCAudioManagerFacade @Inject constructor(
      * @param isSpeakerOn
      * @param type
      */
+    @SuppressLint("WrongConstant")
     override fun createOrUpdateAudioManager(isSpeakerOn: Boolean, type: Int) {
         Timber.d("Create or update audio manager, type is %s", type)
         if (type == Constants.AUDIO_MANAGER_CALL_RINGING) {
             if (rtcAudioManagerRingInCall != null) {
                 removeRTCAudioManagerRingIn()
             }
-            application.registerReceiver(volumeReceiver,
-                IntentFilter(Constants.VOLUME_CHANGED_ACTION))
-            application.registerReceiver(becomingNoisyReceiver,
-                IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY))
+            ContextCompat.registerReceiver(
+                application, volumeReceiver,
+                IntentFilter(Constants.VOLUME_CHANGED_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+            application.registerReceiver(
+                becomingNoisyReceiver,
+                IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+            )
             Timber.d("Creating RTC Audio Manager (ringing mode)")
             rtcAudioManagerRingInCall =
                 AppRTCAudioManager.create(application, false, Constants.AUDIO_MANAGER_CALL_RINGING)

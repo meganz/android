@@ -143,7 +143,7 @@ class UploadService : Service() {
         }
     }
 
-    @SuppressLint("NewApi", "CheckResult")
+    @SuppressLint("NewApi", "CheckResult", "WrongConstant")
     override fun onCreate() {
         super.onCreate()
         Timber.d("onCreate")
@@ -179,9 +179,11 @@ class UploadService : Service() {
                 )
             }
         }
-        registerReceiver(
+        ContextCompat.registerReceiver(
+            this,
             pauseBroadcastReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION)
+            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
         )
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
             .observeForever(stopServiceObserver)

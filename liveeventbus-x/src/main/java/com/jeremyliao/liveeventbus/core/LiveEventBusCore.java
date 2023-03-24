@@ -1,5 +1,6 @@
 package com.jeremyliao.liveeventbus.core;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -117,6 +118,7 @@ public final class LiveEventBusCore {
         this.logger.setEnable(enable);
     }
 
+    @SuppressLint("WrongConstant")
     void registerReceiver() {
         if (isRegisterReceiver) {
             return;

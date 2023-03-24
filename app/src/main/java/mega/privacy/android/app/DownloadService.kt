@@ -227,16 +227,22 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Mega:DownloadServicePowerLock")
     }
 
+    @SuppressLint("WrongConstant")
     private fun setReceivers() {
         // delay 1 second to refresh the pause notification to prevent update is missed
         pauseBroadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                Handler().postDelayed({ updateProgressNotification() },
-                    TransfersManagement.WAIT_TIME_BEFORE_UPDATE)
+                Handler().postDelayed(
+                    { updateProgressNotification() },
+                    TransfersManagement.WAIT_TIME_BEFORE_UPDATE
+                )
             }
         }
-        registerReceiver(pauseBroadcastReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION))
+        ContextCompat.registerReceiver(
+            this, pauseBroadcastReceiver,
+            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
             .observeForever(stopServiceObserver)
     }

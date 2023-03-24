@@ -1,5 +1,6 @@
 package mega.privacy.android.app
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.DialogInterface
@@ -1246,15 +1247,25 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         startActivity(intent)
     }
 
+    /**
+     * Register Broadcast Receiver
+     */
+    @SuppressLint("WrongConstant")
     override fun registerReceiver(receiver: BroadcastReceiver?, filter: IntentFilter): Intent? {
         return try {
-            super.registerReceiver(receiver, filter)
+            ContextCompat.registerReceiver(
+                this, receiver, filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
         } catch (e: IllegalStateException) {
             Timber.e(e, "IllegalStateException registering receiver")
             null
         }
     }
 
+    /**
+     * Unregister Broadcast Receiver
+     */
     override fun unregisterReceiver(receiver: BroadcastReceiver) {
         try {
             //If the receiver is not registered, it throws an IllegalArgumentException

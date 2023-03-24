@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.Animator.AnimatorListener
 import android.animation.AnimatorInflater
 import android.animation.AnimatorSet
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -192,11 +193,14 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
     /**
      * onResume
      */
+    @SuppressLint("WrongConstant")
     override fun onResume() {
         super.onResume()
 
-        requireContext()
-            .registerReceiver(receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST))
+        ContextCompat.registerReceiver(
+            requireContext(), receiverRefreshOffline, IntentFilter(REFRESH_OFFLINE_FILE_LIST),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
 
         viewModel.loadOfflineNodes()
     }

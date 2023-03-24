@@ -149,6 +149,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     /** the receiver and manager for the broadcast to listen to the pause event  */
     private var pauseBroadcastReceiver: BroadcastReceiver? = null
 
+    @SuppressLint("WrongConstant")
     override fun onCreate() {
         super.onCreate()
         app = application as MegaApplication
@@ -178,9 +179,11 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                 Handler(Looper.getMainLooper()).postDelayed({ updateProgressNotification() }, 1000)
             }
         }
-        registerReceiver(
+        ContextCompat.registerReceiver(
+            this,
             pauseBroadcastReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION)
+            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
         )
 
         getGlobalTransferUseCase.get()

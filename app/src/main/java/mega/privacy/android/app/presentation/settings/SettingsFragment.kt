@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -220,9 +221,15 @@ class SettingsFragment :
         super.onResume()
     }
 
+    @SuppressLint("WrongConstant")
     private fun registerAccountChangeReceiver() {
         val filter = IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-        requireContext().registerReceiver(updateMyAccountReceiver, filter)
+        ContextCompat.registerReceiver(
+            requireContext(),
+            updateMyAccountReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     private fun refreshSummaries() {
