@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -281,7 +282,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                     adapter?.addItemData(transfers,
                         transfers.indexOf(transfersState.updatedTransfer))
 
-                    if (transfers.size == 1) {
+                    if (transfers.isNotEmpty() && binding.transfersEmptyImage.isVisible) {
                         setEmptyView(transfers.size)
                     }
                 }

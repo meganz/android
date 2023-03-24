@@ -490,9 +490,11 @@ class MegaTransfersAdapter(
      * @return The progress of the transfer.
      */
     private fun getProgress(transfer: MegaTransfer) =
-        context.getString(R.string.progress_size_indicator,
-            (100.0 * transfer.transferredBytes / transfer.totalBytes).roundToLong(),
-            Util.getSizeString(transfer.totalBytes))
+        context.getString(
+            R.string.progress_size_indicator,
+            if (transfer.totalBytes > 0L) (100.0 * transfer.transferredBytes / transfer.totalBytes).roundToLong() else 0L,
+            Util.getSizeString(transfer.totalBytes)
+        )
 
     /**
      * Selects or deselects a transfer with an animation view.
