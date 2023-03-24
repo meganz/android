@@ -1,18 +1,26 @@
 package mega.privacy.android.data.mapper.mediaplayer
 
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import javax.inject.Inject
 
 /**
  * The mapper class for converting the data entity to [SubtitleFileInfo]
  */
-internal fun interface SubtitleFileInfoMapper {
+class SubtitleFileInfoMapper @Inject constructor() {
 
     /**
-     *Invocation function
+     * Invocation function
      *
+     * @param id file node handle
      * @param name file name
      * @param url file url
-     * @param path file path
+     * @param parentName file parent name
      */
-    operator fun invoke(name: String, url: String?, path: String?): SubtitleFileInfo
+    operator fun invoke(
+        id: Long,
+        name: String,
+        url: String?,
+        parentName: String?,
+    ): SubtitleFileInfo =
+        SubtitleFileInfo(id = id, name = name, url = url, parentName = parentName)
 }

@@ -368,16 +368,7 @@ interface PlayerServiceViewModelGateway {
     /**
      * Get the subtitle file info that is same name as playing media item
      *
-     * @param fileSuffix the subtitle file suffix
      * @return SubtitleFileInfo
      */
-    suspend fun getMatchedSubtitleFileInfoForPlayingItem(fileSuffix: String): SubtitleFileInfo?
-
-    /**
-     * Get all [SubtitleFileInfo] list
-     *
-     * @param fileSuffix the subtitle file suffix
-     * @return all subtitle file info list
-     */
-    suspend fun getSubtitleFileInfoList(fileSuffix: String): List<SubtitleFileInfo>
+    suspend fun getMatchedSubtitleFileInfoForPlayingItem(): SubtitleFileInfo?
 }

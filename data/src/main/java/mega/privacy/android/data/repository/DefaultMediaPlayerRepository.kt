@@ -105,14 +105,16 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
      */
     private suspend fun getMediaNodes(isAudio: Boolean, order: SortOrder): List<UnTypedNode> =
         withContext(ioDispatcher) {
-            megaApi.searchByType(MegaCancelToken.createInstance(),
+            megaApi.searchByType(
+                MegaCancelToken.createInstance(),
                 sortOrderIntMapper(order),
                 if (isAudio) {
                     FILE_TYPE_AUDIO
                 } else {
                     FILE_TYPE_VIDEO
                 },
-                SEARCH_TARGET_ROOTNODE).filter {
+                SEARCH_TARGET_ROOTNODE
+            ).filter {
                 it.isFile && filterByNodeName(isAudio, it.name)
             }.map { megaNode ->
                 convertToUnTypedNode(megaNode)
@@ -137,9 +139,11 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             megaApi.getMegaNodeByHandle(nodeHandle)?.let { node ->
                 suspendCancellableCoroutine { continuation ->
                     val listener = continuation.getRequestListener { it.nodeHandle }
-                    megaApiFolder.getThumbnail(node = node,
+                    megaApiFolder.getThumbnail(
+                        node = node,
                         thumbnailFilePath = path,
-                        listener = listener)
+                        listener = listener
+                    )
                     continuation.invokeOnCancellation {
                         megaApi.removeRequestListener(listener)
                     }
@@ -230,17 +234,21 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         parentHandle: Long,
         order: SortOrder,
     ): List<UnTypedNode>? =
-        getChildrenByParentHandleFromMegaApiFolder(isAudio = true,
+        getChildrenByParentHandleFromMegaApiFolder(
+            isAudio = true,
             parentHandle = parentHandle,
-            order = order)
+            order = order
+        )
 
     override suspend fun getVideosByParentHandleFromMegaApiFolder(
         parentHandle: Long,
         order: SortOrder,
     ): List<UnTypedNode>? =
-        getChildrenByParentHandleFromMegaApiFolder(isAudio = false,
+        getChildrenByParentHandleFromMegaApiFolder(
+            isAudio = false,
             parentHandle = parentHandle,
-            order = order)
+            order = order
+        )
 
     /**
      * Get nodes by parent handle from mega api folder
@@ -422,7 +430,8 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             fileGateway.getLocalFile(
                 typedFileNode.name,
                 typedFileNode.size,
-                typedFileNode.modificationTime)?.path
+                typedFileNode.modificationTime
+            )?.path
         }
 
     override suspend fun deletePlaybackInformation(mediaId: Long) {
@@ -430,8 +439,10 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     }
 
     override suspend fun savePlaybackTimes() {
-        appPreferencesGateway.putString(PREFERENCE_KEY_VIDEO_EXIT_TIME,
-            Gson().toJson(playbackInfoMap))
+        appPreferencesGateway.putString(
+            PREFERENCE_KEY_VIDEO_EXIT_TIME,
+            Gson().toJson(playbackInfoMap)
+        )
     }
 
     override suspend fun updatePlaybackInformation(playbackInformation: PlaybackInformation) {
@@ -441,12 +452,16 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     }
 
     override fun monitorPlaybackTimes(): Flow<Map<Long, PlaybackInformation>?> =
-        appPreferencesGateway.monitorString(PREFERENCE_KEY_VIDEO_EXIT_TIME,
-            null).map { jsonString ->
+        appPreferencesGateway.monitorString(
+            PREFERENCE_KEY_VIDEO_EXIT_TIME,
+            null
+        ).map { jsonString ->
             jsonString?.let {
                 runCatching {
-                    Gson().fromJson<Map<Long, PlaybackInformation>?>(it,
-                        object : TypeToken<Map<Long, PlaybackInformation>>() {}.type)
+                    Gson().fromJson<Map<Long, PlaybackInformation>?>(
+                        it,
+                        object : TypeToken<Map<Long, PlaybackInformation>>() {}.type
+                    )
                         .let { infoMap ->
                             // If the playbackInfoMap is empty, using the local information
                             // else using the current playbackInfoMap
@@ -458,8 +473,10 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                     // Log the error jsonString and clear it.
                     Timber.d(it, "The error jsonString: $jsonString")
                     playbackInfoMap.clear()
-                    appPreferencesGateway.putString(PREFERENCE_KEY_VIDEO_EXIT_TIME,
-                        Gson().toJson(playbackInfoMap))
+                    appPreferencesGateway.putString(
+                        PREFERENCE_KEY_VIDEO_EXIT_TIME,
+                        Gson().toJson(playbackInfoMap)
+                    )
                 }
                 playbackInfoMap
             }
@@ -481,9 +498,10 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 )
             }?.map { megaNode ->
                 subtitleFileInfoMapper(
+                    id = megaNode.handle,
                     name = megaNode.name,
                     url = megaApi.httpServerGetLocalLink(megaNode),
-                    path = megaApi.getNodePath(megaNode)
+                    parentName = megaApi.getParentNode(megaNode)?.name
                 )
             } ?: emptyList()
         }

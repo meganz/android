@@ -23,11 +23,14 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
+import mega.privacy.android.app.mediaplayer.model.SubtitleDisplayState
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -67,6 +70,23 @@ class MediaPlayerViewModel @Inject constructor(
     private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
     private val snackbarMessage = SingleLiveEvent<String>()
+
+    /**
+     * The subtitle file info by add subtitles
+     */
+    var subtitleInfoByAddSubtitles: SubtitleFileInfo? = null
+        private set
+
+    private var currentMediaPlayerMediaId: String? = null
+
+    private val _isAddSubtitle = MutableStateFlow(false)
+
+    private val _state = MutableStateFlow(SubtitleDisplayState())
+
+    /**
+     * Subtitle display state
+     */
+    val state: StateFlow<SubtitleDisplayState> = _state
 
     fun getCollision(): LiveData<NameCollision> = collision
     fun onSnackbarMessage(): LiveData<String> = snackbarMessage
@@ -120,34 +140,17 @@ class MediaPlayerViewModel @Inject constructor(
         false
     )
 
-    /**
-     * The state for subtitle dialog shown
-     */
-    val subtitleDialogShownState: StateFlow<Boolean> = _isSubtitleDialogShown
-
     private val _isSubtitleShown = savedStateHandle.getStateFlow(
         viewModelScope,
         subtitleShowKey,
-        SUBTITLE_STATUS_HIDDEN
+        false
     )
-
-    /**
-     * The state for subtitle shown
-     */
-    val subtitleShownState
-        get() = _isSubtitleShown.value
 
     private val _videoPlayerPausedForPlaylist = savedStateHandle.getStateFlow(
         viewModelScope,
         videoPlayerPausedForPlaylistKey,
         false
     )
-
-    /**
-     * The state for video player paused
-     */
-    val videoPlayerPausedForPlaylistState
-        get() = _videoPlayerPausedForPlaylist.value
 
     private val _currentSubtitleFileInfo: MutableStateFlow<SubtitleFileInfo?> =
         savedStateHandle.getStateFlow(
@@ -156,11 +159,69 @@ class MediaPlayerViewModel @Inject constructor(
             null
         )
 
+    init {
+        viewModelScope.launch {
+            combine(
+                _isSubtitleShown,
+                _isSubtitleDialogShown,
+                _isAddSubtitle,
+                _currentSubtitleFileInfo,
+                _videoPlayerPausedForPlaylist,
+                ::mapToSubtitleDisplayState
+            ).collectLatest { newState ->
+                _state.update {
+                    newState
+                }
+            }
+        }
+    }
+
+    private fun mapToSubtitleDisplayState(
+        subtitleShown: Boolean,
+        subtitleDialogShown: Boolean,
+        isAddSubtitle: Boolean,
+        subtitleFileInfo: SubtitleFileInfo?,
+        videoPlayerPausedForPlaylistState: Boolean,
+    ) = SubtitleDisplayState(
+        isSubtitleShown = subtitleShown,
+        isSubtitleDialogShown = subtitleDialogShown,
+        isAddSubtitle = isAddSubtitle,
+        subtitleFileInfo = subtitleFileInfo,
+        videoPlayerPausedForPlaylistState = videoPlayerPausedForPlaylistState
+    )
+
+
     /**
-     * The state for current subtitle file info
+     * Update the subtitle file info by added subtitles
+     *
+     * @param subtitleFileInfo [SubtitleFileInfo]
      */
-    val currentSubtitleFileInfoState
-        get() = _currentSubtitleFileInfo.value
+    fun updateSubtitleInfoByAddSubtitles(subtitleFileInfo: SubtitleFileInfo?) {
+        subtitleInfoByAddSubtitles = subtitleFileInfo
+        subtitleFileInfo?.let { info ->
+            if (_currentSubtitleFileInfo.value?.id != info.id) {
+                _currentSubtitleFileInfo.update { info }
+                _isAddSubtitle.update { true }
+            } else {
+                _isAddSubtitle.update { false }
+            }
+        }
+    }
+
+    /**
+     * Update the current media player media id
+     *
+     * @param mediaId media item id
+     */
+    fun updateCurrentMediaId(mediaId: String?) {
+        if (currentMediaPlayerMediaId != mediaId) {
+            if (currentMediaPlayerMediaId != null) {
+                _isSubtitleShown.update { false }
+                subtitleInfoByAddSubtitles = null
+            }
+            currentMediaPlayerMediaId = mediaId
+        }
+    }
 
     /**
      * Update whether video player paused for playlist
@@ -177,16 +238,25 @@ class MediaPlayerViewModel @Inject constructor(
      * @param subtitleFileInfo [SubtitleFileInfo]
      */
     fun updateCurrentSubtitleFileInfo(subtitleFileInfo: SubtitleFileInfo) {
-        _currentSubtitleFileInfo.update { subtitleFileInfo }
+        if (subtitleFileInfo.id != _currentSubtitleFileInfo.value?.id) {
+            _currentSubtitleFileInfo.update { subtitleFileInfo }
+            currentMediaPlayerMediaId = subtitleFileInfo.id.toString()
+            _isAddSubtitle.update { true }
+        } else {
+            _isAddSubtitle.update { false }
+        }
     }
 
     /**
      * Update the subtitle shown state
      *
-     * @param showState true is that subtitle is shown, otherwise is false
+     * @param isShow true is that subtitle is shown, otherwise is false
      */
-    fun updateSubtitleShownState(showState: Int) {
-        _isSubtitleShown.update { showState }
+    fun showSubtitle(isShow: Boolean) {
+        _isSubtitleShown.update { isShow }
+        if (!isShow) {
+            _isAddSubtitle.update { false }
+        }
     }
 
     /**
@@ -194,7 +264,7 @@ class MediaPlayerViewModel @Inject constructor(
      *
      * @param isShow true is show dialog, otherwise is false
      */
-    fun updateSubtitleDialogShownState(isShow: Boolean) {
+    fun showSubtitleDialog(isShow: Boolean) {
         _isSubtitleDialogShown.update { isShow }
     }
 
@@ -424,8 +494,5 @@ class MediaPlayerViewModel @Inject constructor(
         private const val DATE_FORMAT_PATTERN = "yyyyMMdd-HHmmss"
         private const val SCREENSHOT_NAME_PREFIX = "Screenshot_"
         private const val SCREENSHOT_NAME_SUFFIX = ".jpg"
-
-        internal const val SUBTITLE_STATUS_SHOWN = 0
-        internal const val SUBTITLE_STATUS_HIDDEN = 1
     }
 }

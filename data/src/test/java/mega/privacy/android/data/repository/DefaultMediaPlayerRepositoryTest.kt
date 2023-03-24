@@ -207,8 +207,12 @@ class DefaultMediaPlayerRepositoryTest {
         val expectedPlaybackInfo = createPlaybackInformation()
 
         underTest.updatePlaybackInformation(expectedPlaybackInfo)
-        whenever(appPreferencesGateway.monitorString(anyOrNull(),
-            anyOrNull())).thenReturn(flowOf("{}"))
+        whenever(
+            appPreferencesGateway.monitorString(
+                anyOrNull(),
+                anyOrNull()
+            )
+        ).thenReturn(flowOf("{}"))
         val actual = underTest.monitorPlaybackTimes().firstOrNull()
 
         assertThat(actual?.get(expectedMediaId)?.mediaId).isEqualTo(expectedMediaId)
@@ -220,9 +224,23 @@ class DefaultMediaPlayerRepositoryTest {
     fun `test that monitorPlaybackTimes`() = runTest {
         val expectedPlaybackInfo = createPlaybackInformation()
 
-        whenever(appPreferencesGateway.monitorString(anyOrNull(),
-            anyOrNull())).thenReturn(flowOf(Gson().toJson(mapOf(Pair(expectedMediaId,
-            expectedPlaybackInfo)))))
+        whenever(
+            appPreferencesGateway.monitorString(
+                anyOrNull(),
+                anyOrNull()
+            )
+        ).thenReturn(
+            flowOf(
+                Gson().toJson(
+                    mapOf(
+                        Pair(
+                            expectedMediaId,
+                            expectedPlaybackInfo
+                        )
+                    )
+                )
+            )
+        )
         val actual = underTest.monitorPlaybackTimes().firstOrNull()
 
         assertThat(actual?.get(expectedMediaId)?.mediaId).isEqualTo(expectedMediaId)
@@ -254,7 +272,9 @@ class DefaultMediaPlayerRepositoryTest {
 
             whenever(appPreferencesGateway.monitorString(anyOrNull(), anyOrNull())).thenReturn(
                 flowOf(
-                    Gson().toJson(expectedPlaybackInfoMap)))
+                    Gson().toJson(expectedPlaybackInfoMap)
+                )
+            )
             val actual = underTest.monitorPlaybackTimes().firstOrNull()
 
             assertThat(actual?.containsKey(expectedDeleteMediaId)).isFalse()
@@ -269,10 +289,14 @@ class DefaultMediaPlayerRepositoryTest {
                 on { name }.thenReturn(expectedName)
             }
             whenever(megaApi.httpServerGetLocalLink(expectedMegaNode)).thenReturn(expectedUrl)
-            whenever(megaApi.search(any(),
-                any(),
-                any(),
-                any())).thenReturn(listOf(expectedMegaNode))
+            whenever(
+                megaApi.search(
+                    any(),
+                    any(),
+                    any(),
+                    any()
+                )
+            ).thenReturn(listOf(expectedMegaNode))
 
             val actual = underTest.getSubtitleFileInfoList(".srt")
 

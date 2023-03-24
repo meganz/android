@@ -90,8 +90,6 @@ import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
-import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
-import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapperImpl
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapperImpl
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
@@ -222,12 +220,6 @@ internal abstract class MapperModule {
      */
     @Binds
     abstract fun bindHandleListMapper(implementation: HandleListMapperImpl): HandleListMapper
-
-    /**
-     * Provide Subtitle file info mapper
-     */
-    @Binds
-    abstract fun bindSubtitleFileInfoMapper(implementation: SubtitleFileInfoMapperImpl): SubtitleFileInfoMapper
 
     @Binds
     abstract fun bindChatScheduledMeetingOccurrMapper(implementation: ChatScheduledMeetingOccurrMapperImpl): ChatScheduledMeetingOccurrMapper

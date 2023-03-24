@@ -117,7 +117,6 @@ import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetRootNode
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetRubbishNode
-import mega.privacy.android.domain.usecase.GetSubtitleFileInfoList
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
@@ -137,10 +136,11 @@ import mega.privacy.android.domain.usecase.MegaApiHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiHttpServerSetMaxBufferSize
 import mega.privacy.android.domain.usecase.MegaApiHttpServerStart
 import mega.privacy.android.domain.usecase.MegaApiHttpServerStop
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimes
 import mega.privacy.android.domain.usecase.SavePlaybackTimes
 import mega.privacy.android.domain.usecase.TrackPlaybackPosition
+import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
@@ -207,7 +207,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getNodesByHandles: GetNodesByHandles,
     private val getFingerprint: GetFingerprint,
     private val fileDurationMapper: FileDurationMapper,
-    private val getSubtitleFileInfoListUseCase: GetSubtitleFileInfoList,
+    private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -1401,8 +1401,8 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
     override fun isActionMode() = actionMode.value
 
-    override suspend fun getMatchedSubtitleFileInfoForPlayingItem(fileSuffix: String): SubtitleFileInfo? =
-        getSubtitleFileInfoListUseCase(fileSuffix).firstOrNull { subtitleFileInfo ->
+    override suspend fun getMatchedSubtitleFileInfoForPlayingItem(): SubtitleFileInfo? =
+        getSRTSubtitleFileListUseCase().firstOrNull { subtitleFileInfo ->
             val subtitleName = subtitleFileInfo.name.let { name ->
                 name.substring(0, name.lastIndexOf("."))
             }
@@ -1411,9 +1411,6 @@ class MediaPlayerServiceViewModel @Inject constructor(
             }
             subtitleName == mediaItemName
         }
-
-    override suspend fun getSubtitleFileInfoList(fileSuffix: String): List<SubtitleFileInfo> =
-        getSubtitleFileInfoListUseCase(fileSuffix)
 
     private fun initPlayerSourceChanged() {
         if (playSourceChanged.isEmpty()) {

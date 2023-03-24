@@ -645,6 +645,10 @@
             android:label="@string/payment"
             android:launchMode="singleTop" />
 
+        <activity
+            android:name="mega.privacy.android.app.mediaplayer.SelectSubtitleFileActivity"
+            android:launchMode="singleTop" />
+
         <receiver android:name=".psa.AlarmReceiver"
             android:exported="false" >
             <intent-filter>

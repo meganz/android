@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.ComponentName
 import android.content.Context
@@ -18,8 +19,10 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -30,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.Player.MEDIA_ITEM_TRANSITION_REASON_REPEAT
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,24 +41,25 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.constants.SettingsConstants.KEY_VIDEO_REPEAT_MODE
 import mega.privacy.android.app.databinding.FragmentAudioPlayerBinding
 import mega.privacy.android.app.databinding.FragmentVideoPlayerBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_STATUS_HIDDEN
-import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_STATUS_SHOWN
 import mega.privacy.android.app.mediaplayer.gateway.MediaPlayerServiceGateway
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.model.RepeatToggleMode
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
+import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.isVisible
+import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.defaultSharedPreferences
@@ -84,8 +89,6 @@ class MediaPlayerFragment : Fragment() {
     private var isAudioPlayer = false
 
     private var playbackPositionDialog: Dialog? = null
-
-    private var currentMediaPlayerMediaId: String? = null
 
     /**
      * GetFeatureFlagValueUseCase injection
@@ -123,16 +126,8 @@ class MediaPlayerFragment : Fragment() {
 
         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
             super.onMediaItemTransition(mediaItem, reason)
-            if (view != null) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    videoPlayerVH?.let {
-                        if (currentMediaPlayerMediaId != mediaItem?.mediaId) {
-                            it.updateSubtitleButtonUI(false)
-                            viewModel.updateSubtitleShownState(SUBTITLE_STATUS_HIDDEN)
-                            currentMediaPlayerMediaId = mediaItem?.mediaId
-                        }
-                    }
-                }
+            if (view != null && reason != MEDIA_ITEM_TRANSITION_REASON_REPEAT) {
+                viewModel.updateCurrentMediaId(mediaItem?.mediaId)
             }
         }
     }
@@ -140,6 +135,21 @@ class MediaPlayerFragment : Fragment() {
     private var toolbarVisible = true
 
     private var retryFailedDialog: AlertDialog? = null
+
+    private val selectSubtitleFileActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                result.data?.serializable<SubtitleFileInfo>(
+                    INTENT_KEY_SUBTITLE_FILE_INFO
+                )?.let { info ->
+                    info.url?.let {
+                        viewModel.updateSubtitleInfoByAddSubtitles(info)
+                    }
+                    viewModel.showSubtitle(true)
+                } ?: viewModel.showSubtitle(false)
+                viewModel.showSubtitleDialog(false)
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -337,6 +347,23 @@ class MediaPlayerFragment : Fragment() {
                     }.launchIn(viewLifecycleOwner.lifecycleScope)
                 }
             }
+            collectFlow(viewModel.state) { state ->
+                videoPlayerVH?.updateSubtitleButtonUI(state.isSubtitleShown)
+                serviceGateway?.setPlayWhenReady(!state.isSubtitleDialogShown)
+                if (!state.isSubtitleDialogShown) {
+                    delayHideToolbar()
+                }
+                if (state.isSubtitleShown) {
+                    if (state.isAddSubtitle) {
+                        state.subtitleFileInfo?.url?.let {
+                            serviceGateway?.addSubtitle(it)
+                        }
+                    }
+                    serviceGateway?.showSubtitle()
+                } else {
+                    serviceGateway?.hideSubtitle()
+                }
+            }
         }
     }
 
@@ -371,30 +398,21 @@ class MediaPlayerFragment : Fragment() {
                             delayHideWhenLocked()
                         }
                     }
+                    initAddSubtitleDialog(viewHolder.binding.addSubtitleDialog)
                     viewLifecycleOwner.lifecycleScope.launch {
                         setupSubtitleButton(
                             // Add feature flag, and will be removed after the feature is finished.
                             isShow = getFeatureFlagValueUseCase(feature = AppFeatures.AddSubtitle),
-                            viewModel.subtitleShownState != SUBTITLE_STATUS_HIDDEN
+                            isSubtitleShown = viewModel.state.value.isSubtitleShown
                         ) {
-                            when (viewModel.subtitleShownState) {
-                                SUBTITLE_STATUS_SHOWN -> {
-                                    viewModel.updateSubtitleShownState(SUBTITLE_STATUS_HIDDEN)
-                                    serviceGateway?.hideSubtitle()
-                                }
-                                SUBTITLE_STATUS_HIDDEN -> {
-                                    viewLifecycleOwner.lifecycleScope.launch {
-                                        initAddSubtitleDialog(viewHolder)
-                                    }
-                                    viewModel.updateSubtitleShownState(SUBTITLE_STATUS_SHOWN)
-                                    serviceGateway?.setPlayWhenReady(false)
-                                }
+                            if (viewModel.state.value.isSubtitleShown) {
+                                serviceGateway?.hideSubtitle()
+                                viewModel.showSubtitle(false)
+                                viewModel.showSubtitleDialog(false)
+                            } else {
+                                viewModel.showSubtitle(true)
+                                viewModel.showSubtitleDialog(true)
                             }
-                            val isSubtitleShown =
-                                viewModel.subtitleShownState != SUBTITLE_STATUS_HIDDEN
-                            updateSubtitleButtonUI(isSubtitleShown)
-                            viewModel.updateSubtitleDialogShownState(isSubtitleShown)
-                            delayHideToolbar()
                         }
                     }
 
@@ -427,7 +445,7 @@ class MediaPlayerFragment : Fragment() {
                 serviceGateway?.run {
                     setupPlayerView(this, viewHolder.binding.playerView, true)
 
-                    if (viewModel.videoPlayerPausedForPlaylistState) {
+                    if (viewModel.state.value.videoPlayerPausedForPlaylistState) {
                         setPlayWhenReady(true)
                         viewModel.updateVideoPlayerPausedForPlaylist(false)
                     }
@@ -649,39 +667,41 @@ class MediaPlayerFragment : Fragment() {
     /**
      * Init the add subtitle dialog
      *
-     * @param videoPlayerViewHolder VideoPlayerViewHolder
+     * @param composeView compose view
      */
-    private suspend fun initAddSubtitleDialog(videoPlayerViewHolder: VideoPlayerViewHolder) {
-        val subtitleFileInfo =
-            playerServiceViewModelGateway?.getMatchedSubtitleFileInfoForPlayingItem(".srt")
-        videoPlayerViewHolder.binding.addSubtitleDialog.apply {
+    private fun initAddSubtitleDialog(composeView: ComposeView) {
+        composeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                if (viewModel.subtitleDialogShownState.collectAsState().value) {
+                if (viewModel.state.collectAsState().value.isSubtitleDialogShown) {
                     AddSubtitleDialog(
-                        matchedItemName = subtitleFileInfo?.name,
-                        onAutoMatch = {
-                            subtitleFileInfo?.url?.let {
-                                if (viewModel.currentSubtitleFileInfoState?.url == it) {
-                                    serviceGateway?.showSubtitle()
-                                } else {
-                                    serviceGateway?.addSubtitle(it)
-                                    viewModel.updateCurrentSubtitleFileInfo(subtitleFileInfo)
-                                }
-                                viewModel.updateSubtitleShownState(SUBTITLE_STATUS_SHOWN)
-                                viewModel.updateSubtitleDialogShownState(false)
-                                serviceGateway?.setPlayWhenReady(true)
+                        matchedSubtitleFileUpdate = {
+                            playerServiceViewModelGateway?.getMatchedSubtitleFileInfoForPlayingItem()
+                        },
+                        subtitleFileName = viewModel.subtitleInfoByAddSubtitles?.name,
+                        onAddedSubtitleClicked = {
+                            viewModel.showSubtitle(true)
+                            viewModel.showSubtitleDialog(false)
+                        },
+                        onAutoMatch = { info ->
+                            info.url?.let {
+                                viewModel.updateCurrentSubtitleFileInfo(info)
+                                viewModel.showSubtitle(true)
+                                viewModel.showSubtitleDialog(false)
+                                viewModel.updateSubtitleInfoByAddSubtitles(null)
                             }
                         },
                         onToSelectSubtitle = {
-                            viewModel.updateSubtitleDialogShownState(false)
-                            Timber.d("open select subtitle page")
+                            selectSubtitleFileActivityLauncher.launch(
+                                Intent(
+                                    requireActivity(),
+                                    SelectSubtitleFileActivity::class.java
+                                )
+                            )
                         }) {
                         // onDismissRequest
-                        viewModel.updateSubtitleShownState(SUBTITLE_STATUS_HIDDEN)
-                        viewModel.updateSubtitleDialogShownState(false)
-                        videoPlayerVH?.updateSubtitleButtonUI(false)
-                        serviceGateway?.setPlayWhenReady(true)
+                        viewModel.showSubtitle(false)
+                        viewModel.showSubtitleDialog(false)
                     }
                 }
             }
@@ -697,5 +717,10 @@ class MediaPlayerFragment : Fragment() {
         private const val SCREENSHOT_RELATE_Y: Float = 0.6F
         private const val ANIMATION_DURATION: Long = 500
         private const val SCREENSHOT_DURATION: Long = 500
+
+        /**
+         * The intent key for passing subtitle file info
+         */
+        const val INTENT_KEY_SUBTITLE_FILE_INFO = "INTENT_KEY_SUBTITLE_FILE_INFO"
     }
 }
