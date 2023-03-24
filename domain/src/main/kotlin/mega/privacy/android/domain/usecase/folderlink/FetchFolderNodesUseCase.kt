@@ -10,13 +10,19 @@ import javax.inject.Inject
 /**
  * Use case implementation for fetching folder nodes
  */
-class DefaultFetchFolderNodes @Inject constructor(
+class FetchFolderNodesUseCase @Inject constructor(
     private val repository: FolderLinkRepository,
     private val addNodeType: AddNodeType,
     private val getChildrenNodes: GetFolderLinkChildrenNodes,
-) : FetchFolderNodes {
+) {
 
-    override suspend fun invoke(): FetchFolderNodesResult {
+    /**
+     * Invoke
+     *
+     * @param folderSubHandle   Base 64 handle of the folder node
+     * @return Folder nodes result
+     */
+    suspend operator fun invoke(folderSubHandle: String?): FetchFolderNodesResult {
         val folderNodesResult = FetchFolderNodesResult()
         runCatching { repository.fetchNodes() }
             .onSuccess { result ->
@@ -29,8 +35,21 @@ class DefaultFetchFolderNodes @Inject constructor(
                         runCatching { addNodeType(rootNode) as TypedFolderNode }
                             .onSuccess { typedFolderNode ->
                                 folderNodesResult.rootNode = typedFolderNode
+                                var parentHandle = typedFolderNode.id.longValue
 
-                                runCatching { getChildrenNodes(typedFolderNode.id.longValue, null) }
+                                if (folderSubHandle != null) {
+                                    runCatching { repository.getFolderLinkNode(folderSubHandle) }
+                                        .onSuccess {
+                                            runCatching { addNodeType(it) as TypedFolderNode }
+                                                .onSuccess {
+                                                    folderNodesResult.parentNode = it
+                                                    parentHandle = it.id.longValue
+                                                }
+                                        }
+                                        .onFailure { throw FetchFolderNodesException.GenericError() }
+                                }
+
+                                runCatching { getChildrenNodes(parentHandle, null) }
                                     .onSuccess { folderNodesResult.childrenNodes = it }
                                     .onFailure { throw FetchFolderNodesException.GenericError() }
                             }

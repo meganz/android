@@ -27,6 +27,13 @@ interface FolderLinkRepository {
     suspend fun loginToFolder(folderLink: String): FolderLoginStatus
 
     /**
+     * Get the node for given handle
+     *
+     * @param handle Base 64 handle of the node
+     */
+    suspend fun getFolderLinkNode(handle: String): UnTypedNode
+
+    /**
      * Get the root node
      */
     suspend fun getRootNode(): UnTypedNode?

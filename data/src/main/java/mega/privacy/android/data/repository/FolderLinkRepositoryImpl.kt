@@ -6,6 +6,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
@@ -28,6 +29,7 @@ import javax.inject.Inject
  */
 class FolderLinkRepositoryImpl @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
+    private val megaApiGateway: MegaApiGateway,
     private val folderLoginStatusMapper: FolderLoginStatusMapper,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
     private val nodeMapper: NodeMapper,
@@ -91,6 +93,13 @@ class FolderLinkRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getFolderLinkNode(handle: String): UnTypedNode =
+        withContext(ioDispatcher) {
+            megaApiFolderGateway.getMegaNodeByHandle(megaApiGateway.base64ToHandle(handle))?.let {
+                convertToUntypedNode(it)
+            } ?: throw SynchronisationException("Non null node found be null when fetched from api")
+        }
 
     override suspend fun getRootNode(): UnTypedNode? = withContext(ioDispatcher) {
         megaApiFolderGateway.getRootNode()?.let { convertToUntypedNode(it) }
