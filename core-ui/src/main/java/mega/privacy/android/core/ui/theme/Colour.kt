@@ -170,6 +170,9 @@ val grey_100_alpha_060 = Color(0x99E0E0E0)
 @ShowkaseColor("grey_300_alpha_026", "grey")
 val grey_300_alpha_026 = Color(0x429E9E9E)
 
+@ShowkaseColor("grey_400_alpha_038", "grey")
+val grey_400_alpha_038 = Color(0x61929292)
+
 @ShowkaseColor("grey_600_alpha_085", "grey")
 val grey_600_alpha_085 = Color(0xD96C6C6C)
 

@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,19 +18,17 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.grey_010
-import mega.privacy.android.core.ui.theme.grey_200
-import mega.privacy.android.core.ui.theme.grey_alpha_038
 import mega.privacy.android.core.ui.theme.grey_alpha_087
-import mega.privacy.android.core.ui.theme.teal_100
-import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white_alpha_087
 
+/**
+ * A switch with a label
+ */
 @Composable
 fun LabelledSwitch(
     label: String,
     checked: Boolean,
-    onCheckChanged: (Boolean) -> Unit = {},
+    onCheckChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -50,27 +46,16 @@ fun LabelledSwitch(
             style = MaterialTheme.typography.subtitle1,
             color = if (!MaterialTheme.colors.isLight) white_alpha_087 else grey_alpha_087
         )
-        Switch(
+        MegaSwitch(
             checked = checked,
             onCheckedChange = null,
-            colors = if (MaterialTheme.colors.isLight) lightSwitchColors() else darkSwitchColors()
         )
     }
 }
 
-@Composable
-private fun darkSwitchColors() = SwitchDefaults.colors(
-    uncheckedThumbColor = grey_200,
-)
-
-@Composable
-private fun lightSwitchColors() = SwitchDefaults.colors(
-    checkedThumbColor = teal_300,
-    checkedTrackColor = teal_100,
-    uncheckedThumbColor = grey_010,
-    uncheckedTrackColor = grey_alpha_038,
-)
-
+/**
+ * Preview showkase
+ */
 @ShowkaseComposable("Labelled Switch", "Controls and sliders")
 @Composable
 fun ShowkasePreviewLabelledSwitch() = PreviewLabelledSwitch()
