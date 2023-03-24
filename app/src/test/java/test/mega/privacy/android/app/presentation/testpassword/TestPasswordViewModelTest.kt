@@ -10,10 +10,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.testpassword.TestPasswordViewModel
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
-import mega.privacy.android.domain.usecase.BlockPasswordReminder
-import mega.privacy.android.domain.usecase.IsCurrentPassword
-import mega.privacy.android.domain.usecase.NotifyPasswordChecked
-import mega.privacy.android.domain.usecase.SkipPasswordReminder
+import mega.privacy.android.domain.usecase.BlockPasswordReminderUseCase
+import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
+import mega.privacy.android.domain.usecase.NotifyPasswordCheckedUseCase
+import mega.privacy.android.domain.usecase.SkipPasswordReminderUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -23,10 +23,10 @@ import org.mockito.kotlin.whenever
 internal class TestPasswordViewModelTest {
     private lateinit var underTest: TestPasswordViewModel
     private val savedStateHandle = SavedStateHandle()
-    private val isCurrentPassword = mock<IsCurrentPassword>()
-    private val skipPasswordReminder = mock<SkipPasswordReminder>()
-    private val blockPasswordReminder = mock<BlockPasswordReminder>()
-    private val notifyPasswordChecked = mock<NotifyPasswordChecked>()
+    private val isCurrentPasswordUseCase = mock<IsCurrentPasswordUseCase>()
+    private val skipPasswordReminderUseCase = mock<SkipPasswordReminderUseCase>()
+    private val blockPasswordReminderUseCase = mock<BlockPasswordReminderUseCase>()
+    private val notifyPasswordCheckedUseCase = mock<NotifyPasswordCheckedUseCase>()
 
     @Before
     fun setup() {
@@ -34,10 +34,10 @@ internal class TestPasswordViewModelTest {
 
         underTest = TestPasswordViewModel(
             savedStateHandle = savedStateHandle,
-            isCurrentPassword = isCurrentPassword,
-            skipPasswordReminder = skipPasswordReminder,
-            blockPasswordReminder = blockPasswordReminder,
-            notifyPasswordChecked = notifyPasswordChecked
+            isCurrentPasswordUseCase = isCurrentPasswordUseCase,
+            skipPasswordReminderUseCase = skipPasswordReminderUseCase,
+            blockPasswordReminderUseCase = blockPasswordReminderUseCase,
+            notifyPasswordCheckedUseCase = notifyPasswordCheckedUseCase
         )
     }
 
@@ -45,7 +45,7 @@ internal class TestPasswordViewModelTest {
     fun `test that checkForCurrentPassword should update state according to isCurrentPassword`() {
         fun verify(isCurrentPassword: Boolean, expected: PasswordState) = runTest {
             val mockPassword = "password"
-            whenever(isCurrentPassword(mockPassword)).thenReturn(isCurrentPassword)
+            whenever(isCurrentPasswordUseCase(mockPassword)).thenReturn(isCurrentPassword)
 
             underTest.checkForCurrentPassword(mockPassword)
 
@@ -91,7 +91,7 @@ internal class TestPasswordViewModelTest {
     @Test
     fun `test that isPasswordReminderNotified should be false when notify password reminder returns error`() =
         runTest {
-            whenever(skipPasswordReminder()).thenThrow(RuntimeException("Error"))
+            whenever(skipPasswordReminderUseCase()).thenThrow(RuntimeException("Error"))
 
             underTest.notifyPasswordReminderSkipped()
 
@@ -104,7 +104,7 @@ internal class TestPasswordViewModelTest {
     fun `test that isCurrentPassword should reset to false when resetCurrentPasswordState is called`() =
         runTest {
             val mockPassword = "password"
-            whenever(isCurrentPassword(mockPassword)).thenReturn(true)
+            whenever(isCurrentPasswordUseCase(mockPassword)).thenReturn(true)
 
             underTest.checkForCurrentPassword(mockPassword)
             underTest.uiState.test {

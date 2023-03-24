@@ -7,7 +7,7 @@ import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.account.ChangePasswordUseCases
 import mega.privacy.android.domain.usecase.ChangePassword
 import mega.privacy.android.domain.usecase.GetPasswordStrength
-import mega.privacy.android.domain.usecase.IsCurrentPassword
+import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.ResetPassword
 import org.mockito.kotlin.mock
 
@@ -19,7 +19,7 @@ import org.mockito.kotlin.mock
 object TestChangePasswordUseCases {
     val changePassword = mock<ChangePassword>()
     val getPasswordStrength = mock<GetPasswordStrength>()
-    val isCurrentPassword = mock<IsCurrentPassword>()
+    val isCurrentPasswordUseCase = mock<IsCurrentPasswordUseCase>()
     val resetPassword = mock<ResetPassword>()
 
     @Provides
@@ -29,7 +29,7 @@ object TestChangePasswordUseCases {
     fun provideGetPasswordStrength(): GetPasswordStrength = getPasswordStrength
 
     @Provides
-    fun provideIsCurrentPassword(): IsCurrentPassword = isCurrentPassword
+    fun provideIsCurrentPassword(): IsCurrentPasswordUseCase = isCurrentPasswordUseCase
 
     @Provides
     fun provideResetPassword(): ResetPassword = resetPassword

@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
 import mega.privacy.android.app.presentation.testpassword.model.TestPasswordUIState
-import mega.privacy.android.domain.usecase.BlockPasswordReminder
-import mega.privacy.android.domain.usecase.IsCurrentPassword
-import mega.privacy.android.domain.usecase.NotifyPasswordChecked
-import mega.privacy.android.domain.usecase.SkipPasswordReminder
+import mega.privacy.android.domain.usecase.BlockPasswordReminderUseCase
+import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
+import mega.privacy.android.domain.usecase.NotifyPasswordCheckedUseCase
+import mega.privacy.android.domain.usecase.SkipPasswordReminderUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -23,10 +23,10 @@ import javax.inject.Inject
 @HiltViewModel
 class TestPasswordViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val isCurrentPassword: IsCurrentPassword,
-    private val skipPasswordReminder: SkipPasswordReminder,
-    private val blockPasswordReminder: BlockPasswordReminder,
-    private val notifyPasswordChecked: NotifyPasswordChecked,
+    private val isCurrentPasswordUseCase: IsCurrentPasswordUseCase,
+    private val skipPasswordReminderUseCase: SkipPasswordReminderUseCase,
+    private val blockPasswordReminderUseCase: BlockPasswordReminderUseCase,
+    private val notifyPasswordCheckedUseCase: NotifyPasswordCheckedUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TestPasswordUIState())
 
@@ -44,7 +44,7 @@ class TestPasswordViewModel @Inject constructor(
     fun checkForCurrentPassword(password: String) {
         viewModelScope.launch {
             val isCurrentPassword =
-                if (isCurrentPassword(password)) PasswordState.True else PasswordState.False
+                if (isCurrentPasswordUseCase(password)) PasswordState.True else PasswordState.False
             _uiState.update {
                 it.copy(isCurrentPassword = isCurrentPassword)
             }
@@ -55,21 +55,21 @@ class TestPasswordViewModel @Inject constructor(
      * Notify the API that password reminder is skipped by the user
      */
     fun notifyPasswordReminderSkipped() {
-        notifyAndUpdateState { skipPasswordReminder() }
+        notifyAndUpdateState { skipPasswordReminderUseCase() }
     }
 
     /**
      * Notify the API that password reminder that password check is totally disable
      */
     fun notifyPasswordReminderBlocked() {
-        notifyAndUpdateState { blockPasswordReminder() }
+        notifyAndUpdateState { blockPasswordReminderUseCase() }
     }
 
     /**
      * Notify the API that password reminder that password reminder succeeded
      */
     fun notifyPasswordReminderSucceed() {
-        notifyAndUpdateState { notifyPasswordChecked() }
+        notifyAndUpdateState { notifyPasswordCheckedUseCase() }
     }
 
     private fun notifyAndUpdateState(block: suspend () -> Unit) = viewModelScope.launch {

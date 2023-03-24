@@ -19,7 +19,7 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.ChangePassword
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
 import mega.privacy.android.domain.usecase.GetPasswordStrength
-import mega.privacy.android.domain.usecase.IsCurrentPassword
+import mega.privacy.android.domain.usecase.IsCurrentPasswordUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetPassword
 import javax.inject.Inject
@@ -28,7 +28,7 @@ import javax.inject.Inject
 internal class ChangePasswordViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val isCurrentPassword: IsCurrentPassword,
+    private val isCurrentPasswordUseCase: IsCurrentPasswordUseCase,
     private val getPasswordStrength: GetPasswordStrength,
     private val changePassword: ChangePassword,
     private val resetPassword: ResetPassword,
@@ -174,7 +174,7 @@ internal class ChangePasswordViewModel @Inject constructor(
 
             _uiState.update {
                 val isCurrentPassword =
-                    if (password.length > MIN_PASSWORD_CHAR) isCurrentPassword(password) else false
+                    if (password.length > MIN_PASSWORD_CHAR) isCurrentPasswordUseCase(password) else false
                 val passwordStrengthLevel =
                     if (password.length > MIN_PASSWORD_CHAR) getPasswordStrength(password = password) else PasswordStrength.VERY_WEAK
 
@@ -256,7 +256,7 @@ internal class ChangePasswordViewModel @Inject constructor(
     private suspend fun getPasswordError(password: String): Int? {
         return when {
             password.isEmpty() -> R.string.error_enter_password
-            isCurrentPassword(password) -> R.string.error_same_password
+            isCurrentPasswordUseCase(password) -> R.string.error_same_password
             getPasswordStrength(password) <= PasswordStrength.VERY_WEAK -> R.string.error_password
             else -> null
         }

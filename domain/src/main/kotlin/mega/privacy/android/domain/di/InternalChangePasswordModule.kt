@@ -6,7 +6,6 @@ import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.ChangePassword
 import mega.privacy.android.domain.usecase.GetPasswordStrength
-import mega.privacy.android.domain.usecase.IsCurrentPassword
 import mega.privacy.android.domain.usecase.ResetPassword
 
 @Module
@@ -25,13 +24,6 @@ internal object InternalChangePasswordModule {
     @Provides
     fun provideGetPasswordStrength(repository: AccountRepository): GetPasswordStrength =
         GetPasswordStrength(repository::getPasswordStrength)
-
-    /**
-     * Provides IsCurrentPassword UseCase
-     */
-    @Provides
-    fun provideIsCurrentPassword(repository: AccountRepository): IsCurrentPassword =
-        IsCurrentPassword(repository::isCurrentPassword)
 
     /**
      * Provides GetPasswordStrength UseCase
