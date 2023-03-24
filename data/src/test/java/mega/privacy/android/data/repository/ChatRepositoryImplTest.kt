@@ -14,7 +14,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
-import mega.privacy.android.data.mapper.ChatListItemMapper
+import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
@@ -369,7 +369,9 @@ class ChatRepositoryImplTest {
         runTest {
             val signalActivityRequired = Random.nextBoolean()
 
-            whenever(megaChatApiGateway.isSignalActivityRequired()).thenReturn(signalActivityRequired)
+            whenever(megaChatApiGateway.isSignalActivityRequired()).thenReturn(
+                signalActivityRequired
+            )
             whenever(megaChatApiGateway.signalPresenceActivity(any())).thenAnswer {
                 ((it.arguments[0]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
                     mock(),

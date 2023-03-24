@@ -73,4 +73,9 @@ enum class ChatListItemChanges {
      * Deleted
      */
     Deleted,
+
+    /**
+     * Unknown
+     */
+    Unknown,
 }

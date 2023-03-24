@@ -1,5 +1,6 @@
 package mega.privacy.android.data.mapper
 
+import mega.privacy.android.data.mapper.chat.LastMessageTypeMapper
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatRoom
@@ -8,7 +9,9 @@ import javax.inject.Inject
 /**
  * Combined chat room mapper implementation
  */
-internal class CombinedChatRoomMapperImpl @Inject constructor() : CombinedChatRoomMapper {
+internal class CombinedChatRoomMapperImpl @Inject constructor(
+    private val lastMessageTypeMapper: LastMessageTypeMapper,
+) : CombinedChatRoomMapper {
 
     override fun invoke(
         megaChatRoom: MegaChatRoom,
@@ -23,7 +26,7 @@ internal class CombinedChatRoomMapperImpl @Inject constructor() : CombinedChatRo
             megaChatListItem.unreadCount,
             megaChatListItem.lastMessage,
             megaChatListItem.lastMessageId,
-            megaChatListItem.lastMessageType.mapLastMessageType(),
+            lastMessageTypeMapper(megaChatListItem.lastMessageType),
             megaChatListItem.lastMessageSender,
             megaChatListItem.lastTimestamp,
             megaChatRoom.peerCount,
