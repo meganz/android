@@ -41,20 +41,21 @@ fun <T> Continuation<T>.failWithException(
 fun <T> Continuation<T>.failWithError(
     error: MegaError,
 ) {
-    this.failWithException(
-        error.toException()
-    )
+    resumeWith(Result.failure(error.toException()))
 }
 
+/**
+ * Fail with error
+ *
+ * Ends a continuation with a generic Mega exception derived from a [MegaChatRequest]
+ *
+ * @param T the type of the continuation
+ * @param error the Mega chat error
+ */
 fun <T> Continuation<T>.failWithError(
     error: MegaChatError,
 ) {
-    this.failWithException(
-        MegaException(
-            error.errorCode,
-            error.errorString
-        )
-    )
+    resumeWith(Result.failure(MegaException(error.errorCode, error.errorString)))
 }
 
 /**
