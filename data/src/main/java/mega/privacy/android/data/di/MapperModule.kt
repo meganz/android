@@ -17,8 +17,6 @@ import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.ChatListItemMapper
 import mega.privacy.android.data.mapper.ChatRoomMapper
-import mega.privacy.android.data.mapper.ChatScheduledMeetingMapper
-import mega.privacy.android.data.mapper.ChatScheduledMeetingMapperImpl
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapperImpl
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
@@ -207,9 +205,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindChatScheduledMeetingOccurrMapper(implementation: ChatScheduledMeetingOccurrMapperImpl): ChatScheduledMeetingOccurrMapper
-
-    @Binds
-    abstract fun bindChatScheduledMeetingMapper(implementation: ChatScheduledMeetingMapperImpl): ChatScheduledMeetingMapper
 
     @Binds
     abstract fun bindCombinedChatRoomMapper(implementation: CombinedChatRoomMapperImpl): CombinedChatRoomMapper

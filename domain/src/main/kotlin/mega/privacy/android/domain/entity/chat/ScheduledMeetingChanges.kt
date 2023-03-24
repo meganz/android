@@ -67,5 +67,10 @@ enum class ScheduledMeetingChanges {
     /**
      * Scheduled meetings flags size have changed
      */
-    ScheduledMeetingFlagsSize
+    ScheduledMeetingFlagsSize,
+
+    /**
+     * Unknown
+     */
+    Unknown
 }
