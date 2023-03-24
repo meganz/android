@@ -116,4 +116,14 @@ internal interface AppEventGateway {
      * Broadcast account update.
      */
     suspend fun broadcastAccountUpdate()
+
+    /**
+     * Monitors paused transfers.
+     */
+    fun monitorPausedTransfers(): Flow<Boolean>
+
+    /**
+     * Broadcast paused transfers.
+     */
+    suspend fun broadcastPausedTransfers()
 }

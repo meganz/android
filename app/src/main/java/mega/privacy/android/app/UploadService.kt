@@ -7,16 +7,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
@@ -30,6 +28,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED
@@ -61,6 +62,8 @@ import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -108,6 +111,16 @@ class UploadService : Service() {
     @Inject
     lateinit var megaChatApi: MegaChatApiAndroid
 
+    /**
+     * Monitor paused transfers.
+     */
+    @Inject
+    lateinit var monitorPausedTransfers: MonitorPausedTransfers
+
+    @Inject
+    @ApplicationScope
+    lateinit var applicationScope: CoroutineScope
+
     private var isForeground = false
     private var canceled = false
 
@@ -128,10 +141,6 @@ class UploadService : Service() {
     //PRE_OVERQUOTA_STORAGE_STATE   = 2 - pre-over quota
     private var isOverQuota = Constants.NOT_OVERQUOTA_STATE
 
-    /**
-     * the receiver and manager for the broadcast to listen to the pause event
-     */
-    private var pauseBroadcastReceiver: BroadcastReceiver? = null
     private val rxSubscriptions = CompositeDisposable()
 
     // the flag to determine the rating dialog is showed for this upload action
@@ -170,21 +179,16 @@ class UploadService : Service() {
             )
         }
 
-        // delay 1 second to refresh the pause notification to prevent update is missed
-        pauseBroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Handler().postDelayed(
-                    { updateProgressNotification() },
+        applicationScope.launch {
+            monitorPausedTransfers().collectLatest {
+                // delay 1 second to refresh the pause notification to prevent update is missed
+                Handler(Looper.getMainLooper()).postDelayed(
+                    { updateProgressNotification(true) },
                     TransfersManagement.WAIT_TIME_BEFORE_UPDATE
                 )
             }
         }
-        ContextCompat.registerReceiver(
-            this,
-            pauseBroadcastReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
+
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
             .observeForever(stopServiceObserver)
         val subscription = getGlobalTransferUseCase.get()
@@ -297,7 +301,6 @@ class UploadService : Service() {
         Timber.d("onDestroy")
         releaseLocks()
         megaChatApi.saveCurrentState()
-        unregisterReceiver(pauseBroadcastReceiver)
         rxSubscriptions.clear()
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
             .removeObserver(stopServiceObserver)
@@ -633,7 +636,7 @@ class UploadService : Service() {
         }
     }
 
-    private fun updateProgressNotification() {
+    private fun updateProgressNotification(pausedTransfers: Boolean = false) {
         val transfers: Collection<MegaTransfer> = ArrayList(
             mapProgressFileTransfers.values
         )
@@ -647,7 +650,7 @@ class UploadService : Service() {
             progressPercent = (inProgressTemp / total).toInt()
             showRating(total, megaApi.currentUploadSpeed)
         }
-        val message = getMessageForProgressNotification(inProgress)
+        val message = getMessageForProgressNotification(inProgress, pausedTransfers)
         Timber.d("updateProgressNotification $progressPercent $message")
         val actionString =
             if (isOverQuota == Constants.NOT_OVERQUOTA_STATE) getString(R.string.download_touch_to_show) else getString(
@@ -672,16 +675,20 @@ class UploadService : Service() {
         }
     }
 
-    private fun getMessageForProgressNotification(inProgress: Long): String {
+    private fun getMessageForProgressNotification(
+        inProgress: Long,
+        pausedTransfers: Boolean = false,
+    ): String {
         Timber.d("inProgress: $inProgress")
         return when {
             isOverQuota != Constants.NOT_OVERQUOTA_STATE -> getString(R.string.overquota_alert_title)
             inProgress == 0L -> getString(R.string.download_preparing_files)
             else -> {
-                val stringId = if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD))
-                    R.string.upload_service_notification_paused
-                else
-                    R.string.upload_service_notification
+                val stringId =
+                    if (pausedTransfers)
+                        R.string.upload_service_notification_paused
+                    else
+                        R.string.upload_service_notification
 
                 getString(
                     stringId,

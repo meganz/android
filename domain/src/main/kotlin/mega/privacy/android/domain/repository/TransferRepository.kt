@@ -157,4 +157,14 @@ interface TransferRepository {
      * @param transferTag
      */
     suspend fun getTransferByTag(transferTag: Int): Transfer?
+
+    /**
+     * Monitors paused transfers.
+     */
+    fun monitorPausedTransfers(): Flow<Boolean>
+
+    /**
+     * Broadcasts paused transfers.
+     */
+    suspend fun broadcastPausedTransfers()
 }

@@ -6,10 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -31,6 +28,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -84,6 +82,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastTransferOverQuota
+import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -147,6 +146,9 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     @ApplicationScope
     lateinit var applicationScope: CoroutineScope
 
+    @Inject
+    lateinit var monitorPausedTransfers: MonitorPausedTransfers
+
     private var errorCount = 0
     private var alreadyDownloaded = 0
     private var isForeground = false
@@ -173,10 +175,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     private var lastUpdated: Long = 0
     private var intent: Intent? = null
 
-    /**
-     * the receiver and manager for the broadcast to listen to the pause event
-     */
-    private var pauseBroadcastReceiver: BroadcastReceiver? = null
     private val rxSubscriptions = CompositeDisposable()
     private val uiHandler = Handler(Looper.getMainLooper())
 
@@ -229,20 +227,15 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @SuppressLint("WrongConstant")
     private fun setReceivers() {
-        // delay 1 second to refresh the pause notification to prevent update is missed
-        pauseBroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Handler().postDelayed(
-                    { updateProgressNotification() },
+        applicationScope.launch {
+            monitorPausedTransfers().collectLatest {
+                // delay 1 second to refresh the pause notification to prevent update is missed
+                Handler(Looper.getMainLooper()).postDelayed(
+                    { updateProgressNotification(true) },
                     TransfersManagement.WAIT_TIME_BEFORE_UPDATE
                 )
             }
         }
-        ContextCompat.registerReceiver(
-            this, pauseBroadcastReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
             .observeForever(stopServiceObserver)
     }
@@ -343,7 +336,6 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         if (fs.size > 1 && fs[1] != null) {
             FileUtil.purgeDirectory(fs[1])
         }
-        unregisterReceiver(pauseBroadcastReceiver)
         rxSubscriptions.clear()
         stopForeground()
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
@@ -1016,7 +1008,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
      * Update notification download progress
      */
     @SuppressLint("NewApi")
-    private fun updateProgressNotification() {
+    private fun updateProgressNotification(pausedTransfers: Boolean = false) {
         val pendingTransfers = megaApi.getNumPendingDownloadsNonBackground()
         val totalTransfers = megaApi.totalDownloads - backgroundTransfers.size
         val totalSizePendingTransfer = megaApi.totalDownloadBytes
@@ -1059,7 +1051,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             } else {
                 val inProgress =
                     if (pendingTransfers == 0) totalTransfers else totalTransfers - pendingTransfers + 1
-                if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)) {
+                if (pausedTransfers) {
                     StringResourcesUtils.getString(R.string.download_service_notification_paused,
                         inProgress,
                         totalTransfers)

@@ -6,10 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
@@ -68,6 +65,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.ChatImageQuality
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.transfer.MonitorPausedTransfers
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiAndroid
@@ -115,6 +113,9 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     @Inject
     lateinit var chatPreferencesGateway: ChatPreferencesGateway
 
+    @Inject
+    lateinit var monitorPausedTransfers: MonitorPausedTransfers
+
     private var isForeground = false
     private var canceled = false
     private var fileNames: HashMap<String, String>? = HashMap()
@@ -146,9 +147,6 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     private var snackbarChatHandle = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
     private val rxSubscriptions = CompositeDisposable()
 
-    /** the receiver and manager for the broadcast to listen to the pause event  */
-    private var pauseBroadcastReceiver: BroadcastReceiver? = null
-
     @SuppressLint("WrongConstant")
     override fun onCreate() {
         super.onCreate()
@@ -173,18 +171,15 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         mNotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         startForeground()
 
-        // delay 1 second to refresh the pause notification to prevent update is missed
-        pauseBroadcastReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Handler(Looper.getMainLooper()).postDelayed({ updateProgressNotification() }, 1000)
+        sharingScope.launch {
+            monitorPausedTransfers().collectLatest {
+                // delay 1 second to refresh the pause notification to prevent update is missed
+                Handler(Looper.getMainLooper()).postDelayed(
+                    { updateProgressNotification(true) },
+                    TransfersManagement.WAIT_TIME_BEFORE_UPDATE
+                )
             }
         }
-        ContextCompat.registerReceiver(
-            this,
-            pauseBroadcastReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_PAUSE_NOTIFICATION),
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
 
         getGlobalTransferUseCase.get()
             .subscribeOn(Schedulers.io())
@@ -285,7 +280,6 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
         }
         megaApi.removeRequestListener(this)
         megaChatApi.saveCurrentState()
-        unregisterReceiver(pauseBroadcastReceiver)
         rxSubscriptions.clear()
         super.onDestroy()
     }
@@ -777,7 +771,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
     }
 
     @SuppressLint("NewApi")
-    private fun updateProgressNotification() {
+    private fun updateProgressNotification(pausedTransfers: Boolean = false) {
         var progressPercent: Long = 0
         val transfers: Collection<MegaTransfer> = mapProgressTransfers!!.values
 
@@ -858,7 +852,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
 
             val videosCompressed = videosCompressed
 
-            if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)) {
+            if (pausedTransfers) {
                 StringResourcesUtils.getString(
                     R.string.upload_service_notification_paused,
                     inProgress, totalUploads

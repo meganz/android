@@ -8828,6 +8828,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             MegaRequest.TYPE_PAUSE_TRANSFER -> {
                 Timber.d("One MegaRequest.TYPE_PAUSE_TRANSFER")
                 if (e.errorCode == MegaError.API_OK) {
+                    updateTransfersWidgetState()
+
                     if (isTransfersInProgressAdded) {
                         transfersFragment?.changeStatusButton(request.transferTag)
                     }

@@ -259,4 +259,8 @@ internal class DefaultTransfersRepository @Inject constructor(
     override suspend fun getTransferByTag(transferTag: Int) = withContext(ioDispatcher) {
         megaApiGateway.getTransfersByTag(transferTag)?.let { transferMapper(it) }
     }
+
+    override fun monitorPausedTransfers() = appEventGateway.monitorPausedTransfers()
+
+    override suspend fun broadcastPausedTransfers() = appEventGateway.broadcastPausedTransfers()
 }

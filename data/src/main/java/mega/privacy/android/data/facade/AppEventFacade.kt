@@ -25,6 +25,7 @@ internal class AppEventFacade @Inject constructor(
     private val logout = MutableSharedFlow<Boolean>()
     private val fetchNodesFinish = MutableSharedFlow<Boolean>()
     private val accountUpdate = MutableSharedFlow<Boolean>()
+    private val pausedTransfers = MutableSharedFlow<Boolean>()
     private val _transferFailed = MutableSharedFlow<Boolean>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
@@ -85,6 +86,10 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorAccountUpdate() = accountUpdate.asSharedFlow()
 
     override suspend fun broadcastAccountUpdate() = accountUpdate.emit(true)
+
+    override fun monitorPausedTransfers() = pausedTransfers.asSharedFlow()
+
+    override suspend fun broadcastPausedTransfers() = pausedTransfers.emit(true)
 }
 
 private fun <T> Flow<T>.toSharedFlow(

@@ -26,6 +26,7 @@ import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
+import mega.privacy.android.domain.usecase.transfer.BroadcastPausedTransfers
 import javax.inject.Inject
 
 /**
@@ -36,6 +37,7 @@ import javax.inject.Inject
  * @property getNumPendingTransfers                 [GetNumPendingTransfers]
  * @property isCompletedTransfersEmpty              [IsCompletedTransfersEmpty]
  * @property areAllTransfersPaused                  [AreAllTransfersPaused]
+ * @property broadcastPausedTransfers               [BroadcastPausedTransfers]
  */
 @OptIn(FlowPreview::class)
 @HiltViewModel
@@ -45,6 +47,7 @@ class TransfersManagementViewModel @Inject constructor(
     private val getNumPendingTransfers: GetNumPendingTransfers,
     private val isCompletedTransfersEmpty: IsCompletedTransfersEmpty,
     private val areAllTransfersPaused: AreAllTransfersPaused,
+    private val broadcastPausedTransfers: BroadcastPausedTransfers,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersSize: MonitorTransfersSize,
@@ -126,10 +129,12 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * Checks if transfers are paused.
      */
-    fun checkTransfersState() {
-        viewModelScope.launch {
-            @SuppressLint("NullSafeMutableLiveData")
-            areTransfersPaused.value = areAllTransfersPaused()
+    fun checkTransfersState() = viewModelScope.launch {
+        areAllTransfersPaused().let { paused ->
+            areTransfersPaused.value = paused
+            if (paused) {
+                broadcastPausedTransfers()
+            }
         }
     }
 }
