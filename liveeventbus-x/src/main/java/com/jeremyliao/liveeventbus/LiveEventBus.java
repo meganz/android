@@ -30,7 +30,9 @@ public final class LiveEventBus {
      * @param type Class
      * @param <T> T
      * @return Observable
+     * @deprecated Use use-cases with clean architecture
      */
+    @Deprecated()
     public static <T> Observable<T> get(@NonNull String key, @NonNull Class<T> type) {
         return LiveEventBusCore.get().with(key, type);
     }
