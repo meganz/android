@@ -33,10 +33,14 @@ import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -62,17 +66,23 @@ class SettingsCameraUploadsViewModelTest {
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
     private val getUploadOption = mock<GetUploadOption>()
     private val getUploadVideoQuality = mock<GetUploadVideoQuality>()
+    private val getVideoCompressionSizeLimit = mock<GetVideoCompressionSizeLimit>()
     private val isCameraUploadByWifi = mock<IsCameraUploadByWifi>()
+    private val isChargingRequiredForVideoCompression =
+        mock<IsChargingRequiredForVideoCompression>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
     private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
     private val restorePrimaryTimestamps = mock<RestorePrimaryTimestamps>()
     private val restoreSecondaryTimestamps = mock<RestoreSecondaryTimestamps>()
     private val setCameraUploadsByWifi = mock<SetCameraUploadsByWifi>()
+    private val setChargingRequiredForVideoCompression =
+        mock<SetChargingRequiredForVideoCompression>()
     private val setLocationTagsEnabled = mock<SetLocationTagsEnabled>()
-    private val setupDefaultSecondaryFolder = mock<SetupDefaultSecondaryFolder>()
     private val setUploadOption = mock<SetUploadOption>()
     private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
     private val setUploadVideoSyncStatus = mock<SetUploadVideoSyncStatus>()
+    private val setVideoCompressionSizeLimit = mock<SetVideoCompressionSizeLimit>()
+    private val setupDefaultSecondaryFolder = mock<SetupDefaultSecondaryFolder>()
     private val setupPrimaryFolder = mock<SetupPrimaryFolder>()
     private val setupSecondaryFolder = mock<SetupSecondaryFolder>()
 
@@ -98,18 +108,22 @@ class SettingsCameraUploadsViewModelTest {
             disableMediaUploadSettings = disableMediaUploadSettings,
             getUploadOption = getUploadOption,
             getUploadVideoQuality = getUploadVideoQuality,
+            getVideoCompressionSizeLimit = getVideoCompressionSizeLimit,
             isCameraUploadByWifi = isCameraUploadByWifi,
+            isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression,
             monitorConnectivityUseCase = mock(),
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
             resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             restorePrimaryTimestamps = restorePrimaryTimestamps,
             restoreSecondaryTimestamps = restoreSecondaryTimestamps,
             setCameraUploadsByWifi = setCameraUploadsByWifi,
+            setChargingRequiredForVideoCompression = setChargingRequiredForVideoCompression,
             setLocationTagsEnabled = setLocationTagsEnabled,
-            setupDefaultSecondaryFolder = setupDefaultSecondaryFolder,
             setUploadOption = setUploadOption,
             setUploadVideoQuality = setUploadVideoQuality,
             setUploadVideoSyncStatus = setUploadVideoSyncStatus,
+            setVideoCompressionSizeLimit = setVideoCompressionSizeLimit,
+            setupDefaultSecondaryFolder = setupDefaultSecondaryFolder,
             setupPrimaryFolder = setupPrimaryFolder,
             setupSecondaryFolder = setupSecondaryFolder,
         )
@@ -124,6 +138,7 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.accessMediaLocationRationaleText).isNull()
             assertThat(state.areLocationTagsIncluded).isFalse()
             assertThat(state.isCameraUploadsRunning).isFalse()
+            assertThat(state.isChargingRequiredForVideoCompression).isFalse()
             assertThat(state.shouldShowBusinessAccountPrompt).isFalse()
             assertThat(state.shouldShowBusinessAccountSuspendedPrompt).isFalse()
             assertThat(state.shouldTriggerCameraUploads).isFalse()
@@ -131,6 +146,7 @@ class SettingsCameraUploadsViewModelTest {
             assertThat(state.shouldShowNotificationPermissionRationale).isFalse()
             assertThat(state.uploadConnectionType).isNull()
             assertThat(state.uploadOption).isNull()
+            assertThat(state.videoCompressionSizeLimit).isEqualTo(0)
             assertThat(state.videoQuality).isNull()
         }
     }
@@ -379,6 +395,42 @@ class SettingsCameraUploadsViewModelTest {
 
         underTest.changeUploadVideoQuality(value)
         verify(setUploadVideoSyncStatus, times(1)).invoke(expectedVideoSyncStatus)
+    }
+
+    @Test
+    fun `test that the device must now be charged in order to compress videos`() =
+        testChargingRequiredForVideoCompression(true)
+
+    @Test
+    fun `test that the device no longer needs to be charged in order to compress videos`() =
+        testChargingRequiredForVideoCompression(false)
+
+    private fun testChargingRequiredForVideoCompression(expectedAnswer: Boolean) = runTest {
+        whenever(isChargingRequiredForVideoCompression()).thenReturn(expectedAnswer)
+
+        setupUnderTest()
+
+        underTest.changeChargingRequiredForVideoCompression(expectedAnswer)
+
+        verify(setChargingRequiredForVideoCompression).invoke(expectedAnswer)
+        underTest.state.test {
+            assertThat(awaitItem().isChargingRequiredForVideoCompression).isEqualTo(expectedAnswer)
+        }
+    }
+
+    @Test
+    fun `test that a new maximum video compression size limit is set`() = runTest {
+        val newSize = 300
+        whenever(getVideoCompressionSizeLimit()).thenReturn(newSize)
+
+        setupUnderTest()
+
+        underTest.changeVideoCompressionSizeLimit(newSize)
+
+        verify(setVideoCompressionSizeLimit).invoke(newSize)
+        underTest.state.test {
+            assertThat(awaitItem().videoCompressionSizeLimit).isEqualTo(newSize)
+        }
     }
 
     @Test

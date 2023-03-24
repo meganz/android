@@ -44,7 +44,6 @@ import mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_WIFI
 import mega.privacy.android.app.constants.SettingsConstants.CAMERA_UPLOAD_WIFI_OR_DATA_PLAN
 import mega.privacy.android.app.constants.SettingsConstants.COMPRESSION_QUEUE_SIZE_MAX
 import mega.privacy.android.app.constants.SettingsConstants.COMPRESSION_QUEUE_SIZE_MIN
-import mega.privacy.android.app.constants.SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_CAMERA_FOLDER
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_CHARGING
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CAMERA_UPLOAD_HOW_TO
@@ -101,8 +100,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var optionFileUpload: ListPreference? = null
     private var optionIncludeLocationTags: SwitchPreferenceCompat? = null
     private var optionVideoQuality: ListPreference? = null
-    private var cameraUploadCharging: SwitchPreferenceCompat? = null
-    private var cameraUploadVideoQueueSize: Preference? = null
+    private var optionChargingOnVideoCompression: SwitchPreferenceCompat? = null
+    private var optionVideoCompressionSize: Preference? = null
     private var keepFileNames: TwoLineCheckPreference? = null
     private var localCameraUploadFolder: Preference? = null
     private var megaCameraFolder: Preference? = null
@@ -112,7 +111,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var businessCameraUploadsAlertDialog: AlertDialog? = null
     private var cameraUpload = false
     private var secondaryUpload = false
-    private var charging = false
     private var fileNames = false
     private var camSyncLocalPath: String? = ""
     private var isExternalSDCardCU = false
@@ -236,11 +234,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         optionVideoQuality = findPreference(KEY_CAMERA_UPLOAD_VIDEO_QUALITY)
         optionVideoQuality?.onPreferenceChangeListener = this
 
-        cameraUploadCharging = findPreference(KEY_CAMERA_UPLOAD_CHARGING)
-        cameraUploadCharging?.onPreferenceClickListener = this
+        optionChargingOnVideoCompression = findPreference(KEY_CAMERA_UPLOAD_CHARGING)
+        optionChargingOnVideoCompression?.onPreferenceClickListener = this
 
-        cameraUploadVideoQueueSize = findPreference(KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE)
-        cameraUploadVideoQueueSize?.onPreferenceClickListener = this
+        optionVideoCompressionSize = findPreference(KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE)
+        optionVideoCompressionSize?.onPreferenceClickListener = this
 
         keepFileNames = findPreference(KEY_KEEP_FILE_NAMES)
         keepFileNames?.onPreferenceClickListener = this
@@ -272,7 +270,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             }
             dbH.setCamSyncEnabled(false)
             cameraUpload = false
-            charging = true
             fileNames = false
         } else {
             cameraUpload = prefs.camSyncEnabled.toBoolean()
@@ -350,10 +347,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 it.isChecked = fileNames
                 preferenceScreen.addPreference(it)
             }
-
-            if (!charging) {
-                disableVideoCompressionSizeSettings()
-            }
             checkSecondaryMediaFolder()
         } else {
             Timber.d("Camera Uploads Off")
@@ -381,19 +374,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             }
         }
 
-        val sizeInDB = prefs.chargingOnSize
-        val size: String = if (sizeInDB == null) {
-            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE)
-            DEFAULT_CONVENTION_QUEUE_SIZE.toString()
-        } else {
-            sizeInDB
-        }
-
-        val chargingHelper = getString(
-            R.string.settings_camera_upload_charging_helper_label,
-            getString(R.string.label_file_size_mega_byte, size)
-        )
-        cameraUploadCharging?.summary = chargingHelper
         if (savedInstanceState != null) {
             val isShowingQueueDialog = savedInstanceState.getBoolean(KEY_SET_QUEUE_DIALOG, false)
             if (isShowingQueueDialog) {
@@ -432,13 +412,9 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 }
             }
             KEY_CAMERA_UPLOAD_CHARGING -> {
-                charging = cameraUploadCharging?.isChecked ?: false
-                if (charging) {
-                    enableVideoCompressionSizeSettingsAndRestartUpload()
-                } else {
-                    disableVideoCompressionSizeSettingsAndRestartUpload()
-                }
-                dbH.setConversionOnCharging(charging)
+                val chargingRequired = optionChargingOnVideoCompression?.isChecked ?: false
+                viewModel.changeChargingRequiredForVideoCompression(chargingRequired)
+                JobUtil.rescheduleCameraUpload(context)
             }
             KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE -> showResetCompressionQueueSizeDialog()
             KEY_KEEP_FILE_NAMES -> {
@@ -715,9 +691,18 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     uploadOption = it.uploadOption,
                     videoQuality = it.videoQuality,
                 )
-                handleChargingSettings(
+                handleChargingOnVideoCompression(
                     isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isChargingRequiredForVideoCompression = it.isChargingRequiredForVideoCompression,
                     uploadOption = it.uploadOption,
+                    videoCompressionSizeLimit = it.videoCompressionSizeLimit,
+                    videoQuality = it.videoQuality,
+                )
+                handleVideoCompressionSizeChange(
+                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    isChargingRequiredForVideoCompression = it.isChargingRequiredForVideoCompression,
+                    uploadOption = it.uploadOption,
+                    videoCompressionSizeLimit = it.videoCompressionSizeLimit,
                     videoQuality = it.videoQuality,
                 )
                 handleBusinessAccountPrompt(it.shouldShowBusinessAccountPrompt)
@@ -832,25 +817,81 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
-     * Handles the display and content of the Charging Settings options when a UI State change happens
+     * Handles the "Require me to actively charge my device" option visibility, content and checked
+     * state when a UI State change happens
      *
      * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isChargingRequiredForVideoCompression Whether compressing videos require the device
+     * to be charged or not
      * @param uploadOption The specific [UploadOption] which can be nullable
+     * @param videoCompressionSizeLimit The maximum video file size that can be compressed
      * @param videoQuality The specific [VideoQuality] which can be nullable
      */
-    private fun handleChargingSettings(
+    private fun handleChargingOnVideoCompression(
         isCameraUploadsRunning: Boolean,
+        isChargingRequiredForVideoCompression: Boolean,
         uploadOption: UploadOption?,
+        videoCompressionSizeLimit: Int,
         videoQuality: VideoQuality?,
     ) {
-        if (isCameraUploadsRunning && uploadOption in listOf(
-                UploadOption.VIDEOS,
-                UploadOption.PHOTOS_AND_VIDEOS,
-            ) && videoQuality != null && videoQuality != VideoQuality.ORIGINAL
-        ) {
-            enableChargingSettings()
-        } else {
-            disableChargingSettings()
+        optionChargingOnVideoCompression?.run {
+            summary =
+                if (isCameraUploadsRunning && uploadOption in listOf(
+                        UploadOption.VIDEOS,
+                        UploadOption.PHOTOS_AND_VIDEOS,
+                    ) && videoQuality != null && videoQuality != VideoQuality.ORIGINAL
+                ) {
+                    preferenceScreen.addPreference(this)
+                    isChecked = isChargingRequiredForVideoCompression
+                    getString(
+                        R.string.settings_camera_upload_charging_helper_label,
+                        getString(
+                            R.string.label_file_size_mega_byte,
+                            videoCompressionSizeLimit.toString()
+                        )
+                    )
+                } else {
+                    preferenceScreen.removePreference(this)
+                    isChecked = false
+                    ""
+                }
+        }
+    }
+
+    /**
+     * Handles the "If videos to compress are larger than" option visibility and content when a UI
+     * State change happens
+     *
+     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param isChargingRequiredForVideoCompression Whether compressing videos require the device
+     * to be charged or not
+     * @param uploadOption The specific [UploadOption] which can be nullable
+     * @param videoCompressionSizeLimit The maximum video file size that can be compressed
+     * @param videoQuality The specific [VideoQuality] which can be nullable
+     */
+    private fun handleVideoCompressionSizeChange(
+        isCameraUploadsRunning: Boolean,
+        isChargingRequiredForVideoCompression: Boolean,
+        uploadOption: UploadOption?,
+        videoCompressionSizeLimit: Int,
+        videoQuality: VideoQuality?,
+    ) {
+        optionVideoCompressionSize?.run {
+            summary =
+                if (isCameraUploadsRunning && uploadOption in listOf(
+                        UploadOption.VIDEOS,
+                        UploadOption.PHOTOS_AND_VIDEOS,
+                    ) && videoQuality != null && videoQuality != VideoQuality.ORIGINAL && isChargingRequiredForVideoCompression
+                ) {
+                    preferenceScreen.addPreference(this)
+                    getString(
+                        R.string.label_file_size_mega_byte,
+                        videoCompressionSizeLimit.toString()
+                    )
+                } else {
+                    preferenceScreen.removePreference(this)
+                    ""
+                }
         }
     }
 
@@ -1184,20 +1225,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             return
         }
         try {
-            val size = value.toInt()
-            if (isQueueSizeValid(size)) {
-                compressionQueueSizeDialog?.dismiss()
-                cameraUploadVideoQueueSize?.summary =
-                    getString(R.string.label_file_size_mega_byte, size.toString())
-                val chargingHelper =
-                    getString(
-                        R.string.settings_camera_upload_charging_helper_label,
-                        getString(R.string.label_file_size_mega_byte, size.toString())
-                    )
-                cameraUploadCharging?.summary = chargingHelper
-                dbH.setChargingOnSize(size)
-                prefs.chargingOnSize = size.toString() + ""
+            val newSize = value.toInt()
+            if (isQueueSizeValid(newSize)) {
+                viewModel.changeVideoCompressionSizeLimit(newSize)
                 JobUtil.rescheduleCameraUpload(context)
+                compressionQueueSizeDialog?.dismiss()
             } else {
                 resetSizeInput(input)
             }
@@ -1314,83 +1346,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     setCompressionQueueSize(value, editText)
                 }
             }
-        }
-    }
-
-    /**
-     * Disable Charging Settings
-     */
-    private fun disableChargingSettings() {
-        charging = false
-        dbH.setConversionOnCharging(false)
-
-        cameraUploadCharging?.let {
-            it.isChecked = charging
-            preferenceScreen.removePreference(it)
-        }
-
-        disableVideoCompressionSizeSettings()
-    }
-
-    /**
-     * Disable Video Compression Size Settings
-     */
-    private fun disableVideoCompressionSizeSettings() =
-        cameraUploadVideoQueueSize?.let { preferenceScreen.removePreference(it) }
-
-    /**
-     * Disable Video Compression Size Settings and Restart the Camera Uploads process
-     */
-    private fun disableVideoCompressionSizeSettingsAndRestartUpload() {
-        disableVideoCompressionSizeSettings()
-        JobUtil.rescheduleCameraUpload(context)
-    }
-
-    /**
-     * Enable Video Compression Size Settings and Restart the Camera Uploads process
-     */
-    private fun enableVideoCompressionSizeSettingsAndRestartUpload() {
-        enableVideoCompressionSizeSettings()
-        JobUtil.rescheduleCameraUpload(context)
-    }
-
-    /**
-     * Enable Video Compression Size Settings
-     */
-    private fun enableVideoCompressionSizeSettings() {
-        prefs = dbH.preferences
-        val sizeInDB = prefs.chargingOnSize
-        val size = if (sizeInDB == null) {
-            dbH.setChargingOnSize(DEFAULT_CONVENTION_QUEUE_SIZE)
-            DEFAULT_CONVENTION_QUEUE_SIZE
-        } else {
-            sizeInDB.toInt()
-        }
-
-        cameraUploadVideoQueueSize?.run {
-            preferenceScreen.addPreference(this)
-            summary = getString(R.string.label_file_size_mega_byte, size.toString())
-        }
-    }
-
-    /**
-     * Enable Charging Settings
-     */
-    private fun enableChargingSettings() {
-        prefs = dbH.preferences
-        charging = if (prefs.conversionOnCharging == null) {
-            dbH.setConversionOnCharging(true)
-            true
-        } else {
-            prefs.conversionOnCharging.toBoolean()
-        }
-        cameraUploadCharging?.run {
-            preferenceScreen.addPreference(this)
-            isChecked = charging
-        }
-
-        if (charging) {
-            enableVideoCompressionSizeSettings()
         }
     }
 
@@ -1516,7 +1471,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         val secHandle = prefs.megaHandleSecondaryFolder
         megaPathSecMediaFolder = getString(R.string.section_secondary_media_uploads)
         if (secHandle != null) {
-            if (!secHandle.isNullOrBlank()) {
+            if (secHandle.isNotBlank()) {
                 handleSecondaryMediaFolder = secHandle.toLong()
 
                 handleSecondaryMediaFolder?.let { longValue ->

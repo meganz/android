@@ -8,6 +8,7 @@ import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -39,10 +40,14 @@ import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 import javax.inject.Inject
 
 /**
@@ -55,18 +60,22 @@ import javax.inject.Inject
  * @property disableMediaUploadSettings Disable Media Uploads by manipulating a certain value in the database
  * @property getUploadOption Retrieves the upload option of Camera Uploads
  * @property getUploadVideoQuality Retrieves the Video Quality of Videos to be uploaded
+ * @property getVideoCompressionSizeLimit Retrieve the maximum video file size that can be compressed
  * @property isCameraUploadByWifi Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
+ * @property isChargingRequiredForVideoCompression Checks whether compressing videos require the device to be charged or not
  * @property monitorConnectivityUseCase Monitor the device online status
  * @property resetCameraUploadTimeStamps Reset the Primary and Secondary Timestamps
  * @property resetMediaUploadTimeStamps Reset the Secondary Timestamps
  * @property restorePrimaryTimestamps Restore the Primary Timestamps
  * @property restoreSecondaryTimestamps Restore the Secondary Timestamps
  * @property setCameraUploadsByWifi Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
+ * @property setChargingRequiredForVideoCompression Sets whether compressing videos require the device to be charged or not
  * @property setLocationTagsEnabled Sets whether Location Tags should be embedded in each Photo to be uploaded or not
- * @property setupDefaultSecondaryFolder Sets up a default Secondary Folder of Camera Uploads
  * @property setUploadOption Sets the new upload option of Camera Uploads
  * @property setUploadVideoQuality Sets the new Video Quality of Videos to be uploaded
  * @property setUploadVideoSyncStatus Sets the new Sync Status of Videos to be uploaded
+ * @property setVideoCompressionSizeLimit Sets the maximum video file size that can be compressed
+ * @property setupDefaultSecondaryFolder Sets up a default Secondary Folder of Camera Uploads
  * @property setupPrimaryFolder Sets up the Primary Folder of Camera Uploads
  * @property setupSecondaryFolder Sets up the Secondary Folder of Camera Uploads
  */
@@ -79,18 +88,22 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
     private val getUploadOption: GetUploadOption,
     private val getUploadVideoQuality: GetUploadVideoQuality,
+    private val getVideoCompressionSizeLimit: GetVideoCompressionSizeLimit,
     private val isCameraUploadByWifi: IsCameraUploadByWifi,
+    private val isChargingRequiredForVideoCompression: IsChargingRequiredForVideoCompression,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
     private val setCameraUploadsByWifi: SetCameraUploadsByWifi,
+    private val setChargingRequiredForVideoCompression: SetChargingRequiredForVideoCompression,
     private val setLocationTagsEnabled: SetLocationTagsEnabled,
-    private val setupDefaultSecondaryFolder: SetupDefaultSecondaryFolder,
     private val setUploadOption: SetUploadOption,
     private val setUploadVideoQuality: SetUploadVideoQuality,
     private val setUploadVideoSyncStatus: SetUploadVideoSyncStatus,
+    private val setVideoCompressionSizeLimit: SetVideoCompressionSizeLimit,
+    private val setupDefaultSecondaryFolder: SetupDefaultSecondaryFolder,
     private val setupPrimaryFolder: SetupPrimaryFolder,
     private val setupSecondaryFolder: SetupSecondaryFolder,
 ) : ViewModel() {
@@ -360,16 +373,49 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * Sets whether charging is required for video compression or not
+     *
+     * @param chargingRequired True if charging is required for video compression, and false
+     * if otherwise
+     */
+    fun changeChargingRequiredForVideoCompression(chargingRequired: Boolean) =
+        viewModelScope.launch {
+            setChargingRequiredForVideoCompression(chargingRequired)
+            refreshChargingRequiredForVideoCompression()
+        }
+
+    /**
+     * Sets the new video compression size limit
+     *
+     * @param size The new video compression size limit
+     */
+    fun changeVideoCompressionSizeLimit(size: Int) = viewModelScope.launch {
+        setVideoCompressionSizeLimit(size)
+        refreshVideoCompressionSizeLimit()
+    }
+
+    /**
      * When [SettingsCameraUploadsViewModel] is instantiated, initialize the UI Elements
      */
-    private fun initializeSettings() = viewModelScope.launch {
-        _state.update {
-            it.copy(
-                areLocationTagsIncluded = areLocationTagsEnabled(),
-                uploadConnectionType = getUploadConnectionType(),
-                uploadOption = getUploadOption(),
-                videoQuality = getUploadVideoQuality(),
-            )
+    private fun initializeSettings() {
+        viewModelScope.launch {
+            val areLocationTagsIncluded = async { areLocationTagsEnabled() }
+            val isChargingRequiredForVideoCompression =
+                async { isChargingRequiredForVideoCompression() }
+            val uploadConnectionType = async { getUploadConnectionType() }
+            val getUploadOption = async { getUploadOption() }
+            val videoCompressionSizeLimit = async { getVideoCompressionSizeLimit() }
+            val videoQuality = async { getUploadVideoQuality() }
+            _state.update {
+                it.copy(
+                    areLocationTagsIncluded = areLocationTagsIncluded.await(),
+                    isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression.await(),
+                    uploadConnectionType = uploadConnectionType.await(),
+                    uploadOption = getUploadOption.await(),
+                    videoCompressionSizeLimit = videoCompressionSizeLimit.await(),
+                    videoQuality = videoQuality.await(),
+                )
+            }
         }
     }
 
@@ -377,29 +423,57 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Updates the value of [SettingsCameraUploadsState.uploadConnectionType] whenever a new Upload
      * Connection type is set
      */
-    private suspend fun refreshUploadConnectionType() =
-        _state.update { it.copy(uploadConnectionType = getUploadConnectionType()) }
+    private suspend fun refreshUploadConnectionType() {
+        val uploadConnectionType = getUploadConnectionType()
+        _state.update { it.copy(uploadConnectionType = uploadConnectionType) }
+    }
 
     /**
      * Updates the value of [SettingsCameraUploadsState.uploadOption] whenever a new
      * Upload Connection type is set
      */
-    private suspend fun refreshUploadOption() =
-        _state.update { it.copy(uploadOption = getUploadOption()) }
+    private suspend fun refreshUploadOption() {
+        val uploadOption = getUploadOption()
+        _state.update { it.copy(uploadOption = uploadOption) }
+    }
 
     /**
      * Updates the value of [SettingsCameraUploadsState.areLocationTagsIncluded] whenever changes
      * to include / exclude Location Tags for Photo uploads are found
      */
-    private suspend fun refreshLocationTags() =
-        _state.update { it.copy(areLocationTagsIncluded = areLocationTagsEnabled()) }
+    private suspend fun refreshLocationTags() {
+        val areLocationTagsIncluded = areLocationTagsEnabled()
+        _state.update { it.copy(areLocationTagsIncluded = areLocationTagsIncluded) }
+    }
 
     /**
      * Updates the value of [SettingsCameraUploadsState.videoQuality] whenever a new upload
      * Video Quality has been set
      */
-    private suspend fun refreshUploadVideoQuality() =
-        _state.update { it.copy(videoQuality = getUploadVideoQuality()) }
+    private suspend fun refreshUploadVideoQuality() {
+        val videoQuality = getUploadVideoQuality()
+        _state.update { it.copy(videoQuality = videoQuality) }
+    }
+
+    /**
+     * Updates the value of [SettingsCameraUploadsState.isChargingRequiredForVideoCompression] whenever
+     * a change to require charging for video compression is found
+     */
+    private suspend fun refreshChargingRequiredForVideoCompression() {
+        val isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression()
+        _state.update {
+            it.copy(isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression)
+        }
+    }
+
+    /**
+     * Updates the value of [SettingsCameraUploadsState.videoCompressionSizeLimit] whenever the
+     * maximum video compression size limit changes
+     */
+    private suspend fun refreshVideoCompressionSizeLimit() {
+        val videoCompressionSizeLimit = getVideoCompressionSizeLimit()
+        _state.update { it.copy(videoCompressionSizeLimit = videoCompressionSizeLimit) }
+    }
 
     /**
      * Retrieves the current Upload Connection Type
