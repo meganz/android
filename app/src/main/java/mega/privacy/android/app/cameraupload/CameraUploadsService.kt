@@ -104,10 +104,8 @@ import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
-import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
@@ -117,7 +115,6 @@ import mega.privacy.android.domain.usecase.IsWifiNotSatisfiedUseCase
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
 import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
@@ -131,7 +128,10 @@ import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
+import mega.privacy.android.domain.usecase.login.GetSessionUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -680,9 +680,12 @@ class CameraUploadsService : LifecycleService() {
      */
     override fun onDestroy() {
         Timber.d("Service destroys.")
-        super.onDestroy()
         stopActiveHeartbeat()
+        stopWakeAndWifiLocks()
         coroutineScope?.cancel()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        cancelNotification()
+        super.onDestroy()
     }
 
     /**
@@ -712,6 +715,8 @@ class CameraUploadsService : LifecycleService() {
                             aborted = aborted
                         )
                     }
+                } else {
+                    finishService()
                 }
             }
             else -> {
@@ -1606,7 +1611,6 @@ class CameraUploadsService : LifecycleService() {
         aborted: Boolean = false,
     ) {
         Timber.d("Finish Camera upload process.")
-        stopWakeAndWifiLocks()
 
         if (coroutineScope?.isActive == true) {
             sendStatusToBackupCenter(aborted = aborted)
@@ -1616,8 +1620,13 @@ class CameraUploadsService : LifecycleService() {
             coroutineScope?.cancel(CancellationException(cancelMessage))
         }
 
-        stopForeground(STOP_FOREGROUND_REMOVE)
-        cancelNotification()
+        finishService()
+    }
+
+    /**
+     *  Stop the service
+     */
+    private fun finishService() {
         stopSelf()
     }
 
