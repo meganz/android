@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -94,11 +95,14 @@ fun RecurringMeetingInfoView(
     ) { paddingValues ->
         LazyColumn(
             state = listState,
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier
+                .padding(paddingValues)
+                .testTag("Occurrence_list_view")
         ) {
             item(key = "Occurrences list") {
                 state.occurrencesList.indices.forEach { i ->
                     OccurrenceItemView(
+                        modifier = Modifier.testTag("Occurrence_item_view"),
                         state = state,
                         occurrence = state.occurrencesList[i],
                         onOccurrenceClicked = onOccurrenceClicked
@@ -191,10 +195,10 @@ private fun OccurrenceItemView(
 ) {
     val isLight = MaterialTheme.colors.isLight
     Column {
-
         occurrence.getDateFormatted()?.let { date ->
             Row(
-                modifier = modifier
+                modifier = Modifier
+                    .testTag("Occurrence_item_view_date_formatted")
                     .fillMaxWidth()
                     .height(36.dp)
                     .padding(start = 16.dp, end = 16.dp),
@@ -240,6 +244,7 @@ private fun OccurrenceItemView(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         state.schedTitle?.let { title ->
                             Text(
+                                modifier = Modifier.testTag("Occurrence_item_view_title"),
                                 text = title,
                                 style = MaterialTheme.typography.subtitle1,
                                 maxLines = 1,
