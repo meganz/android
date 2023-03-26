@@ -52,14 +52,13 @@ import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.RemoveAlbums
-import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateAlbumCover
 import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.impl.DefaultGetProscribedAlbumNames
-import mega.privacy.android.domain.usecase.impl.DefaultRemovePhotosFromAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.impl.DefaultUpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNames
 
@@ -117,9 +116,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindRemoveAlbums(useCase: DefaultRemoveAlbums): RemoveAlbums
-
-    @Binds
-    abstract fun bindRemovePhotosFromAlbum(useCase: DefaultRemovePhotosFromAlbumUseCase): RemovePhotosFromAlbumUseCase
 
     @Binds
     abstract fun bindUpdateAlbumName(useCase: DefaultUpdateAlbumNameUseCase): UpdateAlbumNameUseCase

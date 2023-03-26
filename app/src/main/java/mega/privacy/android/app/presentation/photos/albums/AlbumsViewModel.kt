@@ -37,8 +37,8 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
-import mega.privacy.android.domain.usecase.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
+import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNames
 import timber.log.Timber
 import javax.inject.Inject
