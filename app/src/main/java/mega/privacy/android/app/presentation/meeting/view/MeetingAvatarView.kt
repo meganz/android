@@ -29,28 +29,26 @@ import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
-import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.white_alpha_012
+import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
 
 /**
  * Avatar view for a Meeting user that includes default Placeholder
  *
+ * @param modifier
  * @param avatarUri
  * @param avatarPlaceholder
  * @param avatarColor
- * @param modifier
  * @param avatarTimestamp
  */
 @Composable
 fun MeetingAvatarView(
+    modifier: Modifier = Modifier,
     avatarUri: String?,
     avatarPlaceholder: String?,
     avatarColor: Int?,
-    modifier: Modifier = Modifier,
     avatarTimestamp: Long? = null,
 ) {
-    val color = avatarColor?.let(::Color)
-        ?: grey_alpha_012.takeIf { MaterialTheme.colors.isLight } ?: white_alpha_012
+    val color = avatarColor?.let(::Color) ?: MaterialTheme.colors.grey_012_white_012
     if (avatarUri.isNullOrBlank()) {
         AvatarPlaceholderView(
             char = avatarPlaceholder?.takeIf(String::isNotBlank)?.uppercase()
@@ -74,9 +72,9 @@ fun MeetingAvatarView(
 
 @Composable
 private fun AvatarPlaceholderView(
+    modifier: Modifier = Modifier,
     char: String,
     backgroundColor: Color,
-    modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
         contentAlignment = Alignment.Center,
@@ -109,9 +107,9 @@ private fun AvatarPlaceholderView(
 
 @Composable
 private fun AvatarView(
+    modifier: Modifier = Modifier,
     avatarUri: String,
     placeholderColor: Color,
-    modifier: Modifier,
     avatarTimestamp: Long? = null,
 ) {
     val visiblePlaceholder = remember { mutableStateOf(true) }
@@ -138,6 +136,8 @@ private fun PreviewMeetingAvatarView() {
         avatarUri = null,
         avatarPlaceholder = "D",
         avatarColor = "#00FFFF".toColorInt(),
-        modifier = Modifier.size(40.dp).border(1.dp, Color.White, CircleShape)
+        modifier = Modifier
+            .size(40.dp)
+            .border(1.dp, Color.White, CircleShape)
     )
 }

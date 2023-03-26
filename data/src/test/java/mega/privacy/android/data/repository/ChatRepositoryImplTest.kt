@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.BroadcastReceiverGateway
@@ -27,6 +28,7 @@ import nz.mega.sdk.MegaChatMessage
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -85,6 +87,11 @@ class ChatRepositoryImplTest {
 
         whenever(chatRoom.chatId).thenReturn(chatId)
         whenever(chatRoom.title).thenReturn(chatTitle)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test

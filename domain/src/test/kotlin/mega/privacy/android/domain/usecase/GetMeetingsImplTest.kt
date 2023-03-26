@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
@@ -22,6 +23,7 @@ import mega.privacy.android.domain.entity.meeting.Weekday
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -35,7 +37,6 @@ class GetMeetingsImplTest {
 
     private lateinit var underTest: GetMeetings
 
-    private val testDispatcher = UnconfinedTestDispatcher()
     private val meetingRoomMapper = DefaultMeetingRoomMapper()
     private val getMeetingsRepository = mock<GetMeetingsRepository>()
     private val callRepository = mock<CallRepository>()
@@ -48,7 +49,7 @@ class GetMeetingsImplTest {
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(testDispatcher)
+        Dispatchers.setMain(UnconfinedTestDispatcher())
 
         underTest = GetMeetingsImpl(
             chatRepository = chatRepository,
@@ -72,6 +73,11 @@ class GetMeetingsImplTest {
                     ?.let(::listOf)
             }
         }
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test

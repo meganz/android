@@ -121,6 +121,12 @@ val Colors.grey_087_white: Color
     get() = if (isLight) grey_alpha_087 else white
 
 /**
+ * Color theme for grey 087 when light mode and white 087 when dark mode
+ */
+val Colors.grey_087_white_087: Color
+    get() = if (isLight) grey_alpha_087 else white_alpha_087
+
+/**
  * Color for taken down node
  */
 val Colors.red_800_red_400: Color
