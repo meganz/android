@@ -36,7 +36,6 @@ import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
-import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNames
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 
@@ -123,9 +122,6 @@ object FavouritesTestModule {
 
     @Provides
     fun provideCreateAlbum(): CreateAlbum = mock()
-
-    @Provides
-    fun provideGetProscribedAlbumNames(): GetProscribedAlbumNames = mock()
 
     @Provides
     fun provideIsAvailableOffline(): IsAvailableOffline = isAvailableOffline

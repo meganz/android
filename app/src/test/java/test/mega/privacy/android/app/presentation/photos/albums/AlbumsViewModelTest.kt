@@ -32,7 +32,7 @@ import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
-import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNames
+import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import org.junit.After
 import org.junit.Before
@@ -57,7 +57,7 @@ class AlbumsViewModelTest {
     private val getFeatureFlagUseCase =
         mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val getDefaultAlbumsMap = mock<GetDefaultAlbumsMap>()
-    private val getProscribedAlbumNames = mock<GetProscribedAlbumNames>()
+    private val getProscribedAlbumNamesUseCase = mock<GetProscribedAlbumNamesUseCase>()
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbum = mock<CreateAlbum>()
@@ -76,7 +76,7 @@ class AlbumsViewModelTest {
             getDefaultAlbumsMap = getDefaultAlbumsMap,
             getUserAlbums = getUserAlbums,
             getAlbumPhotos = getAlbumPhotos,
-            getProscribedAlbumNames = getProscribedAlbumNames,
+            getProscribedAlbumNamesUseCase = getProscribedAlbumNamesUseCase,
             uiAlbumMapper = uiAlbumMapper,
             getFeatureFlagUseCase = getFeatureFlagUseCase,
             removeFavourites = removeFavourites,
@@ -370,7 +370,7 @@ class AlbumsViewModelTest {
         whenever(createAlbum(expectedAlbumName)).thenReturn(
             createUserAlbum(title = expectedAlbumName)
         )
-        whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
+        whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
 
         underTest.createNewAlbum(expectedAlbumName)
 
@@ -495,7 +495,7 @@ class AlbumsViewModelTest {
                 Album.RawAlbum to { false },
             )
 
-            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
+            whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
             whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
                 UIAlbum(
                     title = "Favourites",
@@ -541,7 +541,7 @@ class AlbumsViewModelTest {
                     id = Album.FavouriteAlbum
                 )
             )
-            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
+            whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
             whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
@@ -562,7 +562,7 @@ class AlbumsViewModelTest {
     @Test
     fun `test that creating an album with all spaces will not create the album`() =
         runTest {
-            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
+            whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
 
             underTest.state.test {
                 awaitItem()
@@ -583,7 +583,7 @@ class AlbumsViewModelTest {
             val testAlbumName = "Album 1"
             val newAlbum1 = createUserAlbum(title = testAlbumName)
 
-            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
+            whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
             whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
                 UIAlbum(
                     title = newAlbum1.title,
@@ -615,7 +615,7 @@ class AlbumsViewModelTest {
         runTest {
             val testAlbumName = "*"
 
-            whenever(getProscribedAlbumNames()).thenReturn(proscribedStrings)
+            whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
 
             underTest.state.test {
                 awaitItem()

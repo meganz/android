@@ -39,7 +39,7 @@ import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
-import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNames
+import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -53,7 +53,7 @@ class AlbumsViewModel @Inject constructor(
     private val getDefaultAlbumsMap: GetDefaultAlbumsMap,
     private val getUserAlbums: GetUserAlbums,
     private val getAlbumPhotos: GetAlbumPhotos,
-    private val getProscribedAlbumNames: GetProscribedAlbumNames,
+    private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
     private val uiAlbumMapper: UIAlbumMapper,
     private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
     private val removeFavourites: RemoveFavourites,
@@ -378,7 +378,7 @@ class AlbumsViewModel @Inject constructor(
     private suspend fun checkTitleValidity(
         title: String,
     ): Boolean {
-        val proscribedStrings = getProscribedAlbumNames()
+        val proscribedStrings = getProscribedAlbumNamesUseCase()
 
         var errorMessage: Int? = null
         var isTitleValid = true

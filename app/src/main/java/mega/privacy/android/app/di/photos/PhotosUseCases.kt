@@ -42,8 +42,8 @@ import mega.privacy.android.domain.usecase.FilterGIF
 import mega.privacy.android.domain.usecase.FilterRAW
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
-import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPhotosByFolderId
+import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
 import mega.privacy.android.domain.usecase.GetTimelinePhotos
@@ -57,10 +57,7 @@ import mega.privacy.android.domain.usecase.UpdateAlbumCover
 import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
-import mega.privacy.android.domain.usecase.impl.DefaultGetProscribedAlbumNames
-import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.impl.DefaultUpdateAlbumNameUseCase
-import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNames
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -134,9 +131,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindUpdateAlbumCover(useCase: DefaultUpdateAlbumCover): UpdateAlbumCover
-
-    @Binds
-    abstract fun bindGetProscribedAlbumNames(useCase: DefaultGetProscribedAlbumNames): GetProscribedAlbumNames
 
     companion object {
         @Provides
