@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -6,7 +6,6 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock

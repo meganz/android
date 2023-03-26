@@ -1,8 +1,7 @@
-package mega.privacy.android.domain.usecase.impl
+package mega.privacy.android.domain.usecase.photos
 
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import javax.inject.Inject
 
 /**
@@ -10,11 +9,10 @@ import javax.inject.Inject
  *
  * @param albumRepository
  */
-class DefaultUpdateAlbumNameUseCase @Inject constructor(
+class UpdateAlbumNameUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
-) : UpdateAlbumNameUseCase {
-
-    override suspend fun invoke(albumId: AlbumId, newName: String): String =
+) {
+    suspend operator fun invoke(albumId: AlbumId, newName: String): String =
         albumRepository.updateAlbumName(albumId = albumId, newName = newName)
 
 }

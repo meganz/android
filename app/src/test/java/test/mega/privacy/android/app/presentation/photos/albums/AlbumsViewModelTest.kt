@@ -31,9 +31,9 @@ import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCas
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.RemoveFavourites
-import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test

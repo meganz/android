@@ -54,10 +54,8 @@ import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateAlbumCover
-import mega.privacy.android.domain.usecase.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
-import mega.privacy.android.domain.usecase.impl.DefaultUpdateAlbumNameUseCase
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -113,9 +111,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindRemoveAlbums(useCase: DefaultRemoveAlbums): RemoveAlbums
-
-    @Binds
-    abstract fun bindUpdateAlbumName(useCase: DefaultUpdateAlbumNameUseCase): UpdateAlbumNameUseCase
 
     @Binds
     abstract fun bindObserveAlbumPhotosAddingProgress(useCase: DefaultObserveAlbumPhotosAddingProgress): ObserveAlbumPhotosAddingProgress
