@@ -3909,7 +3909,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.e(e, "Exception NotificationManager - remove contact notification")
         }
 
-        viewPagerShares.adapter = sharesPageAdapter
+        if (viewPagerShares.adapter == null) {
+            viewPagerShares.adapter = sharesPageAdapter
+        }
         TabLayoutMediator(
             tabLayoutShares,
             viewPagerShares

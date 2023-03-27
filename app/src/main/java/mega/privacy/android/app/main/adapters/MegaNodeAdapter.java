@@ -656,14 +656,14 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      * Set the nodes list and shareData list
      * This function is used to populate the list of incoming and outgoing shares
      *
-     * @param nodes the list of nodes, whether verified or unverified
+     * @param nodes     the list of nodes, whether verified or unverified
      * @param shareData the list of shares data associated to the node
      */
     public void setNodesWithShareData(List<MegaNode> nodes, List<ShareData> shareData) {
         this.nodes = insertPlaceHolderNode(nodes);
         // need to add extra elements to sharedata too, so that the element at a specific position
         // corresponds exactly to the node in the nodes list
-        for (int i = 0; i < this.nodes.size() - shareData.size(); i ++) {
+        for (int i = 0; i < this.nodes.size() - shareData.size(); i++) {
             shareData.add(0, null);
         }
         this.shareData = shareData;
@@ -1007,8 +1007,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         holder.textViewFileSize.setText("");
 
         holder.imageFavourite.setVisibility(type != INCOMING_SHARES_ADAPTER
-                        && type != FOLDER_LINK_ADAPTER
-                        && node.isFavourite() ? View.VISIBLE : View.GONE);
+                && type != FOLDER_LINK_ADAPTER
+                && node.isFavourite() ? View.VISIBLE : View.GONE);
 
         if (type != FOLDER_LINK_ADAPTER && node.getLabel() != MegaNode.NODE_LBL_UNKNOWN) {
             Drawable drawable = MegaNodeUtil.getNodeLabelDrawable(node.getLabel(), holder.itemView.getResources());
@@ -1301,7 +1301,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         }
     }
 
-    public void filClicked(int currentPosition) {
+    public void reselectUnHandledSingleItem(int currentPosition) {
         notifyItemChanged(currentPosition);
         unHandledItem = currentPosition;
     }
@@ -1560,7 +1560,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
      */
     private void showUnverifiedNodeUi(ViewHolderBrowserList holder, Boolean isIncomingNode, MegaNode node, ShareData shareData) {
         if (isIncomingNode) {
-            if(node.isNodeKeyDecrypted()) {
+            if (node.isNodeKeyDecrypted()) {
                 holder.textViewFileName.setText(node.getName());
             } else {
                 holder.textViewFileName.setText(context.getString(R.string.shared_items_verify_credentials_undecrypted_folder));

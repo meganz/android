@@ -332,7 +332,7 @@ class FileBrowserFragment : RotatableFragment() {
      * reselectUnHandledSingleItem
      */
     override fun reselectUnHandledSingleItem(position: Int) {
-        megaNodeAdapter?.filClicked(position)
+        megaNodeAdapter?.reselectUnHandledSingleItem(position)
     }
 
     /**

@@ -13,12 +13,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DefaultItemAnimator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.components.NewGridRecyclerView
+import mega.privacy.android.app.components.CustomizedGridLayoutManager
+import mega.privacy.android.app.components.PositionDividerItemDecoration
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -31,8 +35,8 @@ import mega.privacy.android.app.utils.Constants.ORDER_OTHERS
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -50,7 +54,11 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     private val viewModel by activityViewModels<OutgoingSharesViewModel>()
 
-    private fun state() = viewModel.state.value
+    private fun outgoingSharesState() = viewModel.state.value
+
+    private val itemDecoration: PositionDividerItemDecoration by lazy(LazyThreadSafetyMode.NONE) {
+        PositionDividerItemDecoration(requireContext(), displayMetrics())
+    }
 
     /**
      * onCreateView
@@ -65,11 +73,9 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         if (megaApi.rootNode == null)
             return null
 
-        val view =
-            if (managerActivity?.isList == true) getListView(inflater, container)
-            else getGridView(inflater, container)
-
-        initAdapter()
+        val view = setupUI(inflater, container)
+        setupAdapter()
+        switchViewType()
 
         return view
     }
@@ -87,7 +93,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
      * activateActionMode
      */
     override fun activateActionMode() {
-        if (adapter?.isMultipleSelect == true) return
+        if (megaNodeAdapter?.isMultipleSelect == true) return
 
         super.activateActionMode()
         actionMode =
@@ -98,8 +104,8 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
     override fun itemClick(position: Int) {
         val actualPosition = position - 1
-        val node = state().nodes.getOrNull(actualPosition)?.first
-        val shareData = state().nodes.getOrNull(actualPosition)?.second
+        val node = outgoingSharesState().nodes.getOrNull(actualPosition)?.first
+        val shareData = outgoingSharesState().nodes.getOrNull(actualPosition)?.second
         when {
             shareData?.isPending == true -> {
                 showCanNotVerifyContact(shareData.user)
@@ -108,9 +114,9 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
                 openAuthenticityCredentials(shareData.user)
             }
             // select mode
-            adapter?.isMultipleSelect == true -> {
-                adapter?.toggleSelection(position)
-                val selectedNodes = adapter?.selectedNodes
+            megaNodeAdapter?.isMultipleSelect == true -> {
+                megaNodeAdapter?.toggleSelection(position)
+                val selectedNodes = megaNodeAdapter?.selectedNodes
                 if ((selectedNodes?.size ?: 0) > 0)
                     updateActionModeTitle()
             }
@@ -132,17 +138,17 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun navigateToFolder(node: MegaNode) {
-        Timber.d("Is folder deep: %s", state().outgoingTreeDepth)
+        Timber.d("Is folder deep: %s", outgoingSharesState().outgoingTreeDepth)
 
         val lastFirstVisiblePosition: Int = when {
-            managerActivity?.isList == true ->
-                mLayoutManager?.findFirstCompletelyVisibleItemPosition() ?: 0
+            outgoingSharesState().currentViewType == ViewType.LIST ->
+                recyclerView?.findFirstCompletelyVisibleItemPosition() ?: 0
 
-            (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition() == -1 ->
-                (recyclerView as NewGridRecyclerView).findFirstVisibleItemPosition()
+            recyclerView?.findFirstCompletelyVisibleItemPosition() == -1 ->
+                recyclerView?.findFirstVisibleItemPosition() ?: 0
 
             else ->
-                (recyclerView as NewGridRecyclerView).findFirstCompletelyVisibleItemPosition()
+                recyclerView?.findFirstCompletelyVisibleItemPosition() ?: 0
         }
 
         viewModel.pushToLastPositionStack(lastFirstVisiblePosition)
@@ -154,47 +160,39 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     override fun onBackPressed(): Int {
         Timber.d("deepBrowserTree: %s", managerActivity?.deepBrowserTreeOutgoing)
 
-        if (adapter == null)
+        if (megaNodeAdapter == null)
             return 0
 
         managerActivity?.invalidateOptionsMenu()
 
         return when {
-            state().outgoingTreeDepth == 1 -> {
+            outgoingSharesState().outgoingTreeDepth == 1 -> {
                 Timber.d("deepBrowserTree==1")
                 viewModel.resetOutgoingTreeDepth()
 
                 val lastVisiblePosition = viewModel.popLastPositionStack()
 
                 lastVisiblePosition.takeIf { it > 0 }?.let {
-                    if (managerActivity?.isList == true)
-                        mLayoutManager?.scrollToPositionWithOffset(it, 0)
-                    else
-                        gridLayoutManager?.scrollToPositionWithOffset(it, 0)
+                    recyclerView?.scrollToPosition(it)
                 }
 
                 recyclerView?.visibility = View.VISIBLE
-                emptyImageView?.visibility = View.GONE
-                emptyLinearLayout?.visibility = View.GONE
+                emptyListImageView?.visibility = View.GONE
                 3
             }
 
-            state().outgoingTreeDepth > 1 -> {
+            outgoingSharesState().outgoingTreeDepth > 1 -> {
                 Timber.d("deepTree>1")
 
-                state().outgoingParentHandle?.let { parentHandle ->
+                outgoingSharesState().outgoingParentHandle?.let { parentHandle ->
                     recyclerView?.visibility = View.VISIBLE
-                    emptyImageView?.visibility = View.GONE
-                    emptyLinearLayout?.visibility = View.GONE
+                    emptyListImageView?.visibility = View.GONE
                     viewModel.decreaseOutgoingTreeDepth(parentHandle)
 
                     val lastVisiblePosition = viewModel.popLastPositionStack()
 
                     lastVisiblePosition.takeIf { it > 0 }?.let {
-                        if (managerActivity?.isList == true)
-                            mLayoutManager?.scrollToPositionWithOffset(it, 0)
-                        else
-                            gridLayoutManager?.scrollToPositionWithOffset(it, 0)
+                        recyclerView?.scrollToPosition(it)
                     }
                 }
 
@@ -210,7 +208,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     }
 
     override fun showSortByPanel() {
-        val orderType = when (state().outgoingTreeDepth) {
+        val orderType = when (outgoingSharesState().outgoingTreeDepth) {
             0 -> ORDER_OTHERS
             else -> ORDER_CLOUD
         }
@@ -220,9 +218,9 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     override val viewerFrom: Int = Constants.VIEWER_FROM_OUTGOING_SHARES
     override val currentSharesTab: SharesTab = SharesTab.OUTGOING_TAB
     override val sortOrder: SortOrder
-        get() = state().sortOrder
+        get() = outgoingSharesState().sortOrder
     override val parentHandle: Long
-        get() = state().outgoingHandle
+        get() = outgoingSharesState().outgoingHandle
 
     /**
      * Setup ViewModel observers
@@ -254,11 +252,52 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             }
         }
 
+        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            showSortByPanel()
+        })
+
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
-            val isList = state.viewType == ViewType.LIST
-            if (isList != viewModel.isList) {
-                viewModel.setIsList(isList)
-                initAdapter()
+            updateViewType(state.viewType)
+        }
+    }
+
+    /**
+     * Updates the View Type of this Fragment
+     *
+     * Changing the View Type will cause the scroll position to be lost. To avoid that, only
+     * refresh the contents when the new View Type is different from the original View Type
+     *
+     * @param viewType The new View Type received from [SortByHeaderViewModel]
+     */
+    private fun updateViewType(viewType: ViewType) {
+        if (viewType != outgoingSharesState().currentViewType) {
+            viewModel.setCurrentViewType(viewType)
+            switchViewType()
+        }
+    }
+
+    /**
+     * Switches how items in the [MegaNodeAdapter] are being displayed, based on the current
+     * [ViewType] in [OutgoingSharesViewModel]
+     */
+    private fun switchViewType() {
+        recyclerView?.run {
+            when (outgoingSharesState().currentViewType) {
+                ViewType.LIST -> {
+                    switchToLinear()
+                    itemAnimator = Util.noChangeRecyclerViewItemAnimator()
+                    if (itemDecorationCount == 0) addItemDecoration(itemDecoration)
+                    megaNodeAdapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                }
+                ViewType.GRID -> {
+                    switchBackToGrid()
+                    itemAnimator = DefaultItemAnimator()
+                    removeItemDecoration(itemDecoration)
+                    (layoutManager as CustomizedGridLayoutManager).apply {
+                        spanSizeLookup = megaNodeAdapter?.getSpanSizeLookup(spanCount)
+                    }
+                    megaNodeAdapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
+                }
             }
         }
     }
@@ -271,35 +310,27 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
     private fun updateNodes(nodes: List<Pair<MegaNode, ShareData?>>) {
         val mutableListNodes = nodes.map { it.first }
         val mutableListShareData = nodes.map { it.second }
-        adapter?.setNodesWithShareData(mutableListNodes, mutableListShareData)
+        megaNodeAdapter?.setNodesWithShareData(mutableListNodes, mutableListShareData)
     }
 
     /**
      * Initialize the adapter
      */
-    private fun initAdapter() {
-        if (adapter == null) {
-            adapter = MegaNodeAdapter(
-                requireActivity(),
-                this,
-                state().nodes.map { it.first },
-                state().outgoingHandle,
-                recyclerView,
-                Constants.OUTGOING_SHARES_ADAPTER,
-                if (managerActivity?.isList == true) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
-                else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
-                sortByHeaderViewModel
-            )
-        } else {
-            adapter?.parentHandle = state().outgoingHandle
-            adapter?.setListFragment(recyclerView)
+    private fun setupAdapter() {
+        megaNodeAdapter = MegaNodeAdapter(
+            requireActivity(),
+            this,
+            outgoingSharesState().nodes.map { it.first },
+            outgoingSharesState().outgoingHandle,
+            recyclerView,
+            Constants.OUTGOING_SHARES_ADAPTER,
+            if (outgoingSharesState().currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+            else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
+            sortByHeaderViewModel
+        ).also {
+            it.isMultipleSelect = false
+            recyclerView?.adapter = it
         }
-        if (managerActivity?.isList == false)
-            gridLayoutManager?.spanSizeLookup =
-                gridLayoutManager?.spanCount?.let { adapter?.getSpanSizeLookup(it) }
-
-        adapter?.isMultipleSelect = false
-        recyclerView?.adapter = adapter
     }
 
     /**
@@ -321,9 +352,9 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
 
         if (isInvalidHandle) {
             if (Util.isScreenInPortrait(requireContext())) {
-                emptyImageView?.setImageResource(R.drawable.empty_outgoing_portrait)
+                emptyListImageView?.setImageResource(R.drawable.empty_outgoing_portrait)
             } else {
-                emptyImageView?.setImageResource(R.drawable.empty_outgoing_landscape)
+                emptyListImageView?.setImageResource(R.drawable.empty_outgoing_landscape)
             }
             textToShow = requireContext().getString(R.string.context_empty_outgoing)
         }
@@ -356,12 +387,12 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             }
             val areAllNotTakenDown = selected.areAllNotTakenDown()
             if (areAllNotTakenDown) {
-                if (state().outgoingHandle == INVALID_HANDLE) {
+                if (outgoingSharesState().outgoingHandle == INVALID_HANDLE) {
                     control.removeShare().setVisible(true).showAsAction =
                         MenuItem.SHOW_AS_ACTION_ALWAYS
                 }
                 control.shareOut().setVisible(true).showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS
-                if (state().outgoingTreeDepth > 0) {
+                if (outgoingSharesState().outgoingTreeDepth > 0) {
                     if (areAllFileNodesAndNotTakenDown(selected)) {
                         control.sendToChat().setVisible(true).showAsAction =
                             MenuItem.SHOW_AS_ACTION_ALWAYS
@@ -415,7 +446,7 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
         ).setTitle(getString(R.string.shared_items_contact_not_in_contact_list_dialog_title))
             .setMessage(
-                StringResourcesUtils.getString(
+                getString(
                     R.string.shared_items_contact_not_in_contact_list_dialog_content,
                     email
                 )

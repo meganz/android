@@ -658,7 +658,8 @@ class SearchFragment : RotatableFragment() {
 
     override fun multipleItemClick(position: Int) = adapter.toggleSelection(position)
 
-    override fun reselectUnHandledSingleItem(position: Int) = adapter.filClicked(position)
+    override fun reselectUnHandledSingleItem(position: Int) =
+        adapter.reselectUnHandledSingleItem(position)
 
     override fun updateActionModeTitle() {
         actionMode?.let {
