@@ -1,55 +1,49 @@
 package mega.privacy.android.app.modalbottomsheet
 
-import mega.privacy.android.app.main.controllers.AccountController.Companion.saveRkToFileSystem
-import dagger.hilt.android.AndroidEntryPoint
-import mega.privacy.android.domain.qualifier.ApplicationScope
-import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
-import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.presentation.testpassword.BackupRecoveryKeyAction
 
-@AndroidEntryPoint
-class RecoveryKeyBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
-
-    @ApplicationScope
-    @Inject
-    lateinit var sharingScope: CoroutineScope
-
+/**
+ * Recovery Bottom Sheet Dialog, to select options of actions for Recovery Key
+ */
+class RecoveryKeyBottomSheetDialogFragment(
+    private val action: BackupRecoveryKeyAction,
+) : BaseBottomSheetDialogFragment() {
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         contentView = View.inflate(requireContext(), R.layout.bottom_sheet_recovery_key, null)
         itemsLayout = contentView.findViewById(R.id.items_layout)
         return contentView
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         contentView.apply {
             findViewById<LinearLayout>(R.id.recovery_key_print_layout).setOnClickListener {
-                AccountController(requireActivity()).printRK()
+                action.print()
                 setStateBottomSheetBehaviorHidden()
             }
 
             findViewById<LinearLayout>(R.id.recovery_key_copytoclipboard_layout).setOnClickListener {
-                AccountController(requireActivity()).copyRkToClipboard(sharingScope)
-
-                if (requireActivity() is TwoFactorAuthenticationActivity) {
-                    requireActivity().finish()
-                }
-
+                action.copyToClipboard()
                 setStateBottomSheetBehaviorHidden()
             }
 
             findViewById<LinearLayout>(R.id.recovery_key_saveTo_fileSystem_layout).setOnClickListener {
-                saveRkToFileSystem(requireActivity())
+                action.saveToFile()
                 setStateBottomSheetBehaviorHidden()
             }
         }

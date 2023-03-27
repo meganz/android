@@ -25,6 +25,7 @@ import mega.privacy.android.app.databinding.ActivityTestPasswordBinding
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.AccountController.Companion.logout
+import mega.privacy.android.app.main.controllers.AccountController.Companion.saveRkToFileSystem
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
@@ -55,6 +56,12 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
     @Inject
     lateinit var sharingScope: CoroutineScope
 
+    /**
+     * Account Controller
+     */
+    @Inject
+    lateinit var accountController: AccountController
+
     private val viewModel: TestPasswordViewModel by viewModels()
 
     /**
@@ -69,7 +76,22 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
     private var testingPassword = false
     private var dismissPasswordReminder = false
     private var numRequests = 0
-    private var recoveryKeyBottomSheetDialogFragment: RecoveryKeyBottomSheetDialogFragment? = null
+    private val backupRecoveryKeyAction = object : BackupRecoveryKeyAction {
+        override fun print() {
+            accountController.printRK()
+        }
+
+        override fun copyToClipboard() {
+            accountController.copyRkToClipboard(sharingScope)
+        }
+
+        override fun saveToFile() {
+            saveRkToFileSystem(this@TestPasswordActivity)
+        }
+    }
+    private val recoveryKeyBottomSheetDialogFragment by lazy(LazyThreadSafetyMode.NONE) {
+        RecoveryKeyBottomSheetDialogFragment(backupRecoveryKeyAction)
+    }
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
@@ -220,10 +242,9 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
 
     private fun onBackupRecoveryClick() {
         if (recoveryKeyBottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        recoveryKeyBottomSheetDialogFragment = RecoveryKeyBottomSheetDialogFragment()
-        recoveryKeyBottomSheetDialogFragment?.show(
+        recoveryKeyBottomSheetDialogFragment.show(
             supportFragmentManager,
-            recoveryKeyBottomSheetDialogFragment?.tag
+            recoveryKeyBottomSheetDialogFragment.tag
         )
     }
 
