@@ -916,15 +916,14 @@ class MyAccountViewModel @Inject constructor(
      */
     private fun addProfileAvatar(path: String?) {
         val app = MegaApplication.getInstance()
-        val myEmail = megaApi.myUser.email
+        val myEmail = megaApi.myUser?.email
         val imgFile = if (!path.isNullOrEmpty()) File(path)
         else CacheFolderManager.getCacheFile(
             app,
             CacheFolderManager.TEMPORARY_FOLDER,
             "picture.jpg"
         )
-
-        if (!FileUtil.isFileAvailable(imgFile)) {
+        if (!FileUtil.isFileAvailable(imgFile) || myEmail.isNullOrEmpty()) {
             showResult(context.getString(R.string.general_error))
             return
         }

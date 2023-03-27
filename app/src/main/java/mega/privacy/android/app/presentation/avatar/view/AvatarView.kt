@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,8 +69,7 @@ fun Avatar(
         is PhotoAvatarContent -> {
             PhotoAvatar(
                 modifier = modifier,
-                photoPath = content.path,
-                showBorder = content.showBorder
+                content = content,
             )
         }
     }
@@ -143,25 +143,26 @@ fun EmojiAvatar(
 @Composable
 fun PhotoAvatar(
     modifier: Modifier = Modifier,
-    photoPath: String,
-    showBorder: Boolean = true,
+    content: PhotoAvatarContent,
 ) {
-    AsyncImage(
-        modifier = modifier
-            .clip(CircleShape)
-            .testTag("PhotoAvatar")
-            .run {
-                if (showBorder) {
-                    border(
-                        width = 3.dp,
-                        color = borderColor(),
-                        shape = CircleShape
-                    )
-                } else this
-            },
-        model = photoPath,
-        contentDescription = "Photo Avatar"
-    )
+    key(content.size, content.path) {
+        AsyncImage(
+            modifier = modifier
+                .clip(CircleShape)
+                .testTag("PhotoAvatar")
+                .run {
+                    if (content.showBorder) {
+                        border(
+                            width = 3.dp,
+                            color = borderColor(),
+                            shape = CircleShape
+                        )
+                    } else this
+                },
+            model = content.path,
+            contentDescription = "Photo Avatar"
+        )
+    }
 }
 
 @Composable
