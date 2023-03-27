@@ -88,10 +88,6 @@ import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapperImpl
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapperImpl
-import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
-import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapperImpl
-import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
-import mega.privacy.android.data.mapper.shares.AccessPermissionMapperImpl
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
@@ -183,15 +179,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindSortOrderIntMapper(implementation: SortOrderIntMapperImpl): SortOrderIntMapper
-
-    /**
-     * Provides AccessPermissionMapper Mapper
-     */
-    @Binds
-    abstract fun bindAccessPermissionMapper(implementation: AccessPermissionMapperImpl): AccessPermissionMapper
-
-    @Binds
-    abstract fun bindAccessPermissionRawMapper(implementation: AccessPermissionIntMapperImpl): AccessPermissionIntMapper
 
     /**
      * Provides PasswordStrength Mapper

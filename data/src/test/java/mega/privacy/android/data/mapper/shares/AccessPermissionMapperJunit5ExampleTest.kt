@@ -10,8 +10,8 @@ import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 
 
-class AccessPermissionMapperImplJunit5ExampleTest {
-    private val underTest: AccessPermissionMapper = AccessPermissionMapperImpl()
+class AccessPermissionMapperJunit5ExampleTest {
+    private val underTest: AccessPermissionMapper = AccessPermissionMapper()
 
     @ParameterizedTest(name = "test {0} is not mapped to null")
     @EnumSource(AccessPermission::class)

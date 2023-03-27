@@ -5,8 +5,8 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 import nz.mega.sdk.MegaShare
 import org.junit.Test
 
-class AccessPermissionMapperImplTest {
-    private val underTest: AccessPermissionMapper = AccessPermissionMapperImpl()
+class AccessPermissionMapperTest {
+    private val underTest: AccessPermissionMapper = AccessPermissionMapper()
 
     @Test
     fun `test read access is mapped correctly`() {
