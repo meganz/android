@@ -86,6 +86,7 @@ internal class UserInfoViewModel @Inject constructor(
             monitorMyAvatarFile()
                 .catch { Timber.e(it) }
                 .collect {
+                    Timber.d("CongHai - UserInfoViewModel monitorMyAvatarFile trigger")
                     getUserAvatarOrDefault(isForceRefresh = false)
                 }
         }
@@ -98,21 +99,19 @@ internal class UserInfoViewModel @Inject constructor(
     }
 
     private suspend fun getUserAvatarOrDefault(isForceRefresh: Boolean) {
-        viewModelScope.launch {
-            val avatarFile = runCatching { getMyAvatarFile(isForceRefresh) }
-                .onFailure { Timber.e(it) }.getOrNull()
-            val avatarContent = avatarContentMapper(
-                fullName = _state.value.fullName,
-                localFile = avatarFile,
-                backgroundColor = { getMyAvatarColor() },
-                showBorder = false,
-                textSize = 36.sp
+        val avatarFile = runCatching { getMyAvatarFile(isForceRefresh) }
+            .onFailure { Timber.e(it) }.getOrNull()
+        val avatarContent = avatarContentMapper(
+            fullName = _state.value.fullName,
+            localFile = avatarFile,
+            backgroundColor = { getMyAvatarColor() },
+            showBorder = false,
+            textSize = 36.sp
+        )
+        _state.update {
+            it.copy(
+                avatarContent = avatarContent,
             )
-            _state.update {
-                it.copy(
-                    avatarContent = avatarContent,
-                )
-            }
         }
     }
 

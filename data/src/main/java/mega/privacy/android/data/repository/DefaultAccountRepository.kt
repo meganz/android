@@ -476,7 +476,11 @@ internal class DefaultAccountRepository @Inject constructor(
     override suspend fun getAccountEmail(forceRefresh: Boolean): String? {
         if (forceRefresh) {
             return megaApiGateway.accountEmail
-                .also { dbHandler.saveMyEmail(it) }
+                .also {
+                    if (it.isNullOrBlank().not()) {
+                        dbHandler.saveMyEmail(it)
+                    }
+                }
         }
         return dbHandler.myEmail
     }
