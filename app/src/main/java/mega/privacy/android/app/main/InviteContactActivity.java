@@ -88,7 +88,7 @@ import mega.privacy.android.app.components.ContactInfoListDialog;
 import mega.privacy.android.app.components.ContactsDividerDecoration;
 import mega.privacy.android.app.components.scrollBar.FastScroller;
 import mega.privacy.android.app.main.adapters.InvitationContactsAdapter;
-import mega.privacy.android.app.main.qrcode.QRCodeActivity;
+import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.TimeUtils;

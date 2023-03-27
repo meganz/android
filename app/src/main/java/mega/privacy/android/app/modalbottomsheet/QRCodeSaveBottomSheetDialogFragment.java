@@ -28,7 +28,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.main.FileStorageActivity;
-import mega.privacy.android.app.main.qrcode.QRCodeActivity;
+import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.bottomsheet.QrCodeSaveBottomSheetDialogViewModel;

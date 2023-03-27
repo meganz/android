@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main.qrcode
+package mega.privacy.android.app.presentation.qrcode
 
 import android.Manifest
 import android.content.Intent
@@ -21,6 +21,7 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityQrCodeBinding
 import mega.privacy.android.app.main.FileStorageActivity
+import mega.privacy.android.app.main.qrcode.QRCodePageAdapter
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.QRCodeSaveBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.qrcode.mycode.MyCodeFragment

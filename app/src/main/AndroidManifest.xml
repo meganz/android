@@ -414,7 +414,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing" />
         <activity
-            android:name=".main.qrcode.QRCodeActivity" />
+            android:name=".presentation.qrcode.QRCodeActivity" />
         <activity
             android:name=".presentation.twofactorauthentication.TwoFactorAuthenticationActivity" />
         <activity

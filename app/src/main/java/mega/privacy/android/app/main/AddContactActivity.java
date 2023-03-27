@@ -111,7 +111,7 @@ import mega.privacy.android.app.main.adapters.PhoneContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsAdapter;
 import mega.privacy.android.app.main.adapters.ShareContactsHeaderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
-import mega.privacy.android.app.main.qrcode.QRCodeActivity;
+import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.data.database.DatabaseHandler;

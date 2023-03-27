@@ -174,7 +174,7 @@ import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.RecentChatsFragment
-import mega.privacy.android.app.main.qrcode.QRCodeActivity
+import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity
