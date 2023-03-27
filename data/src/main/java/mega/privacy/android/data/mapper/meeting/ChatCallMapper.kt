@@ -4,7 +4,6 @@ import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.meeting.CallCompositionChanges
 import mega.privacy.android.domain.entity.meeting.ChatCallChanges
-import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.EndCallReason
 import mega.privacy.android.domain.entity.meeting.NetworkQualityType
 import mega.privacy.android.domain.entity.meeting.TermCodeType
@@ -16,6 +15,7 @@ import javax.inject.Inject
  */
 internal class ChatCallMapper @Inject constructor(
     private val handleListMapper: HandleListMapper,
+    private val megaChatCallStatusMapper: MegaChatCallStatusMapper,
 ) {
     /**
      * Invoke
@@ -26,7 +26,7 @@ internal class ChatCallMapper @Inject constructor(
     operator fun invoke(megaChatCall: MegaChatCall): ChatCall = ChatCall(
         callId = megaChatCall.callId,
         chatId = megaChatCall.chatid,
-        status = callStatus[megaChatCall.status],
+        status = megaChatCallStatusMapper(megaChatCall.status),
         caller = megaChatCall.caller,
         duration = megaChatCall.duration,
         numParticipants = megaChatCall.numParticipants,
@@ -56,15 +56,6 @@ internal class ChatCallMapper @Inject constructor(
     )
 
     companion object {
-        internal val callStatus = mapOf(
-            MegaChatCall.CALL_STATUS_INITIAL to ChatCallStatus.Initial,
-            MegaChatCall.CALL_STATUS_USER_NO_PRESENT to ChatCallStatus.UserNoPresent,
-            MegaChatCall.CALL_STATUS_CONNECTING to ChatCallStatus.Connecting,
-            MegaChatCall.CALL_STATUS_JOINING to ChatCallStatus.Joining,
-            MegaChatCall.CALL_STATUS_IN_PROGRESS to ChatCallStatus.InProgress,
-            MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION to ChatCallStatus.TerminatingUserParticipation,
-            MegaChatCall.CALL_STATUS_DESTROYED to ChatCallStatus.Destroyed
-        )
 
         internal val endCallReason = mapOf(
             MegaChatCall.END_CALL_REASON_INVALID to EndCallReason.Invalid,

@@ -25,7 +25,7 @@ class ChatRequestMapperTest {
 
     @Before
     fun setUp() {
-        underTest = ChatCallMapper(HandleListMapper())
+        underTest = ChatCallMapper(HandleListMapper(), MegaChatCallStatusMapper())
     }
 
     @Test

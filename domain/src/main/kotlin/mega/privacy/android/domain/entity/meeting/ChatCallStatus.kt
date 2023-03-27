@@ -37,5 +37,10 @@ enum class ChatCallStatus {
     /**
      * Call status Destroyed
      */
-    Destroyed
+    Destroyed,
+
+    /**
+     * Call status Unknown
+     */
+    Unknown
 }
