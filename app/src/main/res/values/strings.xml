@@ -595,8 +595,6 @@
     <string name="general_confirm_button">Confirm</string>
     <!-- On “add phone number” page, an error message will be shown if user click next button without select country code. -->
     <string name="verify_account_invalid_country_code">Please select a region code</string>
-    <!-- On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end. -->
-    <string name="verify_account_not_loading_country_code">Region codes could not be fetched.</string>
     <!-- error message if user click next button without enter a valid phone number -->
     <string name="verify_account_invalid_phone_number">Please supply a valid phone number.</string>
     <!-- Label tell user to enter received txt to below input boxes -->
@@ -1013,7 +1011,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">Remove participant</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">Protects your chat with end-to-end (user controlled) encryption, providing essential safety assurances:</string>
+    <string name="mega_info_empty_screen">Protects your chat with zero-knowledge encryption, providing essential safety assurances:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">The system ensures that the data received is truly from the specified sender, and its content has not been manipulated during transit.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1880,7 +1878,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Enable rich URL previews</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Enhance the MEGA Chat experience. URL content will be retrieved without end-to-end encryption.</string>
+    <string name="text_enable_rich_links">Enhance the MEGA Chat experience. URL content will be retrieved without zero-knowledge encryption.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Please enter a stronger password</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -3061,7 +3059,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro users have exclusive access to additional link safety features making your account even more secure.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Our end-to-end encryption system requires a unique key automatically generated for this file or folder. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
+    <string name="decryption_key_explanation">Our zero-knowledge encryption system requires a unique key automatically generated for this file or folder. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Reset password</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3410,7 +3408,7 @@
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA meeting</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">End-to-end encrypted video meeting</string>
+    <string name="content_tour_five">Zero-knowledge encrypted video meeting</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Please enter a valid meeting link</string>
     <!-- Guest leave call-->
@@ -4678,4 +4676,24 @@
     <string name="media_player_video_select_subtitle_file_button_add_subtitles">Add subtitles</string>
     <!-- The message for select subtitle file page when subtitle file is empty. -->
     <string name="media_player_video_select_subtitle_file_empty_message">NO SUBTITLES FOUND</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="one">Left %1$d shared folder</item>
+        <item quantity="other">Left %1$d shared folders</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">Couldn’t leave %1$d shared folder</item>
+        <item quantity="other">Couldn’t leave %1$d shared folders</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">Left %1$d shared folder,&#160;</item>
+        <item quantity="other">Left %1$d shared folders,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">couldn’t leave %1$d shared folder</item>
+        <item quantity="other">couldn’t leave %1$d shared folders</item>
+    </plurals>
 </resources>

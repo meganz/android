@@ -105,10 +105,25 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                             if (error == errorBusiness) {
                                 message = e.getErrorString();
                             } else {
-                                message = context.getString(R.string.number_correctly_leaved, max_items - error) + context.getString(R.string.number_no_leaved, error);
+                                if (error == max_items) {
+                                    message = context.getResources().
+                                            getQuantityString(
+                                                    R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail,
+                                                    error);
+                                } else {
+                                    String correctlyLeft = context.getResources().getQuantityString(
+                                            R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success_concat,
+                                            max_items - error);
+                                    String notLeft = context.getResources().getQuantityString(
+                                            R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail_concat,
+                                            error);
+                                    message = correctlyLeft.concat(notLeft);
+                                }
                             }
                         } else {
-                            message = context.getString(R.string.number_correctly_leaved, max_items);
+                            message = context.getResources().
+                                    getQuantityString(R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success,
+                                            max_items);
                         }
                     }
 
