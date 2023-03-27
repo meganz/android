@@ -49,7 +49,6 @@ import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
@@ -60,6 +59,7 @@ import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
@@ -122,12 +122,16 @@ class FileInfoViewModel @Inject constructor(
     /**
      * the node whose information are displayed
      */
-    lateinit var typedNode: TypedNode
-        private set
+    private lateinit var typedNode: TypedNode
 
     private var versions: List<Node>? = null
     private val monitoringJobs = ArrayList<Job?>()
     private val monitoringMutex = Mutex()
+
+    /**
+     * the [NodeId] of the current node for this screen
+     */
+    val nodeId get() = typedNode.id
 
     /**
      * This initial setup will be removed once MegaNode is not needed anymore in future tasks
@@ -505,6 +509,9 @@ class FileInfoViewModel @Inject constructor(
             val isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue)
             uiState.copy(
                 typedNode = typedNode,
+                publicLink = node.publicLink,
+                publicLinkCreationTime = node.publicLinkCreationTime
+            ).copy(
                 iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
                 isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
                 isNodeInRubbish = isNodeInRubbish,
@@ -516,7 +523,8 @@ class FileInfoViewModel @Inject constructor(
                         fileUtilWrapper.getFileIfExists(fileName = it)?.toURI()?.toString()
                     },
                 inShareOwnerContactItem = inShareOwnerContactItem,
-                accessPermission = getNodeAccessPermission(typedNode.id) ?: AccessPermission.UNKNOWN
+                accessPermission = getNodeAccessPermission(typedNode.id)
+                    ?: AccessPermission.UNKNOWN
             )
         }
         updateHistory()
@@ -539,6 +547,9 @@ class FileInfoViewModel @Inject constructor(
             typedNode = getNodeById(typedNode.id)
             it.copy(
                 typedNode = typedNode,
+                publicLink = node.publicLink,
+                publicLinkCreationTime = node.publicLinkCreationTime
+            ).copy(
                 iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
             )
         }
@@ -560,6 +571,8 @@ class FileInfoViewModel @Inject constructor(
             typedNode = getNodeById(typedNode.id)
             it.copy(
                 typedNode = typedNode,
+                publicLink = node.publicLink,
+                publicLinkCreationTime = node.publicLinkCreationTime
             )
         }
     }
@@ -598,7 +611,11 @@ class FileInfoViewModel @Inject constructor(
     private fun updateTitle() {
         updateState {
             typedNode = getNodeById(typedNode.id)
-            it.copy(typedNode = typedNode)
+            it.copy(
+                typedNode = typedNode,
+                publicLink = node.publicLink,
+                publicLinkCreationTime = node.publicLinkCreationTime,
+            )
         }
     }
 

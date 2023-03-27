@@ -20,9 +20,6 @@ import com.google.android.material.appbar.AppBarLayout
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import net.opacapp.multilinecollapsingtoolbar.CollapsingToolbarLayout
 import kotlin.math.abs
@@ -154,7 +151,10 @@ internal class FileInfoToolbarHelper(
     }
 
     fun updateOptionsMenu(
-        node: TypedNode,
+        isExported: Boolean,
+        isTakenDown: Boolean,
+        isFile: Boolean,
+        hasPreview: Boolean,
         isInRubbish: Boolean,
         isInInbox: Boolean,
         fromIncomingShares: Boolean,
@@ -167,7 +167,7 @@ internal class FileInfoToolbarHelper(
         }
         setIconsColorFilter()
         setupOptionsToolbar(
-            node = node,
+            isExported = isExported, isTakenDown = isTakenDown, isFile = isFile,
             isInRubbish = isInRubbish,
             fromIncomingShares = fromIncomingShares,
             firstIncomingLevel = firstIncomingLevel,
@@ -176,8 +176,7 @@ internal class FileInfoToolbarHelper(
         // Check if read-only properties should be applied on MenuItems
         shouldApplyMenuItemReadOnlyState(isInInbox)
 
-        val isCollapsible = (node as? TypedFileNode)?.hasPreview == true
-        setupCollapsible(isCollapsible, nestedView)
+        setupCollapsible(hasPreview, nestedView)
     }
 
     fun disableMenu() {
@@ -243,11 +242,15 @@ internal class FileInfoToolbarHelper(
 
     /**
      * Applies rubbish restrictions (delete) or default options
-     * @param node the affected node
+     * @param isExported
+     * @param isTakenDown
+     * @param isFile
      * @param isInRubbish the node is in rubbish or not
      */
     private fun setupOptionsToolbar(
-        node: TypedNode,
+        isExported: Boolean,
+        isTakenDown: Boolean,
+        isFile: Boolean,
         isInRubbish: Boolean,
         fromIncomingShares: Boolean,
         firstIncomingLevel: Boolean,
@@ -256,7 +259,14 @@ internal class FileInfoToolbarHelper(
         if (isInRubbish) {
             deleteMenuItem?.isVisible = true
         } else {
-            setDefaultOptionsToolbar(node, fromIncomingShares, firstIncomingLevel, nodeAccess)
+            setDefaultOptionsToolbar(
+                isExported,
+                isTakenDown,
+                isFile,
+                fromIncomingShares,
+                firstIncomingLevel,
+                nodeAccess
+            )
         }
     }
 
@@ -315,17 +325,19 @@ internal class FileInfoToolbarHelper(
      * Sets up the default items to be displayed on the Toolbar Menu
      */
     private fun setDefaultOptionsToolbar(
-        node: TypedNode,
+        isExported: Boolean,
+        isTakenDown: Boolean,
+        isFile: Boolean,
         fromIncomingShares: Boolean,
         firstIncomingLevel: Boolean,
         nodeAccess: AccessPermission?,
     ) {
-        if (!node.isTakenDown && node is TypedFileNode) {
+        if (!isTakenDown && isFile) {
             sendToChatMenuItem?.isVisible = true
             sendToChatMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
         }
         if (fromIncomingShares) {
-            if (!node.isTakenDown) {
+            if (!isTakenDown) {
                 downloadMenuItem?.isVisible = true
                 downloadMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
                 leaveMenuItem?.isVisible = firstIncomingLevel
@@ -348,14 +360,14 @@ internal class FileInfoToolbarHelper(
                 }
             }
         } else {
-            if (!node.isTakenDown) {
+            if (!isTakenDown) {
                 downloadMenuItem?.isVisible = true
                 downloadMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                if (node is TypedFolderNode) {
+                if (!isFile) {
                     shareMenuItem?.isVisible = true
                     shareMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
                 }
-                if (node.isExported) {
+                if (isExported) {
                     editLinkMenuItem?.isVisible = true
                     removeLinkMenuItem?.isVisible = true
                     removeLinkMenuItem?.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
