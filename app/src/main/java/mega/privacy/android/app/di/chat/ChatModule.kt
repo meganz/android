@@ -37,13 +37,11 @@ import mega.privacy.android.domain.usecase.SignalChatPresenceActivity
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.DefaultAnswerChatCall
-import mega.privacy.android.domain.usecase.meeting.DefaultHangChatCall
 import mega.privacy.android.domain.usecase.meeting.DefaultOpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.DefaultStartChatCallNoRinging
 import mega.privacy.android.domain.usecase.meeting.FetchNumberOfScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.FetchScheduledMeetingOccurrencesByChat
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
-import mega.privacy.android.domain.usecase.meeting.HangChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingOccurrencesUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
@@ -95,12 +93,6 @@ abstract class ChatModule {
      */
     @Binds
     abstract fun bindAnswerChatCall(useCase: DefaultAnswerChatCall): AnswerChatCall
-
-    /**
-     * Hang call
-     */
-    @Binds
-    abstract fun bindHangChatCall(useCase: DefaultHangChatCall): HangChatCall
 
     companion object {
         /**

@@ -25,7 +25,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.VideoCaptureUtils
 import mega.privacy.android.domain.entity.statistics.EndedEmptyCallTimeout
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.meeting.HangChatCall
+import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -39,7 +39,7 @@ import javax.inject.Singleton
  * Class for chat management
  *
  * @property applicationScope               [CoroutineScope]
- * @property hangChatCall                   [HangChatCall]
+ * @property hangChatCallUseCase            [HangChatCallUseCase]
  * @property sendStatisticsMeetingsUseCase  [SendStatisticsMeetingsUseCase]
  * @property rtcAudioManagerGateway         [RTCAudioManagerGateway]
  * @property megaChatApi                    [MegaChatApiAndroid]
@@ -47,7 +47,7 @@ import javax.inject.Singleton
 @Singleton
 class ChatManagement @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val hangChatCall: HangChatCall,
+    private val hangChatCallUseCase: HangChatCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val megaChatApi: MegaChatApiAndroid,
@@ -484,8 +484,8 @@ class ChatManagement @Inject constructor(
                             Pair.create(chatId, false)
                         )
                         applicationScope.launch {
-                            kotlin.runCatching {
-                                hangChatCall(call.callId)
+                            runCatching {
+                                hangChatCallUseCase(call.callId)
                                 sendStatisticsMeetingsUseCase(EndedEmptyCallTimeout())
                             }.onFailure { exception ->
                                 Timber.e(exception.message)
