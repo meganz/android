@@ -15,6 +15,7 @@ import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -100,10 +101,12 @@ class IncomingSharesViewModel @Inject constructor(
     }
 
     /**
-     * Set isList when update from MonitorViewType is received
+     * Updates the value of [IncomingSharesState.currentViewType]
+     *
+     * @param newViewType The new [ViewType]
      */
-    fun setIsList(value: Boolean) {
-        isList = value
+    fun setCurrentViewType(newViewType: ViewType) {
+        _state.update { it.copy(currentViewType = newViewType) }
     }
 
     /**
@@ -240,7 +243,7 @@ class IncomingSharesViewModel @Inject constructor(
      */
     private suspend fun isInvalidHandle(handle: Long = _state.value.incomingHandle): Boolean {
         return handle
-            .takeUnless { it == -1L || it == INVALID_HANDLE }
+            .takeUnless { it == INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }
             ?: true
     }

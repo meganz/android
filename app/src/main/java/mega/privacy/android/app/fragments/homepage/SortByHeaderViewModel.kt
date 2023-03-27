@@ -155,7 +155,6 @@ class SortByHeaderViewModel @Inject constructor(
         }
     }
 
-
     /**
      * Previously Selected Order
      */

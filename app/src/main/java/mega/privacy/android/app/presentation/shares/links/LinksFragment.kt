@@ -15,6 +15,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.PositionDividerItemDecoration
+import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.Tab
@@ -27,6 +29,8 @@ import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.canMoveToRubbish
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -43,6 +47,10 @@ class LinksFragment : MegaNodeBaseFragment() {
 
     private fun state() = viewModel.state.value
 
+    private val itemDecoration: PositionDividerItemDecoration by lazy(LazyThreadSafetyMode.NONE) {
+        PositionDividerItemDecoration(requireContext(), displayMetrics())
+    }
+
     /**
      * onCreateView
      */
@@ -57,9 +65,10 @@ class LinksFragment : MegaNodeBaseFragment() {
             return null
         }
 
-        val view = getListView(inflater, container)
+        val view = setupUI(inflater, container)
 
         initAdapter()
+        setupListViewConfiguration()
 
         return view
     }
@@ -77,7 +86,7 @@ class LinksFragment : MegaNodeBaseFragment() {
      * activateActionMode
      */
     override fun activateActionMode() {
-        if (adapter?.isMultipleSelect == true) return
+        if (megaNodeAdapter?.isMultipleSelect == true) return
 
         super.activateActionMode()
         actionMode =
@@ -91,9 +100,9 @@ class LinksFragment : MegaNodeBaseFragment() {
 
         when {
             // select mode
-            adapter?.isMultipleSelect == true -> {
-                adapter?.toggleSelection(position)
-                val selectedNodes = adapter?.selectedNodes
+            megaNodeAdapter?.isMultipleSelect == true -> {
+                megaNodeAdapter?.toggleSelection(position)
+                val selectedNodes = megaNodeAdapter?.selectedNodes
                 if ((selectedNodes?.size ?: 0) > 0)
                     updateActionModeTitle()
             }
@@ -111,7 +120,7 @@ class LinksFragment : MegaNodeBaseFragment() {
     override fun navigateToFolder(node: MegaNode) {
         Timber.d("Is folder deep: %s", state().linksTreeDepth)
 
-        mLayoutManager?.findFirstCompletelyVisibleItemPosition()
+        recyclerView?.findFirstCompletelyVisibleItemPosition()
             ?.let { viewModel.pushToLastPositionStack(it) }
         viewModel.increaseLinksTreeDepth(node.handle)
         recyclerView?.scrollToPosition(0)
@@ -121,7 +130,7 @@ class LinksFragment : MegaNodeBaseFragment() {
     override fun onBackPressed(): Int {
         Timber.d("deepBrowserTree:%s", state().linksTreeDepth)
 
-        if (adapter == null)
+        if (megaNodeAdapter == null)
             return 0
 
         return when {
@@ -132,12 +141,11 @@ class LinksFragment : MegaNodeBaseFragment() {
                 val lastVisiblePosition = viewModel.popLastPositionStack()
 
                 lastVisiblePosition.takeIf { it > 0 }?.let {
-                    mLayoutManager?.scrollToPositionWithOffset(it, 0)
+                    recyclerView?.scrollToPosition(it)
                 }
 
                 recyclerView?.visibility = View.VISIBLE
-                emptyImageView?.visibility = View.GONE
-                emptyLinearLayout?.visibility = View.GONE
+                emptyListImageView?.visibility = View.GONE
 
                 3
             }
@@ -147,14 +155,13 @@ class LinksFragment : MegaNodeBaseFragment() {
 
                 state().linksParentHandle?.let { parentHandle ->
                     recyclerView?.visibility = View.VISIBLE
-                    emptyImageView?.visibility = View.GONE
-                    emptyLinearLayout?.visibility = View.GONE
+                    emptyListImageView?.visibility = View.GONE
                     viewModel.decreaseLinksTreeDepth(parentHandle)
 
                     val lastVisiblePosition = viewModel.popLastPositionStack()
 
                     lastVisiblePosition.takeIf { it > 0 }?.let {
-                        mLayoutManager?.scrollToPositionWithOffset(it, 0)
+                        recyclerView?.scrollToPosition(it)
                     }
                 }
 
@@ -210,14 +217,29 @@ class LinksFragment : MegaNodeBaseFragment() {
                 }
             }
         }
+
+        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
+            showSortByPanel()
+        })
+    }
+
+    /**
+     * Sets up the Fragment to only run in List View configuration
+     */
+    private fun setupListViewConfiguration() {
+        recyclerView?.run {
+            switchToLinear()
+            itemAnimator = Util.noChangeRecyclerViewItemAnimator()
+            if (itemDecorationCount == 0) addItemDecoration(itemDecoration)
+        }
     }
 
     /**
      * Initialize the adapter
      */
     private fun initAdapter() {
-        if (adapter == null) {
-            adapter = MegaNodeAdapter(
+        if (megaNodeAdapter == null) {
+            megaNodeAdapter = MegaNodeAdapter(
                 requireActivity(),
                 this,
                 state().nodes,
@@ -228,12 +250,12 @@ class LinksFragment : MegaNodeBaseFragment() {
                 sortByHeaderViewModel
             )
         } else {
-            adapter?.parentHandle = state().linksHandle
-            adapter?.setListFragment(recyclerView)
+            megaNodeAdapter?.parentHandle = state().linksHandle
+            megaNodeAdapter?.setListFragment(recyclerView)
         }
 
-        adapter?.isMultipleSelect = false
-        recyclerView?.adapter = adapter
+        megaNodeAdapter?.isMultipleSelect = false
+        recyclerView?.adapter = megaNodeAdapter
     }
 
     /**
@@ -243,7 +265,7 @@ class LinksFragment : MegaNodeBaseFragment() {
      */
     private fun updateNodes(nodes: List<MegaNode>) {
         val mutableListNodes = ArrayList(nodes)
-        adapter?.setNodes(mutableListNodes)
+        megaNodeAdapter?.setNodes(mutableListNodes)
     }
 
     /**
@@ -263,13 +285,13 @@ class LinksFragment : MegaNodeBaseFragment() {
     private fun setEmptyView(isInvalidHandle: Boolean) {
         var textToShow: String? = null
         if (isInvalidHandle) {
-            emptyImageView?.let {
+            emptyListImageView?.let {
                 setImageViewAlphaIfDark(
                     requireContext(),
                     it, ColorUtils.DARK_IMAGE_ALPHA
                 )
             }
-            emptyImageView?.setImageResource(R.drawable.ic_zero_data_public_links)
+            emptyListImageView?.setImageResource(R.drawable.ic_zero_data_public_links)
             textToShow = requireContext().getString(R.string.context_empty_links)
         }
         setFinalEmptyView(textToShow)

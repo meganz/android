@@ -11,9 +11,11 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetOutgoingSharesChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.presentation.shares.incoming.model.IncomingSharesState
 import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.ShareData
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -48,13 +50,6 @@ class OutgoingSharesViewModel @Inject constructor(
     /** public UI state */
     val state: StateFlow<OutgoingSharesState> = _state
 
-    /**
-     * Serves as the original View Type.
-     * When an update from MonitorViewType is received, this value is used to determine if the View Type changed & also updated
-     */
-    var isList = true
-        private set
-
     /** stack of scroll position for each depth */
     private val lastPositionStack: Stack<Int> = Stack<Int>()
 
@@ -85,10 +80,12 @@ class OutgoingSharesViewModel @Inject constructor(
     }
 
     /**
-     * Set isList when update from MonitorViewType is received
+     * Updates the value of [IncomingSharesState.currentViewType]
+     *
+     * @param newViewType The new [ViewType]
      */
-    fun setIsList(value: Boolean) {
-        isList = value
+    fun setCurrentViewType(newViewType: ViewType) {
+        _state.update { it.copy(currentViewType = newViewType) }
     }
 
     /**
@@ -226,7 +223,7 @@ class OutgoingSharesViewModel @Inject constructor(
      */
     private suspend fun isInvalidHandle(handle: Long = _state.value.outgoingHandle): Boolean {
         return handle
-            .takeUnless { it == -1L || it == MegaApiJava.INVALID_HANDLE }
+            .takeUnless { it == MegaApiJava.INVALID_HANDLE }
             ?.let { getNodeByHandle(it) == null }
             ?: true
     }

@@ -2,22 +2,23 @@ package mega.privacy.android.app.presentation.shares.incoming.model
 
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
 /**
  * Incoming shares UI state
  *
- * @param incomingHandle current incoming shares handle
- * @param incomingTreeDepth current incoming tree depth
- * @param incomingParentHandle parent handle of the current incoming node
- * @param nodes current list of nodes
- * @param isInvalidHandle true if parent handle is invalid
- * @param isLoading true if the nodes are loading
- * @param sortOrder current sort order
- * @param unverifiedIncomingShares List of unverified incoming [ShareData]
- * @param unVerifiedIncomingNodeHandles List of unverified incoming node handles
+ * @property currentViewType serves as the original View Type
+ * @property incomingHandle current incoming shares handle
+ * @property incomingTreeDepth current incoming tree depth
+ * @property incomingParentHandle parent handle of the current incoming node
+ * @property nodes current list of nodes
+ * @property isInvalidHandle true if parent handle is invalid
+ * @property isLoading true if the nodes are loading
+ * @property sortOrder current sort order
  */
 data class IncomingSharesState(
+    val currentViewType: ViewType = ViewType.LIST,
     val incomingHandle: Long = -1L,
     val incomingTreeDepth: Int = 0,
     val incomingParentHandle: Long? = null,

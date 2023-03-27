@@ -21,6 +21,7 @@ import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetOthersSortOrder
@@ -91,6 +92,7 @@ class IncomingSharesViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
+            assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
             assertThat(initial.incomingHandle).isEqualTo(-1L)
             assertThat(initial.incomingTreeDepth).isEqualTo(0)
             assertThat(initial.nodes).isEmpty()
@@ -518,5 +520,21 @@ class IncomingSharesViewModelTest {
             getIncomingSharesChildrenNode,
             times(2)
         ).invoke(underTest.state.value.incomingHandle)
+    }
+
+    @Test
+    fun `test that the list view type is set when updating the current view type`() =
+        testSetCurrentViewType(ViewType.LIST)
+
+    @Test
+    fun `test that the grid view type is set when updating the current view type`() =
+        testSetCurrentViewType(ViewType.GRID)
+
+    private fun testSetCurrentViewType(expectedValue: ViewType) = runTest {
+        underTest.setCurrentViewType(expectedValue)
+
+        underTest.state.test {
+            assertThat(awaitItem().currentViewType).isEqualTo(expectedValue)
+        }
     }
 }

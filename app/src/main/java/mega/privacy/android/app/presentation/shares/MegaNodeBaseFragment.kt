@@ -11,25 +11,21 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.view.ActionMode
 import androidx.core.content.FileProvider
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
-import mega.privacy.android.app.components.CustomizedGridLayoutManager
-import mega.privacy.android.app.components.PositionDividerItemDecoration
+import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.components.scrollBar.FastScroller
-import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.databinding.FragmentFileBrowserBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getIntentForParentNode
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -50,8 +46,8 @@ import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNodes
 import mega.privacy.android.app.utils.MegaNodeUtil.showConfirmationLeaveIncomingShares
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
@@ -79,7 +75,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
      * Number of items in the adapter
      */
     val itemCount: Int
-        get() = adapter?.itemCount ?: 0
+        get() = megaNodeAdapter?.itemCount ?: 0
 
     /**
      * viewModel responsible for sorting the list
@@ -89,7 +85,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     /**
      * Adapter holding the list of nodes
      */
-    protected var adapter: MegaNodeAdapter? = null
+    protected var megaNodeAdapter: MegaNodeAdapter? = null
 
     /**
      * Activity bound to the fragment
@@ -102,13 +98,22 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     protected var actionMode: ActionMode? = null
 
     /** UI Components*/
-    protected var fastScroller: FastScroller? = null
-    protected var recyclerView: RecyclerView? = null
-    protected var mLayoutManager: LinearLayoutManager? = null
-    protected var gridLayoutManager: CustomizedGridLayoutManager? = null
-    protected var emptyImageView: ImageView? = null
-    protected var emptyLinearLayout: LinearLayout? = null
-    protected var emptyTextViewFirst: TextView? = null
+    private var fastScroller: FastScroller? = null
+
+    /**
+     * The [NewGridRecyclerView] to display the list of items from [megaNodeAdapter]
+     */
+    protected var recyclerView: NewGridRecyclerView? = null
+
+    /**
+     * The [ImageView] that is displayed when there are no items in [megaNodeAdapter]
+     */
+    protected var emptyListImageView: ImageView? = null
+
+    /**
+     * The [TextView] that is displayed when there are no items in [megaNodeAdapter]
+     */
+    private var emptyListTextView: TextView? = null
 
     /**
      * Viewer identifier corresponding to the fragment
@@ -152,13 +157,18 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
      */
     protected abstract fun showSortByPanel()
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView?.let { observeDragSupportEvents(viewLifecycleOwner, it, viewerFrom) }
         checkScroll()
-        setupObservers()
     }
 
+    /**
+     * onAttach
+     */
     override fun onAttach(context: Context) {
         super.onAttach(context)
         if (context is ManagerActivity) {
@@ -166,32 +176,50 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
         }
     }
 
+    /**
+     * onDestroy
+     */
     override fun onDestroy() {
-        adapter?.clearTakenDownDialog()
+        megaNodeAdapter?.clearTakenDownDialog()
         super.onDestroy()
     }
 
-    override fun getAdapter(): RotatableAdapter? = adapter
+    /**
+     * getAdapter
+     */
+    override fun getAdapter(): RotatableAdapter? = megaNodeAdapter
 
+    /**
+     * activateActionMode
+     */
     override fun activateActionMode() {
-        if (adapter?.isMultipleSelect == false)
-            adapter?.isMultipleSelect = true
+        if (megaNodeAdapter?.isMultipleSelect == false)
+            megaNodeAdapter?.isMultipleSelect = true
     }
 
+    /**
+     * multipleItemClick
+     */
     override fun multipleItemClick(position: Int) {
-        adapter?.toggleSelection(position)
+        megaNodeAdapter?.toggleSelection(position)
     }
 
+    /**
+     * reselectUnHandledSingleItem
+     */
     override fun reselectUnHandledSingleItem(position: Int) {
-        adapter?.filClicked(position)
+        megaNodeAdapter?.reselectUnHandledSingleItem(position)
     }
 
+    /**
+     * updateActionModeTitle
+     */
     override fun updateActionModeTitle() {
-        if (actionMode == null || activity == null || adapter == null)
+        if (actionMode == null || activity == null || megaNodeAdapter == null)
             return
 
-        val files = adapter?.selectedNodes?.filter { it.isFile }?.size ?: 0
-        val folders = adapter?.selectedNodes?.filter { it.isFolder }?.size ?: 0
+        val files = megaNodeAdapter?.selectedNodes?.filter { it.isFile }?.size ?: 0
+        val folders = megaNodeAdapter?.selectedNodes?.filter { it.isFolder }?.size ?: 0
 
         actionMode?.title = when {
             (files == 0 && folders == 0) -> 0.toString()
@@ -209,19 +237,65 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     }
 
     /**
+     * Establishes the UI
+     */
+    protected fun setupUI(inflater: LayoutInflater, container: ViewGroup?): View {
+        val binding = FragmentFileBrowserBinding.inflate(inflater, container, false)
+
+        recyclerView = binding.fileBrowserRecyclerView
+        fastScroller = binding.fileBrowserFastScroller
+        emptyListImageView = binding.fileBrowserEmptyListImage
+        emptyListTextView = binding.fileBrowserEmptyListText
+
+        setupFastScroller()
+        setupRecyclerView()
+
+        return binding.root
+    }
+
+    /**
+     * Establishes the [FastScroller] for the [NewGridRecyclerView]
+     */
+    private fun setupFastScroller() = fastScroller?.setRecyclerView(recyclerView)
+
+    /**
+     * Establishes the [NewGridRecyclerView]
+     */
+    private fun setupRecyclerView() {
+        recyclerView?.apply {
+            setPadding(
+                0,
+                0,
+                0,
+                Util.dp2px(85.toFloat(), displayMetrics())
+            )
+            clipToPadding = false
+            setHasFixedSize(true)
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    if (managerActivity?.tabItemShares == currentSharesTab) {
+                        checkScroll()
+                    }
+                }
+            })
+        }
+    }
+
+    /**
      * Method to update an item when a nickname is added, updated or removed from a contact.
      *
      * @param contactHandle Contact ID.
      */
     fun updateContact(contactHandle: Long) {
-        adapter?.updateItem(contactHandle)
+        megaNodeAdapter?.updateItem(contactHandle)
     }
 
     /**
      * Select all items
      */
     fun selectAll() {
-        adapter?.let {
+        megaNodeAdapter?.let {
             activateActionMode()
             it.selectAll()
             updateActionModeTitle()
@@ -240,8 +314,8 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
      * Deactivate action mode
      */
     fun hideMultipleSelect() {
-        if (adapter?.isMultipleSelect == true) {
-            adapter?.isMultipleSelect = false
+        if (megaNodeAdapter?.isMultipleSelect == true) {
+            megaNodeAdapter?.isMultipleSelect = false
             actionMode?.finish()
         }
     }
@@ -250,15 +324,8 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
      * Clear the selected nodes
      */
     fun clearSelections() {
-        if (adapter?.isMultipleSelect == true)
-            adapter?.clearSelections()
-    }
-
-    /**
-     * Refresh the list
-     */
-    fun notifyDataSetChanged() {
-        adapter?.notifyDataSetChanged()
+        if (megaNodeAdapter?.isMultipleSelect == true)
+            megaNodeAdapter?.clearSelections()
     }
 
     /**
@@ -266,19 +333,12 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
      */
     fun visibilityFastScroller() {
         fastScroller?.visibility =
-            if (adapter == null || (adapter ?: return).itemCount < Constants.MIN_ITEMS_SCROLLBAR)
+            if (megaNodeAdapter == null || (megaNodeAdapter
+                    ?: return).itemCount < Constants.MIN_ITEMS_SCROLLBAR
+            )
                 View.GONE
             else
                 View.VISIBLE
-    }
-
-    /**
-     * Setup ViewModel observers
-     */
-    private fun setupObservers() {
-        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
-            showSortByPanel()
-        })
     }
 
     /**
@@ -287,22 +347,20 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     fun checkScroll() {
         val withElevation =
             (recyclerView?.canScrollVertically(-1) == true && recyclerView?.visibility == View.VISIBLE)
-                    || adapter?.isMultipleSelect == true
+                    || megaNodeAdapter?.isMultipleSelect == true
         managerActivity?.changeAppBarElevation(withElevation)
     }
 
     /**
      * Display the empty view or not
      */
-    protected fun checkEmptyView() {
-        if (adapter?.itemCount == 0) {
+    private fun checkEmptyView() {
+        if (megaNodeAdapter?.itemCount == 0) {
             recyclerView?.visibility = View.GONE
-            emptyImageView?.visibility = View.VISIBLE
-            emptyLinearLayout?.visibility = View.VISIBLE
+            emptyListImageView?.visibility = View.VISIBLE
         } else {
             recyclerView?.visibility = View.VISIBLE
-            emptyImageView?.visibility = View.GONE
-            emptyLinearLayout?.visibility = View.GONE
+            emptyListImageView?.visibility = View.GONE
         }
     }
 
@@ -344,7 +402,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
 
                 intent.apply {
                     putExtra("position", position)
-                    putExtra("placeholder", adapter?.placeholderCount ?: 0)
+                    putExtra("placeholder", megaNodeAdapter?.placeholderCount ?: 0)
                     putExtra("parentNodeHandle", parentHandle)
                     putExtra("orderGetChildren", sortOrder)
                     putExtra("adapterType", fragmentAdapter)
@@ -503,14 +561,14 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     recyclerView ?: return,
                     position,
                     viewerFrom,
-                    adapter ?: return
+                    megaNodeAdapter ?: return
                 )
                 startActivity(intent)
                 managerActivity?.overridePendingTransition(0, 0)
             } else {
                 Toast.makeText(
                     requireContext(),
-                    StringResourcesUtils.getString(R.string.intent_not_available),
+                    getString(R.string.intent_not_available),
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -518,84 +576,17 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
     }
 
     /**
-     * Inflate a vertical list
-     */
-    protected fun getListView(inflater: LayoutInflater, container: ViewGroup?): View {
-        val v = inflater.inflate(R.layout.fragment_filebrowserlist, container, false)
-        recyclerView = v.findViewById(R.id.file_list_view_browser)
-        mLayoutManager = LinearLayoutManager(requireContext())
-        recyclerView?.layoutManager = mLayoutManager
-        recyclerView?.addItemDecoration(
-            PositionDividerItemDecoration(
-                requireContext(),
-                resources.displayMetrics
-            )
-        )
-        fastScroller = v.findViewById(R.id.fastscroll)
-        setRecyclerView()
-        recyclerView?.itemAnimator = Util.noChangeRecyclerViewItemAnimator()
-        emptyImageView = v.findViewById(R.id.file_list_empty_image)
-        emptyLinearLayout = v.findViewById(R.id.file_list_empty_text)
-        emptyTextViewFirst = v.findViewById(R.id.file_list_empty_text_first)
-        adapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
-
-        return v
-    }
-
-    /**
-     * Inflate a grid list
-     */
-    protected fun getGridView(inflater: LayoutInflater, container: ViewGroup?): View {
-        val v = inflater.inflate(R.layout.fragment_filebrowsergrid, container, false)
-        recyclerView = v.findViewById(R.id.file_grid_view_browser)
-        gridLayoutManager = recyclerView?.layoutManager as CustomizedGridLayoutManager?
-        fastScroller = v.findViewById(R.id.fastscroll)
-        setRecyclerView()
-        recyclerView?.itemAnimator = DefaultItemAnimator()
-        emptyImageView = v.findViewById(R.id.file_grid_empty_image)
-        emptyLinearLayout = v.findViewById(R.id.file_grid_empty_text)
-        emptyTextViewFirst = v.findViewById(R.id.file_grid_empty_text_first)
-        adapter?.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
-
-        return v
-    }
-
-    /**
-     * Setup the recyclerview
-     */
-    private fun setRecyclerView() {
-        recyclerView?.setPadding(
-            0,
-            0,
-            0,
-            Util.dp2px(85.toFloat(), resources.displayMetrics)
-        )
-        recyclerView?.setHasFixedSize(true)
-        recyclerView?.clipToPadding = false
-        recyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (managerActivity?.tabItemShares == currentSharesTab) {
-                    checkScroll()
-                }
-            }
-        })
-        fastScroller?.setRecyclerView(recyclerView)
-    }
-
-    /**
      * Setup the empty view
      */
     protected fun setFinalEmptyView(initialText: String?) {
-
         var text = initialText
             ?: run {
-                emptyImageView?.setImageResource(
+                emptyListImageView?.setImageResource(
                     if (Util.isScreenInPortrait(requireContext()))
                         R.drawable.empty_folder_portrait
                     else R.drawable.empty_folder_landscape
                 )
-                StringResourcesUtils.getString(R.string.file_browser_empty_folder_new)
+                getString(R.string.file_browser_empty_folder_new)
             }
 
         try {
@@ -614,7 +605,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
         } catch (e: Exception) {
             Timber.w(e, "Exception formatting text")
         }
-        emptyTextViewFirst?.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        emptyListTextView?.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
         checkEmptyView()
     }
 
@@ -628,6 +619,9 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
          */
         protected var selected: List<MegaNode> = ArrayList()
 
+        /**
+         * onCreateActionMode
+         */
         override fun onCreateActionMode(actionMode: ActionMode, menu: Menu): Boolean {
             val inflater = actionMode.menuInflater
             inflater.inflate(R.menu.cloud_storage_action, menu)
@@ -640,13 +634,19 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
             return true
         }
 
+        /**
+         * onPrepareActionMode
+         */
         override fun onPrepareActionMode(actionMode: ActionMode, menu: Menu): Boolean {
-            selected = adapter?.selectedNodes ?: return false
+            selected = megaNodeAdapter?.selectedNodes ?: return false
             menu.findItem(R.id.cab_menu_share_link).title =
-                StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size)
+                resources.getQuantityString(R.plurals.get_links, selected.size)
             return false
         }
 
+        /**
+         * onActionItemClicked
+         */
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             Timber.d("onActionItemClicked")
 
@@ -655,7 +655,13 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
             val nC = NodeController(requireActivity())
             when (item.itemId) {
                 R.id.cab_menu_download -> {
-                    managerActivity?.saveNodesToDevice(selected, false, false, false, false)
+                    managerActivity?.saveNodesToDevice(
+                        nodes = selected,
+                        highPriority = false,
+                        isFolderLink = false,
+                        fromMediaViewer = false,
+                        fromChat = false,
+                    )
                     hideActionMode()
                 }
                 R.id.cab_menu_rename -> {
@@ -692,7 +698,7 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
                     (requireActivity() as SnackbarShower), handleList
                 )
                 R.id.cab_menu_send_to_chat -> {
-                    adapter?.arrayListSelectedNodes?.let {
+                    megaNodeAdapter?.arrayListSelectedNodes?.let {
                         managerActivity?.attachNodesToChats(it)
                     }
                     hideActionMode()
@@ -707,9 +713,12 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
             return true
         }
 
+        /**
+         * onDestroyActionMode
+         */
         override fun onDestroyActionMode(actionMode: ActionMode) {
             clearSelections()
-            adapter?.isMultipleSelect = false
+            megaNodeAdapter?.isMultipleSelect = false
             if (requireActivity() is ManagerActivity) {
                 managerActivity?.showFabButton()
                 managerActivity?.hideTabs(false, currentTab)
@@ -724,8 +733,9 @@ abstract class MegaNodeBaseFragment : RotatableFragment() {
          * @return true if all nodes selected
          */
         protected fun notAllNodesSelected(): Boolean {
-            return selected.size < (adapter?.itemCount?.minus((adapter?.placeholderCount) ?: 0)
-                ?: 0)
+            return selected.size < (megaNodeAdapter?.itemCount?.minus(
+                (megaNodeAdapter?.placeholderCount) ?: 0
+            ) ?: 0)
         }
     }
 }
