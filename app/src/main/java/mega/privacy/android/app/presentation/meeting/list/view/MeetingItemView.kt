@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion.LongPress
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +41,7 @@ import mega.privacy.android.core.ui.theme.extensions.red600_300
 import mega.privacy.android.core.ui.theme.extensions.teal_300_200
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import kotlin.random.Random
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -47,11 +50,12 @@ internal fun MeetingItemView(
     modifier: Modifier = Modifier,
     meeting: MeetingRoomItem,
     isSelected: Boolean,
-    selectionEnabled: Boolean,
+    isSelectionEnabled: Boolean,
     onItemClick: (Long) -> Unit,
     onItemMoreClick: (Long) -> Unit,
     onItemSelected: (Long) -> Unit,
 ) {
+    val hapticFeedback = LocalHapticFeedback.current
     ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
@@ -59,21 +63,24 @@ internal fun MeetingItemView(
             .background(MaterialTheme.colors.surface)
             .combinedClickable(
                 onClick = {
-                    if (selectionEnabled) {
+                    if (isSelectionEnabled) {
+                        hapticFeedback.performHapticFeedback(LongPress)
                         onItemSelected(meeting.chatId)
                     } else {
                         onItemClick(meeting.chatId)
                     }
                 },
-                onLongClick = { onItemSelected(meeting.chatId) },
+                onLongClick = {
+                    hapticFeedback.performHapticFeedback(LongPress)
+                    onItemSelected(meeting.chatId)
+                },
             )
             .indication(
                 interactionSource = MutableInteractionSource(),
                 indication = rememberRipple(bounded = true),
             )
-    )
-    {
-        val (imgAvatar, txtTitle, imgPrivate, imgMute, imgRecurring, imgLastMessage, txtMiddle, txtBottom, btnMore, txtUnreadCount) = createRefs()
+    ) {
+        val (imgAvatar, txtTitle, imgPrivate, imgMute, imgRecurring, imgCall, imgLastMessage, txtMiddle, txtBottom, btnMore, txtUnreadCount) = createRefs()
 
         if (isSelected) {
             Image(
@@ -156,6 +163,24 @@ internal fun MeetingItemView(
                         Visibility.Visible
                     else
                         Visibility.Gone
+                },
+        )
+
+        Icon(
+            imageVector = ImageVector.vectorResource(id = R.drawable.ic_ongoing_call),
+            contentDescription = "Ongoing call icon",
+            tint = MaterialTheme.colors.secondary,
+            modifier = Modifier
+                .size(14.dp)
+                .constrainAs(imgCall) {
+                    start.linkTo(imgRecurring.end, 2.dp, 4.dp)
+                    top.linkTo(txtTitle.top)
+                    bottom.linkTo(txtTitle.bottom)
+                    visibility =
+                        if (meeting.scheduledMeetingStatus == ScheduledMeetingStatus.NotJoined)
+                            Visibility.Visible
+                        else
+                            Visibility.Gone
                 },
         )
 
@@ -360,24 +385,24 @@ private fun AvatarView(
         if (meeting.isSingleMeeting()) {
             MeetingAvatarView(
                 avatarUri = meeting.firstUserAvatar,
-                avatarPlaceholder = meeting.firstUserChar?.toString()?.takeIf(String::isNotBlank)
-                    ?: meeting.title.first().toString(),
+                avatarPlaceholder = meeting.firstUserChar?.takeIf(String::isNotBlank)
+                    ?: meeting.title,
                 avatarColor = meeting.firstUserColor,
             )
         } else {
             MeetingAvatarView(
-                avatarUri = meeting.lastUserAvatar,
-                avatarPlaceholder = meeting.lastUserChar?.toString()?.takeIf(String::isNotBlank)
-                    ?: meeting.title.first().toString(),
-                avatarColor = meeting.lastUserColor,
+                avatarUri = meeting.secondUserAvatar,
+                avatarPlaceholder = meeting.secondUserChar?.takeIf(String::isNotBlank)
+                    ?: meeting.title,
+                avatarColor = meeting.secondUserColor,
                 modifier = Modifier
                     .size(26.dp)
                     .align(Alignment.BottomEnd)
             )
             MeetingAvatarView(
                 avatarUri = meeting.firstUserAvatar,
-                avatarPlaceholder = meeting.firstUserChar?.toString()?.takeIf(String::isNotBlank)
-                    ?: meeting.title.first().toString(),
+                avatarPlaceholder = meeting.firstUserChar?.takeIf(String::isNotBlank)
+                    ?: meeting.title,
                 avatarColor = meeting.firstUserColor,
                 modifier = Modifier
                     .size(26.dp)
@@ -394,18 +419,19 @@ private fun PreviewMeetingItemView() {
         chatId = Random.nextLong(),
         title = "Photos Sprint #${Random.nextInt()}",
         lastMessage = "Anna: Seeya all soon!",
-        firstUserChar = 'A',
-        lastUserChar = 'J',
+        firstUserChar = "A",
+        secondUserChar = "J",
         lastTimestampFormatted = "1 May 2022 17:53",
         unreadCount = Random.nextInt(150),
         isMuted = Random.nextBoolean(),
         isRecurringMonthly = Random.nextBoolean(),
         isPublic = Random.nextBoolean(),
+        scheduledMeetingStatus = if (Random.nextBoolean()) ScheduledMeetingStatus.NotJoined else null
     )
     MeetingItemView(
         meeting = meeting,
         isSelected = Random.nextBoolean(),
-        selectionEnabled = Random.nextBoolean(),
+        isSelectionEnabled = Random.nextBoolean(),
         onItemClick = {},
         onItemMoreClick = {},
     ) {}

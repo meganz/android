@@ -1,4 +1,4 @@
-package mega.privacy.android.app.meeting.list
+package mega.privacy.android.app.presentation.meeting.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -321,5 +321,48 @@ class MeetingListViewModel @Inject constructor(
                 Timber.e(exception)
             }
         }
+    }
+
+    /**
+     * Scroll to top
+     */
+    fun scrollToTop() {
+        state.update { it.copy(scrollToTop = !it.scrollToTop) }
+    }
+
+    /**
+     * On item selected
+     *
+     * @param chatId    Chat selected
+     */
+    fun onItemSelected(chatId: Long) {
+        state.update { oldState ->
+            val selectedMeetings = oldState.selectedMeetings.toMutableList()
+            if (selectedMeetings.contains(chatId)) {
+                oldState.copy(
+                    selectedMeetings = selectedMeetings.apply { remove(chatId) }
+                )
+            } else {
+                oldState.copy(
+                    selectedMeetings = selectedMeetings.apply { add(chatId) }
+                )
+            }
+        }
+    }
+
+    /**
+     * On items selected
+     *
+     * @param chatIds   Chats selected
+     */
+    fun onItemsSelected(chatIds: List<Long>) {
+        state.update { it.copy(selectedMeetings = chatIds) }
+    }
+
+    /**
+     * Clear meetings selection
+     */
+    fun clearSelection() {
+        state.update { it.copy(selectedMeetings = emptyList()) }
     }
 }

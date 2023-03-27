@@ -3,7 +3,7 @@ package mega.privacy.android.app.meeting.chats.adapter
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import mega.privacy.android.app.main.megachat.RecentChatsFragment
-import mega.privacy.android.app.meeting.list.MeetingListFragment
+import mega.privacy.android.app.presentation.meeting.list.MeetingListFragment
 
 /**
  * ViewPager's Adapter to handle chat child fragments.

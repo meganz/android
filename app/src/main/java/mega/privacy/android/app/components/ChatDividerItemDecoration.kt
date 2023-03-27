@@ -6,7 +6,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.R
-import mega.privacy.android.app.meeting.list.adapter.MeetingsAdapter
 
 class ChatDividerItemDecoration(context: Context) : RecyclerView.ItemDecoration() {
 
@@ -33,16 +32,6 @@ class ChatDividerItemDecoration(context: Context) : RecyclerView.ItemDecoration(
             when (adapter.getItemViewType(position)) {
                 VIEWTYPE_DEFAULT -> {
                     canvas.drawDivider(child, marginStart)
-                }
-                MeetingsAdapter.TYPE_DATA -> {
-                    val nextItem = position + 1
-                    if (nextItem < adapter.itemCount
-                        && adapter.getItemViewType(nextItem) == MeetingsAdapter.TYPE_HEADER
-                    ) {
-                        canvas.drawDivider(child, shortMarginStart)
-                    } else {
-                        canvas.drawDivider(child, marginStart)
-                    }
                 }
                 else -> {
                     // no divider required

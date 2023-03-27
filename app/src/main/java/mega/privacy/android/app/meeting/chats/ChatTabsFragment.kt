@@ -16,10 +16,12 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.megachat.RecentChatsFragment
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter
 import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.CHAT
-import mega.privacy.android.app.meeting.list.MeetingListFragment
 import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
+import mega.privacy.android.app.presentation.meeting.list.MeetingListFragment
+import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
 import mega.privacy.android.app.utils.StringResourcesUtils
+import javax.inject.Inject
 
 /**
  * Chat tabs fragment containing Chat and Meeting fragment
@@ -36,6 +38,9 @@ class ChatTabsFragment : Fragment() {
     }
 
     private lateinit var binding: FragmentChatTabsBinding
+
+    @Inject
+    lateinit var passCodeFacade: PasscodeCheck
 
     private var skipClearSelection = false
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
@@ -115,7 +120,7 @@ class ChatTabsFragment : Fragment() {
                 childFragmentManager.fragments.forEach { fragment ->
                     when (fragment) {
                         is RecentChatsFragment -> fragment.clearSelections()
-                        is MeetingListFragment -> fragment.clearSelections(true)
+                        is MeetingListFragment -> fragment.clearSelections()
                     }
                 }
             } else {

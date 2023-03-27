@@ -51,8 +51,7 @@ fun MeetingAvatarView(
     val color = avatarColor?.let(::Color) ?: MaterialTheme.colors.grey_012_white_012
     if (avatarUri.isNullOrBlank()) {
         AvatarPlaceholderView(
-            char = avatarPlaceholder?.takeIf(String::isNotBlank)?.uppercase()
-                ?.let(::getAvatarFirstLetter) ?: "U",
+            char = avatarPlaceholder?.let(::getAvatarFirstLetter) ?: "U",
             backgroundColor = color,
             modifier = modifier
                 .fillMaxSize()

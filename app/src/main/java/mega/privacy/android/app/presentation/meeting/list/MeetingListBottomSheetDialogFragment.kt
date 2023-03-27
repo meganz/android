@@ -1,4 +1,4 @@
-package mega.privacy.android.app.meeting.list
+package mega.privacy.android.app.presentation.meeting.list
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -27,6 +27,7 @@ import mega.privacy.android.app.main.megachat.GroupChatInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.meeting.RecurringMeetingInfoActivity
 import mega.privacy.android.app.presentation.meeting.ScheduledMeetingInfoActivity
+import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkMandatoryCallPermissions
@@ -141,12 +142,12 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             }
         )
 
-        if (room.firstUserChar == null && room.lastUserChar == null) {
+        if (room.firstUserChar == null && room.secondUserChar == null) {
             binding.header.groupThumbnails.isVisible = false
             binding.header.imgThumbnail.isVisible = false
         } else {
             val firstUserPlaceholder =
-                getImagePlaceholder(room.firstUserChar.toString(), room.firstUserColor)
+                getImagePlaceholder(room.firstUserChar, room.firstUserColor)
             if (room.isSingleMeeting()) {
                 binding.header.imgThumbnail.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
@@ -157,7 +158,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 binding.header.imgThumbnail.isVisible = true
             } else {
                 val lastUserPlaceholder =
-                    getImagePlaceholder(room.lastUserChar.toString(), room.lastUserColor)
+                    getImagePlaceholder(room.secondUserChar, room.secondUserColor)
                 binding.header.imgThumbnailGroupFirst.hierarchy.setPlaceholderImage(
                     firstUserPlaceholder,
                     ScalingUtils.ScaleType.FIT_CENTER
@@ -167,7 +168,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     ScalingUtils.ScaleType.FIT_CENTER
                 )
                 binding.header.imgThumbnailGroupFirst.setImageRequestFromFilePath(room.firstUserAvatar)
-                binding.header.imgThumbnailGroupLast.setImageRequestFromFilePath(room.lastUserAvatar)
+                binding.header.imgThumbnailGroupLast.setImageRequestFromFilePath(room.secondUserAvatar)
                 binding.header.groupThumbnails.isVisible = true
                 binding.header.imgThumbnail.isVisible = false
             }
@@ -297,7 +298,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             .show()
     }
 
-    private fun getImagePlaceholder(letter: String?, avatarColor: Int?): Drawable =
+    private fun getImagePlaceholder(placeholder: String?, avatarColor: Int?): Drawable =
         TextDrawable.builder()
             .beginConfig()
             .width(resources.getDimensionPixelSize(R.dimen.image_group_size))
@@ -309,7 +310,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             .toUpperCase()
             .endConfig()
             .buildRound(
-                if (letter.isNullOrEmpty()) "U" else letter,
+                if (placeholder.isNullOrBlank()) "U" else AvatarUtil.getFirstLetter(placeholder),
                 avatarColor ?: defaultAvatarColor
             )
 

@@ -221,7 +221,9 @@ public class TimeUtils implements Comparator<Calendar> {
 
         if (humanized) {
             LocalDate todayDate = LocalDate.now(ZoneId.systemDefault());
-            LocalDate timestampDate = timestampDateTime.toLocalDate();
+            LocalDate timestampDate = timestampDateTime
+                    .withZoneSameInstant(ZoneId.systemDefault())
+                    .toLocalDate();
 
             // Check if date is today, yesterday, tomorrow or less of a week
             if (timestampDate.equals(todayDate)) {

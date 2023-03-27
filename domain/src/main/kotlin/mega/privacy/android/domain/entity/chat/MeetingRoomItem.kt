@@ -21,9 +21,9 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
  * @property firstUserChar
  * @property firstUserAvatar
  * @property firstUserColor
- * @property lastUserChar
- * @property lastUserAvatar
- * @property lastUserColor
+ * @property secondUserChar
+ * @property secondUserAvatar
+ * @property secondUserColor
  * @property schedId
  * @property isRecurringDaily
  * @property isRecurringWeekly
@@ -48,12 +48,12 @@ data class MeetingRoomItem constructor(
     val lastTimestamp: Long = 0L,
     val lastTimestampFormatted: String? = null,
     val highlight: Boolean = false,
-    val firstUserChar: Char? = null,
+    val firstUserChar: String? = null,
     val firstUserAvatar: String? = null,
     val firstUserColor: Int? = null,
-    val lastUserChar: Char? = null,
-    val lastUserAvatar: String? = null,
-    val lastUserColor: Int? = null,
+    val secondUserChar: String? = null,
+    val secondUserAvatar: String? = null,
+    val secondUserColor: Int? = null,
     val schedId: Long? = null,
     val isRecurringDaily: Boolean = false,
     val isRecurringWeekly: Boolean = false,
@@ -66,7 +66,7 @@ data class MeetingRoomItem constructor(
 ) {
 
     fun isSingleMeeting(): Boolean =
-        lastUserChar == null
+        secondUserChar == null
 
     fun isScheduledMeeting(): Boolean =
         schedId != null

@@ -41,9 +41,9 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
                                 firstUserChar = updatedItem.firstUserChar,
                                 firstUserAvatar = updatedItem.firstUserAvatar,
                                 firstUserColor = updatedItem.firstUserColor,
-                                lastUserChar = updatedItem.lastUserChar,
-                                lastUserAvatar = updatedItem.lastUserAvatar,
-                                lastUserColor = updatedItem.lastUserColor,
+                                secondUserChar = updatedItem.secondUserChar,
+                                secondUserAvatar = updatedItem.secondUserAvatar,
+                                secondUserColor = updatedItem.secondUserColor,
                             )
                             items[newIndex] = newUpdatedItem
                             emit(items)
@@ -58,31 +58,31 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
         val myAccount = accountRepository.getUserAccount()
         val myHandle = myAccount.userId?.id ?: -1
 
-        var firstUserChar: Char? = null
+        var firstUserChar: String? = null
         var firstUserAvatar: String? = null
         var firstUserColor: Int? = null
-        var lastUserChar: Char? = null
-        var lastUserAvatar: String? = null
-        var lastUserColor: Int? = null
+        var secondUserChar: String? = null
+        var secondUserAvatar: String? = null
+        var secondUserColor: Int? = null
         when {
             !item.isActive || participants.isEmpty() -> {
-                firstUserChar = item.title.firstOrNull()
+                firstUserChar = item.title
                 firstUserColor = null
             }
             participants.size == 1 -> {
-                firstUserChar = myAccount.fullName?.firstOrNull()
+                firstUserChar = myAccount.fullName
                 firstUserAvatar = avatarRepository.getMyAvatarFile()?.absolutePath
                 firstUserColor = avatarRepository.getAvatarColor(myHandle)
-                participants.lastOrNull()?.let { userHandle ->
-                    lastUserChar = getUserFirstCharacter(userHandle)
-                    lastUserAvatar = getAvatarPath(userHandle)
-                    lastUserColor = avatarRepository.getAvatarColor(userHandle)
+                participants.getOrNull(0)?.let { userHandle ->
+                    secondUserChar = getUserFirstCharacter(userHandle)
+                    secondUserAvatar = getAvatarPath(userHandle)
+                    secondUserColor = avatarRepository.getAvatarColor(userHandle)
                 }
             }
             else -> {
                 participants.firstOrNull()?.let { userHandle ->
                     if (userHandle == myHandle) {
-                        firstUserChar = myAccount.fullName?.firstOrNull()
+                        firstUserChar = myAccount.fullName
                         firstUserAvatar = avatarRepository.getMyAvatarFile()?.absolutePath
                         firstUserColor = avatarRepository.getAvatarColor(myHandle)
                     } else {
@@ -91,15 +91,15 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
                         firstUserColor = avatarRepository.getAvatarColor(userHandle)
                     }
                 }
-                participants.lastOrNull()?.let { userHandle ->
+                participants.getOrNull(1)?.let { userHandle ->
                     if (userHandle == myHandle) {
-                        lastUserChar = myAccount.fullName?.firstOrNull()
-                        lastUserAvatar = avatarRepository.getMyAvatarFile()?.absolutePath
-                        lastUserColor = avatarRepository.getAvatarColor(myHandle)
+                        secondUserChar = myAccount.fullName
+                        secondUserAvatar = avatarRepository.getMyAvatarFile()?.absolutePath
+                        secondUserColor = avatarRepository.getAvatarColor(myHandle)
                     } else {
-                        lastUserChar = getUserFirstCharacter(userHandle)
-                        lastUserAvatar = getAvatarPath(userHandle)
-                        lastUserColor = avatarRepository.getAvatarColor(userHandle)
+                        secondUserChar = getUserFirstCharacter(userHandle)
+                        secondUserAvatar = getAvatarPath(userHandle)
+                        secondUserColor = avatarRepository.getAvatarColor(userHandle)
                     }
                 }
             }
@@ -109,15 +109,15 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
             firstUserChar = firstUserChar,
             firstUserAvatar = firstUserAvatar,
             firstUserColor = firstUserColor,
-            lastUserChar = lastUserChar,
-            lastUserAvatar = lastUserAvatar,
-            lastUserColor = lastUserColor,
+            secondUserChar = secondUserChar,
+            secondUserAvatar = secondUserAvatar,
+            secondUserColor = secondUserColor,
         )
     }
 
-    private suspend fun getUserFirstCharacter(userHandle: Long): Char? =
+    private suspend fun getUserFirstCharacter(userHandle: Long): String? =
         runCatching { getUserFirstName(userHandle, skipCache = false, shouldNotify = false) }
-            .getOrNull()?.firstOrNull()
+            .getOrNull()
 
     private suspend fun getAvatarPath(userHandle: Long): String? =
         runCatching { avatarRepository.getAvatarFile(userHandle) }

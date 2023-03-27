@@ -23,7 +23,7 @@ fun ContactItem.getAvatarFirstLetter(): String =
 fun getAvatarFirstLetter(text: String): String {
     val unknown = "U"
 
-    if (text.isEmpty()) {
+    if (text.isBlank()) {
         return unknown
     }
 

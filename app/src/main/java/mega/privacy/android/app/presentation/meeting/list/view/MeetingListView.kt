@@ -72,7 +72,7 @@ private fun ListView(
 ) {
     val listState = rememberLazyListState()
     val showHeaders = state.meetings.any(MeetingRoomItem::isPending)
-    val selectionEnabled = state.selectedMeetings.isNotEmpty()
+    val isSelectionEnabled = state.selectedMeetings.isNotEmpty()
 
     LazyColumn(
         state = listState,
@@ -83,7 +83,7 @@ private fun ListView(
             key = { _, item -> item.chatId }
         ) { index: Int, item: MeetingRoomItem ->
             val previousItem = state.meetings.getOrNull(index - 1)
-            val isSelected = selectionEnabled && state.selectedMeetings.contains(item.chatId)
+            val isSelected = isSelectionEnabled && state.selectedMeetings.contains(item.chatId)
 
             if (showHeaders) {
                 MeetingHeader(
@@ -95,7 +95,7 @@ private fun ListView(
             MeetingItemView(
                 meeting = item,
                 isSelected = isSelected,
-                selectionEnabled = selectionEnabled,
+                isSelectionEnabled = isSelectionEnabled,
                 onItemClick = onItemClick,
                 onItemMoreClick = onItemMoreClick,
                 onItemSelected = onItemSelected,
