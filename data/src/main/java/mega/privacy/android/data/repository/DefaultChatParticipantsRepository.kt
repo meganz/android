@@ -7,7 +7,7 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
-import mega.privacy.android.data.mapper.userPermission
+import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -44,6 +44,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
     private val avatarRepository: AvatarRepository,
     private val contactsRepository: ContactsRepository,
     private val requestLastGreen: RequestLastGreen,
+    private val chatPermissionsMapper: ChatPermissionsMapper,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChatParticipantsRepository {
 
@@ -55,16 +56,14 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
             val myEmail = megaChatApiGateway.getMyEmail()
             val myName = megaChatApiGateway.getMyFullname()
             val myParticipant = ChatParticipant(
-                handle = megaChatApiGateway.getMyUserHandle(),
-                data = ContactData(
-                    fullName = myName?.ifEmpty { myEmail },
-                    alias = null,
-                    avatarUri = null),
+                handle = megaChatApiGateway.getMyUserHandle(), data = ContactData(
+                    fullName = myName?.ifEmpty { myEmail }, alias = null, avatarUri = null
+                ),
                 email = myEmail,
                 isMe = true,
                 defaultAvatarColor = avatarRepository.getMyAvatarColor(),
-                privilege = userPermission[chatRoom.ownPrivilege]
-                    ?: ChatRoomPermission.Unknown)
+                privilege = chatPermissionsMapper(chatRoom.ownPrivilege)
+            )
 
             list.add(myParticipant)
 
@@ -77,12 +76,13 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                         data = ContactData(
                             fullName = contactsRepository.getUserFullName(handle),
                             alias = alias,
-                            avatarUri = null),
+                            avatarUri = null
+                        ),
                         email = contactsRepository.getUserEmail(handle),
                         isMe = false,
-                        privilege = userPermission[participantPrivilege]
-                            ?: ChatRoomPermission.Unknown,
-                        defaultAvatarColor = avatarRepository.getAvatarColor(handle))
+                        privilege = chatPermissionsMapper(participantPrivilege),
+                        defaultAvatarColor = avatarRepository.getAvatarColor(handle)
+                    )
 
                     list.add(participant)
                 }
@@ -159,7 +159,8 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
 
     override suspend fun getAvatarColor(participant: ChatParticipant): Int =
         if (participant.isMe) avatarRepository.getMyAvatarColor() else avatarRepository.getAvatarColor(
-            participant.handle)
+            participant.handle
+        )
 
     override suspend fun getAvatarUri(participant: ChatParticipant, skipCache: Boolean): File? =
         runCatching {
@@ -187,9 +188,9 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
         megaChatApiGateway.getChatRoom(chatId)?.let { chatRoom ->
             val participantPrivilege =
                 if (participant.isMe) chatRoom.ownPrivilege else chatRoom.getPeerPrivilegeByHandle(
-                    participant.handle)
-            return userPermission[participantPrivilege]
-                ?: ChatRoomPermission.Unknown
+                    participant.handle
+                )
+            return chatPermissionsMapper(participantPrivilege)
         }
 
         return ChatRoomPermission.Unknown

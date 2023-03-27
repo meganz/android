@@ -78,4 +78,9 @@ enum class ChatRoomChanges {
      * The waiting room option has changed
      */
     WaitingRoom,
+
+    /**
+     * Unknown
+     */
+    Unknown
 }

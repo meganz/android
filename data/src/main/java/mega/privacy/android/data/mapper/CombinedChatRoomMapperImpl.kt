@@ -1,6 +1,8 @@
 package mega.privacy.android.data.mapper
 
+import mega.privacy.android.data.mapper.chat.ChatRoomChangesMapper
 import mega.privacy.android.data.mapper.chat.LastMessageTypeMapper
+import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatRoom
@@ -11,6 +13,8 @@ import javax.inject.Inject
  */
 internal class CombinedChatRoomMapperImpl @Inject constructor(
     private val lastMessageTypeMapper: LastMessageTypeMapper,
+    private val chatRoomChangesMapper: ChatRoomChangesMapper,
+    private val chatPermissionsMapper: ChatPermissionsMapper
 ) : CombinedChatRoomMapper {
 
     override fun invoke(
@@ -19,10 +23,10 @@ internal class CombinedChatRoomMapperImpl @Inject constructor(
     ): CombinedChatRoom =
         CombinedChatRoom(
             megaChatRoom.chatId,
-            megaChatRoom.changes.mapChatRoomChanges(),
+            chatRoomChangesMapper(megaChatRoom.changes),
             megaChatRoom.title,
             megaChatRoom.hasCustomTitle(),
-            megaChatRoom.ownPrivilege.mapChatRoomOwnPrivilege(),
+            chatPermissionsMapper(megaChatRoom.ownPrivilege),
             megaChatListItem.unreadCount,
             megaChatListItem.lastMessage,
             megaChatListItem.lastMessageId,

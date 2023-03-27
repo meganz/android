@@ -21,7 +21,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
-import mega.privacy.android.data.mapper.ChatRoomMapper
+import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
@@ -99,12 +99,16 @@ internal class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun getChatRoom(chatId: Long): ChatRoom? =
         withContext(ioDispatcher) {
-            megaChatApiGateway.getChatRoom(chatId)?.let(chatRoomMapper)
+            megaChatApiGateway.getChatRoom(chatId)?.let { chat ->
+                return@withContext chatRoomMapper(chat)
+            }
         }
 
     override suspend fun getChatRoomByUser(userHandle: Long): ChatRoom? =
         withContext(ioDispatcher) {
-            megaChatApiGateway.getChatRoomByUser(userHandle)?.let(chatRoomMapper)
+            megaChatApiGateway.getChatRoomByUser(userHandle)?.let { chat ->
+                return@withContext chatRoomMapper(chat)
+            }
         }
 
     override suspend fun setOpenInvite(chatId: Long): Boolean =
@@ -315,7 +319,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         megaChatApiGateway.getChatRoomUpdates(chatId)
             .filterIsInstance<ChatRoomUpdate.OnChatRoomUpdate>()
             .mapNotNull { it.chat }
-            .map(chatRoomMapper)
+            .map { chatRoomMapper(it) }
             .flowOn(ioDispatcher)
 
     override fun monitorChatListItemUpdates(): Flow<ChatListItem> =

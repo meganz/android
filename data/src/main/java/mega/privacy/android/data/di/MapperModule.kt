@@ -15,7 +15,6 @@ import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
-import mega.privacy.android.data.mapper.ChatRoomMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapperImpl
 import mega.privacy.android.data.mapper.CombinedChatRoomMapper
@@ -103,7 +102,6 @@ import mega.privacy.android.data.mapper.toAccountTransferDetail
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.mapper.toAchievementsOverview
 import mega.privacy.android.data.mapper.toChatFilesFolderUserAttribute
-import mega.privacy.android.data.mapper.toChatRoom
 import mega.privacy.android.data.mapper.toContactRequest
 import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toCountryCallingCodes
@@ -428,12 +426,6 @@ internal abstract class MapperModule {
                 subscriptionStatusMapper,
             )
         }
-
-        /**
-         * Provide chat room mapper
-         */
-        @Provides
-        fun provideChatRoomMapper(): ChatRoomMapper = ::toChatRoom
 
         @Provides
         fun provideOfflineNodeInformationMapper(): OfflineNodeInformationMapper =
