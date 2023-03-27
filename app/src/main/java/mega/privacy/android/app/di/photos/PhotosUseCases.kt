@@ -27,7 +27,6 @@ import mega.privacy.android.domain.usecase.DefaultGetTimelinePhotos
 import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.DefaultObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.DefaultObserveAlbumPhotosRemovingProgress
-import mega.privacy.android.domain.usecase.DefaultRemoveAlbums
 import mega.privacy.android.domain.usecase.DefaultSetInitialCUPreferences
 import mega.privacy.android.domain.usecase.DefaultUpdateAlbumCover
 import mega.privacy.android.domain.usecase.DefaultUpdateAlbumPhotosAddingProgressCompleted
@@ -51,7 +50,6 @@ import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
-import mega.privacy.android.domain.usecase.RemoveAlbums
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateAlbumCover
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
@@ -108,9 +106,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindCreateAlbum(useCase: DefaultCreateAlbum): CreateAlbum
-
-    @Binds
-    abstract fun bindRemoveAlbums(useCase: DefaultRemoveAlbums): RemoveAlbums
 
     @Binds
     abstract fun bindObserveAlbumPhotosAddingProgress(useCase: DefaultObserveAlbumPhotosAddingProgress): ObserveAlbumPhotosAddingProgress

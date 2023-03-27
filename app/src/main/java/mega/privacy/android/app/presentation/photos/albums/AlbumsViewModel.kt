@@ -35,7 +35,7 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
-import mega.privacy.android.domain.usecase.RemoveAlbums
+import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
@@ -59,7 +59,7 @@ class AlbumsViewModel @Inject constructor(
     private val removeFavourites: RemoveFavourites,
     private val getNodeListByIds: GetNodeListByIds,
     private val createAlbum: CreateAlbum,
-    private val removeAlbums: RemoveAlbums,
+    private val removeAlbumsUseCase: RemoveAlbumsUseCase,
     private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
     private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
@@ -225,7 +225,7 @@ class AlbumsViewModel @Inject constructor(
 
     private fun removeAlbumIds(albumIds: List<AlbumId>) = viewModelScope.launch {
         try {
-            removeAlbums(albumIds)
+            removeAlbumsUseCase(albumIds)
         } catch (exception: Exception) {
             Timber.e(exception)
         }

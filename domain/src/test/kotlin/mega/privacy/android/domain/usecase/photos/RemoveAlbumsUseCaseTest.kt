@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -12,14 +12,14 @@ import org.mockito.kotlin.whenever
 import kotlin.test.fail
 
 @ExperimentalCoroutinesApi
-class DefaultRemoveAlbumsTest {
-    private lateinit var underTest: RemoveAlbums
+class RemoveAlbumsUseCaseTest {
+    private lateinit var underTest: RemoveAlbumsUseCase
 
     private val albumRepository = mock<AlbumRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultRemoveAlbums(
+        underTest = RemoveAlbumsUseCase(
             albumRepository = albumRepository,
         )
     }

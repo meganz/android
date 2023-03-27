@@ -10,7 +10,6 @@ import mega.privacy.android.domain.usecase.AddPhotosToAlbum
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import mega.privacy.android.domain.usecase.GetUserAlbums
-import mega.privacy.android.domain.usecase.RemoveAlbums
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -30,7 +29,4 @@ object TestAlbumUseCases {
 
     @Provides
     fun provideAddPhotosToAlbum(): AddPhotosToAlbum = mock()
-
-    @Provides
-    fun provideRemoveAlbums(): RemoveAlbums = mock()
 }

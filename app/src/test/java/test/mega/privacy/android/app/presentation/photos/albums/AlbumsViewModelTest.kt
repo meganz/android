@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
-import mega.privacy.android.domain.usecase.RemoveAlbums
+import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
@@ -61,7 +61,7 @@ class AlbumsViewModelTest {
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbum = mock<CreateAlbum>()
-    private val removeAlbums = mock<RemoveAlbums>()
+    private val removeAlbumsUseCase = mock<RemoveAlbumsUseCase>()
     private val removePhotosFromAlbumUseCase = mock<RemovePhotosFromAlbumUseCase>()
     private val updateAlbumNameUseCase = mock<UpdateAlbumNameUseCase>()
     private val proscribedStrings =
@@ -82,7 +82,7 @@ class AlbumsViewModelTest {
             removeFavourites = removeFavourites,
             getNodeListByIds = getNodeListByIds,
             createAlbum = createAlbum,
-            removeAlbums = removeAlbums,
+            removeAlbumsUseCase = removeAlbumsUseCase,
             removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
             updateAlbumNameUseCase = updateAlbumNameUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
@@ -633,7 +633,7 @@ class AlbumsViewModelTest {
 
     @Test
     fun `test that albums are deleted properly`() = runTest {
-        whenever(removeAlbums(any())).thenReturn(Unit)
+        whenever(removeAlbumsUseCase(any())).thenReturn(Unit)
 
         val expectedDeletedAlbumIds = setOf(
             AlbumId(1L),
