@@ -280,6 +280,7 @@ dependencies {
     implementation google.accompanist.pager
     implementation google.accompanist.flowlayout
     implementation google.accompanist.placeholder
+    implementation google.accompanist.permissions
     implementation google.accompanist.navigationanimation
     implementation google.accompanist.systemui
     implementation google.autovalue.annotations
