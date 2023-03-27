@@ -19,12 +19,12 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class NodeShareKeyResultMapperImplTest {
+class NodeShareKeyResultMapperTest {
 
     private val megaApiGateway = mock<MegaApiGateway>()
     private val accessPermissionIntMapper = mock<AccessPermissionIntMapper>()
 
-    private val underTest: NodeShareKeyResultMapper = NodeShareKeyResultMapperImpl(
+    private val underTest: NodeShareKeyResultMapper = NodeShareKeyResultMapper(
         UnconfinedTestDispatcher(),
         megaApiGateway,
         accessPermissionIntMapper
