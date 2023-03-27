@@ -121,7 +121,8 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
             numRequests--
 
             if (uiState.isPasswordReminderNotified == PasswordState.True) {
-                if (dismissPasswordReminder && isLogout && numRequests <= 0) {
+                // numRequests is temporarily changed to 1 because copy, print, export Recovery Key hasn't been implemented yet in this activity. This is a quick fix for 7.8
+                if (dismissPasswordReminder && isLogout && numRequests <= 1) {
                     logout(this, megaApi, sharingScope)
                 }
             }
