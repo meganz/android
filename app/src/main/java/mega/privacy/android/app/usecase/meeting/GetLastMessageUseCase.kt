@@ -35,6 +35,7 @@ import nz.mega.sdk.MegaChatMessage.TYPE_SET_PRIVATE_MODE
 import nz.mega.sdk.MegaChatMessage.TYPE_SET_RETENTION_TIME
 import nz.mega.sdk.MegaChatMessage.TYPE_TRUNCATE
 import nz.mega.sdk.MegaChatMessage.TYPE_VOICE_CLIP
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -62,27 +63,31 @@ class GetLastMessageUseCase @Inject constructor(
      * @return          Single
      */
     fun get(chatId: Long): Single<String> =
-        Single.fromCallable { megaChatApi.getChatListItem(chatId).lastMessageId }
-            .flatMap { lastMessageId -> get(chatId, lastMessageId) }
-
-    /**
-     * Get a formatted String with the last message
-     *
-     * @param chatId    Chat Id to retrieve chat message
-     * @param msgId     Message Id to retrieve chat message
-     * @return          Single
-     */
-    fun get(chatId: Long, msgId: Long): Single<String> =
         Single.fromCallable {
             val chatListItem = requireNotNull(megaChatApi.getChatListItem(chatId))
             val chatRoom by lazy { megaChatApi.getChatRoom(chatId) }
-            val chatMessage by lazy { megaChatApi.getMessage(chatId, msgId) }
+            val chatMessage by lazy { megaChatApi.getMessage(chatId, chatListItem.lastMessageId) }
+            val isMeeting by lazy {
+                megaChatApi.getScheduledMeetingsByChat(chatId)?.isNotEmpty() == true
+            }
 
             megaChatApi.getChatCall(chatId)?.let { chatCall ->
                 when (chatCall.status) {
                     CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
                         return@fromCallable if (chatCall.isRinging) {
                             getString(R.string.notification_subtitle_incoming)
+                        } else if (isMeeting) {
+                            val message = getString(R.string.meetings_list_ongoing_call_message)
+                            if (chatCall.duration > 0) {
+                                val duration = String.format(
+                                    "%02d:%02d",
+                                    TimeUnit.SECONDS.toMinutes(chatCall.duration),
+                                    TimeUnit.SECONDS.toSeconds(chatCall.duration)
+                                )
+                                "$message · $duration"
+                            } else {
+                                message
+                            }
                         } else {
                             getString(R.string.ongoing_call_messages)
                         }
@@ -105,27 +110,12 @@ class GetLastMessageUseCase @Inject constructor(
                     getString(R.string.general_loading)
                 TYPE_NORMAL, TYPE_CHAT_TITLE, TYPE_CALL_ENDED, TYPE_TRUNCATE, TYPE_ALTER_PARTICIPANTS, TYPE_PRIV_CHANGE, TYPE_CONTAINS_META ->
                     chatController.createManagementString(chatMessage, chatRoom)
-                TYPE_CALL_STARTED -> {
-                    val chatCall = megaChatApi.getChatCall(chatId)
-                        ?: return@fromCallable getString(R.string.call_started_messages)
-                    when (chatCall.status) {
-                        CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
-                            return@fromCallable if (chatCall.isRinging) {
-                                getString(R.string.notification_subtitle_incoming)
-                            } else {
-                                getString(R.string.ongoing_call_messages)
-                            }
-                        }
-                        else -> {
-                            val requestSent = chatManagement.isRequestSent(chatCall.callId)
-                            return@fromCallable if (requestSent) {
-                                getString(R.string.outgoing_call_starting)
-                            } else {
-                                getString(R.string.call_started_messages)
-                            }
-                        }
+                TYPE_CALL_STARTED ->
+                    if (isMeeting) {
+                        getString(R.string.meetings_list_ongoing_call_message)
+                    } else {
+                        getString(R.string.ongoing_call_messages)
                     }
-                }
                 TYPE_SET_RETENTION_TIME -> {
                     val timeFormatted = ChatUtil.transformSecondsInString(chatRoom.retentionTime)
                     if (timeFormatted.isTextEmpty()) {

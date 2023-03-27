@@ -1443,7 +1443,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invite friends and get rewards</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each successful invite. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each invite. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s of storage. Valid for 365 days.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1471,7 +1471,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">How it works</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a MEGA Free account and to install a MEGA Mobile App. You will receive free storage as a bonus for every successful signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a MEGA Free account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Free storage bonus applicable to new invitations only and where MEGA Mobile App or MEGA Desktop App is installed.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -4675,7 +4675,9 @@
     <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
     <string name="media_player_video_select_subtitle_file_button_add_subtitles">Add subtitles</string>
     <!-- The message for select subtitle file page when subtitle file is empty. -->
-    <string name="media_player_video_select_subtitle_file_empty_message">NO SUBTITLES FOUND</string>
+    <string name="media_player_video_select_subtitle_file_empty_message">No subtitles found</string>
+    <!-- Text shown in the list of meetings when there is a call in progress -->
+    <string name="meetings_list_ongoing_call_message">Meeting in progress</string>
     <!-- Success message when left shared folders -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
         <item quantity="one">Left %1$d shared folder</item>
