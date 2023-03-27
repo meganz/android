@@ -620,7 +620,6 @@ class PhotosFragment : Fragment() {
             albumFlow = AlbumFlow.Creation,
         )
         albumPhotosSelectionLauncher.launch(intent)
-        managerActivity.overridePendingTransition(0, 0)
     }
 
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {

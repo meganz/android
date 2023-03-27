@@ -172,7 +172,6 @@ class AlbumDynamicContentFragment : Fragment() {
             albumFlow = AlbumFlow.Addition,
         )
         albumPhotosSelectionLauncher.launch(intent)
-        managerActivity.overridePendingTransition(0, 0)
     }
 
     private fun handleAlbumPhotosSelectionResult(result: ActivityResult) {}
@@ -186,7 +185,6 @@ class AlbumDynamicContentFragment : Fragment() {
             albumId = album.id,
         )
         albumCoverSelectionLauncher.launch(intent)
-        managerActivity.overridePendingTransition(0, 0)
     }
 
     private fun handleAlbumCoverSelectionResult(result: ActivityResult) {

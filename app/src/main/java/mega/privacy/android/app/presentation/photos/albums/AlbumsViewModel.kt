@@ -76,7 +76,6 @@ class AlbumsViewModel @Inject constructor(
 
     init {
         loadAlbums()
-        loadUserAlbums()
     }
 
     private fun loadAlbums() {
@@ -96,6 +95,8 @@ class AlbumsViewModel @Inject constructor(
                         }
                     }
                 }.collectLatest { systemAlbums ->
+                    albumJob ?: loadUserAlbums()
+
                     _state.update { state ->
                         val albums = withContext(defaultDispatcher) {
                             val userAlbums = state.albums.filter { it.id is Album.UserAlbum }
@@ -105,7 +106,6 @@ class AlbumsViewModel @Inject constructor(
                         state.copy(
                             albums = albums,
                             currentAlbum = currentAlbum,
-                            showAlbums = true
                         )
                     }
                 }
@@ -121,7 +121,12 @@ class AlbumsViewModel @Inject constructor(
     private fun loadUserAlbums() {
         albumJob?.cancel()
         albumJob = viewModelScope.launch {
-            if (!getFeatureFlagUseCase(AppFeatures.UserAlbums)) return@launch
+            if (!getFeatureFlagUseCase(AppFeatures.UserAlbums)) {
+                _state.update {
+                    it.copy(showAlbums = true)
+                }
+                return@launch
+            }
 
             getUserAlbums()
                 .catch { exception -> Timber.e(exception) }
@@ -143,6 +148,7 @@ class AlbumsViewModel @Inject constructor(
             state.copy(
                 albums = albums,
                 currentAlbum = currentAlbumId,
+                showAlbums = true,
             )
         }
 

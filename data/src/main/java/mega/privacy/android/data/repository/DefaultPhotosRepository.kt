@@ -113,7 +113,12 @@ internal class DefaultPhotosRepository @Inject constructor(
         refreshPhotosStateFlow
             .filter { it }
             .onEach {
-                photosStateFlow.value = searchMegaPhotos()
+                val photos = searchMegaPhotos()
+                for (photo in photos) {
+                    photosCache[NodeId(photo.id)] = photo
+                }
+
+                photosStateFlow.value = photos
                 refreshPhotosStateFlow.value = false
             }.launchIn(appScope)
     }
@@ -156,8 +161,12 @@ internal class DefaultPhotosRepository @Inject constructor(
 
     override suspend fun getPhotoFromNodeID(nodeId: NodeId, albumPhotoId: AlbumPhotoId?): Photo? {
         return when (val photo = photosCache[nodeId]) {
-            is Photo.Image -> photo.copy(albumPhotoId = albumPhotoId?.id)
-            is Photo.Video -> photo.copy(albumPhotoId = albumPhotoId?.id)
+            is Photo.Image -> {
+                photo.copy(albumPhotoId = albumPhotoId?.id)
+            }
+            is Photo.Video -> {
+                photo.copy(albumPhotoId = albumPhotoId?.id)
+            }
             else -> withContext(ioDispatcher) {
                 megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
                     ?.let { megaNode ->

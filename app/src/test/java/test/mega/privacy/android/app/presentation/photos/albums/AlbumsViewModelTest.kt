@@ -70,6 +70,7 @@ class AlbumsViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
+        whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf()))
 
         underTest = AlbumsViewModel(
             getDefaultAlbumPhotos = getDefaultAlbumPhotos,
@@ -268,6 +269,8 @@ class AlbumsViewModelTest {
             val albums = awaitItem().albums
             assertEquals(albums.size, 1)
             assertThat(albums.first().id).isEqualTo(Album.FavouriteAlbum)
+
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
