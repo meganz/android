@@ -1,0 +1,35 @@
+package mega.privacy.android.app.presentation.fileinfo.view
+
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import mega.privacy.android.app.R
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
+
+/**
+ * View to show the file or folder total size
+ */
+@Composable
+internal fun NodeSizeView(
+    forFolder: Boolean,
+    sizeInBytes: Long,
+    modifier: Modifier = Modifier,
+) = FileInfoTitledText(
+    title = stringResource(id = if (forFolder) R.string.file_properties_info_size else R.string.file_properties_info_size_file),
+    text = Util.getSizeString(sizeInBytes),
+    modifier = modifier
+)
+
+/**
+ * Preview for [NodeSizeView]
+ */
+@CombinedTextAndThemePreviews
+@Composable
+private fun NodeSizePreview() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        NodeSizeView(forFolder = true, sizeInBytes = 1024)
+    }
+}
