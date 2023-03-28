@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase.login
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
@@ -32,12 +33,15 @@ class FetchNodesUseCase @Inject constructor(
 
         runCatching {
             loginRepository.fetchNodesFlow()
-                .collectLatest { update ->
-                    trySend(update)
+                .map { update ->
                     if (update.progress?.floatValue == 1F) {
                         establishCameraUploadsSyncHandles()
                         loginMutex.unlock()
                     }
+                    update
+                }
+                .collectLatest { update ->
+                    trySend(update)
                 }
         }.onFailure {
             if (it !is FetchNodesBlockedAccount) {
