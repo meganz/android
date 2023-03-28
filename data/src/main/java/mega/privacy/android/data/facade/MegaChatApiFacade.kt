@@ -403,4 +403,6 @@ internal class MegaChatApiFacade @Inject constructor(
     ) = chatApi.archiveChat(chatId, archive, listener)
 
     override suspend fun refreshUrl() = chatApi.refreshUrl()
+
+    override fun getChatCalls(state: Int): MegaHandleList? = chatApi.getChatCalls(state)
 }

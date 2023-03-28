@@ -13,8 +13,10 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
+import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
+import mega.privacy.android.data.mapper.meeting.ChatCallStatusMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -30,6 +32,7 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledMeetingOccurr
 import nz.mega.sdk.MegaChatScheduledMeetingOccurrList
+import nz.mega.sdk.MegaHandleList
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -52,6 +55,8 @@ class CallRepositoryImplTest {
     private val chatCallMapper = mock<ChatCallMapper>()
     private val megaChatRequest = mock<MegaChatRequest>()
     private val chatRequestMapper = mock<ChatRequestMapper>()
+    private val chatCallStatusMapper = ChatCallStatusMapper()
+    private val handleListMapper = HandleListMapper()
     private val chatScheduledMeetingMapper = mock<ChatScheduledMeetingMapper>()
     private val chatScheduledMeetingOccurrMapper = mock<ChatScheduledMeetingOccurrMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -69,6 +74,11 @@ class CallRepositoryImplTest {
     private val callId = Random.nextLong()
     private val megaChatCall = mock<MegaChatCall>()
     private val chatCall: ChatCall = mock()
+    private val mockMegaHandleList = mock<MegaHandleList> {
+        on { get(0) }.thenReturn(0)
+        on { get(1) }.thenReturn(1)
+        on { size() }.thenReturn(2)
+    }
 
     private val schedId = Random.nextLong()
     private val chatRequest = mock<ChatRequest>()
@@ -99,6 +109,8 @@ class CallRepositoryImplTest {
             chatScheduledMeetingMapper = chatScheduledMeetingMapper,
             chatScheduledMeetingOccurrMapper = chatScheduledMeetingOccurrMapper,
             dispatcher = testDispatcher,
+            chatCallStatusMapper = chatCallStatusMapper,
+            handleListMapper = handleListMapper,
         )
 
         whenever(megaChatRoom.chatId).thenReturn(chatId)
@@ -420,4 +432,18 @@ class CallRepositoryImplTest {
                 awaitComplete()
             }
         }
+
+    @Test
+    fun `test that getCallHandleList returns empty list when state is unknown`() = runTest {
+        val actual = underTest.getCallHandleList(ChatCallStatus.Unknown)
+        assertThat(actual).isEqualTo(emptyList<Long>())
+    }
+
+    @Test
+    fun `test that getCallHandleList returns list of long when state is initial`() = runTest {
+        whenever(megaChatApiGateway.getChatCalls(chatCallStatusMapper(ChatCallStatus.Initial)))
+            .thenReturn(mockMegaHandleList)
+        val actual = underTest.getCallHandleList(ChatCallStatus.Initial)
+        assertThat(actual.size).isEqualTo(2)
+    }
 }

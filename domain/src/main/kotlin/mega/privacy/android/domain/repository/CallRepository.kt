@@ -5,6 +5,7 @@ import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 
 /**
@@ -151,4 +152,15 @@ interface CallRepository {
      * @return          A flow of ResultOccurrenceUpdate
      */
     fun monitorScheduledMeetingOccurrencesUpdates(): Flow<ResultOccurrenceUpdate>
+
+    /**
+     * Get a list with the ids of chat-rooms where there are active calls
+     *
+     * @param state handle list will be fetched with the calls having this state
+     *              Instance of [ChatCallStatus]
+     * @return List [Long] of call handles which user is participating
+     *         empty list is output is null or throws any errors
+     *         returns all calls regardless their state if state is [ChatCallStatus.Unknown]
+     */
+    suspend fun getCallHandleList(state: ChatCallStatus): List<Long>
 }
