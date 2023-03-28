@@ -15,8 +15,6 @@ import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
-import mega.privacy.android.data.mapper.CombinedChatRoomMapper
-import mega.privacy.android.data.mapper.CombinedChatRoomMapperImpl
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
@@ -170,9 +168,6 @@ internal abstract class MapperModule {
      */
     @Binds
     abstract fun bindsPasswordStrengthMapper(implementation: PasswordStrengthMapperImpl): PasswordStrengthMapper
-
-    @Binds
-    abstract fun bindCombinedChatRoomMapper(implementation: CombinedChatRoomMapperImpl): CombinedChatRoomMapper
 
     @Binds
     abstract fun bindRecentActionBucketMapper(implementation: RecentActionBucketMapperImpl): RecentActionBucketMapper
