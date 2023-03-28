@@ -8,11 +8,11 @@ import javax.inject.Inject
  * Default create support ticket
  *
  * @property environmentRepository
- * @property getAccountDetails
+ * @property getAccountDetailsUseCase
  */
 class DefaultCreateSupportTicket @Inject constructor(
     private val environmentRepository: EnvironmentRepository,
-    private val getAccountDetails: GetAccountDetails,
+    private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
 ) : CreateSupportTicket {
     override suspend fun invoke(
         description: String,
@@ -20,7 +20,7 @@ class DefaultCreateSupportTicket @Inject constructor(
     ): SupportTicket {
         val (appVersion, sdkVersion) = environmentRepository.getAppInfo()
         val (device, languageCode) = environmentRepository.getDeviceInfo()
-        val accountDetails = getAccountDetails(false)
+        val accountDetails = getAccountDetailsUseCase(false)
 
         return SupportTicket(
             androidAppVersion = appVersion,

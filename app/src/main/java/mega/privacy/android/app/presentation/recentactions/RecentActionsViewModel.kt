@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.recentactions.model.RecentActionsSt
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
-import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
@@ -44,7 +44,7 @@ class RecentActionsViewModel @Inject constructor(
     private val getVisibleContacts: GetVisibleContacts,
     private val setHideRecentActivity: SetHideRecentActivity,
     private val getNodeByHandle: GetNodeByHandle,
-    private val getAccountDetails: GetAccountDetails,
+    private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val isPendingShare: IsPendingShare,
     private val getParentMegaNode: GetParentMegaNode,
     monitorHideRecentActivity: MonitorHideRecentActivity,
@@ -163,7 +163,7 @@ class RecentActionsViewModel @Inject constructor(
             val userName =
                 visibleContacts.find { bucket.userEmail == it.email }?.contactData?.fullName.orEmpty()
 
-            val currentUserIsOwner = getAccountDetails(false).email == bucket.userEmail
+            val currentUserIsOwner = getAccountDetailsUseCase(false).email == bucket.userEmail
             val isNodeKeyVerified =
                 bucket.nodes[0].isNodeKeyDecrypted || areCredentialsVerified(bucket.userEmail)
             val parentNode = getNodeByHandle(bucket.parentHandle)

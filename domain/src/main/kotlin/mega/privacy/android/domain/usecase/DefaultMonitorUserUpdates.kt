@@ -14,20 +14,20 @@ import javax.inject.Inject
 /**
  * Default implementation of [MonitorUserUpdates]
  *
- * @property getAccountDetails
+ * @property getAccountDetailsUseCase
  * @property accountRepository
  * @constructor Create empty Default monitor user updates
  */
 @OptIn(FlowPreview::class)
 internal class DefaultMonitorUserUpdates @Inject constructor(
-    private val getAccountDetails: GetAccountDetails,
+    private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val accountRepository: AccountRepository,
     private val isUserLoggedIn: IsUserLoggedIn,
 ) : MonitorUserUpdates {
     override fun invoke(): Flow<UserChanges> {
         return flow {
             if (isUserLoggedIn()) {
-                val loggedInUser = getAccountDetails(false).userId
+                val loggedInUser = getAccountDetailsUseCase(false).userId
                 emitAll(
                     accountRepository.monitorUserUpdates()
                         .flatMapConcat { it.changes.entries.asFlow() }

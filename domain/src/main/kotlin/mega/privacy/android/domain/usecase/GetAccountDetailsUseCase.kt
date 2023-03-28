@@ -9,11 +9,11 @@ import javax.inject.Inject
  *
  * @property accountsRepository
  */
-internal class DefaultGetAccountDetails @Inject constructor(
+class GetAccountDetailsUseCase @Inject constructor(
     private val accountsRepository: AccountRepository,
     private val isDatabaseEntryStale: IsDatabaseEntryStale,
-) : GetAccountDetails {
-    override suspend fun invoke(forceRefresh: Boolean): UserAccount {
+){
+    suspend operator fun invoke(forceRefresh: Boolean): UserAccount {
         if (forceRefresh || accountsRepository.storageCapacityUsedIsBlank() || isDatabaseEntryStale()) {
             accountsRepository.resetAccountDetailsTimeStamp()
             accountsRepository.requestAccount()

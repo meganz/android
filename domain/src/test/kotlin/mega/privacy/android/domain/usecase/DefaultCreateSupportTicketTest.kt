@@ -22,7 +22,7 @@ import org.mockito.kotlin.whenever
 class DefaultCreateSupportTicketTest {
     private lateinit var underTest: CreateSupportTicket
     private val deviceRepository = mock<EnvironmentRepository>()
-    private val getAccountDetails = mock<GetAccountDetails>()
+    private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
 
     private val device = "device"
     private val languageCode = "languageCode"
@@ -58,7 +58,7 @@ class DefaultCreateSupportTicketTest {
 
 
         runBlocking {
-            whenever(getAccountDetails(false)).thenReturn(
+            whenever(getAccountDetailsUseCase(false)).thenReturn(
                 UserAccount(
                     userId = UserId(1L),
                     email = accountEmail,
@@ -73,7 +73,7 @@ class DefaultCreateSupportTicketTest {
 
         underTest = DefaultCreateSupportTicket(
             environmentRepository = deviceRepository,
-            getAccountDetails = getAccountDetails
+            getAccountDetailsUseCase = getAccountDetailsUseCase
         )
     }
 
@@ -88,7 +88,7 @@ class DefaultCreateSupportTicketTest {
     @Test
     fun `test that account information is retrieved`() = runTest {
         underTest(description = description, null)
-        verify(getAccountDetails).invoke(false)
+        verify(getAccountDetailsUseCase).invoke(false)
     }
 
     @Test

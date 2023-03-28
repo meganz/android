@@ -23,7 +23,7 @@ class DefaultMonitorUserUpdatesTest {
 
     private val currentUserId = UserId(1L)
 
-    private val getAccountDetails = mock<GetAccountDetails> {
+    private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase> {
         onBlocking { invoke(any()) }.thenReturn(
             UserAccount(
                 userId = currentUserId,
@@ -46,7 +46,7 @@ class DefaultMonitorUserUpdatesTest {
     @Before
     fun setUp() {
         underTest = DefaultMonitorUserUpdates(
-            getAccountDetails = getAccountDetails,
+            getAccountDetailsUseCase = getAccountDetailsUseCase,
             accountRepository = accountRepository,
             isUserLoggedIn = isUserLoggedIn
         )

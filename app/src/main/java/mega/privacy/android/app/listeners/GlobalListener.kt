@@ -42,12 +42,12 @@ import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
-import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
-import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
+import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdateUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -72,7 +72,7 @@ class GlobalListener @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val storageStateMapper: StorageStateMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
-    private val getAccountDetails: GetAccountDetails,
+    private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
     private val getNumberOfSubscription: GetNumberOfSubscription,
@@ -147,7 +147,7 @@ class GlobalListener @Inject constructor(
             getPaymentMethod(true)
             getPricing(true)
             dbH.resetExtendedAccountDetailsTimestamp()
-            getAccountDetails(forceRefresh = true)
+            getAccountDetailsUseCase(forceRefresh = true)
             getNumberOfSubscription(true)
         }
     }
@@ -355,7 +355,7 @@ class GlobalListener @Inject constructor(
 
     private fun refreshAccountDetail() {
         applicationScope.launch {
-            getAccountDetails(forceRefresh = true)
+            getAccountDetailsUseCase(forceRefresh = true)
         }
     }
 }

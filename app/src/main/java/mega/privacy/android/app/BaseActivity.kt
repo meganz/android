@@ -123,7 +123,7 @@ import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.entity.billing.BillingEvent
 import mega.privacy.android.domain.entity.billing.MegaPurchase
 import mega.privacy.android.domain.entity.user.UserCredentials
-import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferOverQuota
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
@@ -150,7 +150,7 @@ import javax.inject.Inject
  * @property outMetrics                     [DisplayMetrics]
  * @property isResumeTransfersWarningShown  True if the warning should be shown, false otherwise.
  * @property resumeTransfersWarning         [AlertDialog] for paused transfers.
- * @property getAccountDetails
+ * @property getAccountDetailsUseCase
  * @property billingViewModel
  * @property monitorTransferOverQuota
  */
@@ -185,7 +185,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     var composite = CompositeDisposable()
 
     @Inject
-    lateinit var getAccountDetails: GetAccountDetails
+    lateinit var getAccountDetailsUseCase: GetAccountDetailsUseCase
 
     @Inject
     lateinit var monitorTransferOverQuota: MonitorTransferOverQuota
@@ -993,7 +993,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         //Check if the call is recently
         Timber.d("Check the last call to getAccountDetails")
         lifecycleScope.launch {
-            getAccountDetails(false)
+            getAccountDetailsUseCase(false)
         }
     }
 

@@ -21,7 +21,7 @@ import kotlin.test.assertEquals
 class DefaultCheckEnableCameraUploadsStatusTest {
     private lateinit var underTest: DefaultCheckEnableCameraUploadsStatus
 
-    private val getAccountDetails = mock<GetAccountDetails>()
+    private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase>()
     private val isBusinessAccountActive = mock<IsBusinessAccountActive>()
 
     private val testUserAccount = UserAccount(
@@ -37,7 +37,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     @Before
     fun setUp() {
         underTest = DefaultCheckEnableCameraUploadsStatus(
-            getAccountDetails = getAccountDetails,
+            getAccountDetailsUseCase = getAccountDetailsUseCase,
             isBusinessAccountActive = isBusinessAccountActive,
             ioDispatcher = UnconfinedTestDispatcher(),
         )
@@ -46,7 +46,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     @Test
     fun `test that CAN_ENABLE_CAMERA_UPLOADS is returned when the user is under a regular account`() =
         runTest {
-            whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount)
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount)
             whenever(isBusinessAccountActive()).thenReturn(any())
 
             assertEquals(underTest.invoke(), EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
@@ -55,7 +55,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     @Test
     fun `test that CAN_ENABLE_CAMERA_UPLOADS is returned when the user is under an active master business account`() =
         runTest {
-            whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
                 isBusinessAccount = true,
                 isMasterBusinessAccount = true,
                 accountTypeIdentifier = AccountType.BUSINESS
@@ -68,7 +68,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     @Test
     fun `test that SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT is returned when the user is under an active regular business account`() =
         runTest {
-            whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
                 isBusinessAccount = true,
                 accountTypeIdentifier = AccountType.BUSINESS
             ))
@@ -81,7 +81,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     @Test
     fun `test that SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT is returned when the user is under an inactive regular business account`() =
         runTest {
-            whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
                 isBusinessAccount = true,
                 accountTypeIdentifier = AccountType.BUSINESS
             ))
@@ -94,7 +94,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     @Test
     fun `test that SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT is returned when the user is under an inactive master business account`() =
         runTest {
-            whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
                 isBusinessAccount = true,
                 isMasterBusinessAccount = true,
                 accountTypeIdentifier = AccountType.BUSINESS
@@ -108,7 +108,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     @Test
     fun `test that CAN_ENABLE_CAMERA_UPLOADS is returned when the user is Pro Flexi account`() =
         runTest {
-            whenever(getAccountDetails(forceRefresh = true)).thenReturn(testUserAccount.copy(
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
                 isBusinessAccount = true,
                 accountTypeIdentifier = AccountType.PRO_FLEXI
             ))

@@ -77,7 +77,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
-import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
@@ -128,7 +128,7 @@ import javax.inject.Inject
  * @property confirmChangeEmailUseCase
  * @property filePrepareUseCase
  * @property monitorMyAvatarFile
- * @property getAccountDetails
+ * @property getAccountDetailsUseCase
  * @property getExtendedAccountDetail
  * @property getNumberOfSubscription
  * @property getPaymentMethod
@@ -162,7 +162,7 @@ class MyAccountViewModel @Inject constructor(
     private val confirmChangeEmailUseCase: ConfirmChangeEmailUseCase,
     private val filePrepareUseCase: FilePrepareUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
-    private val getAccountDetails: GetAccountDetails,
+    private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val getExtendedAccountDetail: GetExtendedAccountDetail,
     private val getNumberOfSubscription: GetNumberOfSubscription,
     private val getPaymentMethod: GetPaymentMethod,
@@ -677,7 +677,7 @@ class MyAccountViewModel @Inject constructor(
         when (requestCode) {
             REQUEST_CODE_REFRESH -> {
                 viewModelScope.launch {
-                    getAccountDetails(true)
+                    getAccountDetailsUseCase(true)
                     getExtendedAccountDetail(
                         forceRefresh = true,
                         sessions = true,
@@ -1244,7 +1244,7 @@ class MyAccountViewModel @Inject constructor(
      */
     fun refreshAccountInfo() {
         viewModelScope.launch {
-            getAccountDetails(forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty())
+            getAccountDetailsUseCase(forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty())
             getExtendedAccountDetail(
                 forceRefresh = false,
                 sessions = true,

@@ -25,7 +25,7 @@ import mega.privacy.android.domain.usecase.AreChatLogsEnabled
 import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
-import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
@@ -49,7 +49,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val getAccountDetails: GetAccountDetails,
+    private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val canDeleteAccount: CanDeleteAccount,
     private val refreshPasscodeLockPreference: RefreshPasscodeLockPreference,
     areSdkLogsEnabled: AreSdkLogsEnabled,
@@ -121,7 +121,7 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             merge(
-                flowOf(getAccountDetails(false)).map {
+                flowOf(getAccountDetailsUseCase(false)).map {
                     updateAccountState(it)
                 },
                 flowOf(isMultiFactorAuthAvailable())
@@ -200,7 +200,7 @@ class SettingsViewModel @Inject constructor(
         }
 
     fun refreshAccount() = viewModelScope.launch {
-        state.update(updateAccountState(getAccountDetails(true)))
+        state.update(updateAccountState(getAccountDetailsUseCase(true)))
     }
 
     fun toggleAutoAcceptPreference() = viewModelScope.launch {

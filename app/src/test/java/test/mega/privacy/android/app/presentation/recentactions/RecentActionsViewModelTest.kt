@@ -25,7 +25,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
-import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetRecentActions
 import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
@@ -53,7 +53,7 @@ class RecentActionsViewModelTest {
     private val getNodeByHandle = mock<GetNodeByHandle> {
         onBlocking { invoke(any()) }.thenReturn(null)
     }
-    private val getAccountDetails = mock<GetAccountDetails> {
+    private val getAccountDetailsUseCase = mock<GetAccountDetailsUseCase> {
         onBlocking { invoke(any()) }.thenReturn(mock())
     }
     private val isPendingShare = mock<IsPendingShare> {
@@ -114,7 +114,7 @@ class RecentActionsViewModelTest {
             getVisibleContacts,
             setHideRecentActivity,
             getNodeByHandle,
-            getAccountDetails,
+            getAccountDetailsUseCase,
             isPendingShare,
             getParentMegaNode,
             monitorHideRecentActivity,
@@ -247,7 +247,7 @@ class RecentActionsViewModelTest {
                 accountTypeIdentifier = null,
                 accountTypeString = "",
             )
-            whenever(getAccountDetails(false)).thenReturn(userAccount)
+            whenever(getAccountDetailsUseCase(false)).thenReturn(userAccount)
             whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
@@ -269,7 +269,7 @@ class RecentActionsViewModelTest {
                 accountTypeIdentifier = null,
                 accountTypeString = "",
             )
-            whenever(getAccountDetails(false)).thenReturn(userAccount)
+            whenever(getAccountDetailsUseCase(false)).thenReturn(userAccount)
             whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {

@@ -10,12 +10,12 @@ import javax.inject.Inject
 /**
  * Class that implements the Use Case [CheckEnableCameraUploadsStatus]
  *
- * @param getAccountDetails [GetAccountDetails] Use Case
+ * @param getAccountDetailsUseCase [GetAccountDetailsUseCase] Use Case
  * @param isBusinessAccountActive [IsBusinessAccountActive] Use Case
  * @param ioDispatcher the [CoroutineDispatcher]
  */
 class DefaultCheckEnableCameraUploadsStatus @Inject constructor(
-    private val getAccountDetails: GetAccountDetails,
+    private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
     private val isBusinessAccountActive: IsBusinessAccountActive,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : CheckEnableCameraUploadsStatus {
@@ -30,7 +30,7 @@ class DefaultCheckEnableCameraUploadsStatus @Inject constructor(
      * @return the corresponding [EnableCameraUploadsStatus]
      */
     override suspend fun invoke(): EnableCameraUploadsStatus = withContext(ioDispatcher) {
-        val userAccount = getAccountDetails(forceRefresh = true)
+        val userAccount = getAccountDetailsUseCase(forceRefresh = true)
 
         if (userAccount.isBusinessAccount && userAccount.accountTypeIdentifier == AccountType.BUSINESS)
             checkBusinessAccountStatus(isMasterBusinessAccount = userAccount.isMasterBusinessAccount)

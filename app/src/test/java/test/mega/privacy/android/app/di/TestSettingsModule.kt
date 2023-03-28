@@ -17,12 +17,9 @@ import mega.privacy.android.domain.usecase.AreSdkLogsEnabled
 import mega.privacy.android.domain.usecase.CanDeleteAccount
 import mega.privacy.android.domain.usecase.FetchAutoAcceptQRLinks
 import mega.privacy.android.domain.usecase.FetchMultiFactorAuthSetting
-import mega.privacy.android.domain.usecase.GetAccountDetails
-import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.GetChatImageQuality
 import mega.privacy.android.domain.usecase.GetPreference
 import mega.privacy.android.domain.usecase.GetSupportEmail
-import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.IsChatLoggedIn
 import mega.privacy.android.domain.usecase.IsMultiFactorAuthAvailable
 import mega.privacy.android.domain.usecase.MonitorAutoAcceptQRLinks
@@ -32,7 +29,6 @@ import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
-import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
@@ -40,11 +36,13 @@ import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetSdkLogsEnabled
 import mega.privacy.android.domain.usecase.ToggleAutoAcceptQRLinks
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraSyncEnabledUseCase
+import mega.privacy.android.domain.usecase.meeting.GetCallsSoundNotifications
+import mega.privacy.android.domain.usecase.meeting.SetCallsSoundNotifications
 import mega.privacy.android.domain.usecase.setting.EnableFileVersionsOption
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
-import test.mega.privacy.android.app.TEST_USER_ACCOUNT
 
 /**
  * Test settings module
@@ -66,8 +64,6 @@ object TestSettingsModule {
         mock<FetchAutoAcceptQRLinks> { onBlocking { invoke() }.thenReturn(false) }
     val fetchMultiFactorAuthSetting =
         mock<FetchMultiFactorAuthSetting> { onBlocking { invoke() }.thenReturn(false) }
-    val getAccountDetails =
-        mock<GetAccountDetails> { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) }
     val monitorHideRecentActivity =
         mock<MonitorHideRecentActivity> { on { invoke() }.thenReturn(emptyFlow()) }
     val monitorMediaDiscoveryView =
@@ -79,9 +75,6 @@ object TestSettingsModule {
     val getCallsSoundNotifications =
         mock<GetCallsSoundNotifications> { on { invoke() }.thenReturn(emptyFlow()) }
     val setCallsSoundNotifications = mock<SetCallsSoundNotifications>()
-
-    @Provides
-    fun provideGetAccountDetails(): GetAccountDetails = getAccountDetails
 
     @Provides
     fun provideCanDeleteAccount(): CanDeleteAccount = canDeleteAccount

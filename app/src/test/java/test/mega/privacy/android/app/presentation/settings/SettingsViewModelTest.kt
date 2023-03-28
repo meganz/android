@@ -65,7 +65,7 @@ class SettingsViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
         whenever(monitorAutoAcceptQRLinks()).thenReturn(flowOf(true))
         underTest = SettingsViewModel(
-            getAccountDetails = mock { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) },
+            getAccountDetailsUseCase = mock { onBlocking { invoke(any()) }.thenReturn(TEST_USER_ACCOUNT) },
             canDeleteAccount = mock { on { invoke(TEST_USER_ACCOUNT) }.thenReturn(true) },
             refreshPasscodeLockPreference = mock(),
             areSdkLogsEnabled = mock { on { invoke() }.thenReturn(emptyFlow()) },

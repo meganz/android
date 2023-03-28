@@ -6,7 +6,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
-import mega.privacy.android.domain.usecase.GetAccountDetails
+import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
@@ -26,7 +26,7 @@ class DefaultGetFullAccountInfoTest {
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val getPricing: GetPricing = mock()
     private val getNumberOfSubscription: GetNumberOfSubscription = mock()
-    private val getAccountDetails: GetAccountDetails = mock()
+    private val getAccountDetailsUseCase: GetAccountDetailsUseCase = mock()
     private val getPaymentMethod: GetPaymentMethod = mock()
     private val getSpecificAccountDetail: GetSpecificAccountDetail = mock()
 
@@ -36,7 +36,7 @@ class DefaultGetFullAccountInfoTest {
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             getPricing = getPricing,
             getNumberOfSubscription = getNumberOfSubscription,
-            getAccountDetails = getAccountDetails,
+            getAccountDetailsUseCase = getAccountDetailsUseCase,
             getPaymentMethod = getPaymentMethod,
             getSpecificAccountDetail = getSpecificAccountDetail,
         )
@@ -49,7 +49,7 @@ class DefaultGetFullAccountInfoTest {
             whenever(monitorStorageStateEventUseCase()).thenReturn(MutableStateFlow(event))
             underTest()
             verify(getPaymentMethod, times(1)).invoke(true)
-            verify(getAccountDetails, times(1)).invoke(true)
+            verify(getAccountDetailsUseCase, times(1)).invoke(true)
             verifyNoMoreInteractions(getSpecificAccountDetail)
             verify(getPricing, times(1)).invoke(true)
             verify(getNumberOfSubscription, times(1)).invoke(true)
@@ -68,7 +68,7 @@ class DefaultGetFullAccountInfoTest {
                 transfer = true,
                 pro = true,
             )
-            verifyNoMoreInteractions(getAccountDetails)
+            verifyNoMoreInteractions(getAccountDetailsUseCase)
             verify(getPricing, times(1)).invoke(true)
             verify(getNumberOfSubscription, times(1)).invoke(true)
         }

@@ -11,14 +11,14 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetAccountDetailsTest {
-    private lateinit var underTest: GetAccountDetails
+class GetAccountDetailsUseCaseTest {
+    private lateinit var underTest: GetAccountDetailsUseCase
     private val accountRepository = mock<AccountRepository>()
     private val isDatabaseEntryStale = mock<IsDatabaseEntryStale>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAccountDetails(
+        underTest = GetAccountDetailsUseCase(
             accountsRepository = accountRepository,
             isDatabaseEntryStale = isDatabaseEntryStale
         )
