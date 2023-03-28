@@ -155,6 +155,7 @@ class GetMeetingsImplTest {
             ChatScheduledMeeting(
                 chatId = 2L,
                 schedId = Random.nextLong(),
+                parentSchedId = -1L,
                 title = "Chat room #2",
                 startDateTime = now.plusSeconds(2 * 3600).epochSecond,
                 endDateTime = now.plusSeconds(2 * 7200).epochSecond,
@@ -163,6 +164,8 @@ class GetMeetingsImplTest {
             ),
             ChatScheduledMeeting(
                 chatId = 3L,
+                schedId = Random.nextLong(),
+                parentSchedId = -1L,
                 title = "Chat room #3",
                 startDateTime = now.plusSeconds(3 * 3600).epochSecond,
                 endDateTime = now.plusSeconds(3 * 7200).epochSecond,
@@ -171,6 +174,8 @@ class GetMeetingsImplTest {
             ),
             ChatScheduledMeeting(
                 chatId = 5L,
+                schedId = Random.nextLong(),
+                parentSchedId = -1L,
                 title = "Chat room #5",
                 startDateTime = now.plusSeconds(5 * 3600).epochSecond,
                 endDateTime = now.plusSeconds(5 * 7200).epochSecond,
@@ -179,9 +184,7 @@ class GetMeetingsImplTest {
             ),
         )
 
-    private fun generateRandomChatScheduledRules(): ChatScheduledRules? {
-        if (Random.nextBoolean()) return null
-
+    private fun generateRandomChatScheduledRules(): ChatScheduledRules {
         val frequencyTypes = OccurrenceFrequencyType.values()
         val weekdays = Weekday.values()
         val until = Random.nextLong(now.plusSeconds(Random.nextLong(86000, 600000)).epochSecond)

@@ -230,8 +230,8 @@ class GetMeetingsImpl @Inject constructor(
             }
 
     private suspend fun MeetingRoomItem.getScheduledMeetingItem(): MeetingRoomItem? =
-        callRepository.getScheduledMeetingsByChat(chatId)?.firstOrNull()
-            ?.takeIf { !it.isCanceled }
+        callRepository.getScheduledMeetingsByChat(chatId)
+            ?.firstOrNull { it.parentSchedId == -1L && !it.isCanceled }
             ?.let { schedMeeting ->
                 val isPending = isActive && schedMeeting.isPending()
                 val isRecurringDaily = schedMeeting.rules?.freq == OccurrenceFrequencyType.Daily

@@ -16,7 +16,8 @@ internal class ChatScheduledMeetingRulesMapper @Inject constructor(
     private val weekOfMonthMapper: WeekOfMonthMapper,
     private val weekDaysListMapper: WeekDaysListMapper,
 ) {
-    operator fun invoke(megaChatScheduledRules: MegaChatScheduledRules): ChatScheduledRules {
+    operator fun invoke(rules: MegaChatScheduledRules?): ChatScheduledRules? {
+        val megaChatScheduledRules = rules ?: return null
         val freq = occurrenceFrequencyTypeMapper(megaChatScheduledRules.freq())
         var weekDayList: List<Weekday>? = null
         megaChatScheduledRules.byWeekDay()?.let {

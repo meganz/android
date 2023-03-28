@@ -8,7 +8,8 @@ import javax.inject.Inject
  * Mapper to convert chat scheduled meeting changes to [ScheduledMeetingChanges]
  */
 internal class ChatScheduledMeetingChangesMapper @Inject constructor() {
-    operator fun invoke(schedMeet: MegaChatScheduledMeeting): ScheduledMeetingChanges = when {
+    operator fun invoke(schedMeet: MegaChatScheduledMeeting?): ScheduledMeetingChanges? = when {
+        schedMeet == null -> null
         schedMeet.hasChanged(MegaChatScheduledMeeting.SC_START.toLong()) -> ScheduledMeetingChanges.StartDate
         schedMeet.hasChanged(MegaChatScheduledMeeting.SC_END.toLong()) -> ScheduledMeetingChanges.EndDate
         schedMeet.hasChanged(MegaChatScheduledMeeting.SC_TITLE.toLong()) -> ScheduledMeetingChanges.Title
