@@ -61,7 +61,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedParentNodeId = NodeId(expectedParentHandle)
     private val expectedBase64Id = "base 64 id"
     private val expectedIsFavourite = true
-    private val expectedIsExported = true
+    private val expectedExportedData = null
     private val expectedIsTakenDown = true
     private val expectedInRubbishBin = true
     private val expectedIncomingShare = true
@@ -120,7 +120,6 @@ class DefaultMediaPlayerRepositoryTest {
                 assertThat(label).isEqualTo(expectedTypedNode.label)
                 assertThat(hasVersion).isEqualTo(expectedTypedNode.hasVersion)
                 assertThat(isFavourite).isEqualTo(expectedTypedNode.isFavourite)
-                assertThat(isExported).isEqualTo(expectedTypedNode.isExported)
                 assertThat(isTakenDown).isEqualTo(expectedTypedNode.isTakenDown)
                 assertThat(isIncomingShare).isEqualTo(expectedTypedNode.isIncomingShare)
                 assertThat(size).isEqualTo(expectedTypedNode.size)
@@ -152,7 +151,6 @@ class DefaultMediaPlayerRepositoryTest {
                 assertThat(label).isEqualTo(expectedTypedNode.label)
                 assertThat(hasVersion).isEqualTo(expectedTypedNode.hasVersion)
                 assertThat(isFavourite).isEqualTo(expectedTypedNode.isFavourite)
-                assertThat(isExported).isEqualTo(expectedTypedNode.isExported)
                 assertThat(isTakenDown).isEqualTo(expectedTypedNode.isTakenDown)
                 assertThat(isIncomingShare).isEqualTo(expectedTypedNode.isIncomingShare)
                 assertThat(isInRubbishBin).isEqualTo(expectedTypedNode.isInRubbishBin)
@@ -312,7 +310,7 @@ class DefaultMediaPlayerRepositoryTest {
         on { label }.thenReturn(expectedLabel)
         on { base64Handle }.thenReturn(expectedBase64Id)
         on { isFavourite }.thenReturn(expectedIsFavourite)
-        on { isExported }.thenReturn(expectedIsExported)
+        on { isExported }.thenReturn(false)
         on { isTakenDown }.thenReturn(expectedIsTakenDown)
         on { isInShare }.thenReturn(expectedIncomingShare)
         on { isOutShare }.thenReturn(expectedInShared)
@@ -332,7 +330,7 @@ class DefaultMediaPlayerRepositoryTest {
         childFileCount = expectedGetNumChildFiles,
         childFolderCount = expectedGetNumChildFolders,
         isFavourite = expectedIsFavourite,
-        isExported = expectedIsExported,
+        exportedData = expectedExportedData,
         isTakenDown = expectedIsTakenDown,
         isInRubbishBin = expectedInRubbishBin,
         isIncomingShare = expectedIncomingShare,
@@ -351,7 +349,7 @@ class DefaultMediaPlayerRepositoryTest {
         label = expectedLabel,
         hasVersion = expectedHasVersion,
         isFavourite = expectedIsFavourite,
-        isExported = expectedIsExported,
+        exportedData = expectedExportedData,
         isTakenDown = expectedIsTakenDown,
         isIncomingShare = expectedIncomingShare,
         size = expectedSize,

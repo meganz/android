@@ -2,6 +2,7 @@ package mega.privacy.android.data.mapper
 
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
+import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import nz.mega.sdk.MegaNode
@@ -47,7 +48,9 @@ internal suspend fun toNode(
         childFolderCount = numberOfChildFolders(megaNode),
         childFileCount = numberOfChildFiles(megaNode),
         isFavourite = megaNode.isFavourite,
-        isExported = megaNode.isExported,
+        exportedData = megaNode.takeIf { megaNode.isExported }?.let {
+            ExportedData(it.publicLink, it.publicLinkCreationTime)
+        },
         isTakenDown = megaNode.isTakenDown,
         isInRubbishBin = isInRubbish(megaNode),
         isIncomingShare = megaNode.isInShare,
@@ -71,7 +74,9 @@ internal suspend fun toNode(
         thumbnailPath = thumbnailPath(megaNode),
         type = fileTypeInfoMapper(megaNode),
         isFavourite = megaNode.isFavourite,
-        isExported = megaNode.isExported,
+        exportedData = megaNode.takeIf { megaNode.isExported }?.let {
+            ExportedData(it.publicLink, it.publicLinkCreationTime)
+        },
         isTakenDown = megaNode.isTakenDown,
         isIncomingShare = megaNode.isInShare,
         fingerprint = megaNode.fingerprint,

@@ -146,7 +146,7 @@ class FavouritesViewHolder(
                         itemImgLabel.isVisible = favourite.showLabel
                         fileListSavedOffline.isVisible = favourite.isAvailableOffline
                         itemImgFavourite.isVisible = favourite.typedNode.isFavourite
-                        itemPublicLink.isVisible = favourite.typedNode.isExported
+                        itemPublicLink.isVisible = favourite.typedNode.exportedData != null
                         itemTakenDown.isVisible = favourite.typedNode.isTakenDown
                         itemVersionsIcon.isVisible = favourite.typedNode.hasVersion
                         itemFileInfo.text = favourite.info

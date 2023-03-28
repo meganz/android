@@ -15,6 +15,7 @@ import mega.privacy.android.app.presentation.view.INFO_TEXT_TEST_TAG
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.app.presentation.view.SELECTED_TEST_TAG
 import mega.privacy.android.app.presentation.view.TAKEN_TEST_TAG
+import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FolderNode
 import org.junit.Rule
 import org.junit.Test
@@ -30,6 +31,7 @@ class NodesViewTest {
     val composeTestRule = createComposeRule()
 
     private val stringUtilWrapper: StringUtilWrapper = mock()
+    private val exportedData = ExportedData("link", 123L)
 
     @Test
     fun `test when list item is selected then is shows selected image`() = runTest {
@@ -75,7 +77,7 @@ class NodesViewTest {
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
         whenever(node.isFavourite).thenReturn(true)
-        whenever(node.isExported).thenReturn(true)
+        whenever(node.exportedData).thenReturn(exportedData)
         whenever(
             stringUtilWrapper.getFolderInfo(
                 node.childFolderCount,
@@ -115,7 +117,7 @@ class NodesViewTest {
         whenever(node.name).thenReturn("Some name")
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
-        whenever(node.isExported).thenReturn(true)
+        whenever(node.exportedData).thenReturn(exportedData)
         whenever(
             stringUtilWrapper.getFolderInfo(
                 node.childFolderCount,
@@ -157,7 +159,7 @@ class NodesViewTest {
             whenever(node.childFileCount).thenReturn(1)
             whenever(node.childFolderCount).thenReturn(2)
             whenever(node.isTakenDown).thenReturn(true)
-            whenever(node.isExported).thenReturn(true)
+            whenever(node.exportedData).thenReturn(exportedData)
             whenever(node.isFavourite).thenReturn(true)
             whenever(
                 stringUtilWrapper.getFolderInfo(

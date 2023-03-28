@@ -6,10 +6,14 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaNode
-import org.junit.Test
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -23,6 +27,8 @@ class NodeMapperTest {
     private val expectedModificationTime = 123L
     private val expectedFingerprint = "fingerprint"
     private val expectedDuration = 100
+    private val expectedPublicLink = "publicLink"
+    private val expectedPublicLinkCreationTime = 456L
 
     @Test
     fun `test that files are mapped if isFile is true`() = runTest {
@@ -92,12 +98,62 @@ class NodeMapperTest {
         assertThat(actual.parentId).isEqualTo(NodeId(expectedParentId))
         assertThat(actual.base64Id).isEqualTo(expectedBase64Id)
         assertThat(actual.isFavourite).isEqualTo(node.isFavourite)
-        assertThat(actual.isExported).isEqualTo(node.isExported)
         assertThat(actual.isTakenDown).isEqualTo(node.isTakenDown)
         assertThat(actual).isInstanceOf(DefaultFolderNode::class.java)
         val actualAsFolder = actual as DefaultFolderNode
         assertThat(actualAsFolder.isInRubbishBin).isTrue()
         assertThat(actualAsFolder.isPendingShare).isTrue()
+    }
+
+    @Nested
+    @DisplayName("Test that is exported data is correct")
+    inner class Exported {
+
+        @ParameterizedTest(name = "exported: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that exported data is returned if and only if is exported in MegaNode is true`(
+            exported: Boolean,
+        ) = runTest {
+            val megaNode = megaNode(exported)
+            val actual = mappedNode(megaNode)
+            if (exported) {
+                assertThat(actual.exportedData).isNotNull()
+            } else {
+                assertThat(actual.exportedData).isNull()
+            }
+        }
+
+        @Test
+        fun `test that exported public link is correct`() = runTest {
+            val megaNode = megaNode(true)
+            val actual = mappedNode(megaNode)
+            assertThat(actual.exportedData?.publicLink).isEqualTo(expectedPublicLink)
+        }
+
+        @Test
+        fun `test that exported public link creation time is correct`() = runTest {
+            val megaNode = megaNode(true)
+            val actual = mappedNode(megaNode)
+            assertThat(actual.exportedData?.publicLinkCreationTime).isEqualTo(
+                expectedPublicLinkCreationTime
+            )
+        }
+
+        private suspend fun mappedNode(megaNode: MegaNode) = toNode(
+            megaNode = megaNode,
+            thumbnailPath = { null },
+            hasVersion = { false },
+            numberOfChildFolders = { 0 },
+            numberOfChildFiles = { 1 },
+            isInRubbish = { false },
+            fileTypeInfoMapper = { PdfFileTypeInfo },
+            isPendingShare = { false },
+        )
+
+        private fun megaNode(exported: Boolean) = getMockNode(
+            isExported = exported,
+            isFile = false
+        )
     }
 
     private fun getMockNode(
@@ -110,6 +166,9 @@ class NodeMapperTest {
         modificationTime: Long = expectedModificationTime,
         fingerprint: String = expectedFingerprint,
         duration: Int = expectedDuration,
+        isExported: Boolean = true,
+        publicLink: String = expectedPublicLink,
+        publicLinkCreationTime: Long = expectedPublicLinkCreationTime,
         isFile: Boolean,
     ): MegaNode {
         val node = mock<MegaNode> {
@@ -124,6 +183,9 @@ class NodeMapperTest {
             on { this.duration }.thenReturn(duration)
             on { this.isFile }.thenReturn(isFile)
             on { this.isFolder }.thenReturn(!isFile)
+            on { this.isExported }.thenReturn(isExported)
+            on { this.publicLink }.thenReturn(publicLink)
+            on { this.publicLinkCreationTime }.thenReturn(publicLinkCreationTime)
         }
         return node
     }

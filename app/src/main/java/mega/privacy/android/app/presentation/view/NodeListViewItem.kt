@@ -118,7 +118,7 @@ internal fun NodeListViewItem(
 
                             )
                     }
-                    if (nodeUIItem.isExported) {
+                    if (nodeUIItem.exportedData != null) {
                         Image(
                             alignment = Alignment.Center,
                             modifier = iconModifier
