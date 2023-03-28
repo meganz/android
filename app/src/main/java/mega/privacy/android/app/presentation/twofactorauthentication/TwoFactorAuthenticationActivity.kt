@@ -664,12 +664,13 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
     }
 
     private fun handleGetting2FACode(state: TwoFactorAuthenticationUIState) {
-        state.seed.takeIf { state.is2FAFetchCompleted }?.let {
-            seed = it
-            binding.qrProgressBar.visibility = View.VISIBLE
-            setSeed(seed.toSeedArray())
-
-        } ?: showSnackbar(getString(R.string.qr_seed_text_error))
+        if (state.is2FAFetchCompleted) {
+            state.seed?.let {
+                this@TwoFactorAuthenticationActivity.seed = it
+                binding.qrProgressBar.visibility = View.VISIBLE
+                setSeed(it.toSeedArray())
+            } ?: showSnackbar(getString(R.string.qr_seed_text_error))
+        }
     }
 
     private fun handleIsMasterKeyExported(state: TwoFactorAuthenticationUIState) {
