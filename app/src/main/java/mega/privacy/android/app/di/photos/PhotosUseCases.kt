@@ -10,8 +10,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.usecase.CreateAlbum
-import mega.privacy.android.domain.usecase.DefaultCreateAlbum
 import mega.privacy.android.domain.usecase.DefaultEnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.DefaultFilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.DefaultFilterCloudDrivePhotos
@@ -28,7 +26,6 @@ import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.DefaultObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.DefaultObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.DefaultSetInitialCUPreferences
-import mega.privacy.android.domain.usecase.DefaultUpdateAlbumCover
 import mega.privacy.android.domain.usecase.DefaultUpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.DefaultUpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.DownloadPreview
@@ -51,7 +48,6 @@ import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
-import mega.privacy.android.domain.usecase.UpdateAlbumCover
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 
@@ -105,9 +101,6 @@ abstract class PhotosUseCases {
     abstract fun bindGetPhotosByFolderId(useCase: DefaultGetPhotosByFolderId): GetPhotosByFolderId
 
     @Binds
-    abstract fun bindCreateAlbum(useCase: DefaultCreateAlbum): CreateAlbum
-
-    @Binds
     abstract fun bindObserveAlbumPhotosAddingProgress(useCase: DefaultObserveAlbumPhotosAddingProgress): ObserveAlbumPhotosAddingProgress
 
     @Binds
@@ -118,9 +111,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindUpdateAlbumPhotosRemovingProgressCompleted(useCase: DefaultUpdateAlbumPhotosRemovingProgressCompleted): UpdateAlbumPhotosRemovingProgressCompleted
-
-    @Binds
-    abstract fun bindUpdateAlbumCover(useCase: DefaultUpdateAlbumCover): UpdateAlbumCover
 
     companion object {
         @Provides

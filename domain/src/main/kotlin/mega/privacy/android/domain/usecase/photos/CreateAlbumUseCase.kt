@@ -1,20 +1,17 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
-import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.repository.PhotosRepository
 import javax.inject.Inject
 
 /**
- * Default implementation of the use case CreateAlbum
+ * Use Case to create an album
  */
-class DefaultCreateAlbum @Inject constructor(
-    private val photosRepository: PhotosRepository,
+class CreateAlbumUseCase @Inject constructor(
     private val albumRepository: AlbumRepository,
-) : CreateAlbum {
-    override suspend fun invoke(name: String): Album.UserAlbum {
+) {
+    suspend operator fun invoke(name: String): Album.UserAlbum {
         val newUserSet = albumRepository.createAlbum(name)
         val coverPhoto = null
         return Album.UserAlbum(

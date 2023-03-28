@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -12,14 +12,14 @@ import org.mockito.kotlin.whenever
 import kotlin.test.fail
 
 @ExperimentalCoroutinesApi
-class DefaultUpdateAlbumCoverTest {
-    private lateinit var underTest: UpdateAlbumCover
+class UpdateAlbumCoverUseCaseTest {
+    private lateinit var underTest: UpdateAlbumCoverUseCase
 
     private val albumRepository = mock<AlbumRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultUpdateAlbumCover(
+        underTest = UpdateAlbumCoverUseCase(
             albumRepository = albumRepository,
         )
     }

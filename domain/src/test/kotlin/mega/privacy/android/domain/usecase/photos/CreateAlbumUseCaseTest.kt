@@ -4,7 +4,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.repository.PhotosRepository
+import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -13,17 +13,15 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
 
 @ExperimentalCoroutinesApi
-class DefaultCreateAlbumTest {
-    private lateinit var underTest: CreateAlbum
-    private val photosRepository = mock<PhotosRepository>()
+class CreateAlbumUseCaseTest {
+    private lateinit var underTest: CreateAlbumUseCase
     private val albumRepository = mock<AlbumRepository>()
 
     private val testName = "Album1"
 
     @Before
     fun setUp() {
-        underTest = DefaultCreateAlbum(
-            photosRepository = photosRepository,
+        underTest = CreateAlbumUseCase(
             albumRepository = albumRepository,
         )
     }

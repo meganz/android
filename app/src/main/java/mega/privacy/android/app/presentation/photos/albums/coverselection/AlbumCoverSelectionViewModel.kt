@@ -29,7 +29,7 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
-import mega.privacy.android.domain.usecase.UpdateAlbumCover
+import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -41,7 +41,7 @@ class AlbumCoverSelectionViewModel @Inject constructor(
     private val getUserAlbum: GetUserAlbum,
     private val getAlbumPhotos: GetAlbumPhotos,
     private val downloadThumbnail: DownloadThumbnail,
-    private val updateAlbumCover: UpdateAlbumCover,
+    private val updateAlbumCoverUseCase: UpdateAlbumCoverUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumCoverSelectionState())
@@ -129,7 +129,7 @@ class AlbumCoverSelectionViewModel @Inject constructor(
         val albumId = album?.id ?: return@launch
         val elementId = photo?.albumPhotoId?.let { NodeId(it) } ?: return@launch
 
-        updateAlbumCover(albumId, elementId)
+        updateAlbumCoverUseCase(albumId, elementId)
 
         _state.update {
             it.copy(isSelectionCompleted = true)

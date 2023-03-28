@@ -12,7 +12,6 @@ import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPhotosByFolderId
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
-import mega.privacy.android.domain.usecase.UpdateAlbumCover
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import org.mockito.kotlin.mock
@@ -44,9 +43,6 @@ object TestPhotosUseCases {
 
     @Provides
     fun provideUpdateAlbumPhotosRemovingProgressCompletedUseCase(): UpdateAlbumPhotosRemovingProgressCompleted = mock()
-
-    @Provides
-    fun provideUpdateAlbumCoverUseCase(): UpdateAlbumCover = mock()
 
     @Provides
     fun provideGetPhotosByIdsUseCase(): GetPhotosByIds = mock()
