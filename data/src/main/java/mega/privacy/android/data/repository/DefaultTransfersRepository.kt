@@ -19,6 +19,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.TransferRepository
@@ -263,4 +264,15 @@ internal class DefaultTransfersRepository @Inject constructor(
     override fun monitorPausedTransfers() = appEventGateway.monitorPausedTransfers()
 
     override suspend fun broadcastPausedTransfers() = appEventGateway.broadcastPausedTransfers()
+
+    override suspend fun getInProgressTransfers(): List<Transfer> = withContext(ioDispatcher) {
+        val transfers = mutableListOf<Transfer>()
+        megaApiGateway.getTransferData()?.let { data ->
+            transfers.addAll((0 until data.numDownloads)
+                .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
+            transfers.addAll((0 until data.numUploads)
+                .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
+        }
+        transfers.sortedBy { it.priority }
+    }
 }

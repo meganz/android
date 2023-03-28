@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaSetElementList
 import nz.mega.sdk.MegaSetList
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import nz.mega.sdk.MegaUserAlert
@@ -2127,4 +2128,11 @@ interface MegaApiGateway {
      * @param listener mega request listener interface
      */
     fun setUserAlias(userHandle: Long, name: String?, listener: MegaRequestListenerInterface)
+
+    /**
+     * Get information about transfer queues
+     *
+     * @return Information about transfer queues
+     */
+    suspend fun getTransferData(): MegaTransferData?
 }

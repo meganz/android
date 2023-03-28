@@ -167,4 +167,10 @@ interface TransferRepository {
      * Broadcasts paused transfers.
      */
     suspend fun broadcastPausedTransfers()
+
+    /**
+     * Get in progress transfers
+     *
+     */
+    suspend fun getInProgressTransfers(): List<Transfer>
 }

@@ -19,6 +19,7 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaTransfer
+import nz.mega.sdk.MegaTransferData
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -343,4 +344,28 @@ class DefaultTransfersRepositoryTest {
         whenever(megaApiGateway.getTransfersByTag(transferTag)).thenReturn(null)
         assertThat(underTest.getTransferByTag(transferTag)).isNull()
     }
+
+    @Test
+    fun `test that getInProgressTransfers empty when both getTransferData numDownloads and numUploads equal zero`() =
+        runTest {
+            val data = mock<MegaTransferData> {
+                on { numDownloads }.thenReturn(0)
+                on { numUploads }.thenReturn(0)
+            }
+            whenever(megaApiGateway.getTransferData()).thenReturn(data)
+            assertThat(underTest.getInProgressTransfers()).isEmpty()
+        }
+
+    @Test
+    fun `test that getInProgressTransfers returns correctly when both getTransferData numDownloads and numUploads differ zero`() =
+        runTest {
+            val data = mock<MegaTransferData> {
+                on { numDownloads }.thenReturn(5)
+                on { numUploads }.thenReturn(5)
+            }
+            whenever(megaApiGateway.getTransferData()).thenReturn(data)
+            whenever(transferMapper.invoke(any())).thenReturn(mock())
+            whenever(megaApiGateway.getTransfersByTag(any())).thenReturn(mock())
+            assertThat(underTest.getInProgressTransfers()).hasSize(data.numDownloads + data.numUploads)
+        }
 }
