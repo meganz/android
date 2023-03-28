@@ -646,7 +646,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
             putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                megaApi.getNodeByHandle(nodeHandle).parentHandle)
+                megaApi.getNodeByHandle(nodeHandle)?.parentHandle ?: INVALID_HANDLE)
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 
