@@ -12,7 +12,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class ContactItemMapperImplTest {
+class ContactItemMapperTest {
     private lateinit var underTest: ContactItemMapper
 
     private lateinit var user: MegaUser
@@ -33,7 +33,7 @@ class ContactItemMapperImplTest {
             on { email }.thenReturn(userEmail)
             on { timestamp }.thenReturn(userTimestamp)
         }
-        underTest = ContactItemMapperImpl()
+        underTest = ContactItemMapper()
     }
 
     @Test
@@ -58,7 +58,7 @@ class ContactItemMapperImplTest {
     fun `test ContactItem visibility is mapped from MegaUser visibility`() {
         UserVisibility.values().forEach { visibility ->
             val sdkValue =
-                ContactItemMapperImpl.userVisibility.entries.find { it.value == visibility }?.key
+                ContactItemMapper.userVisibility.entries.find { it.value == visibility }?.key
             whenever(user.visibility).thenReturn(sdkValue)
             val actual =
                 underTest.invoke(user, expectedContactData, avatarColor, true, status, null)

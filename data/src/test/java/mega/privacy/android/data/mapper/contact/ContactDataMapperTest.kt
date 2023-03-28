@@ -5,12 +5,12 @@ import mega.privacy.android.domain.entity.contacts.ContactData
 import org.junit.Before
 import org.junit.Test
 
-class ContactDataMapperImplTest {
+class ContactDataMapperTest {
     private lateinit var underTest: ContactDataMapper
 
     @Before
     fun setUp() {
-        underTest = ContactDataMapperImpl()
+        underTest = ContactDataMapper()
     }
 
     @Test

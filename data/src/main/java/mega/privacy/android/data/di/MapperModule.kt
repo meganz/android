@@ -73,10 +73,6 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
-import mega.privacy.android.data.mapper.contact.ContactDataMapper
-import mega.privacy.android.data.mapper.contact.ContactDataMapperImpl
-import mega.privacy.android.data.mapper.contact.ContactItemMapper
-import mega.privacy.android.data.mapper.contact.ContactItemMapperImpl
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
@@ -144,13 +140,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindSmsPermissionMapper(implementation: SmsPermissionMapperImpl): SmsPermissionMapper
-
-    @Binds
-    abstract fun bindContactDataMapper(implementation: ContactDataMapperImpl): ContactDataMapper
-
-    @Binds
-    abstract fun bindContactDataItem(implementation: ContactItemMapperImpl): ContactItemMapper
-
     @Binds
     abstract fun bindUploadOptionMapper(implementation: UploadOptionMapperImpl): UploadOptionMapper
 
