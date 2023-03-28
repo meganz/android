@@ -773,6 +773,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     return
                 }
                 updateAccountDetailsVisibleInfo()
+                checkInitialScreens()
                 if (isBusinessAccount) {
                     invalidateOptionsMenu()
                 }
