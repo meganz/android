@@ -18,7 +18,7 @@ rx-android = "3.0.0"
 rx-coroutines = "1.6.4"
 rx-java = "3.0.4"
 rx-kotlin = "3.0.1"
-showkase = '1.0.0-beta13'
+showkase = '1.0.0-beta17'
 simplestorage = "1.1.0"
 compose-state-events = "1.2.3"
 
