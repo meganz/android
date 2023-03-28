@@ -1,5 +1,6 @@
 package mega.privacy.android.nocturn
 
+import android.annotation.SuppressLint
 import mega.privacy.android.nocturn.notification.NocturnNotificator
 import mega.privacy.android.nocturn.thread.AnrDetectorThread
 
@@ -18,6 +19,7 @@ class NocturnImpl(
         )
     }
 
+    @SuppressLint("MissingPermission")
     private fun handleAnr(tag: String, stackTrace: Array<StackTraceElement>) {
         val summaries = stackTrace
             .filter { it.className.lowercase().contains("mega") }
