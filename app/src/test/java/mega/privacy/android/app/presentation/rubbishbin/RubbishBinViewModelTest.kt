@@ -113,6 +113,7 @@ class RubbishBinViewModelTest {
     fun `test that on setting rubbish bin handle rubbish bin node returns null`() = runTest {
         val newValue = 123456789L
         whenever(getRubbishBinChildrenNode.invoke(newValue)).thenReturn(null)
+        whenever(getRubbishBinChildren(newValue)).thenReturn(emptyList())
         underTest.setRubbishBinHandle(newValue)
         Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(0)
         verify(getRubbishBinChildrenNode, times(1)).invoke(newValue)
@@ -160,6 +161,7 @@ class RubbishBinViewModelTest {
         runTest {
             val newValue = 123456789L
             // to update handles rubbishBinHandle
+            whenever(getRubbishBinChildren(newValue)).thenReturn(emptyList())
             underTest.setRubbishBinHandle(newValue)
             underTest.onBackPressed()
             verify(getRubbishBinChildrenNode, times(1)).invoke(newValue)

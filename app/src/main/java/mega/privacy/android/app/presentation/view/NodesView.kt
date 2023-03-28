@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -22,6 +21,41 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.domain.entity.node.FolderNode
 
 /**
+ * Test tag for info text
+ */
+const val INFO_TEXT_TEST_TAG = "Info Text"
+
+/**
+ * Text tag for selected item
+ */
+const val SELECTED_TEST_TAG = "Selected Tag"
+
+/**
+ * Test tag for folder item
+ */
+const val FOLDER_TEST_TAG = "Folder Tag"
+
+/**
+ * Test tag for file item
+ */
+const val FILE_TEST_TAG = "File Tag"
+
+/**
+ * Test tag for favorite item
+ */
+const val FAVORITE_TEST_TAG = "favorite Tag"
+
+/**
+ * Test tag for exported item
+ */
+const val EXPORTED_TEST_TAG = "exported Tag"
+
+/**
+ * Test tag for taken item
+ */
+const val TAKEN_TEST_TAG = "taken Tag"
+
+/**
  * This method will return different type of folder icons based on their type
  * @param nodeUIItem [FolderNode]
  */
@@ -29,7 +63,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 internal fun getPainter(nodeUIItem: FolderNode): Painter {
     return if (nodeUIItem.isIncomingShare) {
         painterResource(id = R.drawable.ic_folder_incoming)
-    } else if (nodeUIItem.isExported) {
+    } else if (nodeUIItem.isShared || nodeUIItem.isPendingShare) {
         painterResource(id = R.drawable.ic_folder_outgoing)
     } else {
         painterResource(id = R.drawable.ic_folder_list)
@@ -73,9 +107,8 @@ private fun NodeGridView(
     LazyVerticalGrid(
         columns = GridCells.Fixed(spanCount),
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(12.dp),
+        contentPadding = PaddingValues(4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item(
             key = "header",
@@ -93,7 +126,11 @@ private fun NodeGridView(
         }
         items(count = nodeUIItems.size,
             key = {
-                nodeUIItems[it].node.id.longValue
+                if (nodeUIItems[it].isInvisible) {
+                    it
+                } else {
+                    nodeUIItems[it].node.id.longValue
+                }
             }) {
             NodeGridViewItem(
                 modifier = modifier,
@@ -135,7 +172,7 @@ private fun NodeListView(
             key = "header"
         ) {
             HeaderViewItem(
-                modifier = modifier.padding(16.dp),
+                modifier = modifier,
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 sortOrder = sortOrder,
@@ -187,7 +224,7 @@ fun NodesView(
     onChangeViewTypeClick: () -> Unit,
     spanCount: Int = 2,
 ) {
-    if (!isListView) {
+    if (isListView) {
         NodeListView(
             modifier = modifier,
             nodeUIItemList = nodeUIItems,
@@ -233,12 +270,11 @@ private fun rememberNodeListForGrid(nodeUIItems: List<NodeUIItem>, spanCount: In
             val gridItemList = nodeUIItems.toMutableList()
             repeat(placeholderCount) {
                 val node = nodeUIItems[folderCount - 1].copy(
-                    isInvisible = true
+                    isInvisible = true,
                 )
-                gridItemList.add(folderCount + 1, node)
+                gridItemList.add(folderCount, node)
             }
             return@remember gridItemList
         }
         nodeUIItems
     }
-

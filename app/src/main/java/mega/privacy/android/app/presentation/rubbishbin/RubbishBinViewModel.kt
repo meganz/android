@@ -87,11 +87,12 @@ class RubbishBinViewModel @Inject constructor(
      */
     fun refreshNodes() {
         viewModelScope.launch {
+            val nodeList = getNodeUiItems(getRubbishBinChildren(_state.value.rubbishBinHandle))
             _state.update {
                 it.copy(
                     nodes = getRubbishBinChildrenNode(_state.value.rubbishBinHandle) ?: emptyList(),
                     parentHandle = getRubbishBinParentNodeHandle(_state.value.rubbishBinHandle),
-                    nodeList = getNodeUiItems(getRubbishBinChildren(_state.value.rubbishBinHandle))
+                    nodeList = nodeList
                 )
             }
         }

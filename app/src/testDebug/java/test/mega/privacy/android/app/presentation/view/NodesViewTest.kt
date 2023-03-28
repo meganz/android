@@ -9,7 +9,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.app.presentation.view.EXPORTED_TEST_TAG
+import mega.privacy.android.app.presentation.view.FAVORITE_TEST_TAG
+import mega.privacy.android.app.presentation.view.INFO_TEXT_TEST_TAG
 import mega.privacy.android.app.presentation.view.NodesView
+import mega.privacy.android.app.presentation.view.SELECTED_TEST_TAG
+import mega.privacy.android.app.presentation.view.TAKEN_TEST_TAG
 import mega.privacy.android.domain.entity.node.FolderNode
 import org.junit.Rule
 import org.junit.Test
@@ -59,7 +64,7 @@ class NodesViewTest {
             )
         }
         composeTestRule.run {
-            onAllNodes(hasTestTag("Selected Tag"))
+            onAllNodes(hasTestTag(SELECTED_TEST_TAG))
         }
     }
 
@@ -98,9 +103,9 @@ class NodesViewTest {
             )
         }
         composeTestRule.run {
-            onAllNodes(hasTestTag("favorite Tag"))
-            onAllNodes(hasTestTag("exported Tag").not())
-            onAllNodes(hasTestTag("taken Tag").not())
+            onAllNodes(hasTestTag(FAVORITE_TEST_TAG))
+            onAllNodes(hasTestTag(EXPORTED_TEST_TAG).not())
+            onAllNodes(hasTestTag(TAKEN_TEST_TAG).not())
         }
     }
 
@@ -138,9 +143,9 @@ class NodesViewTest {
             )
         }
         composeTestRule.run {
-            onAllNodes(hasTestTag("exported Tag"))
-            onAllNodes(hasTestTag("favorite Tag").not())
-            onAllNodes(hasTestTag("taken Tag").not())
+            onAllNodes(hasTestTag(EXPORTED_TEST_TAG))
+            onAllNodes(hasTestTag(FAVORITE_TEST_TAG).not())
+            onAllNodes(hasTestTag(TAKEN_TEST_TAG).not())
         }
     }
 
@@ -181,9 +186,9 @@ class NodesViewTest {
                 )
             }
             composeTestRule.run {
-                onAllNodes(hasTestTag("exported Tag"))
-                onAllNodes(hasTestTag("favorite Tag"))
-                onAllNodes(hasTestTag("taken Tag"))
+                onAllNodes(hasTestTag(EXPORTED_TEST_TAG))
+                onAllNodes(hasTestTag(FAVORITE_TEST_TAG))
+                onAllNodes(hasTestTag(TAKEN_TEST_TAG))
             }
         }
 
@@ -220,7 +225,7 @@ class NodesViewTest {
             )
         }
         composeTestRule.run {
-            onAllNodes(hasTestTag("Info Text").not())
+            onAllNodes(hasTestTag(INFO_TEXT_TEST_TAG).not())
         }
     }
 }
