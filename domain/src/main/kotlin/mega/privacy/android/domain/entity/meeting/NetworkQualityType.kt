@@ -12,5 +12,10 @@ enum class NetworkQualityType {
     /**
      *  Network quality good
      */
-    Good
+    Good,
+
+    /**
+     *  Network quality unknown
+     */
+    Unknown
 }

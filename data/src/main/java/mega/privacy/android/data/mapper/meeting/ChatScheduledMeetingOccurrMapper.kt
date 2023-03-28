@@ -1,16 +1,14 @@
-package mega.privacy.android.data.mapper
+package mega.privacy.android.data.mapper.meeting
 
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import nz.mega.sdk.MegaChatScheduledMeetingOccurr
 import javax.inject.Inject
 
 /**
- * Chat scheduled meeting occurr mapper implementation
+ * Chat scheduled meeting occurrence mapper
  */
-internal class ChatScheduledMeetingOccurrMapperImpl @Inject constructor() :
-    ChatScheduledMeetingOccurrMapper {
-
-    override fun invoke(megaChatScheduledMeetingOccurr: MegaChatScheduledMeetingOccurr) =
+internal class ChatScheduledMeetingOccurrMapper @Inject constructor() {
+    operator fun invoke(megaChatScheduledMeetingOccurr: MegaChatScheduledMeetingOccurr): ChatScheduledMeetingOccurr =
         ChatScheduledMeetingOccurr(
             megaChatScheduledMeetingOccurr.schedId(),
             megaChatScheduledMeetingOccurr.parentSchedId(),
@@ -22,5 +20,5 @@ internal class ChatScheduledMeetingOccurrMapperImpl @Inject constructor() :
         )
 
     private fun MegaChatScheduledMeetingOccurr.isCancelled(): Boolean =
-        cancelled() != null && cancelled() > 0
+        cancelled() > 0
 }

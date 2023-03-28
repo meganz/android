@@ -18,4 +18,9 @@ enum class TermCodeType {
      *  Term code too many participants
      */
     TooManyParticipants,
+
+    /**
+     *  Term code Unknown
+     */
+    Unknown,
 }
