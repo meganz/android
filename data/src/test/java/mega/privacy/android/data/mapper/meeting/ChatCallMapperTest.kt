@@ -29,7 +29,7 @@ class ChatRequestMapperTest {
             ChatCallMapper(
                 HandleListMapper(),
                 ChatCallChangesMapper(),
-                MegaChatCallStatusMapper(),
+                ChatCallStatusMapper(),
                 EndCallReasonMapper(),
                 CallTermCodeMapper(),
                 CallCompositionChangesMapper(),

@@ -16,7 +16,7 @@ import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
-import mega.privacy.android.data.mapper.meeting.ChatCallStatusMapper
+import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.chat.ChatCall
@@ -55,7 +55,7 @@ class CallRepositoryImplTest {
     private val chatCallMapper = mock<ChatCallMapper>()
     private val megaChatRequest = mock<MegaChatRequest>()
     private val chatRequestMapper = mock<ChatRequestMapper>()
-    private val chatCallStatusMapper = ChatCallStatusMapper()
+    private val megaChatCallStatusMapper = MegaChatCallStatusMapper()
     private val handleListMapper = HandleListMapper()
     private val chatScheduledMeetingMapper = mock<ChatScheduledMeetingMapper>()
     private val chatScheduledMeetingOccurrMapper = mock<ChatScheduledMeetingOccurrMapper>()
@@ -109,7 +109,7 @@ class CallRepositoryImplTest {
             chatScheduledMeetingMapper = chatScheduledMeetingMapper,
             chatScheduledMeetingOccurrMapper = chatScheduledMeetingOccurrMapper,
             dispatcher = testDispatcher,
-            chatCallStatusMapper = chatCallStatusMapper,
+            megaChatCallStatusMapper = megaChatCallStatusMapper,
             handleListMapper = handleListMapper,
         )
 
@@ -441,7 +441,7 @@ class CallRepositoryImplTest {
 
     @Test
     fun `test that getCallHandleList returns list of long when state is initial`() = runTest {
-        whenever(megaChatApiGateway.getChatCalls(chatCallStatusMapper(ChatCallStatus.Initial)))
+        whenever(megaChatApiGateway.getChatCalls(megaChatCallStatusMapper(ChatCallStatus.Initial)))
             .thenReturn(mockMegaHandleList)
         val actual = underTest.getCallHandleList(ChatCallStatus.Initial)
         assertThat(actual.size).isEqualTo(2)

@@ -12,7 +12,7 @@ import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MegaChatCallStatusMapperTest {
-    private val underTest: MegaChatCallStatusMapper = MegaChatCallStatusMapper()
+    private val underTest: ChatCallStatusMapper = ChatCallStatusMapper()
 
     @ParameterizedTest(name = "test {0} is not mapped to null")
     @EnumSource(ChatCallStatus::class)
