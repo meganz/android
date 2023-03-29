@@ -55,7 +55,6 @@ import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
-import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_OPEN_APP
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
@@ -76,10 +75,8 @@ import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
 import mega.privacy.android.app.utils.ViewUtils.removeLeadingAndTrailingSpaces
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.StorageState
-import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginLoggedOutFromOtherLocation
 import mega.privacy.android.domain.exception.QuerySignupLinkException
-import mega.privacy.android.domain.exception.login.FetchNodesException
 import nz.mega.sdk.MegaError
 import timber.log.Timber
 
@@ -115,7 +112,7 @@ class LoginFragment : Fragment() {
     }
 
     private var was2FAErrorShown = false
-    private var isPinLongClick: Boolean = false
+    private var isPinLongClick = false
     private var pendingClicksKarere = CLICKS_TO_ENABLE_LOGS
     private var pendingClicksSDK = CLICKS_TO_ENABLE_LOGS
 
@@ -166,7 +163,7 @@ class LoginFragment : Fragment() {
                         }
                     }
                     isLoginInProgress -> {
-                        showLoginInProgress()
+                        showLoginInProgress(false)
                     }
                     isLoginRequired -> {
                         confirmLogoutDialog?.dismiss()
@@ -174,12 +171,14 @@ class LoginFragment : Fragment() {
                     }
                     fetchNodesUpdate != null -> {
                         with(fetchNodesUpdate) {
-                            if (progress == null && temporaryError == null) {
+                            if (temporaryError == null
+                                && (progress == null || progress?.floatValue == 0F)
+                            ) {
                                 if (is2FAEnabled) {
                                     binding.login2fa.isVisible = false
                                     (requireActivity() as LoginActivity).hideAB()
                                 }
-                                showFetchingNodes()
+                                showLoginInProgress()
                             } else {
                                 showFetchNodesProgress(progress)
 
@@ -197,7 +196,7 @@ class LoginFragment : Fragment() {
                             binding.progressbarVerify2fa.isVisible = false
                             show2FAError()
                         } else {
-                            hideError()
+                            hide2FAError()
                         }
                     }
                     is2FARequired -> {
@@ -207,20 +206,20 @@ class LoginFragment : Fragment() {
 
                 if (isLocalLogoutInProgress) disableLoginButton() else enableLoginButton()
 
-                error?.let { exception ->
-                    when (exception) {
+                loginException?.apply {
+                    when (this) {
                         is LoginLoggedOutFromOtherLocation -> {
                             (requireActivity() as LoginActivity).showAlertLoggedOut()
-                            null
                         }
-                        is LoginException -> exception.error
-                        is FetchNodesException -> exception.error
-                        else -> null
-                    }?.let {
-                        (requireActivity() as LoginActivity).showSnackbar(getString(it))
+                        else -> (requireActivity() as LoginActivity).showSnackbar(getString(error))
                     }
 
-                    setErrorShown()
+                    setLoginErrorConsumed()
+                }
+
+                fetchNodesException?.apply {
+                    (requireActivity() as LoginActivity).showSnackbar(getString(error))
+                    setFetchNodesErrorConsumed()
                 }
             }
         }
@@ -399,9 +398,7 @@ class LoginFragment : Fragment() {
         pinFifthLogin.previousDigitEditText = pinFourthLogin
         pinSixthLogin.previousDigitEditText = pinFifthLogin
 
-        if (viewModel.areThereValidTemporalCredentials()) {
-            submitFormConfirmAccount()
-        }
+        viewModel.checkTemporalCredentials()
     }
 
     private fun clickKarereLogs() {
@@ -499,7 +496,7 @@ class LoginFragment : Fragment() {
                 intentAction?.let { action ->
                     when (action) {
                         Constants.ACTION_REFRESH -> {
-                            viewModel.performFetchNodes(true)
+                            viewModel.fetchNodes(true)
                             return@apply
                         }
                         Constants.ACTION_REFRESH_API_SERVER -> {
@@ -536,7 +533,7 @@ class LoginFragment : Fragment() {
                                 }
                             }
 
-                            if (viewModel.rootNodeExists()) {
+                            if (uiState.rootNodesExists) {
                                 var newIntent =
                                     Intent(requireContext(), ManagerActivity::class.java)
 
@@ -597,7 +594,7 @@ class LoginFragment : Fragment() {
                     }
                 }
 
-                if (viewModel.rootNodeExists() && uiState.fetchNodesUpdate == null && !isIsHeartBeatAlive) {
+                if (uiState.rootNodesExists && uiState.fetchNodesUpdate == null && !isIsHeartBeatAlive) {
                     Timber.d("rootNode != null")
 
                     var newIntent = Intent(requireContext(), ManagerActivity::class.java)
@@ -721,10 +718,7 @@ class LoginFragment : Fragment() {
                     }
                 }
                 ACTION_FORCE_RELOAD_ACCOUNT -> {
-                    viewModel.setPendingAction(ACTION_FORCE_RELOAD_ACCOUNT)
-                    isLoggingIn = true
-                    showFetchingNodes()
-                    viewModel.intentSet()
+                    viewModel.setForceReloadAccountAsPendingAction()
                     return
                 }
             }
@@ -735,30 +729,20 @@ class LoginFragment : Fragment() {
 
     /**
      * Shows login in progress screen.
-     *
-     * @param fetchingNodes      True if it's fetching nodes, false otherwise.
-     * @param queryingSignupLink True if it's checking a signup link, false otherwise.
-     * @param generatingKeys     True if it's generating keys, false otherwise.
-     * @param activatingAccount  True if it's activating account, false otherwise.
      */
-    private fun showFetchingNodes(
-        fetchingNodes: Boolean = true,
-        queryingSignupLink: Boolean = false,
-        generatingKeys: Boolean = false,
-        activatingAccount: Boolean = false,
-    ) = with(binding) {
+    private fun showLoginInProgress(isAlreadyFetchingNodes: Boolean = true) = with(binding) {
         loginLayout.isVisible = false
         loginLoggingInLayout.isVisible = true
         loginProgressBar.isVisible = true
         loginFetchingNodesBar.isVisible = false
         loginLoggingInText.isVisible = true
-        loginFetchNodesText.isVisible = fetchingNodes
+        loginFetchNodesText.isVisible = isAlreadyFetchingNodes
         loginPrepareNodesText.isVisible = false
         loginServersBusyText.isVisible = false
         loginCreateAccountLayout.isVisible = false
-        loginQuerySignupLinkText.isVisible = queryingSignupLink
-        loginConfirmAccountText.isVisible = activatingAccount
-        loginGeneratingKeysText.isVisible = generatingKeys
+        loginQuerySignupLinkText.isVisible = false
+        loginConfirmAccountText.isVisible = false
+        loginGeneratingKeysText.isVisible = false
     }
 
     /**
@@ -773,44 +757,43 @@ class LoginFragment : Fragment() {
      * Shows the login screen.
      */
     private fun showLoginScreen() = with(binding) {
-        loginLoggingInLayout.isVisible = false
         loginLayout.isVisible = true
-        confirmLogoutDialog?.dismiss()
-        loginCreateAccountLayout.isVisible = true
-        loginQuerySignupLinkText.isVisible = false
-        loginConfirmAccountText.isVisible = false
-        loginGeneratingKeysText.isVisible = false
+        loginLoggingInLayout.isVisible = false
+        loginProgressBar.isVisible = false
+        loginFetchingNodesBar.isVisible = false
         loginLoggingInText.isVisible = false
         loginFetchNodesText.isVisible = false
         loginPrepareNodesText.isVisible = false
         loginServersBusyText.isVisible = false
-        loginProgressBar.isVisible = false
-        loginFetchingNodesBar.isVisible = false
+        loginCreateAccountLayout.isVisible = true
+        loginQuerySignupLinkText.isVisible = false
+        loginConfirmAccountText.isVisible = false
+        loginGeneratingKeysText.isVisible = false
         login2fa.isVisible = false
     }
 
     private fun show2FAScreen() = with(binding) {
         (requireActivity() as LoginActivity).showAB(toolbarLogin)
         loginLayout.isVisible = false
-        loginCreateAccountLayout.isVisible = false
         loginLoggingInLayout.isVisible = false
-        loginGeneratingKeysText.isVisible = false
         loginProgressBar.isVisible = false
         loginFetchingNodesBar.isVisible = false
-        loginQuerySignupLinkText.isVisible = false
-        loginConfirmAccountText.isVisible = false
+        loginLoggingInText.isVisible = false
         loginFetchNodesText.isVisible = false
         loginPrepareNodesText.isVisible = false
         loginServersBusyText.isVisible = false
+        loginCreateAccountLayout.isVisible = false
+        loginQuerySignupLinkText.isVisible = false
+        loginConfirmAccountText.isVisible = false
+        loginGeneratingKeysText.isVisible = false
         login2fa.isVisible = true
-        confirmLogoutDialog?.dismiss()
         requestEditTextPinFocus(pinFirstLogin)
     }
 
     /**
      * Hides UI errors.
      */
-    private fun hideError() = with(binding) {
+    private fun hide2FAError() = with(binding) {
         viewModel.checkAndUpdate2FAState()
         pin2faErrorLogin.isVisible = false
         listOf(
@@ -829,7 +812,6 @@ class LoginFragment : Fragment() {
     private fun show2FAError() = with(binding) {
         was2FAErrorShown = true
         pin2faErrorLogin.isVisible = true
-        confirmLogoutDialog?.dismiss()
         listOf(
             pinFirstLogin,
             pinSecondLogin,
@@ -873,41 +855,9 @@ class LoginFragment : Fragment() {
         }
     }
 
-    /**
-     * Updates the UI for starting fast login.
-     */
     private fun startFastLogin() {
         Timber.d("startFastLogin")
-        if (!viewModel.updateEmailAndSession()) {
-            return
-        }
-
-        showFetchingNodes(fetchingNodes = false)
-
-        if (!isLoggingIn) {
-            viewModel.performFastLogin(requireActivity().intent?.action == Constants.ACTION_REFRESH_API_SERVER)
-        } else {
-            viewModel.setPendingAction(ACTION_OPEN_APP)
-            Timber.w("Another login is processing")
-        }
-    }
-
-    /**
-     * Submit typed data for confirming account.
-     */
-    private fun submitFormConfirmAccount() = with(binding) {
-        Timber.d("fromConfirmAccount - true email")
-        viewModel.setTemporalCredentialsAsCurrentCredentials()
-        loginEmailText.hideKeyboard()
-
-        if (!isConnected()) {
-            return
-        }
-
-        showFetchingNodes(fetchingNodes = false, generatingKeys = true)
-        Timber.d("Generating keys")
-
-        viewModel.performLogin()
+        viewModel.fastLogin(requireActivity().intent?.action == Constants.ACTION_REFRESH_API_SERVER)
     }
 
     /**
@@ -921,20 +871,11 @@ class LoginFragment : Fragment() {
             return
         }
 
-        showFetchingNodes(fetchingNodes = false, generatingKeys = true)
-
         val typedEmail = loginEmailText.text.toString().lowercase().trim { it <= ' ' }
         val typedPassword = loginPasswordText.text.toString()
         Timber.d("Generating keys")
 
         viewModel.performLogin(typedEmail, typedPassword)
-    }
-
-    private fun showLoginInProgress() = with(binding) {
-        loginLoggingInText.isVisible = true
-        loginFetchNodesText.isVisible = false
-        loginPrepareNodesText.isVisible = false
-        loginServersBusyText.isVisible = false
     }
 
     /**
@@ -1011,22 +952,19 @@ class LoginFragment : Fragment() {
      * @param intent Intent.
      */
     private fun handleConfirmationIntent(intent: Intent) {
-        val accountConfirmationLink = intent.getStringExtra(Constants.EXTRA_CONFIRMATION)
-
         if (!viewModel.isConnected) {
             showMessage(R.string.error_server_connection_problem)
             return
         }
 
-        showFetchingNodes(fetchingNodes = false, queryingSignupLink = true)
         Timber.d("querySignupLink")
-        accountConfirmationLink?.let { viewModel.checkSignupLink(it) }
+        intent.getStringExtra(Constants.EXTRA_CONFIRMATION)?.let { viewModel.checkSignupLink(it) }
     }
 
     /**
      * Checks pending actions and setups the final intent for launch before finish.
      */
-    fun readyToFinish(uiState: LoginState) {
+    private fun readyToFinish(uiState: LoginState) {
         (requireActivity() as LoginActivity).intent?.apply {
             @Suppress("UNCHECKED_CAST")
             intentShareInfo =
@@ -1565,7 +1503,7 @@ class LoginFragment : Fragment() {
             }
         }
 
-        viewModel.querySignupLinkResultShown()
+        viewModel.setQuerySignupLinkResultConsumed()
     }
 
     companion object {

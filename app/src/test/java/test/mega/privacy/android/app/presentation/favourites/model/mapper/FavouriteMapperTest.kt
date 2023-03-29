@@ -27,7 +27,6 @@ class FavouriteMapperTest {
         val expectedInfo = "Test folder info"
         val expectedIcon = R.drawable.ic_folder_incoming
         val expectedIsFavourite = false
-        val expectedIsExported = false
         val expectedIsTakenDown = false
         val expectedShowLabel = true
         val expectedHasVersion = true
@@ -52,7 +51,6 @@ class FavouriteMapperTest {
             on { childFileCount }.thenReturn(0)
             on { childFolderCount }.thenReturn(0)
             on { isFavourite }.thenReturn(expectedIsFavourite)
-            on { isExported }.thenReturn(expectedIsExported)
             on { isTakenDown }.thenReturn(expectedIsTakenDown)
             on { isInRubbishBin }.thenReturn(expectedIsInRubbishBin)
             on { isIncomingShare }.thenReturn(expectedIsIncomingShare)
@@ -131,7 +129,6 @@ class FavouriteMapperTest {
             on { modificationTime }.thenReturn(expectedModificationTime)
             on { hasVersion }.thenReturn(expectedHasVersion)
             on { isFavourite }.thenReturn(expectedIsFavourite)
-            on { isExported }.thenReturn(expectedIsExported)
             on { isTakenDown }.thenReturn(expectedIsTakenDown)
             on { type }.thenReturn(PdfFileTypeInfo)
         }

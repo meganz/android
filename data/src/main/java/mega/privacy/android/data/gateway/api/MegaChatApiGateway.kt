@@ -566,4 +566,17 @@ interface MegaChatApiGateway {
      * via MegaApi::changeApiUrl.
      */
     suspend fun refreshUrl()
+
+    /**
+     * Get a list with the ids of chat-rooms where there are active calls
+     *
+     * The list of ids can be retrieved for calls in one specific state by setting
+     * the parameter callState. If state is -1, it returns all calls regardless their state.
+     *
+     * You take the ownership of the returned value.
+     *
+     * @param state of calls that you want receive, -1 to consider all states
+     * @return A list of handles with the ids of chat-rooms where there are active calls
+     */
+    fun getChatCalls(state: Int): MegaHandleList?
 }

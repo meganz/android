@@ -1,5 +1,6 @@
 package mega.privacy.android.data.model.node
 
+import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -13,7 +14,7 @@ internal data class DefaultFolderNode(
     override val childFolderCount: Int,
     override val childFileCount: Int,
     override val isFavourite: Boolean,
-    override val isExported: Boolean,
+    override val exportedData: ExportedData?,
     override val isTakenDown: Boolean,
     override val isInRubbishBin: Boolean,
     override val isIncomingShare: Boolean,

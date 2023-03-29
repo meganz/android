@@ -11,28 +11,29 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
-import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
-import mega.privacy.android.core.ui.theme.extensions.grey_087_white
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_060
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
+import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
-import mega.privacy.android.domain.entity.node.NodeId
 
 /**
  * List view item for file/folder info
@@ -59,9 +60,8 @@ internal fun NodeListViewItem(
                 onClick = { onItemClicked(nodeUIItem) },
                 onLongClick = { onLongClick(nodeUIItem) }
             )
-
             .fillMaxWidth()
-            .absolutePadding(left = 16.dp)
+            .padding(vertical = 8.dp)
     ) {
         Row(
             modifier = Modifier
@@ -71,10 +71,12 @@ internal fun NodeListViewItem(
             val thumbNailModifier = Modifier
                 .height(48.dp)
                 .width(48.dp)
+                .padding(4.dp)
+                .clip(RoundedCornerShape(8.dp))
             if (nodeUIItem.isSelected) {
                 Image(
                     modifier = thumbNailModifier
-                        .testTag("Selected Tag"),
+                        .testTag(SELECTED_TEST_TAG),
                     painter = painterResource(R.drawable.ic_select_folder),
                     contentDescription = "Selected",
                 )
@@ -82,26 +84,25 @@ internal fun NodeListViewItem(
                 if (nodeUIItem.node is FolderNode) {
                     Image(
                         modifier = thumbNailModifier
-                            .testTag("Folder Tag"),
+                            .testTag(FOLDER_TEST_TAG),
                         painter = getPainter(nodeUIItem = nodeUIItem.node),
                         contentDescription = "Folder Thumbnail"
                     )
-                } else {
+                } else if (nodeUIItem.node is FileNode) {
                     Image(
                         modifier = thumbNailModifier
-                            .testTag("File Tag"),
-                        bitmap = ThumbnailUtils.getThumbnailFromCache(nodeUIItem.id.longValue)
-                            .asImageBitmap(),
+                            .testTag(FILE_TEST_TAG),
+                        painter = rememberAsyncImagePainter(model = nodeUIItem.node.thumbnailPath),
                         contentDescription = "Thumbnail"
                     )
                 }
             }
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Row {
                     Text(
                         text = nodeUIItem.name,
                         style = MaterialTheme.typography.subtitle1,
-                        color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.grey_087_white,
+                        color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,
                         maxLines = 1
                     )
                     val iconModifier = Modifier
@@ -111,21 +112,21 @@ internal fun NodeListViewItem(
                         Image(
                             alignment = Alignment.Center,
                             modifier = iconModifier
-                                .testTag("favorite Tag"),
+                                .testTag(FAVORITE_TEST_TAG),
                             painter = painterResource(id = R.drawable.ic_favorite),
                             contentDescription = "Favorite",
 
                             )
                     }
-                    if (nodeUIItem.isExported) {
+                    if (nodeUIItem.exportedData != null) {
                         Image(
                             alignment = Alignment.Center,
                             modifier = iconModifier
-                                .testTag("exported Tag"),
+                                .testTag(EXPORTED_TEST_TAG),
                             painter = painterResource(id = R.drawable.link_ic),
                             contentDescription = "Link",
                             colorFilter = ColorFilter.tint(
-                                MaterialTheme.colors.grey_white_alpha_060
+                                MaterialTheme.colors.textColorSecondary
                             )
                         )
                     }
@@ -133,7 +134,7 @@ internal fun NodeListViewItem(
                         Image(
                             alignment = Alignment.Center,
                             modifier = iconModifier
-                                .testTag("taken Tag"),
+                                .testTag(TAKEN_TEST_TAG),
                             painter = painterResource(id = R.drawable.ic_taken_down),
                             contentDescription = "Taken Down",
                         )
@@ -154,9 +155,11 @@ internal fun NodeListViewItem(
                         }"
                     },
                     style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.colors.grey_white_alpha_060,
-                    modifier = Modifier.testTag("Info Text"),
-                    maxLines = 1
+                    color = MaterialTheme.colors.textColorSecondary,
+                    modifier = Modifier.testTag(INFO_TEXT_TEST_TAG)
+                        .padding(top = 2.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
@@ -166,7 +169,7 @@ internal fun NodeListViewItem(
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
-                .absolutePadding(left = 64.dp),
+                .padding(start = 64.dp, top = 8.dp),
             color = MaterialTheme.colors.grey_012_white_012, thickness = 1.dp
         )
     }

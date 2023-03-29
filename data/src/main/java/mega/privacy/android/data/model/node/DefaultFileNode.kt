@@ -1,6 +1,7 @@
 package mega.privacy.android.data.model.node
 
 import mega.privacy.android.domain.entity.FileTypeInfo
+import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -17,7 +18,7 @@ internal data class DefaultFileNode(
     override val type: FileTypeInfo,
     override val thumbnailPath: String? = null,
     override val isFavourite: Boolean,
-    override val isExported: Boolean,
+    override val exportedData: ExportedData?,
     override val isTakenDown: Boolean,
     override val isIncomingShare: Boolean,
     override val fingerprint: String?,

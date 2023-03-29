@@ -84,7 +84,7 @@ data class FileInfoViewState(
     /**
      * Creates a copy of this view state with the info that can be extracted directly from typedNode
      */
-    fun copy(typedNode: TypedNode, publicLink: String?, publicLinkCreationTime: Long?) = this.copy(
+    fun copy(typedNode: TypedNode) = this.copy(
         title = typedNode.name,
         isFile = typedNode is FileNode,
         sizeInBytes = folderTreeInfo?.let {
@@ -96,10 +96,10 @@ data class FileInfoViewState(
             true
         },
         isTakenDown = typedNode.isTakenDown,
-        isExported = typedNode.isExported,
-        publicLink = publicLink,
-        publicLinkCreationTime = publicLinkCreationTime,
-        showLink = !typedNode.isTakenDown && typedNode.isExported && publicLink != null,
+        isExported = typedNode.exportedData != null,
+        publicLink = typedNode.exportedData?.publicLink,
+        publicLinkCreationTime = typedNode.exportedData?.publicLinkCreationTime,
+        showLink = !typedNode.isTakenDown && typedNode.exportedData != null,
         creationTime = typedNode.creationTime,
         modificationTime = (typedNode as? TypedFileNode)?.modificationTime,
         hasPreview = (typedNode as? TypedFileNode)?.hasPreview == true

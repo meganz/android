@@ -9,7 +9,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.app.presentation.view.EXPORTED_TEST_TAG
+import mega.privacy.android.app.presentation.view.FAVORITE_TEST_TAG
+import mega.privacy.android.app.presentation.view.INFO_TEXT_TEST_TAG
 import mega.privacy.android.app.presentation.view.NodesView
+import mega.privacy.android.app.presentation.view.SELECTED_TEST_TAG
+import mega.privacy.android.app.presentation.view.TAKEN_TEST_TAG
+import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.FolderNode
 import org.junit.Rule
 import org.junit.Test
@@ -25,6 +31,7 @@ class NodesViewTest {
     val composeTestRule = createComposeRule()
 
     private val stringUtilWrapper: StringUtilWrapper = mock()
+    private val exportedData = ExportedData("link", 123L)
 
     @Test
     fun `test when list item is selected then is shows selected image`() = runTest {
@@ -59,7 +66,7 @@ class NodesViewTest {
             )
         }
         composeTestRule.run {
-            onAllNodes(hasTestTag("Selected Tag"))
+            onAllNodes(hasTestTag(SELECTED_TEST_TAG))
         }
     }
 
@@ -70,7 +77,7 @@ class NodesViewTest {
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
         whenever(node.isFavourite).thenReturn(true)
-        whenever(node.isExported).thenReturn(true)
+        whenever(node.exportedData).thenReturn(exportedData)
         whenever(
             stringUtilWrapper.getFolderInfo(
                 node.childFolderCount,
@@ -98,9 +105,9 @@ class NodesViewTest {
             )
         }
         composeTestRule.run {
-            onAllNodes(hasTestTag("favorite Tag"))
-            onAllNodes(hasTestTag("exported Tag").not())
-            onAllNodes(hasTestTag("taken Tag").not())
+            onAllNodes(hasTestTag(FAVORITE_TEST_TAG))
+            onAllNodes(hasTestTag(EXPORTED_TEST_TAG).not())
+            onAllNodes(hasTestTag(TAKEN_TEST_TAG).not())
         }
     }
 
@@ -110,7 +117,7 @@ class NodesViewTest {
         whenever(node.name).thenReturn("Some name")
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
-        whenever(node.isExported).thenReturn(true)
+        whenever(node.exportedData).thenReturn(exportedData)
         whenever(
             stringUtilWrapper.getFolderInfo(
                 node.childFolderCount,
@@ -138,9 +145,9 @@ class NodesViewTest {
             )
         }
         composeTestRule.run {
-            onAllNodes(hasTestTag("exported Tag"))
-            onAllNodes(hasTestTag("favorite Tag").not())
-            onAllNodes(hasTestTag("taken Tag").not())
+            onAllNodes(hasTestTag(EXPORTED_TEST_TAG))
+            onAllNodes(hasTestTag(FAVORITE_TEST_TAG).not())
+            onAllNodes(hasTestTag(TAKEN_TEST_TAG).not())
         }
     }
 
@@ -152,7 +159,7 @@ class NodesViewTest {
             whenever(node.childFileCount).thenReturn(1)
             whenever(node.childFolderCount).thenReturn(2)
             whenever(node.isTakenDown).thenReturn(true)
-            whenever(node.isExported).thenReturn(true)
+            whenever(node.exportedData).thenReturn(exportedData)
             whenever(node.isFavourite).thenReturn(true)
             whenever(
                 stringUtilWrapper.getFolderInfo(
@@ -181,9 +188,9 @@ class NodesViewTest {
                 )
             }
             composeTestRule.run {
-                onAllNodes(hasTestTag("exported Tag"))
-                onAllNodes(hasTestTag("favorite Tag"))
-                onAllNodes(hasTestTag("taken Tag"))
+                onAllNodes(hasTestTag(EXPORTED_TEST_TAG))
+                onAllNodes(hasTestTag(FAVORITE_TEST_TAG))
+                onAllNodes(hasTestTag(TAKEN_TEST_TAG))
             }
         }
 
@@ -220,7 +227,7 @@ class NodesViewTest {
             )
         }
         composeTestRule.run {
-            onAllNodes(hasTestTag("Info Text").not())
+            onAllNodes(hasTestTag(INFO_TEXT_TEST_TAG).not())
         }
     }
 }

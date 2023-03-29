@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionViewModel
@@ -18,15 +19,26 @@ import mega.privacy.android.domain.entity.UnknownFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.usecase.photos.UpdateAlbumCoverUseCase
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
 import java.time.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class AlbumCoverSelectionViewModelTest {
+
+    private val updateAlbumCoverUseCase: UpdateAlbumCoverUseCase = mock<UpdateAlbumCoverUseCase>()
+
     @Before
     fun setup() {
         Dispatchers.setMain(StandardTestDispatcher())
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -49,7 +61,7 @@ class AlbumCoverSelectionViewModelTest {
             getUserAlbum = { flowOf(expectedAlbum) },
             getAlbumPhotos = { flowOf(expectedPhotos) },
             downloadThumbnail = { _, _ -> },
-            updateAlbumCover = { _, _ -> },
+            updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
 
@@ -72,7 +84,7 @@ class AlbumCoverSelectionViewModelTest {
             getUserAlbum = { flowOf() },
             getAlbumPhotos = { flowOf() },
             downloadThumbnail = { _, _ -> },
-            updateAlbumCover = { _, _ -> },
+            updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
 
@@ -96,7 +108,7 @@ class AlbumCoverSelectionViewModelTest {
             getUserAlbum = { flowOf() },
             getAlbumPhotos = { flowOf() },
             downloadThumbnail = { _, _ -> },
-            updateAlbumCover = { _, _ -> },
+            updateAlbumCoverUseCase = updateAlbumCoverUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
         )
 

@@ -1,13 +1,12 @@
 package mega.privacy.android.data.mapper.contact
 
 import mega.privacy.android.domain.entity.contacts.ContactData
-import mega.privacy.android.domain.entity.contacts.ContactItem
-import nz.mega.sdk.MegaUser
+import javax.inject.Inject
 
 /**
  * Mapper to convert data to [ContactData]
  */
-fun interface ContactDataMapper {
+internal class ContactDataMapper @Inject constructor() {
     /**
      * Invoke
      *
@@ -21,5 +20,9 @@ fun interface ContactDataMapper {
         fullName: String?,
         alias: String?,
         avatarUri: String?,
-    ): ContactData
+    ) = ContactData(
+        fullName = fullName,
+        alias = alias,
+        avatarUri = avatarUri,
+    )
 }

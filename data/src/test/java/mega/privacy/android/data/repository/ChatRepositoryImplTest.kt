@@ -16,7 +16,7 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
-import mega.privacy.android.data.mapper.CombinedChatRoomMapper
+import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
@@ -55,7 +55,6 @@ class ChatRepositoryImplTest {
     private val sharingScope = mock<CoroutineScope>()
     private val broadcastReceiverGateway = mock<BroadcastReceiverGateway>()
     private val testDispatcher = UnconfinedTestDispatcher()
-
     private val chatId = Random.nextLong()
     private val userHandle = Random.nextLong()
     private val userEmail = "test@email.com"

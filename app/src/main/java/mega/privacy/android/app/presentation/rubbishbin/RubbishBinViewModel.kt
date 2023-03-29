@@ -16,7 +16,10 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import java.util.Stack
 import javax.inject.Inject
 
@@ -28,6 +31,8 @@ import javax.inject.Inject
  * @param getRubbishBinParentNodeHandle [GetParentNodeHandle] Fetch parent handle
  * @param getRubbishBinChildren [GetRubbishBinChildren] Fetch Rubbish Bin [Node]
  * @param getNodeByHandle [GetNodeByHandle] Get MegaNode from Handle
+ * @param setViewType [SetViewType] to set view type
+ * @param monitorViewType [MonitorViewType] check view type
  */
 @HiltViewModel
 class RubbishBinViewModel @Inject constructor(
@@ -36,6 +41,8 @@ class RubbishBinViewModel @Inject constructor(
     private val getRubbishBinParentNodeHandle: GetParentNodeHandle,
     private val getRubbishBinChildren: GetRubbishBinChildren,
     private val getNodeByHandle: GetNodeByHandle,
+    private val setViewType: SetViewType,
+    private val monitorViewType: MonitorViewType,
 ) : ViewModel() {
 
     /**
@@ -53,14 +60,27 @@ class RubbishBinViewModel @Inject constructor(
      */
     private val lastPositionStack = Stack<Int>()
 
+    init {
+        nodeUpdates()
+        checkViewType()
+    }
+
     /**
-     * Get current nodes when RubbishBinViewModel gets created
-     *
+     * This method will monitor view type and update it on state
+     */
+    private fun checkViewType() {
+        viewModelScope.launch {
+            monitorViewType().collect { viewType ->
+                _state.update { it.copy(currentViewType = viewType) }
+            }
+        }
+    }
+
+    /**
      * Uses MonitorNodeUpdates to observe any Node updates
-     *
      * A received Node update will refresh the list of nodes
      */
-    init {
+    private fun nodeUpdates() {
         viewModelScope.launch {
             refreshNodes()
             monitorNodeUpdates().collect {
@@ -87,11 +107,12 @@ class RubbishBinViewModel @Inject constructor(
      */
     fun refreshNodes() {
         viewModelScope.launch {
+            val nodeList = getNodeUiItems(getRubbishBinChildren(_state.value.rubbishBinHandle))
             _state.update {
                 it.copy(
                     nodes = getRubbishBinChildrenNode(_state.value.rubbishBinHandle) ?: emptyList(),
                     parentHandle = getRubbishBinParentNodeHandle(_state.value.rubbishBinHandle),
-                    nodeList = getNodeUiItems(getRubbishBinChildren(_state.value.rubbishBinHandle))
+                    nodeList = nodeList
                 )
             }
         }
@@ -255,6 +276,18 @@ class RubbishBinViewModel @Inject constructor(
     private fun selectAllNodesUiList(): List<NodeUIItem> {
         return _state.value.nodeList.map {
             it.copy(isSelected = true)
+        }
+    }
+
+    /**
+     * This method will toggle view type
+     */
+    fun onChangeViewTypeClicked() {
+        viewModelScope.launch {
+            when (_state.value.currentViewType) {
+                ViewType.LIST -> setViewType(ViewType.GRID)
+                ViewType.GRID -> setViewType(ViewType.LIST)
+            }
         }
     }
 }

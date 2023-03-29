@@ -43,6 +43,11 @@ internal class CallIsSystemInDarkThemeDetector : Detector(), Detector.UastScanne
         val root = (parent as? UMethod) ?: return
         if (root.hasAnnotation(COMPOSABLE_ANNOTATION).not()
             || root.hasAnnotation(PREVIEW_COMPOSABLE_ANNOTATION)
+            || root.annotations.any {
+                it.qualifiedName?.contains(
+                    PREVIEW_COMBINED_ANNOTATIONS_PACKAGE
+                ) == true
+            }
         ) return
 
         val firstParam =
@@ -102,6 +107,8 @@ internal class CallIsSystemInDarkThemeDetector : Detector(), Detector.UastScanne
         private const val COMPOSABLE_ANNOTATION = "androidx.compose.runtime.Composable"
         private const val PREVIEW_COMPOSABLE_ANNOTATION =
             "androidx.compose.ui.tooling.preview.Preview"
+        private const val PREVIEW_COMBINED_ANNOTATIONS_PACKAGE =
+            "mega.privacy.android.core.ui.preview"
 
         private const val DESCRIPTION =
             "isSystemInDarkTheme does not allow, you should use GetThemeMode UseCase"

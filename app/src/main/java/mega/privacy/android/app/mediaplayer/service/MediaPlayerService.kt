@@ -1,8 +1,10 @@
 package mega.privacy.android.app.mediaplayer.service
 
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.AudioManager.OnAudioFocusChangeListener
@@ -112,6 +114,16 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
             }
         }
 
+    private val headsetPlugReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == Intent.ACTION_HEADSET_PLUG) {
+                if (intent.getIntExtra(INTENT_KEY_STATE, -1) == STATE_HEADSET_UNPLUGGED) {
+                    setPlayWhenReady(false)
+                }
+            }
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
         viewModelGateway.setAudioPlayer(this is AudioPlayerService)
@@ -121,6 +133,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         observeData()
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        registerReceiver(headsetPlugReceiver, IntentFilter(Intent.ACTION_HEADSET_PLUG))
     }
 
     private fun createPlayer() {
@@ -334,8 +347,10 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                 } else {
                     lifecycleScope.launch {
                         currentPlayingHandle =
-                            intent?.getLongExtra(Constants.INTENT_EXTRA_KEY_HANDLE,
-                                MegaApiJava.INVALID_HANDLE)
+                            intent?.getLongExtra(
+                                Constants.INTENT_EXTRA_KEY_HANDLE,
+                                MegaApiJava.INVALID_HANDLE
+                            )
                         viewModelGateway.monitorPlaybackTimes(currentPlayingHandle) { positionInMs ->
                             // If the first video contains playback history, show dialog before build sources
                             if (positionInMs != null && positionInMs > 0) {
@@ -454,6 +469,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         mediaPlayerGateway.playerRelease()
         // Remove observer when the service is destroyed to avoid the memory leak, causing Service cannot be stopped.
         ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
+        unregisterReceiver(headsetPlugReceiver)
     }
 
     override fun mainPlayerUIClosed() {
@@ -655,6 +671,9 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
         private const val VIDEO_TYPE_RESUME_PLAYBACK_POSITION = 123
         private const val VIDEO_TYPE_RESTART_PLAYBACK_POSITION = 124
         private const val VIDEO_TYPE_SHOW_PLAYBACK_POSITION_DIALOG = 125
+
+        private const val INTENT_KEY_STATE = "state"
+        private const val STATE_HEADSET_UNPLUGGED = 0
 
         /**
          * The minimum size of single playlist

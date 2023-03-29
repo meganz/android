@@ -1,6 +1,6 @@
 package mega.privacy.android.core.ui.controls
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
+
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -14,9 +14,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
+import mega.privacy.android.core.R
+import mega.privacy.android.core.ui.preview.BooleanProvider
+import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.white_alpha_087
@@ -58,18 +62,18 @@ fun LabelledSwitch(
  */
 @ShowkaseComposable("Labelled Switch", "Controls and sliders")
 @Composable
-fun ShowkasePreviewLabelledSwitch() = PreviewLabelledSwitch()
+fun ShowkasePreviewLabelledSwitch() = PreviewLabelledSwitch(true)
 
-@Preview
-@Preview(
-    uiMode = UI_MODE_NIGHT_YES
-)
+@CombinedTextAndThemePreviews
 @Composable
-private fun PreviewLabelledSwitch() {
-    var checked by remember { mutableStateOf(true) }
+private fun PreviewLabelledSwitch(
+    @PreviewParameter(BooleanProvider::class) initialValue: Boolean,
+) {
+    var checked by remember { mutableStateOf(initialValue) }
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        LabelledSwitch(label = "The label",
+        LabelledSwitch(label = stringResource(if (checked) R.string.on else R.string.off),
             checked = checked,
             onCheckChanged = { checked = !checked })
     }
 }
+

@@ -1,8 +1,6 @@
 package mega.privacy.android.app.presentation.transfers
 
-import android.annotation.SuppressLint
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,9 +8,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
@@ -24,8 +24,8 @@ import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
 import mega.privacy.android.domain.usecase.GetNumPendingTransfers
 import mega.privacy.android.domain.usecase.GetNumPendingUploads
 import mega.privacy.android.domain.usecase.IsCompletedTransfersEmpty
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorTransfersSize
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.transfer.BroadcastPausedTransfers
 import javax.inject.Inject
 
@@ -52,15 +52,19 @@ class TransfersManagementViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersSize: MonitorTransfersSize,
 ) : ViewModel() {
-    private val transfersInfo: MutableLiveData<TransfersInfo> = MutableLiveData()
+    private val _transfersInfo = MutableStateFlow(TransfersInfo())
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
-    private val areTransfersPaused = SingleLiveEvent<Boolean>()
     private val transfersSizeInfoState = MutableStateFlow(TransfersSizeInfo())
 
     /**
      * is network connected
      */
     val online = monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    /**
+     * Transfers info
+     */
+    val transfersInfo = _transfersInfo.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -75,19 +79,9 @@ class TransfersManagementViewModel @Inject constructor(
     }
 
     /**
-     * Notifies about updates on Transfers info.
-     */
-    fun onTransfersInfoUpdate(): LiveData<TransfersInfo> = transfersInfo
-
-    /**
      * Notifies about updates on if should show or not the Completed tab.
      */
     fun onGetShouldCompletedTab(): LiveData<Boolean> = shouldShowCompletedTab
-
-    /**
-     * Notifies about the transfers state
-     */
-    fun onGetTransfersState(): LiveData<Boolean> = areTransfersPaused
 
     /**
      * Checks transfers info.
@@ -104,7 +98,7 @@ class TransfersManagementViewModel @Inject constructor(
             val numPendingDownloadsNonBackground = getNumPendingDownloadsNonBackground()
             val numPendingUploads = getNumPendingUploads()
 
-            transfersInfo.value =
+            _transfersInfo.update {
                 TransfersInfo(
                     transferType = transfersSizeInfo.transferType,
                     numPendingDownloadsNonBackground = numPendingDownloadsNonBackground,
@@ -113,6 +107,7 @@ class TransfersManagementViewModel @Inject constructor(
                     totalSizeTransferred = transfersSizeInfo.totalSizeTransferred,
                     totalSizePendingTransfer = transfersSizeInfo.totalSizePendingTransfer
                 )
+            }
         }
     }
 
@@ -131,10 +126,22 @@ class TransfersManagementViewModel @Inject constructor(
      */
     fun checkTransfersState() = viewModelScope.launch {
         areAllTransfersPaused().let { paused ->
-            areTransfersPaused.value = paused
+            _transfersInfo.update { it.copy(areTransfersPaused = paused) }
             if (paused) {
                 broadcastPausedTransfers()
             }
         }
     }
+
+    /**
+     * Num pending transfers
+     */
+    val numPendingTransfers: Int
+        get() = transfersInfo.value.numPendingTransfers
+
+    /**
+     * Are transfers paused
+     */
+    val areTransfersPaused: Boolean
+        get() = transfersInfo.value.areTransfersPaused
 }

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.rubbishbin.model
 
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
 /**
@@ -12,6 +13,7 @@ import nz.mega.sdk.MegaNode
  *  @property isInSelection to identify if [NodeUIItem] list is in navigation state
  *  @property megaNode [MegaNode]
  *  @property itemIndex index of item clicked
+ *  @property currentViewType ViewType The current ViewType used by the UI
  */
 data class RubbishBinState(
     val rubbishBinHandle: Long = -1L,
@@ -21,5 +23,6 @@ data class RubbishBinState(
     val selectedNodes: Int = 0,
     val isInSelection: Boolean = false,
     val megaNode: MegaNode? = null,
-    val itemIndex: Int = -1
+    val itemIndex: Int = -1,
+    val currentViewType: ViewType = ViewType.LIST
 )

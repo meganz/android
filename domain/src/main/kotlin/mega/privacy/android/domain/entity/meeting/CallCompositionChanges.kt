@@ -18,4 +18,9 @@ enum class CallCompositionChanges {
      *  Peer added
      */
     Added,
+
+    /**
+     *  Unknown
+     */
+    Unknown,
 }

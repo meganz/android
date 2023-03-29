@@ -15,10 +15,6 @@ import mega.privacy.android.data.mapper.AccountTypeMapper
 import mega.privacy.android.data.mapper.AchievementsOverviewMapper
 import mega.privacy.android.data.mapper.BooleanPreferenceMapper
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
-import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
-import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapperImpl
-import mega.privacy.android.data.mapper.CombinedChatRoomMapper
-import mega.privacy.android.data.mapper.CombinedChatRoomMapperImpl
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.CountryMapper
@@ -75,23 +71,13 @@ import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapperImpl
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapperImpl
-import mega.privacy.android.data.mapper.contact.ContactDataMapper
-import mega.privacy.android.data.mapper.contact.ContactDataMapperImpl
-import mega.privacy.android.data.mapper.contact.ContactItemMapper
-import mega.privacy.android.data.mapper.contact.ContactItemMapperImpl
 import mega.privacy.android.data.mapper.getFileTypeInfo
 import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
-import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
-import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapperImpl
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapperImpl
-import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
-import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapperImpl
-import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
-import mega.privacy.android.data.mapper.shares.AccessPermissionMapperImpl
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
@@ -152,13 +138,6 @@ internal abstract class MapperModule {
 
     @Binds
     abstract fun bindSmsPermissionMapper(implementation: SmsPermissionMapperImpl): SmsPermissionMapper
-
-    @Binds
-    abstract fun bindContactDataMapper(implementation: ContactDataMapperImpl): ContactDataMapper
-
-    @Binds
-    abstract fun bindContactDataItem(implementation: ContactItemMapperImpl): ContactItemMapper
-
     @Binds
     abstract fun bindUploadOptionMapper(implementation: UploadOptionMapperImpl): UploadOptionMapper
 
@@ -185,28 +164,10 @@ internal abstract class MapperModule {
     abstract fun bindSortOrderIntMapper(implementation: SortOrderIntMapperImpl): SortOrderIntMapper
 
     /**
-     * Provides AccessPermissionMapper Mapper
-     */
-    @Binds
-    abstract fun bindAccessPermissionMapper(implementation: AccessPermissionMapperImpl): AccessPermissionMapper
-
-    @Binds
-    abstract fun bindAccessPermissionRawMapper(implementation: AccessPermissionIntMapperImpl): AccessPermissionIntMapper
-
-    /**
      * Provides PasswordStrength Mapper
      */
     @Binds
     abstract fun bindsPasswordStrengthMapper(implementation: PasswordStrengthMapperImpl): PasswordStrengthMapper
-
-    @Binds
-    abstract fun bindChatScheduledMeetingOccurrMapper(implementation: ChatScheduledMeetingOccurrMapperImpl): ChatScheduledMeetingOccurrMapper
-
-    @Binds
-    abstract fun bindCombinedChatRoomMapper(implementation: CombinedChatRoomMapperImpl): CombinedChatRoomMapper
-
-    @Binds
-    abstract fun bindNodeShareKeyResultMapper(implementation: NodeShareKeyResultMapperImpl): NodeShareKeyResultMapper
 
     @Binds
     abstract fun bindRecentActionBucketMapper(implementation: RecentActionBucketMapperImpl): RecentActionBucketMapper

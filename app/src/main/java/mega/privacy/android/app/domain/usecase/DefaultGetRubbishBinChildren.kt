@@ -21,7 +21,7 @@ class DefaultGetRubbishBinChildren @Inject constructor(
     override suspend fun invoke(parentHandle: Long): List<Node> {
         val nodeID = if (parentHandle == nodeRepository.getInvalidHandle()) {
             getRubbishBinFolder()?.let {
-                NodeId(longValue = parentHandle)
+                NodeId(longValue = it.handle)
             } ?: run {
                 return emptyList()
             }

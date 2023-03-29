@@ -10,16 +10,19 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
-import mega.privacy.android.data.mapper.ChatScheduledMeetingOccurrMapper
+import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
+import mega.privacy.android.data.mapper.meeting.ChatCallStatusMapper
+import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
+import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
@@ -51,6 +54,8 @@ internal class CallRepositoryImpl @Inject constructor(
     private val chatRequestMapper: ChatRequestMapper,
     private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
+    private val chatCallStatusMapper: ChatCallStatusMapper,
+    private val handleListMapper: HandleListMapper,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : CallRepository {
 
@@ -268,4 +273,9 @@ internal class CallRepositoryImpl @Inject constructor(
 
     private fun Long.toZonedDateTime(): ZonedDateTime =
         ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
+
+    override suspend fun getCallHandleList(state: ChatCallStatus) = withContext(dispatcher) {
+        megaChatApiGateway.getChatCalls(chatCallStatusMapper(state))
+            ?.let { handleListMapper(it) } ?: emptyList()
+    }
 }

@@ -509,8 +509,6 @@ class FileInfoViewModel @Inject constructor(
             val isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue)
             uiState.copy(
                 typedNode = typedNode,
-                publicLink = node.publicLink,
-                publicLinkCreationTime = node.publicLinkCreationTime
             ).copy(
                 iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
                 isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
@@ -546,9 +544,7 @@ class FileInfoViewModel @Inject constructor(
             //we need to update the typedNode to get changes, for instance, on outgoing shares
             typedNode = getNodeById(typedNode.id)
             it.copy(
-                typedNode = typedNode,
-                publicLink = node.publicLink,
-                publicLinkCreationTime = node.publicLinkCreationTime
+                typedNode = typedNode
             ).copy(
                 iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
             )
@@ -569,11 +565,7 @@ class FileInfoViewModel @Inject constructor(
         updateState {
             //we need to update the typedNode to get changes in timeStamps
             typedNode = getNodeById(typedNode.id)
-            it.copy(
-                typedNode = typedNode,
-                publicLink = node.publicLink,
-                publicLinkCreationTime = node.publicLinkCreationTime
-            )
+            it.copy(typedNode = typedNode)
         }
     }
 
@@ -611,11 +603,7 @@ class FileInfoViewModel @Inject constructor(
     private fun updateTitle() {
         updateState {
             typedNode = getNodeById(typedNode.id)
-            it.copy(
-                typedNode = typedNode,
-                publicLink = node.publicLink,
-                publicLinkCreationTime = node.publicLinkCreationTime,
-            )
+            it.copy(typedNode = typedNode)
         }
     }
 

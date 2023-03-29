@@ -42,9 +42,9 @@ interface Node {
     val isFavourite: Boolean
 
     /**
-     * Is exported
+     * Exported data if the node is exported (shared with public link), null otherwise
      */
-    val isExported: Boolean
+    val exportedData: ExportedData?
 
     /**
      * Is taken down

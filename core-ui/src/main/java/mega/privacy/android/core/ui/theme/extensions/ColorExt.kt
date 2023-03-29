@@ -31,6 +31,7 @@ import mega.privacy.android.core.ui.theme.white_alpha_060
 import mega.privacy.android.core.ui.theme.white_alpha_087
 import mega.privacy.android.core.ui.theme.yellow_300
 import mega.privacy.android.core.ui.theme.yellow_600
+import mega.privacy.android.core.ui.theme.yellow_700
 
 /**
  * Text Color Secondary for Composable
@@ -115,12 +116,6 @@ val Colors.white_087_grey_087: Color
     get() = if (isLight) white_alpha_087 else grey_alpha_087
 
 /**
- * Color theme for Grey alpha when light mode grey_alpha_087 and when dark white
- */
-val Colors.grey_087_white: Color
-    get() = if (isLight) grey_alpha_087 else white
-
-/**
  * Color theme for grey 087 when light mode and white 087 when dark mode
  */
 val Colors.grey_087_white_087: Color
@@ -137,3 +132,9 @@ val Colors.red_800_red_400: Color
  */
 val Colors.grey_white_alpha_060: Color
     get() = if (isLight) grey_alpha_060 else white_alpha_060
+
+/**
+ * Color for grey alpha when light [grey_alpha_087] and yellow when dark [yellow_700]
+ */
+val Colors.grey_alpha_087_yellow_700: Color
+    get() = if (isLight) grey_alpha_087 else yellow_700

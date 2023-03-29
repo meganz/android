@@ -23,7 +23,7 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
-import mega.privacy.android.domain.usecase.CreateAlbum
+import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
@@ -60,7 +60,7 @@ class AlbumsViewModelTest {
     private val getProscribedAlbumNamesUseCase = mock<GetProscribedAlbumNamesUseCase>()
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
-    private val createAlbum = mock<CreateAlbum>()
+    private val createAlbumUseCase = mock<CreateAlbumUseCase>()
     private val removeAlbumsUseCase = mock<RemoveAlbumsUseCase>()
     private val removePhotosFromAlbumUseCase = mock<RemovePhotosFromAlbumUseCase>()
     private val updateAlbumNameUseCase = mock<UpdateAlbumNameUseCase>()
@@ -82,7 +82,7 @@ class AlbumsViewModelTest {
             getFeatureFlagUseCase = getFeatureFlagUseCase,
             removeFavourites = removeFavourites,
             getNodeListByIds = getNodeListByIds,
-            createAlbum = createAlbum,
+            createAlbumUseCase = createAlbumUseCase,
             removeAlbumsUseCase = removeAlbumsUseCase,
             removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
             updateAlbumNameUseCase = updateAlbumNameUseCase,
@@ -370,7 +370,7 @@ class AlbumsViewModelTest {
     fun `test that create album returns an album with the right name`() = runTest {
         val expectedAlbumName = "Album 1"
 
-        whenever(createAlbum(expectedAlbumName)).thenReturn(
+        whenever(createAlbumUseCase(expectedAlbumName)).thenReturn(
             createUserAlbum(title = expectedAlbumName)
         )
         whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
@@ -386,7 +386,7 @@ class AlbumsViewModelTest {
 
     @Test
     fun `test that an error in creating an album would keep current album as null`() = runTest {
-        whenever(createAlbum(any())).thenAnswer { throw Exception() }
+        whenever(createAlbumUseCase(any())).thenAnswer { throw Exception() }
 
         underTest.createNewAlbum("ABD")
 
@@ -522,7 +522,7 @@ class AlbumsViewModelTest {
                     item.createDialogErrorMessage
                 )
             }
-            verifyNoInteractions(createAlbum)
+            verifyNoInteractions(createAlbumUseCase)
 
         }
 
@@ -558,7 +558,7 @@ class AlbumsViewModelTest {
                     item.createDialogErrorMessage
                 )
             }
-            verifyNoInteractions(createAlbum)
+            verifyNoInteractions(createAlbumUseCase)
 
         }
 
@@ -577,7 +577,7 @@ class AlbumsViewModelTest {
                     item.createDialogErrorMessage
                 )
             }
-            verifyNoInteractions(createAlbum)
+            verifyNoInteractions(createAlbumUseCase)
         }
 
     @Test
@@ -610,7 +610,7 @@ class AlbumsViewModelTest {
                     R.string.photos_create_album_error_message_duplicate
                 )
             }
-            verifyNoInteractions(createAlbum)
+            verifyNoInteractions(createAlbumUseCase)
         }
 
     @Test
@@ -631,7 +631,7 @@ class AlbumsViewModelTest {
                 )
             }
 
-            verifyNoInteractions(createAlbum)
+            verifyNoInteractions(createAlbumUseCase)
         }
 
     @Test

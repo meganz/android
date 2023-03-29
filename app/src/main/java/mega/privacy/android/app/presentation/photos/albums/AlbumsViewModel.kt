@@ -29,7 +29,7 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.CreateAlbum
+import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
@@ -58,7 +58,7 @@ class AlbumsViewModel @Inject constructor(
     private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
     private val removeFavourites: RemoveFavourites,
     private val getNodeListByIds: GetNodeListByIds,
-    private val createAlbum: CreateAlbum,
+    private val createAlbumUseCase: CreateAlbumUseCase,
     private val removeAlbumsUseCase: RemoveAlbumsUseCase,
     private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
     private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
@@ -307,7 +307,7 @@ class AlbumsViewModel @Inject constructor(
                     _state.value.createAlbumPlaceholderTitle
                 }.trim()
                 if (checkTitleValidity(finalTitle)) {
-                    val album = createAlbum(finalTitle)
+                    val album = createAlbumUseCase(finalTitle)
                     _state.update {
                         it.copy(
                             currentAlbum = album,

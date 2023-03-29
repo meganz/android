@@ -7,8 +7,9 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
-import mega.privacy.android.app.usecase.data.MoveRequestResult
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.usecase.exception.*
+import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -221,7 +222,7 @@ class MoveNodeUseCase @Inject constructor(
      * @param newParentHandle   Parent MegaNode handle in which the nodes have to be moved.
      * @return The movement.
      */
-    fun move(handles: LongArray, newParentHandle: Long): Single<MoveRequestResult> =
+    fun move(handles: LongArray, newParentHandle: Long): Single<MoveRequestResult.GeneralMovement> =
         Single.create { emitter ->
             val parentNode = getNodeUseCase.get(newParentHandle).blockingGetOrNull()
 
@@ -256,11 +257,12 @@ class MoveNodeUseCase @Inject constructor(
 
             when {
                 emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(MoveRequestResult.GeneralMovement(
-                    handles.size,
-                    errorCount,
-                    oldParentHandle
-                ).apply { resetAccountDetailsIfNeeded() })
+                else -> emitter.onSuccess(
+                    MoveRequestResult.GeneralMovement(
+                        count = handles.size,
+                        errorCount = errorCount,
+                        oldParentHandle = oldParentHandle
+                    ).also { resetAccountDetailsIfNeeded(it) })
             }
         }
 
@@ -270,7 +272,7 @@ class MoveNodeUseCase @Inject constructor(
      * @param handles   List of MegaNode handles to move.
      * @return The movement result.
      */
-    fun moveToRubbishBin(handles: List<Long>): Single<MoveRequestResult> =
+    fun moveToRubbishBin(handles: List<Long>): Single<MoveRequestResult.RubbishMovement> =
         Single.create { emitter ->
             var errorCount = 0
             val rubbishNode = megaApi.rubbishNode
@@ -295,11 +297,12 @@ class MoveNodeUseCase @Inject constructor(
 
             when {
                 emitter.isDisposed -> return@create
-                else -> emitter.onSuccess(MoveRequestResult.RubbishMovement(
-                    handles.size,
-                    errorCount,
-                    oldParentHandle
-                ).apply { resetAccountDetailsIfNeeded() })
+                else -> emitter.onSuccess(
+                    MoveRequestResult.RubbishMovement(
+                        count = handles.size,
+                        errorCount = errorCount,
+                        oldParentHandle = oldParentHandle
+                    ).also { resetAccountDetailsIfNeeded(it) })
             }
         }
 
@@ -309,7 +312,7 @@ class MoveNodeUseCase @Inject constructor(
      * @param nodes List of MegaNode to restore.
      * @return The restoration result.
      */
-    fun restore(nodes: List<MegaNode>): Single<MoveRequestResult> =
+    fun restore(nodes: List<MegaNode>): Single<MoveRequestResult.Restoration> =
         Single.create { emitter ->
             var errorCount = 0
             val destination: MegaNode? = if (nodes.size == 1) {
@@ -339,11 +342,12 @@ class MoveNodeUseCase @Inject constructor(
             when {
                 emitter.isDisposed -> return@create
                 throwForeign -> emitter.onError(ForeignNodeException())
-                else -> emitter.onSuccess(MoveRequestResult.Restoration(
-                    nodes.size,
-                    errorCount,
-                    destination
-                ).apply { resetAccountDetailsIfNeeded() })
+                else -> emitter.onSuccess(
+                    MoveRequestResult.Restoration(
+                        count = nodes.size,
+                        errorCount = errorCount,
+                        destination = destination
+                    ).also { resetAccountDetailsIfNeeded(it) })
             }
         }
 
@@ -358,4 +362,12 @@ class MoveNodeUseCase @Inject constructor(
             else -> false
         }
 
+    /**
+     * Resets the account details timestamp if some request finished with success.
+     */
+    private fun resetAccountDetailsIfNeeded(request: MoveRequestResult) {
+        if (request.successCount > 0) {
+            DBUtil.resetAccountDetailsTimeStamp()
+        }
+    }
 }

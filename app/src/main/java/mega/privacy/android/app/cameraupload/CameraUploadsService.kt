@@ -72,7 +72,6 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updat
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.ImageProcessor
-import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.PreviewUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
@@ -128,6 +127,7 @@ import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
@@ -555,6 +555,12 @@ class CameraUploadsService : LifecycleService() {
     lateinit var broadcastCameraUploadProgress: BroadcastCameraUploadProgress
 
     /**
+     * Schedule Camera Upload
+     */
+    @Inject
+    lateinit var scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase
+
+    /**
      * Create temporary file and remove coordinates
      */
     @Inject
@@ -719,6 +725,7 @@ class CameraUploadsService : LifecycleService() {
                     finishService()
                 }
             }
+
             else -> {
                 Timber.d("Received Start CU service command")
                 if (coroutineScope?.isActive != true) {
@@ -1095,8 +1102,7 @@ class CameraUploadsService : LifecycleService() {
                 startVideoCompression()
             } else {
                 Timber.d("Nothing to upload.")
-                // Make sure to re schedule the job
-                JobUtil.scheduleCameraUploadJob(this)
+                scheduleCameraUploadUseCase()
                 endService()
                 deleteCameraUploadTemporaryRootDirectory()
             }

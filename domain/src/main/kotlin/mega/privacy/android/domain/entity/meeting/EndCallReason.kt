@@ -37,5 +37,10 @@ enum class EndCallReason {
     /**
      *  End call reason by moderator
      */
-    ByModerator
+    ByModerator,
+
+    /**
+     *  End call reason unknown
+     */
+    Unknown
 }

@@ -56,4 +56,21 @@
 		<item>@string/section_chat</item>
 		<item>@string/title_shared_items</item>
 	</string-array>
+
+	<string-array name="tour_titles">
+		<item>@string/title_tour_one</item>
+		<item>@string/title_tour_two</item>
+		<item>@string/title_tour_three</item>
+		<item>@string/title_tour_four</item>
+		<item>@string/title_tour_five</item>
+	</string-array>
+
+	<string-array name="tour_text">
+		<item>@string/content_tour_one</item>
+		<item>@string/content_tour_two</item>
+		<item>@string/content_tour_three</item>
+		<item>@string/content_tour_four</item>
+		<item>@string/content_tour_five</item>
+	</string-array>
+
 </resources>

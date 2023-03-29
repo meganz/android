@@ -86,7 +86,6 @@ internal class UserInfoViewModel @Inject constructor(
             monitorMyAvatarFile()
                 .catch { Timber.e(it) }
                 .collect {
-                    Timber.d("CongHai - UserInfoViewModel monitorMyAvatarFile trigger")
                     getUserAvatarOrDefault(isForceRefresh = false)
                 }
         }

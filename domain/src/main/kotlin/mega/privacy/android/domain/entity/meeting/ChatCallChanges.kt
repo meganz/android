@@ -48,4 +48,9 @@ enum class ChatCallChanges {
      * Change type Outgoing ringing stop
      */
     OutgoingRingingStop,
+
+    /**
+     * Unknown
+     */
+    Unknown
 }

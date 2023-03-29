@@ -106,11 +106,12 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
+import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
-import mega.privacy.android.app.usecase.data.MoveRequestResult;
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
@@ -152,6 +153,8 @@ public class ContactFileListActivity extends PasscodeActivity
     CopyNodeUseCase copyNodeUseCase;
     @Inject
     CopyRequestMessageMapper copyRequestMessageMapper;
+    @Inject
+    MoveRequestMessageMapper moveRequestMessageMapper;
 
     private ContactFileListViewModel viewModel;
 
@@ -620,6 +623,7 @@ public class ContactFileListActivity extends PasscodeActivity
                 .subscribe((result, throwable) -> {
                     if (throwable == null) {
                         showMovementResult(result, handleList.get(0));
+                        showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
                     }
                 });
     }
@@ -638,8 +642,6 @@ public class ContactFileListActivity extends PasscodeActivity
             onBackPressed();
             setTitleActionBar(megaApi.getNodeByHandle(parentHandle).getName());
         }
-
-        showSnackbar(SNACKBAR_TYPE, result.getResultText(), MEGACHAT_INVALID_HANDLE);
     }
 
     public void showMove(ArrayList<Long> handleList) {
@@ -770,6 +772,7 @@ public class ContactFileListActivity extends PasscodeActivity
                                         .subscribe((moveResult, moveThrowable) -> {
                                             if (moveThrowable == null) {
                                                 showMovementResult(moveResult, handlesWithoutCollision[0]);
+                                                showSnackbar(SNACKBAR_TYPE, moveRequestMessageMapper.invoke(moveResult), MEGACHAT_INVALID_HANDLE);
                                             } else {
                                                 manageCopyMoveException(moveThrowable);
                                             }

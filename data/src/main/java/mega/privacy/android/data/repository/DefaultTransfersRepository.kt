@@ -271,7 +271,7 @@ internal class DefaultTransfersRepository @Inject constructor(
             transfers.addAll((0 until data.numDownloads)
                 .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
             transfers.addAll((0 until data.numUploads)
-                .mapNotNull { getTransferByTag(data.getDownloadTag(it)) })
+                .mapNotNull { getTransferByTag(data.getUploadTag(it)) })
         }
         transfers.sortedBy { it.priority }
     }

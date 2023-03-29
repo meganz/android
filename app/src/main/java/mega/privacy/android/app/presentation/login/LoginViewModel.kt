@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.getState
@@ -26,6 +24,7 @@ import mega.privacy.android.app.psa.PsaManager
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
+import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.exception.LoginBlockedAccount
 import mega.privacy.android.domain.exception.LoginException
 import mega.privacy.android.domain.exception.LoginMultiFactorAuthRequired
@@ -33,6 +32,7 @@ import mega.privacy.android.domain.exception.LoginWrongMultiFactorAuth
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesException
 import mega.privacy.android.domain.usecase.ClearPsa
+import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -101,12 +102,9 @@ class LoginViewModel @Inject constructor(
     val isConnected: Boolean
         get() = monitorConnectivityUseCase().value
 
-    /**
-     * Checks if root node exists.
-     *
-     * @return True if root node exists, false otherwise.
-     */
-    fun rootNodeExists() = runBlocking { rootNodeExistsUseCase() }
+    private var pendingAction: String? = null
+
+    private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
 
     /**
      * Reset some states values.
@@ -127,6 +125,9 @@ class LoginViewModel @Inject constructor(
                         )
                     }
                 },
+                flowOf(rootNodeExistsUseCase()).map { exists ->
+                    { state: LoginState -> state.copy(rootNodesExists = exists) }
+                },
                 flowOf(hasPreferencesUseCase()).map { hasPreferences ->
                     { state: LoginState -> state.copy(hasPreferences = hasPreferences) }
                 },
@@ -135,40 +136,36 @@ class LoginViewModel @Inject constructor(
                 },
                 flowOf(isCameraSyncEnabledUseCase()).map { isCameraSyncEnabled ->
                     { state: LoginState -> state.copy(isCUSettingEnabled = isCameraSyncEnabled) }
-                }
+                },
+                monitorFetchNodesFinishUseCase().map {
+                    with(pendingAction) {
+                        when (this) {
+                            ACTION_FORCE_RELOAD_ACCOUNT -> {
+                                { state: LoginState -> state.copy(isPendingToFinishActivity = true) }
+                            }
+                            ACTION_OPEN_APP -> {
+                                { state: LoginState -> state.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
+                            }
+                            else -> {
+                                { state: LoginState -> state }
+                            }
+                        }
+                    }
+                },
+                monitorAccountUpdateUseCase().map {
+                    if (state.value.isPendingToShowFragment == LoginFragmentType.ConfirmEmail) {
+                        { state: LoginState -> state.copy(isPendingToShowFragment = LoginFragmentType.Login) }
+                    } else {
+                        { state: LoginState -> state }
+                    }
+                },
             ).collect {
                 _state.update(it)
             }
         }
 
         viewModelScope.launch { resetChatSettingsUseCase() }
-        monitorFetchNodes()
-        monitorAccountUpdates()
     }
-
-    private fun monitorFetchNodes() = viewModelScope.launch {
-        monitorFetchNodesFinishUseCase().collectLatest {
-            with(state.value.pendingAction) {
-                when (this) {
-                    ACTION_FORCE_RELOAD_ACCOUNT -> {
-                        _state.update { it.copy(isPendingToFinishActivity = true) }
-                    }
-                    ACTION_OPEN_APP -> {
-                        _state.update { it.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun monitorAccountUpdates() = viewModelScope.launch {
-        monitorAccountUpdateUseCase().collectLatest {
-            if (state.value.isPendingToShowFragment == LoginFragmentType.ConfirmEmail) {
-                _state.update { it.copy(isPendingToShowFragment = LoginFragmentType.Login) }
-            }
-        }
-    }
-
 
     /**
      * Sets confirm email fragment as pending in state.
@@ -183,12 +180,21 @@ class LoginViewModel @Inject constructor(
         _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Tour) }
 
     /**
-     * Updates state with a new intentAction.
-     *
-     * @param pendingAction Intent action.
+     * Sets [ACTION_FORCE_RELOAD_ACCOUNT] as pendingAction.
      */
-    fun setPendingAction(pendingAction: String) {
-        _state.update { it.copy(pendingAction = pendingAction) }
+    fun setForceReloadAccountAsPendingAction() {
+        pendingAction = ACTION_FORCE_RELOAD_ACCOUNT
+        MegaApplication.isLoggingIn = true
+        _state.update { state ->
+            state.copy(
+                intentState = LoginIntentState.AlreadySet,
+                isLoginInProgress = false,
+                isLoginRequired = false,
+                is2FARequired = false,
+                isAlreadyLoggedIn = true,
+                fetchNodesUpdate = cleanFetchNodesUpdate
+            )
+        }
     }
 
     /**
@@ -201,7 +207,8 @@ class LoginViewModel @Inject constructor(
     /**
      * Sets querySignupLinkResult as null in state.
      */
-    fun querySignupLinkResultShown() = _state.update { it.copy(querySignupLinkResult = null) }
+    fun setQuerySignupLinkResultConsumed() =
+        _state.update { it.copy(querySignupLinkResult = null) }
 
     /**
      * Stops logging in.
@@ -237,31 +244,27 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * Updates error value in state as null.
+     * Updates login error value in state as consumed.
      */
-    fun setErrorShown() {
-        _state.update { it.copy(error = null) }
+    fun setLoginErrorConsumed() {
+        _state.update { it.copy(loginException = null) }
     }
 
     /**
-     * Updates email and session values in state.
+     * Updates fetch nodes error value in state as consumed.
      */
-    fun updateEmailAndSession(): Boolean = runBlocking {
-        getAccountCredentialsUseCase()?.let { credentials ->
-            val accountSession = state.value.accountSession
-            _state.update {
-                it.copy(
-                    accountSession = accountSession?.copy(
-                        email = credentials.email,
-                        session = credentials.session
-                    ) ?: AccountSession(
-                        email = credentials.email,
-                        credentials.session,
-                    )
-                )
-            }
-            true
-        } ?: false
+    fun setFetchNodesErrorConsumed() {
+        _state.update { it.copy(fetchNodesException = null) }
+    }
+
+    private fun UserCredentials.updateCredentials() {
+        val accountSession = state.value.accountSession
+        _state.update {
+            it.copy(
+                accountSession = accountSession?.copy(email = email, session = session)
+                    ?: AccountSession(email = email, session)
+            )
+        }
     }
 
     /**
@@ -272,23 +275,12 @@ class LoginViewModel @Inject constructor(
     }
 
     /**
-     * Set temporal email and password values in state as current email and password.
-     */
-    fun setTemporalCredentialsAsCurrentCredentials() = with(state.value) {
-        _state.update {
-            it.copy(
-                accountSession = accountSession?.copy(email = temporalEmail)
-                    ?: AccountSession(email = temporalEmail),
-                password = temporalPassword
-            )
-        }
-    }
-
-    /**
      * True if there is a not null email and a not null password, false otherwise.
      */
-    fun areThereValidTemporalCredentials() = with(state.value) {
-        temporalEmail != null && temporalPassword != null
+    fun checkTemporalCredentials() = with(state.value) {
+        if (temporalEmail != null && temporalPassword != null) {
+            performLogin(temporalEmail, temporalPassword)
+        }
     }
 
     /**
@@ -360,6 +352,26 @@ class LoginViewModel @Inject constructor(
         }
 
         MegaApplication.isLoggingIn = true
+
+        _state.update {
+            if (typedEmail != null && typedPassword != null) {
+                it.copy(
+                    isLoginInProgress = true,
+                    is2FARequired = false,
+                    accountSession = state.value.accountSession?.copy(email = typedEmail)
+                        ?: AccountSession(email = typedEmail),
+                    password = typedPassword,
+                    ongoingTransfersExist = null
+                )
+            } else {
+                it.copy(
+                    isLoginInProgress = true,
+                    is2FARequired = false,
+                    ongoingTransfersExist = null
+                )
+            }
+        }
+
         viewModelScope.launch {
             with(state.value) {
                 val email = typedEmail ?: accountSession?.email ?: return@launch
@@ -370,7 +382,7 @@ class LoginViewModel @Inject constructor(
                         email,
                         password,
                         DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
-                    ).collectLatest { status -> status.checkStatus(email, password) }
+                    ).collectLatest { status -> status.checkStatus() }
                 }.onFailure { exception ->
                     MegaApplication.isLoggingIn = false
                     if (exception !is LoginException) return@onFailure
@@ -430,14 +442,38 @@ class LoginViewModel @Inject constructor(
     /**
      * Fast login.
      */
-    fun performFastLogin(refreshChatUrl: Boolean) = viewModelScope.launch {
+    fun fastLogin(refreshChatUrl: Boolean) {
+        _state.update {
+            it.copy(
+                isLoginInProgress = false,
+                isLoginRequired = false,
+                is2FARequired = false,
+                isAlreadyLoggedIn = true,
+                fetchNodesUpdate = cleanFetchNodesUpdate
+            )
+        }
+
+        viewModelScope.launch {
+            getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
+
+            if (MegaApplication.isLoggingIn) {
+                Timber.w("Another login is processing")
+                pendingAction = ACTION_OPEN_APP
+                return@launch
+            }
+
+            performFastLogin(refreshChatUrl)
+        }
+    }
+
+    private fun performFastLogin(refreshChatUrl: Boolean) = viewModelScope.launch {
         MegaApplication.isLoggingIn = true
         runCatching {
             fastLoginUseCase(
                 state.value.accountSession?.session ?: return@launch,
                 refreshChatUrl,
                 DisableChatApiUseCase { MegaApplication.getInstance()::disableMegaChatApi }
-            ).collectLatest { status -> status.checkStatus() }
+            ).collectLatest { status -> status.checkStatus(true) }
         }.onFailure { exception ->
             MegaApplication.isLoggingIn = false
             if (exception !is LoginException) return@onFailure
@@ -445,55 +481,44 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun LoginException.loginFailed(is2FARequest: Boolean = false) =
-        _state.update {
-            it.copy(
-                isLoginInProgress = false,
-                isLoginRequired = true,
-                is2FAEnabled = is2FARequest,
-                is2FARequired = false,
-                //If LoginBlockedAccount will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
-                error = this.takeUnless { exception -> exception is LoginBlockedAccount }
-            )
+    private fun LoginException.loginFailed(is2FARequest: Boolean = false) = _state.update {
+        it.copy(
+            isLoginInProgress = false,
+            isLoginRequired = true,
+            is2FAEnabled = is2FARequest,
+            is2FARequired = false,
+            //If LoginBlockedAccount will processed at the `onEvent` when receive an EVENT_ACCOUNT_BLOCKED
+            loginException = this.takeUnless { exception -> exception is LoginBlockedAccount }
+        )
+    }
+
+    private fun LoginStatus.checkStatus(isFastLogin: Boolean = false) = when (this) {
+        LoginStatus.LoginStarted -> {
+            Timber.d("Login started")
         }
-
-    private fun LoginStatus.checkStatus(email: String? = null, password: String? = null) {
-        when (this) {
-            LoginStatus.LoginStarted -> {
-                _state.update {
-                    if (email != null && password != null) {
-                        it.copy(
-                            isLoginInProgress = true,
-                            is2FARequired = false,
-                            accountSession = state.value.accountSession?.copy(email = email)
-                                ?: AccountSession(email = email),
-                            password = password,
-                            ongoingTransfersExist = null
-                        )
-                    } else {
-                        it.copy(
-                            isLoginInProgress = true,
-                            is2FARequired = false,
-                            ongoingTransfersExist = null
-                        )
-                    }
-
-                }
-            }
-            LoginStatus.LoginSucceed -> {
+        LoginStatus.LoginSucceed -> {
+            //If fast login, state already updated.
+            if (!isFastLogin) {
                 _state.update {
                     it.copy(
                         isLoginInProgress = false,
                         isLoginRequired = false,
                         is2FARequired = false,
                         isAlreadyLoggedIn = true,
-                        fetchNodesUpdate = FetchNodesUpdate()
+                        fetchNodesUpdate = cleanFetchNodesUpdate
                     )
                 }
-                performFetchNodes()
             }
-            else -> {
-                //LoginStatus.LoginCannotStart no action required.
+            fetchNodes()
+        }
+        LoginStatus.LoginCannotStart -> {
+            _state.update {
+                it.copy(
+                    isLoginInProgress = false,
+                    isLoginRequired = true,
+                    is2FAEnabled = false,
+                    is2FARequired = false
+                )
             }
         }
     }
@@ -501,16 +526,22 @@ class LoginViewModel @Inject constructor(
     /**
      * Fetch nodes.
      */
-    fun performFetchNodes(isRefreshSession: Boolean = false) = viewModelScope.launch {
-        if (isRefreshSession && !updateEmailAndSession()) return@launch
+    fun fetchNodes(isRefreshSession: Boolean = false) {
+        viewModelScope.launch {
+            getAccountCredentialsUseCase()?.updateCredentials() ?: return@launch
 
-        MegaApplication.getInstance().checkEnabledCookies()
+            MegaApplication.getInstance().checkEnabledCookies()
 
-        if (isRefreshSession) {
-            MegaApplication.isLoggingIn = true
-            _state.update { it.copy(fetchNodesUpdate = FetchNodesUpdate()) }
+            if (isRefreshSession) {
+                MegaApplication.isLoggingIn = true
+                _state.update { it.copy(fetchNodesUpdate = cleanFetchNodesUpdate) }
+            }
+
+            performFetchNodes()
         }
+    }
 
+    private fun performFetchNodes() = viewModelScope.launch {
         runCatching {
             fetchNodesUseCase().collectLatest { update ->
                 if (update.progress?.floatValue == 1F) {
@@ -535,7 +566,7 @@ class LoginViewModel @Inject constructor(
                     isLoginRequired = true,
                     is2FAEnabled = false,
                     is2FARequired = false,
-                    error = it.takeUnless { it is FetchNodesErrorAccess || state.pressedBackWhileLogin }
+                    fetchNodesException = it.takeUnless { it is FetchNodesErrorAccess || state.pressedBackWhileLogin }
                 )
             }
         }
@@ -583,6 +614,6 @@ class LoginViewModel @Inject constructor(
         /**
          * Intent action for opening app.
          */
-        const val ACTION_OPEN_APP = "OPEN_APP"
+        private const val ACTION_OPEN_APP = "OPEN_APP"
     }
 }
