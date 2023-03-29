@@ -147,7 +147,7 @@ fun SecurityUpgradeDialogView(
                         shape = RoundedCornerShape(8.dp),
                         content = {
                             Text(
-                                text = stringResource(id = R.string.cloud_drive_media_discovery_banner_ok),
+                                text = stringResource(id = R.string.shared_items_security_upgrade_dialog_button_ok_got_it),
                                 color = Color.White
                             )
                         },
