@@ -2,16 +2,18 @@ package test.mega.privacy.android.app.presentation.fingerprintauth
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.fingerprintauth.SecurityUpgradeDialogView
+import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
+import mega.privacy.android.domain.entity.ShareData
+import nz.mega.sdk.MegaNode
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 import test.mega.privacy.android.app.onNodeWithText
 
 @HiltAndroidTest
@@ -21,13 +23,20 @@ class SecurityUpgradeDialogTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    private val node1 = mock<MegaNode>()
+    private val node2 = mock<MegaNode>()
+
+    private val shareData1 = mock<ShareData>()
+    private val shareData2 = mock<ShareData>()
+
+    private val pair1: Pair<MegaNode, ShareData> = Pair(node1, shareData1)
+    private val pair2: Pair<MegaNode, ShareData> = Pair(node2, shareData2)
+
+    private val nodes = listOf(pair1, pair2)
+
     private fun initComposeRule() {
         composeTestRule.setContent {
-            SecurityUpgradeDialogView(folderNames = listOf(
-                "folder name 1 ",
-                "folder name 2 ",
-                "folder name 3 "
-            ),
+            SecurityUpgradeDialogView(state = OutgoingSharesState(nodes = nodes),
                 onOkClick = { },
                 onCloseClick = { })
         }

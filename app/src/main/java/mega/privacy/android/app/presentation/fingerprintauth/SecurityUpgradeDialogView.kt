@@ -33,6 +33,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.shares.outgoing.model.OutgoingSharesState
 import mega.privacy.android.core.ui.theme.body2
 import mega.privacy.android.core.ui.theme.jade_300
 import mega.privacy.android.core.ui.theme.subtitle1
@@ -40,14 +41,14 @@ import mega.privacy.android.core.ui.theme.subtitle1
 /**
  * Security upgrade dialog body
  *
- * @param folderName    : Name of the folder for which security settings will upgrade
+ * @param state          : Ui State from OutgoingSharesViewModel
  * @param onOkClick     : Ok button click listener
  * @param onCloseClick : Close icon click listener
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SecurityUpgradeDialogView(
-    folderNames: List<String> = emptyList(),
+    state: OutgoingSharesState,
     onOkClick: () -> Unit,
     onCloseClick: () -> Unit,
 ) {
@@ -118,12 +119,13 @@ fun SecurityUpgradeDialogView(
 
                     Spacer(Modifier.height(20.dp))
 
-                    if (folderNames.isNotEmpty()) {
+                    if (state.nodes.isNotEmpty()) {
                         Text(
                             modifier = Modifier.testTag("SharedNodeInfo"),
                             text = pluralStringResource(
                                 id = R.plurals.shared_items_security_upgrade_dialog_node_sharing_info,
-                                folderNames.size, TextUtils.join(", ", folderNames)
+                                state.nodes.size,
+                                TextUtils.join(", ", state.nodes.map { it.first.name })
                             ),
                             style = body2.copy(textAlign = TextAlign.Center),
                             color = if (MaterialTheme.colors.isLight) {

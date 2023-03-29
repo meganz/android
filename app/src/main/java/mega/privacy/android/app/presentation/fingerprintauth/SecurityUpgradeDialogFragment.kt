@@ -49,10 +49,10 @@ class SecurityUpgradeDialogFragment : DialogFragment() {
                     val mode by getThemeMode()
                         .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
 
-                    val state by outgoingSharesViewModel.state.collectAsStateWithLifecycle()
+                    val uiState by outgoingSharesViewModel.state.collectAsStateWithLifecycle()
                     AndroidTheme(isDark = mode.isDarkMode()) {
                         SecurityUpgradeDialogView(
-                            folderNames = state.nodes.map { it.first.name },
+                            state = uiState,
                             onCloseClick = {
                                 dismiss()
                             },
