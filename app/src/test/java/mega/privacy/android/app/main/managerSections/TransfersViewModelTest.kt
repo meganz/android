@@ -12,6 +12,7 @@ import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
+import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
@@ -37,10 +38,15 @@ internal class TransfersViewModelTest {
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase = mock()
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase = mock()
     private val getTransferByTagUseCase: GetTransferByTagUseCase = mock()
+    private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase = mock()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(ioDispatcher)
+        initViewModel()
+    }
+
+    private fun initViewModel() {
         underTest = TransfersViewModel(
             transfersManagement = transfersManagement,
             dbH = dbH,
@@ -49,7 +55,8 @@ internal class TransfersViewModelTest {
             moveTransferBeforeByTagUseCase = moveTransferBeforeByTagUseCase,
             moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
-            getTransferByTagUseCase = getTransferByTagUseCase
+            getTransferByTagUseCase = getTransferByTagUseCase,
+            getInProgressTransfersUseCase = getInProgressTransfersUseCase
         )
     }
 
@@ -85,11 +92,12 @@ internal class TransfersViewModelTest {
                 transfers.add(transfer)
                 whenever(getTransferByTagUseCase(i)).thenReturn(transfer)
             }
-            underTest.setActiveTransfers(transfers.map { it.tag })
+            whenever(getInProgressTransfersUseCase.invoke()).thenReturn(transfers)
             whenever(moveTransferToLastByTagUseCase.invoke(any())).thenReturn(Unit)
+            underTest.getAllActiveTransfers()
             underTest.moveTransfer(transfers.first(), transfers.lastIndex)
             verify(moveTransferToLastByTagUseCase, times(1)).invoke(any())
-            verify(getTransferByTagUseCase, times(2)).invoke(transfers.first().tag)
+            verify(getTransferByTagUseCase, times(1)).invoke(transfers.first().tag)
             underTest.activeState.test {
                 Truth.assertThat(awaitItem())
                     .isInstanceOf(ActiveTransfersState.TransferMovementFinishedUpdated::class.java)
@@ -111,11 +119,12 @@ internal class TransfersViewModelTest {
                 transfers.add(transfer)
                 whenever(getTransferByTagUseCase(i)).thenReturn(transfer)
             }
-            underTest.setActiveTransfers(transfers.map { it.tag })
+            whenever(getInProgressTransfersUseCase.invoke()).thenReturn(transfers)
             whenever(moveTransferBeforeByTagUseCase.invoke(any(), any())).thenReturn(Unit)
+            underTest.getAllActiveTransfers()
             underTest.moveTransfer(transfers.first(), 2)
             verify(moveTransferBeforeByTagUseCase, times(1)).invoke(any(), any())
-            verify(getTransferByTagUseCase, times(2)).invoke(transfers.first().tag)
+            verify(getTransferByTagUseCase, times(1)).invoke(transfers.first().tag)
             underTest.activeState.test {
                 Truth.assertThat(awaitItem())
                     .isInstanceOf(ActiveTransfersState.TransferMovementFinishedUpdated::class.java)

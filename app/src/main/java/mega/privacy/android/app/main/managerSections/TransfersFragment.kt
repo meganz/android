@@ -89,17 +89,13 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
             if (Util.isScreenInPortrait(requireContext())) {
                 R.drawable.empty_transfer_portrait
             } else R.drawable.empty_transfer_landscape)
-
         binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(requireContext(),
             getString(R.string.transfers_empty_new))
+        binding.transfersEmptyImage.isVisible = false
+        binding.transfersEmptyText.isVisible = false
 
         setupFlow()
-
-        (requireActivity() as ManagerActivity).transfersInProgress?.let {
-            viewModel.setActiveTransfers(
-                it
-            )
-        }
+        viewModel.getAllActiveTransfers()
 
         binding.transfersListView.let { recyclerView ->
             adapter = MegaTransfersAdapter(
@@ -267,6 +263,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
         ).onEach { transfersState ->
             when (transfersState) {
                 is ActiveTransfersState.TransfersUpdated -> {
+                    adapter?.setTransfers(transfersState.newTransfers)
                     setEmptyView(transfersState.newTransfers.size)
                 }
                 is ActiveTransfersState.TransferUpdated -> {
@@ -421,6 +418,12 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
 
     private fun disableDragAndDrop() =
         itemTouchHelper?.attachToRecyclerView(null)
+
+    /**
+     * Is empty transfer
+     *
+     */
+    fun isNotEmptyTransfer() = viewModel.getActiveTransfers().isNotEmpty()
 
     companion object {
 

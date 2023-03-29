@@ -20,6 +20,7 @@ import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFER
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
@@ -44,7 +45,8 @@ class TransfersViewModel @Inject constructor(
     private val moveTransferBeforeByTagUseCase: MoveTransferBeforeByTagUseCase,
     private val moveTransferToFirstByTagUseCase: MoveTransferToFirstByTagUseCase,
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
-    private val getTransferByTagUseCase: GetTransferByTagUseCase
+    private val getTransferByTagUseCase: GetTransferByTagUseCase,
+    private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -93,20 +95,14 @@ class TransfersViewModel @Inject constructor(
     /**
      * Set active transfers
      */
-    fun setActiveTransfers(transfersInProgress: List<Int>) =
-        viewModelScope.launch(ioDispatcher) {
-            kotlin.runCatching {
+    fun getAllActiveTransfers() =
+        viewModelScope.launch {
+            runCatching {
+                val transfers = getInProgressTransfersUseCase()
                 activeTransfers.clear()
-                activeTransfers.addAll(
-                    transfersInProgress.map { tag ->
-                        getTransferByTagUseCase(tag)
-                    }.filter { transfer ->
-                        transfer != null && !transfer.isStreamingTransfer && !transfer.isBackgroundTransfer()
-                    }.filterNotNull()
-                )
-                activeTransfers.sortBy { it.priority }
+                activeTransfers.addAll(transfers)
                 _activeState.update {
-                    ActiveTransfersState.TransfersUpdated(activeTransfers)
+                    ActiveTransfersState.TransfersUpdated(transfers)
                 }
             }.onFailure { exception ->
                 if (exception is ConcurrentModificationException) {

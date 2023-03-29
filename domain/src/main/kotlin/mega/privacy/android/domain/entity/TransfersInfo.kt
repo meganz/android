@@ -16,12 +16,12 @@ import mega.privacy.android.domain.entity.transfer.TransferType
  * @property totalSizePendingTransfer           total size pending transfer
  */
 data class TransfersInfo(
-    val transferType: TransferType,
-    val numPendingDownloadsNonBackground: Int,
-    val numPendingUploads: Int,
-    val areTransfersPaused: Boolean,
-    val totalSizePendingTransfer: Long,
-    val totalSizeTransferred: Long,
+    val transferType: TransferType = TransferType.NONE,
+    val numPendingDownloadsNonBackground: Int = 0,
+    val numPendingUploads: Int = 0,
+    val areTransfersPaused: Boolean = false,
+    val totalSizePendingTransfer: Long = 0L,
+    val totalSizeTransferred: Long = 0L,
 ) {
     val numPendingTransfers: Int
         get() = numPendingDownloadsNonBackground + numPendingUploads

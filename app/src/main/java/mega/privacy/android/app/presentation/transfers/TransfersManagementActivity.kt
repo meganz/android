@@ -93,12 +93,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
             updateTransfersWidget(TransferType.NONE)
         }
 
-        transfersViewModel.onTransfersInfoUpdate().observe(this) { transfersInfo ->
+        collectFlow(transfersViewModel.transfersInfo) { transfersInfo ->
             transfersWidget?.update(transfersInfo = transfersInfo)
-        }
-
-        transfersViewModel.onGetTransfersState().observe(this) { areAllTransfersPaused ->
-            transfersWidget?.updateState(areAllTransfersPaused)
         }
     }
 

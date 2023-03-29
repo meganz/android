@@ -174,7 +174,6 @@ import mega.privacy.android.app.main.managerSections.TurnOnNotificationsFragment
 import mega.privacy.android.app.main.megachat.BadgeDrawerArrowDrawable
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.RecentChatsFragment
-import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.main.tasks.CheckOfflineNodesTask
 import mega.privacy.android.app.mediaplayer.miniplayer.MiniAudioPlayerController
 import mega.privacy.android.app.meeting.activity.MeetingActivity
@@ -229,6 +228,7 @@ import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
+import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.qrcode.scan.ScanCodeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinComposeFragment
 import mega.privacy.android.app.presentation.rubbishbin.RubbishBinFragment
@@ -367,7 +367,6 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransferData
 import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
@@ -464,9 +463,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
 
     private val subscriptions = CompositeDisposable()
-
-    var transfersInProgress: ArrayList<Int> = ArrayList()
-    var transferData: MegaTransferData? = null
     private var transferCallback: Long = 0
 
     //GET PRO ACCOUNT PANEL
@@ -1183,17 +1179,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         setupTransferPager()
         setupAudioPlayerController()
         megaApi.getAccountAchievements(this)
-        transferData = megaApi.getTransferData(this)
-        transferData?.let {
-            for (i in 0 until it.numDownloads) {
-                val tag: Int = it.getDownloadTag(i)
-                transfersInProgress.add(tag)
-            }
-            for (i in 0 until it.numUploads) {
-                val tag: Int = it.getUploadTag(i)
-                transfersInProgress.add(it.getUploadTag(i))
-            }
-        }
+        megaApi.addTransferListener(this)
         if (!viewModel.isConnected) {
             Timber.d("No network -> SHOW OFFLINE MODE")
             if (drawerItem == null) {
@@ -4516,18 +4502,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     private val isTransfersInProgressAdded: Boolean
         get() {
-            transfersFragment = transferTabsAdapter.instantiateItem(
-                viewPagerTransfers,
-                TransfersTab.PENDING_TAB.position
-            ) as? TransfersFragment
+            transfersFragment =
+                supportFragmentManager.findFragmentByTag(FragmentTag.TRANSFERS.tag) as? TransfersFragment
             return transfersFragment?.isAdded ?: false
         }
     private val isTransfersCompletedAdded: Boolean
         get() {
-            completedTransfersFragment = transferTabsAdapter.instantiateItem(
-                viewPagerTransfers,
-                TransfersTab.COMPLETED_TAB.position
-            ) as? CompletedTransfersFragment
+            completedTransfersFragment =
+                supportFragmentManager.findFragmentByTag(FragmentTag.COMPLETED_TRANSFERS.tag) as? CompletedTransfersFragment
             return completedTransfersFragment?.isAdded ?: false
         }
 
@@ -4941,10 +4923,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else {
                     moreMenuItem.isVisible = !isFirstNavigationLevel
                 }
-                DrawerItem.TRANSFERS -> if (tabItemTransfers === TransfersTab.PENDING_TAB && isTransfersInProgressAdded && transfersInProgress.size > 0) {
-                    if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) || megaApi.areTransfersPaused(
-                            MegaTransfer.TYPE_UPLOAD
-                        )
+                DrawerItem.TRANSFERS -> if (tabItemTransfers === TransfersTab.PENDING_TAB && isTransfersInProgressAdded && transfersFragment?.isNotEmptyTransfer() == true) {
+                    if (megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD)
+                        || megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
                     ) {
                         playTransfersMenuIcon?.isVisible = true
                     } else {
@@ -9258,7 +9239,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             val now = Calendar.getInstance().timeInMillis
             lastTimeOnTransferUpdate = now
             if (!transfer.isFolderTransfer) {
-                transfersInProgress.add(transfer.tag)
                 if (isTransfersInProgressAdded) {
                     transfersFragment?.transferStart(transfer)
                 }
@@ -9281,25 +9261,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             val now = Calendar.getInstance().timeInMillis
             lastTimeOnTransferUpdate = now
             if (!transfer.isFolderTransfer) {
-                val li = transfersInProgress.listIterator()
-                var index = 0
-                while (li.hasNext()) {
-                    val next = li.next()
-                    if (next == transfer.tag) {
-                        index = li.previousIndex()
-                        break
-                    }
-                }
-                if (transfersInProgress.isNotEmpty()) {
-                    transfersInProgress.removeAt(index)
-                    Timber.d(
-                        "The transfer with index %d has been removed, left: %d",
-                        index,
-                        transfersInProgress.size
-                    )
-                } else {
-                    Timber.d("The transferInProgress is EMPTY")
-                }
                 val pendingTransfers: Int =
                     megaApi.numPendingDownloads + megaApi.numPendingUploads
                 if (pendingTransfers <= 0) {
