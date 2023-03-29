@@ -15,12 +15,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
@@ -53,15 +53,6 @@ class RubbishBinComposeFragment : Fragment() {
 
     private val sortOrderViewModel: SortByHeaderViewModel by activityViewModels()
 
-    /**
-     * [Boolean] value referenced from [ManagerActivity]
-     *
-     * If "true", the contents are displayed in a List View-like manner
-     * If "false", the contents are displayed in a Grid View-like manner
-     */
-    private val isList
-        get() = (requireActivity() as ManagerActivity).isList
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -82,9 +73,9 @@ class RubbishBinComposeFragment : Fragment() {
                         onItemClicked = viewModel::onItemClicked,
                         onLongClick = viewModel::onLongItemClicked,
                         sortOrder = sortOrderViewModel.order.first.name,
-                        isListView = isList,
+                        isListView = uiState.currentViewType == ViewType.LIST,
                         onSortOrderClick = { },
-                        onChangeViewTypeClick = { },
+                        onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                     )
                 }
             }
@@ -92,7 +83,7 @@ class RubbishBinComposeFragment : Fragment() {
     }
 
     /**
-     * On back pressed from [ManagerActivity]
+     * On back pressed from ManagerActivity
      */
     fun onBackPressed() {
 

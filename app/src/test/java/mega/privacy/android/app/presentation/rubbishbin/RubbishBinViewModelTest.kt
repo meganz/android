@@ -17,7 +17,10 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
+import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,6 +40,8 @@ class RubbishBinViewModelTest {
     private val getRubbishBinParentNodeHandle = mock<GetParentNodeHandle>()
     private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
     private val getNodeByHandle = mock<GetNodeByHandle>()
+    private val setViewType = mock<SetViewType>()
+    private val monitorViewType = mock<MonitorViewType>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -53,7 +58,9 @@ class RubbishBinViewModelTest {
             monitorNodeUpdates = monitorNodeUpdates,
             getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle,
             getRubbishBinChildren = getRubbishBinChildren,
-            getNodeByHandle = getNodeByHandle
+            getNodeByHandle = getNodeByHandle,
+            setViewType = setViewType,
+            monitorViewType = monitorViewType
         )
     }
 
@@ -260,5 +267,12 @@ class RubbishBinViewModelTest {
                 val state = awaitItem()
                 Truth.assertThat(state.selectedNodes).isEqualTo(2)
             }
+        }
+
+    @Test
+    fun `test that on clicking on change view type to Grid it calls setViewType atleast once`() =
+        runTest {
+            underTest.onChangeViewTypeClicked()
+            verify(setViewType, times(1)).invoke(ViewType.GRID)
         }
 }
