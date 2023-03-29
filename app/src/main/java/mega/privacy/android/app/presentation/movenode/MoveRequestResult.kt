@@ -1,10 +1,12 @@
-package mega.privacy.android.app.usecase.data
+package mega.privacy.android.app.presentation.movenode
 
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.DBUtil
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult.GeneralMovement
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult.Restoration
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult.RubbishMovement
 import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 
 /**
@@ -18,23 +20,37 @@ import nz.mega.sdk.MegaNode
 sealed class MoveRequestResult(
     val count: Int,
     val errorCount: Int,
-    val oldParentHandle: Long? = INVALID_HANDLE
+    val oldParentHandle: Long? = MegaApiJava.INVALID_HANDLE,
 ) {
-
+    /**
+     * Count of success move request
+     */
     val successCount = count - errorCount
-    val isSingleAction: Boolean = count == 1
-    val isSuccess: Boolean = errorCount == 0
-
-    abstract fun getResultText(): String
 
     /**
-     * Resets the account details timestamp if some request finished with success.
+     * Checks whether move node request has only one request
      */
-    fun resetAccountDetailsIfNeeded() {
-        if (successCount > 0) {
-            DBUtil.resetAccountDetailsTimeStamp()
-        }
-    }
+    val isSingleAction: Boolean = count == 1
+
+    /**
+     * Checks whether all move node request are all success
+     */
+    val isSuccess: Boolean = errorCount == 0
+
+    /**
+     * Checks whether move node request has data
+     */
+    val hasNoData: Boolean = count == 0
+
+    /**
+     * Checks whether all move node request are errors
+     */
+    val isAllRequestError: Boolean = errorCount == count
+
+    /**
+     * Get Result Text Message after moving node
+     */
+    open fun getResultText(): String = ""
 
     /**
      * Result of a movement request from one location to another one.
@@ -42,24 +58,8 @@ sealed class MoveRequestResult(
     class GeneralMovement(
         count: Int,
         errorCount: Int,
-        oldParentHandle: Long? = null
-    ) : MoveRequestResult(
-        count = count,
-        errorCount = errorCount,
-        oldParentHandle = oldParentHandle
-    ) {
-
-        override fun getResultText(): String =
-            when {
-                count == 1 && !isSuccess -> getString(R.string.context_no_moved)
-                isSuccess -> getQuantityString(R.plurals.number_correctly_moved, count, count)
-                else -> getQuantityString(
-                    R.plurals.number_correctly_moved,
-                    count - errorCount,
-                    count - errorCount
-                ) + getString(R.string.number_incorrectly_moved, errorCount)
-            }
-    }
+        oldParentHandle: Long? = null,
+    ) : MoveRequestResult(count, errorCount, oldParentHandle)
 
     /**
      * Result of a movement to the Rubbish Bin.
@@ -67,7 +67,7 @@ sealed class MoveRequestResult(
     class RubbishMovement constructor(
         count: Int,
         errorCount: Int,
-        oldParentHandle: Long?
+        oldParentHandle: Long?,
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount,
@@ -129,7 +129,7 @@ sealed class MoveRequestResult(
     class Restoration(
         count: Int,
         errorCount: Int,
-        val destination: MegaNode?
+        val destination: MegaNode?,
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount

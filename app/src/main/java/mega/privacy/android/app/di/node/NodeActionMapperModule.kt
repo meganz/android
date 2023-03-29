@@ -9,6 +9,9 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapperImpl
 
+/**
+ * Node Action Module
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class NodeActionMapperModule {

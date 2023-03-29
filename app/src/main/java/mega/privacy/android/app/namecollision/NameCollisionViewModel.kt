@@ -25,7 +25,8 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
-import mega.privacy.android.app.usecase.data.MoveRequestResult
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult
+import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
@@ -55,7 +56,8 @@ class NameCollisionViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val getNodeUseCase: GetNodeUseCase,
     private val setLatestTargetPath: SetLatestTargetPath,
-    private val copyRequestMessageMapper: CopyRequestMessageMapper
+    private val copyRequestMessageMapper: CopyRequestMessageMapper,
+    private val moveRequestMessageMapper: MoveRequestMessageMapper,
 ) : BaseRxViewModel() {
 
     private val currentCollision: MutableLiveData<NameCollisionResult?> = MutableLiveData()
@@ -560,7 +562,7 @@ class NameCollisionViewModel @Inject constructor(
      */
     private fun setMovementResult(movementResult: MoveRequestResult.GeneralMovement) {
         actionResult.value = NameCollisionActionResult(
-            message = movementResult.getResultText(),
+            message = moveRequestMessageMapper(movementResult),
             shouldFinish = pendingCollisions.isEmpty()
         )
     }

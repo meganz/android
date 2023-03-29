@@ -278,7 +278,8 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.usecase.data.MoveRequestResult
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult
+import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.usecase.data.RemoveRequestResult
 import mega.privacy.android.app.usecase.exception.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -461,6 +462,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @Inject
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
+
+    @Inject
+    lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
 
     private val subscriptions = CompositeDisposable()
     private var transferCallback: Long = 0
@@ -5669,7 +5673,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         moveNodeUseCase.restore(nodes)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe { result: MoveRequestResult, throwable: Throwable? ->
+            .subscribe { result: MoveRequestResult.Restoration, throwable: Throwable? ->
                 if (throwable == null) {
                     val notValidView =
                         result.isSingleAction && result.isSuccess && this@ManagerActivity.rubbishBinState().rubbishBinHandle == nodes[0].handle
@@ -5783,9 +5787,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 moveNodeUseCase.moveToRubbishBin(handleList)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { result: MoveRequestResult, throwable: Throwable? ->
+                    .subscribe { result: MoveRequestResult.RubbishMovement, throwable: Throwable? ->
                         if (throwable == null) {
                             showMovementResult(result, handleList[0])
+                            showSnackbar(
+                                Constants.SNACKBAR_TYPE,
+                                result.getResultText(),
+                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                            )
                         }
                     }
             }
@@ -5882,11 +5891,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
             setToolbarTitle()
         }
-        showSnackbar(
-            Constants.SNACKBAR_TYPE,
-            result.getResultText(),
-            MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-        )
     }
 
     /**
@@ -7459,12 +7463,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 moveNodeUseCase.move(handlesWithoutCollision, toHandle)
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe { moveResult: MoveRequestResult, moveThrowable: Throwable? ->
+                                    .subscribe { moveResult: MoveRequestResult.GeneralMovement, moveThrowable: Throwable? ->
                                         if (!manageCopyMoveException(moveThrowable)) {
                                             viewModel.setTargetPath(toHandle)
                                             showMovementResult(
                                                 moveResult,
                                                 handlesWithoutCollision[0]
+                                            )
+                                            showSnackbar(
+                                                Constants.SNACKBAR_TYPE,
+                                                moveRequestMessageMapper(moveResult),
+                                                MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                                             )
                                         }
                                     }
