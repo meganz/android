@@ -32,6 +32,7 @@ class RecentActionBucketMapperTest {
         on { size() }.thenReturn(10)
         on { get(any()) }.thenReturn(megaNode)
     }
+    private val nodeMapper = mock<NodeMapper>()
 
     private val recentActionBucket = mock<MegaRecentActionBucket> {
         on { timestamp }.thenReturn(12L)
@@ -44,7 +45,7 @@ class RecentActionBucketMapperTest {
 
     @Before
     fun setUp() {
-        underTest = RecentActionBucketMapperImpl()
+        underTest = RecentActionBucketMapperImpl(nodeMapper)
     }
 
     @Test

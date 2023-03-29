@@ -1,14 +1,9 @@
 package mega.privacy.android.data.mapper.recentactions
 
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.MapHasVersion
-import mega.privacy.android.data.mapper.MapInRubbish
-import mega.privacy.android.data.mapper.MapNumberOfChildFiles
-import mega.privacy.android.data.mapper.MapNumberOfChildFolders
-import mega.privacy.android.data.mapper.MapPendingShare
-import mega.privacy.android.data.mapper.MapThumbnail
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
 
 /**
@@ -17,12 +12,12 @@ import nz.mega.sdk.MegaRecentActionBucket
 internal fun interface RecentActionBucketMapper {
     suspend operator fun invoke(
         megaRecentActionBucket: MegaRecentActionBucket,
-        thumbnailPath: MapThumbnail,
-        hasVersion: MapHasVersion,
-        numberOfChildFolders: MapNumberOfChildFolders,
-        numberOfChildFiles: MapNumberOfChildFiles,
+        thumbnailPath: suspend (MegaNode) -> String?,
+        hasVersion: suspend (MegaNode) -> Boolean,
+        numberOfChildFolders: suspend (MegaNode) -> Int,
+        numberOfChildFiles: suspend (MegaNode) -> Int,
         fileTypeInfoMapper: FileTypeInfoMapper,
-        isPendingShare: MapPendingShare,
-        isInRubbish: MapInRubbish
+        isPendingShare: suspend (MegaNode) -> Boolean,
+        isInRubbish: suspend (MegaNode) -> Boolean
     ): RecentActionBucketUnTyped
 }

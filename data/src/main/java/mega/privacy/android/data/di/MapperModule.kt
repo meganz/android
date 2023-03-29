@@ -103,7 +103,6 @@ import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toMegaSku
-import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPaymentPlatformType
@@ -289,13 +288,6 @@ internal abstract class MapperModule {
         fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
             getMimeType(extension, MimeTypeMap.getSingleton()::getMimeTypeFromExtension)
         }
-
-
-        /**
-         * Provide favourite info mapper
-         */
-        @Provides
-        fun provideFavouriteInfoMapper(): NodeMapper = ::toNode
 
 
         /**

@@ -1,30 +1,25 @@
 package mega.privacy.android.data.mapper.recentactions
 
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.MapHasVersion
-import mega.privacy.android.data.mapper.MapInRubbish
-import mega.privacy.android.data.mapper.MapNumberOfChildFiles
-import mega.privacy.android.data.mapper.MapNumberOfChildFolders
-import mega.privacy.android.data.mapper.MapPendingShare
-import mega.privacy.android.data.mapper.MapThumbnail
-import mega.privacy.android.data.mapper.toNode
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
 import javax.inject.Inject
 
 /**
  * Implementation of [RecentActionBucketMapper].
  */
-internal class RecentActionBucketMapperImpl @Inject constructor() : RecentActionBucketMapper {
+internal class RecentActionBucketMapperImpl @Inject constructor(private val nodeMapper: NodeMapper) : RecentActionBucketMapper {
     override suspend fun invoke(
         megaRecentActionBucket: MegaRecentActionBucket,
-        thumbnailPath: MapThumbnail,
-        hasVersion: MapHasVersion,
-        numberOfChildFolders: MapNumberOfChildFolders,
-        numberOfChildFiles: MapNumberOfChildFiles,
+        thumbnailPath: suspend (MegaNode) -> String?,
+        hasVersion: suspend (MegaNode) -> Boolean,
+        numberOfChildFolders: suspend (MegaNode) -> Int,
+        numberOfChildFiles: suspend (MegaNode) -> Int,
         fileTypeInfoMapper: FileTypeInfoMapper,
-        isPendingShare: MapPendingShare,
-        isInRubbish: MapInRubbish,
+        isPendingShare: suspend (MegaNode) -> Boolean,
+        isInRubbish: suspend (MegaNode) -> Boolean,
     ) = RecentActionBucketUnTyped(
         timestamp = megaRecentActionBucket.timestamp,
         userEmail = megaRecentActionBucket.userEmail,
@@ -32,7 +27,7 @@ internal class RecentActionBucketMapperImpl @Inject constructor() : RecentAction
         isUpdate = megaRecentActionBucket.isUpdate,
         isMedia = megaRecentActionBucket.isMedia,
         nodes = (0 until megaRecentActionBucket.nodes.size()).map {
-            toNode(
+            nodeMapper(
                 megaRecentActionBucket.nodes.get(it),
                 thumbnailPath,
                 hasVersion,

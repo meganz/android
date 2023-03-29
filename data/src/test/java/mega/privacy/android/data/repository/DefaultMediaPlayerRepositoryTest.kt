@@ -15,9 +15,9 @@ import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.AppPreferencesGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.mediaplayer.SubtitleFileInfoMapper
-import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -81,6 +81,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedTotalDuration: Long = 200000
     private val expectedCurrentPosition: Long = 16000
     private val expectedHasPreview = false
+    private val nodeMapper = mock<NodeMapper>()
 
     @Before
     fun setUp() {
@@ -88,7 +89,7 @@ class DefaultMediaPlayerRepositoryTest {
             megaApi = megaApi,
             megaApiFolder = megaApiFolder,
             dbHandler = dbHandler,
-            nodeMapper = ::toNode,
+            nodeMapper = nodeMapper,
             cacheFolder = cacheFolder,
             fileTypeInfoMapper = fileTypeInfoMapper,
             fileGateway = fileGateway,
@@ -105,6 +106,9 @@ class DefaultMediaPlayerRepositoryTest {
         initTestConditions(expectedFileMegaNode, expectedType)
 
         val expectedTypedNode = createTypedFileNode()
+        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+            expectedTypedNode
+        )
 
         val actualTypedFile = underTest.getUnTypedNodeByHandle(expectedHandle)
 
@@ -137,6 +141,9 @@ class DefaultMediaPlayerRepositoryTest {
         initTestConditions(expectedFolderMegaNode, expectedType)
 
         val expectedTypedNode = createTypedFolderNode()
+        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+            expectedTypedNode
+        )
         val actualTypedFolder = underTest.getUnTypedNodeByHandle(expectedHandle)
 
         assertThat(actualTypedFolder).isNotNull()

@@ -4,83 +4,67 @@ import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
-import mega.privacy.android.domain.entity.node.UnTypedNode
 import nz.mega.sdk.MegaNode
+import javax.inject.Inject
 
 /**
  * The mapper class for converting the data entity to FavouriteInfo
  */
-typealias NodeMapper = @JvmSuppressWildcards suspend (
-    @JvmSuppressWildcards MegaNode,
-    @JvmSuppressWildcards MapThumbnail,
-    @JvmSuppressWildcards MapHasVersion,
-    @JvmSuppressWildcards MapNumberOfChildFolders,
-    @JvmSuppressWildcards MapNumberOfChildFiles,
-    @JvmSuppressWildcards FileTypeInfoMapper,
-    @JvmSuppressWildcards MapPendingShare,
-    @JvmSuppressWildcards MapInRubbish,
-) -> @JvmSuppressWildcards UnTypedNode
-
-internal typealias MapThumbnail = suspend (MegaNode) -> String?
-internal typealias MapHasVersion = suspend (MegaNode) -> Boolean
-internal typealias MapNumberOfChildFolders = suspend (MegaNode) -> Int
-internal typealias MapNumberOfChildFiles = suspend (MegaNode) -> Int
-internal typealias MapPendingShare = suspend (MegaNode) -> Boolean
-internal typealias MapInRubbish = suspend (MegaNode) -> Boolean
-
-internal suspend fun toNode(
-    megaNode: MegaNode,
-    thumbnailPath: MapThumbnail,
-    hasVersion: MapHasVersion,
-    numberOfChildFolders: MapNumberOfChildFolders,
-    numberOfChildFiles: MapNumberOfChildFiles,
-    fileTypeInfoMapper: FileTypeInfoMapper,
-    isPendingShare: MapPendingShare,
-    isInRubbish: MapInRubbish,
-) = if (megaNode.isFolder) {
-    DefaultFolderNode(
-        id = NodeId(megaNode.handle),
-        name = megaNode.name,
-        label = megaNode.label,
-        parentId = NodeId(megaNode.parentHandle),
-        base64Id = megaNode.base64Handle,
-        hasVersion = hasVersion(megaNode),
-        childFolderCount = numberOfChildFolders(megaNode),
-        childFileCount = numberOfChildFiles(megaNode),
-        isFavourite = megaNode.isFavourite,
-        exportedData = megaNode.takeIf { megaNode.isExported }?.let {
-            ExportedData(it.publicLink, it.publicLinkCreationTime)
-        },
-        isTakenDown = megaNode.isTakenDown,
-        isInRubbishBin = isInRubbish(megaNode),
-        isIncomingShare = megaNode.isInShare,
-        isShared = megaNode.isOutShare,
-        isPendingShare = isPendingShare(megaNode),
-        device = megaNode.deviceId,
-        isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
-        creationTime = megaNode.creationTime,
-    )
-} else {
-    DefaultFileNode(
-        id = NodeId(megaNode.handle),
-        name = megaNode.name,
-        size = megaNode.size,
-        label = megaNode.label,
-        parentId = NodeId(megaNode.parentHandle),
-        base64Id = megaNode.base64Handle,
-        creationTime = megaNode.creationTime,
-        modificationTime = megaNode.modificationTime,
-        hasVersion = hasVersion(megaNode),
-        thumbnailPath = thumbnailPath(megaNode),
-        type = fileTypeInfoMapper(megaNode),
-        isFavourite = megaNode.isFavourite,
-        exportedData = megaNode.takeIf { megaNode.isExported }?.let {
-            ExportedData(it.publicLink, it.publicLinkCreationTime)
-        },
-        isTakenDown = megaNode.isTakenDown,
-        isIncomingShare = megaNode.isInShare,
-        fingerprint = megaNode.fingerprint,
-        isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
-        hasPreview = megaNode.hasPreview(),
-    )
+internal class NodeMapper @Inject constructor() {
+    suspend operator fun invoke(
+        megaNode: MegaNode,
+        thumbnailPath: suspend (MegaNode) -> String?,
+        hasVersion: suspend (MegaNode) -> Boolean,
+        numberOfChildFolders: suspend (MegaNode) -> Int,
+        numberOfChildFiles: suspend (MegaNode) -> Int,
+        fileTypeInfoMapper: FileTypeInfoMapper,
+        isPendingShare: suspend (MegaNode) -> Boolean,
+        isInRubbish: suspend (MegaNode) -> Boolean,
+    ) = if (megaNode.isFolder) {
+        DefaultFolderNode(
+            id = NodeId(megaNode.handle),
+            name = megaNode.name,
+            label = megaNode.label,
+            parentId = NodeId(megaNode.parentHandle),
+            base64Id = megaNode.base64Handle,
+            hasVersion = hasVersion(megaNode),
+            childFolderCount = numberOfChildFolders(megaNode),
+            childFileCount = numberOfChildFiles(megaNode),
+            isFavourite = megaNode.isFavourite,
+            exportedData = megaNode.takeIf { megaNode.isExported }?.let {
+                ExportedData(it.publicLink, it.publicLinkCreationTime)
+            },
+            isTakenDown = megaNode.isTakenDown,
+            isInRubbishBin = isInRubbish(megaNode),
+            isIncomingShare = megaNode.isInShare,
+            isShared = megaNode.isOutShare,
+            isPendingShare = isPendingShare(megaNode),
+            device = megaNode.deviceId,
+            isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
+            creationTime = megaNode.creationTime,
+        )
+    } else {
+        DefaultFileNode(
+            id = NodeId(megaNode.handle),
+            name = megaNode.name,
+            size = megaNode.size,
+            label = megaNode.label,
+            parentId = NodeId(megaNode.parentHandle),
+            base64Id = megaNode.base64Handle,
+            creationTime = megaNode.creationTime,
+            modificationTime = megaNode.modificationTime,
+            hasVersion = hasVersion(megaNode),
+            thumbnailPath = thumbnailPath(megaNode),
+            type = fileTypeInfoMapper(megaNode),
+            isFavourite = megaNode.isFavourite,
+            exportedData = megaNode.takeIf { megaNode.isExported }?.let {
+                ExportedData(it.publicLink, it.publicLinkCreationTime)
+            },
+            isTakenDown = megaNode.isTakenDown,
+            isIncomingShare = megaNode.isInShare,
+            fingerprint = megaNode.fingerprint,
+            isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
+            hasPreview = megaNode.hasPreview(),
+        )
+    }
 }
