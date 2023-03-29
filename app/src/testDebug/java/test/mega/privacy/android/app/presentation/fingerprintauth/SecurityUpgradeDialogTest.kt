@@ -23,11 +23,13 @@ class SecurityUpgradeDialogTest {
 
     private fun initComposeRule() {
         composeTestRule.setContent {
-            SecurityUpgradeDialogView(folderNames = listOf("folder name 1 ",
+            SecurityUpgradeDialogView(folderNames = listOf(
+                "folder name 1 ",
                 "folder name 2 ",
-                "folder name 3 "),
+                "folder name 3 "
+            ),
                 onOkClick = { },
-                onCancelClick = {})
+                onCloseClick = { })
         }
     }
 
@@ -39,8 +41,7 @@ class SecurityUpgradeDialogTest {
             onNodeWithText(R.string.shared_items_security_upgrade_dialog_title).assertIsDisplayed()
             onNodeWithText(R.string.shared_items_security_upgrade_dialog_content).assertIsDisplayed()
             onNodeWithTag("SharedNodeInfo").assertIsDisplayed()
-            onNodeWithText(R.string.general_ok).assertIsDisplayed()
-            onNodeWithText(R.string.button_cancel).assertIsDisplayed()
+            onNodeWithText(R.string.cloud_drive_media_discovery_banner_ok).assertIsDisplayed()
         }
     }
 }

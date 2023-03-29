@@ -33,6 +33,9 @@ class SecurityUpgradeDialogFragment : DialogFragment() {
     @Inject
     lateinit var getThemeMode: GetThemeMode
 
+    /**
+     * onCreateDialog
+     */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         collectFlow(securityUpgradeViewModel.state) {
             if (it.shouldFinishScreen) {
@@ -50,8 +53,8 @@ class SecurityUpgradeDialogFragment : DialogFragment() {
                     AndroidTheme(isDark = mode.isDarkMode()) {
                         SecurityUpgradeDialogView(
                             folderNames = state.nodes.map { it.first.name },
-                            onCancelClick = {
-                                requireActivity().finishAffinity()
+                            onCloseClick = {
+                                dismiss()
                             },
                             onOkClick = {
                                 securityUpgradeViewModel.upgradeAccountSecurity()
