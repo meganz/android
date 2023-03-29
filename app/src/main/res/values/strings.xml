@@ -4549,16 +4549,15 @@
     <string name="meetings_one_off_occurrence_info_tomorrow">Tomorrow, %1$s from %2$s to %3$s</string>
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s updated[/A][B] the recurring meeting date[/B]</string>
-    <!-- This is the title of upgrade security dialog -->
+    <!-- Title of the upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">We’re upgrading your account’s security</string>
-    <!-- This is the body of upgrade security dialog -->
+    <!-- Body of the upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_content">You should see this message only once. If you’ve seen it before, first make sure it has been for this account and not for another MEGA account you have. If you’re sure and it’s the second time you’re seeing this message for this account, don’t tap OK. Close this message and stop using this account.</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="one">You’re currently sharing the following folder: %s</item>
         <item quantity="other">You’re currently sharing the following folders: %s</item>
     </plurals>
-    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, got it</string>
     <!-- Undecrypted file title on Recent bucket in cloud drive. This will get displayed instead of the file name if users credentials are not verified-->
     <plurals name="cloud_drive_undecrypted_file">
         <item quantity="one">[Undecrypted file]</item>
@@ -4719,4 +4718,37 @@
         <item quantity="one">couldn’t move %1$d item</item>
         <item quantity="other">couldn’t move %1$d items</item>
     </plurals>
+    <!-- Text hint of option to add meeting name in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_name_hint">Meeting name</string>
+    <!-- Title of option to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_label">Recurrence</string>
+    <!-- Title of option to send calendar invite in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Send calendar invite</string>
+    <!-- Title of option to add description in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_add_description_label">Add description</string>
+    <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_empty_meeting_name_error">Meeting name is required</string>
+    <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter fewer than 30 characters</string>
+    <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer that 4000 characters</string>
+    <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting scheduled</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_never_label">Never</string>
+    <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_calendar_select_date_label">Select date</string>
+    <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Discard this meeting?</string>
+    <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">Keep editing</string>
+    <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">Discard</string>
+    <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
+        <item quantity="one">Added %1$d participant</item>
+        <item quantity="other">Added %1$d participants</item>
+    </plurals>
+    <!-- Ok button label of the upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, got it</string>
 </resources>
