@@ -4550,9 +4550,9 @@
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s updated[/A][B] the recurring meeting date[/B]</string>
     <!-- This is the title of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_title">Security upgrade</string>
+    <string name="shared_items_security_upgrade_dialog_title">We’re upgrading your account’s security</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">Your account’s security is now being upgraded. This will happen only once. If you’ve seen this message for this account before, tap Cancel.</string>
+    <string name="shared_items_security_upgrade_dialog_content">You should see this message only once. If you’ve seen it before, first make sure it has been for this account and not for another MEGA account you have. If you’re sure and it’s the second time you’re seeing this message for this account, don’t tap OK. Close this message and stop using this account.</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="one">You’re currently sharing the following folder: %s</item>
