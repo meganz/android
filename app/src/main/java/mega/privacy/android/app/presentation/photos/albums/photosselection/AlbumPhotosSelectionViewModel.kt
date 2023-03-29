@@ -36,7 +36,7 @@ import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
-import mega.privacy.android.domain.usecase.GetTimelinePhotos
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import timber.log.Timber
 import java.io.File
@@ -48,7 +48,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val getUserAlbum: GetUserAlbum,
     private val getAlbumPhotos: GetAlbumPhotos,
-    private val getTimelinePhotos: GetTimelinePhotos,
+    private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     private val downloadThumbnail: DownloadThumbnail,
     private val filterCloudDrivePhotos: FilterCloudDrivePhotos,
     private val filterCameraUploadPhotos: FilterCameraUploadPhotos,
@@ -104,7 +104,7 @@ class AlbumPhotosSelectionViewModel @Inject constructor(
         }
     }
 
-    private fun fetchPhotos() = getTimelinePhotos()
+    private fun fetchPhotos() = getTimelinePhotosUseCase()
         .mapLatest(::sortPhotos)
         .mapLatest(::determineLocation)
         .onEach { filterPhotos() }

@@ -21,7 +21,6 @@ import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.DefaultGetPhotosByFolderId
 import mega.privacy.android.domain.usecase.DefaultGetPreview
 import mega.privacy.android.domain.usecase.DefaultGetThumbnail
-import mega.privacy.android.domain.usecase.DefaultGetTimelinePhotos
 import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.DefaultObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.DefaultObserveAlbumPhotosRemovingProgress
@@ -42,7 +41,6 @@ import mega.privacy.android.domain.usecase.GetPhotosByFolderId
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
-import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.GetTypedNodesFromFolder
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
@@ -60,9 +58,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindGetPreview(useCase: DefaultGetPreview): GetPreview
-
-    @Binds
-    abstract fun bindGetTimelinePhotos(useCase: DefaultGetTimelinePhotos): GetTimelinePhotos
 
     @Binds
     abstract fun bindFilterCameraUploadPhotos(useCase: DefaultFilterCameraUploadPhotos): FilterCameraUploadPhotos

@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -13,14 +13,14 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetTimelinePhotosTest {
-    private lateinit var underTest: GetTimelinePhotos
+class GetTimelinePhotosUseCaseTest {
+    private lateinit var underTest: GetTimelinePhotosUseCase
 
     private val photosRepository = mock<PhotosRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetTimelinePhotos(
+        underTest = GetTimelinePhotosUseCase(
             photosRepository = photosRepository,
         )
     }

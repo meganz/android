@@ -39,7 +39,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.GetTimelinePhotos
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
@@ -54,7 +54,7 @@ import javax.inject.Inject
  * View Model for Timeline
  *
  * @property isCameraSyncPreferenceEnabled
- * @property getTimelinePhotos
+ * @property getTimelinePhotosUseCase
  * @property getCameraUploadPhotos
  * @property getCloudDrivePhotos
  * @property setInitialCUPreferences
@@ -69,7 +69,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TimelineViewModel @Inject constructor(
     val isCameraSyncPreferenceEnabled: IsCameraSyncPreferenceEnabled,
-    private val getTimelinePhotos: GetTimelinePhotos,
+    private val getTimelinePhotosUseCase: GetTimelinePhotosUseCase,
     val getCameraUploadPhotos: FilterCameraUploadPhotos,
     val getCloudDrivePhotos: FilterCloudDrivePhotos,
     val setInitialCUPreferences: SetInitialCUPreferences,
@@ -91,7 +91,7 @@ class TimelineViewModel @Inject constructor(
 
     init {
         job = viewModelScope.launch {
-            getTimelinePhotos()
+            getTimelinePhotosUseCase()
                 .catch { throwable ->
                     Timber.e(throwable)
                 }.collectLatest { photos ->

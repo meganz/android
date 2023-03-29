@@ -29,12 +29,12 @@ import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
 import mega.privacy.android.domain.usecase.GetOfflineFile
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
-import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 
@@ -89,7 +89,7 @@ object FavouritesTestModule {
     fun provideDownloadPreview(): DownloadPreview = mock()
 
     @Provides
-    fun provideGetTimelinePhotos(): GetTimelinePhotos = mock()
+    fun provideGetTimelinePhotos(): GetTimelinePhotosUseCase = mock()
 
     @Provides
     fun provideFilterCameraUploadPhotos(): FilterCameraUploadPhotos = mock()

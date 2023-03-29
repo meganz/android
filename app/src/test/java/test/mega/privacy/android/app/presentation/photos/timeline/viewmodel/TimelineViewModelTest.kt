@@ -31,7 +31,7 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.GetTimelinePhotos
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
@@ -50,8 +50,8 @@ class TimelineViewModelTest {
     private val isCameraSyncPreferenceEnabled =
         mock<IsCameraSyncPreferenceEnabled> { on { invoke() }.thenReturn(true) }
 
-    private val getTimelinePhotos =
-        mock<GetTimelinePhotos> { on { invoke() }.thenReturn(emptyFlow()) }
+    private val getTimelinePhotosUseCase =
+        mock<GetTimelinePhotosUseCase> { on { invoke() }.thenReturn(emptyFlow()) }
 
     private val filterCameraUploadPhotos =
         mock<FilterCameraUploadPhotos> { onBlocking { invoke(any()) }.thenAnswer { it.arguments[0] } }
@@ -81,7 +81,7 @@ class TimelineViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = TimelineViewModel(
             isCameraSyncPreferenceEnabled = isCameraSyncPreferenceEnabled,
-            getTimelinePhotos = getTimelinePhotos,
+            getTimelinePhotosUseCase = getTimelinePhotosUseCase,
             getCameraUploadPhotos = filterCameraUploadPhotos,
             getCloudDrivePhotos = filterCloudDrivePhotos,
             setInitialCUPreferences = setInitialCUPreferences,
@@ -179,7 +179,7 @@ class TimelineViewModelTest {
     fun `test that a single photo returned is returned by the state`() = runTest {
         val expectedDate = LocalDateTime.now()
         val photo = mock<Photo> { on { modificationTime }.thenReturn(expectedDate) }
-        whenever(getTimelinePhotos()).thenReturn(flowOf(listOf(photo)))
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(listOf(photo)))
 
         underTest.state.drop(1).test {
             val initialisedState = awaitItem()
