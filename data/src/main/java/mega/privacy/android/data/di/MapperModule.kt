@@ -76,8 +76,6 @@ import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
-import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
-import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapperImpl
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
@@ -168,8 +166,6 @@ internal abstract class MapperModule {
     @Binds
     abstract fun bindsPasswordStrengthMapper(implementation: PasswordStrengthMapperImpl): PasswordStrengthMapper
 
-    @Binds
-    abstract fun bindRecentActionBucketMapper(implementation: RecentActionBucketMapperImpl): RecentActionBucketMapper
 
     companion object {
         /**
