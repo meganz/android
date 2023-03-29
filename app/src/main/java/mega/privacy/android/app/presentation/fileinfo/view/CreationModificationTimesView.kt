@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
@@ -27,12 +28,14 @@ internal fun CreationModificationTimesView(
     ) {
         FileInfoTitledText(
             title = stringResource(R.string.file_properties_info_added),
-            text = TimeUtils.formatLongDateTime(creationTimeInSeconds)
+            text = TimeUtils.formatLongDateTime(creationTimeInSeconds),
+            modifier = Modifier.testTag(TEST_TAG_CREATION_TIME),
         )
         modificationTimeInSeconds?.let {
             FileInfoTitledText(
                 title = stringResource(R.string.file_properties_info_last_modified),
-                text = TimeUtils.formatLongDateTime(it)
+                text = TimeUtils.formatLongDateTime(it),
+                modifier = Modifier.testTag(TEST_TAG_MODIFICATION_TIME),
             )
         }
     }

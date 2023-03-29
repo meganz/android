@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.unit.Dp
@@ -49,7 +50,9 @@ internal fun FileVersionsView(
         contentDescription = "versions icon"
     )
     TextButton(
-        modifier = Modifier.widthIn(min = 100.dp),
+        modifier = Modifier
+            .widthIn(min = 100.dp)
+            .testTag(TEST_TAG_VERSIONS_BUTTON),
         onClick = onClick,
         border = BorderStroke(1.dp, MaterialTheme.colors.secondary)
     ) {

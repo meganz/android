@@ -12,6 +12,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +54,9 @@ internal fun ShareLinkView(
     )
     Spacer(modifier = Modifier.height(14.dp))
     TextButton(
-        modifier = Modifier.widthIn(min = 100.dp),
+        modifier = Modifier
+            .widthIn(min = 100.dp)
+            .testTag(TEST_SHARE_LINK_COPY),
         onClick = onCopyLinkClick,
         border = BorderStroke(1.dp, MaterialTheme.colors.secondary)
     ) {

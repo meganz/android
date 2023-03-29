@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,7 +43,8 @@ internal fun TakeDownWarningView(
         MegaSpannedClickableText(
             modifier = modifier
                 .padding(16.dp)
-                .weight(1f),
+                .weight(1f)
+                .testTag(TEST_TAKE_TEXT),
             value = stringResource(
                 id = if (isFile) {
                     R.string.cloud_drive_info_taken_down_file_warning
@@ -59,7 +61,7 @@ internal fun TakeDownWarningView(
             onAnnotationClick = onLinkClick,
             baseStyle = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.grey_alpha_087_yellow_700),
         )
-        IconButton(onClick = onCloseClick) {
+        IconButton(onClick = onCloseClick, modifier = Modifier.testTag(TEST_TAKE_DOWN_CLOSE)) {
             Image(
                 painter = painterResource(id = R.drawable.ic_remove_warning),
                 contentDescription = "Close"

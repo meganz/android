@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -51,6 +52,7 @@ internal fun AvailableOfflineView(
         checked = available,
         enabled = enabled,
         onCheckedChange = onCheckChanged,
+        modifier = Modifier.testTag(TEST_TAG_AVAILABLE_OFFLINE_SWITCH)
     )
 }
 
