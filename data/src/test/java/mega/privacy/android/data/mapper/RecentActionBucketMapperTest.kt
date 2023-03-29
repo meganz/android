@@ -4,7 +4,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
-import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapperImpl
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import nz.mega.sdk.MegaNode
@@ -32,6 +31,7 @@ class RecentActionBucketMapperTest {
         on { size() }.thenReturn(10)
         on { get(any()) }.thenReturn(megaNode)
     }
+    private val nodeMapper = mock<NodeMapper>()
 
     private val recentActionBucket = mock<MegaRecentActionBucket> {
         on { timestamp }.thenReturn(12L)
@@ -44,7 +44,7 @@ class RecentActionBucketMapperTest {
 
     @Before
     fun setUp() {
-        underTest = RecentActionBucketMapperImpl()
+        underTest = RecentActionBucketMapper(nodeMapper)
     }
 
     @Test

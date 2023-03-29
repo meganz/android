@@ -76,8 +76,6 @@ import mega.privacy.android.data.mapper.getMimeType
 import mega.privacy.android.data.mapper.mapBooleanPreference
 import mega.privacy.android.data.mapper.mapMegaNodeListToNodeUpdate
 import mega.privacy.android.data.mapper.mapMegaUserListToUserUpdate
-import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapper
-import mega.privacy.android.data.mapper.recentactions.RecentActionBucketMapperImpl
 import mega.privacy.android.data.mapper.storageStateToInt
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toAccountDetail
@@ -103,7 +101,6 @@ import mega.privacy.android.data.mapper.toMegaAchievement
 import mega.privacy.android.data.mapper.toMegaExceptionModel
 import mega.privacy.android.data.mapper.toMegaPurchase
 import mega.privacy.android.data.mapper.toMegaSku
-import mega.privacy.android.data.mapper.toNode
 import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPaymentPlatformType
@@ -169,8 +166,6 @@ internal abstract class MapperModule {
     @Binds
     abstract fun bindsPasswordStrengthMapper(implementation: PasswordStrengthMapperImpl): PasswordStrengthMapper
 
-    @Binds
-    abstract fun bindRecentActionBucketMapper(implementation: RecentActionBucketMapperImpl): RecentActionBucketMapper
 
     companion object {
         /**
@@ -289,13 +284,6 @@ internal abstract class MapperModule {
         fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
             getMimeType(extension, MimeTypeMap.getSingleton()::getMimeTypeFromExtension)
         }
-
-
-        /**
-         * Provide favourite info mapper
-         */
-        @Provides
-        fun provideFavouriteInfoMapper(): NodeMapper = ::toNode
 
 
         /**

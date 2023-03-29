@@ -40,7 +40,7 @@ class DefaultFavouritesRepositoryTest {
 
     private val favouriteInfo = mock<UnTypedNode>()
 
-    private val nodeMapper: NodeMapper = { _, _, _, _, _, _, _, _ -> favouriteInfo }
+    private val nodeMapper: NodeMapper = mock()
 
     @Before
     fun setUp() {
@@ -77,6 +77,10 @@ class DefaultFavouritesRepositoryTest {
             )
         }
 
+        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+            favouriteInfo
+        )
+
         val actual = underTest.getAllFavorites()
         assertThat(actual[0]).isSameInstanceAs(favouriteInfo)
     }
@@ -105,6 +109,10 @@ class DefaultFavouritesRepositoryTest {
                 error
             )
         }
+
+        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+            favouriteInfo
+        )
 
         underTest.getAllFavorites()
     }

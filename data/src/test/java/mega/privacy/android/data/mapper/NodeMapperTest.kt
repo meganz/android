@@ -18,6 +18,8 @@ import org.mockito.kotlin.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NodeMapperTest {
+    private var underTest = NodeMapper()
+
     private val expectedName = "testName"
     private val expectedSize = 1000L
     private val expectedLabel = MegaNode.NODE_LBL_RED
@@ -34,7 +36,7 @@ class NodeMapperTest {
     fun `test that files are mapped if isFile is true`() = runTest {
         val megaNode = getMockNode(isFile = true)
         val actual =
-            toNode(
+            underTest(
                 megaNode = megaNode,
                 thumbnailPath = { null },
                 hasVersion = { false },
@@ -52,7 +54,7 @@ class NodeMapperTest {
     fun `test that folders are mapped if isFile is false`() = runTest {
         val megaNode = getMockNode(isFile = false)
         val actual =
-            toNode(
+            underTest(
                 megaNode = megaNode,
                 thumbnailPath = { null },
                 hasVersion = { false },
@@ -80,7 +82,7 @@ class NodeMapperTest {
             onBlocking { isPendingShare(node) }.thenReturn(true)
         }
 
-        val actual = toNode(
+        val actual = underTest(
             megaNode = node,
             thumbnailPath = { null },
             hasVersion = gateway::hasVersion,
@@ -139,7 +141,7 @@ class NodeMapperTest {
             )
         }
 
-        private suspend fun mappedNode(megaNode: MegaNode) = toNode(
+        private suspend fun mappedNode(megaNode: MegaNode) = underTest(
             megaNode = megaNode,
             thumbnailPath = { null },
             hasVersion = { false },

@@ -1,28 +1,43 @@
 package mega.privacy.android.data.mapper.recentactions
 
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.MapHasVersion
-import mega.privacy.android.data.mapper.MapInRubbish
-import mega.privacy.android.data.mapper.MapNumberOfChildFiles
-import mega.privacy.android.data.mapper.MapNumberOfChildFolders
-import mega.privacy.android.data.mapper.MapPendingShare
-import mega.privacy.android.data.mapper.MapThumbnail
+import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
+import javax.inject.Inject
 
 /**
  * The mapper class for converting [MegaRecentActionBucket] to [RecentActionBucket]
  */
-internal fun interface RecentActionBucketMapper {
+internal class RecentActionBucketMapper @Inject constructor(private val nodeMapper: NodeMapper) {
     suspend operator fun invoke(
         megaRecentActionBucket: MegaRecentActionBucket,
-        thumbnailPath: MapThumbnail,
-        hasVersion: MapHasVersion,
-        numberOfChildFolders: MapNumberOfChildFolders,
-        numberOfChildFiles: MapNumberOfChildFiles,
+        thumbnailPath: suspend (MegaNode) -> String?,
+        hasVersion: suspend (MegaNode) -> Boolean,
+        numberOfChildFolders: suspend (MegaNode) -> Int,
+        numberOfChildFiles: suspend (MegaNode) -> Int,
         fileTypeInfoMapper: FileTypeInfoMapper,
-        isPendingShare: MapPendingShare,
-        isInRubbish: MapInRubbish
-    ): RecentActionBucketUnTyped
+        isPendingShare: suspend (MegaNode) -> Boolean,
+        isInRubbish: suspend (MegaNode) -> Boolean
+    ) = RecentActionBucketUnTyped(
+        timestamp = megaRecentActionBucket.timestamp,
+        userEmail = megaRecentActionBucket.userEmail,
+        parentHandle = megaRecentActionBucket.parentHandle,
+        isUpdate = megaRecentActionBucket.isUpdate,
+        isMedia = megaRecentActionBucket.isMedia,
+        nodes = (0 until megaRecentActionBucket.nodes.size()).map {
+            nodeMapper(
+                megaRecentActionBucket.nodes.get(it),
+                thumbnailPath,
+                hasVersion,
+                numberOfChildFolders,
+                numberOfChildFiles,
+                fileTypeInfoMapper,
+                isPendingShare,
+                isInRubbish,
+            )
+        },
+    )
 }

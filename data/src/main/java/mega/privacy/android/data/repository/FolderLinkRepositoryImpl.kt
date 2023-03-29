@@ -27,7 +27,7 @@ import javax.inject.Inject
 /**
  * Implementation of [FolderLinkRepository]
  */
-class FolderLinkRepositoryImpl @Inject constructor(
+internal class FolderLinkRepositoryImpl @Inject constructor(
     private val megaApiFolderGateway: MegaApiFolderGateway,
     private val megaApiGateway: MegaApiGateway,
     private val folderLoginStatusMapper: FolderLoginStatusMapper,

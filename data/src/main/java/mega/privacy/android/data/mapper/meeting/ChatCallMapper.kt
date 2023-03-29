@@ -11,7 +11,7 @@ import javax.inject.Inject
 internal class ChatCallMapper @Inject constructor(
     private val handleListMapper: HandleListMapper,
     private val chatCallChangesMapper: ChatCallChangesMapper,
-    private val megaChatCallStatusMapper: MegaChatCallStatusMapper,
+    private val chatCallStatusMapper: ChatCallStatusMapper,
     private val endCallReasonMapper: EndCallReasonMapper,
     private val callTermCodeMapper: CallTermCodeMapper,
     private val callCompositionChangesMapper: CallCompositionChangesMapper,
@@ -20,7 +20,7 @@ internal class ChatCallMapper @Inject constructor(
     operator fun invoke(megaChatCall: MegaChatCall): ChatCall = ChatCall(
         callId = megaChatCall.callId,
         chatId = megaChatCall.chatid,
-        status = megaChatCallStatusMapper(megaChatCall.status),
+        status = chatCallStatusMapper(megaChatCall.status),
         caller = megaChatCall.caller,
         duration = megaChatCall.duration,
         numParticipants = megaChatCall.numParticipants,

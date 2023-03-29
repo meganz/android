@@ -13,7 +13,7 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
-import mega.privacy.android.data.mapper.meeting.ChatCallStatusMapper
+import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.model.ChatCallUpdate
@@ -54,7 +54,7 @@ internal class CallRepositoryImpl @Inject constructor(
     private val chatRequestMapper: ChatRequestMapper,
     private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
-    private val chatCallStatusMapper: ChatCallStatusMapper,
+    private val megaChatCallStatusMapper: MegaChatCallStatusMapper,
     private val handleListMapper: HandleListMapper,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : CallRepository {
@@ -275,7 +275,7 @@ internal class CallRepositoryImpl @Inject constructor(
         ZonedDateTime.ofInstant(Instant.ofEpochSecond(this), ZoneOffset.UTC)
 
     override suspend fun getCallHandleList(state: ChatCallStatus) = withContext(dispatcher) {
-        megaChatApiGateway.getChatCalls(chatCallStatusMapper(state))
+        megaChatApiGateway.getChatCalls(megaChatCallStatusMapper(state))
             ?.let { handleListMapper(it) } ?: emptyList()
     }
 }
