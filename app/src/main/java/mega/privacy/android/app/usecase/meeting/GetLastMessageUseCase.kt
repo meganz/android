@@ -15,6 +15,7 @@ import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiAndroid
+import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION
 import nz.mega.sdk.MegaChatCall.CALL_STATUS_USER_NO_PRESENT
 import nz.mega.sdk.MegaChatListItem
@@ -72,35 +73,7 @@ class GetLastMessageUseCase @Inject constructor(
             }
 
             megaChatApi.getChatCall(chatId)?.let { chatCall ->
-                when (chatCall.status) {
-                    CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
-                        return@fromCallable if (chatCall.isRinging) {
-                            getString(R.string.notification_subtitle_incoming)
-                        } else if (isMeeting) {
-                            val message = getString(R.string.meetings_list_ongoing_call_message)
-                            if (chatCall.duration > 0) {
-                                val duration = String.format(
-                                    "%02d:%02d",
-                                    TimeUnit.SECONDS.toMinutes(chatCall.duration),
-                                    TimeUnit.SECONDS.toSeconds(chatCall.duration)
-                                )
-                                "$message · $duration"
-                            } else {
-                                message
-                            }
-                        } else {
-                            getString(R.string.ongoing_call_messages)
-                        }
-                    }
-                    else -> {
-                        val requestSent = chatManagement.isRequestSent(chatCall.callId)
-                        return@fromCallable if (requestSent) {
-                            getString(R.string.outgoing_call_starting)
-                        } else {
-                            getString(R.string.call_started_messages)
-                        }
-                    }
-                }
+                return@fromCallable chatCall.getChatCallStatusMessage(isMeeting)
             }
 
             return@fromCallable when (chatListItem.lastMessageType) {
@@ -196,6 +169,40 @@ class GetLastMessageUseCase @Inject constructor(
 
     private fun MegaChatListItem.isMine(): Boolean =
         lastMessageSender == megaChatApi.myUserHandle
+
+    private fun MegaChatCall.getChatCallStatusMessage(isMeeting: Boolean): String =
+        when (status) {
+            CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
+                if (isRinging) {
+                    getString(R.string.notification_subtitle_incoming)
+                } else if (isMeeting) {
+                    val message = getString(R.string.meetings_list_ongoing_call_message)
+                    getDurationFormatted()?.let { "$message · $it" } ?: message
+                } else {
+                    getString(R.string.ongoing_call_messages)
+                }
+            }
+            else -> {
+                val requestSent = chatManagement.isRequestSent(callId)
+                if (requestSent) {
+                    getString(R.string.outgoing_call_starting)
+                } else if (isMeeting) {
+                    val message = getString(R.string.meetings_list_ongoing_call_message)
+                    getDurationFormatted()?.let { "$message · $it" } ?: message
+                } else {
+                    getString(R.string.call_started_messages)
+                }
+            }
+        }
+
+    private fun MegaChatCall.getDurationFormatted(): String? =
+        duration.takeIf { it > 0 }?.let { callDuration ->
+            String.format(
+                "%02d:%02d",
+                TimeUnit.SECONDS.toMinutes(callDuration) % 60,
+                TimeUnit.SECONDS.toSeconds(callDuration) % 60
+            )
+        }
 
     private fun String.cleanHtmlText(): String =
         Util.toCDATA(this)
