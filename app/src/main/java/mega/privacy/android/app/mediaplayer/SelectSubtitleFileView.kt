@@ -1,5 +1,8 @@
 package mega.privacy.android.app.mediaplayer
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,22 +21,33 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.core.ui.controls.SearchAppBar
@@ -60,23 +74,29 @@ internal fun SelectSubtitleFileView(
 
     Scaffold(
         topBar = {
-            SearchAppBar(
-                searchWidgetState = viewModel.searchState,
-                typedSearch = viewModel.getQueryStateFlow().collectAsState().value ?: "",
-                onSearchTextChange = { search ->
-                    viewModel.searchQuery(search)
-                },
-                onCloseClicked = {
-                    viewModel.closeSearch()
-                },
-                onBackPressed = onBackPressedCallback,
-                onSearchClicked = {
-                    viewModel.searchWidgetStateUpdate()
-                },
-                elevation = false,
-                titleId = R.string.media_player_video_select_subtitle_file_title,
-                hintId = R.string.hint_action_search
-            )
+            if (viewModel.getSelectedSubtitleFileInfoFlow().collectAsState().value != null) {
+                SelectedTopBar {
+                    onBackPressedCallback()
+                }
+            } else {
+                SearchAppBar(
+                    searchWidgetState = viewModel.searchState,
+                    typedSearch = viewModel.getQueryStateFlow().collectAsState().value ?: "",
+                    onSearchTextChange = { search ->
+                        viewModel.searchQuery(search)
+                    },
+                    onCloseClicked = {
+                        viewModel.closeSearch()
+                    },
+                    onBackPressed = onBackPressedCallback,
+                    onSearchClicked = {
+                        viewModel.searchWidgetStateUpdate()
+                    },
+                    elevation = false,
+                    titleId = R.string.media_player_video_select_subtitle_file_title,
+                    hintId = R.string.hint_action_search
+                )
+            }
         }) { innerPadding ->
         Box(
             modifier = Modifier
@@ -122,7 +142,7 @@ internal fun SelectSubtitleFileView(
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 24.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.teal_300)),
                     onClick = {
-                        onAddSubtitleCallback(viewModel.getSelectedSubtitleFileInfo())
+                        onAddSubtitleCallback(viewModel.getSelectedSubtitleFileInfoFlow().value)
                     },
                     enabled = viewModel.state.firstOrNull { it.selected } != null
                 ) {
@@ -147,8 +167,19 @@ internal fun SubtitleFileInfoListItem(
     subtitleFileInfoItem: SubtitleFileInfoItem,
     onSubtitleFileInfoClicked: (SubtitleFileInfo) -> Unit,
 ) {
+    val rotation = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier.clickable {
+            if (!subtitleFileInfoItem.selected) {
+                scope.launch {
+                    rotation.animateTo(
+                        targetValue = 180f,
+                        animationSpec = tween(100, easing = LinearEasing)
+                    )
+                    rotation.snapTo(0f)
+                }
+            }
             onSubtitleFileInfoClicked(subtitleFileInfoItem.subtitleFileInfo)
         }
     ) {
@@ -166,7 +197,10 @@ internal fun SubtitleFileInfoListItem(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(width = 36.dp, height = 40.dp)
-                    .align(Alignment.CenterVertically),
+                    .align(Alignment.CenterVertically)
+                    .graphicsLayer {
+                        rotationY = rotation.value
+                    }
             )
             Column(
                 modifier = Modifier
@@ -242,6 +276,31 @@ internal fun SubtitleFileInfoListView(
                 )
             })
     }
+}
+
+@Composable
+internal fun SelectedTopBar(onBackPressedCallback: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(
+                text = "1",
+                style = MaterialTheme.typography.subtitle1,
+                fontWeight = FontWeight.Medium,
+                color = colorResource(id = R.color.teal_300)
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackPressedCallback) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back button",
+                    tint = colorResource(id = R.color.teal_300)
+                )
+            }
+        },
+        backgroundColor = MaterialTheme.colors.surface,
+        elevation = 0.dp
+    )
 }
 
 @Preview
