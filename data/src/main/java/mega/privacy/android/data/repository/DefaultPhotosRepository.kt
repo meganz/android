@@ -2,6 +2,7 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -87,30 +88,34 @@ internal class DefaultPhotosRepository @Inject constructor(
         NodeChanges.Parent,
     )
 
-    @Volatile
-    private var isMonitorRefreshPhotosInitiated: Boolean = false
+    private var monitorNodeUpdatesJob: Job? = null
 
-    init {
-        monitorNodeUpdates()
+    private var refreshPhotosJob: Job? = null
+
+    @Volatile
+    private var isMonitoringInitiated: Boolean = false
+
+    private fun monitorNodeUpdates() {
+        monitorNodeUpdatesJob?.cancel()
+        monitorNodeUpdatesJob = nodeRepository.monitorNodeUpdates()
+            .onEach { nodeUpdate ->
+                appScope.launch {
+                    val nodes = nodeUpdate.changes.keys.toList()
+                    nodes.forEach { photosCache.remove(it.id) }
+                }
+
+                appScope.launch {
+                    val changes = nodeUpdate.changes.values
+                    if (changes.flatten().intersect(photosRefreshRules).isNotEmpty()) {
+                        refreshPhotos()
+                    }
+                }
+            }.launchIn(appScope)
     }
 
-    private fun monitorNodeUpdates() = nodeRepository.monitorNodeUpdates()
-        .onEach { nodeUpdate ->
-            appScope.launch {
-                val nodes = nodeUpdate.changes.keys.toList()
-                nodes.forEach { photosCache.remove(it.id) }
-            }
-
-            appScope.launch {
-                val changes = nodeUpdate.changes.values
-                if (changes.flatten().intersect(photosRefreshRules).isNotEmpty()) {
-                    refreshPhotos()
-                }
-            }
-        }.launchIn(appScope)
-
     private fun monitorRefreshPhotos() {
-        refreshPhotosStateFlow
+        refreshPhotosJob?.cancel()
+        refreshPhotosJob = refreshPhotosStateFlow
             .filter { it }
             .onEach {
                 val photos = searchMegaPhotos()
@@ -124,8 +129,10 @@ internal class DefaultPhotosRepository @Inject constructor(
     }
 
     override fun monitorPhotos(): Flow<List<Photo>> {
-        if (!isMonitorRefreshPhotosInitiated) {
-            isMonitorRefreshPhotosInitiated = true
+        if (!isMonitoringInitiated) {
+            isMonitoringInitiated = true
+
+            monitorNodeUpdates()
             monitorRefreshPhotos()
         }
         return photosStateFlow.filterNotNull()
@@ -383,5 +390,19 @@ internal class DefaultPhotosRepository @Inject constructor(
         return previewFolderPath?.let {
             "$it${File.separator}${megaNode.getPreviewFileName()}"
         }
+    }
+
+    override fun clearCache() {
+        monitorNodeUpdatesJob?.cancel()
+        monitorNodeUpdatesJob = null
+
+        refreshPhotosJob?.cancel()
+        refreshPhotosJob = null
+
+        isMonitoringInitiated = false
+        photosCache.clear()
+
+        photosStateFlow.value = null
+        refreshPhotosStateFlow.value = true
     }
 }

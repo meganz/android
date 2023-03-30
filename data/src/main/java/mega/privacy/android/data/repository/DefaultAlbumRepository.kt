@@ -2,10 +2,12 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -73,23 +75,27 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     private val albumPhotosRemovingProgressPool: AlbumPhotosRemovingProgressPool = mutableMapOf()
 
-    init {
-        monitorNodeUpdates()
+    private var monitorNodeUpdatesJob: Job? = null
+
+    @Volatile
+    private var isMonitoringInitiated: Boolean = false
+
+    private fun monitorNodeUpdates() {
+        monitorNodeUpdatesJob?.cancel()
+        monitorNodeUpdatesJob = nodeRepository.monitorNodeUpdates()
+            .onEach { nodeUpdate ->
+                val userSets = nodeUpdate.changes.keys
+                    .flatMap { node ->
+                        val setIds = nodeSetsMap[node.id] ?: emptySet()
+                        setIds.mapNotNull { userSets[it] }
+                    }.distinctBy { it.id }
+
+                if (userSets.isNotEmpty()) {
+                    userSetsFlow.tryEmit(userSets)
+                    userSetsElementsFlow.tryEmit(userSets)
+                }
+            }.launchIn(appScope)
     }
-
-    private fun monitorNodeUpdates() = nodeRepository.monitorNodeUpdates()
-        .onEach { nodeUpdate ->
-            val userSets = nodeUpdate.changes.keys
-                .flatMap { node ->
-                    val setIds = nodeSetsMap[node.id] ?: emptySet()
-                    setIds.mapNotNull { userSets[it] }
-                }.distinctBy { it.id }
-
-            if (userSets.isNotEmpty()) {
-                userSetsFlow.tryEmit(userSets)
-                userSetsElementsFlow.tryEmit(userSets)
-            }
-        }.launchIn(appScope)
 
     override suspend fun createAlbum(name: String): UserSet = withContext(ioDispatcher) {
         suspendCoroutine { continuation ->
@@ -119,14 +125,21 @@ internal class DefaultAlbumRepository @Inject constructor(
         }
     }
 
-    override suspend fun getAllUserSets(): List<UserSet> = withContext(ioDispatcher) {
-        val setList = megaApiGateway.getSets()
-        userSets.clear()
+    override suspend fun getAllUserSets(): List<UserSet> {
+        if (!isMonitoringInitiated) {
+            isMonitoringInitiated = true
+            monitorNodeUpdates()
+        }
 
-        (0 until setList.size()).map { index ->
-            val userSet = setList.get(index).toUserSet()
-            userSets[userSet.id] = userSet
-            userSet
+        return withContext(ioDispatcher) {
+            val setList = megaApiGateway.getSets()
+            userSets.clear()
+
+            (0 until setList.size()).map { index ->
+                val userSet = setList.get(index).toUserSet()
+                userSets[userSet.id] = userSet
+                userSet
+            }
         }
     }
 
@@ -143,6 +156,7 @@ internal class DefaultAlbumRepository @Inject constructor(
             .mapNotNull { it.sets }
             .map { sets -> sets.map { it.toUserSet() } },
         userSetsFlow
+            .filter { it.isNotEmpty() }
             .onEach { sets ->
                 sets.forEach { albumElements.remove(AlbumId(it.id)) }
             },
@@ -303,6 +317,22 @@ internal class DefaultAlbumRepository @Inject constructor(
                 eid = elementId.longValue,
             )
         }
+
+    override fun clearCache() {
+        monitorNodeUpdatesJob?.cancel()
+        monitorNodeUpdatesJob = null
+
+        isMonitoringInitiated = false
+
+        userSets.clear()
+        nodeSetsMap.clear()
+        albumElements.clear()
+        albumPhotosAddingProgressPool.clear()
+        albumPhotosRemovingProgressPool.clear()
+
+        userSetsFlow.tryEmit(listOf())
+        userSetsElementsFlow.tryEmit(listOf())
+    }
 
     private fun getAlbumPhotosAddingProgressFlow(albumId: AlbumId): MutableSharedFlow<AlbumPhotosAddingProgress?> =
         albumPhotosAddingProgressPool.getOrPut(albumId) { MutableSharedFlow(replay = 1) }

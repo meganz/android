@@ -71,7 +71,9 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermissi
 import mega.privacy.android.data.gateway.preferences.AccountPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.CallsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
+import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.BillingRepository
+import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.login.BroadcastLogoutUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -119,6 +121,10 @@ class AccountController @Inject constructor(
         fun billingRepository(): BillingRepository
 
         fun broadcastLogout(): BroadcastLogoutUseCase
+
+        fun photosRepository(): PhotosRepository
+
+        fun albumRepository(): AlbumRepository
     }
 
     fun existsAvatar(): Boolean {
@@ -421,6 +427,8 @@ class AccountController @Inject constructor(
                     accountPreferencesGateway().clearPreferences()
                     pushRepository().clearPushToken()
                     billingRepository().clearCache()
+                    photosRepository().clearCache()
+                    albumRepository().clearCache()
                     broadcastLogout()
                 }
             }

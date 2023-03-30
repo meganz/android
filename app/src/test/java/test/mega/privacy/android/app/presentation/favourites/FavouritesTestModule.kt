@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
+import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.usecase.DefaultMapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
@@ -124,4 +125,7 @@ object FavouritesTestModule {
 
     @Provides
     fun provideGetOfflineFile(): GetOfflineFile = mock()
+
+    @Provides
+    fun provideDateUtilWrapper(): DateUtilWrapper = mock()
 }
