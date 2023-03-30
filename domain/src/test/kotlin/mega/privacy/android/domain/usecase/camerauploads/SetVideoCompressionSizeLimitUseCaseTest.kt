@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
 /**
@@ -25,6 +26,11 @@ class SetVideoCompressionSizeLimitUseCaseTest {
         underTest = SetVideoCompressionSizeLimitUseCase(
             cameraUploadRepository = cameraUploadRepository,
         )
+    }
+
+    @BeforeAll
+    fun resetMocks() {
+        reset(cameraUploadRepository)
     }
 
     @Test

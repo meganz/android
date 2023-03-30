@@ -5,10 +5,12 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.verify
 
 /**
@@ -27,6 +29,11 @@ class SetUploadVideoSyncStatusUseCaseTest {
         underTest = SetUploadVideoSyncStatusUseCase(
             cameraUploadRepository = cameraUploadRepository,
         )
+    }
+
+    @BeforeEach
+    fun resetMocks() {
+        reset(cameraUploadRepository)
     }
 
     @ParameterizedTest(name = "test that the sync status {0} is set ")
