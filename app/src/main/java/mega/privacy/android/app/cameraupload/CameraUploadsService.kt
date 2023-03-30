@@ -124,7 +124,7 @@ import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
@@ -268,7 +268,7 @@ class CameraUploadsService : LifecycleService() {
      * Are Location Tags Enabled
      */
     @Inject
-    lateinit var areLocationTagsEnabled: AreLocationTagsEnabled
+    lateinit var areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase
 
     /**
      * GetSyncRecordByPath
@@ -1146,7 +1146,7 @@ class CameraUploadsService : LifecycleService() {
             val isSecondary = file.isSecondary
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
             if (file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_PHOTO) && !file.isCopyOnly) {
-                if (!areLocationTagsEnabled()) {
+                if (!areLocationTagsEnabledUseCase()) {
                     var shouldContinue = false
                     flowOf(
                         createTempFileAndRemoveCoordinatesUseCase(

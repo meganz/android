@@ -152,7 +152,6 @@ import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
@@ -162,7 +161,6 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
@@ -327,28 +325,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideSetSyncLocalPath(cameraUploadRepository: CameraUploadRepository): SetSyncLocalPath =
             SetSyncLocalPath(cameraUploadRepository::setSyncLocalPath)
-
-        /**
-         * Provide the [AreLocationTagsEnabled] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [AreLocationTagsEnabled]
-         */
-        @Provides
-        fun provideAreLocationTagsEnabled(cameraUploadRepository: CameraUploadRepository): AreLocationTagsEnabled =
-            AreLocationTagsEnabled(cameraUploadRepository::areLocationTagsEnabled)
-
-        /**
-         * Provide the [SetLocationTagsEnabled] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [SetLocationTagsEnabled]
-         */
-        @Provides
-        fun provideSetLocationTagsEnabled(cameraUploadRepository: CameraUploadRepository): SetLocationTagsEnabled =
-            SetLocationTagsEnabled(cameraUploadRepository::setLocationTagsEnabled)
 
         /**
          * Provide the [FileNameExists] implementation

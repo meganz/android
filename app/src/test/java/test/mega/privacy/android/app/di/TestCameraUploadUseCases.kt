@@ -95,7 +95,6 @@ import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
@@ -103,7 +102,6 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
@@ -167,12 +165,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideSetSyncLocalPath() = mock<SetSyncLocalPath>()
-
-    @Provides
-    fun provideAreLocationTagsEnabled() = mock<AreLocationTagsEnabled>()
-
-    @Provides
-    fun provideSetLocationTagsEnabled() = mock<SetLocationTagsEnabled>()
 
     @Provides
     fun provideFileNameExists() = mock<FileNameExists>()

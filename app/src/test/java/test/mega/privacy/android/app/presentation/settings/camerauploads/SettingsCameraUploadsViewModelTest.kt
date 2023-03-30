@@ -30,13 +30,13 @@ import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
@@ -59,7 +59,7 @@ class SettingsCameraUploadsViewModelTest {
 
     private lateinit var underTest: SettingsCameraUploadsViewModel
 
-    private val areLocationTagsEnabled = mock<AreLocationTagsEnabled>()
+    private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase>()
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
@@ -77,7 +77,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setCameraUploadsByWifi = mock<SetCameraUploadsByWifi>()
     private val setChargingRequiredForVideoCompression =
         mock<SetChargingRequiredForVideoCompression>()
-    private val setLocationTagsEnabled = mock<SetLocationTagsEnabled>()
+    private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
     private val setUploadOption = mock<SetUploadOption>()
     private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
     private val setUploadVideoSyncStatus = mock<SetUploadVideoSyncStatus>()
@@ -101,7 +101,7 @@ class SettingsCameraUploadsViewModelTest {
      */
     private fun setupUnderTest() {
         underTest = SettingsCameraUploadsViewModel(
-            areLocationTagsEnabled = areLocationTagsEnabled,
+            areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             clearCacheDirectory = clearCacheDirectory,
             disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
@@ -118,7 +118,7 @@ class SettingsCameraUploadsViewModelTest {
             restoreSecondaryTimestamps = restoreSecondaryTimestamps,
             setCameraUploadsByWifi = setCameraUploadsByWifi,
             setChargingRequiredForVideoCompression = setChargingRequiredForVideoCompression,
-            setLocationTagsEnabled = setLocationTagsEnabled,
+            setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
             setUploadOption = setUploadOption,
             setUploadVideoQuality = setUploadVideoQuality,
             setUploadVideoSyncStatus = setUploadVideoSyncStatus,
@@ -438,13 +438,13 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
 
-            whenever(areLocationTagsEnabled()).thenReturn(true)
+            whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             underTest.includeLocationTags(true)
 
             underTest.state.map { it.areLocationTagsIncluded }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isTrue()
 
-                whenever(areLocationTagsEnabled()).thenReturn(false)
+                whenever(areLocationTagsEnabledUseCase()).thenReturn(false)
                 underTest.includeLocationTags(false)
                 assertThat(awaitItem()).isFalse()
             }
