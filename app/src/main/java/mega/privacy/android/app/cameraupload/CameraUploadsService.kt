@@ -105,7 +105,6 @@ import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
@@ -127,6 +126,7 @@ import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -214,7 +214,7 @@ class CameraUploadsService : LifecycleService() {
      * IsCameraUploadByWifi
      */
     @Inject
-    lateinit var isCameraUploadByWifi: IsCameraUploadByWifi
+    lateinit var isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase
 
     /**
      * IsWifiNotSatisfied Use Case

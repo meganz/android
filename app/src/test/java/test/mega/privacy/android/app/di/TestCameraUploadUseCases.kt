@@ -56,7 +56,6 @@ import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
-import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
@@ -138,9 +137,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideIsCameraUploadSyncEnabled() = mock<IsCameraUploadSyncEnabled>()
-
-    @Provides
-    fun provideIsCameraUploadByWifi() = mock<IsCameraUploadByWifi>()
 
     @Provides
     fun provideGetPendingSyncRecords() = mock<GetPendingSyncRecords>()

@@ -106,10 +106,34 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload sync by wifi only setting`() = runTest {
-        whenever(localStorageGateway.isSyncByWifi()).thenReturn(true)
-        assertThat(underTest.isSyncByWifi()).isTrue()
+    fun `test that camera uploads can only run when connected to wifi`() = runTest {
+        whenever(localStorageGateway.isCameraUploadsByWifi()).thenReturn(true)
+
+        assertThat(underTest.isCameraUploadsByWifi()).isTrue()
     }
+
+    @Test
+    fun `test that camera uploads can run when connected to either wifi or mobile data`() =
+        runTest {
+            whenever(localStorageGateway.isCameraUploadsByWifi()).thenReturn(false)
+
+            assertThat(underTest.isCameraUploadsByWifi()).isFalse()
+        }
+
+    @Test
+    fun `test that camera uploads can now only run when connected to wifi`() = runTest {
+        underTest.setCameraUploadsByWifi(true)
+
+        verify(localStorageGateway).setCameraUploadsByWifi(true)
+    }
+
+    @Test
+    fun `test that camera uploads can now run when connected to either wifi or mobile data`() =
+        runTest {
+            underTest.setCameraUploadsByWifi(false)
+
+            verify(localStorageGateway).setCameraUploadsByWifi(false)
+        }
 
     @Test
     fun `test camera upload retrieves sync records`() = runTest {

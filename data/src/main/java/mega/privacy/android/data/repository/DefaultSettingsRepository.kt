@@ -190,10 +190,6 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setCamSyncFileUpload(fileUpload)
     }
 
-    override suspend fun setCamSyncWifi(wifiOnly: Boolean) {
-        megaLocalStorageGateway.setCamSyncWifi(wifiOnly)
-    }
-
     override suspend fun setCameraUploadLocalPath(path: String?) {
         megaLocalStorageGateway.setCamSyncLocalPath(path)
     }

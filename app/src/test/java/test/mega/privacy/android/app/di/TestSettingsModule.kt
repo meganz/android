@@ -29,7 +29,6 @@ import mega.privacy.android.domain.usecase.MonitorStartScreenPreference
 import mega.privacy.android.domain.usecase.PutPreference
 import mega.privacy.android.domain.usecase.RefreshPasscodeLockPreference
 import mega.privacy.android.domain.usecase.RequestAccountDeletion
-import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.SetChatImageQuality
 import mega.privacy.android.domain.usecase.SetChatLogsEnabled
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
@@ -217,7 +216,4 @@ object TestSettingsModule {
 
     @Provides
     fun provideEnableFileVersionsOption(): EnableFileVersionsOption = mock()
-
-    @Provides
-    fun provideSetCameraUploadsByWifi(): SetCameraUploadsByWifi = mock()
 }

@@ -112,8 +112,12 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.setSecondarySyncHandle(secondaryHandle)
     }
 
-    override suspend fun isSyncByWifi() = withContext(ioDispatcher) {
-        localStorageGateway.isSyncByWifi()
+    override suspend fun isCameraUploadsByWifi() = withContext(ioDispatcher) {
+        localStorageGateway.isCameraUploadsByWifi()
+    }
+
+    override suspend fun setCameraUploadsByWifi(wifiOnly: Boolean) {
+        localStorageGateway.setCameraUploadsByWifi(wifiOnly)
     }
 
     override suspend fun getPendingSyncRecords(): List<SyncRecord> = withContext(ioDispatcher) {

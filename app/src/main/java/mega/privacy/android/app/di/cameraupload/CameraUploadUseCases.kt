@@ -113,7 +113,6 @@ import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
 import mega.privacy.android.domain.usecase.HasCredentials
-import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
@@ -187,13 +186,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideIsCameraUploadSyncEnabled(cameraUploadRepository: CameraUploadRepository): IsCameraUploadSyncEnabled =
             IsCameraUploadSyncEnabled(cameraUploadRepository::isSyncEnabled)
-
-        /**
-         * Provide the [IsCameraUploadByWifi] implementation
-         */
-        @Provides
-        fun provideIsCameraUploadByWifi(cameraUploadRepository: CameraUploadRepository): IsCameraUploadByWifi =
-            IsCameraUploadByWifi(cameraUploadRepository::isSyncByWifi)
 
         /**
          * Provide the [GetPendingSyncRecords] implementation

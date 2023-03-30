@@ -28,20 +28,20 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
-import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
@@ -61,14 +61,14 @@ import javax.inject.Inject
  * @property getUploadOption Retrieves the upload option of Camera Uploads
  * @property getUploadVideoQuality Retrieves the Video Quality of Videos to be uploaded
  * @property getVideoCompressionSizeLimit Retrieve the maximum video file size that can be compressed
- * @property isCameraUploadByWifi Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
+ * @property isCameraUploadsByWifiUseCase Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property isChargingRequiredForVideoCompression Checks whether compressing videos require the device to be charged or not
  * @property monitorConnectivityUseCase Monitor the device online status
  * @property resetCameraUploadTimeStamps Reset the Primary and Secondary Timestamps
  * @property resetMediaUploadTimeStamps Reset the Secondary Timestamps
  * @property restorePrimaryTimestamps Restore the Primary Timestamps
  * @property restoreSecondaryTimestamps Restore the Secondary Timestamps
- * @property setCameraUploadsByWifi Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
+ * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setChargingRequiredForVideoCompression Sets whether compressing videos require the device to be charged or not
  * @property setLocationTagsEnabledUseCase Sets whether Location Tags should be embedded in each Photo to be uploaded or not
  * @property setUploadOption Sets the new upload option of Camera Uploads
@@ -89,14 +89,14 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val getUploadOption: GetUploadOption,
     private val getUploadVideoQuality: GetUploadVideoQuality,
     private val getVideoCompressionSizeLimit: GetVideoCompressionSizeLimit,
-    private val isCameraUploadByWifi: IsCameraUploadByWifi,
+    private val isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase,
     private val isChargingRequiredForVideoCompression: IsChargingRequiredForVideoCompression,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
-    private val setCameraUploadsByWifi: SetCameraUploadsByWifi,
+    private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompression: SetChargingRequiredForVideoCompression,
     private val setLocationTagsEnabledUseCase: SetLocationTagsEnabledUseCase,
     private val setUploadOption: SetUploadOption,
@@ -327,7 +327,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * If false, Camera Uploads can run through either Wi-Fi or Mobile Data
      */
     fun changeUploadConnectionType(wifiOnly: Boolean) = viewModelScope.launch {
-        setCameraUploadsByWifi(wifiOnly)
+        setCameraUploadsByWifiUseCase(wifiOnly)
         refreshUploadConnectionType()
     }
 
@@ -483,5 +483,5 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Wi-Fi or Mobile Data
      */
     private suspend fun getUploadConnectionType() =
-        if (isCameraUploadByWifi()) UploadConnectionType.WIFI else UploadConnectionType.WIFI_OR_MOBILE_DATA
+        if (isCameraUploadsByWifiUseCase()) UploadConnectionType.WIFI else UploadConnectionType.WIFI_OR_MOBILE_DATA
 }
