@@ -89,7 +89,7 @@ object FavouritesTestModule {
     fun provideDownloadPreview(): DownloadPreview = mock()
 
     @Provides
-    fun provideGetTimelinePhotos(): GetTimelinePhotosUseCase = mock()
+    fun provideGetTimelinePhotosUseCase(): GetTimelinePhotosUseCase = mock()
 
     @Provides
     fun provideFilterCameraUploadPhotos(): FilterCameraUploadPhotos = mock()

@@ -35,7 +35,7 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
-import mega.privacy.android.domain.usecase.GetPhotosByFolderId
+import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandle
 import mega.privacy.android.domain.usecase.MegaApiHttpServerIsRunning
 import mega.privacy.android.domain.usecase.MegaApiHttpServerSetMaxBufferSize
@@ -51,7 +51,7 @@ import javax.inject.Inject
 class MediaDiscoveryViewModel @Inject constructor(
     private val getNodeListByIds: GetNodeListByIds,
     private val savedStateHandle: SavedStateHandle,
-    private val getPhotosByFolderId: GetPhotosByFolderId,
+    private val getPhotosByFolderIdUseCase: GetPhotosByFolderIdUseCase,
     private val getCameraSortOrder: GetCameraSortOrder,
     private val setCameraSortOrder: SetCameraSortOrder,
     private val monitorMediaDiscoveryView: MonitorMediaDiscoveryView,
@@ -92,7 +92,7 @@ class MediaDiscoveryViewModel @Inject constructor(
         fetchPhotosJob = currentFolderId?.let {
             viewModelScope.launch {
                 val sortOrder = mapSortToSortOrder(_state.value.currentSort)
-                getPhotosByFolderId(it, sortOrder)
+                getPhotosByFolderIdUseCase(it, sortOrder)
                     .collectLatest { sourcePhotos ->
                         handlePhotoItems(sourcePhotos)
                     }

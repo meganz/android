@@ -18,7 +18,6 @@ import mega.privacy.android.domain.usecase.DefaultFilterGIF
 import mega.privacy.android.domain.usecase.DefaultFilterRAW
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumsMap
-import mega.privacy.android.domain.usecase.DefaultGetPhotosByFolderId
 import mega.privacy.android.domain.usecase.DefaultGetPreview
 import mega.privacy.android.domain.usecase.DefaultGetThumbnail
 import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
@@ -37,7 +36,6 @@ import mega.privacy.android.domain.usecase.FilterGIF
 import mega.privacy.android.domain.usecase.FilterRAW
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
-import mega.privacy.android.domain.usecase.GetPhotosByFolderId
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
@@ -91,9 +89,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindGetTypedNodesFromFolder(useCase: DefaultGetTypedNodesFromFolder): GetTypedNodesFromFolder
-
-    @Binds
-    abstract fun bindGetPhotosByFolderId(useCase: DefaultGetPhotosByFolderId): GetPhotosByFolderId
 
     @Binds
     abstract fun bindObserveAlbumPhotosAddingProgress(useCase: DefaultObserveAlbumPhotosAddingProgress): ObserveAlbumPhotosAddingProgress

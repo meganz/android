@@ -9,7 +9,7 @@ import mega.privacy.android.app.di.photos.PhotosUseCases
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetPhotosByIds
-import mega.privacy.android.domain.usecase.GetPhotosByFolderId
+import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
@@ -30,7 +30,7 @@ object TestPhotosUseCases {
     fun provideGetDefaultAlbumsMap(): GetDefaultAlbumsMap = mock()
 
     @Provides
-    fun provideGetPhotosByFolderId(): GetPhotosByFolderId = mock()
+    fun provideGetPhotosByFolderIdUseCase(): GetPhotosByFolderIdUseCase = mock()
 
     @Provides
     fun provideObserveAlbumPhotosAddingProgressUseCase(): ObserveAlbumPhotosAddingProgress = mock()
