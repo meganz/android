@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.model.RecoveryKeyUIState
-import mega.privacy.android.domain.usecase.GetExportMasterKey
-import mega.privacy.android.domain.usecase.SetMasterKeyExported
+import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
+import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import javax.inject.Inject
 
 /**
@@ -18,8 +18,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ExportRecoveryKeyViewModel @Inject constructor(
-    private val getExportMasterKey: GetExportMasterKey,
-    private val setMasterKeyExported: SetMasterKeyExported,
+    private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
+    private val setMasterKeyExportedUseCase: SetMasterKeyExportedUseCase,
 ) : BaseRxViewModel() {
     private val _uiState = MutableStateFlow(RecoveryKeyUIState())
 
@@ -34,9 +34,9 @@ class ExportRecoveryKeyViewModel @Inject constructor(
      * Exports the Recovery Key
      */
     suspend fun getRecoveryKey(): String? {
-        return getExportMasterKey().also { key ->
+        return getExportMasterKeyUseCase().also { key ->
             if (key.isNullOrBlank().not()) {
-                setMasterKeyExported()
+                setMasterKeyExportedUseCase()
             }
         }
     }
