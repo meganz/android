@@ -96,7 +96,6 @@ import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -365,9 +364,6 @@ object TestCameraUploadUseCases {
     @Provides
     fun provideCreateCameraUploadTemporaryRootDirectory() =
         mock<CreateCameraUploadTemporaryRootDirectory>()
-
-    @Provides
-    fun provideSetUploadVideoSyncStatus() = mock<SetUploadVideoSyncStatus>()
 
     @Provides
     fun provideListenToNewMedia() = mock<ListenToNewMedia>()

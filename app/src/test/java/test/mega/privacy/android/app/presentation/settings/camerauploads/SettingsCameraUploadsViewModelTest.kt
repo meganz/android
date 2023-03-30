@@ -39,7 +39,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForV
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import org.junit.After
 import org.junit.Before
@@ -80,7 +80,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
-    private val setUploadVideoSyncStatus = mock<SetUploadVideoSyncStatus>()
+    private val setUploadVideoSyncStatusUseCase = mock<SetUploadVideoSyncStatusUseCase>()
     private val setVideoCompressionSizeLimitUseCase = mock<SetVideoCompressionSizeLimitUseCase>()
     private val setupDefaultSecondaryFolder = mock<SetupDefaultSecondaryFolder>()
     private val setupPrimaryFolder = mock<SetupPrimaryFolder>()
@@ -121,7 +121,7 @@ class SettingsCameraUploadsViewModelTest {
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
-            setUploadVideoSyncStatus = setUploadVideoSyncStatus,
+            setUploadVideoSyncStatusUseCase = setUploadVideoSyncStatusUseCase,
             setVideoCompressionSizeLimitUseCase = setVideoCompressionSizeLimitUseCase,
             setupDefaultSecondaryFolder = setupDefaultSecondaryFolder,
             setupPrimaryFolder = setupPrimaryFolder,
@@ -394,7 +394,7 @@ class SettingsCameraUploadsViewModelTest {
         setupUnderTest()
 
         underTest.changeUploadVideoQuality(value)
-        verify(setUploadVideoSyncStatus, times(1)).invoke(expectedVideoSyncStatus)
+        verify(setUploadVideoSyncStatusUseCase, times(1)).invoke(expectedVideoSyncStatus)
     }
 
     @Test

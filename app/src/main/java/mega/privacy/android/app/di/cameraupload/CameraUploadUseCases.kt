@@ -155,7 +155,6 @@ import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraU
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 
 /**
  * Provides the use case implementation for camera upload
@@ -504,17 +503,6 @@ abstract class CameraUploadUseCases {
         @Suppress("DEPRECATION")
         fun provideGetNumberOfPendingUploads(cameraUploadRepository: CameraUploadRepository): GetNumberOfPendingUploads =
             GetNumberOfPendingUploads(cameraUploadRepository::getNumberOfPendingUploads)
-
-        /**
-         * Provides the [SetUploadVideoSyncStatus] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [SetUploadVideoSyncStatus]
-         */
-        @Provides
-        fun provideSetUploadVideoSyncStatus(cameraUploadRepository: CameraUploadRepository): SetUploadVideoSyncStatus =
-            SetUploadVideoSyncStatus(cameraUploadRepository::setUploadVideoSyncStatus)
 
         /**
          * Provides the [ListenToNewMedia] implementation

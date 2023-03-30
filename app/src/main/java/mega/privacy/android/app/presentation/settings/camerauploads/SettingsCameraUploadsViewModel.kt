@@ -46,7 +46,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForV
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import javax.inject.Inject
 
@@ -73,7 +73,7 @@ import javax.inject.Inject
  * @property setLocationTagsEnabledUseCase Sets whether Location Tags should be embedded in each Photo to be uploaded or not
  * @property setUploadOptionUseCase Sets the new upload option of Camera Uploads
  * @property setUploadVideoQualityUseCase Sets the new Video Quality of Videos to be uploaded
- * @property setUploadVideoSyncStatus Sets the new Sync Status of Videos to be uploaded
+ * @property setUploadVideoSyncStatusUseCase Sets the new Sync Status of Videos to be uploaded
  * @property setVideoCompressionSizeLimitUseCase Sets the maximum video file size that can be compressed
  * @property setupDefaultSecondaryFolder Sets up a default Secondary Folder of Camera Uploads
  * @property setupPrimaryFolder Sets up the Primary Folder of Camera Uploads
@@ -101,7 +101,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setLocationTagsEnabledUseCase: SetLocationTagsEnabledUseCase,
     private val setUploadOptionUseCase: SetUploadOptionUseCase,
     private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
-    private val setUploadVideoSyncStatus: SetUploadVideoSyncStatus,
+    private val setUploadVideoSyncStatusUseCase: SetUploadVideoSyncStatusUseCase,
     private val setVideoCompressionSizeLimitUseCase: SetVideoCompressionSizeLimitUseCase,
     private val setupDefaultSecondaryFolder: SetupDefaultSecondaryFolder,
     private val setupPrimaryFolder: SetupPrimaryFolder,
@@ -361,7 +361,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     fun changeUploadVideoQuality(value: Int) = viewModelScope.launch {
         VideoQuality.values().find { it.value == value }?.let { videoQuality ->
             setUploadVideoQualityUseCase(videoQuality)
-            setUploadVideoSyncStatus(
+            setUploadVideoSyncStatusUseCase(
                 if (videoQuality == VideoQuality.ORIGINAL) {
                     SyncStatus.STATUS_PENDING
                 } else {
