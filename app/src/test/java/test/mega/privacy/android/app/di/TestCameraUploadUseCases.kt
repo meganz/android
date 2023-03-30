@@ -96,9 +96,7 @@ import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
-import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 import org.mockito.kotlin.mock
@@ -375,14 +373,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideListenToNewMedia() = mock<ListenToNewMedia>()
-
-    @Provides
-    fun provideIsChargingRequiredForVideoCompression() =
-        mock<IsChargingRequiredForVideoCompression>()
-
-    @Provides
-    fun provideSetChargingRequiredForVideoCompression() =
-        mock<SetChargingRequiredForVideoCompression>()
 
     @Provides
     fun provideGetVideoCompressionSizeLimit() = mock<GetVideoCompressionSizeLimit>()

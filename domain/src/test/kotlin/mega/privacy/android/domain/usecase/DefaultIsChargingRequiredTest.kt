@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -19,21 +19,21 @@ class DefaultIsChargingRequiredTest {
     private lateinit var underTest: IsChargingRequired
 
     private val getVideoCompressionSizeLimit = mock<GetVideoCompressionSizeLimit>()
-    private val isChargingRequiredForVideoCompression =
-        mock<IsChargingRequiredForVideoCompression>()
+    private val isChargingRequiredForVideoCompressionUseCase =
+        mock<IsChargingRequiredForVideoCompressionUseCase>()
 
     @Before
     fun setUp() {
         underTest = DefaultIsChargingRequired(
             getVideoCompressionSizeLimit = getVideoCompressionSizeLimit,
-            isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression,
+            isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
         )
     }
 
     @Test
     fun `test that false is returned if isChargingRequiredForVideoCompression is set to false`() =
         runTest {
-            isChargingRequiredForVideoCompression.stub {
+            isChargingRequiredForVideoCompressionUseCase.stub {
                 onBlocking { invoke() }.thenReturn(false)
             }
 
@@ -45,7 +45,7 @@ class DefaultIsChargingRequiredTest {
         val queueSize = 5
 
         whenever(getVideoCompressionSizeLimit()).thenReturn(queueSize + 1)
-        isChargingRequiredForVideoCompression.stub {
+        isChargingRequiredForVideoCompressionUseCase.stub {
             onBlocking { invoke() }.thenReturn(true)
         }
 
@@ -57,7 +57,7 @@ class DefaultIsChargingRequiredTest {
         val queueSize = 5
 
         whenever(getVideoCompressionSizeLimit()).thenReturn(queueSize - 1)
-        isChargingRequiredForVideoCompression.stub {
+        isChargingRequiredForVideoCompressionUseCase.stub {
             onBlocking { invoke() }.thenReturn(true)
         }
 

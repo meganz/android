@@ -33,9 +33,9 @@ import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
@@ -68,15 +68,15 @@ class SettingsCameraUploadsViewModelTest {
     private val getUploadVideoQuality = mock<GetUploadVideoQualityUseCase>()
     private val getVideoCompressionSizeLimit = mock<GetVideoCompressionSizeLimit>()
     private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase>()
-    private val isChargingRequiredForVideoCompression =
-        mock<IsChargingRequiredForVideoCompression>()
+    private val isChargingRequiredForVideoCompressionUseCase =
+        mock<IsChargingRequiredForVideoCompressionUseCase>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
     private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
     private val restorePrimaryTimestamps = mock<RestorePrimaryTimestamps>()
     private val restoreSecondaryTimestamps = mock<RestoreSecondaryTimestamps>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
-    private val setChargingRequiredForVideoCompression =
-        mock<SetChargingRequiredForVideoCompression>()
+    private val setChargingRequiredForVideoCompressionUseCase =
+        mock<SetChargingRequiredForVideoCompressionUseCase>()
     private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
@@ -110,14 +110,14 @@ class SettingsCameraUploadsViewModelTest {
             getUploadVideoQualityUseCase = getUploadVideoQuality,
             getVideoCompressionSizeLimit = getVideoCompressionSizeLimit,
             isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
-            isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression,
+            isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
             monitorConnectivityUseCase = mock(),
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
             resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             restorePrimaryTimestamps = restorePrimaryTimestamps,
             restoreSecondaryTimestamps = restoreSecondaryTimestamps,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
-            setChargingRequiredForVideoCompression = setChargingRequiredForVideoCompression,
+            setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
@@ -406,13 +406,13 @@ class SettingsCameraUploadsViewModelTest {
         testChargingRequiredForVideoCompression(false)
 
     private fun testChargingRequiredForVideoCompression(expectedAnswer: Boolean) = runTest {
-        whenever(isChargingRequiredForVideoCompression()).thenReturn(expectedAnswer)
+        whenever(isChargingRequiredForVideoCompressionUseCase()).thenReturn(expectedAnswer)
 
         setupUnderTest()
 
         underTest.changeChargingRequiredForVideoCompression(expectedAnswer)
 
-        verify(setChargingRequiredForVideoCompression).invoke(expectedAnswer)
+        verify(setChargingRequiredForVideoCompressionUseCase).invoke(expectedAnswer)
         underTest.state.test {
             assertThat(awaitItem().isChargingRequiredForVideoCompression).isEqualTo(expectedAnswer)
         }

@@ -155,9 +155,7 @@ import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraU
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
-import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 
@@ -530,28 +528,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideListenToNewMedia(repository: CameraUploadRepository): ListenToNewMedia =
             ListenToNewMedia(repository::listenToNewMedia)
-
-        /**
-         * Provides the [IsChargingRequiredForVideoCompression] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [IsChargingRequiredForVideoCompression]
-         */
-        @Provides
-        fun provideIsChargingRequiredForVideoCompression(repository: CameraUploadRepository): IsChargingRequiredForVideoCompression =
-            IsChargingRequiredForVideoCompression(repository::isChargingRequiredForVideoCompression)
-
-        /**
-         * Provides the [SetChargingRequiredForVideoCompression] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [SetChargingRequiredForVideoCompression]
-         */
-        @Provides
-        fun provideSetChargingRequiredForVideoCompression(repository: CameraUploadRepository): SetChargingRequiredForVideoCompression =
-            SetChargingRequiredForVideoCompression(repository::setChargingRequiredForVideoCompression)
 
         /**
          * Provides the [GetVideoCompressionSizeLimit] implementation
