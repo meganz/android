@@ -16,6 +16,7 @@ import mega.privacy.android.app.presentation.favourites.facade.MegaUtilWrapper
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
+import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.usecase.DefaultMapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
@@ -29,12 +30,12 @@ import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
 import mega.privacy.android.domain.usecase.GetOfflineFile
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
-import mega.privacy.android.domain.usecase.GetTimelinePhotos
 import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
 import mega.privacy.android.domain.usecase.RemoveFavourites
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 
@@ -89,7 +90,7 @@ object FavouritesTestModule {
     fun provideDownloadPreview(): DownloadPreview = mock()
 
     @Provides
-    fun provideGetTimelinePhotos(): GetTimelinePhotos = mock()
+    fun provideGetTimelinePhotosUseCase(): GetTimelinePhotosUseCase = mock()
 
     @Provides
     fun provideFilterCameraUploadPhotos(): FilterCameraUploadPhotos = mock()
@@ -124,4 +125,7 @@ object FavouritesTestModule {
 
     @Provides
     fun provideGetOfflineFile(): GetOfflineFile = mock()
+
+    @Provides
+    fun provideDateUtilWrapper(): DateUtilWrapper = mock()
 }

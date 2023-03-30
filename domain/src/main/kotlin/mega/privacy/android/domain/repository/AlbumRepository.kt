@@ -134,4 +134,9 @@ interface AlbumRepository {
      * @param elementId the element id to be set as cover
      */
     suspend fun updateAlbumCover(albumId: AlbumId, elementId: NodeId)
+
+    /**
+     * Clear all albums cache
+     */
+    fun clearCache()
 }

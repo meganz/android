@@ -59,4 +59,9 @@ interface PhotosRepository {
      * Get Photos By a list of id
      */
     suspend fun getPhotosByIds(ids: List<NodeId>): List<Photo>
+
+    /**
+     * Clear all photos cache
+     */
+    fun clearCache()
 }

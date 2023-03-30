@@ -105,7 +105,6 @@ import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
 import mega.privacy.android.domain.usecase.GetPendingSyncRecords
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
@@ -124,9 +123,10 @@ import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -214,7 +214,7 @@ class CameraUploadsService : LifecycleService() {
      * IsCameraUploadByWifi
      */
     @Inject
-    lateinit var isCameraUploadByWifi: IsCameraUploadByWifi
+    lateinit var isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase
 
     /**
      * IsWifiNotSatisfied Use Case
@@ -268,7 +268,7 @@ class CameraUploadsService : LifecycleService() {
      * Are Location Tags Enabled
      */
     @Inject
-    lateinit var areLocationTagsEnabled: AreLocationTagsEnabled
+    lateinit var areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase
 
     /**
      * GetSyncRecordByPath
@@ -1146,7 +1146,7 @@ class CameraUploadsService : LifecycleService() {
             val isSecondary = file.isSecondary
             val parent = (if (isSecondary) secondaryUploadNode else primaryUploadNode) ?: continue
             if (file.type == syncRecordTypeIntMapper(SyncRecordType.TYPE_PHOTO) && !file.isCopyOnly) {
-                if (!areLocationTagsEnabled()) {
+                if (!areLocationTagsEnabledUseCase()) {
                     var shouldContinue = false
                     flowOf(
                         createTempFileAndRemoveCoordinatesUseCase(

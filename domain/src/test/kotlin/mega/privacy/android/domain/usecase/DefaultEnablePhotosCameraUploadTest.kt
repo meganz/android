@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
@@ -21,6 +22,7 @@ class DefaultEnablePhotosCameraUploadTest {
     private lateinit var underTest: EnablePhotosCameraUpload
 
     private val settingsRepository = mock<SettingsRepository>()
+    private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
     private val setChargingRequiredForVideoCompression =
         mock<SetChargingRequiredForVideoCompression>()
@@ -31,6 +33,7 @@ class DefaultEnablePhotosCameraUploadTest {
     fun setUp() {
         underTest = DefaultEnablePhotosCameraUpload(
             settingsRepository = settingsRepository,
+            setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setUploadVideoQuality = setUploadVideoQuality,
             setChargingRequiredForVideoCompression = setChargingRequiredForVideoCompression,
             setVideoCompressionSizeLimit = setVideoCompressionSizeLimit,
@@ -56,6 +59,7 @@ class DefaultEnablePhotosCameraUploadTest {
 
         val inOrder = inOrder(
             settingsRepository,
+            setCameraUploadsByWifiUseCase,
             setUploadVideoQuality,
             setChargingRequiredForVideoCompression,
             setVideoCompressionSizeLimit,
@@ -63,7 +67,7 @@ class DefaultEnablePhotosCameraUploadTest {
         )
 
         inOrder.verify(settingsRepository).setCameraUploadLocalPath(expectedPath)
-        inOrder.verify(settingsRepository).setCamSyncWifi(!expectedEnableCellularSync)
+        inOrder.verify(setCameraUploadsByWifiUseCase).invoke(!expectedEnableCellularSync)
         inOrder.verify(settingsRepository).setCameraUploadFileType(expectedSyncVideo)
         inOrder.verify(settingsRepository).setCameraFolderExternalSDCard(false)
         inOrder.verify(setUploadVideoQuality).invoke(expectedVideoQuality)

@@ -57,11 +57,17 @@ interface CameraUploadRepository {
      * Checks if content in Camera Uploads should be uploaded through Wi-Fi only,
      * or through Wi-Fi or Mobile Data
      *
-     * @return If true, will only upload on Wi-Fi. It will also return true if the option has not
-     * been set (null)
-     * Otherwise, will upload through Wi-Fi or Mobile Data
+     * @return If true, will only upload on Wi-Fi. Otherwise, will upload through Wi-Fi or Mobile Data
      */
-    suspend fun isSyncByWifi(): Boolean
+    suspend fun isCameraUploadsByWifi(): Boolean
+
+    /**
+     * Sets whether Camera Uploads should only run through Wi-Fi / Wi-Fi or Mobile Data
+     *
+     * @param wifiOnly If true, Camera Uploads will only run through Wi-Fi
+     * If false, Camera Uploads can run through either Wi-Fi or Mobile Data
+     */
+    suspend fun setCameraUploadsByWifi(wifiOnly: Boolean)
 
     /**
      * Get camera upload sync timestamp

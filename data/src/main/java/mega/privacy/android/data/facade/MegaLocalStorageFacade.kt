@@ -95,7 +95,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getUserCredentials(): UserCredentials? = dbHandler.credentials
 
-    override suspend fun isSyncByWifi(): Boolean =
+    override suspend fun isCameraUploadsByWifi(): Boolean =
         dbHandler.preferences?.camSyncWifi?.toBoolean() ?: true
 
     override suspend fun getPendingSyncRecords(): List<SyncRecord> =
@@ -295,8 +295,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
         dbHandler.setCameraFolderExternalSDCard(cameraFolderExternalSDCard)
     }
 
-    override suspend fun setCamSyncWifi(enableCellularSync: Boolean) {
-        dbHandler.setCamSyncWifi(enableCellularSync)
+    override suspend fun setCameraUploadsByWifi(wifiOnly: Boolean) {
+        dbHandler.setCamSyncWifi(wifiOnly)
     }
 
     override suspend fun setCamSyncFileUpload(fileUpload: Int) {

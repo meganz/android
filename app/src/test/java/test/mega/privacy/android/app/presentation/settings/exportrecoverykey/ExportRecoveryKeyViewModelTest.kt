@@ -11,8 +11,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyViewModel
-import mega.privacy.android.domain.usecase.GetExportMasterKey
-import mega.privacy.android.domain.usecase.SetMasterKeyExported
+import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
+import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -29,13 +29,13 @@ class ExportRecoveryKeyViewModelTest {
     var instantExecutorRule = InstantTaskExecutorRule()
 
     lateinit var underTest: ExportRecoveryKeyViewModel
-    private val getExportMasterKey = mock<GetExportMasterKey>()
-    private val setMasterKeyExported = mock<SetMasterKeyExported>()
+    private val getExportMasterKeyUseCase = mock<GetExportMasterKeyUseCase>()
+    private val setMasterKeyExportedUseCase = mock<SetMasterKeyExportedUseCase>()
     private val fakeRecoveryKey = "JALSJLKNDnsnda12738"
 
     private fun constructViewModel() = ExportRecoveryKeyViewModel(
-        getExportMasterKey,
-        setMasterKeyExported
+        getExportMasterKeyUseCase,
+        setMasterKeyExportedUseCase
     )
 
     @Before
@@ -52,13 +52,13 @@ class ExportRecoveryKeyViewModelTest {
     @Test
     fun `test that setMasterKeyExported should NOT trigger when recovery key is empty, and vice versa`() {
         fun verify(key: String?, expectedInvocation: Int) = runTest {
-            whenever(getExportMasterKey()).thenReturn(key)
+            whenever(getExportMasterKeyUseCase()).thenReturn(key)
 
             underTest.getRecoveryKey()
 
             advanceUntilIdle()
 
-            verify(setMasterKeyExported, times(expectedInvocation)).invoke()
+            verify(setMasterKeyExportedUseCase, times(expectedInvocation)).invoke()
         }
 
         verify(key = null, expectedInvocation = 0)

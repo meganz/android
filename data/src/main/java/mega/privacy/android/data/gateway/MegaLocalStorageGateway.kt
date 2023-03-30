@@ -97,10 +97,14 @@ interface MegaLocalStorageGateway {
     suspend fun getUserCredentials(): UserCredentials?
 
     /**
-     * Is sync by wifi only
-     * @return if sync is by wifi only
+     * Checks if content in Camera Uploads should be uploaded through Wi-Fi only,
+     * or through Wi-Fi or Mobile Data
+     *
+     * @return If true, will only upload on Wi-Fi. It will also return true if the option has not
+     * been set (null)
+     * Otherwise, will upload through Wi-Fi or Mobile Data
      */
-    suspend fun isSyncByWifi(): Boolean
+    suspend fun isCameraUploadsByWifi(): Boolean
 
     /**
      * Get all pending sync records
@@ -473,11 +477,12 @@ interface MegaLocalStorageGateway {
     suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean)
 
     /**
-     * Set if camera upload using wifi only or with cellular also
+     * Sets whether Camera Uploads should only run through Wi-Fi / Wi-Fi or Mobile Data
      *
-     * @param enableCellularSync
+     * @param wifiOnly If true, Camera Uploads will only run through Wi-Fi
+     * If false, Camera Uploads can run through either Wi-Fi or Mobile Data
      */
-    suspend fun setCamSyncWifi(enableCellularSync: Boolean)
+    suspend fun setCameraUploadsByWifi(wifiOnly: Boolean)
 
     /**
      * Set if camera upload only uploads images or images and videos

@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
-import mega.privacy.android.domain.usecase.GetTimelinePhotos
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbum
 import org.junit.After
 import org.junit.Before
@@ -46,7 +46,7 @@ class AlbumPhotosSelectionViewModelTest {
     private val savedStateHandle = SavedStateHandle()
     private val getUserAlbum = mock<GetUserAlbum>()
     private val getAlbumPhotos = mock<GetAlbumPhotos>()
-    private val getTimelinePhotos = mock<GetTimelinePhotos>()
+    private val getTimelinePhotosUseCase = mock<GetTimelinePhotosUseCase>()
     private val downloadThumbnail = mock<DownloadThumbnail>()
     private val filterCloudDrivePhotos = mock<FilterCloudDrivePhotos>()
     private val filterCameraUploadPhotos = mock<FilterCameraUploadPhotos>()
@@ -87,7 +87,7 @@ class AlbumPhotosSelectionViewModelTest {
             createImage(id = 2L),
             createImage(id = 3L),
         )
-        whenever(getTimelinePhotos()).thenReturn(flowOf(images))
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(images))
         whenever(filterCloudDrivePhotos(any())).thenReturn(images)
         whenever(filterCameraUploadPhotos(any())).thenReturn(images)
 
@@ -120,7 +120,7 @@ class AlbumPhotosSelectionViewModelTest {
             createImage(id = 2L),
             createImage(id = 3L),
         )
-        whenever(getTimelinePhotos()).thenReturn(flowOf(images))
+        whenever(getTimelinePhotosUseCase()).thenReturn(flowOf(images))
         whenever(filterCloudDrivePhotos(any())).thenReturn(images)
         whenever(filterCameraUploadPhotos(any())).thenReturn(images)
 
@@ -189,7 +189,7 @@ class AlbumPhotosSelectionViewModelTest {
         savedStateHandle = savedStateHandle,
         getUserAlbum = getUserAlbum,
         getAlbumPhotos = getAlbumPhotos,
-        getTimelinePhotos = getTimelinePhotos,
+        getTimelinePhotosUseCase = getTimelinePhotosUseCase,
         downloadThumbnail = downloadThumbnail,
         filterCloudDrivePhotos = filterCloudDrivePhotos,
         filterCameraUploadPhotos = filterCameraUploadPhotos,

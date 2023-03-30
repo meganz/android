@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -13,15 +13,19 @@ import javax.inject.Inject
 
 /**
  * Get Photos from a folder
- *
- * @param photosRepository
  */
-class DefaultGetPhotosByFolderId @Inject constructor(
-    val photosRepository: PhotosRepository,
-    private val nodeRepository: NodeRepository
-) : GetPhotosByFolderId {
+class GetPhotosByFolderIdUseCase @Inject constructor(
+    private val photosRepository: PhotosRepository,
+    private val nodeRepository: NodeRepository,
+) {
 
-    override fun invoke(folderId: Long, order: SortOrder): Flow<List<Photo>> {
+    /**
+     * Get Photos from a folder
+     *
+     * @param folderId
+     * @return photo
+     */
+    operator fun invoke(folderId: Long, order: SortOrder): Flow<List<Photo>> {
         return flow {
             emit(getChildren(folderId, order))
             emitAll(getMonitoredList(folderId, order))

@@ -3,6 +3,7 @@ package mega.privacy.android.domain.usecase
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
@@ -12,6 +13,7 @@ import javax.inject.Inject
  * Default implementation of [EnablePhotosCameraUpload]
  *
  * @property settingsRepository [SettingsRepository]
+ * @property setCameraUploadsByWifiUseCase [SetCameraUploadsByWifiUseCase]
  * @property setChargingRequiredForVideoCompression [SetChargingRequiredForVideoCompression]
  * @property setUploadVideoQuality [SetUploadVideoQuality]
  * @property setVideoCompressionSizeLimit [SetVideoCompressionSizeLimit]
@@ -19,6 +21,7 @@ import javax.inject.Inject
  */
 class DefaultEnablePhotosCameraUpload @Inject constructor(
     private val settingsRepository: SettingsRepository,
+    private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompression: SetChargingRequiredForVideoCompression,
     private val setUploadVideoQuality: SetUploadVideoQuality,
     private val setVideoCompressionSizeLimit: SetVideoCompressionSizeLimit,
@@ -34,7 +37,7 @@ class DefaultEnablePhotosCameraUpload @Inject constructor(
     ) {
         with(settingsRepository) {
             setCameraUploadLocalPath(path)
-            setCamSyncWifi(!enableCellularSync)
+            setCameraUploadsByWifiUseCase(!enableCellularSync)
             setCameraUploadFileType(syncVideo)
             setCameraFolderExternalSDCard(false)
             setUploadVideoQuality(videoQuality)

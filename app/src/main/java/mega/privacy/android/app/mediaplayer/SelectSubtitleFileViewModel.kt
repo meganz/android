@@ -111,9 +111,9 @@ class SelectSubtitleFileViewModel @Inject constructor(
     fun getQueryStateFlow() = query
 
     /**
-     * Get current selected subtitle file info
+     * Get current selected subtitle file info flow
      */
-    fun getSelectedSubtitleFileInfo() = selected.value
+    fun getSelectedSubtitleFileInfoFlow() = selected
 
 
     /**

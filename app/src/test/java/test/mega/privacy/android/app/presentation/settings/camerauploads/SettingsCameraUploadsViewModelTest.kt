@@ -22,21 +22,21 @@ import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.IsCameraUploadByWifi
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
-import mega.privacy.android.domain.usecase.SetCameraUploadsByWifi
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
-import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabled
+import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
@@ -59,7 +59,7 @@ class SettingsCameraUploadsViewModelTest {
 
     private lateinit var underTest: SettingsCameraUploadsViewModel
 
-    private val areLocationTagsEnabled = mock<AreLocationTagsEnabled>()
+    private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase>()
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
@@ -67,17 +67,17 @@ class SettingsCameraUploadsViewModelTest {
     private val getUploadOption = mock<GetUploadOption>()
     private val getUploadVideoQuality = mock<GetUploadVideoQuality>()
     private val getVideoCompressionSizeLimit = mock<GetVideoCompressionSizeLimit>()
-    private val isCameraUploadByWifi = mock<IsCameraUploadByWifi>()
+    private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase>()
     private val isChargingRequiredForVideoCompression =
         mock<IsChargingRequiredForVideoCompression>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
     private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
     private val restorePrimaryTimestamps = mock<RestorePrimaryTimestamps>()
     private val restoreSecondaryTimestamps = mock<RestoreSecondaryTimestamps>()
-    private val setCameraUploadsByWifi = mock<SetCameraUploadsByWifi>()
+    private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
     private val setChargingRequiredForVideoCompression =
         mock<SetChargingRequiredForVideoCompression>()
-    private val setLocationTagsEnabled = mock<SetLocationTagsEnabled>()
+    private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
     private val setUploadOption = mock<SetUploadOption>()
     private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
     private val setUploadVideoSyncStatus = mock<SetUploadVideoSyncStatus>()
@@ -101,7 +101,7 @@ class SettingsCameraUploadsViewModelTest {
      */
     private fun setupUnderTest() {
         underTest = SettingsCameraUploadsViewModel(
-            areLocationTagsEnabled = areLocationTagsEnabled,
+            areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             clearCacheDirectory = clearCacheDirectory,
             disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
@@ -109,16 +109,16 @@ class SettingsCameraUploadsViewModelTest {
             getUploadOption = getUploadOption,
             getUploadVideoQuality = getUploadVideoQuality,
             getVideoCompressionSizeLimit = getVideoCompressionSizeLimit,
-            isCameraUploadByWifi = isCameraUploadByWifi,
+            isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
             isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression,
             monitorConnectivityUseCase = mock(),
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
             resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             restorePrimaryTimestamps = restorePrimaryTimestamps,
             restoreSecondaryTimestamps = restoreSecondaryTimestamps,
-            setCameraUploadsByWifi = setCameraUploadsByWifi,
+            setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompression = setChargingRequiredForVideoCompression,
-            setLocationTagsEnabled = setLocationTagsEnabled,
+            setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
             setUploadOption = setUploadOption,
             setUploadVideoQuality = setUploadVideoQuality,
             setUploadVideoSyncStatus = setUploadVideoSyncStatus,
@@ -303,13 +303,13 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
 
-            whenever(isCameraUploadByWifi()).thenReturn(true)
+            whenever(isCameraUploadsByWifiUseCase()).thenReturn(true)
             underTest.changeUploadConnectionType(wifiOnly = true)
 
             underTest.state.map { it.uploadConnectionType }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isEqualTo(UploadConnectionType.WIFI)
 
-                whenever(isCameraUploadByWifi()).thenReturn(false)
+                whenever(isCameraUploadsByWifiUseCase()).thenReturn(false)
                 underTest.changeUploadConnectionType(wifiOnly = false)
                 assertThat(awaitItem()).isEqualTo(UploadConnectionType.WIFI_OR_MOBILE_DATA)
             }
@@ -438,13 +438,13 @@ class SettingsCameraUploadsViewModelTest {
         runTest {
             setupUnderTest()
 
-            whenever(areLocationTagsEnabled()).thenReturn(true)
+            whenever(areLocationTagsEnabledUseCase()).thenReturn(true)
             underTest.includeLocationTags(true)
 
             underTest.state.map { it.areLocationTagsIncluded }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isTrue()
 
-                whenever(areLocationTagsEnabled()).thenReturn(false)
+                whenever(areLocationTagsEnabledUseCase()).thenReturn(false)
                 underTest.includeLocationTags(false)
                 assertThat(awaitItem()).isFalse()
             }
