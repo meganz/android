@@ -584,12 +584,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                     isVisible = false
                 }
             }
-            //shared with and permission
-            bindingContent.filePropertiesSharedInfoButton.text =
-                resources.getQuantityString(
-                    R.plurals.general_selection_num_contacts,
-                    visibleOutShares.size, visibleOutShares.size
-                )
             //shared with expanded or not
             if (viewState.isShareContactExpanded) {
                 bindingContent.filePropertiesSharedInfoButton.setText(R.string.general_close)

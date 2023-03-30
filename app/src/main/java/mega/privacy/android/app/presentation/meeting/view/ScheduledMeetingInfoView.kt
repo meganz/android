@@ -62,10 +62,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
-import mega.privacy.android.app.presentation.contact.ContactStatus
-import mega.privacy.android.app.presentation.contact.DefaultContactAvatar
-import mega.privacy.android.app.presentation.contact.UriAvatar
-import mega.privacy.android.app.presentation.contact.getLastSeenString
+import mega.privacy.android.app.presentation.contact.view.ContactStatus
+import mega.privacy.android.app.presentation.contact.view.DefaultContactAvatar
+import mega.privacy.android.app.presentation.contact.view.UriAvatar
+import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.icon
