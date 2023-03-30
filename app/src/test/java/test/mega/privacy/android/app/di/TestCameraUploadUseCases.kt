@@ -95,12 +95,10 @@ import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 import org.mockito.kotlin.mock
@@ -365,18 +363,12 @@ object TestCameraUploadUseCases {
     fun provideCompressVideos() = mock<CompressVideos>()
 
     @Provides
-    fun provideGetUploadVideoQuality() = mock<GetUploadVideoQuality>()
-
-    @Provides
     fun provideDeleteCameraUploadTemporaryRootDirectory() =
         mock<DeleteCameraUploadTemporaryRootDirectory>()
 
     @Provides
     fun provideCreateCameraUploadTemporaryRootDirectory() =
         mock<CreateCameraUploadTemporaryRootDirectory>()
-
-    @Provides
-    fun provideSetUploadVideoQuality() = mock<SetUploadVideoQuality>()
 
     @Provides
     fun provideSetUploadVideoSyncStatus() = mock<SetUploadVideoSyncStatus>()

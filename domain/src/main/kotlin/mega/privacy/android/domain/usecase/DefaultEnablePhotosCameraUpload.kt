@@ -5,7 +5,7 @@ import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 import javax.inject.Inject
 
@@ -15,7 +15,7 @@ import javax.inject.Inject
  * @property settingsRepository [SettingsRepository]
  * @property setCameraUploadsByWifiUseCase [SetCameraUploadsByWifiUseCase]
  * @property setChargingRequiredForVideoCompression [SetChargingRequiredForVideoCompression]
- * @property setUploadVideoQuality [SetUploadVideoQuality]
+ * @property setUploadVideoQualityUseCase [SetUploadVideoQualityUseCase]
  * @property setVideoCompressionSizeLimit [SetVideoCompressionSizeLimit]
  * @property cameraUploadRepository [CameraUploadRepository]
  */
@@ -23,7 +23,7 @@ class DefaultEnablePhotosCameraUpload @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompression: SetChargingRequiredForVideoCompression,
-    private val setUploadVideoQuality: SetUploadVideoQuality,
+    private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
     private val setVideoCompressionSizeLimit: SetVideoCompressionSizeLimit,
     private val cameraUploadRepository: CameraUploadRepository,
 ) : EnablePhotosCameraUpload {
@@ -40,7 +40,7 @@ class DefaultEnablePhotosCameraUpload @Inject constructor(
             setCameraUploadsByWifiUseCase(!enableCellularSync)
             setCameraUploadFileType(syncVideo)
             setCameraFolderExternalSDCard(false)
-            setUploadVideoQuality(videoQuality)
+            setUploadVideoQualityUseCase(videoQuality)
             setChargingRequiredForVideoCompression(true)
             setVideoCompressionSizeLimit(conversionChargingOnSize)
             // After target and local folder setup, then enable CU.

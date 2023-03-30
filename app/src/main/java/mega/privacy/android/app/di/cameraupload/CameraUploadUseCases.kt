@@ -154,12 +154,10 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 
@@ -510,28 +508,6 @@ abstract class CameraUploadUseCases {
         @Suppress("DEPRECATION")
         fun provideGetNumberOfPendingUploads(cameraUploadRepository: CameraUploadRepository): GetNumberOfPendingUploads =
             GetNumberOfPendingUploads(cameraUploadRepository::getNumberOfPendingUploads)
-
-        /**
-         * Provides the [GetUploadVideoQuality] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [GetUploadVideoQuality]
-         */
-        @Provides
-        fun provideGetUploadVideoQuality(cameraUploadRepository: CameraUploadRepository): GetUploadVideoQuality =
-            GetUploadVideoQuality(cameraUploadRepository::getUploadVideoQuality)
-
-        /**
-         * Provides the [SetUploadVideoQuality] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [SetUploadVideoQuality]
-         */
-        @Provides
-        fun provideSetUploadVideoQuality(cameraUploadRepository: CameraUploadRepository): SetUploadVideoQuality =
-            SetUploadVideoQuality(cameraUploadRepository::setUploadVideoQuality)
 
         /**
          * Provides the [SetUploadVideoSyncStatus] implementation
