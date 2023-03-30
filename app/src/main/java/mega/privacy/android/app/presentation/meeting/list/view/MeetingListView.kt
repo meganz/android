@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.list.view
 
 import android.content.res.Configuration
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -10,8 +11,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -71,21 +75,28 @@ private fun ListView(
     onItemSelected: (Long) -> Unit,
 ) {
     val listState = rememberLazyListState()
+    val listTouched = remember { mutableStateOf(false) }
     val showHeaders = state.meetings.any(MeetingRoomItem::isPending)
     val isSelectionEnabled = state.selectedMeetings.isNotEmpty()
 
     LazyColumn(
         state = listState,
-        modifier = modifier.testTag("MeetingListView")
+        modifier = modifier
+            .testTag("MeetingListView")
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = { listTouched.value = true }
+                )
+            }
     ) {
         itemsIndexed(
             items = state.meetings,
             key = { _, item -> item.chatId }
         ) { index: Int, item: MeetingRoomItem ->
-            val previousItem = state.meetings.getOrNull(index - 1)
             val isSelected = isSelectionEnabled && state.selectedMeetings.contains(item.chatId)
 
             if (showHeaders) {
+                val previousItem = state.meetings.getOrNull(index - 1)
                 MeetingHeader(
                     previousItem = previousItem,
                     item = item,
@@ -107,8 +118,10 @@ private fun ListView(
         listState.animateScrollToItem(0)
     }
 
-    LaunchedEffect(state.meetings.size) {
-        listState.scrollToItem(0)
+    LaunchedEffect(state.meetings) {
+        if (!listTouched.value) {
+            listState.scrollToItem(0)
+        }
     }
 }
 
