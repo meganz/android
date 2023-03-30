@@ -34,6 +34,6 @@ class SetChargingRequiredForVideoCompressionUseCaseTest {
         runTest {
             underTest(chargingRequired)
 
-            verify(cameraUploadRepository).setChargingRequiredForVideoCompression(chargingRequired)
-        }
+        verify(cameraUploadRepository).setChargingRequiredForVideoCompression(chargingRequired)
+    }
 }

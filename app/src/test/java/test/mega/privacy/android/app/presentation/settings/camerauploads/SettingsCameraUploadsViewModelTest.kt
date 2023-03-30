@@ -31,7 +31,7 @@ import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
@@ -40,7 +40,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledU
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
-import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -66,7 +66,7 @@ class SettingsCameraUploadsViewModelTest {
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
     private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
     private val getUploadVideoQuality = mock<GetUploadVideoQualityUseCase>()
-    private val getVideoCompressionSizeLimit = mock<GetVideoCompressionSizeLimit>()
+    private val getVideoCompressionSizeLimitUseCase = mock<GetVideoCompressionSizeLimitUseCase>()
     private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase>()
     private val isChargingRequiredForVideoCompressionUseCase =
         mock<IsChargingRequiredForVideoCompressionUseCase>()
@@ -81,7 +81,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
     private val setUploadVideoSyncStatus = mock<SetUploadVideoSyncStatus>()
-    private val setVideoCompressionSizeLimit = mock<SetVideoCompressionSizeLimit>()
+    private val setVideoCompressionSizeLimitUseCase = mock<SetVideoCompressionSizeLimitUseCase>()
     private val setupDefaultSecondaryFolder = mock<SetupDefaultSecondaryFolder>()
     private val setupPrimaryFolder = mock<SetupPrimaryFolder>()
     private val setupSecondaryFolder = mock<SetupSecondaryFolder>()
@@ -108,7 +108,7 @@ class SettingsCameraUploadsViewModelTest {
             disableMediaUploadSettings = disableMediaUploadSettings,
             getUploadOptionUseCase = getUploadOptionUseCase,
             getUploadVideoQualityUseCase = getUploadVideoQuality,
-            getVideoCompressionSizeLimit = getVideoCompressionSizeLimit,
+            getVideoCompressionSizeLimitUseCase = getVideoCompressionSizeLimitUseCase,
             isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
             monitorConnectivityUseCase = mock(),
@@ -122,7 +122,7 @@ class SettingsCameraUploadsViewModelTest {
             setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
             setUploadVideoSyncStatus = setUploadVideoSyncStatus,
-            setVideoCompressionSizeLimit = setVideoCompressionSizeLimit,
+            setVideoCompressionSizeLimitUseCase = setVideoCompressionSizeLimitUseCase,
             setupDefaultSecondaryFolder = setupDefaultSecondaryFolder,
             setupPrimaryFolder = setupPrimaryFolder,
             setupSecondaryFolder = setupSecondaryFolder,
@@ -421,13 +421,13 @@ class SettingsCameraUploadsViewModelTest {
     @Test
     fun `test that a new maximum video compression size limit is set`() = runTest {
         val newSize = 300
-        whenever(getVideoCompressionSizeLimit()).thenReturn(newSize)
+        whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(newSize)
 
         setupUnderTest()
 
         underTest.changeVideoCompressionSizeLimit(newSize)
 
-        verify(setVideoCompressionSizeLimit).invoke(newSize)
+        verify(setVideoCompressionSizeLimitUseCase).invoke(newSize)
         underTest.state.test {
             assertThat(awaitItem().videoCompressionSizeLimit).isEqualTo(newSize)
         }

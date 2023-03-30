@@ -125,7 +125,7 @@ import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
@@ -304,7 +304,7 @@ class CameraUploadsService : LifecycleService() {
      * Get Video Compression Size Limit
      */
     @Inject
-    lateinit var getVideoCompressionSizeLimit: GetVideoCompressionSizeLimit
+    lateinit var getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase
 
     /**
      * IsChargingRequired
@@ -1901,7 +1901,7 @@ class CameraUploadsService : LifecycleService() {
         val pendingIntent =
             PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val title = getString(R.string.title_compression_size_over_limit)
-        val size = getVideoCompressionSizeLimit()
+        val size = getVideoCompressionSizeLimitUseCase()
         val message = getString(
             R.string.message_compression_size_over_limit,
             getString(R.string.label_file_size_mega_byte, size.toString())

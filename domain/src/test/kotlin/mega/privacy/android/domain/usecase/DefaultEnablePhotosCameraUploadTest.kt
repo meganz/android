@@ -8,7 +8,7 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.inOrder
@@ -26,7 +26,7 @@ class DefaultEnablePhotosCameraUploadTest {
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
     private val setChargingRequiredForVideoCompressionUseCase =
         mock<SetChargingRequiredForVideoCompressionUseCase>()
-    private val setVideoCompressionSizeLimit = mock<SetVideoCompressionSizeLimit>()
+    private val setVideoCompressionSizeLimitUseCase = mock<SetVideoCompressionSizeLimitUseCase>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
 
     @Before
@@ -36,7 +36,7 @@ class DefaultEnablePhotosCameraUploadTest {
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
-            setVideoCompressionSizeLimit = setVideoCompressionSizeLimit,
+            setVideoCompressionSizeLimitUseCase = setVideoCompressionSizeLimitUseCase,
             cameraUploadRepository = cameraUploadRepository,
         )
     }
@@ -62,7 +62,7 @@ class DefaultEnablePhotosCameraUploadTest {
             setCameraUploadsByWifiUseCase,
             setUploadVideoQualityUseCase,
             setChargingRequiredForVideoCompressionUseCase,
-            setVideoCompressionSizeLimit,
+            setVideoCompressionSizeLimitUseCase,
             cameraUploadRepository
         )
 
@@ -72,7 +72,7 @@ class DefaultEnablePhotosCameraUploadTest {
         inOrder.verify(settingsRepository).setCameraFolderExternalSDCard(false)
         inOrder.verify(setUploadVideoQualityUseCase).invoke(expectedVideoQuality)
         inOrder.verify(setChargingRequiredForVideoCompressionUseCase).invoke(true)
-        inOrder.verify(setVideoCompressionSizeLimit).invoke(expectedConversionChargingOnSize)
+        inOrder.verify(setVideoCompressionSizeLimitUseCase).invoke(expectedConversionChargingOnSize)
         inOrder.verify(settingsRepository).setEnableCameraUpload(true)
         inOrder.verify(cameraUploadRepository).listenToNewMedia()
 

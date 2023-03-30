@@ -154,10 +154,8 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
-import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 
 /**
  * Provides the use case implementation for camera upload
@@ -528,28 +526,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideListenToNewMedia(repository: CameraUploadRepository): ListenToNewMedia =
             ListenToNewMedia(repository::listenToNewMedia)
-
-        /**
-         * Provides the [GetVideoCompressionSizeLimit] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [GetVideoCompressionSizeLimit]
-         */
-        @Provides
-        fun provideGetVideoCompressionSizeLimit(repository: CameraUploadRepository): GetVideoCompressionSizeLimit =
-            GetVideoCompressionSizeLimit(repository::getVideoCompressionSizeLimit)
-
-        /**
-         * Provides the [SetVideoCompressionSizeLimit] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [SetVideoCompressionSizeLimit]
-         */
-        @Provides
-        fun provideSetVideoCompressionSizeLimit(repository: CameraUploadRepository): SetVideoCompressionSizeLimit =
-            SetVideoCompressionSizeLimit(repository::setVideoCompressionSizeLimit)
     }
 
     /**
