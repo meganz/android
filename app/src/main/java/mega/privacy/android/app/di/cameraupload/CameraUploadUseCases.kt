@@ -154,13 +154,11 @@ import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
@@ -512,28 +510,6 @@ abstract class CameraUploadUseCases {
         @Suppress("DEPRECATION")
         fun provideGetNumberOfPendingUploads(cameraUploadRepository: CameraUploadRepository): GetNumberOfPendingUploads =
             GetNumberOfPendingUploads(cameraUploadRepository::getNumberOfPendingUploads)
-
-        /**
-         * Provides the [GetUploadOption] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [GetUploadOption]
-         */
-        @Provides
-        fun provideGetUploadOption(cameraUploadRepository: CameraUploadRepository): GetUploadOption =
-            GetUploadOption(cameraUploadRepository::getUploadOption)
-
-        /**
-         * Provides the [SetUploadOption] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [SetUploadOption]
-         */
-        @Provides
-        fun provideSetUploadOption(cameraUploadRepository: CameraUploadRepository): SetUploadOption =
-            SetUploadOption(cameraUploadRepository::setUploadOption)
 
         /**
          * Provides the [GetUploadVideoQuality] implementation

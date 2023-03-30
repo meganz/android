@@ -29,7 +29,7 @@ import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
@@ -37,7 +37,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVi
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
@@ -64,7 +64,7 @@ class SettingsCameraUploadsViewModelTest {
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
     private val disableMediaUploadSettings = mock<DisableMediaUploadSettings>()
-    private val getUploadOption = mock<GetUploadOption>()
+    private val getUploadOptionUseCase = mock<GetUploadOptionUseCase>()
     private val getUploadVideoQuality = mock<GetUploadVideoQuality>()
     private val getVideoCompressionSizeLimit = mock<GetVideoCompressionSizeLimit>()
     private val isCameraUploadsByWifiUseCase = mock<IsCameraUploadsByWifiUseCase>()
@@ -78,7 +78,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setChargingRequiredForVideoCompression =
         mock<SetChargingRequiredForVideoCompression>()
     private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
-    private val setUploadOption = mock<SetUploadOption>()
+    private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
     private val setUploadVideoSyncStatus = mock<SetUploadVideoSyncStatus>()
     private val setVideoCompressionSizeLimit = mock<SetVideoCompressionSizeLimit>()
@@ -106,7 +106,7 @@ class SettingsCameraUploadsViewModelTest {
             clearCacheDirectory = clearCacheDirectory,
             disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
             disableMediaUploadSettings = disableMediaUploadSettings,
-            getUploadOption = getUploadOption,
+            getUploadOptionUseCase = getUploadOptionUseCase,
             getUploadVideoQuality = getUploadVideoQuality,
             getVideoCompressionSizeLimit = getVideoCompressionSizeLimit,
             isCameraUploadsByWifiUseCase = isCameraUploadsByWifiUseCase,
@@ -119,7 +119,7 @@ class SettingsCameraUploadsViewModelTest {
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompression = setChargingRequiredForVideoCompression,
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
-            setUploadOption = setUploadOption,
+            setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQuality = setUploadVideoQuality,
             setUploadVideoSyncStatus = setUploadVideoSyncStatus,
             setVideoCompressionSizeLimit = setVideoCompressionSizeLimit,
@@ -330,7 +330,7 @@ class SettingsCameraUploadsViewModelTest {
     private fun testUploadOption(uploadOption: UploadOption) = runTest {
         setupUnderTest()
 
-        whenever(getUploadOption()).thenReturn(uploadOption)
+        whenever(getUploadOptionUseCase()).thenReturn(uploadOption)
 
         underTest.changeUploadOption(uploadOption)
         underTest.state.test {
