@@ -22,7 +22,7 @@ class DefaultEstablishCameraUploadsSyncHandlesTest {
     private lateinit var underTest: EstablishCameraUploadsSyncHandles
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
-    private val getCameraUploadsSyncHandles = mock<GetCameraUploadsSyncHandles>()
+    private val getCameraUploadsSyncHandlesUseCase = mock<GetCameraUploadsSyncHandlesUseCase>()
     private val isNodeInRubbishOrDeleted = mock<IsNodeInRubbishOrDeleted>()
     private val resetCameraUploadTimelines = mock<ResetCameraUploadTimelines>()
     private val setPrimarySyncHandle = mock<SetPrimarySyncHandle>()
@@ -32,7 +32,7 @@ class DefaultEstablishCameraUploadsSyncHandlesTest {
     fun setUp() {
         underTest = DefaultEstablishCameraUploadsSyncHandles(
             cameraUploadRepository = cameraUploadRepository,
-            getCameraUploadsSyncHandles = getCameraUploadsSyncHandles,
+            getCameraUploadsSyncHandlesUseCase = getCameraUploadsSyncHandlesUseCase,
             isNodeInRubbishOrDeleted = isNodeInRubbishOrDeleted,
             resetCameraUploadTimelines = resetCameraUploadTimelines,
             setPrimarySyncHandle = setPrimarySyncHandle,
@@ -44,7 +44,7 @@ class DefaultEstablishCameraUploadsSyncHandlesTest {
     fun `test that both sync handles are set when successfully retrieved from the api`() = runTest {
         val testPair = Pair(10L, 20L)
 
-        whenever(getCameraUploadsSyncHandles()).thenReturn(testPair)
+        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(testPair)
         whenever(isNodeInRubbishOrDeleted(testPair.first)).thenReturn(false)
         whenever(isNodeInRubbishOrDeleted(testPair.second)).thenReturn(false)
 
@@ -67,7 +67,7 @@ class DefaultEstablishCameraUploadsSyncHandlesTest {
         runTest {
             val testPair = Pair(10L, 20L)
 
-            whenever(getCameraUploadsSyncHandles()).thenReturn(testPair)
+            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(testPair)
             whenever(isNodeInRubbishOrDeleted(testPair.first)).thenReturn(false)
             whenever(isNodeInRubbishOrDeleted(testPair.second)).thenReturn(true)
 
@@ -85,7 +85,7 @@ class DefaultEstablishCameraUploadsSyncHandlesTest {
         runTest {
             val testPair = Pair(10L, 20L)
 
-            whenever(getCameraUploadsSyncHandles()).thenReturn(testPair)
+            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(testPair)
             whenever(isNodeInRubbishOrDeleted(testPair.first)).thenReturn(true)
             whenever(isNodeInRubbishOrDeleted(testPair.second)).thenReturn(false)
 
@@ -102,7 +102,7 @@ class DefaultEstablishCameraUploadsSyncHandlesTest {
     fun `test that no sync handles are set when successfully retrieved from the api`() = runTest {
         val testPair = Pair(10L, 20L)
 
-        whenever(getCameraUploadsSyncHandles()).thenReturn(testPair)
+        whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(testPair)
         whenever(isNodeInRubbishOrDeleted(testPair.first)).thenReturn(true)
         whenever(isNodeInRubbishOrDeleted(testPair.second)).thenReturn(true)
 
@@ -116,7 +116,7 @@ class DefaultEstablishCameraUploadsSyncHandlesTest {
     @Test
     fun `test that invalid sync handles are set when the api could not retrieve the sync handles`() =
         runTest {
-            whenever(getCameraUploadsSyncHandles()).thenReturn(null)
+            whenever(getCameraUploadsSyncHandlesUseCase()).thenReturn(null)
 
             underTest()
 

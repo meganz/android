@@ -153,7 +153,6 @@ import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
 import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 
 /**
@@ -463,17 +462,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideIsNodeInRubbishOrDeleted(nodeRepository: NodeRepository): IsNodeInRubbishOrDeleted =
             IsNodeInRubbishOrDeleted(nodeRepository::isNodeInRubbishOrDeleted)
-
-        /**
-         * Provide the [GetCameraUploadsSyncHandles] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [GetCameraUploadsSyncHandles]
-         */
-        @Provides
-        fun provideGetCameraUploadsSyncHandles(cameraUploadRepository: CameraUploadRepository): GetCameraUploadsSyncHandles =
-            GetCameraUploadsSyncHandles(cameraUploadRepository::getCameraUploadsSyncHandles)
 
         /**
          * Provide the [MonitorBatteryInfo] implementation

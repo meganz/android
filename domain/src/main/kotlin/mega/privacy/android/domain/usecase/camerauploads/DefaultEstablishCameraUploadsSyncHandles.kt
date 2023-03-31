@@ -11,7 +11,7 @@ import javax.inject.Inject
  * Default implementation of [EstablishCameraUploadsSyncHandles]
  *
  * @property cameraUploadRepository [CameraUploadRepository]
- * @property getCameraUploadsSyncHandles [GetCameraUploadsSyncHandles]
+ * @property getCameraUploadsSyncHandlesUseCase [GetCameraUploadsSyncHandlesUseCase]
  * @property isNodeInRubbishOrDeleted [IsNodeInRubbishOrDeleted]
  * @property resetCameraUploadTimelines [ResetCameraUploadTimelines]
  * @property setPrimarySyncHandle [SetPrimarySyncHandle]
@@ -19,14 +19,14 @@ import javax.inject.Inject
  */
 class DefaultEstablishCameraUploadsSyncHandles @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val getCameraUploadsSyncHandles: GetCameraUploadsSyncHandles,
+    private val getCameraUploadsSyncHandlesUseCase: GetCameraUploadsSyncHandlesUseCase,
     private val isNodeInRubbishOrDeleted: IsNodeInRubbishOrDeleted,
     private val resetCameraUploadTimelines: ResetCameraUploadTimelines,
     private val setPrimarySyncHandle: SetPrimarySyncHandle,
     private val setSecondarySyncHandle: SetSecondarySyncHandle,
 ) : EstablishCameraUploadsSyncHandles {
     override suspend fun invoke() {
-        getCameraUploadsSyncHandles()?.let {
+        getCameraUploadsSyncHandlesUseCase()?.let {
             processSyncHandle(handle = it.first, isSecondary = false)
             processSyncHandle(handle = it.second, isSecondary = true)
         } ?: run {

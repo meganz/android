@@ -6,7 +6,6 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
@@ -290,9 +289,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideResetMediaUploadTimeStamps() = mock<ResetMediaUploadTimeStamps>()
-
-    @Provides
-    fun provideGetCameraUploadsSyncHandles() = mock<GetCameraUploadsSyncHandles>()
 
     @Provides
     fun provideSetupPrimaryFolder() = mock<SetupPrimaryFolder>()

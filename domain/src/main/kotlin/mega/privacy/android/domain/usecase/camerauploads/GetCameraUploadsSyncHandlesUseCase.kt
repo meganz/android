@@ -1,9 +1,16 @@
 package mega.privacy.android.domain.usecase.camerauploads
 
+import mega.privacy.android.domain.repository.CameraUploadRepository
+import javax.inject.Inject
+
 /**
  * Use Case to retrieve the Camera Uploads Sync Handles from the API
+ *
+ * @property cameraUploadRepository [CameraUploadRepository]
  */
-fun interface GetCameraUploadsSyncHandles {
+class GetCameraUploadsSyncHandlesUseCase @Inject constructor(
+    private val cameraUploadRepository: CameraUploadRepository,
+) {
     /**
      * Invocation function
      *
@@ -12,5 +19,6 @@ fun interface GetCameraUploadsSyncHandles {
      * [Pair.first] represents the Primary Folder Sync Handle for the Camera Uploads folder
      * [Pair.second] represents the Secondary Folder Sync Handle for the Media Uploads folder
      */
-    suspend operator fun invoke(): Pair<Long, Long>?
+    suspend operator fun invoke(): Pair<Long, Long>? =
+        cameraUploadRepository.getCameraUploadsSyncHandles()
 }
