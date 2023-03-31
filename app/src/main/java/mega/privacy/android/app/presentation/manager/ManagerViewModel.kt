@@ -23,8 +23,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetInboxNode
-import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -66,6 +64,8 @@ import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticatio
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -87,8 +87,8 @@ import javax.inject.Inject
  * @property savedStateHandle
  * @property monitorStorageStateEventUseCase
  * @property monitorViewType
- * @property getPrimarySyncHandle
- * @property getSecondarySyncHandle
+ * @property getPrimarySyncHandleUseCase
+ * @property getSecondarySyncHandleUseCase
  * @property checkCameraUpload
  * @property getCloudSortOrder
  * @property monitorConnectivityUseCase
@@ -121,8 +121,8 @@ class ManagerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorViewType: MonitorViewType,
-    private val getPrimarySyncHandle: GetPrimarySyncHandle,
-    private val getSecondarySyncHandle: GetSecondarySyncHandle,
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val checkCameraUpload: CheckCameraUpload,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -433,8 +433,8 @@ class ManagerViewModel @Inject constructor(
      */
     fun checkCameraUploadFolder(shouldDisable: Boolean, updatedNodes: List<Node>?) {
         viewModelScope.launch {
-            val primaryHandle = getPrimarySyncHandle()
-            val secondaryHandle = getSecondarySyncHandle()
+            val primaryHandle = getPrimarySyncHandleUseCase()
+            val secondaryHandle = getSecondarySyncHandleUseCase()
             updatedNodes?.let {
                 val nodeMap = it.associateBy { node -> node.id.longValue }
                 // If CU and MU folder don't change then return.

@@ -12,6 +12,8 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -21,13 +23,12 @@ import javax.inject.Inject
 /**
  * Use case to prepare sync record lists for camera upload
  */
-
 class DefaultGetPendingUploadList @Inject constructor(
     private val getNodeFromCloud: GetNodeFromCloud,
     private val getNodeByHandle: GetNodeByHandle,
     private val getParentMegaNode: GetParentMegaNode,
-    private val getPrimarySyncHandle: GetPrimarySyncHandle,
-    private val getSecondarySyncHandle: GetSecondarySyncHandle,
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
     private val getFingerprint: GetFingerprint,
     private val mediaLocalPathExists: MediaLocalPathExists,
@@ -44,7 +45,8 @@ class DefaultGetPendingUploadList @Inject constructor(
     ): List<SyncRecord> {
         Timber.d("GetPendingUploadList - is secondary upload: $isSecondary, is video: $isVideo")
         val pendingList = mutableListOf<SyncRecord>()
-        val parentNodeHandle = if (isSecondary) getSecondarySyncHandle() else getPrimarySyncHandle()
+        val parentNodeHandle =
+            if (isSecondary) getSecondarySyncHandleUseCase() else getPrimarySyncHandleUseCase()
         Timber.d("Upload to parent node with handle: $parentNodeHandle")
         val type = if (isVideo) SyncRecordType.TYPE_VIDEO else SyncRecordType.TYPE_PHOTO
 

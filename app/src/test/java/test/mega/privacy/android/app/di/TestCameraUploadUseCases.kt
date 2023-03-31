@@ -18,8 +18,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetPendingUploadList
-import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
@@ -269,12 +267,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideClearCacheDirectory() = mock<ClearCacheDirectory>()
-
-    @Provides
-    fun provideGetPrimarySyncHandle() = mock<GetPrimarySyncHandle>()
-
-    @Provides
-    fun provideGetSecondarySyncHandle() = mock<GetSecondarySyncHandle>()
 
     @Provides
     fun provideCheckEnableCameraUploadsStatus() = mock<CheckEnableCameraUploadsStatus>()

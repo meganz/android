@@ -45,13 +45,13 @@ import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -327,13 +327,13 @@ class CameraUploadsService : LifecycleService() {
      * GetPrimarySyncHandle
      */
     @Inject
-    lateinit var getPrimarySyncHandle: GetPrimarySyncHandle
+    lateinit var getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase
 
     /**
      * GetSecondarySyncHandle
      */
     @Inject
-    lateinit var getSecondarySyncHandle: GetSecondarySyncHandle
+    lateinit var getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase
 
     /**
      * SetPrimarySyncHandle
@@ -992,7 +992,7 @@ class CameraUploadsService : LifecycleService() {
      * @return true if the Primary Folder handle is a valid handle, and false if otherwise
      */
     private suspend fun isPrimaryFolderEstablished(): Boolean {
-        val primarySyncHandle = getPrimarySyncHandle()
+        val primarySyncHandle = getPrimarySyncHandleUseCase()
         if (primarySyncHandle == MegaApiJava.INVALID_HANDLE) {
             return false
         }
@@ -1070,7 +1070,7 @@ class CameraUploadsService : LifecycleService() {
 
     private suspend fun checkUploadNodes() {
         Timber.d("Get Pending Files from Media Store Database")
-        val primaryUploadNode = getNodeByHandle(getPrimarySyncHandle())
+        val primaryUploadNode = getNodeByHandle(getPrimarySyncHandleUseCase())
         if (primaryUploadNode == null) {
             Timber.d("ERROR: Primary Parent Folder is NULL")
             endService(aborted = true)
@@ -1078,7 +1078,7 @@ class CameraUploadsService : LifecycleService() {
         }
         val secondaryUploadNode = if (isSecondaryFolderEnabled()) {
             Timber.d("Secondary Upload is ENABLED")
-            getNodeByHandle(getSecondarySyncHandle())
+            getNodeByHandle(getSecondarySyncHandleUseCase())
         } else {
             null
         }
@@ -1131,8 +1131,8 @@ class CameraUploadsService : LifecycleService() {
             updatePrimaryFolderBackupState(BackupState.PAUSE_UPLOADS)
             updateSecondaryFolderBackupState(BackupState.PAUSE_UPLOADS)
         }
-        val primaryUploadNode = getNodeByHandle(getPrimarySyncHandle())
-        val secondaryUploadNode = getNodeByHandle(getSecondarySyncHandle())
+        val primaryUploadNode = getNodeByHandle(getPrimarySyncHandleUseCase())
+        val secondaryUploadNode = getNodeByHandle(getSecondarySyncHandleUseCase())
 
         startActiveHeartbeat(finalList)
         for (file in finalList) {
@@ -1364,7 +1364,7 @@ class CameraUploadsService : LifecycleService() {
             Timber.d("Copy node successful")
             getNodeByHandle(nodeId.longValue)?.let { retrievedNode ->
                 val fingerprint = retrievedNode.fingerprint
-                val isSecondary = retrievedNode.parentHandle == getSecondarySyncHandle()
+                val isSecondary = retrievedNode.parentHandle == getSecondarySyncHandleUseCase()
                 // Delete the Camera Upload sync record by fingerprint
                 deleteSyncRecordByFingerprint(
                     originalPrint = fingerprint,
@@ -1504,7 +1504,7 @@ class CameraUploadsService : LifecycleService() {
      */
     private suspend fun getSecondaryFolderHandle(): Long {
         // get Secondary folder handle of user
-        val secondarySyncHandle = getSecondarySyncHandle()
+        val secondarySyncHandle = getSecondarySyncHandleUseCase()
         if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || getNodeByHandle(secondarySyncHandle) == null) {
             // if it's invalid or deleted then return the default value
             return getDefaultNodeHandle(getString(R.string.section_secondary_media_uploads))
@@ -1694,7 +1694,7 @@ class CameraUploadsService : LifecycleService() {
         if (e.errorCode == MegaError.API_OK) {
             Timber.d("Image Sync API_OK")
             val node = getNodeByHandle(transfer.nodeHandle)
-            val isSecondary = node?.parentHandle == getSecondarySyncHandle()
+            val isSecondary = node?.parentHandle == getSecondarySyncHandleUseCase()
             val record = getSyncRecordByPath(path, isSecondary)
             if (record != null) {
                 node?.let { nonNullNode ->
