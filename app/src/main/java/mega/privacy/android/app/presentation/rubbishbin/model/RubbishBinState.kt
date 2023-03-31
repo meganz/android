@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.rubbishbin.model
 
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
@@ -14,6 +15,7 @@ import nz.mega.sdk.MegaNode
  *  @property megaNode [MegaNode]
  *  @property itemIndex index of item clicked
  *  @property currentViewType ViewType The current ViewType used by the UI
+ *  @property sortOrder [SortOrder] of current list
  */
 data class RubbishBinState(
     val rubbishBinHandle: Long = -1L,
@@ -24,5 +26,6 @@ data class RubbishBinState(
     val isInSelection: Boolean = false,
     val megaNode: MegaNode? = null,
     val itemIndex: Int = -1,
-    val currentViewType: ViewType = ViewType.LIST
+    val currentViewType: ViewType = ViewType.LIST,
+    val sortOrder: SortOrder = SortOrder.ORDER_NONE
 )

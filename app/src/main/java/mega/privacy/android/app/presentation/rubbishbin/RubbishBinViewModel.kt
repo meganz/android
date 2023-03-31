@@ -17,6 +17,7 @@ import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -43,6 +44,7 @@ class RubbishBinViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
+    private val getCloudSortOrder: GetCloudSortOrder,
 ) : ViewModel() {
 
     /**
@@ -112,7 +114,8 @@ class RubbishBinViewModel @Inject constructor(
                 it.copy(
                     nodes = getRubbishBinChildrenNode(_state.value.rubbishBinHandle) ?: emptyList(),
                     parentHandle = getRubbishBinParentNodeHandle(_state.value.rubbishBinHandle),
-                    nodeList = nodeList
+                    nodeList = nodeList,
+                    sortOrder = getCloudSortOrder()
                 )
             }
         }
