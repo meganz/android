@@ -66,7 +66,7 @@ import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticatio
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
-import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
+import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
@@ -139,7 +139,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val setLatestTargetPath: SetLatestTargetPath,
     private val monitorSecurityUpgradeInApp: MonitorSecurityUpgradeInApp,
-    private val listenToNewMedia: ListenToNewMedia,
+    private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
 ) : ViewModel() {
@@ -234,7 +234,7 @@ class ManagerViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            listenToNewMedia()
+            listenToNewMediaUseCase()
         }
         viewModelScope.launch {
             monitorUserUpdates()

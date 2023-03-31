@@ -206,7 +206,7 @@ class ManagerViewModelTest {
             requireTwoFactorAuthenticationUseCase = requireTwoFactorAuthenticationUseCase,
             setLatestTargetPath = setLatestTargetPath,
             monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
-            listenToNewMedia = mock(),
+            listenToNewMediaUseCase = mock(),
             monitorUserUpdates = monitorUserUpdates,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
         )

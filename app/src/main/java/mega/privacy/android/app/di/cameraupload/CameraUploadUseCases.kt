@@ -151,7 +151,6 @@ import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
-import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 
 /**
  * Provides the use case implementation for camera upload
@@ -489,17 +488,6 @@ abstract class CameraUploadUseCases {
         @Suppress("DEPRECATION")
         fun provideGetNumberOfPendingUploads(cameraUploadRepository: CameraUploadRepository): GetNumberOfPendingUploads =
             GetNumberOfPendingUploads(cameraUploadRepository::getNumberOfPendingUploads)
-
-        /**
-         * Provides the [ListenToNewMedia] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [ListenToNewMedia]
-         */
-        @Provides
-        fun provideListenToNewMedia(repository: CameraUploadRepository): ListenToNewMedia =
-            ListenToNewMedia(repository::listenToNewMedia)
     }
 
     /**
