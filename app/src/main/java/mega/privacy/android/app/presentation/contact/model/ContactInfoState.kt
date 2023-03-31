@@ -19,6 +19,7 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
  * @property avatar                 Bitmap of user avatar
  * @property isOnline               Checks if connected to internet
  * @property snackBarMessage        One time snack bar message to be shown to the user
+ * @property isUserRemoved          Checks if selected user is removed from contacts
  */
 data class ContactInfoState(
     val error: Int? = null,
@@ -31,6 +32,7 @@ data class ContactInfoState(
     val chatRoom: ChatRoom? = null,
     val isOnline: Boolean = false,
     val snackBarMessage: Int? = null,
+    val isUserRemoved: Boolean = false,
 ) {
 
     /**

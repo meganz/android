@@ -509,18 +509,18 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun moveTransferToLastByTag(
         transferTag: Int,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferToLastByTag(transferTag, listener)
 
     override fun moveTransferBeforeByTag(
         transferTag: Int,
         prevTransferTag: Int,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferBeforeByTag(transferTag, prevTransferTag, listener)
 
     override fun moveTransferToFirstByTag(
         transferTag: Int,
-        listener: MegaRequestListenerInterface
+        listener: MegaRequestListenerInterface,
     ) = megaApi.moveTransferToFirstByTag(transferTag, listener)
 
     override suspend fun isBusinessAccountActive(): Boolean = megaApi.isBusinessAccountActive
@@ -1081,4 +1081,9 @@ internal class MegaApiFacade @Inject constructor(
     ) = megaApi.setUserAlias(userHandle, name, listener)
 
     override suspend fun getTransferData(): MegaTransferData? = megaApi.getTransferData(null)
+
+    override fun removeContact(user: MegaUser, listener: MegaRequestListenerInterface?) =
+        listener?.let {
+            megaApi.removeContact(user, it)
+        } ?: megaApi.removeContact(user)
 }

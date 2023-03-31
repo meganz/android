@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
+import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAlias
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -70,6 +71,7 @@ import javax.inject.Inject
  * @property getContactFromEmail                [GetContactFromEmail]
  * @property applyContactUpdatesUseCase         [ApplyContactUpdatesUseCase]
  * @property setUserAlias                       [SetUserAlias]
+ * @property removeContactByEmailUseCase        [RemoveContactByEmailUseCase]
  */
 @HiltViewModel
 class ContactInfoViewModel @Inject constructor(
@@ -90,6 +92,7 @@ class ContactInfoViewModel @Inject constructor(
     private val getContactFromEmail: GetContactFromEmail,
     private val applyContactUpdatesUseCase: ApplyContactUpdatesUseCase,
     private val setUserAlias: SetUserAlias,
+    private val removeContactByEmailUseCase: RemoveContactByEmailUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : BaseRxViewModel() {
 
@@ -362,6 +365,18 @@ class ContactInfoViewModel @Inject constructor(
     fun onConsumeSnackBarMessageEvent() {
         viewModelScope.launch {
             _state.update { it.copy(snackBarMessage = null) }
+        }
+    }
+
+    /**
+     * Remove selected contact from user account
+     * InShares are removed and existing calls are closed
+     * Exits from contact info page if succeeds
+     */
+    fun removeContact() = viewModelScope.launch {
+        val isRemoved = state.value.email?.let { email -> removeContactByEmailUseCase(email) }
+        _state.update {
+            it.copy(isUserRemoved = isRemoved ?: false)
         }
     }
 }

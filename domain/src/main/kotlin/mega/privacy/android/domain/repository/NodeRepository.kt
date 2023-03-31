@@ -206,4 +206,11 @@ interface NodeRepository {
      * @return The node if found else null
      */
     suspend fun getRootNode(): Node?
+
+    /**
+     * Remove InShares nodes from specific user
+     *
+     * @param email email of selected user
+     */
+    suspend fun removedInSharedNodesByEmail(email: String)
 }
