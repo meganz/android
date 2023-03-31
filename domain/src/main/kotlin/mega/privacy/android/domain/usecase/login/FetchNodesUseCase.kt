@@ -9,7 +9,7 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.qualifier.LoginMutex
 import mega.privacy.android.domain.repository.LoginRepository
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import javax.inject.Inject
 
@@ -17,7 +17,7 @@ import javax.inject.Inject
  * Use case for fetching nodes.
  */
 class FetchNodesUseCase @Inject constructor(
-    private val establishCameraUploadsSyncHandles: EstablishCameraUploadsSyncHandles,
+    private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val loginRepository: LoginRepository,
     private val resetChatSettingsUseCase: ResetChatSettingsUseCase,
     @LoginMutex private val loginMutex: Mutex,
@@ -35,7 +35,7 @@ class FetchNodesUseCase @Inject constructor(
             loginRepository.fetchNodesFlow()
                 .map { update ->
                     if (update.progress?.floatValue == 1F) {
-                        establishCameraUploadsSyncHandles()
+                        establishCameraUploadsSyncHandlesUseCase()
                         loginMutex.unlock()
                     }
                     update

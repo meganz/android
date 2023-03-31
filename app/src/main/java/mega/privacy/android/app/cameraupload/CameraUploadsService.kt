@@ -124,9 +124,8 @@ import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -209,12 +208,6 @@ class CameraUploadsService : LifecycleService() {
      */
     @Inject
     lateinit var isCameraUploadSyncEnabled: IsCameraUploadSyncEnabled
-
-    /**
-     * IsCameraUploadByWifi
-     */
-    @Inject
-    lateinit var isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase
 
     /**
      * IsWifiNotSatisfied Use Case
@@ -492,7 +485,7 @@ class CameraUploadsService : LifecycleService() {
      * Establish Camera Uploads Sync Handles
      */
     @Inject
-    lateinit var establishCameraUploadsSyncHandles: EstablishCameraUploadsSyncHandles
+    lateinit var establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase
 
     /**
      * Reset Total Uploads
@@ -892,7 +885,7 @@ class CameraUploadsService : LifecycleService() {
             StartCameraUploadsState.MISSING_USER_ATTRIBUTE -> {
                 Timber.w("Handle the missing Camera Uploads user attribute")
                 runCatching {
-                    establishCameraUploadsSyncHandles()
+                    establishCameraUploadsSyncHandlesUseCase()
                     missingAttributesChecked = true
                 }
                     .onSuccess { startWorker() }

@@ -51,7 +51,7 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -167,7 +167,8 @@ class ManagerViewModelTest {
         mock<RequireTwoFactorAuthenticationUseCase>()
     private val setLatestTargetPath = mock<SetLatestTargetPath>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
-    private val establishCameraUploadsSyncHandles = mock<EstablishCameraUploadsSyncHandles>()
+    private val establishCameraUploadsSyncHandlesUseCase =
+        mock<EstablishCameraUploadsSyncHandlesUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -207,7 +208,7 @@ class ManagerViewModelTest {
             monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
             listenToNewMedia = mock(),
             monitorUserUpdates = monitorUserUpdates,
-            establishCameraUploadsSyncHandles = establishCameraUploadsSyncHandles,
+            establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
         )
     }
 
@@ -491,6 +492,6 @@ class ManagerViewModelTest {
             whenever(monitorUserUpdates()).thenReturn(userUpdates.asFlow())
             testScheduler.advanceUntilIdle()
 
-            verify(establishCameraUploadsSyncHandles).invoke()
+            verify(establishCameraUploadsSyncHandlesUseCase).invoke()
         }
 }

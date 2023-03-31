@@ -8,7 +8,10 @@ import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
 import javax.inject.Inject
 
 /**
- * Default implementation of [EstablishCameraUploadsSyncHandles]
+ * Use Case that performs the following functions:
+ *
+ * 1. Retrieve the Camera Uploads Sync Handles from the API
+ * 2. Set the Sync Handles to the local Database
  *
  * @property cameraUploadRepository [CameraUploadRepository]
  * @property getCameraUploadsSyncHandlesUseCase [GetCameraUploadsSyncHandlesUseCase]
@@ -17,15 +20,19 @@ import javax.inject.Inject
  * @property setPrimarySyncHandle [SetPrimarySyncHandle]
  * @property setSecondarySyncHandle [SetSecondarySyncHandle]
  */
-class DefaultEstablishCameraUploadsSyncHandles @Inject constructor(
+class EstablishCameraUploadsSyncHandlesUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
     private val getCameraUploadsSyncHandlesUseCase: GetCameraUploadsSyncHandlesUseCase,
     private val isNodeInRubbishOrDeleted: IsNodeInRubbishOrDeleted,
     private val resetCameraUploadTimelines: ResetCameraUploadTimelines,
     private val setPrimarySyncHandle: SetPrimarySyncHandle,
     private val setSecondarySyncHandle: SetSecondarySyncHandle,
-) : EstablishCameraUploadsSyncHandles {
-    override suspend fun invoke() {
+) {
+
+    /**
+     * Invocation function
+     */
+    suspend operator fun invoke() {
         getCameraUploadsSyncHandlesUseCase()?.let {
             processSyncHandle(handle = it.first, isSecondary = false)
             processSyncHandle(handle = it.second, isSecondary = true)

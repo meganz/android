@@ -11,7 +11,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesBlockedAccount
 import mega.privacy.android.domain.exception.login.FetchNodesErrorAccess
 import mega.privacy.android.domain.exception.login.FetchNodesUnknownStatus
 import mega.privacy.android.domain.repository.LoginRepository
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import org.junit.Before
 import org.junit.Test
@@ -25,14 +25,15 @@ class FetchNodesUseCaseTest {
 
     private lateinit var underTest: FetchNodesUseCase
 
-    private val establishCameraUploadsSyncHandles = mock<EstablishCameraUploadsSyncHandles>()
+    private val establishCameraUploadsSyncHandlesUseCase =
+        mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val loginRepository = mock<LoginRepository>()
     private val resetChatSettingsUseCase = mock<ResetChatSettingsUseCase>()
 
     @Before
     fun setUp() {
         underTest = FetchNodesUseCase(
-            establishCameraUploadsSyncHandles = establishCameraUploadsSyncHandles,
+            establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             loginRepository = loginRepository,
             resetChatSettingsUseCase = resetChatSettingsUseCase,
             loginMutex = mock()
@@ -102,6 +103,6 @@ class FetchNodesUseCaseTest {
                 cancelAndIgnoreRemainingEvents()
             }
 
-            verify(establishCameraUploadsSyncHandles).invoke()
+            verify(establishCameraUploadsSyncHandlesUseCase).invoke()
         }
 }

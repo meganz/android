@@ -93,7 +93,6 @@ import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import org.mockito.kotlin.mock
 
@@ -371,7 +370,4 @@ object TestCameraUploadUseCases {
     @Provides
     fun provideMonitorCameraUploadsProgress() =
         mock<MonitorCameraUploadProgress>()
-
-    @Provides
-    fun provideEstablishCameraUploadsSyncHandles() = mock<EstablishCameraUploadsSyncHandles>()
 }

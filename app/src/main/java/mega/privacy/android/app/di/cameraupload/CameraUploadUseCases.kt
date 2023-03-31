@@ -151,8 +151,6 @@ import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
-import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 
 /**
@@ -503,16 +501,6 @@ abstract class CameraUploadUseCases {
         fun provideListenToNewMedia(repository: CameraUploadRepository): ListenToNewMedia =
             ListenToNewMedia(repository::listenToNewMedia)
     }
-
-    /**
-     * Provides the [EstablishCameraUploadsSyncHandles] implementation
-     *
-     * @param implementation [DefaultEstablishCameraUploadsSyncHandles]
-     *
-     * @return [EstablishCameraUploadsSyncHandles]
-     */
-    @Binds
-    abstract fun bindEstablishCameraUploadsSyncHandles(implementation: DefaultEstablishCameraUploadsSyncHandles): EstablishCameraUploadsSyncHandles
 
     /**
      * Provides the [CheckEnableCameraUploadsStatus] implementation

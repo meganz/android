@@ -65,7 +65,7 @@ import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -141,7 +141,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorSecurityUpgradeInApp: MonitorSecurityUpgradeInApp,
     private val listenToNewMedia: ListenToNewMedia,
     private val monitorUserUpdates: MonitorUserUpdates,
-    private val establishCameraUploadsSyncHandles: EstablishCameraUploadsSyncHandles,
+    private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
 ) : ViewModel() {
 
     /**
@@ -244,7 +244,7 @@ class ManagerViewModel @Inject constructor(
                         "The Camera Uploads Sync Handles have been changed in the API + " +
                                 "Refresh the Sync Handles"
                     )
-                    establishCameraUploadsSyncHandles()
+                    establishCameraUploadsSyncHandlesUseCase()
                 }
         }
     }
@@ -501,7 +501,10 @@ class ManagerViewModel @Inject constructor(
      */
     fun checkToShow2FADialog(newAccount: Boolean, firstLogin: Boolean) {
         viewModelScope.launch {
-            val result = requireTwoFactorAuthenticationUseCase(newAccount = newAccount, firstLogin = firstLogin)
+            val result = requireTwoFactorAuthenticationUseCase(
+                newAccount = newAccount,
+                firstLogin = firstLogin,
+            )
             _state.update { it.copy(show2FADialog = result) }
         }
     }
