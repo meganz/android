@@ -50,7 +50,7 @@ import test.mega.privacy.android.app.onNodeWithText
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
-class ChangePasswordUseCaseComposeViewTest {
+class ChangePasswordComposeViewTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 

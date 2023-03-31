@@ -11,6 +11,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -19,18 +20,29 @@ import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 @Composable
-fun SimpleTopAppBar(titleId: Int, elevation: Boolean, onBackPressed: () -> Unit) {
+fun SimpleTopAppBar(
+    modifier: Modifier = Modifier,
+    titleId: Int,
+    elevation: Boolean,
+    isEnabled: Boolean = true,
+    onBackPressed: () -> Unit,
+) {
     TopAppBar(
+        modifier = modifier,
         title = {
-            Text(text = stringResource(id = titleId),
+            Text(
+                text = stringResource(id = titleId),
                 style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium)
+                fontWeight = FontWeight.Medium
+            )
         },
         navigationIcon = {
-            IconButton(onClick = onBackPressed) {
-                Icon(imageVector = Icons.Filled.ArrowBack,
+            IconButton(onClick = onBackPressed, enabled = isEnabled) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back button",
-                    tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White)
+                    tint = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+                )
             }
         },
         backgroundColor = MaterialTheme.colors.surface,

@@ -1,17 +1,33 @@
 package mega.privacy.android.app.presentation.testpassword.model
 
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
+
 /**
  * UI State for Test Password Feature
  * @param isCurrentPassword ui state to handle checks whether entered password is the same as the current password
- * @param isPasswordReminderNotified ui state to handle when password reminder action has been notified
- * @param isUIEnabled ui state to check whether ui is enabled
- * @param isTestPasswordMode ui state to check whether screen is currently on test password mode layout
+ * @param userMessage ui state to handle showing message to the user
+ * @param isUserLogout ui state to handle when user logs out
+ * @param isFinishedCopyingRecoveryKey ui state to handle when recovery key has been copied
+ * @param isUserExhaustedPasswordAttempts ui state to check whether user has exhausted all password attempts
+ * @param isPasswordReminderBlocked ui state to handle password reminder block checkbox
+ * @param isLoading ui state to handle screen loading
+ * @param isUITestPasswordMode ui state to check whether screen is currently on test password mode layout
+ * @param isLogoutMode ui state to check whether screen is in logout mode
+ * @param wrongPasswordAttempts ui state to count number of wrong password attempts
  */
 data class TestPasswordUIState(
     val isCurrentPassword: PasswordState = PasswordState.Initial,
-    val isPasswordReminderNotified: PasswordState = PasswordState.Initial,
-    val isUIEnabled: Boolean = true,
-    val isTestPasswordMode: Boolean = false,
+    val userMessage: StateEventWithContent<Int> = consumed(),
+    val isUserLogout: StateEventWithContent<Boolean> = consumed(),
+    val isFinishedCopyingRecoveryKey: StateEventWithContent<Boolean> = consumed(),
+    val isUserExhaustedPasswordAttempts: StateEvent = consumed,
+    val isPasswordReminderBlocked: Boolean = false,
+    val isLoading: Boolean = false,
+    val isUITestPasswordMode: Boolean = false,
+    val isLogoutMode: Boolean = false,
+    val wrongPasswordAttempts: Int = 0,
 )
 
 /**

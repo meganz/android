@@ -86,7 +86,7 @@ import javax.inject.Inject
 
 @ActivityScoped
 class AccountController @Inject constructor(
-    @ActivityContext private val context: Context
+    @ActivityContext private val context: Context,
 ) {
     /**
      * Account controller entry point
@@ -140,16 +140,14 @@ class AccountController @Inject constructor(
         return false
     }
 
-    fun printRK() {
+    fun printRK(onAfterPrint: () -> Unit = {}) {
         val rKBitmap = createRkBitmap()
 
         if (rKBitmap != null) {
             PrintHelper(context).apply {
                 scaleMode = PrintHelper.SCALE_MODE_FIT
                 printBitmap("rKPrint", rKBitmap) {
-                    if (context is TestPasswordActivity) {
-                        context.passwordReminderSucceeded()
-                    }
+                    onAfterPrint()
                 }
             }
         }
@@ -173,7 +171,6 @@ class AccountController @Inject constructor(
         if (context is ManagerActivity) {
             megaApi.masterKeyExported(context)
         } else if (context is TestPasswordActivity) {
-            context.incrementRequests()
             megaApi.masterKeyExported(context)
         }
 
@@ -204,7 +201,7 @@ class AccountController @Inject constructor(
             showSnackbar(context, getString(R.string.save_MK_confirmation))
 
             if (context is TestPasswordActivity) {
-                context.passwordReminderSucceeded()
+                context.onRecoveryKeyExported()
             }
         }
     }
@@ -240,24 +237,6 @@ class AccountController @Inject constructor(
             } else {
                 showAlert(context, getString(R.string.general_text_error), null)
             }
-        } else if (context is TestPasswordActivity) {
-            if (key != null) {
-                context.incrementRequests()
-                megaApi.masterKeyExported(context)
-                val clipboard =
-                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                val clip = ClipData.newPlainText("Copied Text", key)
-                clipboard.setPrimaryClip(clip)
-
-                if (logout) {
-                    showConfirmDialogRecoveryKeySaved(sharingScope)
-                } else {
-                    context.showSnackbar(getString(R.string.copy_MK_confirmation))
-                    context.passwordReminderSucceeded()
-                }
-            } else {
-                context.showSnackbar(getString(R.string.general_text_error))
-            }
         }
     }
 
@@ -266,9 +245,6 @@ class AccountController @Inject constructor(
         when (context) {
             is ManagerActivity -> {
                 copyMK(false, sharingScope)
-            }
-            is TestPasswordActivity -> {
-                copyMK(context.isLogout, sharingScope)
             }
             is TwoFactorAuthenticationActivity -> {
                 val intent = Intent(context, ManagerActivity::class.java)
@@ -307,16 +283,7 @@ class AccountController @Inject constructor(
         AlertDialog.Builder(context).apply {
             setMessage(getString(R.string.copy_MK_confirmation))
             setPositiveButton(getString(R.string.action_logout)) { _: DialogInterface?, _: Int ->
-                if (this@AccountController.context is TestPasswordActivity) {
-                    this@AccountController.context.passwordReminderSucceeded()
-                } else {
-                    logout(context, MegaApplication.getInstance().megaApi, sharingScope)
-                }
-            }
-            setOnDismissListener {
-                if (this@AccountController.context is TestPasswordActivity) {
-                    this@AccountController.context.passwordReminderSucceeded()
-                }
+                logout(context, MegaApplication.getInstance().megaApi, sharingScope)
             }
             show()
         }
