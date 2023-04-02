@@ -26,7 +26,7 @@ import mega.privacy.android.domain.entity.photos.PhotoPredicate
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
-import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
+import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
@@ -56,7 +56,7 @@ class AlbumsViewModelTest {
     private val getAlbumPhotos = mock<GetAlbumPhotos>()
     private val getFeatureFlagUseCase =
         mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(true) }
-    private val getDefaultAlbumsMap = mock<GetDefaultAlbumsMap>()
+    private val getDefaultAlbumsMapUseCase = mock<GetDefaultAlbumsMapUseCase>()
     private val getProscribedAlbumNamesUseCase = mock<GetProscribedAlbumNamesUseCase>()
     private val removeFavourites = mock<RemoveFavourites>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
@@ -74,7 +74,7 @@ class AlbumsViewModelTest {
 
         underTest = AlbumsViewModel(
             getDefaultAlbumPhotos = getDefaultAlbumPhotos,
-            getDefaultAlbumsMap = getDefaultAlbumsMap,
+            getDefaultAlbumsMapUseCase = getDefaultAlbumsMapUseCase,
             getUserAlbums = getUserAlbums,
             getAlbumPhotos = getAlbumPhotos,
             getProscribedAlbumNamesUseCase = getProscribedAlbumNamesUseCase,
@@ -149,7 +149,7 @@ class AlbumsViewModelTest {
                 )
             )
 
-            whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
+            whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
 
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf(createImage())))
 
@@ -185,7 +185,7 @@ class AlbumsViewModelTest {
             )
         )
 
-        whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
+        whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
 
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(listOf(createImage())))
 
@@ -213,7 +213,7 @@ class AlbumsViewModelTest {
             )
         )
 
-        whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
+        whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
 
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
@@ -261,7 +261,7 @@ class AlbumsViewModelTest {
 
         whenever(getFeatureFlagUseCase(any())).thenReturn(false)
 
-        whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
+        whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
 
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
@@ -297,7 +297,7 @@ class AlbumsViewModelTest {
             )
         )
 
-        whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
+        whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
 
         whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(testPhotosList))
 
@@ -509,7 +509,7 @@ class AlbumsViewModelTest {
                 )
             )
 
-            whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
+            whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
             underTest.state.drop(1).test {
@@ -545,7 +545,7 @@ class AlbumsViewModelTest {
                 )
             )
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
-            whenever(getDefaultAlbumsMap()).thenReturn(defaultAlbums)
+            whenever(getDefaultAlbumsMapUseCase()).thenReturn(defaultAlbums)
             whenever(getDefaultAlbumPhotos(any())).thenReturn(flowOf(emptyList()))
 
             underTest.state.drop(1).test {

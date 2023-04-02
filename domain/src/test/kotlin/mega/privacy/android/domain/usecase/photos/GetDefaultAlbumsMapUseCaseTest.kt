@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
 import com.google.common.truth.Truth.assertThat
 import mega.privacy.android.domain.entity.photos.Album
@@ -8,29 +8,29 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class DefaultGetDefaultAlbumsMapTest {
-    private lateinit var underTest: GetDefaultAlbumsMap
+class GetDefaultAlbumsMapUseCaseTest {
+    private lateinit var underTest: GetDefaultAlbumsMapUseCase
 
     private val favouritePredicate = mock<PhotoPredicate>()
     private val gifPredicate = mock<PhotoPredicate>()
     private val rawPredicate = mock<PhotoPredicate>()
 
-    private val filterFavourite = mock<FilterFavourite>()
+    private val filterFavouriteUseCase = mock<FilterFavouriteUseCase>()
 
-    private val filterGIF = mock<FilterGIF>()
+    private val filterGIFUseCase = mock<FilterGIFUseCase>()
 
-    private val filterRAW = mock<FilterRAW>()
+    private val filterRAWUseCase = mock<FilterRAWUseCase>()
 
     @Before
     fun setUp() {
-        whenever(filterFavourite()).thenAnswer { favouritePredicate }
-        whenever(filterGIF()).thenAnswer { gifPredicate }
-        whenever(filterRAW()).thenAnswer { rawPredicate }
+        whenever(filterFavouriteUseCase()).thenAnswer { favouritePredicate }
+        whenever(filterGIFUseCase()).thenAnswer { gifPredicate }
+        whenever(filterRAWUseCase()).thenAnswer { rawPredicate }
 
-        underTest = DefaultGetDefaultAlbumsMap(
-            filterFavourite = filterFavourite,
-            filterGIF = filterGIF,
-            filterRAW = filterRAW,
+        underTest = GetDefaultAlbumsMapUseCase(
+            filterFavouriteUseCase = filterFavouriteUseCase,
+            filterGIFUseCase = filterGIFUseCase,
+            filterRAWUseCase = filterRAWUseCase,
         )
     }
 

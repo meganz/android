@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -15,9 +15,9 @@ import kotlin.test.assertTrue
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultFilterFavouriteTest {
+class FilterFavouriteUseCaseTest {
 
-    lateinit var underTest: FilterFavourite
+    lateinit var underTest: FilterFavouriteUseCase
 
     private val cameraUploadFolderId = 10L
     private val mediaUploadFolderId = 20L
@@ -30,7 +30,7 @@ class DefaultFilterFavouriteTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultFilterFavourite(photosRepository)
+        underTest = FilterFavouriteUseCase(photosRepository)
     }
 
     @Test

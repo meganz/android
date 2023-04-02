@@ -1,9 +1,9 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.FileTypeInfo
-import mega.privacy.android.domain.entity.RawFileTypeInfo
+import mega.privacy.android.domain.entity.GifFileTypeInfo
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.photos.Photo
 import org.junit.Before
@@ -13,29 +13,31 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultFilterRAWTest {
+class FilterGIFUseCaseTest {
 
-    lateinit var underTest: FilterRAW
+    lateinit var underTest: FilterGIFUseCase
 
     @Before
     fun setUp() {
-        underTest = DefaultFilterRAW()
+        underTest = FilterGIFUseCase()
     }
 
     @Test
-    fun `test that it is a raw image then return true`() =
+    fun `test that if it is a gif image then return true`() =
         runTest {
-            val image = createImage(fileTypeInfo = RawFileTypeInfo("", ""))
+            val gifImage = createImage(
+                fileTypeInfo = GifFileTypeInfo("", "")
+            )
 
-            assertTrue { underTest().invoke(image) }
+            assertTrue { underTest().invoke(gifImage) }
         }
 
     @Test
-    fun `test that it is not a raw image then return true`() =
+    fun `test that if it is not a gif image then return false`() =
         runTest {
-            val image = createImage()
+            val gifImage = createImage()
 
-            assertFalse { underTest().invoke(image) }
+            assertFalse{ underTest().invoke(gifImage) }
         }
 
     private fun createImage(
@@ -43,8 +45,7 @@ class DefaultFilterRAWTest {
         parentId: Long = 0L,
         isFavourite: Boolean = false,
         modificationTime: LocalDateTime = LocalDateTime.now(),
-        fileTypeInfo: FileTypeInfo = StaticImageFileTypeInfo("",
-            ""),
+        fileTypeInfo: FileTypeInfo = StaticImageFileTypeInfo("", ""),
     ): Photo {
         return Photo.Image(
             id = id,
