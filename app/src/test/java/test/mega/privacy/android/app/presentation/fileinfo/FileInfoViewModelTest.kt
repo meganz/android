@@ -48,17 +48,17 @@ import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
-import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
+import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
@@ -90,7 +90,7 @@ internal class FileInfoViewModelTest {
     private val fileUtilWrapper: FileUtilWrapper = mock()
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = mock()
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase = mock()
-    private val getFileHistoryNumVersions: GetFileHistoryNumVersions = mock()
+    private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase = mock()
     private val isNodeInInbox: IsNodeInInbox = mock()
     private val isNodeInRubbish: IsNodeInRubbish = mock()
     private val checkNameCollision: CheckNameCollision = mock()
@@ -142,7 +142,7 @@ internal class FileInfoViewModelTest {
             fileUtilWrapper = fileUtilWrapper,
             monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            getFileHistoryNumVersions = getFileHistoryNumVersions,
+            getFileHistoryNumVersionsUseCase = getFileHistoryNumVersionsUseCase,
             isNodeInInbox = isNodeInInbox,
             isNodeInRubbish = isNodeInRubbish,
             checkNameCollision = checkNameCollision,
@@ -173,7 +173,7 @@ internal class FileInfoViewModelTest {
         whenever(node.handle).thenReturn(NODE_HANDLE)
         whenever(typedFileNode.id).thenReturn(nodeId)
         whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(true))
-        whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
+        whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(0)
         whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
         whenever(isNodeInRubbish(NODE_HANDLE)).thenReturn(false)
         whenever(previewFile.exists()).thenReturn(true)
@@ -204,7 +204,7 @@ internal class FileInfoViewModelTest {
     fun `test that viewModel state's historyVersions property reflects the value of the getFileHistoryNumVersions use case after updating the node`() =
         runTest {
             for (n in 0..5) {
-                whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(n)
+                whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(n)
                 underTest.setNode(node.handle)
                 Truth.assertThat(underTest.uiState.value.historyVersions).isEqualTo(n)
             }
@@ -240,7 +240,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test showHistoryVersions is true if the node contains one version and is not in the inbox`() =
         runTest {
-            whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(1)
+            whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(1)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
@@ -249,7 +249,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test showHistoryVersions is true if the node contains more than one version and is not in the inbox`() =
         runTest {
-            whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(2)
+            whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(2)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
@@ -258,7 +258,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test showHistoryVersions is false if the node contains one version but is in the inbox`() =
         runTest {
-            whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(1)
+            whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(1)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(true)
             underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
@@ -268,7 +268,7 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test showHistoryVersions is false if the node contains no versions and is not in the inbox`() =
         runTest {
-            whenever(getFileHistoryNumVersions(NODE_HANDLE)).thenReturn(0)
+            whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(0)
             whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
@@ -772,7 +772,9 @@ internal class FileInfoViewModelTest {
             1L, "", 1L, "", EventType.Storage,
             state,
         )
-        whenever(monitorStorageStateEventUseCase.invoke()).thenReturn(MutableStateFlow(storageStateEvent))
+        whenever(monitorStorageStateEventUseCase.invoke()).thenReturn(
+            MutableStateFlow(storageStateEvent)
+        )
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -86,11 +86,11 @@ interface NodeRepository {
     suspend fun getNodeChildren(nodeId: NodeId, order: SortOrder?): List<UnTypedNode>
 
     /**
-     * Get the number of versions in node's history
+     * Get the number of versions of the node, including the current version
      * @param handle the handle of the node
-     * @return the number of history versions or 0 if the file is not found or has no versions
+     * @return the number of versions of the node or 0 if the file is not found
      */
-    suspend fun getNodeHistoryNumVersions(handle: Long): Int
+    suspend fun getNumVersions(handle: Long): Int
 
     /**
      * Get the history versions of the node

@@ -55,7 +55,7 @@ import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCa
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
-import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersions
+import mega.privacy.android.domain.usecase.filenode.GetFileHistoryNumVersionsUseCase
 import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
@@ -80,7 +80,7 @@ class FileInfoViewModel @Inject constructor(
     private val fileUtilWrapper: FileUtilWrapper,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val getFileHistoryNumVersions: GetFileHistoryNumVersions,
+    private val getFileHistoryNumVersionsUseCase: GetFileHistoryNumVersionsUseCase,
     private val isNodeInInbox: IsNodeInInbox,
     private val isNodeInRubbish: IsNodeInRubbish,
     private val checkNameCollision: CheckNameCollision,
@@ -534,8 +534,8 @@ class FileInfoViewModel @Inject constructor(
     }
 
     private fun updateHistory() {
-        if (typedNode is FileNode) {
-            updateState { it.copy(historyVersions = getFileHistoryNumVersions(typedNode.id.longValue)) }
+        (typedNode as? FileNode)?.let { fileNode ->
+            updateState { it.copy(historyVersions = getFileHistoryNumVersionsUseCase(fileNode)) }
         }
     }
 

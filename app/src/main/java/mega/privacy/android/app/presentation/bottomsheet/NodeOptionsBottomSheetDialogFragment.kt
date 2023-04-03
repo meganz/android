@@ -282,7 +282,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         if (megaApi.hasVersions(node) && !isTakenDown) {
                             nodeVersionsIcon.visibility = View.VISIBLE
                             optionVersionsLayout.visibility = View.VISIBLE
-                            versions.text = megaApi.getNumVersions(node).toString()
+                            versions.text = (megaApi.getNumVersions(node) - 1).toString()
                         } else {
                             nodeVersionsIcon.visibility = View.GONE
                             optionVersionsLayout.visibility = View.GONE

@@ -54,7 +54,7 @@ ext {
     buildToolsVerion = '33.0.1'
 
     // Prebuilt MEGA SDK version
-    megaSdkVersion = '20230322.072949-rel'
+    megaSdkVersion = '20230403.142051-dev'
 }
 
 ext.shouldSuppressWarnings = { ->
