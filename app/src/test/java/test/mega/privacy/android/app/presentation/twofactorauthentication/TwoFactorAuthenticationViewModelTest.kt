@@ -132,28 +132,6 @@ internal class TwoFactorAuthenticationViewModelTest {
         }
 
     @Test
-    fun `test that dismissRecoveryKey state should be true when isMasterKeyExported is successful AND request access equals 1`() =
-        runTest {
-            whenever(isMasterKeyExported()).thenReturn(true)
-            underTest.getMasterKeyStatus()
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.dismissRecoveryKey).isEqualTo(true)
-            }
-        }
-
-    @Test
-    fun `test that dismissRecoveryKey state should be false when isMasterKeyExported is successful AND request access NOT equals 1`() =
-        runTest {
-            whenever(isMasterKeyExported()).thenReturn(false)
-            underTest.getMasterKeyStatus()
-            underTest.uiState.test {
-                val state = awaitItem()
-                assertThat(state.dismissRecoveryKey).isEqualTo(false)
-            }
-        }
-
-    @Test
     fun `test that authentication code should not be null when getting multi factor authentication is successful`() =
         runTest {
             val expectedAuthCode = "123456789"

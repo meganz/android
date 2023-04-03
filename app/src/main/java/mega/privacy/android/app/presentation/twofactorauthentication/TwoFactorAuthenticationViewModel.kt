@@ -37,6 +37,10 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
      */
     val uiState = _uiState.asStateFlow()
 
+    init {
+        getMasterKeyStatus()
+    }
+
 
     /**
      * Generate the QR code for the 2fa
@@ -107,16 +111,13 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
     }
 
     /**
-     * Get IsMasterKeyExported status after user successfully enabled 2FA
+     * Get boolean state of IsMasterKeyExported of the user
      */
     fun getMasterKeyStatus() {
         viewModelScope.launch {
             runCatching { isMasterKeyExported() }.let { result ->
                 _uiState.update {
-                    it.copy(
-                        isMasterKeyExported = result.isSuccess,
-                        dismissRecoveryKey = result.getOrElse { false }
-                    )
+                    it.copy(isMasterKeyExported = result.getOrElse { false })
                 }
             }
         }
@@ -139,11 +140,9 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isPinSubmitted = true,
-                        authenticationState = AuthenticationState.AuthenticationPassed,
-                        dismissRecoveryKey = true
+                        authenticationState = AuthenticationState.AuthenticationPassed
                     )
                 }
-                getMasterKeyStatus()
             }.onFailure { e ->
                 _uiState.update {
                     it.copy(

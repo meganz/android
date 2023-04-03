@@ -632,7 +632,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
     private fun observeUIState() {
         this.collectFlow(viewModel.uiState) { state ->
             handleEnableMultiFactorAuthState(state)
-            handleIsMasterKeyExported(state)
             handleGetting2FACode(state)
             handleGettingUserEmail(state)
             handleQRCode(state)
@@ -673,20 +672,6 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         }
     }
 
-    private fun handleIsMasterKeyExported(state: TwoFactorAuthenticationUIState) {
-        with(state) {
-            if (isMasterKeyExported) {
-                with(binding) {
-                    scrollContainer2fa.isVisible = false
-                    scrollContainerVerify.isVisible = false
-                    container2faEnabled.isVisible = true
-                    buttonDismissRk.isVisible = dismissRecoveryKey
-                    rkSaved = dismissRecoveryKey
-                }
-            }
-        }
-    }
-
     private fun handleEnableMultiFactorAuthState(state: TwoFactorAuthenticationUIState) {
         with(state) {
             if (isPinSubmitted) {
@@ -694,6 +679,13 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                     AuthenticationState.AuthenticationPassed -> {
                         confirm2FAIsShown = false
                         isEnabled2FA = true
+                        rkSaved = isMasterKeyExported
+                        with(binding) {
+                            scrollContainer2fa.isVisible = false
+                            scrollContainerVerify.isVisible = false
+                            container2faEnabled.isVisible = true
+                            buttonDismissRk.isVisible = isMasterKeyExported
+                        }
                     }
                     AuthenticationState.AuthenticationFailed -> {
                         showError()
