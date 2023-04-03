@@ -305,6 +305,13 @@ interface CameraUploadRepository {
     suspend fun areUploadFileNamesKept(): Boolean
 
     /**
+     * Sets whether the File Names of files to be uploaded will be kept or not
+     *
+     * @param keepFileNames true if the File Names should now be left as is, and false if otherwise
+     */
+    suspend fun setUploadFileNamesKept(keepFileNames: Boolean)
+
+    /**
      * Is camera folder on external SD card
      *
      * @return true if camera folder is on external SD card

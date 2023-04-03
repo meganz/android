@@ -314,6 +314,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.areUploadFileNamesKept()
     }
 
+    override suspend fun setUploadFileNamesKept(keepFileNames: Boolean) =
+        withContext(ioDispatcher) {
+            localStorageGateway.setUploadFileNamesKept(keepFileNames)
+        }
+
     override suspend fun isFolderExternalSd(): Boolean = withContext(ioDispatcher) {
         localStorageGateway.isFolderExternalSd()
     }

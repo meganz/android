@@ -356,6 +356,20 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
+    fun `test that the file names should now be kept when uploading content`() =
+        testSetUploadFileNamesKept(true)
+
+    @Test
+    fun `test that the file names should no longer be kept when uploading content`() =
+        testSetUploadFileNamesKept(false)
+
+    private fun testSetUploadFileNamesKept(keepFileNames: Boolean) = runTest {
+        underTest.setUploadFileNamesKept(keepFileNames)
+
+        verify(localStorageGateway, times(1)).setUploadFileNamesKept(keepFileNames)
+    }
+
+    @Test
     fun `test camera upload folder is on external SD card`() = runTest {
         whenever(localStorageGateway.isFolderExternalSd()).thenReturn(true)
         assertThat(underTest.isFolderExternalSd()).isEqualTo(true)

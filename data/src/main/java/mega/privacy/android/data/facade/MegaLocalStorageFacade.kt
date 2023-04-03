@@ -206,6 +206,9 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun areUploadFileNamesKept(): Boolean =
         dbHandler.preferences?.keepFileNames.toBoolean()
 
+    override suspend fun setUploadFileNamesKept(keepFileNames: Boolean) =
+        dbHandler.setKeepFileNames(keepFileNames)
+
     override suspend fun isFolderExternalSd(): Boolean =
         dbHandler.preferences?.cameraFolderExternalSDCard.toBoolean()
 
