@@ -31,7 +31,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.NEW_TEXT_FILE_TE
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogState;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.UploadUtil.getFolder;
 import static mega.privacy.android.app.utils.UploadUtil.getTemporalTakePictureFile;
@@ -106,17 +105,16 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener;
 import mega.privacy.android.app.presentation.contact.ContactFileListViewModel;
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper;
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult;
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper;
 import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.usecase.MoveNodeUseCase;
 import mega.privacy.android.app.usecase.UploadUseCase;
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.MegaNodeDialogUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.documentscanner.DocumentScannerActivity;
@@ -298,8 +296,8 @@ public class ContactFileListActivity extends PasscodeActivity
     @Override
     public void scanDocument() {
         String[] saveDestinations = {
-                StringResourcesUtils.getString(R.string.section_cloud_drive),
-                StringResourcesUtils.getString(R.string.section_chat)
+                getString(R.string.section_cloud_drive),
+                getString(R.string.section_chat)
         };
         Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
         startActivityForResult(intent, REQUEST_CODE_SCAN_DOCUMENT);
@@ -617,7 +615,7 @@ public class ContactFileListActivity extends PasscodeActivity
             return;
         }
 
-        moveNodeUseCase.moveToRubbishBin(handleList)
+        moveNodeUseCase.moveToRubbishBin(handleList, this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe((result, throwable) -> {
@@ -696,7 +694,7 @@ public class ContactFileListActivity extends PasscodeActivity
             final long[] copyHandles = intent.getLongArrayExtra("COPY_HANDLES");
             final long toHandle = intent.getLongExtra("COPY_TO", 0);
 
-            checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY)
+            checkNameCollisionUseCase.checkHandleList(copyHandles, toHandle, NameCollisionType.COPY, this)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
@@ -751,7 +749,7 @@ public class ContactFileListActivity extends PasscodeActivity
             }
             statusDialog = temp;
 
-            checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVE)
+            checkNameCollisionUseCase.checkHandleList(moveHandles, toHandle, NameCollisionType.MOVE, this)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((result, throwable) -> {
@@ -787,7 +785,7 @@ public class ContactFileListActivity extends PasscodeActivity
             intent.setAction(Intent.ACTION_GET_CONTENT);
 
             try {
-                statusDialog = createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
+                statusDialog = createProgressDialog(this, getResources().getQuantityString(R.plurals.upload_prepare, 1));
                 statusDialog.show();
             } catch (Exception e) {
                 return;
@@ -824,12 +822,12 @@ public class ContactFileListActivity extends PasscodeActivity
                             .subscribe(handle -> {
                                         ArrayList<NameCollision> list = new ArrayList<>();
                                         list.add(NameCollision.Upload.getUploadCollision(handle,
-                                                file, parentHandle));
+                                                file, parentHandle, this));
                                         nameCollisionActivityContract.launch(list);
                                     },
                                     throwable -> {
                                         if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
-                                            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error));
+                                            showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error));
                                         } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
                                             PermissionUtils.checkNotificationsPermission(this);
                                             uploadUseCase.upload(this, file, contactFileListFragment.getParentHandle())
@@ -847,7 +845,7 @@ public class ContactFileListActivity extends PasscodeActivity
             if (resultCode == RESULT_OK) {
                 String savedDestination = intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION);
                 Intent fileIntent = new Intent(this, FileExplorerActivity.class);
-                if (StringResourcesUtils.getString(R.string.section_chat).equals(savedDestination)) {
+                if (getString(R.string.section_chat).equals(savedDestination)) {
                     fileIntent.setAction(FileExplorerActivity.ACTION_UPLOAD_TO_CHAT);
                 } else {
                     fileIntent.setAction(FileExplorerActivity.ACTION_SAVE_TO_CLOUD);
@@ -869,14 +867,13 @@ public class ContactFileListActivity extends PasscodeActivity
         MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
         if (parentNode == null) {
             dismissAlertDialogIfExists(statusDialog);
-            showErrorAlertDialog(StringResourcesUtils
-                    .getString(R.string.error_temporary_unavaible), false, this);
+            showErrorAlertDialog(getString(R.string.error_temporary_unavaible), false, this);
             return;
         }
 
         if (infos == null) {
             dismissAlertDialogIfExists(statusDialog);
-            showErrorAlertDialog(StringResourcesUtils.getString(R.string.upload_can_not_open),
+            showErrorAlertDialog(getString(R.string.upload_can_not_open),
                     false, this);
             return;
         }
@@ -894,8 +891,7 @@ public class ContactFileListActivity extends PasscodeActivity
                     dismissAlertDialogIfExists(statusDialog);
 
                     if (throwable != null) {
-                        showErrorAlertDialog(StringResourcesUtils
-                                .getString(R.string.error_temporary_unavaible), false, this);
+                        showErrorAlertDialog(getString(R.string.error_temporary_unavaible), false, this);
                     } else {
                         ArrayList<NameCollision> collisions = result.getFirst();
                         List<ShareInfo> withoutCollisions = result.getSecond();
@@ -905,7 +901,7 @@ public class ContactFileListActivity extends PasscodeActivity
                         }
 
                         if (!withoutCollisions.isEmpty()) {
-                            String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
+                            String text = getResources().getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 
                             uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
                                     .subscribeOn(Schedulers.io())
@@ -1131,7 +1127,7 @@ public class ContactFileListActivity extends PasscodeActivity
         if (aB != null) {
             if (title == null) {
                 Timber.d("Reset title and subtitle");
-                aB.setTitle(StringResourcesUtils.getString(R.string.title_incoming_shares_with_explorer));
+                aB.setTitle(getString(R.string.title_incoming_shares_with_explorer));
                 aB.setSubtitle(fullName);
 
             } else {

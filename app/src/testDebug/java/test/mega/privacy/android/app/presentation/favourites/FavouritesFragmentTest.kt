@@ -38,6 +38,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -76,7 +77,8 @@ class FavouritesFragmentTest {
     fun test_that_the_empty_view_is_displayed_when_favourites_is_empty() {
         runBlocking {
             whenever(FavouritesTestModule.getAllFavourites()).thenReturn(
-                flowOf(emptyList()))
+                flowOf(emptyList())
+            )
         }
         launchFragmentInHiltContainer<FavouritesFragment>()
         // Check the empty view if is visible.
@@ -109,8 +111,12 @@ class FavouritesFragmentTest {
             )
         }
 
-        recycleView().perform(RecyclerViewActions.actionOnItemAtPosition<FavouritesViewHolder>(1,
-            ViewActions.click()))
+        recycleView().perform(
+            RecyclerViewActions.actionOnItemAtPosition<FavouritesViewHolder>(
+                1,
+                ViewActions.click()
+            )
+        )
         verify(mockNavController).navigate(
             HomepageFragmentDirections.actionHomepageFragmentToFavouritesFolderFragment(
                 0
@@ -138,8 +144,12 @@ class FavouritesFragmentTest {
         }
 
         connected.tryEmit(false)
-        recycleView().perform(RecyclerViewActions.actionOnItemAtPosition<FavouritesViewHolder>(1,
-            threeDotClicked))
+        recycleView().perform(
+            RecyclerViewActions.actionOnItemAtPosition<FavouritesViewHolder>(
+                1,
+                threeDotClicked
+            )
+        )
 
         snackBarView().check(ViewAssertions.matches(ViewMatchers.withText(R.string.error_server_connection_problem)))
     }
@@ -160,20 +170,30 @@ class FavouritesFragmentTest {
         runBlocking {
             whenever(TestSortOrderUseCases.getCloudSortOrder()).thenReturn(SortOrder.ORDER_DEFAULT_ASC)
             whenever(TestMapperModule.sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
-                MegaApiJava.ORDER_DEFAULT_ASC)
+                MegaApiJava.ORDER_DEFAULT_ASC
+            )
             whenever(FavouritesTestModule.getAllFavourites()).thenReturn(
                 flowOf(list)
             )
-            whenever(FavouritesTestModule.stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
-            whenever(FavouritesTestModule.favouriteMapper(
-                any(),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-            )).thenReturn(
-                favourite)
+            whenever(
+                FavouritesTestModule.stringUtilWrapper.getFolderInfo(
+                    eq(0),
+                    eq(0),
+                    any(),
+                )
+            ).thenReturn("info")
+            whenever(
+                FavouritesTestModule.favouriteMapper(
+                    any(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull(),
+                    anyOrNull(),
+                )
+            ).thenReturn(
+                favourite
+            )
             whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)
             whenever(TestWrapperModule.fetchNodeWrapper(any())).thenReturn(node)
         }

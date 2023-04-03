@@ -14,7 +14,6 @@ import mega.privacy.android.app.globalmanagement.ActivityLifecycleHandler
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SIGNAL_PRESENCE
 import mega.privacy.android.app.utils.Constants.EVENT_CHAT_STATUS_CHANGE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatApi.INIT_ONLINE_SESSION
@@ -116,7 +115,7 @@ class GlobalChatListener @Inject constructor(
             MegaChatApi.DB_ERROR_FULL -> post {
                 activityLifecycleHandler.getCurrentActivity()?.let {
                     Util.showErrorAlertDialog(
-                        StringResourcesUtils.getString(R.string.error_not_enough_free_space),
+                        application.getString(R.string.error_not_enough_free_space),
                         true, it
                     )
                 }

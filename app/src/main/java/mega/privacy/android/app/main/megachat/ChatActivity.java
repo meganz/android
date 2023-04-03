@@ -186,7 +186,6 @@ import static mega.privacy.android.app.utils.MegaApiUtils.isIntentAvailable;
 import static mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getMyChatFilesFolder;
 import static mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.DATE;
@@ -408,7 +407,6 @@ import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.ContactUtil;
 import mega.privacy.android.app.utils.FileUtil;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
@@ -879,7 +877,7 @@ public class ChatActivity extends PasscodeActivity
 
                 if (call.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
                         call.getTermCode() == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS) {
-                    showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
+                    showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
                 }
                 break;
         }
@@ -929,7 +927,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     public void confirmLeaveChat(long chatId) {
         stopReproductions();
-        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.leaving_label));
+        setJoiningOrLeaving(getString(R.string.leaving_label));
         megaChatApi.leaveChat(chatId, new RemoveFromChatRoomListener(this, this));
     }
 
@@ -1046,7 +1044,7 @@ public class ChatActivity extends PasscodeActivity
                 } else {
                     if (initChat()) {
                         //Chat successfully initialized, now can rejoin
-                        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
+                        setJoiningOrLeaving(getString(R.string.joining_label));
                         titleToolbar.setText(getTitleChat(chatRoom));
                         groupalSubtitleToolbar.setText(null);
                         setGroupalSubtitleToolbarVisibility(false);
@@ -1154,7 +1152,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     public void onScanDocumentOptionClicked() {
         String[] saveDestinations = {
-                StringResourcesUtils.getString(R.string.section_chat)
+                getString(R.string.section_chat)
         };
         Intent intent = DocumentScannerActivity.getIntent(this, saveDestinations);
         scanDocumentLauncher.launch(intent);
@@ -1353,7 +1351,7 @@ public class ChatActivity extends PasscodeActivity
                     megaChatApi.leaveChat(extraIdChat, new RemoveFromChatRoomListener(chatActivity, chatActivity));
 
                     if (idChat == extraIdChat) {
-                        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.leaving_label));
+                        setJoiningOrLeaving(getString(R.string.leaving_label));
                     }
                 }
             }
@@ -2078,7 +2076,7 @@ public class ChatActivity extends PasscodeActivity
     private void collectFlows() {
         ViewExtensionsKt.collectFlow(this, viewModel.getState(), Lifecycle.State.STARTED, chatState -> {
             if (chatState.getError() != null) {
-                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
             } else if (chatState.isCallAnswered()) {
                 callInProgressLayout.setEnabled(true);
             }
@@ -2143,7 +2141,7 @@ public class ChatActivity extends PasscodeActivity
 
                     if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
                         openingAndJoining = true;
-                        setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
+                        setJoiningOrLeaving(getString(R.string.joining_label));
                     }
                 } else {
                     long newIdChat = newIntent.getLongExtra(CHAT_ID, MEGACHAT_INVALID_HANDLE);
@@ -2379,7 +2377,7 @@ public class ChatActivity extends PasscodeActivity
      * @param textSnackbar if there is a chat link involved in the action, it it indicates the "Copy chat link" dialog has to be shown.
      *                     If not, a simple Snackbar has to be shown with this text.
      */
-    private void initEmptyScreen(String textSnackbar){
+    private void initEmptyScreen(String textSnackbar) {
         String textToShowB = getString(R.string.chat_loading_messages);
 
         try {
@@ -3231,7 +3229,7 @@ public class ChatActivity extends PasscodeActivity
                 if (recordView.isRecordingNow()) break;
 
                 if (participatingInACall()) {
-                    showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
+                    showConfirmationInACall(this, getString(R.string.ongoing_call_content), passcodeManagement);
                     break;
                 }
 
@@ -3243,7 +3241,7 @@ public class ChatActivity extends PasscodeActivity
                 if (recordView.isRecordingNow()) break;
 
                 if (CallUtil.participatingInACall()) {
-                    showConfirmationInACall(this, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
+                    showConfirmationInACall(this, getString(R.string.ongoing_call_content), passcodeManagement);
                     break;
                 }
                 startVideo = true;
@@ -3714,7 +3712,7 @@ public class ChatActivity extends PasscodeActivity
             return;
         }
 
-        if(StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
+        if (StorageStateExtensionsKt.getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning();
             return;
         }
@@ -3771,8 +3769,8 @@ public class ChatActivity extends PasscodeActivity
             return;
 
         endCallForAllDialog = new MaterialAlertDialogBuilder(this)
-                .setTitle(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_title_end_call_for_all))
-                .setMessage(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
+                .setTitle(getString(R.string.meetings_chat_screen_dialog_title_end_call_for_all))
+                .setMessage(getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
                 .setNegativeButton(R.string.meetings_chat_screen_dialog_negative_button_end_call_for_all, (dialogInterface, i) -> AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog))
                 .setPositiveButton(R.string.meetings_chat_screen_dialog_positive_button_end_call_for_all, (dialogInterface, i) -> {
                     AlertDialogUtil.dismissAlertDialogIfExists(endCallForAllDialog);
@@ -4045,7 +4043,7 @@ public class ChatActivity extends PasscodeActivity
 
             intent.setAction(Intent.ACTION_GET_CONTENT);
             try {
-                statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getQuantityString(R.plurals.upload_prepare, 1));
+                statusDialog = MegaProgressDialogUtil.createProgressDialog(this, getResources().getQuantityString(R.plurals.upload_prepare, 1));
                 statusDialog.show();
             } catch (Exception e) {
                 return;
@@ -4196,7 +4194,7 @@ public class ChatActivity extends PasscodeActivity
 
                                         showSnackbar(SNACKBAR_TYPE, copyThrowable == null
                                                         ? copyRequestMessageMapper.invoke(copyResult)
-                                                        : StringResourcesUtils.getString(R.string.import_success_error),
+                                                        : getString(R.string.import_success_error),
                                                 MEGACHAT_INVALID_HANDLE);
                                     });
                         }
@@ -4236,7 +4234,7 @@ public class ChatActivity extends PasscodeActivity
     private void retryPendingMessage(PendingMessageSingle pendMsg) {
         if (pendMsg == null) {
             Timber.e("Pending message does not exist");
-            showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getQuantityString(R.plurals.messages_forwarded_error_not_available,
+            showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available,
                     1, 1), MEGACHAT_INVALID_HANDLE);
             return;
         }
@@ -4248,7 +4246,7 @@ public class ChatActivity extends PasscodeActivity
             // Retry to send
             File f = new File(pendMsg.getFilePath());
             if (!f.exists()) {
-                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getQuantityString(R.plurals.messages_forwarded_error_not_available,
+                showSnackbar(SNACKBAR_TYPE, getResources().getQuantityString(R.plurals.messages_forwarded_error_not_available,
                         1, 1), MEGACHAT_INVALID_HANDLE);
                 return;
             }
@@ -4325,14 +4323,14 @@ public class ChatActivity extends PasscodeActivity
 
         dialogOnlyMeInCall = new MaterialAlertDialogBuilder(this)
                 .setTitle(isRequestSent ?
-                        StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call) :
-                        StringResourcesUtils.getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call))
-                .setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
-                .setPositiveButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_end_call), (dialog, which) -> {
+                        getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call) :
+                        getString(R.string.calls_chat_screen_dialog_title_only_you_in_the_call))
+                .setMessage(getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
+                .setPositiveButton(getString(R.string.calls_call_screen_button_to_end_call), (dialog, which) -> {
                     viewModel.checkEndCall();
                     hideDialogCall();
                 })
-                .setNegativeButton(StringResourcesUtils.getString(R.string.calls_call_screen_button_to_stay_alone_in_call), (dialog, which) -> {
+                .setNegativeButton(getString(R.string.calls_call_screen_button_to_stay_alone_in_call), (dialog, which) -> {
                     viewModel.checkStayOnCall();
                     hideDialogCall();
                 })
@@ -4366,7 +4364,7 @@ public class ChatActivity extends PasscodeActivity
         joinCallDialogTitle.setText(chatRoom.isGroup() ? R.string.title_join_call : R.string.title_join_one_to_one_call);
         joinCallDialogTitle.setVisibility(View.VISIBLE);
         TextView description = dialogLayout.findViewById(R.id.description_call_dialog);
-        description.setText(StringResourcesUtils.getString(R.string.text_join_another_call));
+        description.setText(getString(R.string.text_join_another_call));
         description.setVisibility(View.VISIBLE);
 
         final Button holdJoinButton = dialogLayout.findViewById(R.id.first_button);
@@ -4567,7 +4565,7 @@ public class ChatActivity extends PasscodeActivity
                 if (chatC.isInAnonymousMode()) {
                     ifAnonymousModeLogin(true);
                 } else if (!isAlreadyJoining(idChat)) {
-                    setJoiningOrLeaving(StringResourcesUtils.getString(R.string.joining_label));
+                    setJoiningOrLeaving(getString(R.string.joining_label));
                     megaChatApi.autojoinPublicChat(idChat, this);
                 }
 
@@ -5934,10 +5932,10 @@ public class ChatActivity extends PasscodeActivity
                 .subscribe((alreadyInvited, throwable) -> {
                     if (throwable == null) {
                         if (alreadyInvited) {
-                            String text = StringResourcesUtils.getString(R.string.contact_already_invited, converterShortCodes(contactName));
+                            String text = getString(R.string.contact_already_invited, converterShortCodes(contactName));
                             showSnackbar(SENT_REQUESTS_TYPE, text, MEGACHAT_INVALID_HANDLE);
                         } else {
-                            String text = StringResourcesUtils.getString(R.string.user_is_not_contact, converterShortCodes(contactName));
+                            String text = getString(R.string.user_is_not_contact, converterShortCodes(contactName));
                             showSnackbar(INVITE_CONTACT_TYPE, text, MEGACHAT_INVALID_HANDLE, email);
                         }
                     }
@@ -6417,7 +6415,7 @@ public class ChatActivity extends PasscodeActivity
             return MEGA_FILE_LINK;
         } else {
             Timber.d("isFolderLink");
-            getPublicLinkInformationUseCase.get(link)
+            getPublicLinkInformationUseCase.get(link, this)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe((richLink, throwable) -> {
@@ -8419,7 +8417,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onStart() {
         super.onStart();
-        if(!viewModel.isChatInitialised()) {
+        if (!viewModel.isChatInitialised()) {
             cleanBuffers();
 
             if (!initChat()) {
@@ -8657,7 +8655,7 @@ public class ChatActivity extends PasscodeActivity
                 if (e.getErrorCode() == MegaError.API_OK) {
                     Timber.d("OK INVITE CONTACT: %s", request.getEmail());
                     if (request.getNumber() == MegaContactRequest.INVITE_ACTION_ADD) {
-                        showSnackbar(DISMISS_ACTION_SNACKBAR, StringResourcesUtils.getString(R.string.contact_invited), MEGACHAT_INVALID_HANDLE);
+                        showSnackbar(DISMISS_ACTION_SNACKBAR, getString(R.string.contact_invited), MEGACHAT_INVALID_HANDLE);
                     }
                 } else {
                     if (e.getErrorCode() == MegaError.API_EEXIST) {
@@ -10021,10 +10019,10 @@ public class ChatActivity extends PasscodeActivity
     private void checkIfIsAlreadyJoiningOrLeaving() {
         if (MegaApplication.getChatManagement().isAlreadyJoining(idChat)) {
             joiningOrLeaving = true;
-            joiningOrLeavingAction = StringResourcesUtils.getString(R.string.joining_label);
+            joiningOrLeavingAction = getString(R.string.joining_label);
         } else if (MegaApplication.getChatManagement().isAlreadyLeaving(idChat)) {
             joiningOrLeaving = true;
-            joiningOrLeavingAction = StringResourcesUtils.getString(R.string.leaving_label);
+            joiningOrLeavingAction = getString(R.string.leaving_label);
         }
     }
 

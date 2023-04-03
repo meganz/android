@@ -1,13 +1,20 @@
 package mega.privacy.android.app.main.adapters;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static mega.privacy.android.app.MimeTypeList.typeForName;
+import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
+import static mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX;
+import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
+import static mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder;
+import static mega.privacy.android.app.utils.Util.hideKeyboardView;
+import static mega.privacy.android.app.utils.Util.showKeyboardDelayed;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -18,6 +25,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.google.android.material.textfield.TextInputLayout;
@@ -35,21 +46,8 @@ import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.components.twemoji.EmojiEditText;
 import mega.privacy.android.app.main.FileExplorerActivity;
 import mega.privacy.android.app.main.ImportFilesFragment;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.domain.entity.ShareTextInfo;
 import nz.mega.sdk.MegaApiAndroid;
-
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-import static mega.privacy.android.app.MimeTypeList.typeForName;
-import static mega.privacy.android.app.utils.Constants.INVALID_POSITION;
-import static mega.privacy.android.app.utils.Constants.NODE_NAME_REGEX;
-import static mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
-import static mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
 
 public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
     public static final int MAX_VISIBLE_ITEMS_AT_BEGINNING = 4;
@@ -181,7 +179,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      *
      * @return the size of the list
      */
-    public int getContentItemCount(){
+    public int getContentItemCount() {
         if (textInfo != null) {
             return 1;
         }
@@ -195,7 +193,8 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
     /**
      * Check whether the current item is a footer view
-     * @param position  The position of the item within the adapter's data set.
+     *
+     * @param position The position of the item within the adapter's data set.
      * @return true if the the current item is a footer view
      */
     public boolean isBottomView(int position) {
@@ -249,16 +248,16 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof BottomViewHolder) {
             boolean showMoreVisible = textInfo == null && filesAll.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING;
-            ((BottomViewHolder)holder).showMore.setVisibility(showMoreVisible ? VISIBLE : GONE);
-            ((BottomViewHolder)holder).showMore.setOnClickListener(show->{
+            ((BottomViewHolder) holder).showMore.setVisibility(showMoreVisible ? VISIBLE : GONE);
+            ((BottomViewHolder) holder).showMore.setOnClickListener(show -> {
                 areItemsVisible = !areItemsVisible;
 
                 if (areItemsVisible) {
-                    ((BottomViewHolder)holder).showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_less));
-                    ((BottomViewHolder)holder).showMoreImage.setImageResource(R.drawable.ic_expand);
+                    ((BottomViewHolder) holder).showMoreText.setText(context.getString(R.string.general_show_less));
+                    ((BottomViewHolder) holder).showMoreImage.setImageResource(R.drawable.ic_expand);
                 } else {
-                    ((BottomViewHolder)holder).showMoreText.setText(StringResourcesUtils.getString(R.string.general_show_more));
-                    ((BottomViewHolder)holder).showMoreImage.setImageResource(R.drawable.ic_collapse_acc);
+                    ((BottomViewHolder) holder).showMoreText.setText(context.getString(R.string.general_show_more));
+                    ((BottomViewHolder) holder).showMoreImage.setImageResource(R.drawable.ic_collapse_acc);
                 }
                 setDataList(areItemsVisible);
             });
@@ -303,15 +302,15 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 }
 
                 if (files.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING) {
-                    if (position == getItemCount() - 2 ) {
+                    if (position == getItemCount() - 2) {
                         ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
                     } else {
                         ((ViewHolderImportFiles) holder).separator.setVisibility(VISIBLE);
                     }
                 } else {
-                    if (getItemCount() == 2){
+                    if (getItemCount() == 2) {
                         ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
-                    } else if (filesAll.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING && position == LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING){
+                    } else if (filesAll.size() > MAX_VISIBLE_ITEMS_AT_BEGINNING && position == LATEST_VISIBLE_ITEM_POSITION_AT_BEGINNING) {
                         ((ViewHolderImportFiles) holder).separator.setVisibility(GONE);
                     } else {
                         ((ViewHolderImportFiles) holder).separator.setVisibility(VISIBLE);
@@ -372,7 +371,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
      * @param areItemsVisible True if showing whole list, false otherwise.
      */
     private void setDataList(boolean areItemsVisible) {
-        if(areItemsVisible) {
+        if (areItemsVisible) {
             files = filesAll;
         } else {
             files = filesPartial;
@@ -395,10 +394,10 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if (isTextEmpty(typedName)) {
             nameLayout.setErrorEnabled(true);
-            nameLayout.setError(getString(R.string.empty_name));
+            nameLayout.setError(context.getString(R.string.empty_name));
         } else if (NODE_NAME_REGEX.matcher(typedName).find()) {
             nameLayout.setErrorEnabled(true);
-            nameLayout.setError(getString(R.string.invalid_characters));
+            nameLayout.setError(context.getString(R.string.invalid_characters));
         } else {
             nameLayout.setErrorEnabled(false);
         }
@@ -410,7 +409,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         int mBottomCount = 1;
 
         if (files == null) {
-            return textInfo!= null ? mBottomCount + 1 : mBottomCount;
+            return textInfo != null ? mBottomCount + 1 : mBottomCount;
         }
 
         return files.size() + mBottomCount;
@@ -439,6 +438,7 @@ public class ImportFilesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         ImageView showMoreImage;
         Button cloudDriveButton;
         Button chatButton;
+
         public BottomViewHolder(View itemView) {
             super(itemView);
         }

@@ -13,12 +13,9 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.constants.EventConstants.EVENT_UPDATE_SCROLL
 import mega.privacy.android.app.databinding.ActivitySettingsBinding
-import mega.privacy.android.app.fragments.settingsFragments.SettingsBaseFragment
 import mega.privacy.android.app.interfaces.SimpleSnackbarCallBack
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
-import java.util.*
 
 @AndroidEntryPoint
 open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack {
@@ -26,7 +23,12 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
     protected lateinit var binding: ActivitySettingsBinding
 
     private val isDark by lazy { Util.isDarkMode(this) }
-    private val transparentColor by lazy { ContextCompat.getColor(this, android.R.color.transparent) }
+    private val transparentColor by lazy {
+        ContextCompat.getColor(
+            this,
+            android.R.color.transparent
+        )
+    }
     private val elevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private var withElevation = false
 
@@ -54,7 +56,7 @@ open class PreferencesBaseActivity : PasscodeActivity(), SimpleSnackbarCallBack 
     }
 
     override fun setTitle(@StringRes titleId: Int) {
-        supportActionBar?.title = StringResourcesUtils.getString(titleId)
+        supportActionBar?.title = getString(titleId)
     }
 
     protected fun replaceFragment(fragment: Fragment) {

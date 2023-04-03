@@ -503,9 +503,9 @@ class OfflineViewModel @Inject constructor(
         val file = getOfflineFile(context, node)
 
         return if (file.isDirectory) {
-            getFileFolderInfo(file)
+            getFileFolderInfo(file, context)
         } else {
-            getFileInfo(file)
+            getFileInfo(file, context)
         }
     }
 }

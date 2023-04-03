@@ -66,7 +66,6 @@ import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.SortOrder
@@ -296,15 +295,31 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
 
     private val nodeHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_HANDLE, INVALID_HANDLE) }
-    private val nodeOfflineHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_OFFLINE_HANDLE, INVALID_HANDLE) }
-    private val parentNodeHandle by lazy { intent.getLongExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, INVALID_HANDLE) }
+    private val nodeOfflineHandle by lazy {
+        intent.getLongExtra(
+            INTENT_EXTRA_KEY_OFFLINE_HANDLE,
+            INVALID_HANDLE
+        )
+    }
+    private val parentNodeHandle by lazy {
+        intent.getLongExtra(
+            INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+            INVALID_HANDLE
+        )
+    }
     private val nodeFileLink by lazy { intent.getStringExtra(EXTRA_LINK) }
     private val childrenHandles by lazy { intent.getLongArrayExtra(NODE_HANDLES) }
-    private val childrenOfflineHandles by lazy { intent.getLongArrayExtra(INTENT_EXTRA_KEY_ARRAY_OFFLINE) }
+    private val childrenOfflineHandles by lazy {
+        intent.getLongArrayExtra(
+            INTENT_EXTRA_KEY_ARRAY_OFFLINE
+        )
+    }
     private val childOrder by lazy {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getSerializableExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
-                SortOrder::class.java) ?: SortOrder.ORDER_PHOTO_ASC
+            intent.getSerializableExtra(
+                INTENT_EXTRA_KEY_ORDER_GET_CHILDREN,
+                SortOrder::class.java
+            ) ?: SortOrder.ORDER_PHOTO_ASC
         } else {
             @Suppress("DEPRECATION")
             intent.getSerializableExtra(INTENT_EXTRA_KEY_ORDER_GET_CHILDREN) as SortOrder?
@@ -321,10 +336,20 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             intent.getParcelableExtra(INTENT_EXTRA_KEY_URI)
         }
     }
-    private val showNearbyFiles by lazy { intent.getBooleanExtra(INTENT_EXTRA_KEY_SHOW_NEARBY_FILES, false) }
+    private val showNearbyFiles by lazy {
+        intent.getBooleanExtra(
+            INTENT_EXTRA_KEY_SHOW_NEARBY_FILES,
+            false
+        )
+    }
     private val showSlideshow by lazy { intent.getBooleanExtra(EXTRA_SHOW_SLIDESHOW, false) }
     private val isTimeline by lazy { intent.getBooleanExtra(EXTRA_IS_TIMELINE, false) }
-    private val isFileVersion by lazy { intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_FILE_VERSION, false) }
+    private val isFileVersion by lazy {
+        intent.getBooleanExtra(
+            INTENT_EXTRA_KEY_IS_FILE_VERSION,
+            false
+        )
+    }
 
     private val viewModel by viewModels<ImageViewerViewModel>()
     private val appBarConfiguration by lazy {
@@ -399,10 +424,12 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             ViewCompat.setOnApplyWindowInsetsListener(binding.root) { _, windowInsets ->
                 val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
                 binding.toolbar.updatePadding(0, insets.top, 0, 0)
-                binding.imagesNavHostFragment.updatePadding(insets.left,
+                binding.imagesNavHostFragment.updatePadding(
+                    insets.left,
                     0,
                     insets.right,
-                    insets.bottom)
+                    insets.bottom
+                )
                 WindowInsetsCompat.CONSUMED
             }
         }
@@ -452,7 +479,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         }
         viewModel.onActionBarMessage().observe(this) { message ->
             bottomSheet?.dismissAllowingStateLoss()
-            showTransfersSnackBar(StringResourcesUtils.getString(message))
+            showTransfersSnackBar(getString(message))
         }
     }
 
@@ -645,8 +672,10 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
             putExtra(INTENT_EXTRA_KEY_HANDLE, nodeHandle)
             putExtra(INTENT_EXTRA_KEY_FILE_NAME, nodeName)
             putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, FROM_IMAGE_VIEWER)
-            putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                megaApi.getNodeByHandle(nodeHandle)?.parentHandle ?: INVALID_HANDLE)
+            putExtra(
+                INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
+                megaApi.getNodeByHandle(nodeHandle)?.parentHandle ?: INVALID_HANDLE
+            )
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
 

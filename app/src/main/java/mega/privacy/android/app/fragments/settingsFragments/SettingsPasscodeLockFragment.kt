@@ -19,7 +19,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_REQUIRE_PASSCODE
 import mega.privacy.android.app.constants.SettingsConstants.KEY_RESET_PASSCODE
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.PasscodeUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import timber.log.Timber
 import java.util.concurrent.Executor
@@ -180,7 +179,7 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
                         super.onAuthenticationSucceeded(result)
                         dbH.isFingerprintLockEnabled = true
                         snackbarCallBack?.showSnackbar(
-                            StringResourcesUtils.getString(R.string.confirmation_fingerprint_enabled)
+                            getString(R.string.confirmation_fingerprint_enabled)
                         )
                     }
 
@@ -193,8 +192,8 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
 
         if (!this::promptInfo.isInitialized) {
             promptInfo = BiometricPrompt.PromptInfo.Builder()
-                .setTitle(StringResourcesUtils.getString(R.string.title_enable_fingerprint))
-                .setNegativeButtonText(StringResourcesUtils.getString(R.string.general_cancel))
+                .setTitle(getString(R.string.title_enable_fingerprint))
+                .setNegativeButtonText(getString(R.string.general_cancel))
                 .setAllowedAuthenticators(BIOMETRIC_STRONG)
                 .build()
         }
@@ -203,7 +202,8 @@ class SettingsPasscodeLockFragment : SettingsBaseFragment() {
     }
 
     private fun showRequirePasscodeDialog(selectedPosition: Int) {
-        requirePasscodeDialog = passcodeUtil.showRequirePasscodeDialog(selectedPosition)
+        requirePasscodeDialog =
+            passcodeUtil.showRequirePasscodeDialog(selectedPosition, requireContext())
         requirePasscodeDialog.setOnDismissListener {
             requirePasscode?.summary =
                 passcodeUtil.getRequiredPasscodeText(dbH.passcodeRequiredTime)

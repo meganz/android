@@ -33,8 +33,6 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeParceler
 import mega.privacy.android.app.utils.MegaNodeUtil.getDlList
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -205,10 +203,10 @@ class MegaNodeSaving(
 
         val message = when {
             numberOfNodesPending == 0 && numberOfNodesAlreadyDownloaded == 0 -> {
-                getQuantityString(R.plurals.empty_folders, emptyFolders)
+                app.resources.getQuantityString(R.plurals.empty_folders, emptyFolders)
             }
             numberOfNodesAlreadyDownloaded > 0 && numberOfNodesPending == 0 -> {
-                getQuantityString(
+                app.resources.getQuantityString(
                     R.plurals.file_already_downloaded,
                     numberOfNodesAlreadyDownloaded,
                     numberOfNodesAlreadyDownloaded
@@ -216,9 +214,9 @@ class MegaNodeSaving(
             }
             numberOfNodesAlreadyDownloaded == 0 && numberOfNodesPending > 0 -> {
                 if (downloadForPreview || downloadByOpenWith) {
-                    getString(R.string.cloud_drive_snackbar_preparing_file_for_preview_context)
+                    app.getString(R.string.cloud_drive_snackbar_preparing_file_for_preview_context)
                 } else {
-                    getQuantityString(
+                    app.resources.getQuantityString(
                         R.plurals.download_began,
                         numberOfNodesPending,
                         numberOfNodesPending
@@ -226,14 +224,14 @@ class MegaNodeSaving(
                 }
             }
             numberOfNodesAlreadyDownloaded == 1 -> {
-                getQuantityString(
+                app.resources.getQuantityString(
                     R.plurals.file_already_downloaded_and_files_pending_download,
                     numberOfNodesPending,
                     numberOfNodesPending
                 )
             }
             numberOfNodesPending == 1 -> {
-                getQuantityString(
+                app.resources.getQuantityString(
                     R.plurals.files_already_downloaded_and_file_pending_download,
                     numberOfNodesAlreadyDownloaded,
                     numberOfNodesAlreadyDownloaded
@@ -241,13 +239,13 @@ class MegaNodeSaving(
             }
             else -> {
                 StringBuilder().append(
-                    getQuantityString(
+                    app.resources.getQuantityString(
                         R.plurals.file_already_downloaded,
                         numberOfNodesAlreadyDownloaded,
                         numberOfNodesAlreadyDownloaded
                     )
                 ).append(" ").append(
-                    getQuantityString(
+                    app.resources.getQuantityString(
                         R.plurals.file_pending_download,
                         numberOfNodesPending,
                         numberOfNodesPending

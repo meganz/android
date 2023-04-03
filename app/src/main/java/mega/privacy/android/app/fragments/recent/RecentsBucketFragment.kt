@@ -33,7 +33,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.observeDragSupportEvents
 import mega.privacy.android.app.components.dragger.DragToExitSupport.Companion.putThumbnailLocation
 import mega.privacy.android.app.databinding.FragmentRecentBucketBinding
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.fragments.homepage.NodeItem
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -62,6 +61,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.mutateIconSecondary
 import mega.privacy.android.app.utils.callManager
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -217,7 +217,10 @@ class RecentsBucketFragment : Fragment() {
             )
 
             binding.dateText.text =
-                TimeUtils.formatBucketDate(viewModel.bucket.value?.timestamp ?: return)
+                TimeUtils.formatBucketDate(
+                    viewModel.bucket.value?.timestamp ?: return,
+                    requireContext()
+                )
             binding.headerInfoLayout.visibility = View.VISIBLE
         }
     }
@@ -298,11 +301,13 @@ class RecentsBucketFragment : Fragment() {
 
         val paramsSetSuccessfully =
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
+                FileUtil.setLocalIntentParams(
+                    activity, node, intent, localPath, false,
                     requireActivity() as ManagerActivity
                 )
             } else {
-                FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
+                FileUtil.setStreamingIntentParams(
+                    activity, node, megaApi, intent,
                     requireActivity() as ManagerActivity
                 )
             }
@@ -335,11 +340,13 @@ class RecentsBucketFragment : Fragment() {
 
         val paramsSetSuccessfully =
             if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                FileUtil.setLocalIntentParams(activity, node, intent, localPath, false,
+                FileUtil.setLocalIntentParams(
+                    activity, node, intent, localPath, false,
                     requireActivity() as ManagerActivity
                 )
             } else {
-                FileUtil.setStreamingIntentParams(activity, node, megaApi, intent,
+                FileUtil.setStreamingIntentParams(
+                    activity, node, megaApi, intent,
                     requireActivity() as ManagerActivity
                 )
             }
@@ -461,7 +468,8 @@ class RecentsBucketFragment : Fragment() {
                         thumbnail.hierarchy.roundingParams = RoundingParams.fromCornersRadius(
                             requireContext().resources.getDimensionPixelSize(
                                 R.dimen.cu_fragment_selected_round_corner_radius
-                            ).toFloat())
+                            ).toFloat()
+                        )
                         thumbnail.background =
                             ContextCompat.getDrawable(
                                 requireContext(), R.drawable.background_item_grid_selected

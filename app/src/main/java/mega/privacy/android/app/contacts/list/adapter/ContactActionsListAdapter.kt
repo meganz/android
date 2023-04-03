@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.list.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -16,8 +17,9 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
  */
 class ContactActionsListAdapter(
     private val onRequestsCallback: () -> Unit,
-    private val onGroupsCallback: () -> Unit
-) : ListAdapter<ContactActionItem, ContactActionViewHolder>(ContactActionItem.DiffCallback()), SectionTitleProvider {
+    private val onGroupsCallback: () -> Unit,
+) : ListAdapter<ContactActionItem, ContactActionViewHolder>(ContactActionItem.DiffCallback()),
+    SectionTitleProvider {
 
     init {
         setHasStableIds(true)
@@ -48,5 +50,5 @@ class ContactActionsListAdapter(
     override fun getItemId(position: Int): Long =
         getItem(position).id.ordinal.toLong()
 
-    override fun getSectionTitle(position: Int): String? = null
+    override fun getSectionTitle(position: Int, context: Context): String? = null
 }

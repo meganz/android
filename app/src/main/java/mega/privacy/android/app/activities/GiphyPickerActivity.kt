@@ -33,7 +33,6 @@ import mega.privacy.android.app.objects.GifData
 import mega.privacy.android.app.objects.GiphyResponse
 import mega.privacy.android.app.services.GiphyService
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.hideKeyboard
@@ -115,7 +114,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
 
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
-            title = StringResourcesUtils.getString(R.string.search_giphy_title)
+            title = getString(R.string.search_giphy_title)
         }
 
         binding.giphyToolbar.setOnClickListener { searchMenuItem?.expandActionView() }
@@ -139,11 +138,15 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
         var emptyTextSearch = getString(R.string.empty_search_giphy)
 
         try {
-            endOfList = endOfList.replace("[A]",
-                "<font color='${ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)}'>")
+            endOfList = endOfList.replace(
+                "[A]",
+                "<font color='${ColorUtils.getColorHexString(this, R.color.grey_300_grey_600)}'>"
+            )
             endOfList = endOfList.replace("[/A]", "</font>")
-            emptyTextSearch = emptyTextSearch.replace("[A]",
-                "<font color='${ColorUtils.getColorHexString(this, R.color.black_white)}'>")
+            emptyTextSearch = emptyTextSearch.replace(
+                "[A]",
+                "<font color='${ColorUtils.getColorHexString(this, R.color.black_white)}'>"
+            )
             emptyTextSearch = emptyTextSearch.replace("[/A]", "</font>")
         } catch (e: Exception) {
             Timber.w(e, "Exception formatting string")
@@ -470,7 +473,7 @@ class GiphyPickerActivity : PasscodeActivity(), GiphyInterface {
                 binding.giphyListView.visibility = GONE
                 binding.emptyGiphyText.text =
                     if (emptyState == EMPTY_SEARCH) emptyText
-                    else StringResourcesUtils.getString(R.string.server_down_giphy)
+                    else getString(R.string.server_down_giphy)
             }
         }
     }

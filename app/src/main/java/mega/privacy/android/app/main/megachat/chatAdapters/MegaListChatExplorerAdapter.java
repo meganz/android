@@ -320,7 +320,7 @@ public class MegaListChatExplorerAdapter extends RecyclerView.Adapter<MegaListCh
     }
 
     @Override
-    public String getSectionTitle(int position) {
+    public String getSectionTitle(int position, Context context) {
         if (items != null) {
             if (position >= 0 && position < items.size()) {
                 String name = items.get(position).getTitle();

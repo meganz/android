@@ -11,17 +11,16 @@ import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.sync.Backup
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.RxUtil.logErr
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_INVALID
@@ -146,9 +145,9 @@ object CameraUploadSyncManager {
 
         // Same as localized CU/MU folder name.
         val backupName = if (backupType == BACKUP_TYPE_CAMERA_UPLOADS)
-            StringResourcesUtils.getString(R.string.section_photo_sync)
+            megaApplication.getString(R.string.section_photo_sync)
         else
-            StringResourcesUtils.getString(R.string.section_secondary_media_uploads)
+            megaApplication.getString(R.string.section_secondary_media_uploads)
 
         megaApi.setBackup(
             backupType,
@@ -289,7 +288,7 @@ object CameraUploadSyncManager {
                 backupId = cuSync.backupId,
                 targetNode = newTargetNode,
                 localFolder = null,
-                backupName = StringResourcesUtils.getString(R.string.section_photo_sync),
+                backupName = megaApplication.getString(R.string.section_photo_sync),
                 backupState = BackupState.INVALID,
             )
         }
@@ -328,7 +327,7 @@ object CameraUploadSyncManager {
                 backupId = muSync.backupId,
                 targetNode = newTargetNode,
                 localFolder = null,
-                backupName = StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
+                backupName = megaApplication.getString(R.string.section_secondary_media_uploads),
                 backupState = BackupState.INVALID,
             )
         }
@@ -361,7 +360,7 @@ object CameraUploadSyncManager {
                 backupId = cuSync.backupId,
                 targetNode = INVALID_HANDLE,
                 localFolder = newLocalFolder,
-                backupName = StringResourcesUtils.getString(R.string.section_photo_sync),
+                backupName = megaApplication.getString(R.string.section_photo_sync),
                 backupState = BackupState.INVALID,
             )
         }
@@ -394,7 +393,7 @@ object CameraUploadSyncManager {
                 backupId = muSync.backupId,
                 targetNode = INVALID_HANDLE,
                 localFolder = newLocalFolder,
-                backupName = StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
+                backupName = megaApplication.getString(R.string.section_secondary_media_uploads),
                 backupState = BackupState.INVALID,
             )
         }
@@ -417,7 +416,7 @@ object CameraUploadSyncManager {
                 backupId = cuSync.backupId,
                 targetNode = INVALID_HANDLE,
                 localFolder = null,
-                backupName = StringResourcesUtils.getString(R.string.section_photo_sync),
+                backupName = megaApplication.getString(R.string.section_photo_sync),
                 backupState = BackupState.INVALID,
             )
         }
@@ -440,7 +439,7 @@ object CameraUploadSyncManager {
                 backupId = muSync.backupId,
                 targetNode = INVALID_HANDLE,
                 localFolder = null,
-                backupName = StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
+                backupName = megaApplication.getString(R.string.section_secondary_media_uploads),
                 backupState = BackupState.INVALID,
             )
         }
@@ -463,7 +462,7 @@ object CameraUploadSyncManager {
                 backupId = cuSync.backupId,
                 targetNode = INVALID_HANDLE,
                 localFolder = null,
-                backupName = StringResourcesUtils.getString(R.string.section_photo_sync),
+                backupName = megaApplication.getString(R.string.section_photo_sync),
                 backupState = backupState,
             )
         }
@@ -486,7 +485,7 @@ object CameraUploadSyncManager {
                 backupId = muSync.backupId,
                 targetNode = INVALID_HANDLE,
                 localFolder = null,
-                backupName = StringResourcesUtils.getString(R.string.section_secondary_media_uploads),
+                backupName = megaApplication.getString(R.string.section_secondary_media_uploads),
                 backupState = backupState,
             )
         }
@@ -824,11 +823,13 @@ object CameraUploadSyncManager {
             myUserHandle = megaApi.myUser.handle.toString() + ""
         }
         val credentials =
-            UserCredentials(lastEmail,
+            UserCredentials(
+                lastEmail,
                 fastLoginSession,
                 "",
                 "",
-                myUserHandle)
+                myUserHandle
+            )
         val dbH = getDbHandler()
         dbH.saveCredentials(credentials)
     }

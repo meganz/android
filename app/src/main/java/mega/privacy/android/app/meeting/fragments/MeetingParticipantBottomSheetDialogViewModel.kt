@@ -12,7 +12,6 @@ import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatPeerList
 import javax.inject.Inject
@@ -22,7 +21,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
-    private val megaChatApi: MegaChatApiAndroid
+    private val megaChatApi: MegaChatApiAndroid,
 ) : ViewModel() {
 
     var isGuest = false
@@ -37,7 +36,7 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
         moderator: Boolean,
         guest: Boolean,
         speakerMode: Boolean,
-        info: Participant
+        info: Participant,
     ) {
         isModerator = moderator
         participant = info
@@ -134,7 +133,8 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      *
      * @return if should show `Edit Profile` item, return true, else false
      */
-    fun showEditProfile(): Boolean = !isGuest && !isParticipantGuest() && (participant?.isMe == true || participant?.peerId == megaChatApi.myUserHandle)
+    fun showEditProfile(): Boolean =
+        !isGuest && !isParticipantGuest() && (participant?.isMe == true || participant?.peerId == megaChatApi.myUserHandle)
 
     /**
      * Determine if show the `Send Message` item
@@ -160,8 +160,8 @@ class MeetingParticipantBottomSheetDialogViewModel @Inject constructor(
      *
      * @return the target text for the item
      */
-    fun getContactItemText(): String? {
-        return StringResourcesUtils.getString(
+    fun getContactItemText(context: Context): String {
+        return context.getString(
             if (participant?.isMe == true || participant?.peerId == megaChatApi.myUserHandle) R.string.group_chat_edit_profile_label
             else R.string.contact_properties_activity
         )

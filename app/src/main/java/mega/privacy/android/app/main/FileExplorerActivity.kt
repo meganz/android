@@ -92,7 +92,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.cloudRootHandle
 import mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder
 import mega.privacy.android.app.utils.MegaNodeUtil.myChatFilesFolder
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -547,7 +546,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 viewModel.ownFilePrepareTask(this, intent)
                 createAndShowProgressDialog(
                     false,
-                    StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1)
+                    resources.getQuantityString(R.plurals.upload_prepare, 1)
                 )
             }
             return
@@ -734,9 +733,9 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     isSelectFile = false
                     parentHandleCloud =
                         intent.getLongExtra(EXTRA_PARENT_HANDLE, INVALID_HANDLE)
-                    title = StringResourcesUtils.getString(R.string.section_cloud_drive)
+                    title = getString(R.string.section_cloud_drive)
                     supportActionBar?.subtitle =
-                        StringResourcesUtils.getString(R.string.cloud_drive_select_destination)
+                        getString(R.string.cloud_drive_select_destination)
                     setView(CLOUD_TAB, false)
                     tabShown = NO_TABS
                 }
@@ -750,7 +749,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     chooseFragment(IMPORT_FRAGMENT)
                     createAndShowProgressDialog(
                         false,
-                        StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1)
+                        resources.getQuantityString(R.plurals.upload_prepare, 1)
                     )
 
                     with(binding) {
@@ -796,10 +795,10 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 explorerTabsPager
             ) { tab: TabLayout.Tab, tabPosition: Int ->
                 tab.text = when (tabPosition) {
-                    1 -> StringResourcesUtils.getString(R.string.tab_incoming_shares)
-                    2 -> StringResourcesUtils.getString(R.string.section_chat)
-                    0 -> StringResourcesUtils.getString(R.string.section_cloud_drive)
-                    else -> StringResourcesUtils.getString(R.string.section_cloud_drive)
+                    1 -> getString(R.string.tab_incoming_shares)
+                    2 -> getString(R.string.section_chat)
+                    0 -> getString(R.string.section_cloud_drive)
+                    else -> getString(R.string.section_cloud_drive)
                 }
             }.attach()
 
@@ -1217,7 +1216,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 getString(R.string.title_file_explorer_send_link)
             }
             mode == SAVE -> {
-                StringResourcesUtils.getString(R.string.section_cloud_drive)
+                getString(R.string.section_cloud_drive)
             }
             mode == UPLOAD -> {
                 when (importFragmentSelected) {
@@ -1238,7 +1237,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         cDriveExplorer = cloudExplorerFragment
         iSharesExplorer = incomingExplorerFragment
         supportActionBar?.subtitle = if (mode == SAVE) {
-            StringResourcesUtils.getString(R.string.cloud_drive_select_destination)
+            getString(R.string.cloud_drive_select_destination)
         } else {
             null
         }
@@ -1606,7 +1605,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         if (folderSelected) {
             if (infos == null) {
                 dismissAlertDialogIfExists(statusDialog)
-                showSnackbar(StringResourcesUtils.getString(R.string.upload_can_not_open))
+                showSnackbar(getString(R.string.upload_can_not_open))
                 return
             }
 
@@ -1635,7 +1634,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     dismissAlertDialogIfExists(statusDialog)
 
                     if (throwable != null) {
-                        showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible))
+                        showSnackbar(getString(R.string.error_temporary_unavaible))
                     } else {
                         if (collisions.isNotEmpty()) {
                             (nameCollisionActivityContract ?: return@subscribe).launch(collisions)
@@ -1645,7 +1644,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                             checkNotificationsPermission(this)
 
                             val text =
-                                StringResourcesUtils.getQuantityString(
+                                resources.getQuantityString(
                                     R.plurals.upload_began,
                                     withoutCollisions.size,
                                     withoutCollisions.size
@@ -1765,7 +1764,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     viewModel.ownFilePrepareTask(this, intent)
                     createAndShowProgressDialog(
                         false,
-                        StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1)
+                        resources.getQuantityString(R.plurals.upload_prepare, 1)
                     )
                 } else {
                     onIntentProcessed()
@@ -1878,7 +1877,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         }
 
         if (file == null) {
-            showSnackbar(StringResourcesUtils.getString(R.string.general_text_error))
+            showSnackbar(getString(R.string.general_text_error))
             return
         }
 
@@ -1888,14 +1887,14 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ handle: Long? ->
                 val list = ArrayList<NameCollision>()
-                list.add(getUploadCollision(handle ?: return@subscribe, file, parentHandle))
+                list.add(getUploadCollision(handle ?: return@subscribe, file, parentHandle, this))
                 nameCollisionActivityContract?.launch(list)
             }) { throwable: Throwable? ->
                 if (throwable is ParentDoesNotExistException) {
-                    showSnackbar(StringResourcesUtils.getString(R.string.general_text_error))
+                    showSnackbar(getString(R.string.general_text_error))
                 } else if (throwable is ChildDoesNotExistsException) {
                     checkNotificationsPermission(this)
-                    val text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, 1, 1)
+                    val text = resources.getQuantityString(R.plurals.upload_began, 1, 1)
                     uploadUseCase.upload(this, file, parentHandle)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -2262,7 +2261,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
     private fun getChatAdded(listItems: ArrayList<ChatExplorerListItem>) {
         val chats = ArrayList<MegaChatRoom>()
         val users = ArrayList<MegaUser>()
-        createAndShowProgressDialog(true, StringResourcesUtils.getString(R.string.preparing_chats))
+        createAndShowProgressDialog(true, getString(R.string.preparing_chats))
 
         for (item in listItems) {
             if (item.chat != null) {
@@ -2361,7 +2360,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
         if (filePreparedInfos == null) {
             createAndShowProgressDialog(
                 false,
-                StringResourcesUtils.getQuantityString(R.plurals.upload_prepare, 1)
+                resources.getQuantityString(R.plurals.upload_prepare, 1)
             )
 
             filePrepareUseCase.prepareFiles(intent)

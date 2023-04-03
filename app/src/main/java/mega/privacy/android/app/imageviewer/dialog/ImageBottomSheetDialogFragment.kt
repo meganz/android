@@ -50,11 +50,10 @@ import mega.privacy.android.app.imageviewer.util.shouldShowRestoreOption
 import mega.privacy.android.app.imageviewer.util.shouldShowRubbishBinOption
 import mega.privacy.android.app.imageviewer.util.shouldShowSendToContactOption
 import mega.privacy.android.app.imageviewer.util.shouldShowShareOption
-import mega.privacy.android.app.imageviewer.util.shouldShowSlideshowOption
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil
 import mega.privacy.android.app.modalbottomsheet.nodelabel.NodeLabelBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity
 import mega.privacy.android.app.utils.Constants.DISPUTE_URL
 import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
@@ -66,8 +65,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelColor
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelDrawable
 import mega.privacy.android.app.utils.MegaNodeUtil.getNodeLabelText
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -99,7 +96,9 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private val viewModel by viewModels<ImageViewerViewModel>({ requireActivity() })
-    private val itemId by lazy { arguments?.getLong(INTENT_EXTRA_KEY_HANDLE) ?: error("Null Item Id") }
+    private val itemId by lazy {
+        arguments?.getLong(INTENT_EXTRA_KEY_HANDLE) ?: error("Null Item Id")
+    }
     private var alertDialog: Dialog? = null
     private var alertDialogType: AlertDialogType? = null
 
@@ -213,7 +212,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     if (node.isFavourite) R.string.file_properties_unfavourite else R.string.file_properties_favourite
                 val favoriteDrawable =
                     if (node.isFavourite) R.drawable.ic_remove_favourite else R.drawable.ic_add_favourite
-                optionFavorite.text = StringResourcesUtils.getString(favoriteText)
+                optionFavorite.text = getString(favoriteText)
                 optionFavorite.setCompoundDrawablesWithIntrinsicBounds(favoriteDrawable, 0, 0, 0)
                 optionFavorite.setOnClickListener {
                     viewModel.markNodeAsFavorite(nodeHandle!!, !node.isFavourite)
@@ -226,12 +225,14 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 val labelColor =
                     ResourcesCompat.getColor(resources, getNodeLabelColor(node.label), null)
                 val labelDrawable = getNodeLabelDrawable(node.label, resources)
-                optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(null,
+                optionLabelCurrent.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                    null,
                     null,
                     labelDrawable,
-                    null)
+                    null
+                )
                 optionLabelCurrent.setTextColor(labelColor)
-                optionLabelCurrent.text = getNodeLabelText(node.label)
+                optionLabelCurrent.text = getNodeLabelText(node.label, requireContext())
                 optionLabelCurrent.isVisible = node.label != MegaNode.NODE_LBL_UNKNOWN
                 optionLabelLayout.setOnClickListener {
                     NodeLabelBottomSheetDialogFragment.newInstance(nodeHandle!!)
@@ -297,8 +298,10 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 dismissAllowingStateLoss()
             }
             optionOfflineRemove.setOnClickListener {
-                viewModel.removeOfflineNode(nodeHandle!!,
-                    requireActivity())
+                viewModel.removeOfflineNode(
+                    nodeHandle!!,
+                    requireActivity()
+                )
             }
             switchOffline.post {
                 optionOfflineLayout.setOnClickListener { offlineAction.invoke() }
@@ -309,9 +312,9 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionManageLink.isVisible = imageItem.shouldShowManageLinkOption()
             optionRemoveLink.isVisible = imageItem.shouldShowRemoveLinkOption()
             if (node?.isExported == true) {
-                optionManageLink.text = StringResourcesUtils.getString(R.string.edit_link_option)
+                optionManageLink.text = getString(R.string.edit_link_option)
             } else {
-                optionManageLink.text = getQuantityString(R.plurals.get_links, 1)
+                optionManageLink.text = resources.getQuantityString(R.plurals.get_links, 1)
             }
             optionManageLink.setOnClickListener {
                 LinksUtil.showGetLinkActivity(this@ImageBottomSheetDialogFragment, nodeHandle!!)
@@ -371,7 +374,7 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             val copyDrawable =
                 if (nodeItem?.isExternalNode == true || imageItem is ImageItem.ChatNode) R.drawable.ic_import_to_cloud_white else R.drawable.ic_menu_copy
             optionCopy.setCompoundDrawablesWithIntrinsicBounds(copyDrawable, 0, 0, 0)
-            optionCopy.text = StringResourcesUtils.getString(copyAction)
+            optionCopy.text = getString(copyAction)
 
             // Restore
             optionRestore.isVisible = imageItem.shouldShowRestoreOption()
@@ -461,13 +464,15 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         when (type) {
             AlertDialogType.TYPE_REMOVE_LINK -> {
                 alertDialog = MaterialAlertDialogBuilder(requireContext())
-                    .setMessage(getQuantityString(R.plurals.remove_links_warning_text, 1))
-                    .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
+                    .setMessage(resources.getQuantityString(R.plurals.remove_links_warning_text, 1))
+                    .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
                         viewModel.removeLink(nodeHandle)
                         dismissAllowingStateLoss()
                     }
-                    .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel),
-                        null)
+                    .setNegativeButton(
+                        getString(R.string.general_cancel),
+                        null
+                    )
                     .show()
             }
             AlertDialogType.TYPE_RUBBISH_BIN -> {
@@ -484,8 +489,8 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 }
 
                 alertDialog = MaterialAlertDialogBuilder(requireContext())
-                    .setMessage(StringResourcesUtils.getString(messageText))
-                    .setPositiveButton(StringResourcesUtils.getString(buttonText)) { _, _ ->
+                    .setMessage(getString(messageText))
+                    .setPositiveButton(getString(buttonText)) { _, _ ->
                         if (isFromRubbishBin) {
                             viewModel.removeNode(nodeHandle)
                         } else {
@@ -493,19 +498,21 @@ class ImageBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         }
                         dismissAllowingStateLoss()
                     }
-                    .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel),
-                        null)
+                    .setNegativeButton(
+                        getString(R.string.general_cancel),
+                        null
+                    )
                     .show()
             }
             AlertDialogType.TYPE_REMOVE_CHAT_NODE -> {
                 alertDialog = MaterialAlertDialogBuilder(requireContext())
-                    .setMessage(StringResourcesUtils.getString(R.string.confirmation_delete_one_message))
-                    .setPositiveButton(StringResourcesUtils.getString(R.string.general_remove)) { _, _ ->
+                    .setMessage(getString(R.string.confirmation_delete_one_message))
+                    .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
                         viewModel.removeChatMessage(nodeHandle)
                         dismissAllowingStateLoss()
                     }
                     .setNegativeButton(
-                        StringResourcesUtils.getString(R.string.general_cancel),
+                        getString(R.string.general_cancel),
                         null
                     )
                     .show()

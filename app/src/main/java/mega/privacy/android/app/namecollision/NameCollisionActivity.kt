@@ -32,7 +32,6 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.usecase.exception.MegaException
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
@@ -57,7 +56,7 @@ class NameCollisionActivity : PasscodeActivity() {
         @JvmStatic
         fun getIntentForList(
             context: Context,
-            collisions: ArrayList<NameCollision>
+            collisions: ArrayList<NameCollision>,
         ): Intent =
             Intent(context, NameCollisionActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_COLLISION_RESULTS, collisions)
@@ -66,14 +65,14 @@ class NameCollisionActivity : PasscodeActivity() {
         @JvmStatic
         fun getIntentForFolderUpload(
             context: Context,
-            collisions: ArrayList<NameCollision>
+            collisions: ArrayList<NameCollision>,
         ): Intent =
             getIntentForList(context, collisions).apply { action = UPLOAD_FOLDER_CONTEXT }
 
         @JvmStatic
         fun getIntentForSingleItem(
             context: Context,
-            collision: NameCollision
+            collision: NameCollision,
         ): Intent =
             Intent(context, NameCollisionActivity::class.java).apply {
                 putExtra(INTENT_EXTRA_SINGLE_COLLISION_RESULT, collision)
@@ -147,7 +146,7 @@ class NameCollisionActivity : PasscodeActivity() {
     private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
-            title = StringResourcesUtils.getString(R.string.title_duplicated_items)
+            title = getString(R.string.title_duplicated_items)
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }
@@ -222,13 +221,13 @@ class NameCollisionActivity : PasscodeActivity() {
         val isFile = collision.isFile
         val name = collision.name
 
-        binding.alreadyExistsText.text = StringResourcesUtils.getString(
+        binding.alreadyExistsText.text = getString(
             if (isFile) R.string.file_already_exists_in_location
             else R.string.folder_already_exists_in_location, name
         ).formatColorTag(this, 'B', R.color.grey_900_grey_100)
             .toSpannedHtmlText()
 
-        binding.selectText.text = StringResourcesUtils.getString(
+        binding.selectText.text = getString(
             if (isFile) R.string.choose_file
             else R.string.choose_folder
         )
@@ -253,7 +252,10 @@ class NameCollisionActivity : PasscodeActivity() {
                 }
             }
             this.name.text = name
-            size.text = if (isFile) getSizeString(collision.size!!) else collision.folderContent
+            size.text = if (isFile) getSizeString(
+                collision.size ?: 0,
+                this@NameCollisionActivity
+            ) else collision.folderContent
             date.text = formatLongDateTime(
                 if (collision is NameCollision.Upload) collision.lastModified / 1000
                 else collision.lastModified
@@ -268,7 +270,7 @@ class NameCollisionActivity : PasscodeActivity() {
             }
         }
 
-        binding.cancelInfo.text = StringResourcesUtils.getString(
+        binding.cancelInfo.text = getString(
             if (isFile) R.string.skip_file
             else R.string.skip_folder
         )
@@ -309,9 +311,12 @@ class NameCollisionActivity : PasscodeActivity() {
             }
             this.name.text = collisionResult.collisionName
             size.text =
-                if (isFile) getSizeString(collisionResult.collisionSize!!)
+                if (isFile) getSizeString(
+                    collisionResult.collisionSize ?: 0,
+                    this@NameCollisionActivity
+                )
                 else collisionResult.collisionFolderContent
-            date.text = formatLongDateTime(collisionResult.collisionLastModified!!)
+            date.text = formatLongDateTime(collisionResult.collisionLastModified ?: 0)
 
             val thumbnailView = if (hasThumbnail) R.id.thumbnail else R.id.thumbnail_icon
 
@@ -322,7 +327,7 @@ class NameCollisionActivity : PasscodeActivity() {
             }
         }
 
-        binding.cancelButton.text = StringResourcesUtils.getString(cancelButtonId)
+        binding.cancelButton.text = getString(cancelButtonId)
 
         binding.cancelSeparator.isVisible = isFile
         binding.renameInfo.isVisible = isFile
@@ -330,7 +335,7 @@ class NameCollisionActivity : PasscodeActivity() {
         binding.renameButton.isVisible = isFile
 
         if (isFile) {
-            binding.renameInfo.text = StringResourcesUtils.getString(renameInfoId)
+            binding.renameInfo.text = getString(renameInfoId)
             binding.renameView.apply {
                 val hasThumbnail = collisionResult.thumbnail != null
                 thumbnail.isVisible = hasThumbnail
@@ -365,7 +370,7 @@ class NameCollisionActivity : PasscodeActivity() {
                     applyTo(root)
                 }
             }
-            binding.renameButton.text = StringResourcesUtils.getString(renameButtonId)
+            binding.renameButton.text = getString(renameButtonId)
         }
 
         val pendingCollisions =
@@ -377,7 +382,7 @@ class NameCollisionActivity : PasscodeActivity() {
 
             if (isVisible) {
                 text =
-                    StringResourcesUtils.getString(R.string.file_apply_for_all, pendingCollisions)
+                    getString(R.string.file_apply_for_all, pendingCollisions)
             }
         }
     }
@@ -503,9 +508,9 @@ class NameCollisionActivity : PasscodeActivity() {
         }
 
         binding.replaceUpdateMergeInfo.text =
-            StringResourcesUtils.getString(replaceUpdateMergeInfoId)
+            getString(replaceUpdateMergeInfoId)
         binding.replaceUpdateMergeButton.text =
-            StringResourcesUtils.getString(replaceUpdateMergeButtonId)
+            getString(replaceUpdateMergeButtonId)
     }
 
     private fun manageCollisionsResolution(collisionsResolution: ArrayList<NameCollisionResult>) {

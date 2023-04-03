@@ -45,7 +45,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
 
         // if the name is empty, get the default name for the meeting
         if (meetingName.isEmpty()) {
-            binding.typeMeetingEditText.setText(viewModel.initHintMeetingName())
+            binding.typeMeetingEditText.setText(viewModel.initHintMeetingName(requireContext()))
         }
 
         Timber.d("Meeting Name: $meetingName")
@@ -111,7 +111,7 @@ class CreateMeetingFragment : AbstractMeetingOnBoardingFragment() {
             it.visibility = View.VISIBLE
             it.setSelectAllOnFocus(true)
             it.setEmojiSize(Util.dp2px(Constants.EMOJI_SIZE.toFloat(), resources.displayMetrics))
-            val defaultName = viewModel.initHintMeetingName()
+            val defaultName = viewModel.initHintMeetingName(requireContext())
             it.hint = defaultName
             val maxAllowed = ChatUtil.getMaxAllowed(defaultName)
             it.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxAllowed))

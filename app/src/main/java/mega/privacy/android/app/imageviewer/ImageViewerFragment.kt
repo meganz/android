@@ -17,7 +17,6 @@ import mega.privacy.android.app.databinding.FragmentImageViewerBinding
 import mega.privacy.android.app.imageviewer.adapter.ImageViewerAdapter
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.utils.ContextUtils.isLowMemory
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import timber.log.Timber
 
@@ -123,7 +122,7 @@ class ImageViewerFragment : Fragment() {
 
                     val imagesSize = items.size
                     binding.txtPageCount.apply {
-                        text = StringResourcesUtils.getString(
+                        text = getString(
                             R.string.wizard_steps_indicator,
                             currentPosition + 1,
                             imagesSize
@@ -148,7 +147,7 @@ class ImageViewerFragment : Fragment() {
         val position = viewModel.getCurrentPosition(false)
         binding.txtTitle.text = imageItem?.name
         binding.txtPageCount.apply {
-            text = StringResourcesUtils.getString(
+            text = getString(
                 R.string.wizard_steps_indicator,
                 position + 1,
                 imagesSize

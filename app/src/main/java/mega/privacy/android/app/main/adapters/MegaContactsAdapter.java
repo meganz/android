@@ -92,7 +92,7 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
     }
 
     @Override
-    public String getSectionTitle(int position) {
+    public String getSectionTitle(int position, Context context) {
         return contacts.get(position).getFullName().substring(0, 1).toUpperCase();
     }
 

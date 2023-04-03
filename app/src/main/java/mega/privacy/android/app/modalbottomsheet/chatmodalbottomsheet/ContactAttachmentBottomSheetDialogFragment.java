@@ -41,7 +41,6 @@ import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaChatMessage;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
@@ -205,7 +204,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
                 titleMailContactChatPanel.setText(name);
 
-                String email = StringResourcesUtils.getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
+                String email = getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 titleNameContactChatPanel.setText(email);
 
                 setImageAvatar(INVALID_HANDLE, null, userCount + "", contactImageView);
@@ -280,7 +279,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         switch (v.getId()) {
             case R.id.option_info_layout:
                 if (!isOnline(requireContext())) {
-                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
@@ -310,7 +309,7 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
 
             case R.id.option_invite_layout:
                 if (!isOnline(requireContext())) {
-                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 

@@ -123,7 +123,7 @@ class SMSVerificationViewModelTest {
     @Test
     fun `test that state is updated if set is user locked is called with true`() = runTest {
         underTest.uiState.test {
-            underTest.setIsUserLocked(true)
+            underTest.setIsUserLocked(true, mock())
             val expected = getInitialState().copy(isUserLocked = true)
             awaitItem()
             val actual = awaitItem()
@@ -139,8 +139,8 @@ class SMSVerificationViewModelTest {
         whenever(smsVerificationTextMapper(any())).thenReturn(expected)
         whenever(areAccountAchievementsEnabled()).thenReturn(true)
         whenever(getAccountAchievements(any(), any())).thenReturn(mock())
-        whenever(stringUtilWrapper.getSizeString(any())).thenReturn(bonusStorage)
-        underTest.setIsUserLocked(false)
+        whenever(stringUtilWrapper.getSizeString(any(), any())).thenReturn(bonusStorage)
+        underTest.setIsUserLocked(false, mock())
         advanceUntilIdle()
         underTest.uiState.test {
             val actual = awaitItem()

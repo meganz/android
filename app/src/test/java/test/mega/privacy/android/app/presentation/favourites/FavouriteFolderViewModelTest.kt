@@ -18,7 +18,6 @@ import mega.privacy.android.app.presentation.favourites.model.ChildrenNodesLoadS
 import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMapper
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
-import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
 import nz.mega.sdk.MegaNode
@@ -27,6 +26,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.test.assertTrue
@@ -104,7 +104,7 @@ class FavouriteFolderViewModelTest {
     @Test
     fun `test that start with loading state, children nodes is not empty and back pressed callback is not enable`() =
         runTest {
-            whenever(stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
+            whenever(stringUtilWrapper.getFolderInfo(eq(0), eq(0), any())).thenReturn("info")
             whenever(getFavouriteFolderInfo(rootHandle)).thenReturn(
                 flowOf(
                     FavouriteFolderInfo(
@@ -117,8 +117,12 @@ class FavouriteFolderViewModelTest {
             )
             whenever(favouriteMapper(any(), any(), any(), any(), any(), any())).thenReturn(mock())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
-            whenever(megaUtilWrapper.availableOffline(anyOrNull(),
-                anyOrNull())).thenReturn(true)
+            whenever(
+                megaUtilWrapper.availableOffline(
+                    anyOrNull(),
+                    anyOrNull()
+                )
+            ).thenReturn(true)
             underTest.childrenNodesState.test {
                 assertTrue(awaitItem() is ChildrenNodesLoadState.Loading)
                 val actual = awaitItem()
@@ -130,7 +134,7 @@ class FavouriteFolderViewModelTest {
     @Test
     fun `test that start with loading state, children nodes is not empty and back pressed callback is enable`() =
         runTest {
-            whenever(stringUtilWrapper.getFolderInfo(0, 0)).thenReturn("info")
+            whenever(stringUtilWrapper.getFolderInfo(eq(0), eq(0), any())).thenReturn("info")
             whenever(getFavouriteFolderInfo(rootHandle)).thenReturn(
                 flowOf(
                     FavouriteFolderInfo(
@@ -143,8 +147,12 @@ class FavouriteFolderViewModelTest {
             )
             whenever(favouriteMapper(any(), any(), any(), any(), any(), any())).thenReturn(mock())
             whenever(fetchNodeWrapper(anyOrNull())).thenReturn(megaNode)
-            whenever(megaUtilWrapper.availableOffline(anyOrNull(),
-                anyOrNull())).thenReturn(true)
+            whenever(
+                megaUtilWrapper.availableOffline(
+                    anyOrNull(),
+                    anyOrNull()
+                )
+            ).thenReturn(true)
             underTest.childrenNodesState.test {
                 assertTrue(awaitItem() is ChildrenNodesLoadState.Loading)
                 val actual = awaitItem()

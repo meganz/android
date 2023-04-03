@@ -19,16 +19,15 @@ import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.GetNameCollisionResultUseCase
-import mega.privacy.android.app.usecase.CopyNodeUseCase
-import mega.privacy.android.app.usecase.GetNodeUseCase
-import mega.privacy.android.app.usecase.MoveNodeUseCase
-import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
+import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.GetNodeUseCase
+import mega.privacy.android.app.usecase.MoveNodeUseCase
+import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -448,7 +447,7 @@ class NameCollisionViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onComplete = {
-                    setUploadResult(1)
+                    setUploadResult(1, context)
                     continueWithNext(choice)
                 },
                 onError = Timber::e
@@ -488,7 +487,7 @@ class NameCollisionViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onComplete = { setUploadResult(list.size) },
+                onComplete = { setUploadResult(list.size, context) },
                 onError = Timber::e
             ).addTo(composite)
     }
@@ -498,9 +497,9 @@ class NameCollisionViewModel @Inject constructor(
      *
      * @param quantity  Number of processed uploads.
      */
-    private fun setUploadResult(quantity: Int) {
+    private fun setUploadResult(quantity: Int, context: Context) {
         actionResult.value = NameCollisionActionResult(
-            message = StringResourcesUtils.getQuantityString(
+            message = context.resources.getQuantityString(
                 R.plurals.upload_began,
                 quantity,
                 quantity

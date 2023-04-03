@@ -73,7 +73,7 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
         nodeInfo.setMaxWidth(scaleWidthPx(200, getResources().getDisplayMetrics()));
 
         nodeName.setText(node.getName());
-        nodeInfo.setText(getFileInfo(node));
+        nodeInfo.setText(getFileInfo(node, requireContext()));
 
         setNodeThumbnail(requireContext(), node, nodeThumb);
 

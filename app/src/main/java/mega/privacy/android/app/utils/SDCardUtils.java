@@ -183,7 +183,7 @@ public class SDCardUtils {
                     Timber.e(e, "Error moving file to the sd card path");
                 }
 
-                dbH.setCompletedTransferWithCheck(new AndroidCompletedTransfer(sdtransfer));
+                dbH.setCompletedTransferWithCheck(new AndroidCompletedTransfer(sdtransfer, app));
             }
         }).start();
     }

@@ -43,7 +43,11 @@ class FavouritesViewModelTest {
     private lateinit var underTest: FavouritesViewModel
 
     private val stringUtilWrapper =
-        mock<StringUtilWrapper> { on { getFolderInfo(any(), any()) }.thenReturn("info") }
+        mock<StringUtilWrapper> { on { getFolderInfo(
+            any(),
+            any(),
+            any(),
+        ) }.thenReturn("info") }
     private val favouriteMapper = mock<FavouriteMapper> {
         on { invoke(any(), any(), any(), any(), any(), any()) }
             .thenAnswer {
@@ -231,16 +235,20 @@ class FavouritesViewModelTest {
 
             val filteredItems = awaitItem()
             val expected = timeDescendingOddOnly.reversed()
-            verifyInOrder(filteredItems,
+            verifyInOrder(
+                filteredItems,
                 expected,
-                "Items contain odd values in ascending time order")
+                "Items contain odd values in ascending time order"
+            )
 
             underTest.onOrderChange(SortOrder.ORDER_CREATION_DESC)
 
             val sortedItems = awaitItem()
-            verifyInOrder(sortedItems,
+            verifyInOrder(
+                sortedItems,
                 timeDescendingOddOnly,
-                "Items contain odd values in descending time order")
+                "Items contain odd values in descending time order"
+            )
             assertThat((sortedItems as FavouriteLoadState.Success).favourites.drop(1)
                 .mapNotNull { it.favourite?.typedNode?.name }
                 .all { it.startsWith(oddString) }).isTrue()
@@ -260,7 +268,8 @@ class FavouritesViewModelTest {
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
             underTest.itemSelected(mock { on { typedNode }.thenReturn(expected) })
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).containsExactly(
-                expected.id)
+                expected.id
+            )
         }
     }
 
@@ -278,7 +287,8 @@ class FavouritesViewModelTest {
             val selected = mock<Favourite> { on { typedNode }.thenReturn(expected) }
             underTest.itemSelected(selected)
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).containsExactly(
-                expected.id)
+                expected.id
+            )
             underTest.itemSelected(selected)
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).isEmpty()
         }
@@ -293,7 +303,8 @@ class FavouritesViewModelTest {
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
             underTest.selectAll()
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).containsExactlyElementsIn(
-                expected)
+                expected
+            )
         }
     }
 
@@ -306,7 +317,8 @@ class FavouritesViewModelTest {
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Success::class.java)
             underTest.selectAll()
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).containsExactlyElementsIn(
-                expected)
+                expected
+            )
             underTest.clearSelections()
             assertThat((awaitItem() as FavouriteLoadState.Success).selectedItems).isEmpty()
         }
@@ -325,10 +337,12 @@ class FavouritesViewModelTest {
     ) {
         assertThat(items).isInstanceOf(FavouriteLoadState.Success::class.java)
         assertWithMessage(message).that((items as FavouriteLoadState.Success).favourites.drop(
-            1)
+            1
+        )
             .map { (it.favourite?.typedNode as? TypedFileNode)?.modificationTime })
             .containsExactlyElementsIn(
-                expected).inOrder()
+                expected
+            ).inOrder()
     }
 
     @Test

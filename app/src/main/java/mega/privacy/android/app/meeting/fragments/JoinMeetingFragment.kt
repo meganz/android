@@ -9,7 +9,6 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETI
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_REJOIN
 import mega.privacy.android.app.meeting.activity.MeetingActivity.Companion.MEETING_ACTION_START
 import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
-import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
@@ -63,7 +62,7 @@ class JoinMeetingFragment : AbstractMeetingOnBoardingFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRTCAudioManager()
-        binding.btnStartJoinMeeting.text = StringResourcesUtils.getString(R.string.join_meeting)
+        binding.btnStartJoinMeeting.text = getString(R.string.join_meeting)
         binding.typeMeetingEditText.visibility = View.GONE
     }
 }

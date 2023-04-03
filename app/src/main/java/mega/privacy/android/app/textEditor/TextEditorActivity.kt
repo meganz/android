@@ -71,7 +71,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.showRenameNodeDialog
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToCopy
 import mega.privacy.android.app.utils.MegaNodeUtil.selectFolderToMove
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
@@ -322,19 +321,19 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
                 val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
                     ?: return
 
-                viewModel.copyNode(toHandle)
+                viewModel.copyNode(toHandle, this)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
                 val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
                     ?: return
 
-                viewModel.moveNode(toHandle)
+                viewModel.moveNode(toHandle, this)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
                 val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
                     ?: return
 
-                viewModel.copyNode(toHandle)
+                viewModel.copyNode(toHandle, this)
             }
         }
     }
@@ -344,7 +343,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         this.menu = menu
 
         menu.findItem(R.id.action_get_link)?.title =
-            StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
+            resources.getQuantityString(R.plurals.get_links, 1)
 
         refreshMenuOptionsVisibility()
 
@@ -482,7 +481,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
     private fun updateLineNumbersMenuOption(lineNumbersOption: MenuItem) {
         lineNumbersOption.apply {
             isVisible = true
-            title = StringResourcesUtils.getString(
+            title = getString(
                 if (viewModel.shouldShowLineNumbers()) R.string.action_hide_line_numbers
                 else R.string.action_show_line_numbers
             )
@@ -764,7 +763,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
 
         errorReadingContentDialog =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                .setMessage(StringResourcesUtils.getString(R.string.error_opening_file))
+                .setMessage(getString(R.string.error_opening_file))
                 .setCancelable(false)
                 .setPositiveButton(R.string.general_ok) { _, _ ->
                     finish()
@@ -881,7 +880,7 @@ class TextEditorActivity : PasscodeActivity(), SnackbarShower, Scrollable {
         }
 
         binding.paginationIndicator.apply {
-            text = StringResourcesUtils.getString(
+            text = getString(
                 R.string.pagination_progress,
                 pagination.getCurrentPage() + 1,
                 pagination.size()

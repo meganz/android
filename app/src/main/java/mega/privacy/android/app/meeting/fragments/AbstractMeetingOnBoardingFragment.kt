@@ -31,7 +31,6 @@ import mega.privacy.android.app.utils.Constants.MEETING_BOTTOM_MARGIN_WITH_KEYBO
 import mega.privacy.android.app.utils.Constants.MEETING_NAME_MARGIN_TOP
 import mega.privacy.android.app.utils.Constants.MIN_MEETING_HEIGHT_CHANGE
 import mega.privacy.android.app.utils.Constants.PERMISSIONS_TYPE
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -237,14 +236,14 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                             binding.onOffFab.fabSpeaker.isOn = true
                             binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
                             binding.onOffFab.fabSpeakerLabel.text =
-                                StringResourcesUtils.getString(R.string.general_speaker)
+                                getString(R.string.general_speaker)
                         }
                         AppRTCAudioManager.AudioDevice.EARPIECE -> {
                             binding.onOffFab.fabSpeaker.enable = true
                             binding.onOffFab.fabSpeaker.isOn = false
                             binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
                             binding.onOffFab.fabSpeakerLabel.text =
-                                StringResourcesUtils.getString(R.string.general_speaker)
+                                getString(R.string.general_speaker)
                         }
                         AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
                         AppRTCAudioManager.AudioDevice.BLUETOOTH,
@@ -253,14 +252,14 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
                             binding.onOffFab.fabSpeaker.isOn = true
                             binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
                             binding.onOffFab.fabSpeakerLabel.text =
-                                StringResourcesUtils.getString(R.string.general_headphone)
+                                getString(R.string.general_headphone)
                         }
                         else -> {
                             binding.onOffFab.fabSpeaker.enable = false
                             binding.onOffFab.fabSpeaker.isOn = true
                             binding.onOffFab.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
                             binding.onOffFab.fabSpeakerLabel.text =
-                                StringResourcesUtils.getString(R.string.general_speaker)
+                                getString(R.string.general_speaker)
                         }
                     }
                 }
@@ -331,7 +330,7 @@ abstract class AbstractMeetingOnBoardingFragment : MeetingBaseFragment() {
      */
     protected fun showSnackBar() {
         val warningText =
-            StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
+            getString(R.string.meeting_required_permissions_warning)
         (activity as BaseActivity).showSnackbar(
             PERMISSIONS_TYPE,
             binding.root,

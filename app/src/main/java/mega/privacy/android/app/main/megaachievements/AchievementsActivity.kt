@@ -20,7 +20,6 @@ import mega.privacy.android.app.databinding.ActivityAchievementsBinding
 import mega.privacy.android.app.listeners.GetAchievementsListener
 import mega.privacy.android.app.main.InviteContactActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber
 import javax.inject.Inject
@@ -110,7 +109,7 @@ class AchievementsActivity : PasscodeActivity() {
             Constants.ACHIEVEMENTS_FRAGMENT -> {
                 Util.hideKeyboard(this, InputMethodManager.HIDE_NOT_ALWAYS)
                 supportActionBar?.title =
-                    StringResourcesUtils.getString(R.string.achievements_title)
+                    getString(R.string.achievements_title)
                 fragment = AchievementsFragment()
                 tag = "achievementsFragment"
             }

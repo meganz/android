@@ -50,8 +50,6 @@ import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
-import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -125,12 +123,14 @@ import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
-import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -1686,7 +1686,7 @@ class CameraUploadsService : LifecycleService() {
         val path = transfer.path
         if (transfer.state == MegaTransfer.STATE_COMPLETED) {
             addCompletedTransfer(
-                AndroidCompletedTransfer(transfer, e),
+                AndroidCompletedTransfer(transfer, e, this),
                 tempDbHandler
             )
         }

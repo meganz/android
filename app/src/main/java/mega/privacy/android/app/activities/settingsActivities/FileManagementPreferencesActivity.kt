@@ -57,7 +57,13 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
     private val cacheSizeUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (sttFileManagement != null && intent.action == ACTION_UPDATE_CACHE_SIZE_SETTING) {
-                sttFileManagement?.setCacheSize(intent.getStringExtra(CACHE_SIZE))
+                val size = intent.getLongExtra(CACHE_SIZE, 0)
+                sttFileManagement?.setCacheSize(
+                    Util.getSizeString(
+                        size,
+                        this@FileManagementPreferencesActivity
+                    )
+                )
             }
         }
     }

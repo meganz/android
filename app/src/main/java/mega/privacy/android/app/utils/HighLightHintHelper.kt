@@ -66,8 +66,8 @@ class HighLightHintHelper(private val activity: Activity) {
     init {
         statusBarHeight = getStatusBarHeight()
         navigationBarHeight =
-            // Only on landscape and navigation bar may be on the left side need to consider the navigation bar's height.
-            // If so need extra margin left the value is height of navigation bar.
+                // Only on landscape and navigation bar may be on the left side need to consider the navigation bar's height.
+                // If so need extra margin left the value is height of navigation bar.
             if (activity.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && navigationBarOnLeft()) {
                 getNavigationBarHeight()
             } else {
@@ -95,10 +95,10 @@ class HighLightHintHelper(private val activity: Activity) {
         if (!hasNavigationBar()) return false
 
         // If it's a tablet.
-        if(Util.isTablet(activity)) return false
+        if (Util.isTablet(activity)) return false
 
         // If it's a HUAWEI device.
-        if(MANUFACTURE_HUAWEI.equals(Build.MANUFACTURER, true)) return false
+        if (MANUFACTURE_HUAWEI.equals(Build.MANUFACTURER, true)) return false
 
         // Rotate to right, navigation bar will stay at the left of the screen.
         @Suppress("DEPRECATION")
@@ -206,7 +206,7 @@ class HighLightHintHelper(private val activity: Activity) {
     private fun getHintView(onDismissCallback: () -> Unit, hintTextId: Int) =
         LayoutInflater.from(activity).inflate(R.layout.highlight_hint_meeting, null).apply {
             findViewById<TextView>(R.id.tv_tip).text =
-                StringResourcesUtils.getString(hintTextId)
+                activity.getString(hintTextId)
             findViewById<View>(R.id.bt_ok).setOnClickListener {
                 onDismissCallback.invoke()
             }

@@ -78,7 +78,6 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -175,8 +174,10 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     if (action == BroadcastConstants.ACTION_UPDATE_NICKNAME || action == BroadcastConstants.ACTION_UPDATE_FIRST_NAME ||
                         action == BroadcastConstants.ACTION_UPDATE_LAST_NAME || action == BroadcastConstants.ACTION_UPDATE_CREDENTIALS
                     ) {
-                        val userHandle = intent.getLongExtra(BroadcastConstants.EXTRA_USER_HANDLE,
-                            MegaApiJava.INVALID_HANDLE)
+                        val userHandle = intent.getLongExtra(
+                            BroadcastConstants.EXTRA_USER_HANDLE,
+                            MegaApiJava.INVALID_HANDLE
+                        )
                         if (userHandle != MegaApiJava.INVALID_HANDLE) {
                             updateAdapter(userHandle)
                             if (action != BroadcastConstants.ACTION_UPDATE_CREDENTIALS
@@ -210,8 +211,12 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             intent?.let {
                 it.action?.let { action ->
                     if (action == BroadcastConstants.ACTION_UPDATE_RETENTION_TIME) {
-                        adapter?.updateRetentionTimeUI(intent.getLongExtra(BroadcastConstants.RETENTION_TIME,
-                            Constants.DISABLED_RETENTION_TIME))
+                        adapter?.updateRetentionTimeUI(
+                            intent.getLongExtra(
+                                BroadcastConstants.RETENTION_TIME,
+                                Constants.DISABLED_RETENTION_TIME
+                            )
+                        )
                     }
                 }
             }
@@ -255,7 +260,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 repeatOnLifecycle(Lifecycle.State.RESUMED) {
                     viewModel.state.collect { (_, error, enabled) ->
                         if (error != null) {
-                            showSnackbar(StringResourcesUtils.getString(error))
+                            showSnackbar(getString(error))
                             adapter?.updateAllowAddParticipants(getChatRoom().isOpenInvite)
                         } else if (enabled != null) {
                             adapter?.updateAllowAddParticipants(enabled)
@@ -314,10 +319,14 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 megaChatApi.signalPresenceActivity()
             }
 
-            registerReceiver(chatRoomMuteUpdateReceiver,
-                IntentFilter(BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING))
-            registerReceiver(retentionTimeReceiver,
-                IntentFilter(BroadcastConstants.ACTION_UPDATE_RETENTION_TIME))
+            registerReceiver(
+                chatRoomMuteUpdateReceiver,
+                IntentFilter(BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
+            )
+            registerReceiver(
+                retentionTimeReceiver,
+                IntentFilter(BroadcastConstants.ACTION_UPDATE_RETENTION_TIME)
+            )
             val contactUpdateFilter =
                 IntentFilter(BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE)
             contactUpdateFilter.addAction(BroadcastConstants.ACTION_UPDATE_NICKNAME)
@@ -335,7 +344,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                     endCallForAllShouldBeVisible = false
                 } else {
                     val callSubscription = getCallUseCase.isThereACallAndIAmModerator(
-                        chatRoom.chatId)
+                        chatRoom.chatId
+                    )
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({ shouldBeVisible: Boolean ->
@@ -353,7 +363,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
             savedInstanceState?.let {
                 val isEndCallForAllDialogShown = it.getBoolean(
-                    END_CALL_FOR_ALL_DIALOG, false)
+                    END_CALL_FOR_ALL_DIALOG, false
+                )
                 if (isEndCallForAllDialogShown) {
                     showEndCallForAllDialog()
                 }
@@ -381,12 +392,14 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 if (myFullName.isNullOrEmpty()) {
                     myFullName = megaChatApi.myEmail
                 }
-                val me = MegaChatParticipant(megaChatApi.myUserHandle,
+                val me = MegaChatParticipant(
+                    megaChatApi.myUserHandle,
                     null,
                     null,
                     getString(R.string.chat_me_text_bracket, myFullName),
                     megaChatApi.myEmail,
-                    chatRoom.ownPrivilege)
+                    chatRoom.ownPrivilege
+                )
                 participants.add(me)
             }
 
@@ -423,8 +436,10 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         if (contactHandle == megaChatApi.myUserHandle) {
             val pos = participants.size - 1
             participants[pos]?.fullName =
-                StringResourcesUtils.getString(R.string.chat_me_text_bracket,
-                    megaChatApi.myFullname)
+                getString(
+                    R.string.chat_me_text_bracket,
+                    megaChatApi.myFullname
+                )
 
             adapter?.updateParticipant(pos, participants)
             return
@@ -499,17 +514,21 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                 intent.putExtra(INTENT_EXTRA_KEY_CONTACT_TYPE, Constants.CONTACT_TYPE_MEGA)
                 intent.putExtra(INTENT_EXTRA_KEY_CHAT, true)
                 intent.putExtra(INTENT_EXTRA_KEY_CHAT_ID, chatHandle)
-                intent.putExtra(INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                    getString(R.string.add_participants_menu_item))
+                intent.putExtra(
+                    INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                    getString(R.string.add_participants_menu_item)
+                )
 
                 @Suppress("deprecation")
                 startActivityForResult(intent, Constants.REQUEST_ADD_PARTICIPANTS)
             }
         } else {
             Timber.w("Online but not megaApi")
-            Util.showErrorAlertDialog(getString(R.string.error_server_connection_problem),
+            Util.showErrorAlertDialog(
+                getString(R.string.error_server_connection_problem),
                 false,
-                this)
+                this
+            )
         }
     }
 
@@ -525,7 +544,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
         groupChatInfoActivity?.let { activity ->
             val builder = MaterialAlertDialogBuilder(
-                activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+                activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog
+            )
             val name = chatC?.getParticipantFullName(handle)
             builder.setMessage(resources.getString(R.string.confirmation_remove_chat_contact, name))
                 .setPositiveButton(R.string.general_remove) { _: DialogInterface?, _: Int -> removeParticipant() }
@@ -597,7 +617,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         val clickListener = View.OnClickListener { v: View ->
             when (v.id) {
                 R.id.change_permissions_dialog_administrator_layout -> changePermissions(
-                    MegaChatRoom.PRIV_MODERATOR)
+                    MegaChatRoom.PRIV_MODERATOR
+                )
                 R.id.change_permissions_dialog_member_layout -> changePermissions(MegaChatRoom.PRIV_STANDARD)
                 R.id.change_permissions_dialog_observer_layout -> changePermissions(MegaChatRoom.PRIV_RO)
             }
@@ -638,9 +659,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         }
 
         bottomSheetDialogFragment = ManageChatLinkBottomSheetDialogFragment()
-        (bottomSheetDialogFragment as ManageChatLinkBottomSheetDialogFragment).setValues(chatLink
-            ?: return,
-            chat?.ownPrivilege == MegaChatRoom.PRIV_MODERATOR)
+        (bottomSheetDialogFragment as ManageChatLinkBottomSheetDialogFragment).setValues(
+            chatLink
+                ?: return,
+            chat?.ownPrivilege == MegaChatRoom.PRIV_MODERATOR
+        )
 
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
@@ -700,30 +723,40 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         Timber.d("fromGetLink: %s", fromGetLink)
         val layout = LinearLayout(this)
         layout.orientation = LinearLayout.VERTICAL
-        val params = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT)
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
 
         if (fromGetLink) {
             val alertRename = TextView(this)
             alertRename.text = getString(R.string.message_error_set_title_get_link)
-            val paramsText = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT)
-            paramsText.setMargins(Util.scaleWidthPx(24, outMetrics),
+            val paramsText = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            paramsText.setMargins(
+                Util.scaleWidthPx(24, outMetrics),
                 Util.scaleHeightPx(8, outMetrics),
                 Util.scaleWidthPx(12, outMetrics),
-                0)
+                0
+            )
             alertRename.layoutParams = paramsText
 
             layout.addView(alertRename)
-            params.setMargins(Util.scaleWidthPx(20, outMetrics),
+            params.setMargins(
+                Util.scaleWidthPx(20, outMetrics),
                 Util.scaleHeightPx(8, outMetrics),
                 Util.scaleWidthPx(17, outMetrics),
-                0)
+                0
+            )
         } else {
-            params.setMargins(Util.scaleWidthPx(20, outMetrics),
+            params.setMargins(
+                Util.scaleWidthPx(20, outMetrics),
                 Util.scaleHeightPx(16, outMetrics),
                 Util.scaleWidthPx(17, outMetrics),
-                0)
+                0
+            )
         }
 
         val input = EmojiEditText(this)
@@ -740,8 +773,15 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             imeOptions = EditorInfo.IME_ACTION_DONE
             inputType = InputType.TYPE_CLASS_TEXT
             filters =
-                arrayOf<InputFilter>(InputFilter.LengthFilter(ChatUtil.getMaxAllowed(ChatUtil.getTitleChat(
-                    chat))))
+                arrayOf<InputFilter>(
+                    InputFilter.LengthFilter(
+                        ChatUtil.getMaxAllowed(
+                            ChatUtil.getTitleChat(
+                                chat
+                            )
+                        )
+                    )
+                )
             setText(ChatUtil.getTitleChat(chat))
         }
 
@@ -761,8 +801,10 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             .setNegativeButton(android.R.string.cancel, null)
             .setView(layout)
             .setOnDismissListener {
-                Util.hideKeyboard(groupChatInfoActivity,
-                    InputMethodManager.HIDE_NOT_ALWAYS)
+                Util.hideKeyboard(
+                    groupChatInfoActivity,
+                    InputMethodManager.HIDE_NOT_ALWAYS
+                )
             }
 
         changeTitleDialog = builder.create()
@@ -800,7 +842,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     fun showConfirmationLeaveChat() {
         MaterialAlertDialogBuilder(this)
             .setTitle(resources.getString(R.string.title_confirmation_leave_group_chat))
-            .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
+            .setMessage(getString(R.string.confirmation_leave_group_chat))
             .setPositiveButton(R.string.general_leave) { _: DialogInterface?, _: Int -> notifyShouldLeaveChat() }
             .setNegativeButton(R.string.general_cancel, null)
             .show()
@@ -813,8 +855,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         if (isAlertDialogShown(endCallForAllDialog)) return
 
         endCallForAllDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_title_end_call_for_all))
-            .setMessage(StringResourcesUtils.getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
+            .setTitle(getString(R.string.meetings_chat_screen_dialog_title_end_call_for_all))
+            .setMessage(getString(R.string.meetings_chat_screen_dialog_description_end_call_for_all))
             .setNegativeButton(R.string.meetings_chat_screen_dialog_negative_button_end_call_for_all) { _: DialogInterface?, _: Int ->
                 dismissAlertDialogIfExists(endCallForAllDialog)
             }
@@ -830,9 +872,11 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
      */
     private fun notifyShouldLeaveChat() =
         chat?.let { chatRoom ->
-            sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_LEFT_CHAT)
-                .setAction(BroadcastConstants.ACTION_LEFT_CHAT)
-                .putExtra(Constants.CHAT_ID, chatRoom.chatId))
+            sendBroadcast(
+                Intent(BroadcastConstants.BROADCAST_ACTION_INTENT_LEFT_CHAT)
+                    .setAction(BroadcastConstants.ACTION_LEFT_CHAT)
+                    .putExtra(Constants.CHAT_ID, chatRoom.chatId)
+            )
             finish()
         }
 
@@ -1087,13 +1131,21 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
                         MegaError.API_OK -> {
                             Timber.d("OK INVITE CONTACT: %s", request.email)
                             if (request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong()) {
-                                showSnackbar(getString(R.string.context_contact_request_sent,
-                                    request.email))
+                                showSnackbar(
+                                    getString(
+                                        R.string.context_contact_request_sent,
+                                        request.email
+                                    )
+                                )
                             }
                             return
                         }
-                        MegaError.API_EEXIST -> showSnackbar(getString(R.string.context_contact_already_invited,
-                            request.email))
+                        MegaError.API_EEXIST -> showSnackbar(
+                            getString(
+                                R.string.context_contact_already_invited,
+                                request.email
+                            )
+                        )
                         else -> {
                             if (request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong() && e.errorCode == MegaError.API_EARGS) {
                                 showSnackbar(getString(R.string.error_own_email_as_contact))
@@ -1128,7 +1180,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             updateParticipants()
             invalidateOptionsMenu()
         } else if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_TITLE) || item.hasChanged(
-                MegaChatListItem.CHANGE_TYPE_UPDATE_PREVIEWERS)
+                MegaChatListItem.CHANGE_TYPE_UPDATE_PREVIEWERS
+            )
         ) {
             updateAdapterHeader()
         } else {
@@ -1176,9 +1229,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
     private fun onChatConnectionStateUpdate(chatId: Long, newState: Int) {
         Timber.d("Chat ID: %d, New state: %d", chatId, newState)
         megaChatApi.getChatRoom(chatId)?.let { chatRoom ->
-            if (CallUtil.isChatConnectedInOrderToInitiateACall(newState,
-                    chatRoom) && CallUtil.canCallBeStartedFromContactOption(this,
-                    passcodeManagement)
+            if (CallUtil.isChatConnectedInOrderToInitiateACall(
+                    newState,
+                    chatRoom
+                ) && CallUtil.canCallBeStartedFromContactOption(
+                    this,
+                    passcodeManagement
+                )
             ) {
                 startCall()
             }
@@ -1279,10 +1336,13 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         val peers = MegaChatPeerList.createInstance()
 
         for (i in 0 until participantsCount) {
-            Timber.d("Add participant: %d, privilege: %d",
+            Timber.d(
+                "Add participant: %d, privilege: %d",
                 chatRoom.getPeerHandle(i),
                 chatRoom.getPeerPrivilege(
-                    i))
+                    i
+                )
+            )
             peers.addPeer(chatRoom.getPeerHandle(i), chatRoom.getPeerPrivilege(i))
         }
         val listener = CreateGroupChatWithPublicLink(this, ChatUtil.getTitleChat(chatRoom))
@@ -1437,17 +1497,21 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         participantAvatars: HashMap<Int, String>,
     ) {
         if (handleList.size() > 0) {
-            megaChatApi.loadUserAttributes(chatHandle,
+            megaChatApi.loadUserAttributes(
+                chatHandle,
                 handleList,
-                GetPeerAttributesListener(this, participantRequests))
+                GetPeerAttributesListener(this, participantRequests)
+            )
         }
 
         for (positionInAdapter in participantAvatars.keys) {
             val handle = participantAvatars[positionInAdapter]
             if (!TextUtil.isTextEmpty(handle)) {
-                megaApi.getUserAvatar(handle,
+                megaApi.getUserAvatar(
+                    handle,
                     buildAvatarFile(this, handle + FileUtil.JPG_EXTENSION)?.absolutePath,
-                    GetAttrUserListener(this, positionInAdapter))
+                    GetAttrUserListener(this, positionInAdapter)
+                )
             }
         }
     }
@@ -1488,8 +1552,10 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
 
                                     if (hasParticipantAttributes(participant)) {
                                         participants[positionInArray] = participant
-                                        adapter?.updateParticipant(positionInArray,
-                                            participants)
+                                        adapter?.updateParticipant(
+                                            positionInArray,
+                                            participants
+                                        )
                                     }
                                 }
                             }
@@ -1512,7 +1578,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         adapter?.getParticipantPositionInArray(positionInAdapter)?.let { positionInArray ->
             if (positionInArray >= 0 && positionInArray < participants.size && (isEmail && participants[positionInArray]?.email == emailOrHandle
                         || participants[positionInArray]?.handle == MegaApiJava.base64ToUserHandle(
-                    emailOrHandle))
+                    emailOrHandle
+                ))
             ) {
                 AvatarUtil.getAvatarBitmap(emailOrHandle)?.let {
                     adapter?.notifyItemChanged(positionInAdapter)

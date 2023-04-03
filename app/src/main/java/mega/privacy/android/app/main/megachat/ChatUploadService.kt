@@ -56,7 +56,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.PreviewUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
@@ -249,8 +248,10 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                 notificationChannelId = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID,
                 notificationChannelName = Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_NAME,
                 mNotificationManager = mNotificationManager!!,
-                mBuilderCompat = NotificationCompat.Builder(this@ChatUploadService,
-                    Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID)
+                mBuilderCompat = NotificationCompat.Builder(
+                    this@ChatUploadService,
+                    Constants.NOTIFICATION_CHANNEL_CHAT_UPLOAD_ID
+                )
             )
 
         } else {
@@ -853,18 +854,18 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
             val videosCompressed = videosCompressed
 
             if (pausedTransfers) {
-                StringResourcesUtils.getString(
+                getString(
                     R.string.upload_service_notification_paused,
                     inProgress, totalUploads
                 )
             } else if (thereAreChatUploads() || videosCompressed == mapVideoDownsampling!!.size) {
-                StringResourcesUtils.getString(
+                getString(
                     R.string.upload_service_notification,
                     inProgress,
                     totalUploads
                 )
             } else {
-                StringResourcesUtils.getString(
+                getString(
                     R.string.title_compress_video,
                     videosCompressed + 1, mapVideoDownsampling!!.size
                 )
@@ -1072,7 +1073,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                         totalUploadsCompleted++
                     }
 
-                    addCompletedTransfer(AndroidCompletedTransfer(transfer, error), dbH)
+                    addCompletedTransfer(AndroidCompletedTransfer(transfer, error, this), dbH)
                     mapProgressTransfers!![transfer.tag] = transfer
 
                     if (canceled) {

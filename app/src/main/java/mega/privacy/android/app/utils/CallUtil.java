@@ -35,7 +35,6 @@ import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE;
 import static mega.privacy.android.app.utils.ContactUtil.getNicknameContact;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.isOnline;
@@ -1308,7 +1307,7 @@ public class CallUtil {
 
         if (amIParticipatingInAnotherCall(chatId)) {
             Timber.d("I am participating in another call");
-            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.text_join_call), passcodeManagement);
+            showConfirmationInACall(context, context.getString(R.string.text_join_call), passcodeManagement);
             return;
         }
 
@@ -1414,8 +1413,8 @@ public class CallUtil {
      * @param chatRoom MegaChatRoom of the call
      * @return Notification title
      */
-    public static String getIncomingCallNotificationTitle(MegaChatRoom chatRoom) {
-        return getString(isOneToOneCall(chatRoom)
+    public static String getIncomingCallNotificationTitle(MegaChatRoom chatRoom, Context context) {
+        return context.getString(isOneToOneCall(chatRoom)
                 ? R.string.title_notification_incoming_individual_audio_call
                 : R.string.title_notification_incoming_group_call);
     }
@@ -1431,7 +1430,7 @@ public class CallUtil {
     public static RemoteViews collapsedAndExpandedIncomingCallNotification(Context context, int layoutId, MegaChatRoom chatToAnswer, Bitmap avatarIcon) {
         Bitmap statusIcon = CallUtil.isOneToOneCall(chatToAnswer) ? getStatusBitmap(MegaApplication.getInstance().getMegaChatApi().getUserOnlineStatus(chatToAnswer.getPeerHandle(0))) : null;
         String titleChat = getTitleChat(chatToAnswer);
-        String titleCall = CallUtil.getIncomingCallNotificationTitle(chatToAnswer);
+        String titleCall = CallUtil.getIncomingCallNotificationTitle(chatToAnswer, context);
 
         RemoteViews views = new RemoteViews(context.getPackageName(), layoutId);
         views.setTextViewText(R.id.chat_title, titleChat);
@@ -1468,7 +1467,7 @@ public class CallUtil {
         }
 
         if (CallUtil.participatingInACall()) {
-            showConfirmationInACall(context, StringResourcesUtils.getString(R.string.ongoing_call_content), passcodeManagement);
+            showConfirmationInACall(context, context.getString(R.string.ongoing_call_content), passcodeManagement);
             return false;
         }
 

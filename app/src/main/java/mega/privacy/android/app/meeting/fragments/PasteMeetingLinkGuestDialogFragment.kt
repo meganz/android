@@ -18,7 +18,6 @@ import mega.privacy.android.app.OpenLinkActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage
 import mega.privacy.android.app.utils.ColorUtils.setErrorAwareInputAppearance
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 
 class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
@@ -51,7 +50,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
         })
 
         builder.setTitle(R.string.paste_meeting_link_guest_dialog_title)
-            .setMessage(StringResourcesUtils.getString(R.string.paste_meeting_link_guest_instruction))
+            .setMessage(getString(R.string.paste_meeting_link_guest_instruction))
             .setView(view)
             .setPositiveButton(R.string.general_ok, null)
             .setNegativeButton(R.string.general_cancel, null)
@@ -97,7 +96,7 @@ class PasteMeetingLinkGuestDialogFragment : DialogFragment() {
     private fun showError(errorStringId: Int) {
         setErrorAwareInputAppearance(linkEdit, true)
         errorLayout.visibility = View.VISIBLE
-        errorText.text = StringResourcesUtils.getString(errorStringId)
+        errorText.text = getString(errorStringId)
     }
 
     private fun hideError() {

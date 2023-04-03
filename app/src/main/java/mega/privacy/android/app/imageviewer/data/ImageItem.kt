@@ -1,5 +1,6 @@
 package mega.privacy.android.app.imageviewer.data
 
+import android.content.Context
 import android.net.Uri
 import mega.privacy.android.app.usecase.data.MegaNodeItem
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
@@ -32,7 +33,7 @@ sealed class ImageItem {
         override val name: String,
         override val infoText: String = "",
         override val nodeItem: MegaNodeItem? = null,
-        override val imageResult: ImageResult? = null
+        override val imageResult: ImageResult? = null,
     ) : ImageItem()
 
     /**
@@ -74,7 +75,7 @@ sealed class ImageItem {
         override val name: String,
         override val infoText: String,
         override val nodeItem: MegaNodeItem? = null,
-        override val imageResult: ImageResult? = null
+        override val imageResult: ImageResult? = null,
     ) : ImageItem()
 
     /**
@@ -99,7 +100,7 @@ sealed class ImageItem {
         override val name: String,
         override val infoText: String,
         override val nodeItem: MegaNodeItem? = null,
-        override val imageResult: ImageResult? = null
+        override val imageResult: ImageResult? = null,
     ) : ImageItem()
 
     /**
@@ -118,7 +119,7 @@ sealed class ImageItem {
         override val name: String,
         override val infoText: String,
         override val nodeItem: MegaNodeItem? = null,
-        override val imageResult: ImageResult? = null
+        override val imageResult: ImageResult? = null,
     ) : ImageItem()
 
     /**
@@ -155,12 +156,56 @@ sealed class ImageItem {
      * @param imageResult   ImageResult to be replaced
      * @return              ImageItem with updated fields
      */
-    fun copy(nodeItem: MegaNodeItem? = null, imageResult: ImageResult? = null): ImageItem =
+    fun copy(
+        nodeItem: MegaNodeItem? = null,
+        imageResult: ImageResult? = null,
+        context: Context,
+    ): ImageItem =
         when (this) {
-            is Node -> copy(handle, id, nodeItem?.name ?: name, nodeItem?.node?.getInfoText() ?: infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
-            is OfflineNode -> copy(handle, fileUri, id, nodeItem?.name ?: name, nodeItem?.node?.getInfoText() ?: infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
-            is ChatNode -> copy(handle, chatMessageId, chatRoomId, isDeletable, id, nodeItem?.name ?: name, nodeItem?.node?.getInfoText() ?: infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
-            is PublicNode -> copy(handle, nodePublicLink, id, nodeItem?.name ?: name, nodeItem?.node?.getInfoText() ?: infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
-            is File -> copy(fileUri, id, name, infoText, nodeItem ?: this.nodeItem, imageResult ?: this.imageResult)
+            is Node -> copy(
+                handle,
+                id,
+                nodeItem?.name ?: name,
+                nodeItem?.node?.getInfoText(context) ?: infoText,
+                nodeItem ?: this.nodeItem,
+                imageResult ?: this.imageResult
+            )
+            is OfflineNode -> copy(
+                handle,
+                fileUri,
+                id,
+                nodeItem?.name ?: name,
+                nodeItem?.node?.getInfoText(context) ?: infoText,
+                nodeItem ?: this.nodeItem,
+                imageResult ?: this.imageResult
+            )
+            is ChatNode -> copy(
+                handle,
+                chatMessageId,
+                chatRoomId,
+                isDeletable,
+                id,
+                nodeItem?.name ?: name,
+                nodeItem?.node?.getInfoText(context) ?: infoText,
+                nodeItem ?: this.nodeItem,
+                imageResult ?: this.imageResult
+            )
+            is PublicNode -> copy(
+                handle,
+                nodePublicLink,
+                id,
+                nodeItem?.name ?: name,
+                nodeItem?.node?.getInfoText(context) ?: infoText,
+                nodeItem ?: this.nodeItem,
+                imageResult ?: this.imageResult
+            )
+            is File -> copy(
+                fileUri,
+                id,
+                name,
+                infoText,
+                nodeItem ?: this.nodeItem,
+                imageResult ?: this.imageResult
+            )
         }
 }

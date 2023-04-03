@@ -20,7 +20,6 @@ import static mega.privacy.android.app.utils.MegaNodeDialogUtil.ACTION_BACKUP_SH
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
 import static mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.changeViewElevation;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator;
@@ -86,7 +85,6 @@ import mega.privacy.android.app.presentation.contact.FileContactListViewModel;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiJava;
@@ -654,7 +652,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                 emptyImage.setVisibility(View.GONE);
                 emptyText.setVisibility(View.GONE);
                 if (parentHandle == -1) {
-                    aB.setTitle(StringResourcesUtils.getString(R.string.file_properties_shared_folder_select_contact));
+                    aB.setTitle(getString(R.string.file_properties_shared_folder_select_contact));
 
                     aB.setLogo(R.drawable.ic_action_navigation_accept_white);
                     supportInvalidateOptionsMenu();
@@ -682,7 +680,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             Timber.d("Contacts selected: %s", contacts.size());
         }
 
-        actionMode.setTitle(getQuantityString(R.plurals.general_selection_num_contacts,
+        actionMode.setTitle(getResources().getQuantityString(R.plurals.general_selection_num_contacts,
                 contacts.size(), contacts.size()));
         try {
             actionMode.invalidate();
@@ -782,13 +780,13 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         MegaNode parentNode = megaApi.getNodeByHandle(parentHandle);
         if (parentNode == null) {
             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
-            showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
+            showSnackbar(getString(R.string.error_temporary_unavaible));
             return;
         }
 
         if (infos == null) {
             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
-            showSnackbar(StringResourcesUtils.getString(R.string.upload_can_not_open));
+            showSnackbar(getString(R.string.upload_can_not_open));
             return;
         }
 
@@ -805,7 +803,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                     AlertDialogUtil.dismissAlertDialogIfExists(statusDialog);
 
                     if (throwable != null) {
-                        showSnackbar(StringResourcesUtils.getString(R.string.error_temporary_unavaible));
+                        showSnackbar(getString(R.string.error_temporary_unavaible));
                     } else {
                         ArrayList<NameCollision> collisions = result.getFirst();
                         List<ShareInfo> withoutCollisions = result.getSecond();
@@ -816,7 +814,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
 
                         if (!withoutCollisions.isEmpty()) {
                             PermissionUtils.checkNotificationsPermission(this);
-                            String text = StringResourcesUtils.getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
+                            String text = getResources().getQuantityString(R.plurals.upload_began, withoutCollisions.size(), withoutCollisions.size());
 
                             uploadUseCase.uploadInfos(this, withoutCollisions, null, parentNode.getHandle())
                                     .subscribeOn(Schedulers.io())

@@ -26,7 +26,6 @@ import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.settings.chat.imagequality.SettingsChatImageQualityActivity
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
@@ -161,7 +160,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.state.collect { state ->
                     findPreference<Preference?>(KEY_CHAT_IMAGE_QUALITY)?.summary =
-                        state.imageQuality?.title?.let { StringResourcesUtils.getString(it) }
+                        state.imageQuality?.title?.let { getString(it) }
                 }
             }
         }
@@ -285,7 +284,10 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
         chatNotificationsPreference?.summary = when (option) {
             Constants.NOTIFICATIONS_DISABLED -> getString(R.string.mute_chatroom_notification_option_off)
             Constants.NOTIFICATIONS_ENABLED -> getString(R.string.mute_chat_notification_option_on)
-            else -> TimeUtils.getCorrectStringDependingOnOptionSelected(pushNotificationSettings!!.globalChatsDnd)
+            else -> TimeUtils.getCorrectStringDependingOnOptionSelected(
+                pushNotificationSettings!!.globalChatsDnd,
+                requireContext()
+            )
         }
     }
 

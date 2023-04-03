@@ -1,16 +1,16 @@
 package mega.privacy.android.app.components.scrollBar;
 
+import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.core.widget.TextViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -19,8 +19,6 @@ import com.jeremyliao.liveeventbus.LiveEventBus;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.scrollBar.viewprovider.DefaultScrollerViewProvider;
 import mega.privacy.android.app.components.scrollBar.viewprovider.ScrollerViewProvider;
-
-import static mega.privacy.android.app.utils.Constants.EVENT_FAB_CHANGE;
 
 /**
  * Credit: https://github.com/FutureMind/recycler-fast-scroll
@@ -199,8 +197,8 @@ public class FastScroller extends LinearLayout {
         int targetPos = (int) Utils.getValueInRange(0, itemCount - 1, (int) (relativePos * (float) itemCount));
         recyclerView.scrollToPosition(targetPos);
         if (titleProvider != null && bubbleTextView != null) {
-            if (titleProvider.getSectionTitle(targetPos) != null) {
-                bubbleTextView.setText(titleProvider.getSectionTitle(targetPos));
+            if (titleProvider.getSectionTitle(targetPos, getContext()) != null) {
+                bubbleTextView.setText(titleProvider.getSectionTitle(targetPos, getContext()));
             }
         }
         setScrollerPosition(relativePos);

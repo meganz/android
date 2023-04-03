@@ -186,7 +186,12 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                     if (!api.isInRubbish(it)) {
                         val name = context.getString(R.string.my_chat_files_folder)
                         if (it.name != name) {
-                            api.renameNode(it, name, RenameListener(true))
+                            api.renameNode(
+                                it, name, RenameListener(
+                                    isMyChatFilesFolder = true,
+                                    context = context
+                                )
+                            )
                         }
                         api.setMyChatFilesFolder(it.handle, SetAttrUserListener(context))
                     }
@@ -200,9 +205,11 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
             databaseHandler.myChatFilesFolderHandle = myChatFolderNode.handle
             myChatFolderFound = true
         } else if (!onlyDBUpdate) {
-            api.createFolder(context.getString(R.string.my_chat_files_folder),
+            api.createFolder(
+                context.getString(R.string.my_chat_files_folder),
                 api.rootNode,
-                CreateFolderListener(context, ExtraAction.MY_CHAT_FILES))
+                CreateFolderListener(context, ExtraAction.MY_CHAT_FILES)
+            )
         }
 
         if (onlyDBUpdate) {

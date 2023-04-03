@@ -11,7 +11,6 @@ import static mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineFile;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.getFolderInfo;
 import static mega.privacy.android.app.utils.TimeUtils.formatLongDateTime;
 import static mega.privacy.android.app.utils.Util.getSizeString;
@@ -95,8 +94,8 @@ public class FileUtil {
 
     private static final String PRIMARY_VOLUME_NAME = "primary";
 
-    public static String getRecoveryKeyFileName() {
-        return getString(R.string.general_rk) + TXT_EXTENSION;
+    public static String getRecoveryKeyFileName(Context context) {
+        return context.getString(R.string.general_rk) + TXT_EXTENSION;
     }
 
     public static boolean isAudioOrVideo(MegaNode node) {
@@ -159,7 +158,7 @@ public class FileUtil {
             return true;
         }
 
-        snackbarShower.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error),
+        snackbarShower.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error),
                 MEGACHAT_INVALID_HANDLE);
 
         return false;
@@ -196,7 +195,7 @@ public class FileUtil {
             }
         }
 
-        snackbarShower.showSnackbar(SNACKBAR_TYPE, getString(R.string.general_text_error),
+        snackbarShower.showSnackbar(SNACKBAR_TYPE, context.getString(R.string.general_text_error),
                 MEGACHAT_INVALID_HANDLE);
 
         return false;
@@ -750,7 +749,7 @@ public class FileUtil {
         shareIntent.putExtra(Intent.EXTRA_STREAM, getUriForFile(context, file));
         // To avoid java.lang.SecurityException: Permission Denial
         shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)));
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 
     /**
@@ -798,7 +797,7 @@ public class FileUtil {
         shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         context.startActivity(
-                Intent.createChooser(shareIntent, getString(R.string.context_share)));
+                Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 
     /**
@@ -813,7 +812,7 @@ public class FileUtil {
         shareIntent.setType(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extention) + "/*");
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)));
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.context_share)));
     }
 
     /**
@@ -948,10 +947,10 @@ public class FileUtil {
      * @param file The folder to get its string content.
      * @return The string to show as content of the folder.
      */
-    public static String getFileFolderInfo(File file) {
+    public static String getFileFolderInfo(File file, Context context) {
         File[] fList = file.listFiles();
         if (fList == null) {
-            return getString(R.string.file_browser_empty_folder);
+            return context.getString(R.string.file_browser_empty_folder);
         }
 
         int numFolders = 0;
@@ -965,7 +964,7 @@ public class FileUtil {
             }
         }
 
-        return getFolderInfo(numFolders, numFiles);
+        return getFolderInfo(numFolders, numFiles, context);
     }
 
     /**
@@ -974,7 +973,7 @@ public class FileUtil {
      * @param documentFile The folder to get its string content.
      * @return The string to show as content of the folder.
      */
-    public static String getFileFolderInfo(DocumentFile documentFile) {
+    public static String getFileFolderInfo(DocumentFile documentFile, Context context) {
         DocumentFile[] fList = documentFile.listFiles();
 
         int numFolders = 0;
@@ -988,7 +987,7 @@ public class FileUtil {
             }
         }
 
-        return getFolderInfo(numFolders, numFiles);
+        return getFolderInfo(numFolders, numFiles, context);
     }
 
     /**
@@ -1087,8 +1086,8 @@ public class FileUtil {
      * @param file The file  from which to get the details.
      * @return The string so show as file info details.
      */
-    public static String getFileInfo(File file) {
-        return TextUtil.getFileInfo(getSizeString(file.length()), formatLongDateTime(file.lastModified() / 1000));
+    public static String getFileInfo(File file, Context context) {
+        return TextUtil.getFileInfo(getSizeString(file.length(), context), formatLongDateTime(file.lastModified() / 1000));
     }
 
     /**
@@ -1104,7 +1103,7 @@ public class FileUtil {
             // If export the file to SD card.
             if (SDCardUtils.isLocalFolderOnSDCard(context, path)) {
                 // Export to cache folder root first.
-                File temp = new File(context.getCacheDir() + File.separator + getRecoveryKeyFileName());
+                File temp = new File(context.getCacheDir() + File.separator + getRecoveryKeyFileName(context));
 
                 if (!saveContentOnFile(content, new FileWriter(temp))) {
                     return false;

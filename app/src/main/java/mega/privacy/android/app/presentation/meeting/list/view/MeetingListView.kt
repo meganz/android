@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -153,7 +154,8 @@ private fun MeetingHeader(
                 text = TimeUtils.formatDate(
                     item.scheduledStartTimestamp!!,
                     TimeUtils.DATE_WEEK_DAY_FORMAT,
-                    true
+                    true,
+                    LocalContext.current,
                 ),
                 showDivider = showTopDivider
             )

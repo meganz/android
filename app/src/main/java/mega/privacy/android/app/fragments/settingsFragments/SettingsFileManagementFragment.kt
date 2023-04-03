@@ -33,8 +33,6 @@ import mega.privacy.android.app.presentation.settings.filesettings.FilePreferenc
 import mega.privacy.android.app.presentation.settings.filesettings.model.FilePreferencesState
 import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
-import mega.privacy.android.app.utils.StringResourcesUtils
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import nz.mega.sdk.MegaAccountDetails
 import timber.log.Timber
 import javax.inject.Inject
@@ -105,8 +103,10 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
         }
         cacheAdvancedOptions?.summary = getString(R.string.settings_advanced_features_calculating)
         offlineFileManagement?.summary = getString(R.string.settings_advanced_features_calculating)
-        rubbishFileManagement?.summary = getString(R.string.settings_advanced_features_size,
-            myAccountInfo.formattedUsedRubbish)
+        rubbishFileManagement?.summary = getString(
+            R.string.settings_advanced_features_size,
+            myAccountInfo.formattedUsedRubbish
+        )
         taskGetSizeCache()
         taskGetSizeOffline()
         if (savedInstanceState != null
@@ -121,8 +121,10 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
         viewLifecycleOwner.collectFlow(viewModel.state) {
             observeState(it)
         }
-        viewLifecycleOwner.collectFlow(viewModel.monitorConnectivityEvent,
-            Lifecycle.State.STARTED) { isConnected ->
+        viewLifecycleOwner.collectFlow(
+            viewModel.monitorConnectivityEvent,
+            Lifecycle.State.STARTED
+        ) { isConnected ->
             setOnlineOptions(isConnected)
         }
     }
@@ -139,7 +141,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
         } else {
             filePreferencesState.sizeOfPreviousVersionsInBytes?.let { sizeBytes ->
                 val size = Formatter.formatShortFileSize(requireActivity(), sizeBytes)
-                fileVersionsFileManagement?.summary = StringResourcesUtils.getQuantityString(
+                fileVersionsFileManagement?.summary = resources.getQuantityString(
                     R.plurals.settings_file_management_file_versions_subtitle,
                     versions,
                     versions,
@@ -179,7 +181,8 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
                     if (!viewModel.isConnected) return false
                     if (it.isChecked) {
                         (context as? FileManagementPreferencesActivity)?.showRbSchedulerValueDialog(
-                            true)
+                            true
+                        )
                     } else if (myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE) {
                         (context as FileManagementPreferencesActivity).showRBNotDisabledDialog()
                         it.onPreferenceClickListener = null
@@ -187,7 +190,8 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
                         it.onPreferenceClickListener = this
                     } else {
                         (context as FileManagementPreferencesActivity).setRBSchedulerValue(
-                            INITIAL_VALUE)
+                            INITIAL_VALUE
+                        )
                     }
                 }
 
@@ -300,7 +304,8 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
                         if (myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE)
                             R.string.settings_rb_scheduler_enable_period_FREE
                         else
-                            R.string.settings_rb_scheduler_enable_period_PRO)
+                            R.string.settings_rb_scheduler_enable_period_PRO
+                    )
                 }"
                 it.onPreferenceClickListener = this
             }
@@ -309,7 +314,7 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
                 preferenceScreen.addPreference(it)
                 it.onPreferenceClickListener = this
                 it.summary =
-                    getQuantityString(
+                    context.resources.getQuantityString(
                         R.plurals.settings_file_management_remove_files_older_than_days,
                         daysCount.toInt(),
                         daysCount.toInt()
@@ -386,13 +391,14 @@ class SettingsFileManagementFragment : SettingsBaseFragment() {
     private fun showWarningDisableVersions() {
         enableVersionsSwitch?.isChecked = true
         disableVersionsWarning = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(StringResourcesUtils.getString(R.string.disable_versioning_label))
-            .setMessage(StringResourcesUtils.getString(R.string.disable_versioning_warning))
-            .setPositiveButton(StringResourcesUtils.getString(R.string.verify_2fa_subtitle_diable_2fa)
+            .setTitle(getString(R.string.disable_versioning_label))
+            .setMessage(getString(R.string.disable_versioning_warning))
+            .setPositiveButton(
+                getString(R.string.verify_2fa_subtitle_diable_2fa)
             ) { _, _ ->
                 viewModel.enableFileVersionOption(false)
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+            .setNegativeButton(getString(R.string.general_cancel), null)
             .show()
     }
 

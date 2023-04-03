@@ -86,7 +86,7 @@ public class ShareContactsHeaderAdapter extends RecyclerView.Adapter<ShareContac
     }
 
     @Override
-    public String getSectionTitle(int position) {
+    public String getSectionTitle(int position, Context context) {
         ShareContactInfo contact = shareContacts.get(position);
 
         if (contact.isMegaContact() && !contact.isHeader()) {

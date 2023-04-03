@@ -1,14 +1,30 @@
 package mega.privacy.android.app.main.megachat.chatAdapters;
 
+import static mega.privacy.android.app.utils.AvatarUtil.getAvatarBitmap;
+import static mega.privacy.android.app.utils.AvatarUtil.getColorAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getDefaultAvatar;
+import static mega.privacy.android.app.utils.AvatarUtil.getSpecificAvatarColor;
+import static mega.privacy.android.app.utils.AvatarUtil.getUserAvatar;
+import static mega.privacy.android.app.utils.ChatUtil.StatusIconLocation;
+import static mega.privacy.android.app.utils.ChatUtil.checkSpecificChatNotifications;
+import static mega.privacy.android.app.utils.ChatUtil.createMuteNotificationsAlertDialogOfAChat;
+import static mega.privacy.android.app.utils.ChatUtil.getTitleChat;
+import static mega.privacy.android.app.utils.ChatUtil.getUpdatedRetentionTimeFromAChat;
+import static mega.privacy.android.app.utils.ChatUtil.getUserStatus;
+import static mega.privacy.android.app.utils.ChatUtil.setContactLastGreen;
+import static mega.privacy.android.app.utils.ChatUtil.setContactStatusParticipantList;
+import static mega.privacy.android.app.utils.ChatUtil.updateRetentionTimeLayout;
+import static mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR;
+import static mega.privacy.android.app.utils.Constants.AVATAR_SIZE;
+import static mega.privacy.android.app.utils.Constants.CHAT_ID;
+import static mega.privacy.android.app.utils.Constants.IS_FROM_CONTACTS;
+import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_ENABLED;
+import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static nz.mega.sdk.MegaChatApi.INIT_ANONYMOUS;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.widget.SwitchCompat;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -19,6 +35,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
@@ -37,14 +59,6 @@ import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApiAndroid;
 import nz.mega.sdk.MegaChatRoom;
 import nz.mega.sdk.MegaUser;
-import timber.log.Timber;
-
-import static mega.privacy.android.app.utils.ChatUtil.*;
-import static mega.privacy.android.app.utils.Constants.*;
-import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
-import static mega.privacy.android.app.utils.Util.*;
-import static mega.privacy.android.app.utils.AvatarUtil.*;
-import static nz.mega.sdk.MegaChatApi.*;
 
 public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaParticipantsChatAdapter.ViewHolderParticipants> implements OnClickListener {
 
@@ -223,9 +237,9 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 holderHeader.sharedFilesLayout.setOnClickListener(this);
 
                 //Clear chat Layout
-                holderHeader.manageChatLayout =  v.findViewById(R.id.manage_chat_history_group_info_layout);
+                holderHeader.manageChatLayout = v.findViewById(R.id.manage_chat_history_group_info_layout);
                 holderHeader.manageChatLayout.setOnClickListener(this);
-                holderHeader.retentionTimeText =  v.findViewById(R.id.manage_chat_history_group_info_subtitle);
+                holderHeader.retentionTimeText = v.findViewById(R.id.manage_chat_history_group_info_subtitle);
                 holderHeader.retentionTimeText.setVisibility(View.GONE);
                 holderHeader.dividerClearLayout = v.findViewById(R.id.divider_clear_layout);
 
@@ -251,7 +265,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                 //Observers layout
                 holderHeader.observersLayout = v.findViewById(R.id.chat_group_observers_layout);
                 holderHeader.observersNumberText = v.findViewById(R.id.chat_group_observers_number_text);
-                holderHeader.participantsLayout =  v.findViewById(R.id.chat_group_contact_properties_participants_title);
+                holderHeader.participantsLayout = v.findViewById(R.id.chat_group_contact_properties_participants_title);
                 holderHeader.observersSeparator = v.findViewById(R.id.divider_observers_layout);
 
                 v.setTag(holderHeader);
@@ -309,7 +323,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
 
                 holderHeader.infoTitleChatText.setText(getTitleChat(getChat()));
 
-                holderHeader.endCallForAllLayout.setVisibility(groupChatInfoActivity.getEndCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
+                holderHeader.endCallForAllLayout.setVisibility(groupChatInfoActivity.getEndCallForAllShouldBeVisible() ? View.VISIBLE : View.GONE);
 
                 if (getChat().isArchived()) {
                     holderHeader.archiveChatTitle.setText(groupChatInfoActivity.getString(R.string.general_unarchive));
@@ -348,7 +362,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                         holderHeader.editImageView.setVisibility(View.VISIBLE);
                         holderHeader.dividerClearLayout.setVisibility(View.VISIBLE);
                         holderHeader.manageChatLayout.setVisibility(View.VISIBLE);
-                        holderHeader.dividerLeaveLayout.setVisibility(groupChatInfoActivity.getEndCallForAllShouldBeVisible()? View.VISIBLE : View.GONE);
+                        holderHeader.dividerLeaveLayout.setVisibility(groupChatInfoActivity.getEndCallForAllShouldBeVisible() ? View.VISIBLE : View.GONE);
                         holderHeader.privateLayout.setVisibility(View.VISIBLE);
                         holderHeader.dividerEndCallForAllLayout.setVisibility(View.VISIBLE);
                         holderHeader.privateSeparator.setVisibility(View.VISIBLE);
@@ -380,7 +394,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                         if (!groupChatInfoActivity.isChatOpen()) {
                             MegaApplication.getChatManagement().openChatRoom(getChat().getChatId());
                         }
-                        updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId()));
+                        updateRetentionTimeLayout(holderHeader.retentionTimeText, getUpdatedRetentionTimeFromAChat(getChat().getChatId()), groupChatInfoActivity);
                     } else {
                         holderHeader.editImageView.setVisibility(View.GONE);
                         holderHeader.dividerClearLayout.setVisibility(View.GONE);
@@ -413,7 +427,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                         holderHeader.dividerNotifications.setVisibility(View.GONE);
                     }
 
-                    checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
+                    checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle, groupChatInfoActivity);
                 }
 
                 holderHeader.infoNumParticipantsText.setText(isNecessaryToHideParticipants()
@@ -506,12 +520,12 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     /**
      * Gets the number of items in the adapter.
      * It depends on the user:
-     *
+     * <p>
      * If they is not previewing the chat and they are a moderator there are two more views in the adapter (Header + Add participant views),
-     *      so the count in the adapter is the same as in the array plus 2.
-     *
+     * so the count in the adapter is the same as in the array plus 2.
+     * <p>
      * Otherwise, there is only one more view in the adapter (Header),
-     *      so the count in the adapter is the same as in the array plus 1.
+     * so the count in the adapter is the same as in the array plus 1.
      *
      * @return Number of items in the adapter.
      */
@@ -538,14 +552,14 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     /**
      * Gets the position of the participant in the array.
      * It depends on the user:
-     *
+     * <p>
      * If they is not previewing the chat and they are a moderator there are two more views in the adapter (Header + Add participant views),
-     *      so the position in the array is the same as in the adapter minus 2.
-     *
+     * so the position in the array is the same as in the adapter minus 2.
+     * <p>
      * Otherwise, there is only one more view in the adapter (Header),
-     *      so the position in the array is the same as in the adapter minus 1.
+     * so the position in the array is the same as in the adapter minus 1.
      *
-     * @param adapterPosition   the position of the participant in the adapter.
+     * @param adapterPosition the position of the participant in the adapter.
      * @return The position of the participant in the array.
      */
     public int getParticipantPositionInArray(int adapterPosition) {
@@ -559,14 +573,14 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     /**
      * Gets the position of the participant in the adapter.
      * It depends on the user:
-     *
+     * <p>
      * If they is not previewing the chat and they are a moderator there are two more views in the adapter (Header + Add participant views),
-     *      so the position in the adapter is the same as in the array plus 2.
-     *
+     * so the position in the adapter is the same as in the array plus 2.
+     * <p>
      * Otherwise, there is only one more view in the adapter (Header),
-     *      so the position in the adapter is the same as in the array plus 1.
+     * so the position in the adapter is the same as in the array plus 1.
      *
-     * @param arrayPosition   the position of the participant in the array.
+     * @param arrayPosition the position of the participant in the array.
      * @return The position of the participant in the adapter.
      */
     private int getParticipantPositionInAdapter(int arrayPosition) {
@@ -674,14 +688,14 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     public void checkNotifications(long chatId) {
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
         if (holderHeader != null) {
-            checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle);
+            checkSpecificChatNotifications(chatId, holderHeader.notificationsSwitch, holderHeader.notificationsSubTitle, groupChatInfoActivity);
         }
     }
 
     /**
      * Sets the participants in the adapter and notifies it.
      *
-     * @param participants  participants' list to set
+     * @param participants participants' list to set
      */
     public void setParticipants(ArrayList<MegaChatParticipant> participants) {
         this.participants = participants;
@@ -691,8 +705,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     /**
      * Updates a participant in the adapter.
      *
-     * @param positionInArray      position in
-     * @param participants  list of MegaChatParticipant
+     * @param positionInArray position in
+     * @param participants    list of MegaChatParticipant
      */
     public void updateParticipant(int positionInArray, ArrayList<MegaChatParticipant> participants) {
         this.participants = participants;
@@ -702,7 +716,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     /**
      * Updates a participant due to a change in their status.
      *
-     * @param positionInArray  participant's position in the array without taking into account the header and add participants items.
+     * @param positionInArray participant's position in the array without taking into account the header and add participants items.
      */
     public void updateContactStatus(int positionInArray) {
         int positionInAdapter = getParticipantPositionInAdapter(positionInArray);
@@ -731,7 +745,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     public void updateRetentionTimeUI(long seconds) {
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
         if (holderHeader != null) {
-            updateRetentionTimeLayout(holderHeader.retentionTimeText, seconds);
+            updateRetentionTimeLayout(holderHeader.retentionTimeText, seconds, groupChatInfoActivity);
         }
     }
 
@@ -743,11 +757,11 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
     public void updateEndCallOption(boolean isVisible) {
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
         if (holderHeader != null) {
-            if(holderHeader.endCallForAllLayout.isShown() != isVisible) {
+            if (holderHeader.endCallForAllLayout.isShown() != isVisible) {
                 holderHeader.endCallForAllLayout.setVisibility(isVisible ? View.VISIBLE : View.GONE);
             }
 
-            holderHeader.dividerLeaveLayout.setVisibility(isVisible? View.VISIBLE : View.GONE);
+            holderHeader.dividerLeaveLayout.setVisibility(isVisible ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -755,8 +769,8 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
      * Checks if the participant has attributes.
      * If not, it stores the participant to ask for their when necessary.
      *
-     * @param position      the position of the participant in the adapter.
-     * @param participant   the participant to check.
+     * @param position    the position of the participant in the adapter.
+     * @param participant the participant to check.
      * @return The participant's avatar if they have, null otherwise.
      */
     private Bitmap checkParticipant(ViewHolderParticipantsList holderParticipantsList, int position, MegaChatParticipant participant) {

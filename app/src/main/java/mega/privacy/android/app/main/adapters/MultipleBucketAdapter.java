@@ -64,8 +64,7 @@ import timber.log.Timber;
 
 public class MultipleBucketAdapter
         extends ListAdapter<NodeItem, MultipleBucketAdapter.ViewHolderMultipleBucket>
-        implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, DragThumbnailGetter
-{
+        implements View.OnClickListener, View.OnLongClickListener, SectionTitleProvider, DragThumbnailGetter {
 
     Context context;
     Object fragment;
@@ -259,16 +258,16 @@ public class MultipleBucketAdapter
                 holder.thumbnailMedia.setController(controller);
             } else {
                 holder.thumbnailMedia.setImageResource(
-                    MimeTypeList.typeForName(megaNode.getName()).getIconResourceId()
+                        MimeTypeList.typeForName(megaNode.getName()).getIconResourceId()
                 );
             }
 
             if (node.getSelected()) {
                 holder.selectedIcon.setVisibility(View.VISIBLE);
                 holder.thumbnailMedia.getHierarchy().setRoundingParams(
-                    RoundingParams.fromCornersRadius((float) context.getResources().getDimensionPixelSize(
-                        R.dimen.cu_fragment_selected_round_corner_radius
-                    ))
+                        RoundingParams.fromCornersRadius((float) context.getResources().getDimensionPixelSize(
+                                R.dimen.cu_fragment_selected_round_corner_radius
+                        ))
                 );
                 holder.thumbnailMedia.setBackground(ContextCompat.getDrawable(
                         holder.thumbnailMedia.getContext(),
@@ -285,7 +284,7 @@ public class MultipleBucketAdapter
             holder.mediaView.setVisibility(View.GONE);
             holder.listView.setVisibility(View.VISIBLE);
             holder.nameText.setText(megaNode.getName());
-            holder.infoText.setText(getSizeString(megaNode.getSize()) + " · " + formatTime(megaNode.getCreationTime()));
+            holder.infoText.setText(getSizeString(megaNode.getSize(), context) + " · " + formatTime(megaNode.getCreationTime()));
 
             holder.thumbnailList.setVisibility(View.VISIBLE);
 
@@ -405,7 +404,7 @@ public class MultipleBucketAdapter
     }
 
     @Override
-    public String getSectionTitle(int position) {
+    public String getSectionTitle(int position, Context context) {
         NodeItem node = getItemAtPosition(position);
         if (node == null) return "";
 

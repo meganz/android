@@ -31,7 +31,6 @@ import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AVATAR_GROUP_CHAT_COLOR
 import mega.privacy.android.app.utils.Constants.AVATAR_SIZE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.permissionsBuilder
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -86,7 +85,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     private fun initComponent() {
 
         // Always be 'calling'.
-        toolbarSubtitle.text = StringResourcesUtils.getString(R.string.outgoing_call_starting)
+        toolbarSubtitle.text = getString(R.string.outgoing_call_starting)
 
         binding.answerVideoFab.setOnClickListener {
             inMeetingViewModel.checkAnotherCallsInProgress(inMeetingViewModel.currentChatId)
@@ -120,7 +119,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             PermissionUtils.hasPermissions(requireContext(), Manifest.permission.RECORD_AUDIO)
 
         if (!audio) {
-            showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
+            showSnackBar(getString(R.string.meeting_required_permissions_warning))
             return
         }
         var video = enableVideo
@@ -152,7 +151,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
     private fun initViewModel() {
         if (chatId != MEGACHAT_INVALID_HANDLE) {
             sharedModel.updateChatRoomId(chatId)
-            inMeetingViewModel.setChatId(chatId)
+            inMeetingViewModel.setChatId(chatId, requireContext())
         }
 
         inMeetingViewModel.chatTitle.observe(viewLifecycleOwner) { title ->
@@ -261,7 +260,7 @@ class RingingMeetingFragment : MeetingBaseFragment() {
             || permissions.contains(Manifest.permission.CAMERA)
         ) {
             Timber.d("user denies the permission")
-            showSnackBar(StringResourcesUtils.getString(R.string.meeting_required_permissions_warning))
+            showSnackBar(getString(R.string.meeting_required_permissions_warning))
         }
     }
 

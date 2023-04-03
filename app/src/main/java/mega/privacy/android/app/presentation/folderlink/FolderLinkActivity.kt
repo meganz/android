@@ -327,12 +327,12 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     showSnackbar(R.string.context_no_copied)
                     return@ActivityResultCallback
                 }
-                viewModel.checkNameCollision(nodes, toHandle)
+                viewModel.checkNameCollision(nodes, toHandle, this)
 
             } else if (selectedNode != null) {
                 Timber.d("No multiple select")
                 selectedNode = megaApiFolder.authorizeNode(selectedNode)
-                selectedNode?.let { viewModel.checkNameCollision(listOf(it), toHandle) }
+                selectedNode?.let { viewModel.checkNameCollision(listOf(it), toHandle, this) }
 
             } else {
                 Timber.w("Selected Node is NULL")
@@ -855,7 +855,8 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                                         folderLinkFragmentContainer.isVisible = false
                                         folderLinkFileLinkFragmentContainer.isVisible = true
                                         folderLinkFileLinkName.text = it.name
-                                        folderLinkFileLinkSize.text = Util.getSizeString(it.size)
+                                        folderLinkFileLinkSize.text =
+                                            Util.getSizeString(it.size, this@FolderLinkActivity)
                                         folderLinkFileLinkIcon.setImageResource(
                                             typeForName(it.name).iconResourceId
                                         )
@@ -1329,7 +1330,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         nodeSaver.handleRequestPermissionsResult(requestCode)

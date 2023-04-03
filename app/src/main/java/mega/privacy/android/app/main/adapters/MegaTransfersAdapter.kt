@@ -212,7 +212,7 @@ class MegaTransfersAdapter(
                         if (Util.isOnline(context))
                             transfer.speed
                         else
-                            0
+                            0, context
                     )
                     holder.speedText.isVisible = true
                 }
@@ -376,7 +376,7 @@ class MegaTransfersAdapter(
         context.getString(
             R.string.progress_size_indicator,
             if (transfer.totalBytes > 0L) (100.0 * transfer.transferredBytes / transfer.totalBytes).roundToLong() else 0L,
-            Util.getSizeString(transfer.totalBytes)
+            Util.getSizeString(transfer.totalBytes, context)
         )
 
     /**

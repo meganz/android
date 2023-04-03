@@ -39,12 +39,7 @@ class NodesViewTest {
         whenever(node.name).thenReturn("Some name")
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
-        whenever(
-            stringUtilWrapper.getFolderInfo(
-                node.childFolderCount,
-                node.childFileCount
-            )
-        ).thenReturn(" 2 Folder 1 file")
+
         composeTestRule.setContent {
             NodesView(
                 modifier = Modifier,
@@ -78,12 +73,7 @@ class NodesViewTest {
         whenever(node.childFolderCount).thenReturn(2)
         whenever(node.isFavourite).thenReturn(true)
         whenever(node.exportedData).thenReturn(exportedData)
-        whenever(
-            stringUtilWrapper.getFolderInfo(
-                node.childFolderCount,
-                node.childFileCount
-            )
-        ).thenReturn(" 2 Folder 1 file")
+
         composeTestRule.setContent {
             NodesView(
                 modifier = Modifier,
@@ -118,12 +108,7 @@ class NodesViewTest {
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
         whenever(node.exportedData).thenReturn(exportedData)
-        whenever(
-            stringUtilWrapper.getFolderInfo(
-                node.childFolderCount,
-                node.childFileCount
-            )
-        ).thenReturn(" 2 Folder 1 file")
+
         composeTestRule.setContent {
             NodesView(
                 modifier = Modifier,
@@ -161,12 +146,7 @@ class NodesViewTest {
             whenever(node.isTakenDown).thenReturn(true)
             whenever(node.exportedData).thenReturn(exportedData)
             whenever(node.isFavourite).thenReturn(true)
-            whenever(
-                stringUtilWrapper.getFolderInfo(
-                    node.childFolderCount,
-                    node.childFileCount
-                )
-            ).thenReturn(" 2 Folder 1 file")
+
             composeTestRule.setContent {
                 NodesView(
                     modifier = Modifier,
@@ -200,12 +180,7 @@ class NodesViewTest {
         whenever(node.name).thenReturn("Some name")
         whenever(node.childFileCount).thenReturn(1)
         whenever(node.childFolderCount).thenReturn(2)
-        whenever(
-            stringUtilWrapper.getFolderInfo(
-                node.childFolderCount,
-                node.childFileCount
-            )
-        ).thenReturn("2 Folder 1 file")
+
         composeTestRule.setContent {
             NodesView(
                 modifier = Modifier,

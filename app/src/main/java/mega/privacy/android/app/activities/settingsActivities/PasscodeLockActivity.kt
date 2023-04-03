@@ -38,7 +38,6 @@ import mega.privacy.android.app.utils.Constants.PIN_6
 import mega.privacy.android.app.utils.Constants.PIN_ALPHANUMERIC
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.PasscodeUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
@@ -186,7 +185,7 @@ class PasscodeLockActivity : BaseActivity() {
             setSupportActionBar(binding.toolbarPasscode)
             supportActionBar?.setDisplayHomeAsUpEnabled(true)
             supportActionBar?.title =
-                StringResourcesUtils.getString(
+                getString(
                     if (mode == SET_MODE) R.string.settings_passcode_lock
                     else R.string.title_change_passcode
                 )
@@ -240,13 +239,13 @@ class PasscodeLockActivity : BaseActivity() {
         }
 
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setTitle(StringResourcesUtils.getString(R.string.proceed_to_logout))
+            .setTitle(getString(R.string.proceed_to_logout))
             .setMessage(message)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.action_logout)) { _, _ ->
+            .setPositiveButton(getString(R.string.action_logout)) { _, _ ->
                 isConfirmLogoutDialogShown = false
                 logout()
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel)) { _, _ ->
+            .setNegativeButton(getString(R.string.general_cancel)) { _, _ ->
                 isConfirmLogoutDialogShown = false
             }
             .create()
@@ -480,7 +479,7 @@ class PasscodeLockActivity : BaseActivity() {
      * Sets the text of the title depending on the current situation.
      */
     private fun setTitleText() {
-        binding.titleText.text = StringResourcesUtils.getString(
+        binding.titleText.text = getString(
             when {
                 forgetPasscode -> R.string.settings_passcode_enter_password_title
                 secondRound && setOrUnlockMode -> R.string.unlock_pin_title_2
@@ -637,7 +636,7 @@ class PasscodeLockActivity : BaseActivity() {
     private fun showAttemptsError() {
         binding.failedAttemptsText.apply {
             isVisible = true
-            text = StringResourcesUtils.getQuantityString(
+            text = resources.getQuantityString(
                 R.plurals.passcode_lock_alert_attempts,
                 attempts,
                 attempts
@@ -831,8 +830,8 @@ class PasscodeLockActivity : BaseActivity() {
 
         if (!this::promptInfo.isInitialized) {
             promptInfo = PromptInfo.Builder()
-                .setTitle(StringResourcesUtils.getString(R.string.title_unlock_fingerprint))
-                .setNegativeButtonText(StringResourcesUtils.getString(R.string.action_use_passcode))
+                .setTitle(getString(R.string.title_unlock_fingerprint))
+                .setNegativeButtonText(getString(R.string.action_use_passcode))
                 .setAllowedAuthenticators(BIOMETRIC_STRONG)
                 .build()
         }

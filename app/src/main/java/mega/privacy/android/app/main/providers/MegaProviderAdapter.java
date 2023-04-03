@@ -173,7 +173,7 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
             params.setMargins(margin, margin, margin, margin);
 
             holder.imageView.setImageResource(R.drawable.ic_folder_list);
-            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
+            holder.textViewFileSize.setText(getMegaNodeFolderInfo(node, context));
 
             if (node.isInShare()) {
                 ArrayList<MegaShare> sharesIncoming = megaApi.getInSharesList();
@@ -201,7 +201,7 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
                 }
             } else {
                 holder.permissionsIcon.setVisibility(View.GONE);
-                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node));
+                holder.textViewFileSize.setText(getMegaNodeFolderInfo(node, context));
             }
 
             if (isMultipleSelect() && isItemChecked(position)) {
@@ -214,7 +214,7 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
         } else {
             holder.permissionsIcon.setVisibility(View.GONE);
 
-            holder.textViewFileSize.setText(getFileInfo(node));
+            holder.textViewFileSize.setText(getFileInfo(node, context));
 
             if (isMultipleSelect() && isItemChecked(position)) {
                 params.height = params.width = dp2px(ICON_SIZE_DP);

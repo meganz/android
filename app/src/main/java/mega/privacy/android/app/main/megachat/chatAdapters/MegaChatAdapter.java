@@ -59,8 +59,6 @@ import static mega.privacy.android.app.utils.PreviewUtils.getPreviewFromFolder;
 import static mega.privacy.android.app.utils.PreviewUtils.previewCache;
 import static mega.privacy.android.app.utils.PreviewUtils.resizeBitmapUpload;
 import static mega.privacy.android.app.utils.PreviewUtils.setPreviewCache;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TextUtil.replaceFormatChatMessages;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
@@ -180,7 +178,6 @@ import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.utils.CacheFolderManager;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MeetingUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1534,7 +1531,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (message.isUploading()) {
             if (message.getInfoToShow() != -1) {
                 setInfoToShow(position, ((ViewHolderMessageChat) holder), true, message.getInfoToShow(),
-                        formatDate(message.getPendingMessage().getUploadTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getPendingMessage().getUploadTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message.getPendingMessage().getUploadTimestamp()));
             }
 
@@ -1664,16 +1661,16 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     switch (pendingMsg.getState()) {
                         case PendingMessageSingle.STATE_ERROR_UPLOADING:
                         case PendingMessageSingle.STATE_ERROR_ATTACHING:
-                            state = getString(R.string.attachment_uploading_state_error);
+                            state = context.getString(R.string.attachment_uploading_state_error);
                             break;
 
                         case PendingMessageSingle.STATE_COMPRESSING:
-                            state = getString(R.string.attachment_uploading_state_compressing);
+                            state = context.getString(R.string.attachment_uploading_state_compressing);
                             break;
 
                         default:
                             if (!areTransfersPaused) {
-                                state = getString(R.string.attachment_uploading_state_uploading);
+                                state = context.getString(R.string.attachment_uploading_state_uploading);
                             }
                     }
 
@@ -1990,7 +1987,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -2001,33 +1998,33 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
                 holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_started));
-                textToShow = MeetingUtil.getAppropriateStringForCallStarted();
+                textToShow = MeetingUtil.getAppropriateStringForCallStarted(context);
             } else {
                 switch (message.getTermCode()) {
                     case MegaChatMessage.END_CALL_REASON_ENDED:
                     case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
                         holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_ended));
-                        textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration());
+                        textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration(), context);
                         break;
 
                     case MegaChatMessage.END_CALL_REASON_REJECTED:
                         holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
-                        textToShow = MeetingUtil.getAppropriateStringForCallRejected();
+                        textToShow = MeetingUtil.getAppropriateStringForCallRejected(context);
                         break;
 
                     case END_CALL_REASON_NO_ANSWER:
                         holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
-                        textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle());
+                        textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle(), context);
                         break;
 
                     case MegaChatMessage.END_CALL_REASON_FAILED:
                         holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
-                        textToShow = MeetingUtil.getAppropriateStringForCallFailed();
+                        textToShow = MeetingUtil.getAppropriateStringForCallFailed(context);
                         break;
 
                     case END_CALL_REASON_CANCELLED:
                         holder.ownManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_cancelled));
-                        textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle());
+                        textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle(), context);
                         break;
                 }
             }
@@ -2059,7 +2056,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
             ((ViewHolderMessageChat) holder).layoutAvatarMessages.setVisibility(View.GONE);
@@ -2087,34 +2084,34 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 if (chatRoom != null && chatRoom.isGroup()) {
                     holder.nameContactText.setVisibility(View.VISIBLE);
                 }
-                textToShow = MeetingUtil.getAppropriateStringForCallStarted();
+                textToShow = MeetingUtil.getAppropriateStringForCallStarted(context);
 
             } else {
                 switch (message.getTermCode()) {
                     case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
                     case MegaChatMessage.END_CALL_REASON_ENDED:
                         holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_ended));
-                        textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration());
+                        textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration(), context);
                         break;
 
                     case MegaChatMessage.END_CALL_REASON_REJECTED:
                         holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_rejected));
-                        textToShow = MeetingUtil.getAppropriateStringForCallRejected();
+                        textToShow = MeetingUtil.getAppropriateStringForCallRejected(context);
                         break;
 
                     case END_CALL_REASON_NO_ANSWER:
                         holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_missed));
-                        textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle());
+                        textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle(), context);
                         break;
 
                     case MegaChatMessage.END_CALL_REASON_FAILED:
                         holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_failed));
-                        textToShow = MeetingUtil.getAppropriateStringForCallFailed();
+                        textToShow = MeetingUtil.getAppropriateStringForCallFailed(context);
                         break;
 
                     case END_CALL_REASON_CANCELLED:
                         holder.contactManagementMessageIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_call_cancelled));
-                        textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle());
+                        textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle(), context);
                         break;
                 }
             }
@@ -2141,7 +2138,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             Timber.d("Me alter participant");
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -2239,7 +2236,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
@@ -2400,13 +2397,13 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         String textToShow = "";
         switch (privilege) {
             case MegaChatRoom.PRIV_MODERATOR:
-                textToShow = StringResourcesUtils.getString(R.string.chat_chat_room_message_permissions_changed_to_host, participantsNameWhosePermissionsWereChanged, participantsNameWhoMadeTheAction);
+                textToShow = context.getString(R.string.chat_chat_room_message_permissions_changed_to_host, participantsNameWhosePermissionsWereChanged, participantsNameWhoMadeTheAction);
                 break;
             case MegaChatRoom.PRIV_STANDARD:
-                textToShow = StringResourcesUtils.getString(R.string.chat_chat_room_message_permissions_changed_to_standard, participantsNameWhosePermissionsWereChanged, participantsNameWhoMadeTheAction);
+                textToShow = context.getString(R.string.chat_chat_room_message_permissions_changed_to_standard, participantsNameWhosePermissionsWereChanged, participantsNameWhoMadeTheAction);
                 break;
             case MegaChatRoom.PRIV_RO:
-                textToShow = StringResourcesUtils.getString(R.string.chat_chat_room_message_permissions_changed_to_read_only, participantsNameWhosePermissionsWereChanged, participantsNameWhoMadeTheAction);
+                textToShow = context.getString(R.string.chat_chat_room_message_permissions_changed_to_read_only, participantsNameWhosePermissionsWereChanged, participantsNameWhoMadeTheAction);
                 break;
         }
 
@@ -2434,7 +2431,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -2467,7 +2464,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.GONE);
@@ -2533,7 +2530,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 Timber.d("MY message handle!!: %s", message.getMsgId());
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                             formatTime(message));
                 }
 
@@ -2640,7 +2637,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                             formatTime(message));
                 }
 
@@ -2725,7 +2722,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             checkReactionsInMessage(position, holder, chatRoom.getChatId(), androidMessage);
 
         } else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
-            String invalidMetaMessage = getInvalidMetaMessage(message);
+            String invalidMetaMessage = getInvalidMetaMessage(message, context);
 
             if (message.getUserHandle() == myUserHandle) {
                 holder.layoutAvatarMessages.setVisibility(View.GONE);
@@ -2739,7 +2736,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                             formatTime(message));
                 }
 
@@ -2806,7 +2803,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                 if (messages.get(position - 1).getInfoToShow() != -1) {
                     setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                            formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                             formatTime(message));
                 }
 
@@ -2903,7 +2900,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (messages.get(position - 1).getInfoToShow() != -1) {
             setInfoToShow(position, holder, isMyMessage, messages.get(position - 1).getInfoToShow(),
-                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                     formatTime(message));
         }
 
@@ -3070,7 +3067,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 switch (messages.get(position - 1).getInfoToShow()) {
                     case AndroidMegaChatMessage.CHAT_ADAPTER_SHOW_ALL: {
                         holder.dateLayout.setVisibility(View.VISIBLE);
-                        holder.dateText.setText(formatDate(message.getTimestamp(), DATE_SHORT_FORMAT));
+                        holder.dateText.setText(formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context));
                         holder.titleOwnMessage.setVisibility(View.VISIBLE);
                         holder.timeOwnText.setText(formatTime(message));
                         break;
@@ -3213,7 +3210,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                             ((ViewHolderMessageChat) holder).urlOwnMessageImage.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                         }
                     }
-                    ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(getSizeString(node.getSize()));
+                    ((ViewHolderMessageChat) holder).urlOwnMessageDescription.setText(getSizeString(node.getSize(), context));
                 } else {
                     ((ViewHolderMessageChat) holder).urlOwnMessageTitle.setText(androidMessage.getRichLinkMessage().getFolderName());
                     holder.urlOwnMessageImage.setImageResource(R.drawable.ic_folder_list);
@@ -3276,7 +3273,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -3374,7 +3371,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                         }
                     }
-                    ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(getSizeString(node.getSize()));
+                    ((ViewHolderMessageChat) holder).urlContactMessageDescription.setText(getSizeString(node.getSize(), context));
                 } else {
                     ((ViewHolderMessageChat) holder).urlContactMessageTitle.setText(androidMessage.getRichLinkMessage().getFolderName());
                     ((ViewHolderMessageChat) holder).urlContactMessageImage.setImageResource(R.drawable.ic_folder_list);
@@ -3446,7 +3443,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -3707,7 +3704,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -3900,7 +3897,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             Timber.d("MY message handle!!: %s", message.getMsgId());
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -3970,7 +3967,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     holder.contentOwnMessageFileName.setText(node.getName());
 
                     long nodeSize = node.getSize();
-                    holder.contentOwnMessageFileSize.setText(getSizeString(nodeSize));
+                    holder.contentOwnMessageFileSize.setText(getSizeString(nodeSize, context));
                     holder.contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
                     Bitmap preview = null;
@@ -4155,7 +4152,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         totalSize = totalSize + temp.getSize();
                     }
 
-                    holder.contentOwnMessageFileSize.setText(getSizeString(totalSize));
+                    holder.contentOwnMessageFileSize.setText(getSizeString(totalSize, context));
 
                     MegaNode node = nodeList.get(0);
                     holder.contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
@@ -4180,7 +4177,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -4250,7 +4247,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     }
                     holder.contentContactMessageFileName.setText(node.getName());
                     long nodeSize = node.getSize();
-                    holder.contentContactMessageFileSize.setText(getSizeString(nodeSize));
+                    holder.contentContactMessageFileSize.setText(getSizeString(nodeSize, context));
                     holder.contentContactMessageFileThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
 
                     Timber.d("Get preview of node");
@@ -4388,7 +4385,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         count++;
                         totalSize = totalSize + temp.getSize();
                     }
-                    ((ViewHolderMessageChat) holder).contentContactMessageFileSize.setText(getSizeString(totalSize));
+                    ((ViewHolderMessageChat) holder).contentContactMessageFileSize.setText(getSizeString(totalSize, context));
                     MegaNode node = nodeList.get(0);
                     ((ViewHolderMessageChat) holder).contentContactMessageFileThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                     if (count == 1) {
@@ -4541,7 +4538,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (messages.get(position - 1).getInfoToShow() != -1) {
             setInfoToShow(position, holder, isOwnMessage, messages.get(position - 1).getInfoToShow(),
-                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                     formatTime(message));
         }
 
@@ -4604,7 +4601,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 holder.contentOwnMessageFileName.setMaxWidth((int) maxWidth);
                 holder.contentOwnMessageFileSize.setMaxWidth((int) maxWidth);
                 holder.contentOwnMessageFileName.setText(gifName);
-                holder.contentOwnMessageFileSize.setText(getSizeString(gifSize));
+                holder.contentOwnMessageFileSize.setText(getSizeString(gifSize, context));
 
                 holder.contentOwnMessageFileThumb.setImageResource(MimeTypeList.typeForName(gifName).getIconResourceId());
 
@@ -4681,7 +4678,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 holder.contentContactMessageFileName.setMaxWidth((int) maxWidth);
                 holder.contentContactMessageFileSize.setMaxWidth((int) maxWidth);
                 holder.contentContactMessageFileName.setText(gifName);
-                holder.contentContactMessageFileSize.setText(getSizeString(gifSize));
+                holder.contentContactMessageFileSize.setText(getSizeString(gifSize, context));
 
                 holder.contentContactMessageFileThumb.setImageResource(MimeTypeList.typeForName(gifName).getIconResourceId());
             } else if (node.hasPreview()) {
@@ -5108,7 +5105,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             Timber.d("MY message handle!!: %s", message.getMsgId());
             if (messages.get(positionInAdapter - 1).getInfoToShow() != -1) {
                 setInfoToShow(positionInAdapter, holder, true, messages.get(positionInAdapter - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -5285,7 +5282,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(positionInAdapter - 1).getInfoToShow() != -1) {
                 setInfoToShow(positionInAdapter, holder, false, messages.get(positionInAdapter - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -5457,7 +5454,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (messages.get(position - 1).getInfoToShow() != INVALID_VALUE) {
             setInfoToShow(position, holder, isOwnMessage, messages.get(position - 1).getInfoToShow(),
-                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                     formatTime(message));
         }
 
@@ -5616,7 +5613,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -5692,7 +5689,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     name.append(", " + message.getUserName(i));
                 }
                 holder.contentOwnMessageContactEmail.setText(name);
-                String numContacts = getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
+                String numContacts = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 holder.contentOwnMessageContactName.setText(numContacts);
                 Drawable drawableDefaultAvatar = getAvatarUseCase.getDefaultAvatarDrawable(context,
                         userCount + "", getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), GetAvatarUseCase.AvatarType.GENERAL);
@@ -5714,7 +5711,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             }
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -5780,7 +5777,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     name.append(", " + message.getUserName(i));
                 }
                 holder.contentContactMessageContactEmail.setText(name);
-                String numContacts = getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
+                String numContacts = context.getResources().getQuantityString(R.plurals.general_selection_num_contacts, (int) userCount, userCount);
                 holder.contentContactMessageContactName.setText(numContacts);
                 Bitmap bitmap = getDefaultAvatar(getSpecificAvatarColor(AVATAR_PRIMARY_COLOR), userCount + "", AVATAR_SIZE, true);
                 holder.contentContactMessageContactThumb.setImageBitmap(bitmap);
@@ -5830,7 +5827,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             Timber.d("MY message handle!!: %s", message.getMsgId());
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -5886,7 +5883,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -5956,7 +5953,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (messages.get(position - 1).getInfoToShow() != -1) {
             setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                     formatTime(message));
         }
 
@@ -6038,7 +6035,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         if (messages.get(position - 1).getInfoToShow() != INVALID_INFO) {
             setInfoToShow(position, holder, isMyMessage(message), messages.get(position - 1).getInfoToShow(),
-                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                    formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                     formatTime(message));
         }
 
@@ -6124,7 +6121,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -6160,7 +6157,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -6204,7 +6201,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -6261,7 +6258,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -6338,7 +6335,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, true, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 
@@ -6399,7 +6396,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             if (messages.get(position - 1).getInfoToShow() != -1) {
                 setInfoToShow(position, holder, false, messages.get(position - 1).getInfoToShow(),
-                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT),
+                        formatDate(message.getTimestamp(), DATE_SHORT_FORMAT, context),
                         formatTime(message));
             }
 

@@ -16,7 +16,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.addExtraOnDrawBehaviour
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.initTextPaint
 import mega.privacy.android.app.textEditor.views.LineNumberViewUtils.updatePaddingsAndView
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
 
 class LineNumberEditText : AppCompatEditText {
@@ -72,19 +71,19 @@ class LineNumberEditText : AppCompatEditText {
         if (inputConnection == null) return inputConnection
 
         EditorInfoCompat.setContentMimeTypes(
-                editorInfo,
-                arrayOf("image/*", "image/png", "image/gif", "image/jpeg")
+            editorInfo,
+            arrayOf("image/*", "image/png", "image/gif", "image/jpeg")
         )
 
         @Suppress("DEPRECATION")
         return InputConnectionCompat.createWrapper(
-                inputConnection,
-                editorInfo
+            inputConnection,
+            editorInfo
         ) { _: InputContentInfoCompat?, _: Int, _: Bundle? ->
             Toast.makeText(
-                    context,
-                    getString(R.string.image_insertion_not_allowed),
-                    Toast.LENGTH_SHORT
+                context,
+                context.getString(R.string.image_insertion_not_allowed),
+                Toast.LENGTH_SHORT
             ).show()
             true
         }

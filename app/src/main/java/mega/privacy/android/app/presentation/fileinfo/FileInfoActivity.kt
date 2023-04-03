@@ -60,10 +60,10 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgres
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOrigin
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.presentation.security.PasscodeCheck
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager.OperationType.OPERATION_EXECUTE
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.utils.AlertsAndWarnings
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.AvatarUtil
@@ -345,7 +345,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         updateSize(viewState.sizeInBytes)
         updateFolderContentInfo(
             viewState.folderTreeInfo != null,
-            viewState.folderContentInfoString
+            viewState.getFolderContentInfoString(this)
         )
         updateFolderHistoryVersions(
             show = viewState.showFolderHistoryVersions,
@@ -423,7 +423,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     }
 
     private fun updateSize(size: Long) {
-        bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(size)
+        bindingContent.filePropertiesInfoDataSize.text = Util.getSizeString(size, this)
     }
 
     private fun updateFolderContentInfo(show: Boolean, folderContentInfo: String) {
@@ -434,8 +434,8 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     private fun updateFolderHistoryVersions(
         show: Boolean,
         numVersions: Int,
-        currentVersionsSize: String,
-        previousVersionsSize: String,
+        currentVersionsSize: Long,
+        previousVersionsSize: Long,
     ) = with(bindingContent) {
         bindingContent.filePropertiesFolderVersionsLayout.isVisible = show
         bindingContent.filePropertiesFolderCurrentVersionsLayout.isVisible = show
@@ -447,8 +447,10 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 numVersions
             )
             bindingContent.filePropertiesInfoDataFolderVersions.text = text
-            bindingContent.filePropertiesInfoDataFolderCurrentVersions.text = currentVersionsSize
-            bindingContent.filePropertiesInfoDataFolderPreviousVersions.text = previousVersionsSize
+            bindingContent.filePropertiesInfoDataFolderCurrentVersions.text =
+                Util.getSizeString(currentVersionsSize, this@FileInfoActivity)
+            bindingContent.filePropertiesInfoDataFolderPreviousVersions.text =
+                Util.getSizeString(previousVersionsSize, this@FileInfoActivity)
         }
     }
 

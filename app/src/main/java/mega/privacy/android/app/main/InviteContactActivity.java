@@ -15,7 +15,6 @@ import static mega.privacy.android.app.utils.Constants.OPEN_SCAN_QR;
 import static mega.privacy.android.app.utils.Constants.PHONE_NUMBER_REGEX;
 import static mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS;
 import static mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
@@ -459,7 +458,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         Timber.d("setTitleAB");
         if (aB != null) {
             if (addedContacts.size() > 0) {
-                aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
+                aB.setSubtitle(getResources().getQuantityString(R.plurals.general_selection_num_contacts,
                         addedContacts.size(), addedContacts.size()));
             } else {
                 aB.setSubtitle(null);
@@ -1163,7 +1162,7 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
                         }
                     } else {
                         if (!fromAchievement) {
-                            showSnackbar(getQuantityString(R.plurals.number_correctly_invite_contact_request, numberToSend, numberToSend));
+                            showSnackbar(getResources().getQuantityString(R.plurals.number_correctly_invite_contact_request, numberToSend, numberToSend));
                         } else {
                             result.putExtra(KEY_SENT_NUMBER, numberSent);
                         }

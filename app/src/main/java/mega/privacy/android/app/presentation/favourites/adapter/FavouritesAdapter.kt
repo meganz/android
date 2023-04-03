@@ -149,7 +149,7 @@ class FavouritesViewHolder(
                         itemPublicLink.isVisible = favourite.typedNode.exportedData != null
                         itemTakenDown.isVisible = favourite.typedNode.isTakenDown
                         itemVersionsIcon.isVisible = favourite.typedNode.hasVersion
-                        itemFileInfo.text = favourite.info
+                        itemFileInfo.text = favourite.info(context)
                         itemFavouriteLayout.setOnClickListener {
                             onItemClicked(favourite)
                         }
@@ -175,9 +175,13 @@ class FavouritesViewHolder(
 
     override fun animate(listener: Animation.AnimationListener, isSelected: Boolean) {
         (binding as? ItemFavouriteBinding)?.let {
-            val flipAnimation = if (isSelected) AnimationUtils.loadAnimation(context,
-                R.anim.multiselect_flip_reverse) else AnimationUtils.loadAnimation(context,
-                R.anim.multiselect_flip)
+            val flipAnimation = if (isSelected) AnimationUtils.loadAnimation(
+                context,
+                R.anim.multiselect_flip_reverse
+            ) else AnimationUtils.loadAnimation(
+                context,
+                R.anim.multiselect_flip
+            )
             flipAnimation.duration = PlaylistAdapter.ANIMATION_DURATION
             flipAnimation.setAnimationListener(listener)
             it.imageSelected.startAnimation(flipAnimation)

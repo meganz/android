@@ -243,7 +243,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 ChatUtil.checkSpecificChatNotifications(
                     chatHandle,
                     contentContactProperties.notificationSwitch,
-                    contentContactProperties.notificationsMutedText
+                    contentContactProperties.notificationsMutedText,
+                    this@ContactInfoActivity
                 )
             }
         }
@@ -255,7 +256,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 val seconds = intent.getLongExtra(RETENTION_TIME, Constants.DISABLED_RETENTION_TIME)
                 ChatUtil.updateRetentionTimeLayout(
                     contentContactProperties.retentionTimeText,
-                    seconds
+                    seconds,
+                    this@ContactInfoActivity
                 )
             }
         }
@@ -581,7 +583,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     checkNameCollisionUseCase.checkHandleList(
                         copyHandles,
                         toHandle,
-                        NameCollisionType.COPY
+                        NameCollisionType.COPY,
+                        this,
                     )
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -1475,7 +1478,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 }
                 ChatUtil.updateRetentionTimeLayout(
                     retentionTimeText,
-                    ChatUtil.getUpdatedRetentionTimeFromAChat(chatHandle)
+                    ChatUtil.getUpdatedRetentionTimeFromAChat(chatHandle),
+                    this@ContactInfoActivity
                 )
                 if (viewModel.isOnline()) {
                     updateChatHistoryLayoutVisibility(shouldShow = true)
@@ -1487,7 +1491,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             ChatUtil.checkSpecificChatNotifications(
                 chatHandle,
                 notificationSwitch,
-                notificationsMutedText
+                notificationsMutedText,
+                this@ContactInfoActivity
             )
             makeNotificationLayoutVisible()
         }

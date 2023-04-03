@@ -17,11 +17,10 @@ import androidx.navigation.fragment.navArgs
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentSetLinkPasswordBinding
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import javax.inject.Inject
@@ -54,22 +53,72 @@ class LinkPasswordFragment : Fragment(), Scrollable {
             R.drawable.passwd_very_weak
         )
     }
-    private val weakShape by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.passwd_weak) }
-    private val mediumShape by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.passwd_medium) }
-    private val goodShape by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.passwd_good) }
-    private val strongShape by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.passwd_strong) }
-    private val emptyShape by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.shape_password) }
+    private val weakShape by lazy {
+        ContextCompat.getDrawable(
+            requireContext(),
+            R.drawable.passwd_weak
+        )
+    }
+    private val mediumShape by lazy {
+        ContextCompat.getDrawable(
+            requireContext(),
+            R.drawable.passwd_medium
+        )
+    }
+    private val goodShape by lazy {
+        ContextCompat.getDrawable(
+            requireContext(),
+            R.drawable.passwd_good
+        )
+    }
+    private val strongShape by lazy {
+        ContextCompat.getDrawable(
+            requireContext(),
+            R.drawable.passwd_strong
+        )
+    }
+    private val emptyShape by lazy {
+        ContextCompat.getDrawable(
+            requireContext(),
+            R.drawable.shape_password
+        )
+    }
 
-    private val veryWeakColor by lazy { ContextCompat.getColor(requireContext(), R.color.red_600_red_300) }
-    private val weakColor by lazy { ContextCompat.getColor(requireContext(), R.color.yellow_600_yellow_300) }
-    private val mediumColor by lazy { ContextCompat.getColor(requireContext(), R.color.green_500_green_400) }
-    private val goodColor by lazy { ContextCompat.getColor(requireContext(), R.color.lime_green_500_200) }
-    private val strongColor by lazy { ContextCompat.getColor(requireContext(), R.color.dark_blue_500_200) }
+    private val veryWeakColor by lazy {
+        ContextCompat.getColor(
+            requireContext(),
+            R.color.red_600_red_300
+        )
+    }
+    private val weakColor by lazy {
+        ContextCompat.getColor(
+            requireContext(),
+            R.color.yellow_600_yellow_300
+        )
+    }
+    private val mediumColor by lazy {
+        ContextCompat.getColor(
+            requireContext(),
+            R.color.green_500_green_400
+        )
+    }
+    private val goodColor by lazy {
+        ContextCompat.getColor(
+            requireContext(),
+            R.color.lime_green_500_200
+        )
+    }
+    private val strongColor by lazy {
+        ContextCompat.getColor(
+            requireContext(),
+            R.color.dark_blue_500_200
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentSetLinkPasswordBinding.inflate(layoutInflater)
         return binding.root
@@ -159,7 +208,7 @@ class LinkPasswordFragment : Fragment(), Scrollable {
      */
     private fun onPasswordSet(password: String?) {
         resetView()
-        
+
         if (!password.isNullOrEmpty() && (!args.isReset || alreadyReset)) {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
@@ -331,10 +380,10 @@ class LinkPasswordFragment : Fragment(), Scrollable {
         val value: String = binding.passwordText.text.toString()
 
         if (isTextEmpty(value)) {
-            return StringResourcesUtils.getString(R.string.error_enter_password)
+            return getString(R.string.error_enter_password)
         } else if (!isPasswordValid) {
             binding.containerPasswdElements.visibility = GONE
-            return StringResourcesUtils.getString(R.string.error_password)
+            return getString(R.string.error_password)
         }
 
         return null
@@ -350,9 +399,9 @@ class LinkPasswordFragment : Fragment(), Scrollable {
         val confirm: String = binding.confirmPasswordText.text.toString()
 
         if (isTextEmpty(confirm)) {
-            return StringResourcesUtils.getString(R.string.error_enter_password)
+            return getString(R.string.error_enter_password)
         } else if (password != confirm) {
-            return StringResourcesUtils.getString(R.string.error_passwords_dont_match)
+            return getString(R.string.error_passwords_dont_match)
         }
 
         return null

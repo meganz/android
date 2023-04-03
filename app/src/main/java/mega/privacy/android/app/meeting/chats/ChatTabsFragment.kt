@@ -19,7 +19,6 @@ import mega.privacy.android.app.meeting.chats.adapter.ChatTabsPageAdapter.Tabs.C
 import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
 import mega.privacy.android.app.presentation.meeting.list.MeetingListFragment
 import mega.privacy.android.app.utils.ColorUtils.setElevationWithColor
-import mega.privacy.android.app.utils.StringResourcesUtils
 
 /**
  * Chat tabs fragment containing Chat and Meeting fragment
@@ -83,9 +82,9 @@ class ChatTabsFragment : Fragment() {
 
             TabLayoutMediator(binding.tabs, this) { tab, position ->
                 tab.text = if (position == CHAT.ordinal) {
-                    StringResourcesUtils.getString(R.string.chats_label)
+                    getString(R.string.chats_label)
                 } else {
-                    StringResourcesUtils.getString(R.string.chat_tab_meetings_title)
+                    getString(R.string.chat_tab_meetings_title)
                 }
             }.attach()
 

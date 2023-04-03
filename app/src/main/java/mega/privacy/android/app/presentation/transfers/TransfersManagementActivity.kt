@@ -25,7 +25,6 @@ import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.transfer.TransferType
 import timber.log.Timber
@@ -238,7 +237,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
         scanningTransfersDialog = MaterialAlertDialogBuilder(this)
             .setView(R.layout.dialog_scanning_transfers)
             .setPositiveButton(
-                StringResourcesUtils.getString(R.string.cancel_transfers)
+                getString(R.string.cancel_transfers)
             ) { _, _ ->
                 if (transfersManagement.shouldShowScanningTransfersDialog()) {
                     showCancelTransfersDialog()
@@ -261,19 +260,19 @@ open class TransfersManagementActivity : PasscodeActivity() {
         }
 
         cancelTransfersDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.cancel_transfers))
-            .setMessage(StringResourcesUtils.getString(R.string.warning_cancel_transfers))
+            .setTitle(getString(R.string.cancel_transfers))
+            .setMessage(getString(R.string.warning_cancel_transfers))
             .setPositiveButton(
-                StringResourcesUtils.getString(R.string.button_proceed)
+                getString(R.string.button_proceed)
             ) { _, _ ->
                 LiveEventBus.get(EVENT_SCANNING_TRANSFERS_CANCELLED, Boolean::class.java).post(true)
                 transfersManagement.cancelScanningTransfers()
                 Util.showSnackbar(
                     this,
-                    StringResourcesUtils.getString(R.string.transfers_cancelled)
+                    getString(R.string.transfers_cancelled)
                 )
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
+            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
                 if (transfersManagement.shouldShowScanningTransfersDialog()) {
                     showScanningTransfersDialog()
                 }

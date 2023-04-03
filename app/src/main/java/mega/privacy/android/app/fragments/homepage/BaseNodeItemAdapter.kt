@@ -1,5 +1,6 @@
 package mega.privacy.android.app.fragments.homepage
 
+import android.content.Context
 import android.view.View
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -10,7 +11,7 @@ import mega.privacy.android.app.components.scrollBar.SectionTitleProvider
 abstract class BaseNodeItemAdapter(
     private val actionModeViewModel: ActionModeViewModel,
     private val itemOperationViewModel: ItemOperationViewModel,
-    private val sortByHeaderViewModel: SortByHeaderViewModel
+    private val sortByHeaderViewModel: SortByHeaderViewModel,
 ) : ListAdapter<NodeItem, NodeViewHolder>(NodeDiffCallback()),
     SectionTitleProvider, DragThumbnailGetter {
 
@@ -30,7 +31,7 @@ abstract class BaseNodeItemAdapter(
         )
     }
 
-    override fun getSectionTitle(position: Int): String? {
+    override fun getSectionTitle(position: Int, context: Context): String? {
         if (position < 0 || position >= itemCount) {
             return null
         }

@@ -6,8 +6,6 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.data.database.DatabaseHandler
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.imageviewer.data.ImageItem
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.chat.DeleteChatMessageUseCase
@@ -19,12 +17,13 @@ import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SortOrder
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaApiJava.ORDER_PHOTO_ASC
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -149,7 +148,7 @@ class GetImageHandlesUseCase @Inject constructor(
                         id = node.handle,
                         handle = node.handle,
                         name = node.name,
-                        infoText = node.getInfoText()
+                        infoText = node.getInfoText(context)
                     )
                 )
             }
@@ -192,7 +191,7 @@ class GetImageHandlesUseCase @Inject constructor(
                         id = nodeFileLink.hashCode().toLong(),
                         handle = node.handle,
                         name = node.name,
-                        infoText = node.getInfoText(),
+                        infoText = node.getInfoText(context),
                         nodePublicLink = nodeFileLink
                     )
                 )
@@ -218,7 +217,7 @@ class GetImageHandlesUseCase @Inject constructor(
                         id = (chatRoomId.hashCode() + messageId.hashCode()).toLong(),
                         handle = node.handle,
                         name = node.name,
-                        infoText = node.getInfoText(),
+                        infoText = node.getInfoText(context),
                         chatRoomId = chatRoomId,
                         chatMessageId = messageId,
                         isDeletable = deletable

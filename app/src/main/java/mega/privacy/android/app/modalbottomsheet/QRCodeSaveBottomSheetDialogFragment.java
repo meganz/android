@@ -28,13 +28,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.ShareInfo;
 import mega.privacy.android.app.main.FileStorageActivity;
-import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.bottomsheet.QrCodeSaveBottomSheetDialogViewModel;
+import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.usecase.UploadUseCase;
 import mega.privacy.android.app.usecase.exception.MegaNodeException;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaNode;
@@ -86,7 +85,7 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
         File qrFile = buildQrFile(getActivity(), myEmail + QR_IMAGE_FILE_NAME);
 
         if (!isFileAvailable(qrFile)) {
-            showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
+            showSnackbar(requireActivity(), getString(R.string.error_upload_qr));
             return;
         }
 
@@ -101,22 +100,22 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
                 .subscribe(handle -> {
                             ArrayList<NameCollision> list = new ArrayList<>();
                             list.add(NameCollision.Upload.getUploadCollision(handle, qrFile,
-                                    parentNode.getHandle()));
+                                    parentNode.getHandle(), requireContext()));
                             ((QRCodeActivity) requireActivity()).nameCollisionActivityContract.launch(list);
                         },
                         throwable -> {
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
-                                showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
-                            } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException){
+                                showSnackbar(requireActivity(), getString(R.string.error_upload_qr));
+                            } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
                                 ShareInfo info = ShareInfo.infoFromFile(qrFile);
                                 if (info == null) {
-                                    showSnackbar(requireActivity(), StringResourcesUtils.getString(R.string.error_upload_qr));
+                                    showSnackbar(requireActivity(), getString(R.string.error_upload_qr));
                                     return;
                                 }
 
                                 PermissionUtils.checkNotificationsPermission(requireActivity());
 
-                                String text = StringResourcesUtils.getString(R.string.save_qr_cloud_drive, qrFile.getName());
+                                String text = getString(R.string.save_qr_cloud_drive, qrFile.getName());
 
                                 uploadUseCase.upload(requireActivity(), info, null, parentNode.getHandle())
                                         .subscribeOn(Schedulers.io())

@@ -23,8 +23,6 @@ import static mega.privacy.android.app.utils.FileUtil.isFileAvailable;
 import static mega.privacy.android.app.utils.MegaNodeUtil.existsMyChatFilesFolder;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getMyChatFilesFolder;
 import static mega.privacy.android.app.utils.OfflineUtils.getOfflineParentFile;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnCalendar;
 import static mega.privacy.android.app.utils.Util.showErrorAlertDialog;
@@ -66,7 +64,6 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.presentation.extensions.StorageStateExtensionsKt;
 import mega.privacy.android.app.utils.Constants;
 import mega.privacy.android.app.utils.MeetingUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.chat.NonContactInfo;
 import mega.privacy.android.domain.entity.StorageState;
@@ -283,7 +280,7 @@ public class ChatController {
 
             case NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING:
             case NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING:
-                showSnackbar(context, getCorrectStringDependingOnCalendar(option));
+                showSnackbar(context, getCorrectStringDependingOnCalendar(option, context));
                 break;
 
             default:
@@ -300,7 +297,7 @@ public class ChatController {
         String text = createManagementString(androidMessage.getMessage(), chatRoom);
         if ((text != null) && (!text.isEmpty())) {
             text = text.substring(text.indexOf(":") + 2);
-            String strEdited = " " + StringResourcesUtils.getString(R.string.edited_message_text);
+            String strEdited = " " + context.getString(R.string.edited_message_text);
             if (text.contains(strEdited)) {
                 int index = text.indexOf(strEdited);
                 text = text.substring(0, index);
@@ -403,13 +400,13 @@ public class ChatController {
             String textToShow = "";
             switch (privilege) {
                 case MegaChatRoom.PRIV_MODERATOR:
-                    textToShow = StringResourcesUtils.getString(R.string.chat_chats_list_last_message_permissions_changed_to_host, participantsNameWhoMadeTheAction, participantsNameWhosePermissionsWereChanged);
+                    textToShow = context.getString(R.string.chat_chats_list_last_message_permissions_changed_to_host, participantsNameWhoMadeTheAction, participantsNameWhosePermissionsWereChanged);
                     break;
                 case MegaChatRoom.PRIV_STANDARD:
-                    textToShow = StringResourcesUtils.getString(R.string.chat_chats_list_last_message_permissions_changed_to_standard, participantsNameWhoMadeTheAction, participantsNameWhosePermissionsWereChanged);
+                    textToShow = context.getString(R.string.chat_chats_list_last_message_permissions_changed_to_standard, participantsNameWhoMadeTheAction, participantsNameWhosePermissionsWereChanged);
                     break;
                 case MegaChatRoom.PRIV_RO:
-                    textToShow = StringResourcesUtils.getString(R.string.chat_chats_list_last_message_permissions_changed_to_read_only, participantsNameWhoMadeTheAction, participantsNameWhosePermissionsWereChanged);
+                    textToShow = context.getString(R.string.chat_chats_list_last_message_permissions_changed_to_read_only, participantsNameWhoMadeTheAction, participantsNameWhosePermissionsWereChanged);
                     break;
             }
 
@@ -425,7 +422,7 @@ public class ChatController {
                 if (message.getType() == MegaChatMessage.TYPE_NORMAL) {
                     Timber.d("Message type NORMAL");
 
-                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
+                    builder.append(context.getString(R.string.chat_last_message_sender_me)).append(": ");
                     String messageContent = "";
                     if (message.getContent() != null) {
                         messageContent = message.getContent();
@@ -471,7 +468,7 @@ public class ChatController {
                     return builder.toString();
 
                 } else if (message.getType() == MegaChatMessage.TYPE_CONTAINS_META) {
-                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
+                    builder.append(context.getString(R.string.chat_last_message_sender_me)).append(": ");
                     MegaChatContainsMeta meta = message.getContainsMeta();
                     if (meta != null) {
                         switch (meta.getType()) {
@@ -481,7 +478,7 @@ public class ChatController {
                                 return builder.toString();
                             }
                             case MegaChatContainsMeta.CONTAINS_META_GEOLOCATION: {
-                                String text = getString(R.string.title_geolocation_message);
+                                String text = context.getString(R.string.title_geolocation_message);
                                 builder.append(text);
                                 return builder.toString();
                             }
@@ -495,32 +492,32 @@ public class ChatController {
 
                     return "";
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
-                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
-                    String textToShow = MeetingUtil.getAppropriateStringForCallStarted().toString();
+                    builder.append(context.getString(R.string.chat_last_message_sender_me)).append(": ");
+                    String textToShow = MeetingUtil.getAppropriateStringForCallStarted(context).toString();
                     builder.append(textToShow);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
-                    builder.append(getString(R.string.chat_last_message_sender_me)).append(": ");
+                    builder.append(context.getString(R.string.chat_last_message_sender_me)).append(": ");
                     String textToShow = "";
                     switch (message.getTermCode()) {
                         case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
                         case MegaChatMessage.END_CALL_REASON_ENDED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration()).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration(), context).toString();
                             break;
                         case MegaChatMessage.END_CALL_REASON_REJECTED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallRejected().toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallRejected(context).toString();
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_NO_ANSWER:
-                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle()).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle(), context).toString();
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_FAILED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallFailed().toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallFailed(context).toString();
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_CANCELLED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle()).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle(), context).toString();
                             break;
                     }
 
@@ -591,7 +588,7 @@ public class ChatController {
                                 return builder.toString();
                             }
                             case MegaChatContainsMeta.CONTAINS_META_GEOLOCATION: {
-                                String text = getString(R.string.title_geolocation_message);
+                                String text = context.getString(R.string.title_geolocation_message);
                                 builder.append(text);
                                 return builder.toString();
                             }
@@ -605,7 +602,7 @@ public class ChatController {
                     return "";
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_STARTED) {
                     builder.append(fullNameTitle).append(": ");
-                    String textToShow = MeetingUtil.getAppropriateStringForCallStarted().toString();
+                    String textToShow = MeetingUtil.getAppropriateStringForCallStarted(context).toString();
                     builder.append(textToShow);
                     return builder.toString();
                 } else if (message.getType() == MegaChatMessage.TYPE_CALL_ENDED) {
@@ -614,23 +611,23 @@ public class ChatController {
                     switch (message.getTermCode()) {
                         case MegaChatMessage.END_CALL_REASON_BY_MODERATOR:
                         case MegaChatMessage.END_CALL_REASON_ENDED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration()).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallEnded(chatRoom, message.getDuration(), context).toString();
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_REJECTED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallRejected().toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallRejected(context).toString();
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_NO_ANSWER:
-                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle()).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallNoAnswered(message.getUserHandle(), context).toString();
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_FAILED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallFailed().toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallFailed(context).toString();
                             break;
 
                         case MegaChatMessage.END_CALL_REASON_CANCELLED:
-                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle()).toString();
+                            textToShow = MeetingUtil.getAppropriateStringForCallCancelled(message.getUserHandle(), context).toString();
                             break;
                     }
 
@@ -786,7 +783,7 @@ public class ChatController {
                     if (offlineFile.exists() && document.getSize() == offlineFile.length() && offlineFile.getName().equals(document.getName())) { //This means that is already available offline
                         Timber.w("File already exists!");
                         snackbarShower.showSnackbar(SNACKBAR_TYPE,
-                                getString(R.string.file_already_exists), MEGACHAT_INVALID_HANDLE);
+                                context.getString(R.string.file_already_exists), MEGACHAT_INVALID_HANDLE);
                     } else {
                         dlFiles.put(document, destination.getAbsolutePath());
                     }
@@ -810,8 +807,8 @@ public class ChatController {
 
             if (availableFreeSpace < document.getSize()) {
                 showErrorAlertDialog(
-                        getString(R.string.location_label,
-                                getString(R.string.error_not_enough_free_space),
+                        context.getString(R.string.location_label,
+                                context.getString(R.string.error_not_enough_free_space),
                                 document.getName()),
                         false, ((Activity) context));
                 continue;
@@ -1011,9 +1008,9 @@ public class ChatController {
 
         if (errors > 0) {
             if (typeImport == IMPORT_TO_SHARE_OPTION) {
-                showSnackbar(context, getString(R.string.number_no_imported_from_chat, errors));
+                showSnackbar(context, context.getString(R.string.number_no_imported_from_chat, errors));
             } else {
-                showSnackbar(context, getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
+                showSnackbar(context, context.getResources().getQuantityString(R.plurals.messages_forwarded_partial_error, errors, errors));
             }
         }
     }

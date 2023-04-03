@@ -46,7 +46,7 @@ import timber.log.Timber;
 public class PhoneContactsAdapter extends RecyclerView.Adapter<PhoneContactsAdapter.ViewHolderPhoneContacts> implements OnClickListener, SectionTitleProvider {
 
     @Override
-    public String getSectionTitle(int position) {
+    public String getSectionTitle(int position, Context context) {
         return phoneContacts.get(position).getName().substring(0, 1).toUpperCase();
     }
 

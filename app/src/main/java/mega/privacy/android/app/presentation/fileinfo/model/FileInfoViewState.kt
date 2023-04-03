@@ -1,9 +1,9 @@
 package mega.privacy.android.app.presentation.fileinfo.model
 
+import android.content.Context
 import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.FileNode
@@ -123,28 +123,23 @@ data class FileInfoViewState(
     /**
      * computed utility field to get the folder's previous versions size string
      */
-    val folderVersionsSizeInBytesString: String by lazy(LazyThreadSafetyMode.NONE) {
-        Util.getSizeString(folderTreeInfo?.sizeOfPreviousVersionsInBytes ?: 0)
-    }
+    val folderVersionsSizeInBytesString: Long = folderTreeInfo?.sizeOfPreviousVersionsInBytes ?: 0
 
     /**
      * computed utility field to get the folder's current version size string
      */
-    val folderCurrentVersionSizeInBytesString: String by lazy(LazyThreadSafetyMode.NONE) {
-        Util.getSizeString(folderTreeInfo?.totalCurrentSizeInBytes ?: 0)
-    }
+    val folderCurrentVersionSizeInBytesString: Long = folderTreeInfo?.totalCurrentSizeInBytes ?: 0
 
     /**
      * computed utility field to get the folder content string. Ex "2 folders . 5 files"
      */
-    val folderContentInfoString by lazy(LazyThreadSafetyMode.NONE) {
-        folderTreeInfo?.let {
-            TextUtil.getFolderInfo(
-                it.numberOfFolders - 1, //-1 because we don't want to count the folder itself
-                it.numberOfFiles
-            )
-        } ?: ""
-    }
+    fun getFolderContentInfoString(context: Context) = folderTreeInfo?.let {
+        TextUtil.getFolderInfo(
+            it.numberOfFolders - 1, //-1 because we don't want to count the folder itself
+            it.numberOfFiles,
+            context
+        )
+    } ?: ""
 
     /**
      * the limited amount of outshares to be shown

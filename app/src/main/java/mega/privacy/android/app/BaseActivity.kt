@@ -107,7 +107,6 @@ import mega.privacy.android.app.utils.Constants.VISIBLE_FRAGMENT
 import mega.privacy.android.app.utils.Constants.WEAK_PROTECTION_ACCOUNT_BLOCK
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.autoPlayNode
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -361,7 +360,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             val numTransfers = intent.getIntExtra(BroadcastConstants.NUMBER_FILES, 1)
             var message: String
             message = if (intent.getBooleanExtra(BroadcastConstants.OFFLINE_AVAILABLE, false)) {
-                StringResourcesUtils.getString(R.string.file_available_offline)
+                getString(R.string.file_available_offline)
             } else {
                 resources.getQuantityString(
                     R.plurals.download_finish, numTransfers, numTransfers
@@ -460,7 +459,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             if (view != null) {
                 showSnackbar(
                     view,
-                    StringResourcesUtils.getString(R.string.dialog_cookie_snackbar_saved)
+                    getString(R.string.dialog_cookie_snackbar_saved)
                 )
             }
         }
@@ -917,7 +916,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             when (type) {
                 MESSAGE_SNACKBAR_TYPE -> Snackbar.make(
                     view,
-                    (if (s?.isNotEmpty() == true) s else StringResourcesUtils.getString(R.string.sent_as_message))
+                    (if (s?.isNotEmpty() == true) s else getString(R.string.sent_as_message))
                         ?: return,
                     Snackbar.LENGTH_LONG
                 )
@@ -1000,7 +999,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                     show()
                 }
                 OPEN_FILE_SNACKBAR_TYPE -> {
-                    setAction(StringResourcesUtils.getString(R.string.general_confirmation_open)) { openDownloadedFile() }
+                    setAction(getString(R.string.general_confirmation_open)) { openDownloadedFile() }
                     show()
                 }
                 SENT_REQUESTS_TYPE -> {
@@ -1059,7 +1058,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                         setMessage(R.string.expired_admin_business_text)
                     } else {
                         var expiredString =
-                            StringResourcesUtils.getString(R.string.expired_user_business_text)
+                            getString(R.string.expired_user_business_text)
                         try {
                             expiredString = expiredString.replace(
                                 "[B]", "<b><font color=\'"
@@ -1076,7 +1075,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                     expiredString,
                                     HtmlCompat.FROM_HTML_MODE_LEGACY
                                 ),
-                                "\n\n${StringResourcesUtils.getString(R.string.expired_user_business_text_2)}"
+                                "\n\n${getString(R.string.expired_user_business_text_2)}"
                             )
                         )
                     }
@@ -1115,28 +1114,28 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             TOS_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(
                 ChatLogoutListener(
                     this,
-                    StringResourcesUtils.getString(R.string.dialog_account_suspended_ToS_copyright_message),
+                    getString(R.string.dialog_account_suspended_ToS_copyright_message),
                     loggingSettings
                 )
             )
             TOS_NON_COPYRIGHT_ACCOUNT_BLOCK -> megaChatApi.logout(
                 ChatLogoutListener(
                     this,
-                    StringResourcesUtils.getString(R.string.dialog_account_suspended_ToS_non_copyright_message),
+                    getString(R.string.dialog_account_suspended_ToS_non_copyright_message),
                     loggingSettings
                 )
             )
             DISABLED_BUSINESS_ACCOUNT_BLOCK -> megaChatApi.logout(
                 ChatLogoutListener(
                     this,
-                    StringResourcesUtils.getString(R.string.error_business_disabled),
+                    getString(R.string.error_business_disabled),
                     loggingSettings
                 )
             )
             REMOVED_BUSINESS_ACCOUNT_BLOCK -> megaChatApi.logout(
                 ChatLogoutListener(
                     this,
-                    StringResourcesUtils.getString(R.string.error_business_removed),
+                    getString(R.string.error_business_removed),
                     loggingSettings
                 )
             )
@@ -1233,7 +1232,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         transferGeneralOverQuotaWarning?.setCanceledOnTouchOutside(false)
         val stringResource =
             if (transfersManagement.isCurrentTransferOverQuota) R.string.current_text_depleted_transfer_overquota else R.string.text_depleted_transfer_overquota
-        binding.textTransferOverquota.text = StringResourcesUtils.getString(
+        binding.textTransferOverquota.text = getString(
             stringResource, TimeUtils.getHumanizedTime(megaApi.bandwidthOverquotaDelay)
         )
         binding.transferOverquotaButtonPayment.apply {
@@ -1241,9 +1240,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             text = if (isLoggedIn) {
                 val isFreeAccount =
                     myAccountInfo.accountType == MegaAccountDetails.ACCOUNT_TYPE_FREE
-                StringResourcesUtils.getString(if (isFreeAccount) R.string.my_account_upgrade_pro else R.string.plans_depleted_transfer_overquota)
+                getString(if (isFreeAccount) R.string.my_account_upgrade_pro else R.string.plans_depleted_transfer_overquota)
             } else {
-                StringResourcesUtils.getString(R.string.login_text)
+                getString(R.string.login_text)
             }
             setOnClickListener {
                 transferGeneralOverQuotaWarning?.dismiss()
@@ -1399,8 +1398,8 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                 //payment has been processed
                 Timber.d(
                     "Purchase " + sku + " successfully, subscription type is: "
-                            + getSubscriptionType(sku) + ", subscription renewal type is: "
-                            + getSubscriptionRenewalType(sku)
+                            + getSubscriptionType(sku, this) + ", subscription renewal type is: "
+                            + getSubscriptionRenewalType(sku, this)
                 )
                 RatingHandlerImpl(this).updateTransactionFlag(true)
                 PurchaseType.SUCCESS
@@ -1480,15 +1479,15 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
             return
         }
         val builder = MaterialAlertDialogBuilder(this)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok), null)
+            .setPositiveButton(getString(R.string.general_ok), null)
         when (purchaseType) {
             PurchaseType.PENDING -> upgradeAlert =
-                builder.setTitle(StringResourcesUtils.getString(R.string.title_user_purchased_subscription))
-                    .setMessage(StringResourcesUtils.getString(R.string.message_user_payment_pending))
+                builder.setTitle(getString(R.string.title_user_purchased_subscription))
+                    .setMessage(getString(R.string.message_user_payment_pending))
                     .create()
             PurchaseType.DOWNGRADE -> upgradeAlert =
-                builder.setTitle(StringResourcesUtils.getString(R.string.my_account_upgrade_pro))
-                    .setMessage(StringResourcesUtils.getString(R.string.message_user_purchased_subscription_down_grade))
+                builder.setTitle(getString(R.string.my_account_upgrade_pro))
+                    .setMessage(getString(R.string.message_user_purchased_subscription_down_grade))
                     .create()
             PurchaseType.SUCCESS -> {
                 upgradeAlert = builder.setView(R.layout.dialog_purchase_success).create().apply {
@@ -1509,7 +1508,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                             Skus.SKU_PRO_I_MONTH, Skus.SKU_PRO_I_YEAR -> {
                                 account = R.string.pro1_account
                                 image = R.drawable.ic_pro_i_big_crest
-                                purchaseMessage.text = StringResourcesUtils.getString(
+                                purchaseMessage.text = getString(
                                     if (Skus.SKU_PRO_I_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_1_yearly
                                     else R.string.upgrade_account_successful_pro_1_monthly
                                 )
@@ -1517,7 +1516,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                             Skus.SKU_PRO_II_MONTH, Skus.SKU_PRO_II_YEAR -> {
                                 account = R.string.pro2_account
                                 image = R.drawable.ic_pro_ii_big_crest
-                                purchaseMessage.text = StringResourcesUtils.getString(
+                                purchaseMessage.text = getString(
                                     if (Skus.SKU_PRO_II_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_2_yearly
                                     else R.string.upgrade_account_successful_pro_2_monthly
                                 )
@@ -1525,7 +1524,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                             Skus.SKU_PRO_III_MONTH, Skus.SKU_PRO_III_YEAR -> {
                                 account = R.string.pro3_account
                                 image = R.drawable.ic_pro_iii_big_crest
-                                purchaseMessage.text = StringResourcesUtils.getString(
+                                purchaseMessage.text = getString(
                                     if (Skus.SKU_PRO_III_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_3_yearly
                                     else R.string.upgrade_account_successful_pro_3_monthly
                                 )
@@ -1534,7 +1533,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                 account = R.string.prolite_account
                                 color = R.color.orange_400_orange_300
                                 image = R.drawable.ic_lite_big_crest
-                                purchaseMessage.text = StringResourcesUtils.getString(
+                                purchaseMessage.text = getString(
                                     if (Skus.SKU_PRO_LITE_YEAR == activeSubscriptionSku) R.string.upgrade_account_successful_pro_lite_yearly
                                     else R.string.upgrade_account_successful_pro_lite_monthly
                                 )
@@ -1544,7 +1543,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
                                 return@setOnShowListener
                             }
                         }
-                        purchaseType.text = StringResourcesUtils.getString(account)
+                        purchaseType.text = getString(account)
                         purchaseType.setTextColor(ContextCompat.getColor(this@BaseActivity, color))
                         purchaseImage.setImageResource(image)
                     }

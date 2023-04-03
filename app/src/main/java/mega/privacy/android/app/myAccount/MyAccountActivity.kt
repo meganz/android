@@ -58,7 +58,6 @@ import mega.privacy.android.app.utils.Constants.RESULT
 import mega.privacy.android.app.utils.Constants.UPDATE_ACCOUNT_DETAILS
 import mega.privacy.android.app.utils.Constants.VERIFY_CHANGE_MAIL_LINK_REGEXS
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.Util.matchRegexs
@@ -442,7 +441,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      */
     private fun showKillSessionsResult(success: Boolean) {
         showSnackbar(
-            StringResourcesUtils.getString(
+            getString(
                 if (success) R.string.success_kill_all_sessions
                 else R.string.error_kill_all_sessions
             )
@@ -456,7 +455,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
      */
     private fun showCancelSubscriptionsResult(success: Boolean) {
         showSnackbar(
-            StringResourcesUtils.getString(
+            getString(
                 if (success) R.string.cancel_subscription_ok
                 else R.string.cancel_subscription_error
             )
@@ -474,11 +473,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         }
 
         killSessionsConfirmationDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.confirmation_close_sessions_title))
-            .setMessage(StringResourcesUtils.getString(R.string.confirmation_close_sessions_text))
-            .setPositiveButton(StringResourcesUtils.getString(R.string.contact_accept)) { _, _ ->
+            .setTitle(getString(R.string.confirmation_close_sessions_title))
+            .setMessage(getString(R.string.confirmation_close_sessions_text))
+            .setPositiveButton(getString(R.string.contact_accept)) { _, _ ->
                 viewModel.killSessions { success -> showKillSessionsResult(success) }
-            }.setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+            }.setNegativeButton(getString(R.string.general_cancel), null)
             .show()
     }
 
@@ -495,10 +494,10 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         cancelSubscriptionsDialog =
             builder.setView(R.layout.dialog_cancel_subscriptions)
                 .setPositiveButton(
-                    StringResourcesUtils.getString(R.string.send_cancel_subscriptions),
+                    getString(R.string.send_cancel_subscriptions),
                     null
                 )
-                .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
+                .setNegativeButton(getString(R.string.general_dismiss), null)
                 .create()
 
         cancelSubscriptionsDialog?.apply {
@@ -514,7 +513,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
                 getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener {
                     if (cancelSubscriptionsFeedback?.isEmpty() == true) {
-                        showSnackbar(StringResourcesUtils.getString(R.string.reason_cancel_subscriptions))
+                        showSnackbar(getString(R.string.reason_cancel_subscriptions))
                     } else {
                         showConfirmationCancelSubscriptions()
                     }
@@ -534,12 +533,12 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         }
 
         cancelSubscriptionsConfirmationDialog = MaterialAlertDialogBuilder(this)
-            .setMessage(StringResourcesUtils.getString(R.string.confirmation_cancel_subscriptions))
-            .setPositiveButton(StringResourcesUtils.getString(R.string.general_yes)) { _, _ ->
+            .setMessage(getString(R.string.confirmation_cancel_subscriptions))
+            .setPositiveButton(getString(R.string.general_yes)) { _, _ ->
                 viewModel.cancelSubscriptions(cancelSubscriptionsFeedback) { success ->
                     showCancelSubscriptionsResult(success)
                 }
-            }.setNegativeButton(StringResourcesUtils.getString(R.string.general_no), null)
+            }.setNegativeButton(getString(R.string.general_no), null)
             .show()
     }
 
@@ -547,7 +546,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         if (matchRegexs(result, CANCEL_ACCOUNT_LINK_REGEXS)) {
             viewModel.checkSubscription()
         } else {
-            showErrorAlert(StringResourcesUtils.getString(R.string.general_error_word))
+            showErrorAlert(getString(R.string.general_error_word))
         }
     }
 
@@ -561,7 +560,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             TYPE_ANDROID_PLATFORM,
             TYPE_ANDROID_PLATFORM_NO_NAVIGATION,
             ->
-                StringResourcesUtils.getString(
+                getString(
                     R.string.message_android_platform_subscription,
                     platformInfo.platformName,
                     platformInfo.platformStoreName
@@ -574,7 +573,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
         MaterialAlertDialogBuilder(this).apply {
             setTitle(
-                StringResourcesUtils.getString(
+                getString(
                     R.string.title_platform_subscription,
                     platformInfo.platformName
                 )
@@ -586,7 +585,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             }
             if (type == TYPE_ANDROID_PLATFORM) {
                 setNegativeButton(
-                    StringResourcesUtils.getString(
+                    getString(
                         R.string.button_visit_platform,
                         platformInfo.platformStoreAbbrName
                     )
@@ -620,11 +619,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private fun showConfirmCancelAccountDialog(messageId: Int) {
         val errorInputBinding = DialogErrorPasswordInputEditTextBinding.inflate(layoutInflater)
         confirmCancelAccountDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.delete_account))
-            .setMessage(StringResourcesUtils.getString(messageId))
+            .setTitle(getString(R.string.delete_account))
+            .setMessage(getString(messageId))
             .setView(errorInputBinding.root)
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss), null)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.delete_account), null)
+            .setNegativeButton(getString(R.string.general_dismiss), null)
+            .setPositiveButton(getString(R.string.delete_account), null)
             .setOnDismissListener {
                 /* Clear the value of current CancelAccountDialogState when the dialog is dismissed
                 to avoid the dialog open again when the screen is rotated. */
@@ -654,7 +653,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 )
             }
             else -> {
-                showErrorAlert(StringResourcesUtils.getString(R.string.general_error_word))
+                showErrorAlert(getString(R.string.general_error_word))
             }
         }
     }
@@ -662,11 +661,11 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     private fun showConfirmChangeEmailDialog() {
         val errorInputBinding = DialogErrorInputEditTextBinding.inflate(layoutInflater)
         confirmChangeEmailDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.change_mail_title_last_step))
-            .setMessage(StringResourcesUtils.getString(R.string.change_mail_text_last_step))
+            .setTitle(getString(R.string.change_mail_title_last_step))
+            .setMessage(getString(R.string.change_mail_text_last_step))
             .setView(errorInputBinding.root)
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.change_pass), null)
+            .setNegativeButton(getString(R.string.general_cancel), null)
+            .setPositiveButton(getString(R.string.change_pass), null)
             .create()
 
         showConfirmDialog(
@@ -690,7 +689,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 quitEditTextError(editLayout, errorIcon)
 
                 editLayout.hint =
-                    StringResourcesUtils.getString(R.string.edit_text_insert_pass)
+                    getString(R.string.edit_text_insert_pass)
                         .replaceFirstChar { it.uppercase(Locale.ROOT) }
 
                 textField.apply {
@@ -715,7 +714,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
                     if (password.isEmpty()) {
                         setEditTextError(
-                            StringResourcesUtils.getString(R.string.invalid_string),
+                            getString(R.string.invalid_string),
                             editLayout,
                             errorIcon
                         )
@@ -746,7 +745,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     }
 
     private fun showEmailChangeSuccess(newEmail: String) {
-        showSnackbar(StringResourcesUtils.getString(R.string.email_changed, newEmail))
+        showSnackbar(getString(R.string.email_changed, newEmail))
     }
 
     private fun showConfirmResetPasswordDialog() {
@@ -775,7 +774,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
         showAlert(
             this,
             message,
-            StringResourcesUtils.getString(R.string.general_error_word)
+            getString(R.string.general_error_word)
         )
     }
 

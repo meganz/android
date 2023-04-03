@@ -46,7 +46,6 @@ import mega.privacy.android.app.utils.Constants.PRO_II
 import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
@@ -84,7 +83,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
     private var phoneNumberBottomSheet: PhoneNumberBottomSheetDialogFragment? = null
 
-    private val gettingInfo by lazy { StringResourcesUtils.getString(R.string.recovering_info) }
+    private val gettingInfo by lazy { getString(R.string.recovering_info) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -218,7 +217,7 @@ class MyAccountFragment : Fragment(), Scrollable {
                     findNavController().navigate(R.id.action_my_account_to_achievements)
                 } else {
                     messageResultCallback?.show(
-                        StringResourcesUtils.getString(R.string.error_server_connection_problem)
+                        getString(R.string.error_server_connection_problem)
                     )
                 }
             }
@@ -254,7 +253,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             }
         }
 
-        binding.contactsSubtitle.text = StringResourcesUtils.getQuantityString(
+        binding.contactsSubtitle.text = resources.getQuantityString(
             R.plurals.my_account_connections,
             visibleContacts.size,
             visibleContacts.size
@@ -281,7 +280,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         binding.upgradeButton.apply {
             isEnabled = true
-            text = StringResourcesUtils.getString(R.string.my_account_upgrade_pro)
+            text = getString(R.string.my_account_upgrade_pro)
 
             setOnClickListener {
                 findNavController().navigate(R.id.action_my_account_to_upgrade)
@@ -307,7 +306,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             )
         )
 
-        binding.accountTypeText.text = StringResourcesUtils.getString(
+        binding.accountTypeText.text = getString(
             when (viewModel.getAccountType()) {
                 FREE -> R.string.free_account
                 PRO_I -> R.string.pro1_account
@@ -350,10 +349,10 @@ class MyAccountFragment : Fragment(), Scrollable {
             )
         )
 
-        binding.accountTypeText.text = StringResourcesUtils.getString(R.string.business_label)
+        binding.accountTypeText.text = getString(R.string.business_label)
         binding.upgradeButton.apply {
             isEnabled = false
-            text = StringResourcesUtils.getString(
+            text = getString(
                 if (megaApi.isMasterBusinessAccount) R.string.admin_label
                 else R.string.user_label
             )
@@ -473,10 +472,10 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         if (addPhoneNumberVisible) {
             binding.addPhoneSubtitle.text =
-                if (megaApi.isAchievementsEnabled) StringResourcesUtils.getString(
+                if (megaApi.isAchievementsEnabled) getString(
                     R.string.sms_add_phone_number_dialog_msg_achievement_user,
                     viewModel.getBonusStorageSMS()
-                ) else StringResourcesUtils.getString(
+                ) else getString(
                     R.string.sms_add_phone_number_dialog_msg_non_achievement_user
                 )
         }

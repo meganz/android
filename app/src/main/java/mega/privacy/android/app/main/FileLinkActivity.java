@@ -96,7 +96,6 @@ import mega.privacy.android.app.usecase.exception.MegaNodeException;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiJava;
@@ -502,7 +501,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
 
                 collapsingToolbar.setTitle(document.getName());
 
-                sizeTextView.setText(getSizeString(document.getSize()));
+                sizeTextView.setText(getSizeString(document.getSize(), this));
 
                 iconView.setImageResource(MimeTypeList.typeForName(document.getName()).getIconResourceId());
                 iconViewLayout.setVisibility(View.VISIBLE);
@@ -682,7 +681,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
      * Checks if there is any name collision before copying the node.
      */
     private void checkCollisionBeforeCopying() {
-        checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY)
+        checkNameCollisionUseCase.check(document, target, NameCollisionType.COPY, this)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(collision -> {
@@ -692,7 +691,7 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
                         },
                         throwable -> {
                             if (throwable instanceof MegaNodeException.ParentDoesNotExistException) {
-                                showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
+                                showSnackbar(SNACKBAR_TYPE, getString(R.string.general_error), MEGACHAT_INVALID_HANDLE);
                             } else if (throwable instanceof MegaNodeException.ChildDoesNotExistsException) {
                                 copyNode();
                             }

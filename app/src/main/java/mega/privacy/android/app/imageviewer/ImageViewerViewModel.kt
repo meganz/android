@@ -1,6 +1,7 @@
 package mega.privacy.android.app.imageviewer
 
 import android.app.Activity
+import android.content.Context
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
@@ -10,6 +11,7 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.facebook.drawee.backends.pipeline.Fresco
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
@@ -24,7 +26,6 @@ import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.imageviewer.data.ImageAdapterItem
 import mega.privacy.android.app.imageviewer.data.ImageItem
-import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.NEXT
 import mega.privacy.android.app.imageviewer.slideshow.ImageSlideshowState.STARTED
@@ -50,11 +51,10 @@ import mega.privacy.android.app.usecase.exception.ResourceAlreadyExistsMegaExcep
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.MegaNodeUtil.getInfoText
 import mega.privacy.android.app.utils.MegaNodeUtil.isValidForImageViewer
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.usecase.AreTransfersPaused
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
 import nz.mega.sdk.MegaNode
@@ -100,6 +100,7 @@ class ImageViewerViewModel @Inject constructor(
     private val moveNodeUseCase: MoveNodeUseCase,
     private val removeNodeUseCase: RemoveNodeUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
+    @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -387,12 +388,14 @@ class ImageViewerViewModel @Inject constructor(
                 val currentItem = items[index]
                 if (nodeItem != null && nodeItem != currentItem.nodeItem) {
                     items[index] = currentItem.copy(
-                        nodeItem = nodeItem
+                        nodeItem = nodeItem,
+                        context = context,
                     )
                 }
                 if (imageResult != null && imageResult != currentItem.imageResult) {
                     items[index] = currentItem.copy(
-                        imageResult = imageResult
+                        imageResult = imageResult,
+                        context = context,
                     )
                 }
                 images.value = items.toList()
@@ -438,7 +441,7 @@ class ImageViewerViewModel @Inject constructor(
                                             id = changedNode.handle,
                                             handle = changedNode.handle,
                                             name = changedNode.name,
-                                            infoText = changedNode.getInfoText()
+                                            infoText = changedNode.getInfoText(context)
                                         )
                                     )
                                     dirtyNodeHandles.add(changedNode.handle)
@@ -554,7 +557,8 @@ class ImageViewerViewModel @Inject constructor(
     fun removeLink(nodeHandle: Long) {
         exportNodeUseCase.disableExport(nodeHandle)
             .subscribeAndComplete {
-                snackBarMessage.value = getQuantityString(R.plurals.context_link_removal_success, 1)
+                snackBarMessage.value =
+                    context.resources.getQuantityString(R.plurals.context_link_removal_success, 1)
             }
     }
 
@@ -567,7 +571,7 @@ class ImageViewerViewModel @Inject constructor(
                 val index = images.value?.indexOfFirst { it.id == imageItem.id } ?: INVALID_POSITION
                 removeImageItemAt(index)
 
-                snackBarMessage.value = getString(R.string.context_correctly_removed)
+                snackBarMessage.value = context.getString(R.string.context_correctly_removed)
             }
     }
 
@@ -606,7 +610,7 @@ class ImageViewerViewModel @Inject constructor(
             copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
                 .subscribeAndComplete(
                     completeAction = {
-                        snackBarMessage.value = getString(R.string.context_correctly_copied)
+                        snackBarMessage.value = context.getString(R.string.context_correctly_copied)
                     }, errorAction = { error -> copyMoveException.value = error })
         }
     }
@@ -628,7 +632,7 @@ class ImageViewerViewModel @Inject constructor(
             moveNodeUseCase.move(node = node, parentHandle = newParentHandle)
                 .subscribeAndComplete(
                     completeAction = {
-                        snackBarMessage.value = getString(R.string.context_correctly_moved)
+                        snackBarMessage.value = context.getString(R.string.context_correctly_moved)
                     }, errorAction = { error -> copyMoveException.value = error }
                 )
         }
@@ -651,7 +655,8 @@ class ImageViewerViewModel @Inject constructor(
         checkNameCollisionUseCase.check(
             node = node,
             parentHandle = newParentHandle,
-            type = type
+            type = type,
+            context = context,
         ).observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { collisionResult -> collision.value = collisionResult },
@@ -668,14 +673,15 @@ class ImageViewerViewModel @Inject constructor(
     fun moveNodeToRubbishBin(nodeHandle: Long) {
         moveNodeUseCase.moveToRubbishBin(nodeHandle)
             .subscribeAndComplete(false) {
-                snackBarMessage.value = getString(R.string.context_correctly_moved_to_rubbish)
+                snackBarMessage.value =
+                    context.getString(R.string.context_correctly_moved_to_rubbish)
             }
     }
 
     fun removeNode(nodeHandle: Long) {
         removeNodeUseCase.remove(nodeHandle)
             .subscribeAndComplete(false) {
-                snackBarMessage.value = getString(R.string.context_correctly_removed)
+                snackBarMessage.value = context.getString(R.string.context_correctly_removed)
             }
     }
 

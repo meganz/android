@@ -27,7 +27,6 @@ import mega.privacy.android.app.utils.Constants.SECONDS_IN_HOUR
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_MONTH_30
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_WEEK
 import mega.privacy.android.app.utils.Constants.SECONDS_IN_YEAR
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -219,23 +218,23 @@ class ManageChatHistoryActivity : PasscodeActivity(), View.OnClickListener {
     private fun fillPickerText(value: Int) {
         binding.textPicker.displayedValues = null
         val arrayString: Array<String> = arrayOf(
-            StringResourcesUtils.getQuantityString(
+            resources.getQuantityString(
                 R.plurals.retention_time_picker_hours,
                 value
             ).lowercase(Locale.getDefault()),
-            StringResourcesUtils.getQuantityString(
+            resources.getQuantityString(
                 R.plurals.retention_time_picker_days,
                 value
             ).lowercase(Locale.getDefault()),
-            StringResourcesUtils.getQuantityString(
+            resources.getQuantityString(
                 R.plurals.retention_time_picker_weeks,
                 value
             ).lowercase(Locale.getDefault()),
-            StringResourcesUtils.getQuantityString(
+            resources.getQuantityString(
                 R.plurals.retention_time_picker_months,
                 value
             ).lowercase(Locale.getDefault()),
-            StringResourcesUtils.getString(R.string.retention_time_picker_year)
+            getString(R.string.retention_time_picker_year)
                 .lowercase(Locale.getDefault())
         )
         binding.textPicker.displayedValues = arrayString

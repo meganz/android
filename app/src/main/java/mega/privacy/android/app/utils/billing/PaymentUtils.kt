@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils.billing
 
+import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
@@ -8,7 +9,6 @@ import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_II
 import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.domain.entity.Product
@@ -34,13 +34,13 @@ object PaymentUtils {
      * @return The renewal type of the sku item, Monthly or Yearly.
      */
     @JvmStatic
-    fun getSubscriptionRenewalType(sku: String?): String? {
+    fun getSubscriptionRenewalType(sku: String?, context: Context): String? {
         return when (sku) {
             SKU_PRO_LITE_MONTH, SKU_PRO_I_MONTH, SKU_PRO_II_MONTH, SKU_PRO_III_MONTH ->
-                getString(R.string.subscription_type_monthly)
+                context.getString(R.string.subscription_type_monthly)
 
             SKU_PRO_LITE_YEAR, SKU_PRO_I_YEAR, SKU_PRO_II_YEAR, SKU_PRO_III_YEAR ->
-                getString(R.string.subscription_type_yearly)
+                context.getString(R.string.subscription_type_yearly)
 
             else -> ""
         }
@@ -53,12 +53,12 @@ object PaymentUtils {
      * @return The type name of the sku.
      */
     @JvmStatic
-    fun getSubscriptionType(sku: String?): String? {
+    fun getSubscriptionType(sku: String?, context: Context): String? {
         return when (sku) {
-            SKU_PRO_LITE_MONTH, SKU_PRO_LITE_YEAR -> getString(R.string.prolite_account)
-            SKU_PRO_I_MONTH, SKU_PRO_I_YEAR -> getString(R.string.pro1_account)
-            SKU_PRO_II_MONTH, SKU_PRO_II_YEAR -> getString(R.string.pro2_account)
-            SKU_PRO_III_MONTH, SKU_PRO_III_YEAR -> getString(R.string.pro3_account)
+            SKU_PRO_LITE_MONTH, SKU_PRO_LITE_YEAR -> context.getString(R.string.prolite_account)
+            SKU_PRO_I_MONTH, SKU_PRO_I_YEAR -> context.getString(R.string.pro1_account)
+            SKU_PRO_II_MONTH, SKU_PRO_II_YEAR -> context.getString(R.string.pro2_account)
+            SKU_PRO_III_MONTH, SKU_PRO_III_YEAR -> context.getString(R.string.pro3_account)
             else -> ""
         }
     }
@@ -119,7 +119,8 @@ object PaymentUtils {
                 megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
             } else {
                 attributes?.run {
-                    megaApi.submitPurchaseReceipt(PAYMENT_GATEWAY, json, lastPublicHandle,
+                    megaApi.submitPurchaseReceipt(
+                        PAYMENT_GATEWAY, json, lastPublicHandle,
                         lastPublicHandleType, lastPublicHandleTimeStamp, listener
                     )
                 }

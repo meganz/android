@@ -153,9 +153,13 @@ class MegaExplorerAdapter(
                 }
         }
         else -> {
-            ViewHolderSortBy(SortByHeaderBinding.inflate(LayoutInflater.from(parent.context),
-                parent,
-                false))
+            ViewHolderSortBy(
+                SortByHeaderBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
         }
     }
 
@@ -165,8 +169,10 @@ class MegaExplorerAdapter(
             ITEM_VIEW_TYPE_LIST -> getItem(position)?.let { node ->
                 (holder as ViewHolderListExplorer).bind(position, node)
             }
-            ITEM_VIEW_TYPE_GRID -> (holder as ViewHolderGridExplorer).bind(position,
-                getItem(position))
+            ITEM_VIEW_TYPE_GRID -> (holder as ViewHolderGridExplorer).bind(
+                position,
+                getItem(position)
+            )
         }
     }
 
@@ -270,7 +276,8 @@ class MegaExplorerAdapter(
                         })
 
                         (view as ViewHolderGridExplorer).fileSelectedIcon.startAnimation(
-                            flipAnimation)
+                            flipAnimation
+                        )
                     }
             } ?: let {
                 Timber.d("view is null - not animation")
@@ -318,7 +325,7 @@ class MegaExplorerAdapter(
         return result
     }
 
-    override fun getSectionTitle(position: Int): String? =
+    override fun getSectionTitle(position: Int, context: Context): String? =
         getItem(position)?.let { node ->
             if (node.name != null && node.name.isNotEmpty()) {
                 node.name.substring(0, 1)
@@ -538,9 +545,13 @@ class MegaExplorerAdapter(
                     setImageParams(imageView, ICON_SIZE_DP, ICON_MARGIN_DP)
                     itemView.setOnClickListener(::clickItem)
                     binding.fileExplorerPermissions.isVisible = false
-                    binding.fileExplorerFilesize.text = getMegaNodeFolderInfo(node)
-                    imageView.setImageResource(getFolderIcon(node,
-                        DrawerItem.CLOUD_DRIVE))
+                    binding.fileExplorerFilesize.text = getMegaNodeFolderInfo(node, context)
+                    imageView.setImageResource(
+                        getFolderIcon(
+                            node,
+                            DrawerItem.CLOUD_DRIVE
+                        )
+                    )
 
                     if (node.isInShare) {
                         if (context.resources.configuration.orientation == ORIENTATION_LANDSCAPE) {
@@ -564,20 +575,23 @@ class MegaExplorerAdapter(
                         // Check permissions
                         binding.fileExplorerPermissions.isVisible = true
                         megaApi.getAccess(node).let { accessLevel ->
-                            binding.fileExplorerPermissions.setImageResource(when (accessLevel) {
-                                MegaShare.ACCESS_FULL -> R.drawable.ic_shared_fullaccess
-                                MegaShare.ACCESS_READ -> R.drawable.ic_shared_read
-                                else -> R.drawable.ic_shared_read_write
-                            })
+                            binding.fileExplorerPermissions.setImageResource(
+                                when (accessLevel) {
+                                    MegaShare.ACCESS_FULL -> R.drawable.ic_shared_fullaccess
+                                    MegaShare.ACCESS_READ -> R.drawable.ic_shared_read
+                                    else -> R.drawable.ic_shared_read_write
+                                }
+                            )
                         }
                         return@with
                     }
                 } else {
                     binding.fileExplorerPermissions.isVisible = false
 
-                    binding.fileExplorerFilesize.text = getFileInfo(node)
+                    binding.fileExplorerFilesize.text = getFileInfo(node, context)
                     imageView.setImageResource(
-                        MimeTypeList.typeForName(node.name).iconResourceId)
+                        MimeTypeList.typeForName(node.name).iconResourceId
+                    )
                     setImageParams(imageView, ICON_SIZE_DP, ICON_MARGIN_DP)
 
                     if (selectFile) {
@@ -594,8 +608,11 @@ class MegaExplorerAdapter(
                             Timber.d("Do not show thumb")
                             return
                         } else {
-                            imageView.setImageResource(MimeTypeList.typeForName(
-                                node.name).iconResourceId)
+                            imageView.setImageResource(
+                                MimeTypeList.typeForName(
+                                    node.name
+                                ).iconResourceId
+                            )
                             binding.fileExplorerItemLayout.background = null
                         }
                     } else {
@@ -607,17 +624,21 @@ class MegaExplorerAdapter(
                     if (thumbnail == null) {
                         runCatching {
                             if (node.hasThumbnail()) {
-                                thumbnail = ThumbnailUtils.getThumbnailFromMegaExplorer(node,
+                                thumbnail = ThumbnailUtils.getThumbnailFromMegaExplorer(
+                                    node,
                                     context,
                                     this@ViewHolderListExplorer,
                                     megaApi,
-                                    this@MegaExplorerAdapter)
+                                    this@MegaExplorerAdapter
+                                )
                             } else {
-                                ThumbnailUtils.createThumbnailExplorer(context,
+                                ThumbnailUtils.createThumbnailExplorer(
+                                    context,
                                     node,
                                     this@ViewHolderListExplorer,
                                     megaApi,
-                                    this@MegaExplorerAdapter)
+                                    this@MegaExplorerAdapter
+                                )
                             }
                         }.onFailure {
                             Timber.e(it)
@@ -626,10 +647,13 @@ class MegaExplorerAdapter(
 
                     thumbnail?.let {
                         setImageParams(imageView, THUMB_SIZE_DP, THUMB_MARGIN_DP)
-                        imageView.setImageBitmap(ThumbnailUtils.getRoundedBitmap(
-                            context,
-                            it,
-                            dp2px(THUMB_CORNER_RADIUS_DP)))
+                        imageView.setImageBitmap(
+                            ThumbnailUtils.getRoundedBitmap(
+                                context,
+                                it,
+                                dp2px(THUMB_CORNER_RADIUS_DP)
+                            )
+                        )
                     }
                 }
             }
@@ -683,9 +707,12 @@ class MegaExplorerAdapter(
                 binding.fileExplorerGridFolderLayout.isVisible = true
                 binding.fileExplorerGridFileLayout.isVisible = false
                 textViewSettings(binding.fileExplorerGridFolderFilename, node)
-                binding.fileExplorerGridFolderIcon.setImageResource(getFolderIcon(
-                    node,
-                    DrawerItem.CLOUD_DRIVE))
+                binding.fileExplorerGridFolderIcon.setImageResource(
+                    getFolderIcon(
+                        node,
+                        DrawerItem.CLOUD_DRIVE
+                    )
+                )
                 itemView.setOnClickListener(::clickItem)
 
                 binding.fileGridTakenDown.isVisible = node.isTakenDown
@@ -694,8 +721,11 @@ class MegaExplorerAdapter(
                 binding.fileExplorerGridFileLayout.isVisible = true
                 textViewSettings(binding.fileGridFilenameForFile, node)
                 fileThumbnail.isVisible = false
-                fileIcon.setImageResource(MimeTypeThumbnail.typeForName(
-                    node.name).iconResourceId)
+                fileIcon.setImageResource(
+                    MimeTypeThumbnail.typeForName(
+                        node.name
+                    ).iconResourceId
+                )
 
                 binding.fileGridTakenDownForFile.isVisible = node.isTakenDown
 
@@ -716,8 +746,10 @@ class MegaExplorerAdapter(
 
                 var thumbnail =
                     ThumbnailUtils.getThumbnailFromCache(node)
-                        ?: ThumbnailUtils.getThumbnailFromFolder(node,
-                            context)
+                        ?: ThumbnailUtils.getThumbnailFromFolder(
+                            node,
+                            context
+                        )
                 if (thumbnail == null) {
                     runCatching {
                         if (node.hasThumbnail()) {
@@ -727,14 +759,16 @@ class MegaExplorerAdapter(
                                     context,
                                     this@ViewHolderGridExplorer,
                                     megaApi,
-                                    this@MegaExplorerAdapter)
+                                    this@MegaExplorerAdapter
+                                )
                         } else {
                             ThumbnailUtils.createThumbnailExplorer(
                                 context,
                                 node,
                                 this@ViewHolderGridExplorer,
                                 megaApi,
-                                this@MegaExplorerAdapter)
+                                this@MegaExplorerAdapter
+                            )
                         }
                     }.onFailure {
                         Timber.e(it)
@@ -746,7 +780,9 @@ class MegaExplorerAdapter(
                         ThumbnailUtils.getRoundedRectBitmap(
                             context,
                             thumbnail,
-                            2))
+                            2
+                        )
+                    )
                     fileThumbnail.isVisible = true
                     fileIcon.isVisible = false
                 } ?: let {
@@ -767,13 +803,17 @@ class MegaExplorerAdapter(
 
                     if (multipleSelected && isItemChecked(position)) {
                         binding.fileExplorerGridLayout.background =
-                            ContextCompat.getDrawable(context,
-                                R.drawable.background_item_grid_selected)
+                            ContextCompat.getDrawable(
+                                context,
+                                R.drawable.background_item_grid_selected
+                            )
                         fileSelectedIcon.setImageResource(R.drawable.ic_select_folder)
                     } else {
                         binding.fileExplorerGridLayout.background =
-                            ContextCompat.getDrawable(context,
-                                R.drawable.background_item_grid)
+                            ContextCompat.getDrawable(
+                                context,
+                                R.drawable.background_item_grid
+                            )
                         fileSelectedIcon.setImageDrawable(ColorDrawable(Color.TRANSPARENT))
                     }
                 } else {

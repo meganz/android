@@ -7,7 +7,6 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -63,7 +62,8 @@ class ExportListener constructor(private val context: Context) :
      * @param shareIntent Intent to share the content
      */
     constructor(context: Context, shareIntent: Intent?, messageId: Long, chatId: Long) : this(
-        context) {
+        context
+    ) {
         action = Constants.ACTION_SHARE_MSG
         this.shareIntent = shareIntent
         this.messageId = messageId
@@ -91,7 +91,8 @@ class ExportListener constructor(private val context: Context) :
      * @param onExportFinishedListener Listener to manage the result of export request.
      */
     constructor(context: Context, onExportFinishedListener: (() -> Unit)?) : this(
-        context) {
+        context
+    ) {
         action = Constants.ACTION_REMOVE_LINK
         pendingRemove = 1
         numberRemove = pendingRemove
@@ -168,9 +169,13 @@ class ExportListener constructor(private val context: Context) :
         pendingExport--
         if (pendingExport == 0) {
             Timber.e("%s errors exporting nodes", numberExport)
-            Util.showSnackbar(context,
-                StringResourcesUtils.getQuantityString(R.plurals.context_link_export_error,
-                    numberExport))
+            Util.showSnackbar(
+                context,
+                context.resources.getQuantityString(
+                    R.plurals.context_link_export_error,
+                    numberExport
+                )
+            )
         }
     }
 
@@ -212,14 +217,22 @@ class ExportListener constructor(private val context: Context) :
                     if (pendingRemove == 0) {
                         if (numberError > 0) {
                             Timber.e("Removing link error")
-                            Util.showSnackbar(context,
-                                StringResourcesUtils.getQuantityString(R.plurals.context_link_removal_error,
-                                    numberRemove))
+                            Util.showSnackbar(
+                                context,
+                                context.resources.getQuantityString(
+                                    R.plurals.context_link_removal_error,
+                                    numberRemove
+                                )
+                            )
                         } else {
                             onExportFinishedListener?.invoke()
-                            Util.showSnackbar(context,
-                                StringResourcesUtils.getQuantityString(R.plurals.context_link_removal_success,
-                                    numberRemove))
+                            Util.showSnackbar(
+                                context,
+                                context.resources.getQuantityString(
+                                    R.plurals.context_link_removal_success,
+                                    numberRemove
+                                )
+                            )
                         }
                     }
                 }
@@ -243,25 +256,33 @@ class ExportListener constructor(private val context: Context) :
                         if (pendingExport == 0) {
                             shareIntent?.let { nonNullShareIntent ->
                                 if (numberError < numberExport) {
-                                    startShareIntent(context,
+                                    startShareIntent(
+                                        context,
                                         nonNullShareIntent,
-                                        exportedLinks.toString())
+                                        exportedLinks.toString()
+                                    )
                                 }
                             }
 
                             if (numberError > 0) {
                                 Timber.e("%s errors exporting nodes", numberError)
-                                Util.showSnackbar(context, context.resources
-                                    .getQuantityString(R.plurals.context_link_export_error,
-                                        numberExport))
+                                Util.showSnackbar(
+                                    context, context.resources
+                                        .getQuantityString(
+                                            R.plurals.context_link_export_error,
+                                            numberExport
+                                        )
+                                )
                                 return
                             }
                         }
                     } ?: run {
                         if (action == Constants.ACTION_SHARE_MSG) {
                             // It is necessary to import the node into the cloud to create a new link from that node.
-                            Timber.e("Error exporting node: %s, it is necessary to import the node",
-                                e.errorString)
+                            Timber.e(
+                                "Error exporting node: %s, it is necessary to import the node",
+                                e.errorString
+                            )
                             val chatC = ChatController(context)
                             if (messages.isNullOrEmpty()) {
                                 Timber.d("One node to import to MEGA and then share")

@@ -55,7 +55,6 @@ import mega.privacy.android.app.utils.Constants.REQUEST_CREATE_CHAT
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.waitForLayout
 import mega.privacy.android.app.utils.callManager
@@ -814,11 +813,11 @@ class HomepageFragment : Fragment() {
     private fun showChooseStartScreenDialog() {
         startScreenDialog = MaterialAlertDialogBuilder(requireContext())
             .setView(R.layout.dialog_choose_start_screen)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.change_setting_action)) { _, _ ->
+            .setPositiveButton(getString(R.string.change_setting_action)) { _, _ ->
                 callManager { manager -> manager.moveToSettingsSectionStartScreen() }
                 notAlertAnymoreAboutStartScreen(requireContext())
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
+            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
                 notAlertAnymoreAboutStartScreen(requireContext())
             }
             .show().apply {

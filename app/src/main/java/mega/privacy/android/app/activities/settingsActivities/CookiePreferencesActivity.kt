@@ -9,7 +9,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieSettingsFragment
 import mega.privacy.android.app.fragments.settingsFragments.cookie.CookieSettingsViewModel
-import mega.privacy.android.app.utils.StringResourcesUtils
 
 @AndroidEntryPoint
 class CookiePreferencesActivity : PreferencesBaseActivity() {
@@ -43,11 +42,11 @@ class CookiePreferencesActivity : PreferencesBaseActivity() {
 
     private fun showUnsavedDialog() {
         MaterialAlertDialogBuilder(this)
-            .setMessage(StringResourcesUtils.getString(R.string.dialog_cookie_alert_unsaved))
-            .setPositiveButton(StringResourcesUtils.getString(R.string.save_action)) { _: DialogInterface, _: Int ->
+            .setMessage(getString(R.string.dialog_cookie_alert_unsaved))
+            .setPositiveButton(getString(R.string.save_action)) { _: DialogInterface, _: Int ->
                 saveCookieSettings()
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel), null)
+            .setNegativeButton(getString(R.string.button_cancel), null)
             .create()
             .show()
     }

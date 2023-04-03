@@ -1,10 +1,10 @@
 package mega.privacy.android.app.data.extensions
 
+import android.content.Context
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.RelativeSizeSpan
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import java.text.DecimalFormat
 
 /**
@@ -13,7 +13,7 @@ import java.text.DecimalFormat
  *
  * @return [Spanned] with the big formatted storage string.
  */
-fun Long.getBigFormattedStorageString(): Spanned {
+fun Long.getBigFormattedStorageString(context: Context): Spanned {
     val df = DecimalFormat("#.##")
 
     val kB = 1024f
@@ -25,25 +25,43 @@ fun Long.getBigFormattedStorageString(): Spanned {
 
     var storageSizeString = when {
         this < kB -> {
-            getString(R.string.account_achievements_storage_quota_byte, this.toString())
+            context.getString(R.string.account_achievements_storage_quota_byte, this.toString())
         }
         this < mB -> {
-            getString(R.string.account_achievements_storage_quota_kilo_byte, df.format((this / kB)))
+            context.getString(
+                R.string.account_achievements_storage_quota_kilo_byte,
+                df.format((this / kB))
+            )
         }
         this < gB -> {
-            getString(R.string.account_achievements_storage_quota_mega_byte, df.format((this / mB)))
+            context.getString(
+                R.string.account_achievements_storage_quota_mega_byte,
+                df.format((this / mB))
+            )
         }
         this < tB -> {
-            getString(R.string.account_achievements_storage_quota_giga_byte, df.format((this / gB)))
+            context.getString(
+                R.string.account_achievements_storage_quota_giga_byte,
+                df.format((this / gB))
+            )
         }
         this < pB -> {
-            getString(R.string.account_achievements_storage_quota_tera_byte, df.format((this / tB)))
+            context.getString(
+                R.string.account_achievements_storage_quota_tera_byte,
+                df.format((this / tB))
+            )
         }
         this < eB -> {
-            getString(R.string.account_achievements_storage_quota_peta_byte, df.format((this / pB)))
+            context.getString(
+                R.string.account_achievements_storage_quota_peta_byte,
+                df.format((this / pB))
+            )
         }
         else -> {
-            getString(R.string.account_achievements_storage_quota_exa_byte, df.format((this / eB)))
+            context.getString(
+                R.string.account_achievements_storage_quota_exa_byte,
+                df.format((this / eB))
+            )
         }
     }
 
@@ -55,9 +73,11 @@ fun Long.getBigFormattedStorageString(): Spanned {
     storageSizeString = storageSizeString.replace(finalPlaceHolder, "")
 
     return SpannableString(storageSizeString).apply {
-        setSpan(RelativeSizeSpan(2.5f),
+        setSpan(
+            RelativeSizeSpan(2.5f),
             firstIndex,
             lastIndex,
-            0)
+            0
+        )
     }
 }

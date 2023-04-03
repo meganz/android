@@ -9,6 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
@@ -100,7 +101,7 @@ internal fun FileInfoContent(
         //file size layout
         NodeSizeView(
             forFolder = !isFile,
-            sizeString = Util.getSizeString(sizeInBytes),
+            sizeString = Util.getSizeString(sizeInBytes, LocalContext.current),
             modifier = paddingHorizontal
         )
 

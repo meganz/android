@@ -331,7 +331,7 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
         holder.textViewFileName.setText(node.getName());
         holder.textViewFileSize.setText("");
 
-        String fileInfo = getFileInfo(node);
+        String fileInfo = getFileInfo(node, context);
         holder.textViewFileSize.setText(fileInfo);
 
         RelativeLayout.LayoutParams paramsLarge = (RelativeLayout.LayoutParams) holder.imageView.getLayoutParams();

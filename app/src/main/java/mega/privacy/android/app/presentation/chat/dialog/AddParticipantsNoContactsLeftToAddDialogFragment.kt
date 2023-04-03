@@ -8,7 +8,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.main.InviteContactActivity
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
@@ -24,15 +23,17 @@ class AddParticipantsNoContactsLeftToAddDialogFragment : DialogFragment() {
     lateinit var getThemeMode: GetThemeMode
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
-        MaterialAlertDialogBuilder(requireContext(),
-            R.style.ThemeOverlay_Mega_MaterialAlertDialog)
+        MaterialAlertDialogBuilder(
+            requireContext(),
+            R.style.ThemeOverlay_Mega_MaterialAlertDialog
+        )
             .apply {
-                setTitle(StringResourcesUtils.getString(R.string.chat_add_participants_no_contacts_left_to_add_title))
-                setMessage(StringResourcesUtils.getString(R.string.chat_add_participants_no_contacts_left_to_add_message))
-                setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel)) { _, _ ->
+                setTitle(getString(R.string.chat_add_participants_no_contacts_left_to_add_title))
+                setMessage(getString(R.string.chat_add_participants_no_contacts_left_to_add_message))
+                setNegativeButton(getString(R.string.button_cancel)) { _, _ ->
                     dismiss()
                 }
-                setPositiveButton(StringResourcesUtils.getString(R.string.contact_invite)) { _, _ ->
+                setPositiveButton(getString(R.string.contact_invite)) { _, _ ->
                     startActivity(Intent(requireContext(), InviteContactActivity::class.java))
                     dismiss()
                 }

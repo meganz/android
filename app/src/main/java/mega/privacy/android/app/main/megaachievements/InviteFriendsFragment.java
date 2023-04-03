@@ -25,7 +25,6 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.listeners.GetAchievementsListener;
 import mega.privacy.android.app.main.InviteContactActivity;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.data.qualifier.MegaApi;
 import nz.mega.sdk.MegaAchievementsDetails;
@@ -77,7 +76,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
         // Activity actionbar has been created which might be accessed by UpdateUI().
         ActionBar actionBar = ((AppCompatActivity) requireActivity()).getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(StringResourcesUtils.getString(R.string.title_referral_bonuses));
+            actionBar.setTitle(getString(R.string.title_referral_bonuses));
         }
 
         // The root view has been created, fill it with the data when data ready
@@ -107,7 +106,7 @@ public class InviteFriendsFragment extends Fragment implements OnClickListener
 
         long referralsStorageValue = details.getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_INVITE);
 
-        titleCard.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue)));
+        titleCard.setText(getString(R.string.figures_achievements_text_referrals, getSizeString(referralsStorageValue, requireContext())));
     }
 
     @Override

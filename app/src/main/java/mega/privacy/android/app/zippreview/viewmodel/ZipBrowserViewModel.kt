@@ -1,5 +1,6 @@
 package mega.privacy.android.app.zippreview.viewmodel
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -84,10 +85,10 @@ class ZipBrowserViewModel @Inject constructor(
      * Update zip info list
      * @param folderPath the path of folder, default value is ""
      */
-    private fun updateZipInfoList(folderPath: String = "") {
+    private fun updateZipInfoList(context: Context, folderPath: String = "") {
         _zipInfoList.value =
             zipFileRepository.updateZipInfoList(zipFile, folderPath).map {
-                zipTreeNodeToZipInfoUIO(it)
+                zipTreeNodeToZipInfoUIO(it, context)
             }
 
         getTitle(folderPath.ifEmpty { "" })
@@ -99,7 +100,7 @@ class ZipBrowserViewModel @Inject constructor(
      * @param zipTreeNode ZipTreeNode
      * @return ZipInfoUIO
      */
-    private fun zipTreeNodeToZipInfoUIO(zipTreeNode: ZipTreeNode): ZipInfoUIO {
+    private fun zipTreeNodeToZipInfoUIO(zipTreeNode: ZipTreeNode, context: Context): ZipInfoUIO {
         val imageResourceId = if (zipTreeNode.fileType == FileType.FOLDER) {
             R.drawable.ic_folder_list
         } else {
@@ -115,9 +116,9 @@ class ZipBrowserViewModel @Inject constructor(
             zipTreeNode.parent,
             if (zipTreeNode.fileType == FileType.FOLDER) {
                 val result = countFiles(zipTreeNode)
-                TextUtil.getFolderInfo(result.first, result.second)
+                TextUtil.getFolderInfo(result.first, result.second, context)
             } else
-                Util.getSizeString(zipTreeNode.size),
+                Util.getSizeString(zipTreeNode.size, context),
             imageResourceId,
             zipTreeNode.fileType
         )
@@ -145,7 +146,7 @@ class ZipBrowserViewModel @Inject constructor(
      * @param zipFullPath zip file full path
      * @param unzipRootPath unzip root path
      */
-    fun viewModelInit(zipFullPath: String, unzipRootPath: String) {
+    fun viewModelInit(zipFullPath: String, unzipRootPath: String, context: Context) {
         this.zipFullPath = zipFullPath
         this.unzipRootPath = "${unzipRootPath}${File.separator}"
         // Log the zip file path
@@ -154,21 +155,21 @@ class ZipBrowserViewModel @Inject constructor(
         rootFolderPath = unzipRootPath.split("/").last()
         viewModelScope.launch {
             zipFileRepository.initZipTreeNode(zipFile)
-            updateZipInfoList()
+            updateZipInfoList(context)
         }
     }
 
     /**
      * Validation current folder if the root folder when the back button clicked.
      */
-    fun handleOnBackPressed() {
+    fun handleOnBackPressed(context: Context) {
         if (zipInfoList.value.isNullOrEmpty()) {
             currentZipInfo?.let {
-                backUpdateZipInfoList(it.path, true)
+                backUpdateZipInfoList(it.path, true, context)
             }
         } else {
             _zipInfoList.value?.get(0)?.path?.apply {
-                backUpdateZipInfoList(this, false)
+                backUpdateZipInfoList(this, false, context)
             }
         }
         _deepOfFolder.value = _deepOfFolder.value.dec()
@@ -179,10 +180,14 @@ class ZipBrowserViewModel @Inject constructor(
      * @param parentFolderPath parent folder path
      * @param isEmptyFolder current folder whether is empty folder
      */
-    private fun backUpdateZipInfoList(parentFolderPath: String, isEmptyFolder: Boolean) {
+    private fun backUpdateZipInfoList(
+        parentFolderPath: String,
+        isEmptyFolder: Boolean,
+        context: Context,
+    ) {
         _zipInfoList.value =
             zipFileRepository.getParentZipInfoList(parentFolderPath, isEmptyFolder).map {
-                zipTreeNodeToZipInfoUIO(it)
+                zipTreeNodeToZipInfoUIO(it, context)
             }.also {
                 val firstNodeParent = it.firstOrNull()?.parent
                 getTitle(if (firstNodeParent.isNullOrEmpty()) "" else firstNodeParent)
@@ -194,7 +199,7 @@ class ZipBrowserViewModel @Inject constructor(
      * @param zipInfoUIO ZipInfoUIO
      * @param position the position of clicked file
      */
-    fun onZipFileClicked(zipInfoUIO: ZipInfoUIO, position: Int) {
+    fun onZipFileClicked(zipInfoUIO: ZipInfoUIO, position: Int, context: Context) {
         when (getItemClickedStatus(zipInfoUIO, unzipRootPath)) {
             StatusItemClicked.ZIP_NOT_UNPACK -> {
                 _showProgressDialog.value = true
@@ -214,7 +219,7 @@ class ZipBrowserViewModel @Inject constructor(
 
             StatusItemClicked.OPEN_FOLDER -> {
                 currentZipInfo = zipInfoUIO
-                updateZipInfoList(zipInfoUIO.path)
+                updateZipInfoList(context, zipInfoUIO.path)
             }
             StatusItemClicked.ITEM_NOT_EXIST -> {
                 Timber.e("zip entry position $position file not exists")

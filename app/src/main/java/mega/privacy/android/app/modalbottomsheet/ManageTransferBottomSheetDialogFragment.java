@@ -1,5 +1,19 @@
 package mega.privacy.android.app.modalbottomsheet;
 
+import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setThumbnail;
+import static mega.privacy.android.app.utils.Constants.INVALID_ID;
+import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromCache;
+import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbnailFromFolder;
+import static mega.privacy.android.app.utils.Util.dp2px;
+import static mega.privacy.android.app.utils.Util.isOnline;
+import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
+import static nz.mega.sdk.MegaTransfer.STATE_CANCELLED;
+import static nz.mega.sdk.MegaTransfer.STATE_COMPLETED;
+import static nz.mega.sdk.MegaTransfer.STATE_FAILED;
+import static nz.mega.sdk.MegaTransfer.TYPE_DOWNLOAD;
+import static nz.mega.sdk.MegaTransfer.TYPE_UPLOAD;
+
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -21,16 +35,7 @@ import mega.privacy.android.app.R;
 import mega.privacy.android.app.databinding.BottomSheetManageTransferBinding;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
-
-import static mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.setThumbnail;
-import static mega.privacy.android.app.utils.Constants.INVALID_ID;
-import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
-import static mega.privacy.android.app.utils.ThumbnailUtils.*;
-import static mega.privacy.android.app.utils.Util.*;
-import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
-import static nz.mega.sdk.MegaTransfer.*;
 
 public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
     private static final String TRANSFER_ID = "TRANSFER_ID";
@@ -92,7 +97,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
         }
 
         location.setTextColor(ContextCompat.getColor(requireContext(), R.color.grey_054_white_054));
-        RelativeLayout.LayoutParams params =  (RelativeLayout.LayoutParams) stateIcon.getLayoutParams();
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) stateIcon.getLayoutParams();
         params.rightMargin = dp2px(5, getResources().getDisplayMetrics());
 
         switch (transfer.getState()) {
@@ -105,7 +110,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
             case STATE_FAILED:
                 location.setTextColor(ColorUtils.getThemeColor(requireContext(), R.attr.colorError));
-                location.setText(String.format("%s: %s", StringResourcesUtils.getString(R.string.failed_label), transfer.getError()));
+                location.setText(String.format("%s: %s", getString(R.string.failed_label), transfer.getError()));
                 params.rightMargin = 0;
                 stateIcon.setImageBitmap(null);
                 viewInFolderOption.setVisibility(View.GONE);

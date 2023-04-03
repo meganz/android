@@ -129,7 +129,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.getFragmentFromNavHost
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -356,7 +355,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         }
 
         viewModel.onSnackbarMessage().observe(this) { message ->
-            showSnackbar(message)
+            showSnackbar(getString(message))
         }
 
         viewModel.onExceptionThrown().observe(this, ::manageException)
@@ -405,7 +404,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
     }
 
     private fun showNotAllowPlayAlert() {
-        showSnackbar(StringResourcesUtils.getString(R.string.not_allow_play_alert))
+        showSnackbar(getString(R.string.not_allow_play_alert))
     }
 
     override fun onResume() {
@@ -467,7 +466,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                     viewingTrackInfo = null
                 }
                 R.id.track_info -> {
-                    actionBar.title = StringResourcesUtils.getString(R.string.audio_track_info)
+                    actionBar.title = getString(R.string.audio_track_info)
 
                     if (args != null) {
                         viewingTrackInfo = TrackInfoFragmentArgs.fromBundle(args)
@@ -513,7 +512,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         )
 
         menu.findItem(R.id.get_link).title =
-            StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
+            resources.getQuantityString(R.plurals.get_links, 1)
 
         searchMenuItem = menu.findItem(R.id.action_search)
 
@@ -597,7 +596,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                             val moveToTrash = menu.findItem(R.id.move_to_trash) ?: return
                             moveToTrash.isVisible = true
                             moveToTrash.title =
-                                StringResourcesUtils.getString(R.string.context_remove)
+                                getString(R.string.context_remove)
 
                             return
                         }
@@ -627,7 +626,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
 
                             moveToTrash.isVisible = true
                             moveToTrash.title =
-                                StringResourcesUtils.getString(R.string.context_remove)
+                                getString(R.string.context_remove)
 
                             return
                         }
@@ -913,7 +912,8 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 }
 
                 AlertsAndWarnings.showConfirmRemoveLinkDialog(this) {
-                    megaApi.disableExport(node,
+                    megaApi.disableExport(
+                        node,
                         OptionalMegaRequestListenerInterface(onRequestFinish = { _, error ->
                             if (error.errorCode == MegaError.API_OK) {
                                 // Some times checking node.isExported immediately will still
@@ -1050,21 +1050,25 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 val toHandle = intent?.getLongExtra(INTENT_EXTRA_KEY_IMPORT_TO, INVALID_HANDLE)
                     ?: return
 
-                viewModel.copyNode(node = node, newParentHandle = toHandle)
+                viewModel.copyNode(node = node, newParentHandle = toHandle, context = this)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_MOVE -> {
                 val moveHandles = intent?.getLongArrayExtra(INTENT_EXTRA_KEY_MOVE_HANDLES)
                     ?: return
                 val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
 
-                viewModel.moveNode(moveHandles[0], toHandle)
+                viewModel.moveNode(moveHandles[0], toHandle, this)
             }
             REQUEST_CODE_SELECT_FOLDER_TO_COPY -> {
                 val copyHandles = intent?.getLongArrayExtra(Constants.INTENT_EXTRA_KEY_COPY_HANDLES)
                     ?: return
                 val toHandle = intent.getLongExtra(INTENT_EXTRA_KEY_MOVE_TO, INVALID_HANDLE)
 
-                viewModel.copyNode(nodeHandle = copyHandles[0], newParentHandle = toHandle)
+                viewModel.copyNode(
+                    nodeHandle = copyHandles[0],
+                    newParentHandle = toHandle,
+                    context = this
+                )
             }
         }
     }

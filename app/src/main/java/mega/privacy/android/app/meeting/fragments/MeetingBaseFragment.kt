@@ -10,7 +10,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivityViewModel
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.permission.PermissionRequest
 import mega.privacy.android.app.utils.permission.PermissionType
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -226,10 +225,10 @@ open class MeetingBaseFragment : Fragment() {
         val permissionsWarningDialogBuilder =
             MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
-        permissionsWarningDialogBuilder.setTitle(StringResourcesUtils.getString(R.string.meeting_permission_info))
-            .setMessage(StringResourcesUtils.getString(R.string.meeting_permission_info_message))
+        permissionsWarningDialogBuilder.setTitle(getString(R.string.meeting_permission_info))
+            .setMessage(getString(R.string.meeting_permission_info_message))
             .setCancelable(false)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.button_permission_info)) { dialog, _ ->
+            .setPositiveButton(getString(R.string.button_permission_info)) { dialog, _ ->
                 run {
                     dialog.dismiss()
                     checkPermission()

@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -51,9 +52,7 @@ import mega.privacy.android.app.utils.ChatUtil.amIParticipatingInAChat
 import mega.privacy.android.app.utils.ChatUtil.getTitleChat
 import mega.privacy.android.app.utils.Constants.AUDIO_MANAGER_CREATING_JOINING_MEETING
 import mega.privacy.android.app.utils.Constants.REQUEST_ADD_PARTICIPANTS
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.VideoCaptureUtils
-import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.usecase.CheckChatLink
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -84,9 +83,9 @@ class MeetingActivityViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
     private val chatManagement: ChatManagement,
     private val cameraGateway: CameraGateway,
-    private val megaChatApiGateway: MegaChatApiGateway,
     private val checkChatLink: CheckChatLink,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    @ApplicationContext private val context: Context,
 ) : BaseRxViewModel(), OpenVideoDeviceListener.OnOpenVideoDeviceCallback,
     DisableAudioVideoCallListener.OnDisableAudioVideoCallback {
 
@@ -162,9 +161,9 @@ class MeetingActivityViewModel @Inject constructor(
 
                 _speakerLiveData.value = it
                 tips.value = when (it) {
-                    AppRTCAudioManager.AudioDevice.EARPIECE -> getString(R.string.general_speaker_off)
-                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> getString(R.string.general_speaker_on)
-                    else -> getString(R.string.general_headphone_on)
+                    AppRTCAudioManager.AudioDevice.EARPIECE -> context.getString(R.string.general_speaker_off)
+                    AppRTCAudioManager.AudioDevice.SPEAKER_PHONE -> context.getString(R.string.general_speaker_on)
+                    else -> context.getString(R.string.general_headphone_on)
                 }
             }
         }
@@ -183,7 +182,7 @@ class MeetingActivityViewModel @Inject constructor(
                     if (!chatAndLink.second.isNullOrEmpty()) {
                         _meetingLinkLiveData.value = chatAndLink.second
                     } else {
-                        _snackBarLiveData.value = getString(R.string.no_chat_link_available)
+                        _snackBarLiveData.value = context.getString(R.string.no_chat_link_available)
                     }
                 }
             }
@@ -244,10 +243,10 @@ class MeetingActivityViewModel @Inject constructor(
                             _micLiveData.value = isEnable
                             Timber.d("open Mic: $isEnable")
                             tips.value = when (isEnable) {
-                                true -> getString(
+                                true -> context.getString(
                                     R.string.general_mic_unmute
                                 )
-                                false -> getString(
+                                false -> context.getString(
                                     R.string.general_mic_mute
                                 )
                             }
@@ -471,9 +470,9 @@ class MeetingActivityViewModel @Inject constructor(
             _micLiveData.value = shouldAudioBeEnabled
             Timber.d("open Mic: $shouldAudioBeEnabled")
             tips.value = if (shouldAudioBeEnabled) {
-                getString(R.string.general_mic_unmute)
+                context.getString(R.string.general_mic_unmute)
             } else {
-                getString(R.string.general_mic_mute)
+                context.getString(R.string.general_mic_mute)
             }
         }
     }
@@ -617,10 +616,10 @@ class MeetingActivityViewModel @Inject constructor(
         _cameraLiveData.value = isVideoOn
         Timber.d("Open video: ${_cameraLiveData.value}")
         tips.value = when (isVideoOn) {
-            true -> getString(
+            true -> context.getString(
                 R.string.general_camera_enable
             )
-            false -> getString(
+            false -> context.getString(
                 R.string.general_camera_disable
             )
         }
@@ -668,7 +667,7 @@ class MeetingActivityViewModel @Inject constructor(
             if (contactsData != null) {
                 currentChatId.value?.let {
                     InviteToChatRoomListener(context).inviteToChat(it, contactsData)
-                    _snackBarLiveData.value = getString(R.string.invite_sent)
+                    _snackBarLiveData.value = context.getString(R.string.invite_sent)
                 }
             }
         } else {

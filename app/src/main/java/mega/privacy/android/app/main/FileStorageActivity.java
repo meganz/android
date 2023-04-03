@@ -62,7 +62,6 @@ import mega.privacy.android.app.components.SimpleDividerItemDecoration;
 import mega.privacy.android.app.interfaces.Scrollable;
 import mega.privacy.android.app.main.adapters.FileStorageAdapter;
 import mega.privacy.android.app.utils.ColorUtils;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.data.model.MegaPreferences;
 import timber.log.Timber;
 
@@ -300,7 +299,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
                 .addCategory(Intent.CATEGORY_OPENABLE)
                 .setType(TYPE_TEXT_PLAIN)
                 .putExtra(DocumentsContract.EXTRA_INITIAL_URI, initialUri)
-                .putExtra(Intent.EXTRA_TITLE, getRecoveryKeyFileName()), REQUEST_SAVE_RK);
+                .putExtra(Intent.EXTRA_TITLE, getRecoveryKeyFileName(this)), REQUEST_SAVE_RK);
     }
 
     /**
@@ -336,7 +335,7 @@ public class FileStorageActivity extends PasscodeActivity implements Scrollable 
      */
     private void showOpenDocumentWarningAndFinish(ActivityNotFoundException e) {
         Timber.e(e, "Error launching ACTION_OPEN_DOCUMENT_TREE.");
-        showSnackbar(viewContainer, StringResourcesUtils.getString(R.string.general_warning_no_picker));
+        showSnackbar(viewContainer, getString(R.string.general_warning_no_picker));
         new Handler().postDelayed(this::finish, LONG_SNACKBAR_DURATION);
     }
 

@@ -56,7 +56,6 @@ import mega.privacy.android.app.utils.Constants.MAX_WIDTH_APPBAR_PORT
 import mega.privacy.android.app.utils.Constants.REQUEST_CAMERA
 import mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.canVoluntaryVerifyPhoneNumber
 import mega.privacy.android.app.utils.Util.checkTakePicture
@@ -123,7 +122,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         setContentView(binding.root)
 
         lifecycleScope.launch {
-            val monitorPhoneNumberEnabled = getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)
+            val monitorPhoneNumberEnabled =
+                getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)
             setupView(monitorPhoneNumberEnabled)
             setupObservers(monitorPhoneNumberEnabled)
         }
@@ -223,7 +223,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
             if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 checkTakePicture(this, TAKE_PICTURE_PROFILE_CODE)
             } else {
-                showSnackbar(StringResourcesUtils.getString(R.string.denied_write_permissions))
+                showSnackbar(getString(R.string.denied_write_permissions))
             }
         }
     }
@@ -294,7 +294,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 viewModel.markHandleChangeUserNameResult()
             }
 
-            if (monitorPhoneNumberEnabled){
+            if (monitorPhoneNumberEnabled) {
                 setupPhoneNumber(
                     alreadyRegistered = state.verifiedPhoneNumber != null,
                     canVerify = state.canVerifyPhoneNumber && state.verifiedPhoneNumber == null,
@@ -317,7 +317,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
      */
     private fun updateName(success: Boolean) {
         showSnackbar(
-            StringResourcesUtils.getString(
+            getString(
                 if (success) R.string.success_changing_user_attributes
                 else R.string.error_changing_user_attributes
             )
@@ -355,8 +355,8 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         showAlert(
             this,
-            StringResourcesUtils.getString(firstMessageId),
-            StringResourcesUtils.getString(secondMessageId)
+            getString(firstMessageId),
+            getString(secondMessageId)
         )
     }
 
@@ -477,7 +477,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         canVerify: Boolean = canVoluntaryVerifyPhoneNumber(),
     ) {
 
-        binding.addPhoneNumber.text = StringResourcesUtils.getString(
+        binding.addPhoneNumber.text = getString(
             if (alreadyRegistered) R.string.title_modify_phone_number
             else R.string.add_phone_number_action
         )
@@ -513,7 +513,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
 
         binding.logoutWarningText.apply {
             isVisible = existOfflineFiles || existOutgoingTransfers
-            text = StringResourcesUtils.getString(
+            text = getString(
                 when {
                     existOfflineFiles && existOutgoingTransfers -> R.string.logout_warning_offline_and_transfers
                     existOfflineFiles -> R.string.logout_warning_offline
@@ -533,10 +533,10 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         val dialogBinding = DialogChangeNameBinding.inflate(layoutInflater)
 
         changeNameDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.change_name_action))
+            .setTitle(getString(R.string.change_name_action))
             .setView(dialogBinding.root)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.save_action), null)
-            .setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel), null)
+            .setPositiveButton(getString(R.string.save_action), null)
+            .setNegativeButton(getString(R.string.button_cancel), null)
             .create()
 
         changeNameDialog?.apply {
@@ -592,7 +592,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                     if (dialogBinding.firstNameField.text.isNullOrEmpty()) {
                         errorShown = true
                         setEditTextError(
-                            StringResourcesUtils.getString(R.string.error_enter_username),
+                            getString(R.string.error_enter_username),
                             dialogBinding.firstNameLayout, dialogBinding.firstNameErrorIcon
                         )
                     }
@@ -600,7 +600,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                     if (dialogBinding.lastNameField.text.isNullOrEmpty()) {
                         errorShown = true
                         setEditTextError(
-                            StringResourcesUtils.getString(R.string.error_enter_userlastname),
+                            getString(R.string.error_enter_userlastname),
                             dialogBinding.lastNameLayout, dialogBinding.lastNameErrorIcon
                         )
                     }
@@ -631,10 +631,10 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
         val dialogBinding = DialogChangeEmailBinding.inflate(layoutInflater)
 
         changeEmailDialog = MaterialAlertDialogBuilder(this)
-            .setTitle(StringResourcesUtils.getString(R.string.change_mail_title_last_step))
+            .setTitle(getString(R.string.change_mail_title_last_step))
             .setView(dialogBinding.root)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.save_action), null)
-            .setNegativeButton(StringResourcesUtils.getString(R.string.button_cancel), null)
+            .setPositiveButton(getString(R.string.save_action), null)
+            .setNegativeButton(getString(R.string.button_cancel), null)
             .create()
 
         changeEmailDialog?.apply {
@@ -662,7 +662,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                 getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                     if (dialogBinding.emailField.text.isNullOrEmpty()) {
                         setEditTextError(
-                            StringResourcesUtils.getString(R.string.error_enter_email),
+                            getString(R.string.error_enter_email),
                             dialogBinding.emailLayout, dialogBinding.emailErrorIcon
                         )
                     } else {
@@ -711,12 +711,12 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
     override fun showRemovePhoneNumberConfirmation(isModify: Boolean) {
         this.isModify = isModify
 
-        val title = StringResourcesUtils.getString(
+        val title = getString(
             if (isModify) R.string.title_modify_phone_number
             else R.string.title_remove_phone_number
         )
 
-        val message = StringResourcesUtils.getString(
+        val message = getString(
             if (isModify) R.string.modify_phone_number_message
             else R.string.remove_phone_number_message
         )
@@ -730,7 +730,7 @@ class EditProfileActivity : PasscodeActivity(), PhotoBottomSheetDialogFragment.P
                         startActivity(Intent(this, SMSVerificationActivity::class.java))
                     }
                 }
-                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .setNegativeButton(getString(R.string.general_cancel), null)
                 .show()
     }
 

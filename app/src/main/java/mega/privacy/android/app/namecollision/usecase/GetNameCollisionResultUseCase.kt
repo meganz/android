@@ -8,7 +8,6 @@ import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.MimeTypeList
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
@@ -16,9 +15,9 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
@@ -63,7 +62,10 @@ class GetNameCollisionResultUseCase @Inject constructor(
                     collisionName = name
                     collisionSize = if (collisionNode.isFile) size else null
                     collisionFolderContent =
-                        if (collisionNode.isFolder) getMegaNodeFolderInfo(collisionNode) else null
+                        if (collisionNode.isFolder) getMegaNodeFolderInfo(
+                            collisionNode,
+                            context
+                        ) else null
                     collisionLastModified =
                         if (collisionNode.isFile) modificationTime else creationTime
                 }

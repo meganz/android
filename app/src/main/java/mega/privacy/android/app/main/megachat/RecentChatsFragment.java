@@ -86,7 +86,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.ChatDividerItemDecoration;
@@ -106,12 +105,12 @@ import mega.privacy.android.app.objects.PasscodeManagement;
 import mega.privacy.android.app.presentation.chat.recent.RecentChatsViewModel;
 import mega.privacy.android.app.presentation.search.SearchViewModel;
 import mega.privacy.android.app.usecase.chat.SearchChatsUseCase;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.TextUtil;
 import mega.privacy.android.app.utils.TimeUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.contacts.MegaContactGetter;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
+import mega.privacy.android.data.database.DatabaseHandler;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -624,7 +623,7 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
         if (context instanceof ArchivedChatsActivity) {
             emptyLayoutContainer.findViewById(R.id.txt_empty_description).setVisibility(View.GONE);
             emptyLayoutContainer.findViewById(R.id.btn_new_chat).setVisibility(View.GONE);
-            Spanned result = TextUtil.formatEmptyRecentChatsScreenText(context, StringResourcesUtils.getString(R.string.recent_chat_empty).toUpperCase());
+            Spanned result = TextUtil.formatEmptyRecentChatsScreenText(context, getString(R.string.recent_chat_empty).toUpperCase());
             ((TextView) emptyLayoutContainer.findViewById(R.id.txt_empty_header)).setText(result);
         }
 

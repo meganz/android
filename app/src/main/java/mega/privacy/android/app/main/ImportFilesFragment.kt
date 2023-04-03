@@ -18,7 +18,6 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.main.adapters.ImportFilesAdapter
 import mega.privacy.android.app.main.adapters.ImportFilesAdapter.OnImportFilesAdapterFooterListener
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.domain.entity.ShareTextInfo
 
@@ -95,9 +94,9 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
         }
 
         val headerText: String = if (info.isUrl) {
-            StringResourcesUtils.getString(R.string.file_properties_shared_folder_public_link_name)
+            getString(R.string.file_properties_shared_folder_public_link_name)
         } else {
-            StringResourcesUtils.getQuantityString(R.plurals.general_num_files, 1)
+            resources.getQuantityString(R.plurals.general_num_files, 1)
         }
 
         setupAdapter(setNames, headerText)
@@ -117,7 +116,7 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
         }
 
         val headerText =
-            StringResourcesUtils.getQuantityString(R.plurals.general_num_files, info.size)
+            resources.getQuantityString(R.plurals.general_num_files, info.size)
         setupAdapter(setNames, headerText)
     }
 
@@ -171,13 +170,13 @@ class ImportFilesFragment : Fragment(), OnImportFilesAdapterFooterListener {
         if (wrongNames > 0 || emptyNames > 0) {
             val warning: String = when {
                 emptyNames > 0 && wrongNames > 0 -> {
-                    StringResourcesUtils.getString(R.string.general_incorrect_names)
+                    getString(R.string.general_incorrect_names)
                 }
                 emptyNames > 0 -> {
-                    StringResourcesUtils.getQuantityString(R.plurals.empty_names, emptyNames)
+                    resources.getQuantityString(R.plurals.empty_names, emptyNames)
                 }
                 else -> {
-                    StringResourcesUtils.getString(
+                    getString(
                         R.string.invalid_characters_defined,
                         INVALID_CHARACTERS
                     )

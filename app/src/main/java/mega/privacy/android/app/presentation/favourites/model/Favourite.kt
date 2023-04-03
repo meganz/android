@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.favourites.model
 
+import android.content.Context
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import mega.privacy.android.domain.entity.node.TypedNode
@@ -37,7 +38,7 @@ sealed interface Favourite {
     /**
      * Info
      */
-    val info: String // Replace with folderInfo property on folder, and size and modified date on file
+    val info: (Context) -> String
 
     /**
      * Is selected

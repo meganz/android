@@ -10,7 +10,6 @@ import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllNotTakenDown
-import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaShare
@@ -36,11 +35,13 @@ class ActionModeCallback constructor(
         when (item.itemId) {
             R.id.cab_menu_download -> {
                 viewModel.executeTransfer {
-                    mainActivity.saveNodesToDevice(selectedNodes,
+                    mainActivity.saveNodesToDevice(
+                        selectedNodes,
                         false,
                         false,
                         false,
-                        false)
+                        false
+                    )
                 }
             }
             R.id.cab_menu_copy -> {
@@ -95,7 +96,7 @@ class ActionModeCallback constructor(
         val areAllNotTakenDown = selectedNodes.areAllNotTakenDown()
 
         menu?.findItem(R.id.cab_menu_share_link)?.title =
-            StringResourcesUtils.getQuantityString(R.plurals.get_links, selectedNodes.size)
+            mainActivity.resources.getQuantityString(R.plurals.get_links, selectedNodes.size)
 
         if (areAllNotTakenDown) {
             if (selectedNodes.size == 1

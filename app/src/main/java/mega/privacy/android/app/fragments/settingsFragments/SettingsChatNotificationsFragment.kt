@@ -4,19 +4,19 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.preference.Preference
-import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
-import mega.privacy.android.data.model.ChatSettings
 import androidx.preference.SwitchPreferenceCompat
+import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.activities.settingsActivities.ChatNotificationsPreferencesActivity
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_DND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_NOTIFICATIONS
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_SOUND
 import mega.privacy.android.app.constants.SettingsConstants.KEY_CHAT_VIBRATE
+import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.data.model.ChatSettings
 import timber.log.Timber
 
 /**
@@ -57,12 +57,15 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment() {
             it.onPreferenceChangeListener =
                 Preference.OnPreferenceChangeListener { preference, _ ->
                     if ((preference as SwitchPreferenceCompat).isChecked) {
-                        getPushNotificationSettingManagement().controlMuteNotifications(context,
+                        getPushNotificationSettingManagement().controlMuteNotifications(
+                            context,
                             Constants.NOTIFICATIONS_ENABLED,
-                            null)
+                            null
+                        )
                     } else {
                         ChatUtil.createMuteNotificationsChatAlertDialog(
-                            context as ChatNotificationsPreferencesActivity, null)
+                            context as ChatNotificationsPreferencesActivity, null
+                        )
                     }
                     false
                 }
@@ -108,12 +111,15 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment() {
         chatSettings?.vibrationEnabled = isVibrationEnabled.toString()
         chatVibrateSwitch?.isChecked = isVibrationEnabled
         if (TextUtil.isTextEmpty(chatSettings?.notificationsSound)) {
-            val defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(context,
-                RingtoneManager.TYPE_NOTIFICATION)
+            val defaultSoundUri = RingtoneManager.getActualDefaultRingtoneUri(
+                context,
+                RingtoneManager.TYPE_NOTIFICATION
+            )
             val defaultSound = RingtoneManager.getRingtone(context, defaultSoundUri)
             chatSoundPreference?.summary =
                 if (defaultSound == null) getString(R.string.settings_chat_silent_sound_not) else defaultSound.getTitle(
-                    context)
+                    context
+                )
         } else if (chatSettings?.notificationsSound == Constants.INVALID_OPTION) {
             chatSoundPreference?.summary = getString(R.string.settings_chat_silent_sound_not)
         } else {
@@ -141,7 +147,10 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment() {
             } else {
                 it.isChecked = true
                 pushNotificationSettings?.globalChatsDnd?.let { timestampMute ->
-                    it.summary = TimeUtils.getCorrectStringDependingOnOptionSelected(timestampMute)
+                    it.summary = TimeUtils.getCorrectStringDependingOnOptionSelected(
+                        timestampMute,
+                        requireContext()
+                    )
                 }
             }
         }
@@ -167,7 +176,8 @@ class SettingsChatNotificationsFragment : SettingsBaseFragment() {
                             Constants.NOTIFICATIONS_ENABLED
                         else
                             Constants.NOTIFICATIONS_DISABLED,
-                        null)
+                        null
+                    )
                 }
             KEY_CHAT_VIBRATE ->
                 if (chatSettings?.vibrationEnabled == null

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import kotlinx.parcelize.Parcelize
+import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -12,7 +13,6 @@ import mega.privacy.android.app.utils.FileUtil.copyUriToFile
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import java.io.File
@@ -25,6 +25,7 @@ class UriSaving(
     private val fromMediaViewer: Boolean,
 ) : Saving() {
 
+    val context = MegaApplication.getInstance()
     override fun totalSize() = size
 
     override fun hasUnsupportedFile(context: Context): Boolean {
@@ -62,7 +63,7 @@ class UriSaving(
         }
 
         post {
-            snackbarShower?.showSnackbar(getString(R.string.copy_already_downloaded))
+            snackbarShower?.showSnackbar(context.getString(R.string.copy_already_downloaded))
         }
 
         return AutoPlayInfo.NO_AUTO_PLAY

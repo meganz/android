@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.verification
 
+import android.content.Context
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.SavedStateHandle
@@ -120,11 +121,11 @@ class SMSVerificationViewModel @Inject constructor(
      * set whether user is locked or not
      * @param isUserLocked [Boolean]
      */
-    fun setIsUserLocked(isUserLocked: Boolean) {
+    fun setIsUserLocked(isUserLocked: Boolean, context: Context) {
         Timber.d("is user locked $isUserLocked")
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isUserLocked = isUserLocked)
-            getBonusStorage()
+            getBonusStorage(context)
         }
     }
 
@@ -154,7 +155,7 @@ class SMSVerificationViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getBonusStorage() {
+    private suspend fun getBonusStorage(context: Context) {
         if (!_uiState.value.isUserLocked) {
             val isAchievementUser = areAccountAchievementsEnabled()
             if (isAchievementUser) {
@@ -165,7 +166,7 @@ class SMSVerificationViewModel @Inject constructor(
                     )
                 achievements?.let {
                     val bonusStorageSMS =
-                        stringUtilWrapper.getSizeString(achievements.grantedStorage)
+                        stringUtilWrapper.getSizeString(achievements.grantedStorage, context)
                     _uiState.mapAndUpdate {
                         it.copy(isAchievementsEnabled = true, bonusStorageSMS = bonusStorageSMS)
                     }

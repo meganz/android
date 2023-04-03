@@ -970,7 +970,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                 Timber.d("ChatRoom ID: %s", chat.getChatId());
                 Timber.d("Chat timestamp: %s", chat.getLastTimestamp());
                 String date = formatDateAndTime(context, chat.getLastTimestamp(), DATE_LONG_FORMAT);
-                String dateFS = formatDate(chat.getLastTimestamp(), DATE_SHORT_SHORT_FORMAT);
+                String dateFS = formatDate(chat.getLastTimestamp(), DATE_SHORT_SHORT_FORMAT, context);
                 Timber.d("Date timestamp: %s", date);
                 ((ViewHolderNormalChatList) holder).textViewDate.setText(date);
                 ((ViewHolderNormalChatList) holder).textFastScroller = dateFS;
@@ -1383,7 +1383,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
                 } else if (meta.getType() == MegaChatContainsMeta.CONTAINS_META_INVALID) {
                     Timber.w("Invalid meta message");
 
-                    String invalidMetaMessage = getInvalidMetaMessage(message);
+                    String invalidMetaMessage = getInvalidMetaMessage(message, context);
 
                     if (lastMsgSender == megaChatApi.getMyUserHandle()) {
 
@@ -1615,7 +1615,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
     }
 
     @Override
-    public String getSectionTitle(int position) {
+    public String getSectionTitle(int position, Context context) {
         if (holder instanceof ViewHolderNormalChatList) {
             if (((ViewHolderNormalChatList) holder).textFastScroller.isEmpty()) {
                 return null;

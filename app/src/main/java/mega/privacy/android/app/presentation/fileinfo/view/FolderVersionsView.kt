@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import mega.privacy.android.app.R
@@ -37,11 +38,11 @@ internal fun FolderVersionsView(
         )
         FileInfoTitledText(
             title = stringResource(R.string.file_properties_folder_current_versions),
-            text = Util.getSizeString(currentVersionsSizeInBytes),
+            text = Util.getSizeString(currentVersionsSizeInBytes, LocalContext.current),
         )
         FileInfoTitledText(
             title = stringResource(R.string.file_properties_folder_previous_versions),
-            text = Util.getSizeString(previousVersionsSizeInBytes),
+            text = Util.getSizeString(previousVersionsSizeInBytes, LocalContext.current),
         )
     }
 

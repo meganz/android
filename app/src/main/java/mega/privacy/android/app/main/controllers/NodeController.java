@@ -18,7 +18,6 @@ import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.MegaApiUtils.calculateDeepBrowserTreeIncoming;
 import static mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE;
 import static mega.privacy.android.app.utils.MegaNodeUtil.checkBackupNodeTypeByHandle;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.isOnline;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
 import static nz.mega.sdk.MegaShare.ACCESS_READ;
@@ -99,7 +98,7 @@ public class NodeController {
         Timber.d("copyNodes");
 
         if (!isOnline(context)) {
-            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -256,7 +255,7 @@ public class NodeController {
     public void exportLink(MegaNode document) {
         Timber.d("exportLink");
         if (!isOnline(context)) {
-            showSnackbar(context, getString(R.string.error_server_connection_problem));
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
         } else if (context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, ((MegaRequestListenerInterface) context));
         }
@@ -265,7 +264,7 @@ public class NodeController {
     public void exportLinkTimestamp(MegaNode document, int timestamp) {
         Timber.d("exportLinkTimestamp: %s", timestamp);
         if (!isOnline(context)) {
-            showSnackbar(context, getString(R.string.error_server_connection_problem));
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem));
         } else if (context instanceof MegaRequestListenerInterface) {
             megaApi.exportNode(document, timestamp, ((MegaRequestListenerInterface) context));
         }
@@ -277,7 +276,7 @@ public class NodeController {
 
     public void removeLinks(ArrayList<MegaNode> nodes) {
         if (!isOnline(context)) {
-            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -294,7 +293,7 @@ public class NodeController {
 
 
         if (!isOnline(context)) {
-            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -511,7 +510,7 @@ public class NodeController {
 
     public void shareFolder(MegaNode node, ArrayList<String> selectedContacts, int permissions) {
         if (!isOnline(context)) {
-            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 
@@ -527,7 +526,7 @@ public class NodeController {
     public void shareFolders(long[] nodeHandles, ArrayList<String> contactsData, int permissions) {
 
         if (!isOnline(context)) {
-            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+            ((SnackbarShower) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
             return;
         }
 

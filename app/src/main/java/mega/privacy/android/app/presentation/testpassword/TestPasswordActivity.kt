@@ -88,7 +88,7 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
                 var parentPath = result.data?.getStringExtra(FileStorageActivity.EXTRA_PATH)
                 if (parentPath != null) {
                     Timber.d("parentPath no NULL")
-                    parentPath = parentPath + File.separator + FileUtil.getRecoveryKeyFileName()
+                    parentPath = parentPath + File.separator + FileUtil.getRecoveryKeyFileName(this)
                     accountController.exportMK(parentPath)
                 }
             }

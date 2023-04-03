@@ -70,7 +70,6 @@ import mega.privacy.android.app.utils.MegaTransferUtils.getNumPendingDownloadsNo
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.SDCardOperator
 import mega.privacy.android.app.utils.SDCardUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
@@ -288,8 +287,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             if (getDownloadCount() > 0) {
                 isForeground = kotlin.runCatching {
                     val notification = createInitialNotification()
-                    startForeground(Constants.NOTIFICATION_DOWNLOAD,
-                        notification)
+                    startForeground(
+                        Constants.NOTIFICATION_DOWNLOAD,
+                        notification
+                    )
                 }.fold(
                     onSuccess = { true },
                     onFailure = {
@@ -308,8 +309,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 notificationChannelId = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                 notificationChannelName = Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
                 mNotificationManager = mNotificationManager,
-                mBuilderCompat = NotificationCompat.Builder(this@DownloadService,
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+                mBuilderCompat = NotificationCompat.Builder(
+                    this@DownloadService,
+                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                )
             )
 
         } else {
@@ -354,7 +357,11 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         }
         rxSubscriptions.add(Single.just(intent)
             .observeOn(Schedulers.single())
-            .subscribe({ intent: Intent -> onHandleIntent(intent) }) { t: Throwable? -> Timber.e(t) })
+            .subscribe({ intent: Intent -> onHandleIntent(intent) }) { t: Throwable? ->
+                Timber.e(
+                    t
+                )
+            })
         return START_NOT_STICKY
     }
 
@@ -414,9 +421,13 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         currentDir = getDir(intent)
         currentDir?.mkdirs()
         currentFile = if (currentDir?.isDirectory == true) {
-            File(currentDir,
-                megaApi.escapeFsIncompatible(node.name,
-                    currentDir?.absolutePath + Constants.SEPARATOR))
+            File(
+                currentDir,
+                megaApi.escapeFsIncompatible(
+                    node.name,
+                    currentDir?.absolutePath + Constants.SEPARATOR
+                )
+            )
         } else {
             currentDir
         }
@@ -467,14 +478,18 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     if (type?.contains(Constants.APP_DATA_VOICE_CLIP) == true) Constants.APP_DATA_VOICE_CLIP else ""
             }
             val localPath = currentDir?.absolutePath + "/"
-            val token = transfersManagement.addScanningTransfer(MegaTransfer.TYPE_DOWNLOAD,
-                localPath, node, node.isFolder)
-            megaApi.startDownload(currentDocument,
+            val token = transfersManagement.addScanningTransfer(
+                MegaTransfer.TYPE_DOWNLOAD,
+                localPath, node, node.isFolder
+            )
+            megaApi.startDownload(
+                currentDocument,
                 localPath,
                 node.name,
                 appData,
                 highPriority,
-                token)
+                token
+            )
         } else {
             Timber.w("currentDir is not a directory")
         }
@@ -502,7 +517,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     ChatUtil.initMegaChatApi(gSession)
                     pendingIntents.add(intent)
                     if (type?.contains(Constants.APP_DATA_VOICE_CLIP) == true && type?.contains(
-                            Constants.APP_DATA_BACKGROUND_TRANSFER) == true
+                            Constants.APP_DATA_BACKGROUND_TRANSFER
+                        ) == true
                     ) {
                         updateProgressNotification()
                     }
@@ -594,20 +610,24 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             val totalDownloads = megaApi.totalDownloads - backgroundTransfers.size
             if (totalDownloads == 1 && autoPlayInfo != null && downloadForPreview) {
                 // If the file is Microsoft file, send the corresponding broadcast
-                sendBroadcast(Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
-                    .putExtra(TRANSFER_TYPE, DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW)
-                    .putExtra(NODE_NAME, autoPlayInfo?.nodeName)
-                    .putExtra(NODE_HANDLE, autoPlayInfo?.nodeHandle)
-                    .putExtra(NUMBER_FILES, 1)
-                    .putExtra(NODE_LOCAL_PATH, autoPlayInfo?.localPath)
-                    .putExtra(IS_OPEN_WITH, downloadByOpenWith))
+                sendBroadcast(
+                    Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+                        .putExtra(TRANSFER_TYPE, DOWNLOAD_FILE_AND_OPEN_FOR_PREVIEW)
+                        .putExtra(NODE_NAME, autoPlayInfo?.nodeName)
+                        .putExtra(NODE_HANDLE, autoPlayInfo?.nodeHandle)
+                        .putExtra(NUMBER_FILES, 1)
+                        .putExtra(NODE_LOCAL_PATH, autoPlayInfo?.localPath)
+                        .putExtra(IS_OPEN_WITH, downloadByOpenWith)
+                )
             } else if (totalDownloads == 1 && java.lang.Boolean.parseBoolean(dbH.autoPlayEnabled) && autoPlayInfo != null) {
-                sendBroadcast(Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
-                    .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER_OPEN)
-                    .putExtra(NODE_NAME, autoPlayInfo?.nodeName)
-                    .putExtra(NODE_HANDLE, autoPlayInfo?.nodeHandle)
-                    .putExtra(NUMBER_FILES, 1)
-                    .putExtra(NODE_LOCAL_PATH, autoPlayInfo?.localPath))
+                sendBroadcast(
+                    Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
+                        .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER_OPEN)
+                        .putExtra(NODE_NAME, autoPlayInfo?.nodeName)
+                        .putExtra(NODE_HANDLE, autoPlayInfo?.nodeHandle)
+                        .putExtra(NUMBER_FILES, 1)
+                        .putExtra(NODE_LOCAL_PATH, autoPlayInfo?.localPath)
+                )
             } else if (totalDownloads > 0) {
                 val intent: Intent = Intent(BROADCAST_ACTION_INTENT_SHOWSNACKBAR_TRANSFERS_FINISHED)
                     .putExtra(TRANSFER_TYPE, DOWNLOAD_TRANSFER)
@@ -661,7 +681,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         if (current?.exists() == true
             && document.size == current.length() && FileUtil.isFileDownloadedLatest(
                 current,
-                document)
+                document
+            )
         ) {
             current.setReadable(true, false)
             return false
@@ -669,9 +690,11 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         if (document.size > 1024L * 1024 * 1024 * 4) {
             Timber.d("Show size alert: %s", document.size)
             uiHandler.post {
-                Toast.makeText(applicationContext,
+                Toast.makeText(
+                    applicationContext,
                     getString(R.string.error_file_size_greater_than_4gb),
-                    Toast.LENGTH_LONG).show()
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
         return true
@@ -688,64 +711,84 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         if (alreadyDownloaded > 0 && errorCount > 0) {
             val totalNumber = totalDownloads + errorCount + alreadyDownloaded
             notificationTitle =
-                resources.getQuantityString(R.plurals.download_service_final_notification_with_details,
+                resources.getQuantityString(
+                    R.plurals.download_service_final_notification_with_details,
                     totalNumber,
                     totalDownloads,
-                    totalNumber)
-            val copiedString = resources.getQuantityString(R.plurals.already_downloaded_service,
+                    totalNumber
+                )
+            val copiedString = resources.getQuantityString(
+                R.plurals.already_downloaded_service,
                 alreadyDownloaded,
-                alreadyDownloaded)
+                alreadyDownloaded
+            )
             val errorString =
                 resources.getQuantityString(R.plurals.upload_service_failed, errorCount, errorCount)
             size = "$copiedString, $errorString"
         } else if (alreadyDownloaded > 0) {
             val totalNumber = totalDownloads + alreadyDownloaded
             notificationTitle =
-                resources.getQuantityString(R.plurals.download_service_final_notification_with_details,
+                resources.getQuantityString(
+                    R.plurals.download_service_final_notification_with_details,
                     totalNumber,
                     totalDownloads,
-                    totalNumber)
-            size = resources.getQuantityString(R.plurals.already_downloaded_service,
+                    totalNumber
+                )
+            size = resources.getQuantityString(
+                R.plurals.already_downloaded_service,
                 alreadyDownloaded,
-                alreadyDownloaded)
+                alreadyDownloaded
+            )
         } else if (errorCount > 0) {
             sendTakenDownAlert()
             val totalNumber = totalDownloads + errorCount
             notificationTitle =
-                resources.getQuantityString(R.plurals.download_service_final_notification_with_details,
+                resources.getQuantityString(
+                    R.plurals.download_service_final_notification_with_details,
                     totalNumber,
                     totalDownloads,
-                    totalNumber)
-            size = resources.getQuantityString(R.plurals.download_service_failed,
+                    totalNumber
+                )
+            size = resources.getQuantityString(
+                R.plurals.download_service_failed,
                 errorCount,
-                errorCount)
+                errorCount
+            )
         } else {
             notificationTitle =
-                resources.getQuantityString(R.plurals.download_service_final_notification,
+                resources.getQuantityString(
+                    R.plurals.download_service_final_notification,
                     totalDownloads,
-                    totalDownloads)
+                    totalDownloads
+                )
             val totalBytes = Util.getSizeString(
-                megaApi.totalDownloadedBytes)
+                megaApi.totalDownloadedBytes, this
+            )
             size = getString(R.string.general_total_size, totalBytes)
         }
         val intent = Intent(applicationContext, ManagerActivity::class.java)
         intent.action = Constants.ACTION_SHOW_TRANSFERS
         intent.putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.COMPLETED_TAB)
-        val pendingIntent = PendingIntent.getActivity(applicationContext,
+        val pendingIntent = PendingIntent.getActivity(
+            applicationContext,
             0,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         if (totalDownloads != 1) {
             Timber.d("Show notification")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                val channel = NotificationChannel(
+                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                     Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT)
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
                 channel.setShowBadge(true)
                 channel.setSound(null, null)
                 mNotificationManager.createNotificationChannel(channel)
                 val mBuilderCompatO = NotificationCompat.Builder(
-                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                )
                 mBuilderCompatO
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
@@ -753,8 +796,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false)
-                mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                    mBuilderCompatO.build())
+                mNotificationManager.notify(
+                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                    mBuilderCompatO.build()
+                )
             } else {
                 val builder = NotificationCompat.Builder(this)
                 builder
@@ -764,8 +809,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     .setAutoCancel(true).setTicker(notificationTitle)
                     .setContentTitle(notificationTitle).setContentText(size)
                     .setOngoing(false)
-                mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                    builder.build())
+                mNotificationManager.notify(
+                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                    builder.build()
+                )
             }
         } else {
             try {
@@ -773,14 +820,17 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 if (downloadForPreview || openFile && autoPlayEnabled) {
 
                     val path = FileUtil.getLocalFile(
-                        megaApi.getNodeByHandle(handle))
+                        megaApi.getNodeByHandle(handle)
+                    )
                     currentFile?.let { file ->
                         val fileLocalPath: String = path ?: file.absolutePath
                         currentDocument?.let {
-                            autoPlayInfo = AutoPlayInfo(it.name,
+                            autoPlayInfo = AutoPlayInfo(
+                                it.name,
                                 it.handle,
                                 fileLocalPath,
-                                true)
+                                true
+                            )
                             Timber.d("Both openFile and autoPlayEnabled are true")
                         }
                     }
@@ -797,22 +847,27 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                             Timber.d("Show notification")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 val channel =
-                                    NotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                                    NotificationChannel(
+                                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                                         Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                                        NotificationManager.IMPORTANCE_DEFAULT)
+                                        NotificationManager.IMPORTANCE_DEFAULT
+                                    )
                                 channel.setShowBadge(true)
                                 channel.setSound(null, null)
                                 mNotificationManager.createNotificationChannel(channel)
                                 val mBuilderCompatO = NotificationCompat.Builder(
-                                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+                                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                                )
                                 mBuilderCompatO
                                     .setSmallIcon(R.drawable.ic_stat_notify)
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
                                     .setOngoing(false)
-                                mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    mBuilderCompatO.build())
+                                mNotificationManager.notify(
+                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                    mBuilderCompatO.build()
+                                )
                             } else {
                                 val builder = NotificationCompat.Builder(this)
                                 builder
@@ -821,34 +876,42 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
                                     .setOngoing(false)
-                                mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    builder.build())
+                                mNotificationManager.notify(
+                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                    builder.build()
+                                )
                             }
                         }
                     } else if (MimeTypeList.typeForName(currentFile?.name).isVideoMimeType || MimeTypeList.typeForName(
-                            currentFile?.name).isAudio
+                            currentFile?.name
+                        ).isAudio
                     ) {
                         Timber.d("Video/Audio file")
                         if (fromMV) {
                             Timber.d("Show notification")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 val channel =
-                                    NotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                                    NotificationChannel(
+                                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                                         Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                                        NotificationManager.IMPORTANCE_DEFAULT)
+                                        NotificationManager.IMPORTANCE_DEFAULT
+                                    )
                                 channel.setShowBadge(true)
                                 channel.setSound(null, null)
                                 mNotificationManager.createNotificationChannel(channel)
                                 val mBuilderCompatO = NotificationCompat.Builder(
-                                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+                                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                                )
                                 mBuilderCompatO
                                     .setSmallIcon(R.drawable.ic_stat_notify)
                                     .setContentIntent(pendingIntent)
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
                                     .setOngoing(false)
-                                mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    mBuilderCompatO.build())
+                                mNotificationManager.notify(
+                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                    mBuilderCompatO.build()
+                                )
                             } else {
                                 val builder = NotificationCompat.Builder(this)
                                 builder
@@ -857,8 +920,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
                                     .setOngoing(false)
-                                mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    builder.build())
+                                mNotificationManager.notify(
+                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                    builder.build()
+                                )
                             }
                         }
                     } else if (MimeTypeList.typeForName(currentFile?.name).isImage) {
@@ -867,14 +932,17 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                             Timber.d("Show notification")
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                                 val channel =
-                                    NotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                                    NotificationChannel(
+                                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                                         Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                                        NotificationManager.IMPORTANCE_DEFAULT)
+                                        NotificationManager.IMPORTANCE_DEFAULT
+                                    )
                                 channel.setShowBadge(true)
                                 channel.setSound(null, null)
                                 mNotificationManager.createNotificationChannel(channel)
                                 val mBuilderCompatO = NotificationCompat.Builder(
-                                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+                                    applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                                )
                                 mBuilderCompatO
                                     .setSmallIcon(R.drawable.ic_stat_notify)
                                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
@@ -882,8 +950,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
                                     .setOngoing(false)
-                                mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    mBuilderCompatO.build())
+                                mNotificationManager.notify(
+                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                    mBuilderCompatO.build()
+                                )
                             } else {
                                 val builder = NotificationCompat.Builder(this)
                                 builder
@@ -893,22 +963,27 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                                     .setAutoCancel(true).setTicker(notificationTitle)
                                     .setContentTitle(notificationTitle).setContentText(size)
                                     .setOngoing(false)
-                                mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                    builder.build())
+                                mNotificationManager.notify(
+                                    Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                    builder.build()
+                                )
                             }
                         }
                     } else {
                         Timber.d("Show notification")
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                             val channel =
-                                NotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                                NotificationChannel(
+                                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                                     Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                                    NotificationManager.IMPORTANCE_DEFAULT)
+                                    NotificationManager.IMPORTANCE_DEFAULT
+                                )
                             channel.setShowBadge(true)
                             channel.setSound(null, null)
                             mNotificationManager.createNotificationChannel(channel)
                             val mBuilderCompatO = NotificationCompat.Builder(
-                                applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+                                applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                            )
                             mBuilderCompatO
                                 .setSmallIcon(R.drawable.ic_stat_notify)
                                 .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
@@ -916,8 +991,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                                 .setAutoCancel(true).setTicker(notificationTitle)
                                 .setContentTitle(notificationTitle).setContentText(size)
                                 .setOngoing(false)
-                            mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                mBuilderCompatO.build())
+                            mNotificationManager.notify(
+                                Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                mBuilderCompatO.build()
+                            )
                         } else {
                             val builder = NotificationCompat.Builder(this)
                             builder
@@ -927,8 +1004,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                                 .setAutoCancel(true).setTicker(notificationTitle)
                                 .setContentTitle(notificationTitle).setContentText(size)
                                 .setOngoing(false)
-                            mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                                builder.build())
+                            mNotificationManager.notify(
+                                Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                                builder.build()
+                            )
                         }
                     }
                 } else {
@@ -936,14 +1015,17 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     Timber.d("Show notification")
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         val channel =
-                            NotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                            NotificationChannel(
+                                Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                                 Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                                NotificationManager.IMPORTANCE_DEFAULT)
+                                NotificationManager.IMPORTANCE_DEFAULT
+                            )
                         channel.setShowBadge(true)
                         channel.setSound(null, null)
                         mNotificationManager.createNotificationChannel(channel)
                         val mBuilderCompatO = NotificationCompat.Builder(
-                            applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+                            applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                        )
                         mBuilderCompatO
                             .setSmallIcon(R.drawable.ic_stat_notify)
                             .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
@@ -951,8 +1033,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                             .setAutoCancel(true).setTicker(notificationTitle)
                             .setContentTitle(notificationTitle).setContentText(size)
                             .setOngoing(false)
-                        mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                            mBuilderCompatO.build())
+                        mNotificationManager.notify(
+                            Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                            mBuilderCompatO.build()
+                        )
                     } else {
                         val builder = NotificationCompat.Builder(this)
                         builder
@@ -962,8 +1046,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                             .setAutoCancel(true).setTicker(notificationTitle)
                             .setContentTitle(notificationTitle).setContentText(size)
                             .setOngoing(false)
-                        mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                            builder.build())
+                        mNotificationManager.notify(
+                            Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                            builder.build()
+                        )
                     }
                 }
             } catch (e: Exception) {
@@ -971,14 +1057,17 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 Timber.e(e)
                 Timber.d("Show notification")
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val channel = NotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                    val channel = NotificationChannel(
+                        Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                         Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                        NotificationManager.IMPORTANCE_DEFAULT)
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    )
                     channel.setShowBadge(true)
                     channel.setSound(null, null)
                     mNotificationManager.createNotificationChannel(channel)
                     val mBuilderCompatO = NotificationCompat.Builder(
-                        applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+                        applicationContext, Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                    )
                     mBuilderCompatO
                         .setSmallIcon(R.drawable.ic_stat_notify)
                         .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
@@ -986,8 +1075,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                         .setAutoCancel(true).setTicker(notificationTitle)
                         .setContentTitle(notificationTitle).setContentText(size)
                         .setOngoing(false)
-                    mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                        mBuilderCompatO.build())
+                    mNotificationManager.notify(
+                        Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                        mBuilderCompatO.build()
+                    )
                 } else {
                     val builder = NotificationCompat.Builder(this)
                     builder
@@ -997,8 +1088,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                         .setAutoCancel(true).setTicker(notificationTitle)
                         .setContentTitle(notificationTitle).setContentText(size)
                         .setOngoing(false)
-                    mNotificationManager.notify(Constants.NOTIFICATION_DOWNLOAD_FINAL,
-                        builder.build())
+                    mNotificationManager.notify(
+                        Constants.NOTIFICATION_DOWNLOAD_FINAL,
+                        builder.build()
+                    )
                 }
             }
         }
@@ -1034,7 +1127,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 val now = System.currentTimeMillis()
                 lastUpdated =
                     if (now - lastUpdated > Util.ONTRANSFERUPDATE_REFRESH_MILLIS || megaApi.areTransfersPaused(
-                            MegaTransfer.TYPE_DOWNLOAD)
+                            MegaTransfer.TYPE_DOWNLOAD
+                        )
                     ) {
                         now
                     } else {
@@ -1052,18 +1146,24 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 val inProgress =
                     if (pendingTransfers == 0) totalTransfers else totalTransfers - pendingTransfers + 1
                 if (pausedTransfers) {
-                    StringResourcesUtils.getString(R.string.download_service_notification_paused,
+                    getString(
+                        R.string.download_service_notification_paused,
                         inProgress,
-                        totalTransfers)
+                        totalTransfers
+                    )
                 } else {
-                    StringResourcesUtils.getString(R.string.download_service_notification,
+                    getString(
+                        R.string.download_service_notification,
                         inProgress,
-                        totalTransfers)
+                        totalTransfers
+                    )
                 }
             }
-            val info = Util.getProgressSize(this@DownloadService,
+            val info = Util.getProgressSize(
+                this@DownloadService,
                 totalSizeTransferred,
-                totalSizePendingTransfer)
+                totalSizePendingTransfer
+            )
             var notification: Notification? = null
             val contentText = getString(R.string.download_touch_to_show)
             val intent = Intent(this@DownloadService, ManagerActivity::class.java)
@@ -1076,14 +1176,18 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             notification = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
+                val channel = NotificationChannel(
+                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID,
                     Constants.NOTIFICATION_CHANNEL_DOWNLOAD_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT)
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
                 channel.setShowBadge(true)
                 channel.setSound(null, null)
                 mNotificationManager.createNotificationChannel(channel)
-                val mBuilderCompat = NotificationCompat.Builder(applicationContext,
-                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID)
+                val mBuilderCompat = NotificationCompat.Builder(
+                    applicationContext,
+                    Constants.NOTIFICATION_CHANNEL_DOWNLOAD_ID
+                )
                 mBuilderCompat
                     .setSmallIcon(R.drawable.ic_stat_notify)
                     .setColor(ContextCompat.getColor(this, R.color.red_600_red_300))
@@ -1132,7 +1236,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     private fun showRating(total: Long, currentDownloadSpeed: Int) {
         if (!isRatingShowed) {
             RatingHandlerImpl(this)
-                .showRatingBaseOnSpeedAndSize(total,
+                .showRatingBaseOnSpeedAndSize(
+                    total,
                     currentDownloadSpeed.toLong()
                 ) { isRatingShowed = true }
         }
@@ -1150,9 +1255,11 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     private fun doOnTransferStart(transfer: MegaTransfer?): Completable {
         return Completable.fromCallable {
-            Timber.d("Download start: %d, totalDownloads: %d",
+            Timber.d(
+                "Download start: %d, totalDownloads: %d",
                 transfer?.nodeHandle,
-                megaApi.totalDownloads)
+                megaApi.totalDownloads
+            )
             if (transfer?.isStreamingTransfer == true || transfer?.isVoiceClipTransfer() == true) return@fromCallable null
             if (transfer?.isBackgroundTransfer() == true) {
                 backgroundTransfers.add(transfer.tag)
@@ -1161,13 +1268,16 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             if (transfer?.type == MegaTransfer.TYPE_DOWNLOAD) {
                 val appData = transfer.appData
                 if (!TextUtil.isTextEmpty(appData) && appData.contains(Constants.APP_DATA_SD_CARD)) {
-                    dbH.addSDTransfer(SDTransfer(
-                        transfer.tag,
-                        transfer.fileName,
-                        Util.getSizeString(transfer.totalBytes),
-                        java.lang.Long.toString(transfer.nodeHandle),
-                        transfer.path,
-                        appData))
+                    dbH.addSDTransfer(
+                        SDTransfer(
+                            transfer.tag,
+                            transfer.fileName,
+                            Util.getSizeString(transfer.totalBytes, this),
+                            java.lang.Long.toString(transfer.nodeHandle),
+                            transfer.path,
+                            appData
+                        )
+                    )
                 }
                 transfersManagement.checkScanningTransferOnStart(transfer)
                 transfersCount++
@@ -1195,7 +1305,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 val targetPath = SDCardUtils.getSDCardTargetPath(transfer.appData)
                 if (!transfer.isFolderTransfer) {
                     if (!isVoiceClip && !isBackgroundTransfer) {
-                        val completedTransfer = AndroidCompletedTransfer(transfer, error)
+                        val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
                         if (!TextUtil.isTextEmpty(targetPath)) {
                             completedTransfer.path = targetPath
                         }
@@ -1212,8 +1322,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     releaseLocks()
                     Timber.d("Download canceled: %s", transfer.nodeHandle)
                     if (isVoiceClip) {
-                        resultTransfersVoiceClip(transfer.nodeHandle,
-                            Constants.ERROR_VOICE_CLIP_TRANSFER)
+                        resultTransfersVoiceClip(
+                            transfer.nodeHandle,
+                            Constants.ERROR_VOICE_CLIP_TRANSFER
+                        )
                         val localFile = buildVoiceClipFile(this, transfer.fileName)
                         if (FileUtil.isFileAvailable(localFile)) {
                             Timber.d("Delete own voiceclip : exists")
@@ -1228,8 +1340,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     if (error.errorCode == MegaError.API_OK) {
                         Timber.d("Download OK - Node handle: %s", transfer.nodeHandle)
                         if (isVoiceClip) {
-                            resultTransfersVoiceClip(transfer.nodeHandle,
-                                Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER)
+                            resultTransfersVoiceClip(
+                                transfer.nodeHandle,
+                                Constants.SUCCESSFUL_VOICE_CLIP_TRANSFER
+                            )
                         }
 
                         //need to move downloaded file to a location on sd card.
@@ -1237,10 +1351,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                             val source = File(path)
                             try {
                                 val sdCardOperator = SDCardOperator(this)
-                                sdCardOperator.moveDownloadedFileToDestinationPath(source,
+                                sdCardOperator.moveDownloadedFileToDestinationPath(
+                                    source,
                                     targetPath,
                                     SDCardUtils.getSDCardTargetUri(transfer.appData),
-                                    transfer.tag)
+                                    transfer.tag
+                                )
                             } catch (e: Exception) {
                                 Timber.e(e, "Error moving file to the sd card path.")
                             }
@@ -1252,10 +1368,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                             if (videoNode != null) {
                                 if (!videoNode.hasThumbnail()) {
                                     Timber.d("The video has not thumb")
-                                    ThumbnailUtils.createThumbnailVideo(this,
+                                    ThumbnailUtils.createThumbnailVideo(
+                                        this,
                                         path,
                                         megaApi,
-                                        transfer.nodeHandle)
+                                        transfer.nodeHandle
+                                    )
                                 }
                             } else {
                                 Timber.w("videoNode is NULL")
@@ -1276,11 +1394,13 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                             Timber.d("It is Offline file")
                             offlineNode = megaApi.getNodeByHandle(transfer.nodeHandle)
                             if (offlineNode != null) {
-                                OfflineUtils.saveOffline(this,
+                                OfflineUtils.saveOffline(
+                                    this,
                                     megaApi,
                                     dbH,
                                     offlineNode,
-                                    transfer.path)
+                                    transfer.path
+                                )
                             } else {
                                 OfflineUtils.saveOfflineChatFile(dbH, transfer)
                             }
@@ -1290,8 +1410,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                     } else {
                         Timber.e("Download ERROR: %s", transfer.nodeHandle)
                         if (isVoiceClip) {
-                            resultTransfersVoiceClip(transfer.nodeHandle,
-                                Constants.ERROR_VOICE_CLIP_TRANSFER)
+                            resultTransfersVoiceClip(
+                                transfer.nodeHandle,
+                                Constants.ERROR_VOICE_CLIP_TRANSFER
+                            )
                             val localFile = buildVoiceClipFile(this, transfer.fileName)
                             if (FileUtil.isFileAvailable(localFile)) {
                                 Timber.d("Delete own voice clip : exists")
@@ -1389,8 +1511,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     private fun doOnTransferTemporaryError(transfer: MegaTransfer?, e: MegaError): Completable {
         return Completable.fromCallable {
-            Timber.w("""Download Temporary Error - Node Handle: ${transfer?.nodeHandle}
-Error: ${e.errorCode} ${e.errorString}""")
+            Timber.w(
+                """Download Temporary Error - Node Handle: ${transfer?.nodeHandle}
+Error: ${e.errorCode} ${e.errorString}"""
+            )
             if (transfer?.isStreamingTransfer == true || transfer?.isBackgroundTransfer() == true) {
                 return@fromCallable null
             }
@@ -1486,9 +1610,13 @@ Error: ${e.errorCode} ${e.errorString}""")
                 return
             }
             currentFile = if (currentDir?.isDirectory == true) {
-                File(currentDir,
-                    megaApi.escapeFsIncompatible(node.name,
-                        currentDir?.absolutePath + Constants.SEPARATOR))
+                File(
+                    currentDir,
+                    megaApi.escapeFsIncompatible(
+                        node.name,
+                        currentDir?.absolutePath + Constants.SEPARATOR
+                    )
+                )
             } else {
                 currentDir
             }
@@ -1499,14 +1627,18 @@ Error: ${e.errorCode} ${e.errorString}""")
                 Timber.d("To downloadPublic(dir)")
                 val localPath = currentDir?.absolutePath + "/"
                 currentDocument?.let {
-                    val token = transfersManagement.addScanningTransfer(MegaTransfer.TYPE_DOWNLOAD,
-                        localPath, it, it.isFolder)
-                    megaApi.startDownload(currentDocument,
+                    val token = transfersManagement.addScanningTransfer(
+                        MegaTransfer.TYPE_DOWNLOAD,
+                        localPath, it, it.isFolder
+                    )
+                    megaApi.startDownload(
+                        currentDocument,
                         localPath,
                         it.name,
                         appData,
                         false,
-                        token)
+                        token
+                    )
                 }
             }
         }

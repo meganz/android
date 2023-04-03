@@ -48,7 +48,6 @@ import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.FileUtil.TXT_EXTENSION
 import mega.privacy.android.app.utils.MegaNodeUtil.getRootParentNode
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.getCursorPositionOfName
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.Util.SHOW_IM_DELAY
@@ -118,7 +117,7 @@ object MegaNodeDialogUtil {
         val renameDialogBuilder = MaterialAlertDialogBuilder(context)
 
         renameDialogBuilder
-            .setTitle(getString(R.string.context_rename))
+            .setTitle(context.getString(R.string.context_rename))
             .setPositiveButton(R.string.context_rename, null)
             .setNegativeButton(R.string.general_cancel, null)
 
@@ -153,7 +152,8 @@ object MegaNodeDialogUtil {
 
         val dialog = setFinalValuesAndShowDialog(
             context, parentNode, actionNodeCallback, null, null, null,
-            false, newFolderDialogBuilder, TYPE_NEW_FOLDER)
+            false, newFolderDialogBuilder, TYPE_NEW_FOLDER
+        )
 
         if (!typedText.isNullOrEmpty()) {
             dialog.findViewById<EmojiEditText>(R.id.type_text)?.setText(typedText)
@@ -399,21 +399,21 @@ object MegaNodeDialogUtil {
                 showDialogError(
                     typeText,
                     errorText,
-                    getString(R.string.invalid_string)
+                    context.getString(R.string.invalid_string)
                 )
             }
             NODE_NAME_REGEX.matcher(typedString).find() -> {
                 showDialogError(
                     typeText,
                     errorText,
-                    getString(R.string.invalid_characters_defined, INVALID_CHARACTERS)
+                    context.getString(R.string.invalid_characters_defined, INVALID_CHARACTERS)
                 )
             }
             nameAlreadyExists(typedString, dialogType == TYPE_RENAME, node) -> {
                 showDialogError(
                     typeText,
                     errorText,
-                    getString(
+                    context.getString(
                         if (dialogType == TYPE_RENAME || dialogType == TYPE_NEW_FOLDER) R.string.same_item_name_warning
                         else R.string.same_file_name_warning
                     )
@@ -442,7 +442,7 @@ object MegaNodeDialogUtil {
                                     showDialogError(
                                         typeText,
                                         errorText,
-                                        getString(
+                                        context.getString(
                                             R.string.file_without_extension,
                                             oldMimeType.extension
                                         )
@@ -450,7 +450,7 @@ object MegaNodeDialogUtil {
 
                                     snackbarShower?.showSnackbar(
                                         SNACKBAR_TYPE,
-                                        getString(R.string.file_without_extension_warning),
+                                        context.getString(R.string.file_without_extension_warning),
                                         MEGACHAT_INVALID_HANDLE
                                     )
 
@@ -522,16 +522,18 @@ object MegaNodeDialogUtil {
         snackbarShower: SnackbarShower?,
         actionNodeCallback: ActionNodeCallback?,
     ) {
-        val megaApi = MegaApplication.getInstance().megaApi
+        val app = MegaApplication.getInstance()
+        val megaApi = app.megaApi
 
         megaApi.renameNode(
             node,
             typedString,
             RenameListener(
-                snackbarShower,
+                snackbarShower = snackbarShower,
                 showSnackbar = true,
                 isMyChatFilesFolder = false,
-                actionNodeCallback = actionNodeCallback
+                actionNodeCallback = actionNodeCallback,
+                context = app,
             )
         )
 
@@ -574,10 +576,10 @@ object MegaNodeDialogUtil {
         actionNodeCallback: ActionNodeCallback?,
     ) {
         MaterialAlertDialogBuilder(context)
-            .setTitle(getString(R.string.file_extension_change_title))
-            .setMessage(getString(R.string.file_extension_change_warning))
-            .setPositiveButton(getString(R.string.general_cancel), null)
-            .setNegativeButton(getString(R.string.action_change_anyway)) { _, _ ->
+            .setTitle(context.getString(R.string.file_extension_change_title))
+            .setMessage(context.getString(R.string.file_extension_change_warning))
+            .setPositiveButton(context.getString(R.string.general_cancel), null)
+            .setNegativeButton(context.getString(R.string.action_change_anyway)) { _, _ ->
                 confirmRenameAction(node, typedString, snackbarShower, actionNodeCallback)
             }
             .show()
@@ -657,7 +659,7 @@ object MegaNodeDialogUtil {
         val megaApi = MegaApplication.getInstance().megaApi
 
         if (!isOnline(activity)) {
-            snackbarShower.showSnackbar(getString(R.string.error_server_connection_problem))
+            snackbarShower.showSnackbar(activity.getString(R.string.error_server_connection_problem))
             return
         }
 
@@ -666,11 +668,11 @@ object MegaNodeDialogUtil {
 
         if (rubbishNode.handle != megaApi.getRootParentNode(node).handle) {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                .setMessage(getString(R.string.confirmation_move_to_rubbish))
-                .setPositiveButton(getString(R.string.general_move)) { _, _ ->
+                .setMessage(activity.getString(R.string.confirmation_move_to_rubbish))
+                .setPositiveButton(activity.getString(R.string.general_move)) { _, _ ->
                     val progress = MegaProgressDialogUtil.createProgressDialog(
                         activity,
-                        getString(R.string.context_move_to_trash)
+                        activity.getString(R.string.context_move_to_trash)
                     )
 
                     megaApi.moveNode(
@@ -684,48 +686,49 @@ object MegaNodeDialogUtil {
 
                                 val isForeignOverQuota =
                                     megaError.errorCode == MegaError.API_EOVERQUOTA && megaApi.isForeignNode(
-                                        megaRequest.parentHandle)
+                                        megaRequest.parentHandle
+                                    )
 
                                 if (isForeignOverQuota) {
                                     showForeignStorageOverQuotaWarningDialog(activity)
                                 } else {
                                     snackbarShower.showSnackbar(
-                                        getString(
+                                        activity.getString(
                                             if (megaError.errorCode == MegaError.API_OK) R.string.context_correctly_moved
                                             else R.string.context_no_moved
                                         )
                                     )
                                 }
                             }
-                        }))
+                        })
+                    )
 
                     progress.show()
                 }
-                .setNegativeButton(getString(R.string.general_cancel), null)
+                .setNegativeButton(activity.getString(R.string.general_cancel), null)
                 .show()
         } else {
             MaterialAlertDialogBuilder(activity, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-                .setMessage(getString(R.string.confirmation_delete_from_mega))
-                .setPositiveButton(getString(R.string.general_remove)) { _, _ ->
+                .setMessage(activity.getString(R.string.confirmation_delete_from_mega))
+                .setPositiveButton(activity.getString(R.string.general_remove)) { _, _ ->
                     val progress = MegaProgressDialogUtil.createProgressDialog(
                         activity,
-                        getString(R.string.context_delete_from_mega)
+                        activity.getString(R.string.context_delete_from_mega)
                     )
 
-                    megaApi.remove(node, RemoveListener {
+                    megaApi.remove(node, RemoveListener(context = activity) {
                         progress.dismiss()
-
                         if (it) {
-                            snackbarShower.showSnackbar(getString(R.string.context_correctly_removed))
+                            snackbarShower.showSnackbar(activity.getString(R.string.context_correctly_removed))
                             activity.finish()
                         } else {
-                            snackbarShower.showSnackbar(getString(R.string.context_no_removed))
+                            snackbarShower.showSnackbar(activity.getString(R.string.context_no_removed))
                         }
                     })
 
                     progress.show()
                 }
-                .setNegativeButton(getString(R.string.general_cancel), null)
+                .setNegativeButton(activity.getString(R.string.general_cancel), null)
                 .show()
         }
     }
@@ -834,10 +837,11 @@ object MegaNodeDialogUtil {
         when (actionType) {
             ACTION_BACKUP_FAB -> {
                 if (nodeType == BACKUP_DEVICE) {
-                    tvTitle.text = getString(R.string.backup_add_item_title)
+                    tvTitle.text = activity.getString(R.string.backup_add_item_title)
                     tvContent.setText(R.string.backup_add_item_to_root_text)
                 } else {
-                    val displayName = getString(R.string.backup_add_confirm_title, nodeName)
+                    val displayName =
+                        activity.getString(R.string.backup_add_confirm_title, nodeName)
                     tvTitle.text = displayName
                     tvContent.setText(R.string.backup_add_item_text)
                 }
@@ -866,33 +870,33 @@ object MegaNodeDialogUtil {
                     val nodeSize = handleList.size
                     if (nodeSize > 1 && nodeType == BACKUP_ROOT) {
                         builder.setPositiveButton(
-                            getString(R.string.general_positive_button),
+                            activity.getString(R.string.general_positive_button),
                             dialogClickListener
                         )
                         builder.setNegativeButton(
-                            getString(R.string.general_cancel),
+                            activity.getString(R.string.general_cancel),
                             dialogClickListener
                         )
                     } else {
                         builder.setPositiveButton(
-                            getString(R.string.button_permission_info),
+                            activity.getString(R.string.button_permission_info),
                             dialogClickListener
                         )
                     }
                 } else {
                     builder.setPositiveButton(
-                        getString(R.string.button_permission_info),
+                        activity.getString(R.string.button_permission_info),
                         dialogClickListener
                     )
                 }
             }
             else -> {
                 builder.setPositiveButton(
-                    getString(R.string.button_continue),
+                    activity.getString(R.string.button_continue),
                     dialogClickListener
                 )
                 builder.setNegativeButton(
-                    getString(R.string.general_cancel),
+                    activity.getString(R.string.general_cancel),
                     dialogClickListener
                 )
             }
@@ -945,8 +949,8 @@ object MegaNodeDialogUtil {
             }
         })
 
-        var checkStr = getString(R.string.backup_disable_confirm)
-        var confirmInfo = getString(R.string.backup_action_confirm, checkStr)
+        var checkStr = activity.getString(R.string.backup_disable_confirm)
+        var confirmInfo = activity.getString(R.string.backup_action_confirm, checkStr)
         tvConfirmString.text = confirmInfo
 
 
@@ -955,19 +959,19 @@ object MegaNodeDialogUtil {
         when (actionType) {
             ACTION_BACKUP_FAB -> {
                 // Add
-                tvTitle.text = getString(R.string.backup_add_confirm_title, nodeName)
+                tvTitle.text = activity.getString(R.string.backup_add_confirm_title, nodeName)
             }
         }
 
         val builder = MaterialAlertDialogBuilder(activity)
             .setView(view)
-            .setPositiveButton(getString(R.string.general_move), null)
-            .setNegativeButton(getString(R.string.general_cancel), null)
+            .setPositiveButton(activity.getString(R.string.general_move), null)
+            .setNegativeButton(activity.getString(R.string.general_cancel), null)
 
         if (handleList == null) {
-            builder.setPositiveButton(getString(R.string.general_add), null)
+            builder.setPositiveButton(activity.getString(R.string.general_add), null)
         } else {
-            builder.setPositiveButton(getString(R.string.general_move), null)
+            builder.setPositiveButton(activity.getString(R.string.general_move), null)
         }
         val dialog = builder.create()
         dialog.setOnShowListener {
@@ -978,7 +982,7 @@ object MegaNodeDialogUtil {
                     Objects.requireNonNull(editText.text)
                         .toString()
 
-                if (getString(R.string.backup_disable_confirm) == strEditText) {
+                if (activity.getString(R.string.backup_disable_confirm) == strEditText) {
                     Timber.d("MyBackup + showConfirmDialogWithBackup / actionExecute")
                     actionBackupNodeCallback.actionExecute(
                         handleList,
@@ -989,7 +993,7 @@ object MegaNodeDialogUtil {
                     //Dismiss once everything is OK.
                     dialog.dismiss()
                 } else {
-                    showErrorInfo(editText, editTextLayout)
+                    showErrorInfo(editText, editTextLayout, activity)
                 }
             }
 
@@ -1011,10 +1015,11 @@ object MegaNodeDialogUtil {
     private fun showErrorInfo(
         editText: TextInputEditText,
         editTextLayout: TextInputLayout,
+        context: Context,
     ) {
         editText.requestFocus()
         editTextLayout.error =
-            getString(R.string.error_backup_confirm_dont_match)
+            context.getString(R.string.error_backup_confirm_dont_match)
         editTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Error)
     }
 

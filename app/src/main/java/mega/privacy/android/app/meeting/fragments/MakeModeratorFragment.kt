@@ -28,7 +28,6 @@ import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.SelectedParticipantsAdapter
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
 import nz.mega.sdk.MegaChatCall
@@ -80,11 +79,14 @@ class MakeModeratorFragment : MeetingBaseFragment() {
                 when (callAndSession.second.status) {
                     MegaChatSession.SESSION_STATUS_IN_PROGRESS -> {
                         Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
-                        inMeetingViewModel.addParticipant(callAndSession.second)
+                        inMeetingViewModel.addParticipant(callAndSession.second, requireContext())
                     }
                     MegaChatSession.SESSION_STATUS_DESTROYED -> {
                         Timber.d("Session destroyed, clientID = ${callAndSession.second.clientid}")
-                        inMeetingViewModel.removeParticipant(callAndSession.second)
+                        inMeetingViewModel.removeParticipant(
+                            callAndSession.second,
+                            requireContext()
+                        )
                     }
                 }
             }
@@ -153,7 +155,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
 
         toolbarTitle = meetingActivity.binding.titleToolbar
         toolbarTitle.apply {
-            text = StringResourcesUtils.getString(R.string.assign_moderator)
+            text = getString(R.string.assign_moderator)
 
             setTextColor(ContextCompat.getColor(requireContext(), R.color.black_white))
         }
@@ -161,7 +163,7 @@ class MakeModeratorFragment : MeetingBaseFragment() {
         toolbarSubtitle = meetingActivity.binding.subtitleToolbar
 
         toolbarSubtitle.apply {
-            text = StringResourcesUtils.getString(R.string.pick_new_moderator_message)
+            text = getString(R.string.pick_new_moderator_message)
             setTextColor(ContextCompat.getColor(requireContext(), R.color.grey_300))
         }
 
@@ -256,11 +258,11 @@ class MakeModeratorFragment : MeetingBaseFragment() {
     private fun updateSelectedParticipant() {
         if (selectedParticipants.size > 0) {
             toolbarSubtitle.text =
-                StringResourcesUtils.getString(R.string.selected_items, selectedParticipants.size)
+                getString(R.string.selected_items, selectedParticipants.size)
             binding.btOk.isEnabled = true
         } else {
             toolbarSubtitle.text =
-                StringResourcesUtils.getString(R.string.pick_new_moderator_message)
+                getString(R.string.pick_new_moderator_message)
             binding.btOk.isEnabled = false
         }
 

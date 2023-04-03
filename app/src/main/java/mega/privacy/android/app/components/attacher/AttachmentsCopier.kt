@@ -1,11 +1,11 @@
 package mega.privacy.android.app.components.attacher
 
+import android.content.Context
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.SetAttrUserListener
 import mega.privacy.android.app.utils.Constants.CHAT_FOLDER
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -30,6 +30,7 @@ import timber.log.Timber
 class AttachmentsCopier(
     private val megaApi: MegaApiAndroid,
     private val nodes: List<MegaNode>,
+    private val context: Context,
     private val callback: (ArrayList<MegaNode>, Int) -> Unit,
 ) : MegaRequestListenerInterface {
 
@@ -91,7 +92,7 @@ class AttachmentsCopier(
                         api.getNodeByPath(CHAT_FOLDER, api.rootNode)?.let {
                             api.renameNode(
                                 it,
-                                getString(R.string.my_chat_files_folder),
+                                context.getString(R.string.my_chat_files_folder),
                                 this@AttachmentsCopier
                             )
 
@@ -103,7 +104,7 @@ class AttachmentsCopier(
                             chatFilesFolderHandle = it.handle
                         } ?: run {
                             api.createFolder(
-                                getString(R.string.my_chat_files_folder),
+                                context.getString(R.string.my_chat_files_folder),
                                 api.rootNode,
                                 this@AttachmentsCopier
                             )
@@ -118,15 +119,17 @@ class AttachmentsCopier(
                     }
                 }
                 type == TYPE_CREATE_FOLDER
-                        && name == getString(R.string.my_chat_files_folder) -> {
+                        && name == context.getString(R.string.my_chat_files_folder) -> {
 
                     if (e.errorCode == API_OK) {
-                        api.setMyChatFilesFolder(nodeHandle,
-                            SetAttrUserListener(MegaApplication.getInstance()))
+                        api.setMyChatFilesFolder(
+                            nodeHandle,
+                            SetAttrUserListener(MegaApplication.getInstance())
+                        )
 
                         copy(api.getNodeByHandle(nodeHandle))
                     } else {
-                        Timber.e("Error creating ${getString(R.string.my_chat_files_folder)} folder")
+                        Timber.e("Error creating ${context.getString(R.string.my_chat_files_folder)} folder")
                     }
                 }
                 type == TYPE_COPY -> {

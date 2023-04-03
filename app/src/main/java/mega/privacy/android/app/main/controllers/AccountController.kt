@@ -38,13 +38,13 @@ import mega.privacy.android.app.fragments.offline.OfflineFragment
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
-import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerService.Companion.stopAudioPlayer
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.clearSettings
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
+import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.psa.PsaManager.stopChecking
 import mega.privacy.android.app.sync.removeBackupsBeforeLogout
 import mega.privacy.android.app.textEditor.TextEditorViewModel
@@ -61,7 +61,6 @@ import mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorke
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.isOffline
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showSnackbar
@@ -193,12 +192,12 @@ class AccountController @Inject constructor(
         }
 
         if (thereIsNotEnoughFreeSpace(path!!)) {
-            showSnackbar(context, getString(R.string.error_not_enough_free_space))
+            showSnackbar(context, context.getString(R.string.error_not_enough_free_space))
             return
         }
 
         if (saveTextOnFile(context, key, path)) {
-            showSnackbar(context, getString(R.string.save_MK_confirmation))
+            showSnackbar(context, context.getString(R.string.save_MK_confirmation))
 
             if (context is TestPasswordActivity) {
                 context.onRecoveryKeyExported()
@@ -212,7 +211,7 @@ class AccountController @Inject constructor(
      */
     fun renameRK(oldFile: File) {
         Timber.d("renameRK")
-        val newRKFile = File(oldFile.parentFile, getRecoveryKeyFileName())
+        val newRKFile = File(oldFile.parentFile, getRecoveryKeyFileName(context))
         oldFile.renameTo(newRKFile)
     }
 
@@ -232,10 +231,10 @@ class AccountController @Inject constructor(
                 if (logout) {
                     showConfirmDialogRecoveryKeySaved(sharingScope)
                 } else {
-                    showAlert(context, getString(R.string.copy_MK_confirmation), null)
+                    showAlert(context, context.getString(R.string.copy_MK_confirmation), null)
                 }
             } else {
-                showAlert(context, getString(R.string.general_text_error), null)
+                showAlert(context, context.getString(R.string.general_text_error), null)
             }
         }
     }
@@ -275,14 +274,14 @@ class AccountController @Inject constructor(
             return rKBitmap
         }
 
-        showAlert(context as ManagerActivity, getString(R.string.general_text_error), null)
+        showAlert(context as ManagerActivity, context.getString(R.string.general_text_error), null)
         return null
     }
 
     fun showConfirmDialogRecoveryKeySaved(sharingScope: CoroutineScope) {
         AlertDialog.Builder(context).apply {
-            setMessage(getString(R.string.copy_MK_confirmation))
-            setPositiveButton(getString(R.string.action_logout)) { _: DialogInterface?, _: Int ->
+            setMessage(context.getString(R.string.copy_MK_confirmation))
+            setPositiveButton(context.getString(R.string.action_logout)) { _: DialogInterface?, _: Int ->
                 logout(context, MegaApplication.getInstance().megaApi, sharingScope)
             }
             show()
@@ -455,7 +454,7 @@ class AccountController @Inject constructor(
                         showSnackbar(
                             context,
                             Constants.SNACKBAR_TYPE,
-                            getString(R.string.general_error),
+                            context.getString(R.string.general_error),
                             MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                         )
                     }

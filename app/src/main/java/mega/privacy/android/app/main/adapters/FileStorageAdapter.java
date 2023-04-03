@@ -89,11 +89,11 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
         holder.textViewFileName.setText(document.getName());
 
         if (document.isFolder()) {
-            String items = getNumberItemChildren(document.getFile());
+            String items = getNumberItemChildren(document.getFile(), context);
             holder.textViewFileSize.setText(items);
         } else {
             long documentSize = document.getSize();
-            holder.textViewFileSize.setText(getSizeString(documentSize));
+            holder.textViewFileSize.setText(getSizeString(documentSize, context));
         }
 
         resetImageView(holder.imageView);

@@ -1,12 +1,12 @@
 package mega.privacy.android.app.listeners
 
+import android.content.Context
 import android.content.Intent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringResourcesUtils.getTranslatedErrorString
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -22,6 +22,7 @@ import nz.mega.sdk.MegaRequestListenerInterface
 class RemoveListener(
     private val snackbarShower: SnackbarShower? = null,
     private val isIncomingShare: Boolean = false,
+    private val context: Context,
     private val onFinish: ((Boolean) -> Unit)? = null,
 ) : MegaRequestListenerInterface {
 
@@ -58,7 +59,10 @@ class RemoveListener(
             if (isIncomingShare) {
                 if (e.errorCode == MegaError.API_OK) {
                     Intent(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR).run {
-                        putExtra(BroadcastConstants.SNACKBAR_TEXT, getString(R.string.share_left))
+                        putExtra(
+                            BroadcastConstants.SNACKBAR_TEXT,
+                            context.getString(R.string.share_left)
+                        )
                         MegaApplication.getInstance().sendBroadcast(this)
                     }
                 } else {

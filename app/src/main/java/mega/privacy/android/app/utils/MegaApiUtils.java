@@ -49,48 +49,27 @@ public class MegaApiUtils {
     /**
      * Gets the string to show as content of a folder.
      *
-     * @param n The folder to get its string content.
+     * @param node The folder to get its string content.
      * @return The string to show as content of the folder.
      */
-    public static String getMegaNodeFolderInfo(MegaNode n) {
+    public static String getMegaNodeFolderInfo(MegaNode node, Context context) {
         MegaApiJava megaApi = MegaApplication.getInstance().getMegaApi();
 
-        return getFolderInfo(megaApi.getNumChildFolders(n), megaApi.getNumChildFiles(n));
+        return getFolderInfo(megaApi.getNumChildFolders(node), megaApi.getNumChildFiles(node), context);
     }
 
     /**
      * Gets the string to show as content of a folder link.
      *
-     * @param n The folder to get its string content.
+     * @param node The folder to get its string content.
      * @return The string to show as content of the folder.
      */
-    public static String getMegaNodeFolderLinkInfo(MegaNode n) {
+    public static String getMegaNodeFolderLinkInfo(MegaNode node, Context context) {
         MegaApiJava megaApiFolder = MegaApplication.getInstance().getMegaApiFolder();
 
-        return getFolderInfo(megaApiFolder.getNumChildFolders(n), megaApiFolder.getNumChildFiles(n));
+        return getFolderInfo(megaApiFolder.getNumChildFolders(node), megaApiFolder.getNumChildFiles(node), context);
     }
 
-    /**
-     * Gets the string to show as content of a list of nodes.
-     *
-     * @param nodes The list of nodes to get its string content.
-     * @return The string to show as content of the list of nodes.
-     */
-    public static String getDescription(ArrayList<MegaNode> nodes) {
-        int numFolders = 0;
-        int numFiles = 0;
-
-        for (int i = 0; i < nodes.size(); i++) {
-            MegaNode c = nodes.get(i);
-            if (c.isFolder()) {
-                numFolders++;
-            } else {
-                numFiles++;
-            }
-        }
-
-        return getFolderInfo(numFolders, numFiles);
-    }
 
     /*
      * If there is an application that can manage the Intent, returns true. Otherwise, false.

@@ -1,9 +1,10 @@
 package mega.privacy.android.app.myAccount.usecase
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Single
 import mega.privacy.android.app.R
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError.API_EEXIST
@@ -11,8 +12,16 @@ import nz.mega.sdk.MegaError.API_ENOENT
 import nz.mega.sdk.MegaError.API_OK
 import javax.inject.Inject
 
+/**
+ * Confirm change email use case
+ *
+ * @property megaApi
+ * @property context
+ * @constructor Create empty Confirm change email use case
+ */
 class ConfirmChangeEmailUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    @ApplicationContext private val context: Context,
 ) {
 
     /**
@@ -31,9 +40,9 @@ class ConfirmChangeEmailUseCase @Inject constructor(
                     emitter.onSuccess(
                         when (error.errorCode) {
                             API_OK -> request.email
-                            API_EEXIST -> getString(R.string.mail_already_used)
-                            API_ENOENT -> getString(R.string.old_password_provided_incorrect)
-                            else -> getString(R.string.general_text_error)
+                            API_EEXIST -> context.getString(R.string.mail_already_used)
+                            API_ENOENT -> context.getString(R.string.old_password_provided_incorrect)
+                            else -> context.getString(R.string.general_text_error)
                         }
                     )
                 })

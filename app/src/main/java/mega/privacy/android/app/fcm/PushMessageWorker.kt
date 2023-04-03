@@ -17,7 +17,6 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.data.mapper.pushmessage.PushMessageMapper
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.PushReceived
@@ -130,7 +129,7 @@ class PushMessageWorker @AssistedInject constructor(
                 setSmallIcon(iconId)
 
                 if (titleId != null) {
-                    setContentText(getString(titleId))
+                    setContentText(applicationContext.getString(titleId))
                 }
             }
 

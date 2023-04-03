@@ -221,6 +221,8 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.app.presentation.manager.outgoingSharesState
 import mega.privacy.android.app.presentation.manager.rubbishBinState
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult
+import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
 import mega.privacy.android.app.presentation.notification.model.NotificationNavigationHandler
 import mega.privacy.android.app.presentation.permissions.PermissionsFragment
@@ -278,8 +280,6 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.RemoveNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult
-import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.usecase.data.RemoveRequestResult
 import mega.privacy.android.app.usecase.exception.ForeignNodeException
 import mega.privacy.android.app.usecase.exception.MegaNodeException
@@ -318,7 +318,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.showProcessFileDialog
 import mega.privacy.android.app.utils.OfflineUtils
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.TimeUtils
@@ -1902,7 +1901,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             Timber.d("Check if there any INCOMING pendingRequest contacts")
             setContactTitleSection()
             viewModel.checkNumUnreadUserAlerts(UnreadUserAlertsCheckType.NOTIFICATIONS_TITLE)
-            val firstLaunch = intent?.getBooleanExtra(IntentConstants.EXTRA_FIRST_LOGIN, false) == true
+            val firstLaunch =
+                intent?.getBooleanExtra(IntentConstants.EXTRA_FIRST_LOGIN, false) == true
             if (drawerItem == null) {
                 drawerItem = getStartDrawerItem()
                 if (intent != null) {
@@ -4235,10 +4235,17 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 appBarLayout.visibility = View.VISIBLE
                 lifecycleScope.launch {
                     if (isRubbishBinComposeEnabled()) {
-                        rubbishBinComposeFragment = getRubbishBinComposeFragment() ?: RubbishBinComposeFragment.newInstance()
-                        rubbishBinComposeFragment?.let {replaceFragment(it, FragmentTag.RUBBISH_BIN_COMPOSE.tag) }
+                        rubbishBinComposeFragment = getRubbishBinComposeFragment()
+                            ?: RubbishBinComposeFragment.newInstance()
+                        rubbishBinComposeFragment?.let {
+                            replaceFragment(
+                                it,
+                                FragmentTag.RUBBISH_BIN_COMPOSE.tag
+                            )
+                        }
                     } else {
-                        rubbishBinFragment = getRubbishBinFragment() ?: RubbishBinFragment.newInstance()
+                        rubbishBinFragment =
+                            getRubbishBinFragment() ?: RubbishBinFragment.newInstance()
                         rubbishBinFragment?.let { replaceFragment(it, FragmentTag.RUBBISH_BIN.tag) }
                     }
                     setBottomNavigationMenuItemChecked(NO_BNV)
@@ -5654,7 +5661,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      */
     fun restoreFromRubbish(nodes: List<MegaNode?>?) {
         if (nodes == null) return
-        checkNameCollisionUseCase.checkRestorations(nodes.filterNotNull())
+        checkNameCollisionUseCase.checkRestorations(nodes.filterNotNull(), this)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { (collisions, nodesWithoutCollisions): Pair<ArrayList<NameCollision>, List<MegaNode>>, throwable: Throwable? ->
@@ -5670,7 +5677,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun proceedWithRestoration(nodes: List<MegaNode>) {
-        moveNodeUseCase.restore(nodes)
+        moveNodeUseCase.restore(nodes, this)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { result: MoveRequestResult.Restoration, throwable: Throwable? ->
@@ -5784,7 +5791,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 builder.setMessage(resources.getString(R.string.confirmation_move_to_rubbish))
             }
             builder.setPositiveButton(R.string.general_move) { _: DialogInterface?, _: Int ->
-                moveNodeUseCase.moveToRubbishBin(handleList)
+                moveNodeUseCase.moveToRubbishBin(handleList, this)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { result: MoveRequestResult.RubbishMovement, throwable: Throwable? ->
@@ -5808,7 +5815,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         if (throwable == null) {
                             val notValidView = (result.isSingleAction
                                     && result.isSuccess) && this@ManagerActivity.rubbishBinState().rubbishBinHandle == handleList[0]
-                            showRestorationOrRemovalResult(notValidView, result.getResultText())
+                            showRestorationOrRemovalResult(notValidView, result.getResultText(this))
                         }
                     }
             }
@@ -6540,7 +6547,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         val builder = MaterialAlertDialogBuilder(this)
         builder.setMessage(
-            getQuantityString(
+            resources.getQuantityString(
                 R.plurals.alert_remove_several_shares,
                 shares.size,
                 shares.size
@@ -7449,7 +7456,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 checkNameCollisionUseCase.checkHandleList(
                     moveHandles,
                     toHandle,
-                    NameCollisionType.MOVE
+                    NameCollisionType.MOVE,
+                    this
                 )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -7492,7 +7500,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 checkNameCollisionUseCase.checkHandleList(
                     copyHandles,
                     toHandle,
-                    NameCollisionType.COPY
+                    NameCollisionType.COPY,
+                    this
                 )
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -7546,7 +7555,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                     list.add(
                                         NameCollision.Upload.getUploadCollision(
                                             handle,
-                                            file, parentHandle
+                                            file, parentHandle, this
                                         )
                                     )
                                     nameCollisionActivityContract?.launch(list)
@@ -7650,7 +7659,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             requestCode == Constants.REQUEST_DOWNLOAD_FOLDER && resultCode == Activity.RESULT_OK -> {
                 val parentPath = intent?.getStringExtra(FileStorageActivity.EXTRA_PATH)
                 if (parentPath != null) {
-                    val path = parentPath + File.separator + FileUtil.getRecoveryKeyFileName()
+                    val path = parentPath + File.separator + FileUtil.getRecoveryKeyFileName(this)
                     Timber.d("REQUEST_DOWNLOAD_FOLDER:path to download: %s", path)
                     val ac = AccountController(this)
                     ac.exportMK(path)
@@ -8327,7 +8336,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (withoutCollisions.isNotEmpty()) {
                         showSnackbar(
                             Constants.SNACKBAR_TYPE,
-                            getQuantityString(
+                            resources.getQuantityString(
                                 R.plurals.upload_began,
                                 withoutCollisions.size,
                                 withoutCollisions.size
@@ -8474,7 +8483,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     list.add(
                         NameCollision.Upload.getUploadCollision(
                             handle,
-                            file, parentNode.handle
+                            file, parentNode.handle, this
                         )
                     )
                     nameCollisionActivityContract?.launch(list)
@@ -8489,7 +8498,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     } else if (throwable is MegaNodeException.ChildDoesNotExistsException) {
                         PermissionUtils.checkNotificationsPermission(this)
                         val text: String =
-                            getQuantityString(R.plurals.upload_began, 1, 1)
+                            resources.getQuantityString(R.plurals.upload_began, 1, 1)
                         uploadUseCase.upload(this, file, parentNode.handle)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
@@ -8650,7 +8659,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 if (e.errorCode == MegaError.API_OK) {
                     myAccountInfo.bonusStorageSMS = Util.getSizeString(
                         request.megaAchievementsDetails
-                            .getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE)
+                            .getClassStorage(MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE),
+                        this
                     )
                 }
                 showAddPhoneNumberInMenu()
@@ -8955,12 +8965,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             showSnackbar(
                                 Constants.SNACKBAR_TYPE,
                                 getString(R.string.version_history_deleted_erroneously)
-                                        + "\n" + getQuantityString(
+                                        + "\n" + resources.getQuantityString(
                                     R.plurals.versions_deleted_succesfully,
                                     versionsRemoved,
                                     versionsRemoved
                                 )
-                                        + "\n" + getQuantityString(
+                                        + "\n" + resources.getQuantityString(
                                     R.plurals.versions_not_deleted,
                                     errorVersionRemove,
                                     errorVersionRemove
@@ -9925,7 +9935,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (transfer.isOfflineFile) {
                 selectDrawerItem(DrawerItem.HOMEPAGE)
                 openFullscreenOfflineFragment(
-                    OfflineUtils.removeInitialOfflinePath(transfer.path) + Constants.SEPARATOR
+                    OfflineUtils.removeInitialOfflinePath(transfer.path, this) + Constants.SEPARATOR
                 )
             } else {
                 val file = transfer.path?.let { File(it) }

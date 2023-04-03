@@ -95,9 +95,9 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
             if (!isFileAvailable(file)) return;
 
             if (file.isDirectory()) {
-                nodeInfo.setText(getFileFolderInfo(file));
+                nodeInfo.setText(getFileFolderInfo(file, requireContext()));
             } else {
-                nodeInfo.setText(getFileInfo(file));
+                nodeInfo.setText(getFileInfo(file, requireContext()));
             }
 
             if (file.isFile()) {

@@ -83,7 +83,6 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.meeting.CallNotificationIntentService;
 import mega.privacy.android.app.meeting.activity.MeetingActivity;
 import mega.privacy.android.app.utils.CallUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.data.model.ChatSettings;
 import mega.privacy.android.domain.entity.ChatRequest;
@@ -802,12 +801,12 @@ public final class ChatAdvancedNotificationBuilder {
             expandedView.setViewVisibility(R.id.small_layout, View.VISIBLE);
             expandedView.setViewVisibility(R.id.big_layout, GONE);
             if (CallUtil.isOneToOneCall(chatToAnswer)) {
-                expandedView.setTextViewText(R.id.decline_button_text, StringResourcesUtils.getString(R.string.contact_decline));
-                expandedView.setTextViewText(R.id.answer_button_text, StringResourcesUtils.getString(R.string.answer_call_incoming));
+                expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.contact_decline));
+                expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.answer_call_incoming));
                 expandedView.setOnClickPendingIntent(R.id.decline_button_layout, intentDecline);
             } else {
-                expandedView.setTextViewText(R.id.decline_button_text, StringResourcesUtils.getString(R.string.ignore_call_incoming));
-                expandedView.setTextViewText(R.id.answer_button_text, StringResourcesUtils.getString(R.string.action_join));
+                expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.ignore_call_incoming));
+                expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.action_join));
                 expandedView.setOnClickPendingIntent(R.id.decline_button_layout, intentIgnore);
             }
             PendingIntent intentAnswer = getPendingIntent(isAnotherActiveCall(chatIdCallInProgress), chatIdCallToAnswer, CallNotificationIntentService.ANSWER, notificationId);
@@ -825,9 +824,9 @@ public final class ChatAdvancedNotificationBuilder {
                 PendingIntent intentHoldAnswer = getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.HOLD_ANSWER, notificationId);
                 PendingIntent intentEndAnswer = getPendingIntent(callToHangUpChatId, chatIdCallToAnswer, CallNotificationIntentService.END_ANSWER, notificationId);
 
-                expandedView.setTextViewText(R.id.first_button_text, StringResourcesUtils.getString(R.string.contact_decline));
-                expandedView.setTextViewText(R.id.second_button_text, StringResourcesUtils.getString(R.string.hold_and_answer_call_incoming));
-                expandedView.setTextViewText(R.id.third_button_text, StringResourcesUtils.getString(R.string.end_and_answer_call_incoming));
+                expandedView.setTextViewText(R.id.first_button_text, context.getString(R.string.contact_decline));
+                expandedView.setTextViewText(R.id.second_button_text, context.getString(R.string.hold_and_answer_call_incoming));
+                expandedView.setTextViewText(R.id.third_button_text, context.getString(R.string.end_and_answer_call_incoming));
                 expandedView.setOnClickPendingIntent(R.id.first_button_layout, intentDecline);
                 expandedView.setOnClickPendingIntent(R.id.second_button_layout, intentHoldAnswer);
                 expandedView.setOnClickPendingIntent(R.id.third_button_layout, intentEndAnswer);
@@ -835,9 +834,9 @@ public final class ChatAdvancedNotificationBuilder {
                 PendingIntent intentHoldJoin = getPendingIntent(chatIdCallInProgress, chatIdCallToAnswer, CallNotificationIntentService.HOLD_JOIN, notificationId);
                 PendingIntent intentEndJoin = getPendingIntent(callToHangUpChatId, chatIdCallToAnswer, CallNotificationIntentService.END_JOIN, notificationId);
 
-                expandedView.setTextViewText(R.id.first_button_text, StringResourcesUtils.getString(R.string.ignore_call_incoming));
-                expandedView.setTextViewText(R.id.second_button_text, StringResourcesUtils.getString(R.string.hold_and_join_call_incoming));
-                expandedView.setTextViewText(R.id.third_button_text, StringResourcesUtils.getString(R.string.end_and_join_call_incoming));
+                expandedView.setTextViewText(R.id.first_button_text, context.getString(R.string.ignore_call_incoming));
+                expandedView.setTextViewText(R.id.second_button_text, context.getString(R.string.hold_and_join_call_incoming));
+                expandedView.setTextViewText(R.id.third_button_text, context.getString(R.string.end_and_join_call_incoming));
                 expandedView.setOnClickPendingIntent(R.id.first_button_layout, intentIgnore);
                 expandedView.setOnClickPendingIntent(R.id.second_button_layout, intentHoldJoin);
                 expandedView.setOnClickPendingIntent(R.id.third_button_layout, intentEndJoin);
@@ -953,12 +952,12 @@ public final class ChatAdvancedNotificationBuilder {
 
         if (CallUtil.isOneToOneCall(chatToAnswer)) {
             PendingIntent intentDecline = getPendingIntent(MEGACHAT_INVALID_HANDLE, chatIdCallToAnswer, CallNotificationIntentService.DECLINE, notificationId);
-            expandedView.setTextViewText(R.id.decline_button_text, StringResourcesUtils.getString(R.string.contact_decline));
-            expandedView.setTextViewText(R.id.answer_button_text, StringResourcesUtils.getString(R.string.answer_call_incoming));
+            expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.contact_decline));
+            expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.answer_call_incoming));
             expandedView.setOnClickPendingIntent(R.id.decline_button_layout, intentDecline);
         } else {
-            expandedView.setTextViewText(R.id.decline_button_text, StringResourcesUtils.getString(R.string.ignore_call_incoming));
-            expandedView.setTextViewText(R.id.answer_button_text, StringResourcesUtils.getString(R.string.action_join));
+            expandedView.setTextViewText(R.id.decline_button_text, context.getString(R.string.ignore_call_incoming));
+            expandedView.setTextViewText(R.id.answer_button_text, context.getString(R.string.action_join));
             expandedView.setOnClickPendingIntent(R.id.decline_button_layout, intentIgnore);
         }
 

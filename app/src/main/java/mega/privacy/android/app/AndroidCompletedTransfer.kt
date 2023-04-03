@@ -1,18 +1,19 @@
 package mega.privacy.android.app
 
+import android.content.Context
 import android.os.Parcel
 import android.os.Parcelable
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
-import mega.privacy.android.app.utils.MegaNodeUtil.getNodeFolderPath
-import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaError
 import mega.privacy.android.app.objects.SDTransfer
+import mega.privacy.android.app.utils.MegaNodeUtil.getNodeFolderPath
+import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.StringResourcesUtils
-import nz.mega.sdk.MegaApiJava
-import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
+import nz.mega.sdk.MegaApiJava
+import nz.mega.sdk.MegaError
+import nz.mega.sdk.MegaTransfer
 
 /**
  * The entity for completed transfer
@@ -64,20 +65,20 @@ class AndroidCompletedTransfer : Parcelable {
         this.parentHandle = parentHandle
     }
 
-    constructor(transfer: MegaTransfer, error: MegaError) {
+    constructor(transfer: MegaTransfer, error: MegaError, context: Context) {
         fileName = transfer.fileName
         type = transfer.type
         state = transfer.state
-        size = Util.getSizeString(transfer.totalBytes)
+        size = Util.getSizeString(transfer.totalBytes, context)
         nodeHandle = transfer.nodeHandle.toString()
         path = getTransferPath(transfer)
         timeStamp = System.currentTimeMillis()
-        this.error = getErrorString(transfer, error)
+        this.error = getErrorString(transfer, error, context)
         originalPath = transfer.path
         parentHandle = transfer.parentHandle
     }
 
-    constructor(transfer: SDTransfer) {
+    constructor(transfer: SDTransfer, context: Context) {
         fileName = transfer.name
         type = MegaTransfer.TYPE_DOWNLOAD
         state = MegaTransfer.STATE_COMPLETED
@@ -85,7 +86,7 @@ class AndroidCompletedTransfer : Parcelable {
         nodeHandle = transfer.nodeHandle
         path = removeLastFileSeparator(SDCardUtils.getSDCardTargetPath(transfer.appData))
         timeStamp = System.currentTimeMillis()
-        error = StringResourcesUtils.getString(R.string.api_ok)
+        error = context.getString(R.string.api_ok)
         originalPath = transfer.path
         parentHandle = MegaApiJava.INVALID_HANDLE
         isOfflineFile = false
@@ -123,7 +124,8 @@ class AndroidCompletedTransfer : Parcelable {
                 val offlineFolder = OfflineUtils.getOfflineFolder(app, OfflineUtils.OFFLINE_DIR)
                 isOfflineFile =
                     !TextUtil.isTextEmpty(path) && offlineFolder != null && path.startsWith(
-                        offlineFolder.absolutePath)
+                        offlineFolder.absolutePath
+                    )
                 if (isOfflineFile) {
                     path = OfflineUtils.removeInitialOfflinePath(path, transfer.nodeHandle)
                 }
@@ -143,9 +145,9 @@ class AndroidCompletedTransfer : Parcelable {
      * @param error    MegaError of the transfer.
      * @return The error to show as cause of the failure.
      */
-    private fun getErrorString(transfer: MegaTransfer, error: MegaError): String =
+    private fun getErrorString(transfer: MegaTransfer, error: MegaError, context: Context): String =
         if (error.errorCode == MegaError.API_EOVERQUOTA && transfer.isForeignOverquota)
-            StringResourcesUtils.getString(R.string.error_share_owner_storage_quota)
+            context.getString(R.string.error_share_owner_storage_quota)
         else
             StringResourcesUtils.getTranslatedErrorString(error)
 

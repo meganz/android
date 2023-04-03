@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.favourites.model.mapper
 
+import android.content.Context
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import mega.privacy.android.app.R
@@ -14,6 +15,7 @@ import mega.privacy.android.domain.entity.node.TypedFolderNode
 import nz.mega.sdk.MegaNode
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -60,10 +62,10 @@ class FavouriteMapperTest {
         }
 
 
-        val stringUtil = mock<StringUtilWrapper> {
-            on {
-                getFolderInfo(any(), any())
-            }.thenReturn(expectedInfo)
+        val stringUtil = mock<StringUtilWrapper>()
+
+        val context = mock<Context> {
+            on { getString(any()) }.thenReturn(expectedInfo)
         }
 
         val actual = toFavourite(
@@ -76,7 +78,8 @@ class FavouriteMapperTest {
 
         assertWithMessage("ShowLabel not mapped correctly").that(actual.showLabel)
             .isEqualTo(expectedShowLabel)
-        assertWithMessage("Info not mapped correctly").that(actual.info).isEqualTo(expectedInfo)
+        assertWithMessage("Info not mapped correctly").that(actual.info(context))
+            .isEqualTo(expectedInfo)
         assertWithMessage("IsAvailableOffline not mapped correctly").that(actual.isAvailableOffline)
             .isEqualTo(expectedIsAvailableOffline)
         assertWithMessage("LabelColour not mapped correctly").that(actual.labelColour)
@@ -135,7 +138,7 @@ class FavouriteMapperTest {
 
 
         val stringUtil = mock<StringUtilWrapper> {
-            on { getSizeString(expectedSize) }.thenReturn("Size")
+            on { getSizeString(eq(expectedSize), any()) }.thenReturn("Size")
             on { formatLongDateTime(expectedModificationTime) }.thenReturn("Modification")
         }
 
@@ -152,7 +155,7 @@ class FavouriteMapperTest {
         )
 
         assertThat(actual.showLabel).isEqualTo(expectedShowLabel)
-        assertThat(actual.info).isEqualTo(expectedInfo)
+        assertThat(actual.info(mock())).isEqualTo(expectedInfo)
         assertThat(actual.isAvailableOffline).isEqualTo(expectedIsAvailableOffline)
         assertThat(actual.labelColour).isEqualTo(expectedLabelColour)
         assertThat(actual.icon).isEqualTo(expectedIcon)
