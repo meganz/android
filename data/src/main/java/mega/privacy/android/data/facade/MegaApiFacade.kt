@@ -690,7 +690,7 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun getOutShares(megaNode: MegaNode): List<MegaShare> =
         megaApi.getOutShares(megaNode)
 
-    override suspend fun getRubbishNode(): MegaNode = megaApi.rubbishNode
+    override suspend fun getRubbishNode(): MegaNode? = megaApi.rubbishNode
 
     override fun createSet(name: String, listener: MegaRequestListenerInterface) =
         megaApi.createSet(name, listener)
