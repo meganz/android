@@ -16,28 +16,6 @@ sealed class ActiveTransfersState {
     data class GetMoreQuotaViewVisibility(val isVisible: Boolean) : ActiveTransfersState()
 
     /**
-     * Update the active transfers
-     *
-     * @property newTransfers  [MegaTransfer] List
-     */
-    data class TransfersUpdated(val newTransfers: List<Transfer>) :
-        ActiveTransfersState()
-
-    /**
-     * Update when the transfer speed changed
-     *
-     * @property index the index of changed transfer
-     * @property updatedTransfer the updated transfer
-     * @property newTransfers updated [MegaTransfer] List
-     */
-    data class TransferUpdated(
-        val index: Int,
-        val updatedTransfer: Transfer,
-        val newTransfers: List<Transfer>,
-    ) :
-        ActiveTransfersState()
-
-    /**
      * Update when transfer is finished
      *
      * @property success the
@@ -48,18 +26,6 @@ sealed class ActiveTransfersState {
         val success: Boolean,
         val pos: Int,
         val newTransfers: List<Transfer>,
-    ) :
-        ActiveTransfersState()
-
-    /**
-     * Update when the new transfer start
-     *
-     * @property updatedTransfer the updated transfer
-     * @property newTransfers updated [MegaTransfer] List
-     */
-    data class TransferStartUpdated(
-        val updatedTransfer: Transfer,
-        val newTransfers: List<Transfer>,
     ) : ActiveTransfersState()
 
     /**
@@ -69,15 +35,6 @@ sealed class ActiveTransfersState {
      * @property newTransfers updated [MegaTransfer] List
      */
     data class TransferFinishedUpdated(val index: Int, val newTransfers: List<Transfer>) :
-        ActiveTransfersState()
-
-    /**
-     * Update when the transfer status is changed
-     *
-     * @property index index of status changed item
-     * @property transfer status changed item
-     */
-    data class TransferChangeStatusUpdated(val index: Int, val transfer: Transfer) :
         ActiveTransfersState()
 
     /**

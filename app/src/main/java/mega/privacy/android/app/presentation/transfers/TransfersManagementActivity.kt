@@ -319,6 +319,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      */
     fun updateTransfersWidget() {
         transfersViewModel.checkTransfersInfo(TransferType.NONE)
+        transfersWidget?.update(transfersViewModel.transfersInfo.value)
     }
 
     /**

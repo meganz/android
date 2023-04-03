@@ -8806,7 +8806,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         val areUploadsPaused: Boolean =
                             megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD)
                         refreshFragment(FragmentTag.TRANSFERS.tag)
-                        transferTabsAdapter.notifyDataSetChanged()
                         pauseTransfersMenuIcon?.isVisible =
                             !(areDownloadsPaused || areUploadsPaused)
                         playTransfersMenuIcon?.isVisible = areDownloadsPaused || areUploadsPaused
@@ -9233,27 +9232,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
 
-    override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {
-        Timber.d(
-            "onTransferStart: %d-%d - %d",
-            transfer.notificationNumber,
-            transfer.nodeHandle,
-            transfer.tag
-        )
-        if (transfer.isStreamingTransfer || transfer.isBackgroundTransfer()) {
-            return
-        }
-        if (transferCallback < transfer.notificationNumber) {
-            transferCallback = transfer.notificationNumber
-            val now = Calendar.getInstance().timeInMillis
-            lastTimeOnTransferUpdate = now
-            if (!transfer.isFolderTransfer) {
-                if (isTransfersInProgressAdded) {
-                    transfersFragment?.transferStart(transfer)
-                }
-            }
-        }
-    }
+    override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {}
 
     override fun onTransferFinish(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
         Timber.d(
@@ -9285,34 +9264,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 refreshSharesFragments()
                 sharesPageAdapter.notifyDataSetChanged()
                 LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE).post(false)
-                if (isTransfersInProgressAdded) {
-                    transfersFragment?.transferFinish(transfer.tag)
-                }
             }
         }
     }
 
-    override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {
-        if (transfer.isStreamingTransfer || transfer.isBackgroundTransfer()) {
-            return
-        }
-        val now = Calendar.getInstance().timeInMillis
-        if (now - lastTimeOnTransferUpdate > Util.ONTRANSFERUPDATE_REFRESH_MILLIS) {
-            Timber.d(
-                "Update onTransferUpdate: %d - %d - %d",
-                transfer.nodeHandle,
-                transfer.tag,
-                transfer.notificationNumber
-            )
-            lastTimeOnTransferUpdate = now
-            if (!transfer.isFolderTransfer && transferCallback < transfer.notificationNumber) {
-                transferCallback = transfer.notificationNumber
-                if (isTransfersInProgressAdded) {
-                    transfersFragment?.transferUpdate(transfer)
-                }
-            }
-        }
-    }
+    override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {}
 
     override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
         Timber.w("onTransferTemporaryError: %d - %d", transfer.nodeHandle, transfer.tag)
