@@ -1143,7 +1143,7 @@ interface MegaApiGateway {
      *
      * @return Rubbish node of the account.
      */
-    suspend fun getRubbishNode(): MegaNode
+    suspend fun getRubbishNode(): MegaNode?
 
     /**
      * Create a new MegaSet item
