@@ -198,7 +198,7 @@ class PhotosFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        if (arguments?.getBoolean(firsLoginKey) == true) {
+        if (arguments?.getBoolean(firstLoginKey) == true) {
             timelineViewModel.shouldEnableCUPage(true)
         }
         setUpFlow()
@@ -234,7 +234,7 @@ class PhotosFragment : Fragment() {
                     if (
                         timelineViewModel.state.value.enableCameraUploadPageShowing
                         && timelineViewModel.state.value.currentShowingPhotos.isNotEmpty()
-                        || arguments?.getBoolean(firsLoginKey) == true
+                        || arguments?.getBoolean(firstLoginKey) == true
                     ) {
                         photosViewModel.setMenuShowing(false)
                     }
@@ -669,9 +669,9 @@ class PhotosFragment : Fragment() {
      * Performs actions when the Button to enable Camera Uploads has been clicked
      */
     private fun onCameraUploadsButtonClicked() {
-        if (arguments?.getBoolean(firsLoginKey) == true) {
+        if (arguments?.getBoolean(firstLoginKey) == true) {
             timelineViewModel.setInitialPreferences()
-            arguments?.putBoolean(firsLoginKey, false)
+            arguments?.putBoolean(firstLoginKey, false)
         }
         MegaApplication.getInstance().sendSignalPresenceActivity()
 
@@ -794,11 +794,11 @@ class PhotosFragment : Fragment() {
     companion object {
         fun newInstance(isFirstLogin: Boolean): PhotosFragment {
             val fragment = PhotosFragment()
-            fragment.arguments = bundleOf(firsLoginKey to isFirstLogin)
+            fragment.arguments = bundleOf(firstLoginKey to isFirstLogin)
 
             return fragment
         }
 
-        private const val firsLoginKey = "PHOTOS_FRAGMENT_FIRST_LOGIN_ARGUMENT"
+        private const val firstLoginKey = "PHOTOS_FRAGMENT_FIRST_LOGIN_ARGUMENT"
     }
 }

@@ -2021,7 +2021,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
             //INITIAL FRAGMENT
             if (selectDrawerItemPending) {
-                selectDrawerItem(drawerItem, firstLaunch)
+                selectDrawerItem(drawerItem)
             }
         }
         return false
@@ -4175,7 +4175,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     @SuppressLint("NewApi")
     @JvmOverloads
-    fun selectDrawerItem(item: DrawerItem?, firstLaunch: Boolean = false) {
+    fun selectDrawerItem(item: DrawerItem?) {
         Timber.d("Selected DrawerItem: ${item?.name}. Current drawerItem is ${drawerItem?.name}")
         drawerItem = item ?: drawerItem ?: DrawerItem.CLOUD_DRIVE
 
@@ -4290,7 +4290,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else {
                     appBarLayout.visibility = View.VISIBLE
                     if (getPhotosFragment() == null) {
-                        photosFragment = PhotosFragment.newInstance(firstLaunch)
+                        photosFragment = PhotosFragment.newInstance(viewModel.state.value.isFirstLogin)
                     } else {
                         refreshFragment(FragmentTag.PHOTOS.tag)
                     }
