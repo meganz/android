@@ -301,9 +301,12 @@ interface MegaLocalStorageGateway {
     suspend fun getUploadVideoQuality(): String
 
     /**
-     * Keep file names for camera upload or not
+     * Checks whether the File Names are kept or not when uploading content
+     *
+     * @return true if the File Names should be left as is, and false if otherwise. It will also
+     * return false when the value does not exist in the Database
      */
-    suspend fun getKeepFileNames(): Boolean
+    suspend fun areUploadFileNamesKept(): Boolean
 
     /**
      * Is folder path on external SD card

@@ -59,7 +59,6 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.IsNodeInRubbishOrDeleted
 import mega.privacy.android.domain.usecase.IsNotEnoughQuota
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
-import mega.privacy.android.domain.usecase.KeepFileNames
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.MonitorBatteryInfo
 import mega.privacy.android.domain.usecase.MonitorCameraUploadPauseState
@@ -150,9 +149,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideFileNameExists() = mock<FileNameExists>()
-
-    @Provides
-    fun provideKeepFileNames() = mock<KeepFileNames>()
 
     @Provides
     fun provideGetSyncRecordByFingerprint() = mock<GetSyncRecordByFingerprint>()

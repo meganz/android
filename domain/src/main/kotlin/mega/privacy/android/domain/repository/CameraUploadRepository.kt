@@ -298,11 +298,11 @@ interface CameraUploadRepository {
     suspend fun setUploadVideoSyncStatus(syncStatus: SyncStatus)
 
     /**
-     * Get keep file names preference
+     * Checks whether the File Names are kept or not when uploading content
      *
-     * @return keep file names preference
+     * @return true if the File Names should be left as is, and false if otherwise
      */
-    suspend fun getKeepFileNames(): Boolean
+    suspend fun areUploadFileNamesKept(): Boolean
 
     /**
      * Is camera folder on external SD card

@@ -203,7 +203,7 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getUploadVideoQuality(): String =
         dbHandler.preferences?.uploadVideoQuality ?: VideoQuality.ORIGINAL.value.toString()
 
-    override suspend fun getKeepFileNames(): Boolean =
+    override suspend fun areUploadFileNamesKept(): Boolean =
         dbHandler.preferences?.keepFileNames.toBoolean()
 
     override suspend fun isFolderExternalSd(): Boolean =

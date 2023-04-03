@@ -343,9 +343,16 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload retrieves keep file names preference`() = runTest {
-        whenever(localStorageGateway.getKeepFileNames()).thenReturn(true)
-        assertThat(underTest.getKeepFileNames()).isEqualTo(true)
+    fun `test that the file names are kept as is when uploading content`() =
+        testAreUploadFileNamesKept(true)
+
+    @Test
+    fun `test that the file names should be different when uploading content`() =
+        testAreUploadFileNamesKept(false)
+
+    private fun testAreUploadFileNamesKept(input: Boolean) = runTest {
+        whenever(localStorageGateway.areUploadFileNamesKept()).thenReturn(input)
+        assertThat(underTest.areUploadFileNamesKept()).isEqualTo(input)
     }
 
     @Test
