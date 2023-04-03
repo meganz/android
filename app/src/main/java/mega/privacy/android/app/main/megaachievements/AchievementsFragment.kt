@@ -88,9 +88,6 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View? {
-
-        val enabledAchievements = megaApi.isAchievementsEnabled
-        Timber.d("The achievements are: $enabledAchievements")
         val root = inflater.inflate(R.layout.fragment_achievements, container, false)
 
         val inviteFriendsButton = root.findViewById<Button>(R.id.invite_button)
@@ -254,6 +251,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                     if (transferReferrals > 0 || storageReferrals > 0) Constants.BONUSES_FRAGMENT else Constants.INVITE_FRIENDS_FRAGMENT,
                 )
             }
+
             R.id.install_app_layout -> {
                 Timber.d("Go to info app install")
                 (requireActivity() as AchievementsActivity).showFragment(
@@ -261,6 +259,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                     MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL
                 )
             }
+
             R.id.add_phone_layout -> {
                 Timber.d("Go to info add phone")
                 (requireActivity() as AchievementsActivity).showFragment(
@@ -268,6 +267,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                     MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE
                 )
             }
+
             R.id.registration_layout -> {
                 Timber.d("Go to info registration")
                 (requireActivity() as AchievementsActivity).showFragment(
@@ -275,6 +275,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                     MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME
                 )
             }
+
             R.id.install_desktop_layout -> {
                 Timber.d("Go to info desktop install")
                 (requireActivity() as AchievementsActivity).showFragment(
@@ -282,6 +283,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                     MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL
                 )
             }
+
             R.id.invite_button -> {
                 Timber.d("Invite friends")
                 (requireActivity() as AchievementsActivity).showFragment(

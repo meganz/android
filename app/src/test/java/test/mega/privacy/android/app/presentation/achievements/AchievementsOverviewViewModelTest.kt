@@ -11,7 +11,9 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.main.megaachievements.AchievementsOverviewViewModel
 import mega.privacy.android.app.main.megaachievements.AchievementsUIState
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
+import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
+import mega.privacy.android.domain.usecase.achievements.IsAddPhoneRewardEnabledUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -23,7 +25,8 @@ import kotlin.test.assertEquals
 class AchievementsOverviewViewModelTest {
 
     private val getAccountAchievementsOverview: GetAccountAchievementsOverview = mock()
-
+    private val areAchievementsEnabled: AreAchievementsEnabledUseCase = mock()
+    private val isAddPhoneRewardEnabled: IsAddPhoneRewardEnabledUseCase = mock()
     private lateinit var underTest: AchievementsOverviewViewModel
 
     private val scheduler = TestCoroutineScheduler()
@@ -35,7 +38,11 @@ class AchievementsOverviewViewModelTest {
     }
 
     private fun initViewModel() {
-        underTest = AchievementsOverviewViewModel(getAccountAchievementsOverview)
+        underTest = AchievementsOverviewViewModel(
+            getAccountAchievementsOverview = getAccountAchievementsOverview,
+            areAchievementsEnabled = areAchievementsEnabled,
+            isAddPhoneRewardEnabled = isAddPhoneRewardEnabled
+        )
     }
 
     @After
@@ -59,7 +66,19 @@ class AchievementsOverviewViewModelTest {
             underTest.state.test {
                 val initialState = awaitItem()
                 val contentState = awaitItem()
+                assertEquals(expectedUiContent, contentState)
+            }
+        }
 
+    @Test
+    fun `test that state contains add phone reward when the add phone reward enabled use case returns true`() =
+        runTest {
+            val expectedUiContent = AchievementsUIState(showAddPhoneReward = true)
+            whenever(isAddPhoneRewardEnabled()).thenReturn(true)
+
+            underTest.state.test {
+                val initialState = awaitItem()
+                val contentState = awaitItem()
                 assertEquals(expectedUiContent, contentState)
             }
         }
@@ -71,7 +90,6 @@ class AchievementsOverviewViewModelTest {
         underTest.state.test {
             val initialState = awaitItem()
             val errorState = awaitItem()
-
             assertEquals(AchievementsUIState(showError = true), errorState)
         }
     }

@@ -5,26 +5,56 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.AwardedAchievementInvite
+import mega.privacy.android.domain.usecase.achievements.AreAchievementsEnabledUseCase
 import mega.privacy.android.domain.usecase.achievements.GetAccountAchievementsOverview
+import mega.privacy.android.domain.usecase.achievements.IsAddPhoneRewardEnabledUseCase
 import timber.log.Timber
 import java.util.Calendar
 import javax.inject.Inject
 
+/**
+ * View Model for achievements related data
+ */
 @HiltViewModel
 class AchievementsOverviewViewModel @Inject constructor(
     private val getAccountAchievementsOverview: GetAccountAchievementsOverview,
+    private val areAchievementsEnabled: AreAchievementsEnabledUseCase,
+    private val isAddPhoneRewardEnabled: IsAddPhoneRewardEnabledUseCase,
 ) : ViewModel() {
 
-    private val _state =
-        MutableStateFlow(AchievementsUIState())
+    private val _state = MutableStateFlow(AchievementsUIState())
 
+    /**
+     * Achievements state
+     */
     val state = _state.asStateFlow()
 
     init {
+        logAchievementsEnabled()
+        getAchievementsOverview()
+        updateAddPhoneReward()
+    }
+
+    private fun updateAddPhoneReward() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(showAddPhoneReward = isAddPhoneRewardEnabled())
+            }
+        }
+    }
+
+    private fun logAchievementsEnabled() {
+        viewModelScope.launch {
+            Timber.d("Achievements are enabled: ${areAchievementsEnabled()}")
+        }
+    }
+
+    private fun getAchievementsOverview() {
         viewModelScope.launch {
             runCatching { getAccountAchievementsOverview() }
                 .onSuccess { achievementsOverview ->
@@ -37,10 +67,10 @@ class AchievementsOverviewViewModel @Inject constructor(
         }
     }
 
-    private fun areAllRewardsExpired(achievementsDetails: AchievementsOverview): Boolean {
+    private fun areAllRewardsExpired(overview: AchievementsOverview): Boolean {
         var expiredAwardCount = 0
 
-        achievementsDetails.awardedAchievements.forEach { award ->
+        overview.awardedAchievements.forEach { award ->
             if (award is AwardedAchievementInvite) {
                 Timber.d("Registration award expires in ${award.expirationTimestampInDays} days")
                 val start =
@@ -58,6 +88,6 @@ class AchievementsOverviewViewModel @Inject constructor(
             }
         }
 
-        return expiredAwardCount == achievementsDetails.awardedAchievements.size
+        return expiredAwardCount == overview.awardedAchievements.size
     }
 }
