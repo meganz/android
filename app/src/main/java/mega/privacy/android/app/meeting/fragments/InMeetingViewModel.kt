@@ -58,7 +58,6 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.NAME_CHANGE
 import mega.privacy.android.app.utils.Constants.TYPE_JOIN
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
@@ -238,8 +237,9 @@ class InMeetingViewModel @Inject constructor(
     private val _anotherChatTitle = MutableStateFlow(" ")
     val anotherChatTitle: StateFlow<String> get() = _anotherChatTitle
 
-    private val _getParticipantsChanges = MutableStateFlow(Pair(TYPE_JOIN, ""))
-    val getParticipantsChanges: StateFlow<Pair<Int, String>> get() = _getParticipantsChanges
+    private val _getParticipantsChanges =
+        MutableStateFlow<Pair<Int, ((Context) -> String)?>>(Pair(TYPE_JOIN, null))
+    val getParticipantsChanges: StateFlow<Pair<Int, ((Context) -> String)?>> get() = _getParticipantsChanges
 
     // Name of moderators
     private val _updateModeratorsName = MutableStateFlow(" ")
@@ -389,31 +389,40 @@ class InMeetingViewModel @Inject constructor(
      * @param type Type of change
      */
     private fun getParticipantChanges(list: ArrayList<Long>, type: Int) {
-        val text = when (val numParticipants = list.size) {
-            1 -> StringResourcesUtils.getString(
-                if (type == TYPE_JOIN)
-                    R.string.meeting_call_screen_one_participant_joined_call
-                else
-                    R.string.meeting_call_screen_one_participant_left_call,
-                getParticipantFullName(list[0]))
-            2 -> StringResourcesUtils.getString(
-                if (type == TYPE_JOIN)
-                    R.string.meeting_call_screen_two_participants_joined_call
-                else
-                    R.string.meeting_call_screen_two_participants_left_call,
-                getParticipantFullName(list[0]),
-                getParticipantFullName(list[1]))
-            else -> StringResourcesUtils.getQuantityString(
-                if (type == TYPE_JOIN)
-                    R.plurals.meeting_call_screen_more_than_two_participants_joined_call
-                else
-                    R.plurals.meeting_call_screen_more_than_two_participants_left_call,
-                numParticipants,
-                getParticipantFullName(list[0]),
-                (numParticipants - 1))
+        val action = when (val numParticipants = list.size) {
+            1 -> { context: Context ->
+                context.getString(
+                    if (type == TYPE_JOIN)
+                        R.string.meeting_call_screen_one_participant_joined_call
+                    else
+                        R.string.meeting_call_screen_one_participant_left_call,
+                    getParticipantFullName(list[0])
+                )
+            }
+            2 -> { context: Context ->
+                context.getString(
+                    if (type == TYPE_JOIN)
+                        R.string.meeting_call_screen_two_participants_joined_call
+                    else
+                        R.string.meeting_call_screen_two_participants_left_call,
+                    getParticipantFullName(list[0]),
+                    getParticipantFullName(list[1])
+                )
+            }
+            else -> { context: Context ->
+                context.resources.getQuantityString(
+                    if (type == TYPE_JOIN)
+                        R.plurals.meeting_call_screen_more_than_two_participants_joined_call
+                    else
+                        R.plurals.meeting_call_screen_more_than_two_participants_left_call,
+                    numParticipants,
+                    getParticipantFullName(list[0]),
+                    (numParticipants - 1)
+                )
+            }
         }
 
-        _getParticipantsChanges.value = Pair(type, text)
+        _getParticipantsChanges.value = Pair(type, action)
     }
 
     /**
@@ -622,7 +631,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param chatId chat ID
      */
-    fun setCall(chatId: Long) {
+    fun setCall(chatId: Long, context: Context) {
         if (isSameChatRoom(chatId)) {
             _callLiveData.value = inMeetingRepository.getMeeting(chatId)
             _callLiveData.value?.let {
@@ -631,10 +640,10 @@ class InMeetingViewModel @Inject constructor(
                     checkSubtitleToolbar(it.status, it.isOutgoing)
                     checkAnotherCallBanner()
                     checkToolbarClickability()
-                    checkParticipantsList()
+                    checkParticipantsList(context)
                     checkNetworkQualityChanges()
                     checkReconnectingChanges()
-                    updateMeetingInfoBottomPanel()
+                    updateMeetingInfoBottomPanel(context)
                 }
 
                 if (it.status != CALL_STATUS_INITIAL && previousState == CALL_STATUS_INITIAL) {
@@ -690,14 +699,14 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param chatId chat ID
      */
-    fun setChatId(chatId: Long) {
+    fun setChatId(chatId: Long, context: Context) {
         if (chatId == MEGACHAT_INVALID_HANDLE || currentChatId == chatId)
             return
 
         currentChatId = chatId
 
         inMeetingRepository.getChatRoom(currentChatId)?.let {
-            setCall(it.chatId)
+            setCall(it.chatId, context)
             _chatTitle.value = getTitleChat(it)
         }
     }
@@ -931,7 +940,11 @@ class InMeetingViewModel @Inject constructor(
      * @param typeChange the type of change, name or avatar
      * @return list of participants with changes
      */
-    fun updateParticipantsNameOrAvatar(peerId: Long, typeChange: Int): MutableSet<Participant> {
+    fun updateParticipantsNameOrAvatar(
+        peerId: Long,
+        typeChange: Int,
+        context: Context,
+    ): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
@@ -951,7 +964,7 @@ class InMeetingViewModel @Inject constructor(
                     else -> participant
                 }
             }?.toMutableList()
-            updateMeetingInfoBottomPanel()
+            updateMeetingInfoBottomPanel(context)
         }
         return listWithChanges
     }
@@ -959,7 +972,7 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method that makes the necessary changes to the participant list when my own privileges have changed.
      */
-    fun updateOwnPrivileges() {
+    fun updateOwnPrivileges(context: Context) {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
                 return@map participant.copy(
@@ -969,7 +982,7 @@ class InMeetingViewModel @Inject constructor(
                     )
                 )
             }?.toMutableList()
-            updateMeetingInfoBottomPanel()
+            updateMeetingInfoBottomPanel(context)
         }
     }
 
@@ -978,7 +991,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return list of participants with changes
      */
-    fun updateParticipantsPrivileges(): MutableSet<Participant> {
+    fun updateParticipantsPrivileges(context: Context): MutableSet<Participant> {
         val listWithChanges = mutableSetOf<Participant>()
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             participants.value = participants.value?.map { participant ->
@@ -990,7 +1003,7 @@ class InMeetingViewModel @Inject constructor(
                     else -> participant
                 }
             }?.toMutableList()
-            updateMeetingInfoBottomPanel()
+            updateMeetingInfoBottomPanel(context)
         }
 
         return listWithChanges
@@ -1040,7 +1053,7 @@ class InMeetingViewModel @Inject constructor(
                 it.isVisible = false
             }
             bannerText?.let {
-                it.text = StringResourcesUtils.getString(R.string.call_on_hold)
+                it.text = it.context.getString(R.string.call_on_hold)
             }
             return true
         }
@@ -1054,7 +1067,7 @@ class InMeetingViewModel @Inject constructor(
                             it.isVisible = true
                         }
                         bannerText?.let {
-                            it.text = StringResourcesUtils.getString(
+                            it.text = it.context.getString(
                                 R.string.muted_contact_micro,
                                 inMeetingRepository.getContactOneToOneCallName(
                                     session.peerid
@@ -1072,7 +1085,7 @@ class InMeetingViewModel @Inject constructor(
                 }
                 bannerText?.let {
                     it.text =
-                        StringResourcesUtils.getString(R.string.muted_own_micro)
+                        it.context.getString(R.string.muted_own_micro)
                 }
                 return true
             }
@@ -1125,10 +1138,12 @@ class InMeetingViewModel @Inject constructor(
                 megaChatApiGateway.getChatCall(currentChatId)?.let {
                     Timber.d("There is a call, open it")
                     chatIdResult.value = it.chatid
-                    CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,
+                    CallUtil.openMeetingInProgress(
+                        MegaApplication.getInstance().applicationContext,
                         currentChatId,
                         true,
-                        passcodeManagement)
+                        passcodeManagement
+                    )
 
                     return chatIdResult
                 }
@@ -1275,9 +1290,9 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method to update the current participants list
      */
-    fun checkParticipantsList() {
+    fun checkParticipantsList(context: Context) {
         callLiveData.value?.let {
-            createCurrentParticipants(it.sessionsClientid)
+            createCurrentParticipants(it.sessionsClientid, context)
         }
     }
 
@@ -1286,7 +1301,7 @@ class InMeetingViewModel @Inject constructor(
      *
      * @param list list of participants
      */
-    private fun createCurrentParticipants(list: MegaHandleList?) {
+    private fun createCurrentParticipants(list: MegaHandleList?, context: Context) {
         list?.let { listParticipants ->
             participants.value?.clear()
             if (listParticipants.size() > 0) {
@@ -1299,7 +1314,7 @@ class InMeetingViewModel @Inject constructor(
                     }
                 }
 
-                updateParticipantsList()
+                updateParticipantsList(context)
             }
         }
     }
@@ -1307,10 +1322,10 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method to control when the number of participants changes
      */
-    fun updateParticipantsList() {
+    fun updateParticipantsList(context: Context) {
         participants.value = participants.value
         Timber.d("Num of participants in the call: ${participants.value?.size}")
-        updateMeetingInfoBottomPanel()
+        updateMeetingInfoBottomPanel(context)
     }
 
     /**
@@ -1319,11 +1334,11 @@ class InMeetingViewModel @Inject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    fun addParticipant(session: MegaChatSession): Int? {
+    fun addParticipant(session: MegaChatSession, context: Context): Int? {
         createParticipant(session)?.let { participantCreated ->
             participants.value?.add(participantCreated)
             Timber.d("Adding participant... ${participantCreated.clientId}")
-            updateParticipantsList()
+            updateParticipantsList(context)
 
             val currentSpeaker = getCurrentSpeakerParticipant()
             if (currentSpeaker == null) {
@@ -1420,7 +1435,7 @@ class InMeetingViewModel @Inject constructor(
      * @param session MegaChatSession of a participant
      * @return the position of the participant
      */
-    fun removeParticipant(session: MegaChatSession): Int {
+    fun removeParticipant(session: MegaChatSession, context: Context): Int {
         inMeetingRepository.getChatRoom(currentChatId)?.let {
             val iterator = participants.value?.iterator()
             iterator?.let { list ->
@@ -1441,7 +1456,7 @@ class InMeetingViewModel @Inject constructor(
 
                             participants.value?.removeAt(position)
                             Timber.d("Removing participant... $clientId")
-                            updateParticipantsList()
+                            updateParticipantsList(context)
 
                             if (isSpeaker) {
                                 Timber.d("The removed participant was speaker, clientID ${participant.clientId}")
@@ -2198,10 +2213,10 @@ class InMeetingViewModel @Inject constructor(
      *
      * @return The appropriate text of the button
      */
-    fun getGuestLinkTitle(): String = if (isModeratorOfPrivateRoom()) {
-        StringResourcesUtils.getString(R.string.invite_participants)
+    fun getGuestLinkTitle(context: Context): String = if (isModeratorOfPrivateRoom()) {
+        context.getString(R.string.invite_participants)
     } else {
-        StringResourcesUtils.getString(R.string.context_get_link)
+        context.getString(R.string.context_get_link)
     }
 
     /**
@@ -2310,7 +2325,7 @@ class InMeetingViewModel @Inject constructor(
     /**
      * Method for updating meeting info panel information
      */
-    private fun updateMeetingInfoBottomPanel() {
+    private fun updateMeetingInfoBottomPanel(context: Context) {
         var nameList =
             if (isModerator()) inMeetingRepository.getMyName() else ""
         var numParticipantsModerator = if (isModerator()) 1 else 0
@@ -2329,9 +2344,11 @@ class InMeetingViewModel @Inject constructor(
         _updateNumParticipants.value = numParticipants
 
         _updateModeratorsName.value = if (numParticipantsModerator == 0) "" else
-            StringResourcesUtils.getQuantityString(R.plurals.meeting_call_screen_meeting_info_bottom_panel_name_of_moderators,
+            context.resources.getQuantityString(
+                R.plurals.meeting_call_screen_meeting_info_bottom_panel_name_of_moderators,
                 numParticipantsModerator,
-                nameList)
+                nameList
+            )
     }
 
     /**

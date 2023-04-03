@@ -92,7 +92,7 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                 binding.itemBucketLayout.visibility = View.GONE
                 binding.headerLayout.visibility = View.VISIBLE
                 binding.headerLayout.setBackgroundColor(headerColor)
-                binding.headerText.text = TimeUtils.formatBucketDate(item.timestamp)
+                binding.headerText.text = TimeUtils.formatBucketDate(item.timestamp, context)
             }
 
             is RecentActionItemType.Item -> {
@@ -119,11 +119,15 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                     binding.secondLineText.visibility = View.GONE
                 } else {
                     val userAction = if (bucket.isUpdate) {
-                        context.getFormattedStringOrDefault(R.string.update_action_bucket,
-                            item.userName)
+                        context.getFormattedStringOrDefault(
+                            R.string.update_action_bucket,
+                            item.userName
+                        )
                     } else {
-                        context.getFormattedStringOrDefault(R.string.create_action_bucket,
-                            item.userName)
+                        context.getFormattedStringOrDefault(
+                            R.string.create_action_bucket,
+                            item.userName
+                        )
                     }
                     binding.secondLineText.visibility = View.VISIBLE
                     binding.secondLineText.text = formatUserAction(context, userAction)
@@ -171,7 +175,8 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                         binding.firstLineText.text =
                             context.resources.getQuantityString(
                                 R.plurals.cloud_drive_undecrypted_file,
-                                nodeList.size)
+                                nodeList.size
+                            )
                         binding.nameText.text =
                             context.getString(R.string.shared_items_verify_credentials_undecrypted_folder)
                     } else {
@@ -203,15 +208,19 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
                     } else {
                         if (!item.isKeyVerified) {
                             binding.firstLineText.text =
-                                context.getQuantityStringOrDefault(R.plurals.cloud_drive_undecrypted_file,
-                                    nodeList.size)
+                                context.getQuantityStringOrDefault(
+                                    R.plurals.cloud_drive_undecrypted_file,
+                                    nodeList.size
+                                )
                             binding.nameText.text =
                                 context.getString(R.string.shared_items_verify_credentials_undecrypted_folder)
                         } else {
                             binding.firstLineText.text =
-                                context.getFormattedStringOrDefault(R.string.title_bucket,
+                                context.getFormattedStringOrDefault(
+                                    R.string.title_bucket,
                                     node.name,
-                                    nodeList.size - 1)
+                                    nodeList.size - 1
+                                )
                         }
                     }
                 }
@@ -248,10 +257,10 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
             viewHolder.binding.thumbnailView
         } else null
 
-    override fun getSectionTitle(position: Int): String {
+    override fun getSectionTitle(position: Int, context: Context): String {
         return if (recentActionItems.isNullOrEmpty() || position < 0 || position >= itemCount)
             ""
-        else TimeUtils.formatBucketDate(recentActionItems!![position].timestamp)
+        else TimeUtils.formatBucketDate(recentActionItems!![position].timestamp, context)
     }
 
     /**
@@ -292,9 +301,13 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
     private fun formatUserAction(context: Context, userAction: String): Spanned {
         val formattedUserAction = try {
             userAction
-                .replace("[A]",
-                    "<font color=\'" + getColorHexString(context,
-                        R.color.grey_300_grey_600) + "\'>")
+                .replace(
+                    "[A]",
+                    "<font color=\'" + getColorHexString(
+                        context,
+                        R.color.grey_300_grey_600
+                    ) + "\'>"
+                )
                 .replace("[/A]", "</font>")
         } catch (e: Exception) {
             Timber.e(e, "Exception formatting string")
@@ -319,22 +332,30 @@ class RecentActionsAdapter @Inject constructor() : RecyclerView.Adapter<RecentAc
 
         val mediaTitle = when {
             numImages > 0 && numVideos == 0 -> {
-                context.getQuantityStringOrDefault(R.plurals.title_media_bucket_only_images,
+                context.getQuantityStringOrDefault(
+                    R.plurals.title_media_bucket_only_images,
                     numImages,
-                    numImages)
+                    numImages
+                )
             }
             numImages == 0 && numVideos > 0 -> {
-                context.getQuantityStringOrDefault(R.plurals.title_media_bucket_only_videos,
+                context.getQuantityStringOrDefault(
+                    R.plurals.title_media_bucket_only_videos,
                     numVideos,
-                    numVideos)
+                    numVideos
+                )
             }
             else -> {
-                context.getQuantityStringOrDefault(R.plurals.title_media_bucket_images_and_videos,
+                context.getQuantityStringOrDefault(
+                    R.plurals.title_media_bucket_images_and_videos,
                     numImages,
-                    numImages) +
-                        context.getQuantityStringOrDefault(R.plurals.title_media_bucket_images_and_videos_2,
+                    numImages
+                ) +
+                        context.getQuantityStringOrDefault(
+                            R.plurals.title_media_bucket_images_and_videos_2,
                             numVideos,
-                            numVideos)
+                            numVideos
+                        )
             }
         }
         return mediaTitle

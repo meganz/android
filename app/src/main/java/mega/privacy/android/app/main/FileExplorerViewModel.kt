@@ -17,12 +17,11 @@ import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.domain.entity.ShareTextInfo
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.GetLatestTargetPath
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import javax.inject.Inject
 
 /**
@@ -92,13 +91,13 @@ class FileExplorerViewModel @Inject constructor(
      * @param context Current context
      * @param intent  The intent that started the current activity
      */
-    fun ownFilePrepareTask(context: Context?, intent: Intent) {
+    fun ownFilePrepareTask(context: Context, intent: Intent) {
         if (dataAlreadyRequested) return
 
         viewModelScope.launch(ioDispatcher) {
             dataAlreadyRequested = true
             if (isImportingText(intent)) {
-                updateTextInfoFromIntent(intent)
+                updateTextInfoFromIntent(intent, context)
             } else {
                 updateFilesInfoFromIntent(intent, context)
             }
@@ -110,7 +109,7 @@ class FileExplorerViewModel @Inject constructor(
      *
      * @param intent
      */
-    private fun updateTextInfoFromIntent(intent: Intent) {
+    private fun updateTextInfoFromIntent(intent: Intent, context: Context) {
         val sharedText = intent.getStringExtra(Intent.EXTRA_TEXT)
         val isUrl = URLUtil.isHttpUrl(sharedText) || URLUtil.isHttpsUrl(sharedText)
         val sharedSubject = intent.getStringExtra(Intent.EXTRA_SUBJECT)
@@ -121,12 +120,14 @@ class FileExplorerViewModel @Inject constructor(
             text = sharedText,
             subject = sharedSubject,
             email = sharedEmail,
-            isUrl = isUrl
+            isUrl = isUrl,
+            context = context,
         )
         val messageContent = buildMessageContent(
             text = sharedText,
             subject = sharedSubject,
-            email = sharedEmail
+            email = sharedEmail,
+            context = context,
         )
 
         _fileNames.postValue(hashMapOf(subject to subject))
@@ -183,11 +184,12 @@ class FileExplorerViewModel @Inject constructor(
         subject: String?,
         email: String?,
         isUrl: Boolean,
+        context: Context,
     ): String {
         return if (isUrl && text != null) {
-            buildUrlContent(text, subject, email)
+            buildUrlContent(text, subject, email, context)
         } else {
-            buildMessageContent(text, subject, email)
+            buildMessageContent(text, subject, email, context)
         }
     }
 
@@ -202,14 +204,15 @@ class FileExplorerViewModel @Inject constructor(
         text: String?,
         subject: String?,
         email: String?,
+        context: Context,
     ) = with(StringBuilder()) {
         append("[InternetShortcut]\n").append("URL=").append(text).append("\n\n")
         subject?.let {
-            append(StringResourcesUtils.getString(R.string.new_file_subject_when_uploading))
+            append(context.getString(R.string.new_file_subject_when_uploading))
                 .append(": ").append(it).append("\n")
         }
         email?.let {
-            append(StringResourcesUtils.getString(R.string.new_file_email_when_uploading))
+            append(context.getString(R.string.new_file_email_when_uploading))
                 .append(": ").append(it)
         }
     }.toString()
@@ -222,14 +225,19 @@ class FileExplorerViewModel @Inject constructor(
      * @param email   Shared email.
      * @return The message content.
      */
-    private fun buildMessageContent(text: String?, subject: String?, email: String?) =
+    private fun buildMessageContent(
+        text: String?,
+        subject: String?,
+        email: String?,
+        context: Context,
+    ) =
         with(StringBuilder()) {
             subject?.let {
-                append(StringResourcesUtils.getString(R.string.new_file_subject_when_uploading))
+                append(context.getString(R.string.new_file_subject_when_uploading))
                     .append(": ").append(it).append("\n\n")
             }
             email?.let {
-                append(StringResourcesUtils.getString(R.string.new_file_email_when_uploading))
+                append(context.getString(R.string.new_file_email_when_uploading))
                     .append(": ").append(it).append("\n\n")
             }
             text?.let {

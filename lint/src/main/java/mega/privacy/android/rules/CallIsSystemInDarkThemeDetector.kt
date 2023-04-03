@@ -67,9 +67,11 @@ internal class CallIsSystemInDarkThemeDetector : Detector(), Detector.UastScanne
                             override fun visitElement(node: UElement): Boolean {
                                 // find the method call isSystemInDarkTheme()
                                 if (node is UCallExpression) {
-                                    return isSystemDarkThemeComposeMethod(context,
+                                    return isSystemDarkThemeComposeMethod(
+                                        context,
                                         node,
-                                        themeNode)
+                                        themeNode
+                                    )
                                 }
                                 return false
                             }

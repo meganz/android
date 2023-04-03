@@ -2,12 +2,6 @@ package mega.privacy.android.app.presentation.permissions
 
 import android.Manifest
 import android.os.Build
-import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
-import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
-import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
-import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
-import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
-import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,10 +17,15 @@ import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.image
 import mega.privacy.android.app.presentation.extensions.title
-import mega.privacy.android.app.utils.StringResourcesUtils
+import mega.privacy.android.app.presentation.permissions.model.Permission
 import mega.privacy.android.app.presentation.permissions.model.PermissionScreen
 import mega.privacy.android.app.presentation.permissions.model.PermissionType
-import mega.privacy.android.app.presentation.permissions.model.Permission
+import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.getReadExternalStoragePermission
+import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
+import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
+import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import timber.log.Timber
 
 /**
@@ -79,29 +78,59 @@ class PermissionsFragment : Fragment() {
     private fun setupData() {
         val missingPermission = mutableListOf<Pair<Permission, Boolean>>().apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                add(Pair(Permission.Notifications, hasPermissions(requireActivity(),
-                    Manifest.permission.POST_NOTIFICATIONS)))
+                add(
+                    Pair(
+                        Permission.Notifications, hasPermissions(
+                            requireActivity(),
+                            Manifest.permission.POST_NOTIFICATIONS
+                        )
+                    )
+                )
             }
 
-            add(Pair(Permission.Read,
-                hasPermissions(requireActivity(), *readPermissions)))
+            add(
+                Pair(
+                    Permission.Read,
+                    hasPermissions(requireActivity(), *readPermissions)
+                )
+            )
 
-            add(Pair(Permission.Write,
-                hasPermissions(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)))
+            add(
+                Pair(
+                    Permission.Write,
+                    hasPermissions(requireActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                )
+            )
 
-            add(Pair(Permission.Camera,
-                hasPermissions(requireActivity(), Manifest.permission.CAMERA)))
+            add(
+                Pair(
+                    Permission.Camera,
+                    hasPermissions(requireActivity(), Manifest.permission.CAMERA)
+                )
+            )
 
-            add(Pair(Permission.Microphone,
-                hasPermissions(requireActivity(), Manifest.permission.RECORD_AUDIO)))
+            add(
+                Pair(
+                    Permission.Microphone,
+                    hasPermissions(requireActivity(), Manifest.permission.RECORD_AUDIO)
+                )
+            )
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                add(Pair(Permission.Bluetooth,
-                    hasPermissions(requireActivity(), Manifest.permission.BLUETOOTH_CONNECT)))
+                add(
+                    Pair(
+                        Permission.Bluetooth,
+                        hasPermissions(requireActivity(), Manifest.permission.BLUETOOTH_CONNECT)
+                    )
+                )
             }
 
-            add(Pair(Permission.Contacts,
-                hasPermissions(requireActivity(), Manifest.permission.READ_CONTACTS)))
+            add(
+                Pair(
+                    Permission.Contacts,
+                    hasPermissions(requireActivity(), Manifest.permission.READ_CONTACTS)
+                )
+            )
         }
         viewModel.updateFirstTimeLoginStatus()
         viewModel.setData(missingPermission)
@@ -132,9 +161,9 @@ class PermissionsFragment : Fragment() {
         permissionBinding.imagePermissions
             .setImageDrawable(ContextCompat.getDrawable(requireContext(), currentPermission.image))
         permissionBinding.titlePermissions.text =
-            StringResourcesUtils.getString(currentPermission.title)
+            getString(currentPermission.title)
         permissionBinding.subtitlePermissions.text =
-            StringResourcesUtils.getString(currentPermission.description)
+            getString(currentPermission.description)
         permissionBinding.subtitleExplanation.isVisible =
             currentPermission == PermissionScreen.Contacts
     }
@@ -162,9 +191,11 @@ class PermissionsFragment : Fragment() {
      * Asks for notifications permission.
      */
     private fun askForNotificationsPermission() {
-        requestPermission(requireActivity(),
+        requestPermission(
+            requireActivity(),
             PERMISSIONS_FRAGMENT,
-            Manifest.permission.POST_NOTIFICATIONS)
+            Manifest.permission.POST_NOTIFICATIONS
+        )
     }
 
     /**
@@ -186,9 +217,11 @@ class PermissionsFragment : Fragment() {
      */
     private fun askForWritePermission() {
         Timber.d("WRITE_EXTERNAL_STORAGE")
-        requestPermission(requireActivity(),
+        requestPermission(
+            requireActivity(),
             PERMISSIONS_FRAGMENT,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
     }
 
     /**
@@ -212,10 +245,12 @@ class PermissionsFragment : Fragment() {
      */
     private fun askForMicrophoneAndBluetoothPermissions() {
         Timber.d("RECORD_AUDIO && BLUETOOTH_CONNECT")
-        requestPermission(requireActivity(),
+        requestPermission(
+            requireActivity(),
             PERMISSIONS_FRAGMENT,
             Manifest.permission.RECORD_AUDIO,
-            Manifest.permission.BLUETOOTH_CONNECT)
+            Manifest.permission.BLUETOOTH_CONNECT
+        )
     }
 
     /**
@@ -223,9 +258,11 @@ class PermissionsFragment : Fragment() {
      */
     private fun askForMicrophonePermission() {
         Timber.d("RECORD_AUDIO")
-        requestPermission(requireActivity(),
+        requestPermission(
+            requireActivity(),
             PERMISSIONS_FRAGMENT,
-            Manifest.permission.RECORD_AUDIO)
+            Manifest.permission.RECORD_AUDIO
+        )
     }
 
     /**
@@ -233,9 +270,11 @@ class PermissionsFragment : Fragment() {
      */
     private fun askForBluetoothPermission() {
         Timber.d("BLUETOOTH_CONNECT")
-        requestPermission(requireActivity(),
+        requestPermission(
+            requireActivity(),
             PERMISSIONS_FRAGMENT,
-            Manifest.permission.BLUETOOTH_CONNECT)
+            Manifest.permission.BLUETOOTH_CONNECT
+        )
     }
 
     /**
@@ -243,9 +282,11 @@ class PermissionsFragment : Fragment() {
      */
     private fun askForContactsPermissions() {
         Timber.d("Ask for CONTACT permission")
-        requestPermission(requireActivity(),
+        requestPermission(
+            requireActivity(),
             PERMISSIONS_FRAGMENT,
-            Manifest.permission.READ_CONTACTS)
+            Manifest.permission.READ_CONTACTS
+        )
     }
 
     private fun showScreen(showInitialSetupScreen: Boolean) {

@@ -3,8 +3,6 @@ package mega.privacy.android.app.utils;
 import static android.text.format.DateFormat.getBestDateTimePattern;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_DISABLED_UNTIL_TOMORROW_MORNING;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.Util.calculateDateFromTimestamp;
 
 import android.content.Context;
@@ -157,8 +155,8 @@ public class TimeUtils implements Comparator<Calendar> {
      * @param timestamp Timestamp in seconds to get the date formatted string.
      * @return The date formatted string.
      */
-    public static String formatDate(long timestamp) {
-        return formatDate(timestamp, DATE_LONG_FORMAT, true);
+    public static String formatDate(long timestamp, Context context) {
+        return formatDate(timestamp, DATE_LONG_FORMAT, true, context);
     }
 
     /**
@@ -168,8 +166,8 @@ public class TimeUtils implements Comparator<Calendar> {
      * @param format    Date format.
      * @return The date formatted string.
      */
-    public static String formatDate(long timestamp, int format) {
-        return formatDate(timestamp, format, true);
+    public static String formatDate(long timestamp, int format, Context context) {
+        return formatDate(timestamp, format, true, context);
     }
 
     /**
@@ -180,7 +178,7 @@ public class TimeUtils implements Comparator<Calendar> {
      * @param humanized Use humanized date format (i.e. today, yesterday or week day).
      * @return The date formatted string.
      */
-    public static String formatDate(long timestamp, int format, boolean humanized) {
+    public static String formatDate(long timestamp, int format, boolean humanized, Context context) {
         ZonedDateTime timestampDateTime = ZonedDateTime.ofInstant(
                 Instant.ofEpochSecond(timestamp),
                 ZoneOffset.UTC
@@ -227,14 +225,14 @@ public class TimeUtils implements Comparator<Calendar> {
 
             // Check if date is today, yesterday, tomorrow or less of a week
             if (timestampDate.equals(todayDate)) {
-                return getString(R.string.label_today);
+                return context.getString(R.string.label_today);
             } else if (timestampDate == todayDate.minusDays(1)) {
-                return getString(R.string.label_yesterday);
+                return context.getString(R.string.label_yesterday);
             } else if (timestampDate == todayDate.plusDays(1)) {
                 DateTimeFormatter tomorrowFormat = DateTimeFormatter.ofPattern(
                         getBestDateTimePattern(getUserLocale(), "d MMM yyyy")
                 ).withZone(ZoneId.systemDefault());
-                return getString(R.string.tomorrow_date, tomorrowFormat.format(timestampDateTime));
+                return context.getString(R.string.tomorrow_date, tomorrowFormat.format(timestampDateTime));
             } else if (format != DATE_WEEK_DAY_FORMAT && timestampDate.isBefore(todayDate.plusWeeks(1))) {
                 DateTimeFormatter futureFormat = DateTimeFormatter.ofPattern(
                         getBestDateTimePattern(getUserLocale(), "EEEE, d MMM yyyy")
@@ -372,7 +370,7 @@ public class TimeUtils implements Comparator<Calendar> {
         return dateString;
     }
 
-    public static String formatBucketDate(long ts) {
+    public static String formatBucketDate(long ts, Context context) {
         Calendar cal = Util.calculateDateFromTimestamp(ts);
         Calendar calToday = Calendar.getInstance();
         Calendar calYesterday = Calendar.getInstance();
@@ -380,9 +378,9 @@ public class TimeUtils implements Comparator<Calendar> {
         TimeUtils tc = new TimeUtils(TimeUtils.DATE);
 
         if (tc.compare(cal, calToday) == 0) {
-            return getString(R.string.label_today);
+            return context.getString(R.string.label_today);
         } else if (tc.compare(cal, calYesterday) == 0) {
-            return getString(R.string.label_yesterday);
+            return context.getString(R.string.label_yesterday);
         } else {
             Date date = cal.getTime();
             return new SimpleDateFormat(
@@ -425,7 +423,7 @@ public class TimeUtils implements Comparator<Calendar> {
      * @param option Selected mute type.
      * @return The right string.
      */
-    public static String getCorrectStringDependingOnCalendar(String option) {
+    public static String getCorrectStringDependingOnCalendar(String option, Context context) {
         Calendar calendar = getCalendarSpecificTime(option);
         TimeZone tz = calendar.getTimeZone();
 
@@ -439,8 +437,8 @@ public class TimeUtils implements Comparator<Calendar> {
         String time = df.format(calendar.getTime());
 
         return option.equals(NOTIFICATIONS_DISABLED_UNTIL_THIS_MORNING) ?
-                getQuantityString(R.plurals.success_muting_chat_until_specific_time, hour, time) :
-                getQuantityString(R.plurals.success_muting_chat_until_specific_date_and_time, hour, getString(R.string.label_tomorrow).toLowerCase(), time);
+                context.getResources().getQuantityString(R.plurals.success_muting_chat_until_specific_time, hour, time) :
+                context.getResources().getQuantityString(R.plurals.success_muting_chat_until_specific_date_and_time, hour, context.getString(R.string.label_tomorrow).toLowerCase(), time);
     }
 
     /**
@@ -449,7 +447,7 @@ public class TimeUtils implements Comparator<Calendar> {
      * @param timestamp The time in minutes that notifications of a chat or all chats are muted.
      * @return The right string
      */
-    public static String getCorrectStringDependingOnOptionSelected(long timestamp) {
+    public static String getCorrectStringDependingOnOptionSelected(long timestamp, Context context) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(timestamp * 1000);
 
@@ -465,7 +463,7 @@ public class TimeUtils implements Comparator<Calendar> {
         TimeZone tz = cal.getTimeZone();
         df.setTimeZone(tz);
 
-        return getQuantityString(R.plurals.chat_notifications_muted_until_specific_time, cal.get(Calendar.HOUR_OF_DAY), df.format(cal.getTime()));
+        return context.getResources().getQuantityString(R.plurals.chat_notifications_muted_until_specific_time, cal.get(Calendar.HOUR_OF_DAY), df.format(cal.getTime()));
     }
 
     private static Locale getUserLocale() {

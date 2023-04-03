@@ -1,11 +1,11 @@
 package mega.privacy.android.app.listeners
 
+import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -25,11 +25,22 @@ class RenameListener(
     private val showSnackbar: Boolean = true,
     private val isMyChatFilesFolder: Boolean = false,
     private val actionNodeCallback: ActionNodeCallback?,
+    private val context: Context,
 ) : MegaRequestListenerInterface {
-    constructor() : this(null, false, false, null)
+    constructor(context: Context) : this(
+        snackbarShower = null,
+        showSnackbar = false,
+        isMyChatFilesFolder = false,
+        actionNodeCallback = null,
+        context = context
+    )
 
-    constructor(isMyChatFilesFolder: Boolean) : this(
-        null, false, isMyChatFilesFolder, null
+    constructor(isMyChatFilesFolder: Boolean, context: Context) : this(
+        snackbarShower = null,
+        showSnackbar = false,
+        isMyChatFilesFolder = isMyChatFilesFolder,
+        actionNodeCallback = null,
+        context = context
     )
 
     /**
@@ -63,7 +74,7 @@ class RenameListener(
         if (request.type == MegaRequest.TYPE_RENAME) {
             if (showSnackbar) {
                 snackbarShower?.showSnackbar(
-                    getString(
+                    context.getString(
                         if (e.errorCode == MegaError.API_OK) R.string.context_correctly_renamed
                         else R.string.context_no_renamed
                     )

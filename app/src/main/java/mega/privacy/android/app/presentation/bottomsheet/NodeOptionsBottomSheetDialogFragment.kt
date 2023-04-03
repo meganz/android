@@ -21,7 +21,6 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MegaOffline
-import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.MimeTypeList.Companion.typeForName
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.WebViewActivity
@@ -256,7 +255,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     nodeName.text = node.name
                     if (node.isFolder) {
                         optionVersionsLayout.visibility = View.GONE
-                        nodeInfo.text = MegaApiUtils.getMegaNodeFolderInfo(node)
+                        nodeInfo.text = MegaApiUtils.getMegaNodeFolderInfo(node, context)
                         nodeVersionsIcon.visibility = View.GONE
                         drawerItem?.let { item ->
                             nodeThumb.setImageResource(
@@ -279,7 +278,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         ) {
                             optionEdit.visibility = View.VISIBLE
                         }
-                        nodeInfo.text = getFileInfo(node)
+                        nodeInfo.text = getFileInfo(node, requireContext())
                         if (megaApi.hasVersions(node) && !isTakenDown) {
                             nodeVersionsIcon.visibility = View.VISIBLE
                             optionVersionsLayout.visibility = View.VISIBLE
@@ -608,7 +607,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         drawable,
                         null
                     )
-                    optionLabelCurrent.text = getNodeLabelText(node.label)
+                    optionLabelCurrent.text = getNodeLabelText(node.label, requireContext())
                     optionLabelCurrent.setTextColor(color)
                     optionLabelCurrent.visibility = View.VISIBLE
                 } else {

@@ -1,13 +1,14 @@
 package mega.privacy.android.app.main.adapters
 
 import android.content.Context
-import android.util.SparseBooleanArray
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -34,32 +35,28 @@ import kotlin.math.roundToLong
  */
 class MegaTransfersAdapter(
     private val context: Context,
-    transfers: List<Transfer>,
     private val listView: RecyclerView,
     private val selectModeInterface: SelectModeInterface,
     private val transfersViewModel: TransfersViewModel,
     private val megaApi: MegaApiAndroid,
     private val megaApiFolder: MegaApiAndroid,
-) : RecyclerView.Adapter<TransferViewHolder>(), RotatableAdapter {
-
-    private var transferList: List<Transfer>
+) : ListAdapter<Transfer, TransferViewHolder>(TRANSFER_DIFF_CALLBACK), RotatableAdapter {
 
     private var multipleSelect: Boolean = false
+    private val selectedItems = mutableSetOf<Int>()
 
-    private var selectedItems: SparseBooleanArray? = null
-
-    init {
-        transferList = transfers
-    }
-
-    /**
-     * Set transfers
-     *
-     * @param transfers [MegaTransfer] list
-     */
-    fun setTransfers(transfers: List<Transfer>) {
-        transferList = transfers
-        notifyDataSetChanged()
+    override fun submitList(list: List<Transfer>?) {
+        super.submitList(list)
+        if (isMultipleSelect() && list != null) {
+            val newSelectedItem =
+                list.mapNotNull { if (selectedItems.contains(it.tag)) it.tag else null }
+            val isChanged = newSelectedItem.size == selectedItems.size
+            selectedItems.clear()
+            selectedItems.addAll(newSelectedItem)
+            if (isChanged) {
+                selectModeInterface.notifyItemChanged()
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransferViewHolder {
@@ -104,7 +101,7 @@ class MegaTransfersAdapter(
             return
         }
         holder.textViewFileName.text = transfer.fileName
-        val isItemChecked = isItemChecked(position)
+        val isItemChecked = isItemChecked(transfer)
         when (transfer.transferType) {
             TransferType.TYPE_DOWNLOAD -> {
                 holder.progressText.setTextColor(
@@ -215,8 +212,9 @@ class MegaTransfersAdapter(
                         if (Util.isOnline(context))
                             transfer.speed
                         else
-                            0
+                            0, context
                     )
+                    holder.speedText.isVisible = true
                 }
                 TransferState.STATE_COMPLETING,
                 TransferState.STATE_RETRYING,
@@ -280,120 +278,17 @@ class MegaTransfersAdapter(
         holder.optionPause.tag = holder
     }
 
-    override fun getItemCount(): Int = transferList.size
+    override fun getItemCount(): Int = currentList.size
 
     override fun getItemId(position: Int): Long = position.toLong()
 
-    override fun getSelectedItems(): MutableList<Int>? =
-        selectedItems?.let {
-            mutableListOf<Int>().also { items ->
-                for (i in 0 until it.size()) {
-                    items.add(it.keyAt(i))
-                }
-            }
-        }
+    override fun getSelectedItems(): MutableList<Int> = selectedItems.toMutableList()
 
     override fun getFolderCount(): Int = 0
 
     override fun getPlaceholderCount(): Int = 0
 
     override fun getUnhandledItem(): Int = INVALID_POSITION
-
-    /**
-     * Adds a new transfer to the adapter.
-     *
-     * @param transfers Updated list of transfers.
-     * @param position Position of the transfer in the adapter.
-     */
-    fun addItemData(transfers: List<Transfer>, position: Int) {
-        transferList = transfers
-        notifyItemInserted(position)
-    }
-
-    /**
-     * Update the transfer item
-     *
-     * @param transfer updated transfer item
-     * @param position position of the transfer in the adapter.
-     */
-    fun updateItemState(transfer: Transfer, position: Int) {
-        transferList = transferList.toMutableList().also { transfers ->
-            transfers[position] = transfer
-        }
-        notifyItemChanged(position)
-    }
-
-    /**
-     * Removes a transfer from adapter.
-     * Also checks if the transfer to remove is selected. If so, removes it from selected items list
-     * and updates the list with the new positions that the rest of selected transfers occupies after
-     * the removal.
-     *
-     * @param transfers Updated list of transfers.
-     * @param position Item to remove.
-     */
-    fun removeItemData(transfers: List<Transfer>, position: Int) {
-        transferList = transfers
-
-        if (isItemChecked(position)) {
-            selectedItems?.let {
-                it.indexOfKey(position).let { nextIndex ->
-                    it.delete(position)
-
-                    for (i in nextIndex until it.size()) {
-                        val pos = it.keyAt(i)
-                        it.delete(pos)
-                        it.append(pos - 1, true)
-                    }
-                }
-                selectModeInterface.notifyItemChanged()
-            }
-        }
-
-        notifyItemRemoved(position)
-    }
-
-    /**
-     * Moves a transfer.
-     *
-     * @param transfers          Updated list of transfers.
-     * @param oldPosition Old position of the transfer.
-     * @param newPosition New position of the transfer.
-     */
-    fun moveItemData(transfers: List<Transfer>, oldPosition: Int, newPosition: Int) {
-        transferList = transfers
-        notifyItemMoved(oldPosition, newPosition)
-    }
-
-    /**
-     * Updates the progress of a transfer.
-     *
-     * @param position Position of the transfer in the adapter.
-     * @param transfer Transfer to which the progress has to be updated.
-     */
-    fun updateProgress(position: Int, transfer: Transfer) {
-        (listView.findViewHolderForLayoutPosition(position) as? TransferViewHolder)?.let { holder ->
-            if (!holder.progressText.isVisible) {
-                holder.progressText.isVisible = true
-                holder.speedText.isVisible = true
-                holder.textViewCompleted.isVisible = false
-                holder.imageViewCompleted.isVisible = false
-            }
-
-            holder.progressText.text = getProgress(transfer)
-            holder.speedText.text = if (megaApi.areTransfersPaused(TYPE_DOWNLOAD)
-                || megaApi.areTransfersPaused(TYPE_UPLOAD)
-            ) {
-                context.getString(R.string.transfer_paused)
-            } else {
-                Util.getSpeedString(
-                    if (Util.isOnline(context))
-                        transfer.speed
-                    else 0
-                )
-            }
-        } ?: notifyItemChanged(position)
-    }
 
     /**
      * Set multipleSelect
@@ -405,12 +300,7 @@ class MegaTransfersAdapter(
             this.multipleSelect = multipleSelect
             notifyDataSetChanged()
         }
-
-        if (this.multipleSelect) {
-            selectedItems = SparseBooleanArray()
-        } else {
-            selectedItems?.clear()
-        }
+        selectedItems.clear()
     }
 
     /**
@@ -425,9 +315,9 @@ class MegaTransfersAdapter(
      * Select all
      */
     fun selectAll() {
-        for (i in 0 until itemCount) {
-            if (!isItemChecked(i)) {
-                toggleSelection(i)
+        currentList.forEachIndexed { index, transfer ->
+            if (!isItemChecked(transfer)) {
+                toggleSelection(index)
             }
         }
     }
@@ -436,9 +326,9 @@ class MegaTransfersAdapter(
      * Clear selections
      */
     fun clearSelections() {
-        for (i in 0 until itemCount) {
-            if (isItemChecked(i)) {
-                toggleSelection(i)
+        currentList.forEachIndexed { index, transfer ->
+            if (isItemChecked(transfer)) {
+                toggleSelection(index)
             }
         }
     }
@@ -448,47 +338,26 @@ class MegaTransfersAdapter(
      *
      * @return selected [MegaTransfer] list
      */
-    fun getSelectedTransfers(): List<Transfer> = selectedItems?.let {
-        mutableListOf<Transfer>().let { selectedTransfers ->
-            for (i in 0 until it.size()) {
-                if (!it.valueAt(i)) {
-                    continue
-                }
-                val selected = it.keyAt(i)
-                if (selected < 0 || selected >= transferList.size) {
-                    continue
-                } else {
-                    selectedTransfers.add(transferList[selected])
-                }
-            }
-            selectedTransfers
-        }
-    }.orEmpty()
+    fun getSelectedTransfers(): List<Transfer> =
+        currentList.filter { selectedItems.contains(it.tag) }
 
     /**
      * Get the selected items count
      *
      * @return selected items count
      */
-    fun getSelectedItemsCount() = selectedItems?.size() ?: 0
+    fun getSelectedItemsCount() = selectedItems.size
 
-    private fun getTransferItem(position: Int): Transfer? =
-        if (position >= 0 && position < transferList.size) {
-            transferList[position]
-        } else {
-            Timber.e("Error: position NOT valid: %s", position)
-            null
-        }
+    private fun getTransferItem(position: Int): Transfer? = currentList.getOrNull(position)
 
     /**
      * Checks if select mode is enabled. If so, checks if the position is selected.
      *
-     * @param position Position to check.
+     * @param transfer transfer to check.
      * @return True if the position is selected, false otherwise.
      */
-    private fun isItemChecked(position: Int): Boolean = selectedItems?.let {
-        isMultipleSelect() && position >= 0 && it[position]
-    } ?: false
+    private fun isItemChecked(transfer: Transfer): Boolean =
+        isMultipleSelect() && selectedItems.contains(transfer.tag)
 
     /**
      * Get multipleSelect
@@ -507,7 +376,7 @@ class MegaTransfersAdapter(
         context.getString(
             R.string.progress_size_indicator,
             if (transfer.totalBytes > 0L) (100.0 * transfer.transferredBytes / transfer.totalBytes).roundToLong() else 0L,
-            Util.getSizeString(transfer.totalBytes)
+            Util.getSizeString(transfer.totalBytes, context)
         )
 
     /**
@@ -561,20 +430,25 @@ class MegaTransfersAdapter(
      * @param position Position to check.
      * @return True if the position is selected, false otherwise.
      */
-    private fun putOrDeletePosition(position: Int) =
-        selectedItems?.let {
-            if (it.get(position, false)) {
-                it.delete(position)
-                true
-            } else {
-                it.append(position, true)
-                false
-            }
-        } ?: false
+    private fun putOrDeletePosition(position: Int) = currentList.getOrNull(position)?.let {
+        with(selectedItems.contains(it.tag)) {
+            if (this) selectedItems.remove(it.tag) else selectedItems.add(it.tag)
+        }
+    } ?: false
 
     private fun showDefaultIcon(holder: TransferViewHolder, drawableId: Int) {
         holder.defaultIcon.setImageResource(drawableId)
         holder.thumbnailIcon.isVisible = false
         holder.defaultIcon.isVisible = true
+    }
+
+    companion object {
+        private val TRANSFER_DIFF_CALLBACK = object : DiffUtil.ItemCallback<Transfer>() {
+            override fun areItemsTheSame(oldItem: Transfer, newItem: Transfer): Boolean =
+                oldItem.tag == newItem.tag
+
+            override fun areContentsTheSame(oldItem: Transfer, newItem: Transfer): Boolean =
+                oldItem == newItem
+        }
     }
 }

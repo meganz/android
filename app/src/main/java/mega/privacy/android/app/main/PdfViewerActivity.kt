@@ -75,7 +75,6 @@ import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
 import mega.privacy.android.app.utils.MegaNodeUtil.showShareOption
 import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAvailableDialog
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -788,7 +787,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         val propertiesMenuItem = menu.findItem(R.id.pdf_viewer_properties)
         val getLinkMenuItem = menu.findItem(R.id.pdf_viewer_get_link)
         getLinkMenuItem.title =
-            StringResourcesUtils.getQuantityString(R.plurals.get_links, 1)
+            resources.getQuantityString(R.plurals.get_links, 1)
         val renameMenuItem = menu.findItem(R.id.pdf_viewer_rename)
         val moveMenuItem = menu.findItem(R.id.pdf_viewer_move)
         val copyMenuItem = menu.findItem(R.id.pdf_viewer_copy)
@@ -1366,7 +1365,12 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
      * @param type         Type of name collision to check.
      */
     private fun checkCollision(parentHandle: Long, type: NameCollisionType) = node?.let {
-        checkNameCollisionUseCase.check(it, parentHandle, type)
+        checkNameCollisionUseCase.check(
+            node = it,
+            parentHandle = parentHandle,
+            type = type,
+            context = this
+        )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
@@ -1380,7 +1384,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 if (throwable is ParentDoesNotExistException) {
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
-                        StringResourcesUtils.getString(R.string.general_error),
+                        getString(R.string.general_error),
                         MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                     )
                 } else if (throwable is ChildDoesNotExistsException) {
@@ -1406,7 +1410,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 dismissAlertDialogIfExists(statusDialog)
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
-                    StringResourcesUtils.getString(R.string.context_correctly_moved),
+                    getString(R.string.context_correctly_moved),
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
                 finish()
@@ -1416,7 +1420,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 if (!manageCopyMoveException(throwable)) {
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
-                        StringResourcesUtils.getString(R.string.context_no_moved),
+                        getString(R.string.context_no_moved),
                         MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                     )
                 }
@@ -1436,7 +1440,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 dismissAlertDialogIfExists(statusDialog)
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
-                    StringResourcesUtils.getString(R.string.context_correctly_copied),
+                    getString(R.string.context_correctly_copied),
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
             }
@@ -1445,7 +1449,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 if (!manageCopyMoveException(throwable)) {
                     showSnackbar(
                         Constants.SNACKBAR_TYPE,
-                        StringResourcesUtils.getString(R.string.context_no_copied),
+                        getString(R.string.context_no_copied),
                         MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                     )
                 }

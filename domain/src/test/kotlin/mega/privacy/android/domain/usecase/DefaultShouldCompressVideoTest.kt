@@ -5,7 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -19,19 +19,19 @@ class DefaultShouldCompressVideoTest {
     private lateinit var underTest: ShouldCompressVideo
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
-    private val getUploadVideoQuality = mock<GetUploadVideoQuality>()
+    private val getUploadVideoQualityUseCase = mock<GetUploadVideoQualityUseCase>()
 
     @Before
     fun setUp() {
         underTest = DefaultShouldCompressVideo(
             cameraUploadRepository = cameraUploadRepository,
-            getUploadVideoQuality = getUploadVideoQuality,
+            getUploadVideoQuality = getUploadVideoQualityUseCase,
         )
     }
 
     @Test
     fun `test that false is returned if no setting is returned`() = runTest {
-        getUploadVideoQuality.stub {
+        getUploadVideoQualityUseCase.stub {
             onBlocking { invoke() }.thenReturn(null)
         }
 
@@ -40,7 +40,7 @@ class DefaultShouldCompressVideoTest {
 
     @Test
     fun `test that false is returned if quality is original`() = runTest {
-        getUploadVideoQuality.stub {
+        getUploadVideoQualityUseCase.stub {
             onBlocking { invoke() }.thenReturn(VideoQuality.ORIGINAL)
         }
 
@@ -52,7 +52,7 @@ class DefaultShouldCompressVideoTest {
         VideoQuality.values()
             .filterNot { it == VideoQuality.ORIGINAL }
             .forEach { quality ->
-                getUploadVideoQuality.stub {
+                getUploadVideoQualityUseCase.stub {
                     onBlocking { invoke() }.thenReturn(quality)
                 }
 

@@ -1,5 +1,6 @@
 package mega.privacy.android.app.globalmanagement
 
+import android.content.Context
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.TimeUtils.getDateString
@@ -109,7 +110,7 @@ class MyAccountInfo @Inject constructor(
         upgradeOpenedFrom = UpgradeFrom.MANAGER
     }
 
-    fun setAccountDetails(accountInfo: MegaAccountDetails, numDetails: Int) {
+    fun setAccountDetails(accountInfo: MegaAccountDetails, numDetails: Int, context: Context) {
         Timber.d("numDetails: $numDetails")
         Timber.d("Renews ts: ${accountInfo.subscriptionRenewTime}")
         Timber.d("Renews on: ${getDateString(accountInfo.subscriptionRenewTime)}")
@@ -129,7 +130,7 @@ class MyAccountInfo @Inject constructor(
             //Check size of the different nodes
             if (megaApi.rootNode != null) {
                 usedCloudDrive = accountInfo.getStorageUsed(megaApi.rootNode.handle)
-                formattedUsedCloud = getSizeString(usedCloudDrive)
+                formattedUsedCloud = getSizeString(usedCloudDrive, context)
             }
 
             // Check the My Backups root folder
@@ -140,7 +141,7 @@ class MyAccountInfo @Inject constructor(
                             // The Backups Root Folder may be null if
                             // the user has not setup his/her Backups
                             megaApi.getNodeByHandle(request.nodeHandle)
-                                ?.let { setUsedBackupsStorage(it) }
+                                ?.let { setUsedBackupsStorage(it, context) }
                         }
                     }
                 )
@@ -148,7 +149,7 @@ class MyAccountInfo @Inject constructor(
 
             if (megaApi.rubbishNode != null) {
                 usedRubbish = accountInfo.getStorageUsed(megaApi.rubbishNode.handle)
-                formattedUsedRubbish = getSizeString(usedRubbish)
+                formattedUsedRubbish = getSizeString(usedRubbish, context)
             }
 
             val nodes = megaApi.inShares
@@ -159,10 +160,10 @@ class MyAccountInfo @Inject constructor(
                 }
             }
 
-            formattedUsedIncoming = getSizeString(usedIncoming)
-            totalFormatted = getSizeString(totalStorage)
+            formattedUsedIncoming = getSizeString(usedIncoming, context)
+            totalFormatted = getSizeString(totalStorage, context)
             usedStorage = accountInfo.storageUsed
-            usedFormatted = getSizeString(usedStorage)
+            usedFormatted = getSizeString(usedStorage, context)
             usedPercentage = 0
             subscriptionMethodId = accountInfo.subscriptionMethodId
 
@@ -172,12 +173,13 @@ class MyAccountInfo @Inject constructor(
 
             val availableSpace = totalStorage.minus(usedStorage)
 
-            formattedAvailableSpace = getSizeString(if (availableSpace < 0) 0 else availableSpace)
+            formattedAvailableSpace =
+                getSizeString(if (availableSpace < 0) 0 else availableSpace, context)
         }
 
         if (transfer) {
-            totalTransferFormatted = getSizeString(accountInfo.transferMax)
-            usedTransferFormatted = getSizeString(accountInfo.transferUsed)
+            totalTransferFormatted = getSizeString(accountInfo.transferMax, context)
+            usedTransferFormatted = getSizeString(accountInfo.transferUsed, context)
             usedTransferPercentage = 0
 
             if (accountInfo.transferMax != 0L) {
@@ -209,20 +211,20 @@ class MyAccountInfo @Inject constructor(
      * Displays the total storage used by the My Backups root folder
      * @param rootFolder The My Backups root folder which may be nullable
      */
-    private fun setUsedBackupsStorage(rootFolder: MegaNode) {
+    private fun setUsedBackupsStorage(rootFolder: MegaNode, context: Context) {
         megaApi.getFolderInfo(rootFolder, OptionalMegaRequestListenerInterface(
             onRequestFinish = { request, error ->
                 if (error.errorCode == MegaError.API_OK) {
                     val totalStorage = request.megaFolderInfo.currentSize
                     formattedUsedBackups =
-                        if (totalStorage < 1) "" else getSizeString(totalStorage)
+                        if (totalStorage < 1) "" else getSizeString(totalStorage, context)
                 }
             }
         ))
     }
 
-    fun getFormattedPreviousVersionsSize(): String? {
-        return getSizeString(previousVersionsSize)
+    fun getFormattedPreviousVersionsSize(context: Context): String? {
+        return getSizeString(previousVersionsSize, context)
     }
 
     fun wasNotBusinessAlertShownYet(): Boolean = !wasBusinessAlertAlreadyShown

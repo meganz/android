@@ -1,10 +1,11 @@
 package mega.privacy.android.app.usecase
 
+import android.content.Context
 import io.reactivex.rxjava3.core.Single
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.main.megachat.AndroidMegaRichLinkMessage
 import mega.privacy.android.app.usecase.exception.toMegaException
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaError.API_OK
 import javax.inject.Inject
@@ -13,7 +14,7 @@ import javax.inject.Inject
  * Use case for getting folder link information without logging and without fetching nodes.
  */
 class GetPublicLinkInformationUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
 ) {
 
     /**
@@ -22,7 +23,7 @@ class GetPublicLinkInformationUseCase @Inject constructor(
      * @param link The folder link.
      * @return AndroidMegaRichLinkMessage containing the folder link info.
      */
-    fun get(link: String): Single<AndroidMegaRichLinkMessage> =
+    fun get(link: String, context: Context): Single<AndroidMegaRichLinkMessage> =
         Single.create { emitter ->
             megaApi.getPublicLinkInformation(
                 link,
@@ -36,7 +37,8 @@ class GetPublicLinkInformationUseCase @Inject constructor(
                             val folderContent =
                                 mega.privacy.android.app.utils.TextUtil.getFolderInfo(
                                     folderInfo.numFolders,
-                                    folderInfo.numFiles
+                                    folderInfo.numFiles,
+                                    context,
                                 )
 
                             emitter.onSuccess(

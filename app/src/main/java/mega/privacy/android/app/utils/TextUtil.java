@@ -3,8 +3,6 @@ package mega.privacy.android.app.utils;
 import static mega.privacy.android.app.utils.Constants.COPIED_TEXT_LABEL;
 import static mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS;
 import static mega.privacy.android.app.utils.Constants.STRING_SEPARATOR;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -212,15 +210,15 @@ public class TextUtil {
      * @param numFiles   The number of files the folder contains.
      * @return The string so show as content of the folder.
      */
-    public static String getFolderInfo(int numFolders, int numFiles) {
+    public static String getFolderInfo(int numFolders, int numFiles, Context context) {
         if (numFolders == 0 && numFiles == 0) {
-            return getString(R.string.file_browser_empty_folder);
+            return context.getString(R.string.file_browser_empty_folder);
         } else if (numFolders == 0 && numFiles > 0) {
-            return getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
+            return context.getResources().getQuantityString(R.plurals.num_files_with_parameter, numFiles, numFiles);
         } else if (numFiles == 0 && numFolders > 0) {
-            return getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
+            return context.getResources().getQuantityString(R.plurals.num_folders_with_parameter, numFolders, numFolders);
         } else {
-            return getQuantityString(R.plurals.num_folders_num_files, numFolders, numFolders) + getQuantityString(R.plurals.num_folders_num_files_2, numFiles, numFiles);
+            return context.getResources().getQuantityString(R.plurals.num_folders_num_files, numFolders, numFolders) + context.getResources().getQuantityString(R.plurals.num_folders_num_files_2, numFiles, numFiles);
         }
     }
 

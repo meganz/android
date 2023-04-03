@@ -73,7 +73,6 @@ import mega.privacy.android.app.utils.FileUtil.setLocalIntentParams
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.getMediaIntent
@@ -418,7 +417,7 @@ class OfflineFragment : Fragment(), ActionMode.Callback, Scrollable {
             binding.offlineBrowserList.addItemDecoration(listDivider ?: return)
         }
 
-        var textToShow = StringResourcesUtils.getString(R.string.context_empty_offline)
+        var textToShow = getString(R.string.context_empty_offline)
 
         try {
             textToShow = textToShow.replace(

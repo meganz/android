@@ -1,15 +1,20 @@
 package mega.privacy.android.data.repository
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import mega.privacy.android.domain.entity.chat.MeetingRoomItem
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.MeetingParticipantsResult
+import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingResult
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
+import mega.privacy.android.domain.usecase.GetChatRoom
+import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
+import mega.privacy.android.domain.usecase.meeting.GetChatCall
+import mega.privacy.android.domain.usecase.meeting.GetNextSchedMeetingOccurrenceUseCase
 import javax.inject.Inject
 
 /**
@@ -19,42 +24,27 @@ import javax.inject.Inject
  * @property avatarRepository
  * @property getUserFirstName
  * @property chatParticipantsRepository
+ * @property getScheduledMeetingByChat
+ * @property getNextSchedMeetingOccurrence
+ * @property getChatRoom
+ * @property getChatCall
+ * @property megaChatApiGateway
  */
 internal class DefaultGetMeetingsRepository @Inject constructor(
     private val accountRepository: AccountRepository,
     private val avatarRepository: AvatarRepository,
     private val getUserFirstName: GetUserFirstName,
     private val chatParticipantsRepository: ChatParticipantsRepository,
+    private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
+    private val getNextSchedMeetingOccurrence: GetNextSchedMeetingOccurrenceUseCase,
+    private val getChatRoom: GetChatRoom,
+    private val getChatCall: GetChatCall,
+    private val megaChatApiGateway: MegaChatApiGateway,
 ) : GetMeetingsRepository {
 
-    override suspend fun getUpdatedMeetingItems(
-        items: MutableList<MeetingRoomItem>,
-        mutex: Mutex,
-    ): Flow<MutableList<MeetingRoomItem>> =
-        flow {
-            items.toList().forEach { item ->
-                getUpdatedMeetingItem(item).let { updatedItem ->
-                    mutex.withLock {
-                        val newIndex = items.indexOfFirst { updatedItem.chatId == it.chatId }
-                        if (newIndex != -1) {
-                            val newUpdatedItem = items[newIndex].copy(
-                                firstUserChar = updatedItem.firstUserChar,
-                                firstUserAvatar = updatedItem.firstUserAvatar,
-                                firstUserColor = updatedItem.firstUserColor,
-                                secondUserChar = updatedItem.secondUserChar,
-                                secondUserAvatar = updatedItem.secondUserAvatar,
-                                secondUserColor = updatedItem.secondUserColor,
-                            )
-                            items[newIndex] = newUpdatedItem
-                            emit(items)
-                        }
-                    }
-                }
-            }
-        }
-
-    override suspend fun getUpdatedMeetingItem(item: MeetingRoomItem): MeetingRoomItem {
-        val participants = chatParticipantsRepository.getChatParticipantsHandles(item.chatId)
+    override suspend fun getMeetingParticipants(chatId: Long): MeetingParticipantsResult {
+        val chatRoom = getChatRoom(chatId) ?: error("Chat room does not exist")
+        val participants = chatParticipantsRepository.getChatParticipantsHandles(chatId)
         val myAccount = accountRepository.getUserAccount()
         val myHandle = myAccount.userId?.id ?: -1
 
@@ -65,8 +55,8 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
         var secondUserAvatar: String? = null
         var secondUserColor: Int? = null
         when {
-            !item.isActive || participants.isEmpty() -> {
-                firstUserChar = item.title
+            !chatRoom.isActive || participants.isEmpty() -> {
+                firstUserChar = chatRoom.title
                 firstUserColor = null
             }
             participants.size == 1 -> {
@@ -105,7 +95,7 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
             }
         }
 
-        return item.copy(
+        return MeetingParticipantsResult(
             firstUserChar = firstUserChar,
             firstUserAvatar = firstUserAvatar,
             firstUserColor = firstUserColor,
@@ -114,6 +104,50 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
             secondUserColor = secondUserColor,
         )
     }
+
+    override suspend fun getMeetingScheduleData(chatId: Long): ScheduledMeetingResult? =
+        getScheduledMeetingByChat(chatId)
+            ?.firstOrNull { !it.isCanceled && it.parentSchedId == megaChatApiGateway.getChatInvalidHandle() }
+            ?.let { schedMeeting ->
+                val chatRoom = getChatRoom(chatId) ?: error("Chat room does not exist")
+                val isPending = chatRoom.isActive && schedMeeting.isPending()
+                val isRecurringDaily = schedMeeting.rules?.freq == OccurrenceFrequencyType.Daily
+                val isRecurringWeekly = schedMeeting.rules?.freq == OccurrenceFrequencyType.Weekly
+                val isRecurringMonthly = schedMeeting.rules?.freq == OccurrenceFrequencyType.Monthly
+                var startTimestamp = schedMeeting.startDateTime
+                var endTimestamp = schedMeeting.endDateTime
+                val scheduledMeetingStatus = getScheduledMeetingStatus(schedMeeting.chatId)
+
+                if (isPending && schedMeeting.rules != null) {
+                    runCatching { getNextSchedMeetingOccurrence(chatId) }.getOrNull()?.let {
+                        startTimestamp = it.startDateTime
+                        endTimestamp = it.endDateTime
+                    }
+                }
+
+                ScheduledMeetingResult(
+                    schedId = schedMeeting.schedId,
+                    scheduledStartTimestamp = startTimestamp,
+                    scheduledEndTimestamp = endTimestamp,
+                    isRecurringDaily = isRecurringDaily,
+                    isRecurringWeekly = isRecurringWeekly,
+                    isRecurringMonthly = isRecurringMonthly,
+                    isPending = isPending,
+                    scheduledMeetingStatus = scheduledMeetingStatus
+                )
+            }
+
+    override suspend fun getScheduledMeetingStatus(chatId: Long): ScheduledMeetingStatus =
+        getChatCall(chatId)?.status?.let { status ->
+            when (status) {
+                ChatCallStatus.Connecting,
+                ChatCallStatus.Joining,
+                ChatCallStatus.InProgress,
+                -> ScheduledMeetingStatus.Joined
+                ChatCallStatus.UserNoPresent -> ScheduledMeetingStatus.NotJoined
+                else -> ScheduledMeetingStatus.NotStarted
+            }
+        } ?: ScheduledMeetingStatus.NotStarted
 
     private suspend fun getUserFirstCharacter(userHandle: Long): String? =
         runCatching { getUserFirstName(userHandle, skipCache = false, shouldNotify = false) }

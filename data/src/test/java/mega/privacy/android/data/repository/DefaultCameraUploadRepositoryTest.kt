@@ -19,6 +19,8 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.camerauploads.CameraUploadsHandlesMapper
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
+import mega.privacy.android.data.mapper.camerauploads.UploadOptionIntMapper
+import mega.privacy.android.data.mapper.camerauploads.UploadOptionMapper
 import mega.privacy.android.data.mapper.syncStatusToInt
 import mega.privacy.android.data.mapper.toVideoAttachment
 import mega.privacy.android.data.mapper.toVideoQuality
@@ -31,6 +33,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import nz.mega.sdk.MegaError
@@ -61,6 +64,8 @@ class DefaultCameraUploadRepositoryTest {
     private val cameraUploadsHandlesMapper = mock<CameraUploadsHandlesMapper>()
     private val videoCompressorGateway = mock<VideoCompressorGateway>()
     private val appEventGateway = mock<AppEventGateway>()
+    private val uploadOptionIntMapper = mock<UploadOptionIntMapper>()
+    private val uploadOptionMapper = mock<UploadOptionMapper>()
 
     private val fakeRecord = SyncRecord(
         id = 0,
@@ -99,8 +104,8 @@ class DefaultCameraUploadRepositoryTest {
             syncStatusIntMapper = ::syncStatusToInt,
             videoCompressorGateway = videoCompressorGateway,
             videoAttachmentMapper = ::toVideoAttachment,
-            uploadOptionMapper = mock(),
-            uploadOptionIntMapper = mock(),
+            uploadOptionMapper = uploadOptionMapper,
+            uploadOptionIntMapper = uploadOptionIntMapper,
             context = mock()
         )
     }
@@ -139,6 +144,43 @@ class DefaultCameraUploadRepositoryTest {
     fun `test camera upload retrieves sync records`() = runTest {
         whenever(localStorageGateway.getPendingSyncRecords()).thenReturn(listOf(fakeRecord))
         assertThat(underTest.getPendingSyncRecords()).isEqualTo(listOf(fakeRecord))
+    }
+
+    @Test
+    fun `test that the current upload option is only photos`() =
+        testGetUploadOption(input = "0", expectedUploadOption = UploadOption.PHOTOS)
+
+    @Test
+    fun `test that the current upload option is only videos`() =
+        testGetUploadOption(input = "1", expectedUploadOption = UploadOption.VIDEOS)
+
+    @Test
+    fun `test that the current upload option is both photos and videos`() =
+        testGetUploadOption(input = "2", expectedUploadOption = UploadOption.PHOTOS_AND_VIDEOS)
+
+    private fun testGetUploadOption(input: String, expectedUploadOption: UploadOption) = runTest {
+        whenever(localStorageGateway.getCameraSyncFileUpload()).thenReturn(input)
+        whenever(uploadOptionMapper(input)).thenReturn(expectedUploadOption)
+
+        assertThat(underTest.getUploadOption()).isEqualTo(expectedUploadOption)
+    }
+
+    @Test
+    fun `test that the new upload option is only photos`() =
+        testSetUploadOption(UploadOption.PHOTOS)
+
+    @Test
+    fun `test that the new upload option is only videos`() =
+        testSetUploadOption(UploadOption.VIDEOS)
+
+    @Test
+    fun `test that the new upload option is both photos and videos`() =
+        testSetUploadOption(UploadOption.PHOTOS_AND_VIDEOS)
+
+    private fun testSetUploadOption(input: UploadOption) = runTest {
+        underTest.setUploadOption(input)
+
+        verify(localStorageGateway).setCameraSyncFileUpload(uploadOptionIntMapper(input))
     }
 
     @Test

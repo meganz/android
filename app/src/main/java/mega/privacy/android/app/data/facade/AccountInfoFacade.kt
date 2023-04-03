@@ -57,7 +57,7 @@ class AccountInfoFacade @Inject constructor(
         }
         val megaAccountDetails = request.megaAccountDetails ?: return
         // backward compatible, it will replace by new AccountDetail domain entity
-        myAccountInfo.setAccountDetails(megaAccountDetails, request.numDetails)
+        myAccountInfo.setAccountDetails(megaAccountDetails, request.numDetails, context)
         val sessions =
             request.numDetails and MyAccountInfo.HAS_SESSIONS_DETAILS != 0
         if (sessions) {
@@ -65,9 +65,11 @@ class AccountInfoFacade @Inject constructor(
             Timber.d("getMegaAccountSESSION not Null")
             db.setExtendedAccountDetailsTimestamp()
             val mostRecentSession: Long = megaAccountSession.mostRecentUsage
-            val date: String = TimeUtils.formatDateAndTime(context,
+            val date: String = TimeUtils.formatDateAndTime(
+                context,
                 mostRecentSession,
-                TimeUtils.DATE_LONG_FORMAT)
+                TimeUtils.DATE_LONG_FORMAT
+            )
             myAccountInfo.lastSessionFormattedDate = date
             myAccountInfo.createSessionTimeStamp = megaAccountSession.creationTimestamp
             Timber.d("onRequest TYPE_ACCOUNT_DETAILS: %s", myAccountInfo.usedPercentage)
@@ -122,7 +124,8 @@ class AccountInfoFacade @Inject constructor(
                 megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, listener)
             } else {
                 attributes?.run {
-                    megaApiGateway.submitPurchaseReceipt(PAYMENT_GATEWAY, json, lastPublicHandle,
+                    megaApiGateway.submitPurchaseReceipt(
+                        PAYMENT_GATEWAY, json, lastPublicHandle,
                         lastPublicHandleType, lastPublicHandleTimeStamp, listener
                     )
                 }
@@ -132,8 +135,10 @@ class AccountInfoFacade @Inject constructor(
 
     // we have to continue send broadcast receiver it will replace by accountDetail SharedFlow
     private fun sendBroadcastUpdateAccountDetails() {
-        context.sendBroadcast(Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-            .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS))
+        context.sendBroadcast(
+            Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+                .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS)
+        )
     }
 
     private fun getAccountTypeLabel(accountType: Int?) = with(context) {

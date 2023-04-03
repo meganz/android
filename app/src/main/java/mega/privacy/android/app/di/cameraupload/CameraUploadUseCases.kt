@@ -17,8 +17,6 @@ import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQu
 import mega.privacy.android.app.domain.usecase.DefaultGetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.DefaultGetPendingUploadList
-import mega.privacy.android.app.domain.usecase.DefaultGetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.DefaultGetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
@@ -37,8 +35,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetPendingUploadList
-import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
@@ -151,19 +147,6 @@ import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
-import mega.privacy.android.domain.usecase.camerauploads.DefaultEstablishCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
-import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
-import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
-import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 
 /**
  * Provides the use case implementation for camera upload
@@ -474,17 +457,6 @@ abstract class CameraUploadUseCases {
             IsNodeInRubbishOrDeleted(nodeRepository::isNodeInRubbishOrDeleted)
 
         /**
-         * Provide the [GetCameraUploadsSyncHandles] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [GetCameraUploadsSyncHandles]
-         */
-        @Provides
-        fun provideGetCameraUploadsSyncHandles(cameraUploadRepository: CameraUploadRepository): GetCameraUploadsSyncHandles =
-            GetCameraUploadsSyncHandles(cameraUploadRepository::getCameraUploadsSyncHandles)
-
-        /**
          * Provide the [MonitorBatteryInfo] implementation
          */
         @Provides
@@ -512,127 +484,7 @@ abstract class CameraUploadUseCases {
         @Suppress("DEPRECATION")
         fun provideGetNumberOfPendingUploads(cameraUploadRepository: CameraUploadRepository): GetNumberOfPendingUploads =
             GetNumberOfPendingUploads(cameraUploadRepository::getNumberOfPendingUploads)
-
-        /**
-         * Provides the [GetUploadOption] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [GetUploadOption]
-         */
-        @Provides
-        fun provideGetUploadOption(cameraUploadRepository: CameraUploadRepository): GetUploadOption =
-            GetUploadOption(cameraUploadRepository::getUploadOption)
-
-        /**
-         * Provides the [SetUploadOption] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [SetUploadOption]
-         */
-        @Provides
-        fun provideSetUploadOption(cameraUploadRepository: CameraUploadRepository): SetUploadOption =
-            SetUploadOption(cameraUploadRepository::setUploadOption)
-
-        /**
-         * Provides the [GetUploadVideoQuality] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [GetUploadVideoQuality]
-         */
-        @Provides
-        fun provideGetUploadVideoQuality(cameraUploadRepository: CameraUploadRepository): GetUploadVideoQuality =
-            GetUploadVideoQuality(cameraUploadRepository::getUploadVideoQuality)
-
-        /**
-         * Provides the [SetUploadVideoQuality] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [SetUploadVideoQuality]
-         */
-        @Provides
-        fun provideSetUploadVideoQuality(cameraUploadRepository: CameraUploadRepository): SetUploadVideoQuality =
-            SetUploadVideoQuality(cameraUploadRepository::setUploadVideoQuality)
-
-        /**
-         * Provides the [SetUploadVideoSyncStatus] implementation
-         *
-         * @param cameraUploadRepository [CameraUploadRepository]
-         *
-         * @return [SetUploadVideoSyncStatus]
-         */
-        @Provides
-        fun provideSetUploadVideoSyncStatus(cameraUploadRepository: CameraUploadRepository): SetUploadVideoSyncStatus =
-            SetUploadVideoSyncStatus(cameraUploadRepository::setUploadVideoSyncStatus)
-
-        /**
-         * Provides the [ListenToNewMedia] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [ListenToNewMedia]
-         */
-        @Provides
-        fun provideListenToNewMedia(repository: CameraUploadRepository): ListenToNewMedia =
-            ListenToNewMedia(repository::listenToNewMedia)
-
-        /**
-         * Provides the [IsChargingRequiredForVideoCompression] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [IsChargingRequiredForVideoCompression]
-         */
-        @Provides
-        fun provideIsChargingRequiredForVideoCompression(repository: CameraUploadRepository): IsChargingRequiredForVideoCompression =
-            IsChargingRequiredForVideoCompression(repository::isChargingRequiredForVideoCompression)
-
-        /**
-         * Provides the [SetChargingRequiredForVideoCompression] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [SetChargingRequiredForVideoCompression]
-         */
-        @Provides
-        fun provideSetChargingRequiredForVideoCompression(repository: CameraUploadRepository): SetChargingRequiredForVideoCompression =
-            SetChargingRequiredForVideoCompression(repository::setChargingRequiredForVideoCompression)
-
-        /**
-         * Provides the [GetVideoCompressionSizeLimit] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [GetVideoCompressionSizeLimit]
-         */
-        @Provides
-        fun provideGetVideoCompressionSizeLimit(repository: CameraUploadRepository): GetVideoCompressionSizeLimit =
-            GetVideoCompressionSizeLimit(repository::getVideoCompressionSizeLimit)
-
-        /**
-         * Provides the [SetVideoCompressionSizeLimit] implementation
-         *
-         * @param repository [CameraUploadRepository]
-         *
-         * @return [SetVideoCompressionSizeLimit]
-         */
-        @Provides
-        fun provideSetVideoCompressionSizeLimit(repository: CameraUploadRepository): SetVideoCompressionSizeLimit =
-            SetVideoCompressionSizeLimit(repository::setVideoCompressionSizeLimit)
     }
-
-    /**
-     * Provides the [EstablishCameraUploadsSyncHandles] implementation
-     *
-     * @param implementation [DefaultEstablishCameraUploadsSyncHandles]
-     *
-     * @return [EstablishCameraUploadsSyncHandles]
-     */
-    @Binds
-    abstract fun bindEstablishCameraUploadsSyncHandles(implementation: DefaultEstablishCameraUploadsSyncHandles): EstablishCameraUploadsSyncHandles
 
     /**
      * Provides the [CheckEnableCameraUploadsStatus] implementation
@@ -717,18 +569,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindRenameSecondaryFolder(renameSecondaryFolder: DefaultRenameSecondaryFolder): RenameSecondaryFolder
-
-    /**
-     * Provide the [GetPrimarySyncHandle] implementation
-     */
-    @Binds
-    abstract fun bindGetPrimarySyncHandle(getPrimarySyncHandle: DefaultGetPrimarySyncHandle): GetPrimarySyncHandle
-
-    /**
-     * Provide the [GetSecondarySyncHandle] implementation
-     */
-    @Binds
-    abstract fun bindGetSecondarySyncHandle(getSecondarySyncHandle: DefaultGetSecondarySyncHandle): GetSecondarySyncHandle
 
     /**
      * Provide the [UpdateCameraUploadTimeStamp] implementation

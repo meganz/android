@@ -1,11 +1,13 @@
 package mega.privacy.android.app.contacts.list
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -22,12 +24,11 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
+import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.RxUtil.debounceImmediate
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
-import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -60,6 +61,7 @@ class ContactListViewModel @Inject constructor(
     private val chatApiGateway: MegaChatApiGateway,
     private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
+    @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -82,8 +84,12 @@ class ContactListViewModel @Inject constructor(
             .subscribeBy(
                 onNext = { incomingRequests ->
                     contactActions.value = listOf(
-                        ContactActionItem(Type.REQUESTS, getString(R.string.section_requests), incomingRequests),
-                        ContactActionItem(Type.GROUPS, getString(R.string.section_groups))
+                        ContactActionItem(
+                            Type.REQUESTS,
+                            context.getString(R.string.section_requests),
+                            incomingRequests
+                        ),
+                        ContactActionItem(Type.GROUPS, context.getString(R.string.section_groups))
                     )
                 },
                 onError = Timber::e
@@ -112,9 +118,9 @@ class ContactListViewModel @Inject constructor(
         contacts.map { items ->
             if (queryString.isNullOrBlank() && items.any { it.isNew }) {
                 mutableListOf<ContactItem>().apply {
-                    add(ContactItem.Header(getString(R.string.section_recently_added)))
+                    add(ContactItem.Header(context.getString(R.string.section_recently_added)))
                     addAll(items.filter { it.isNew })
-                    add(ContactItem.Header(getString(R.string.section_contacts)))
+                    add(ContactItem.Header(context.getString(R.string.section_contacts)))
                 }
             } else {
                 emptyList()
@@ -126,7 +132,9 @@ class ContactListViewModel @Inject constructor(
             val itemsWithHeaders = mutableListOf<ContactItem>()
             items?.forEachIndexed { index, item ->
                 if (queryString.isNullOrBlank()) {
-                    if (index == 0 || !items[index - 1].getFirstCharacter().equals(items[index].getFirstCharacter(), true)) {
+                    if (index == 0 || !items[index - 1].getFirstCharacter()
+                            .equals(items[index].getFirstCharacter(), true)
+                    ) {
                         itemsWithHeaders.add(ContactItem.Header(item.getFirstCharacter()))
                     }
                     itemsWithHeaders.add(item)
@@ -213,10 +221,12 @@ class ContactListViewModel @Inject constructor(
     private fun startCall(chatId: Long, video: Boolean, audio: Boolean) {
         if (chatApiGateway.getChatCall(chatId) != null) {
             Timber.d("There is a call, open it")
-            CallUtil.openMeetingInProgress(MegaApplication.getInstance().applicationContext,
+            CallUtil.openMeetingInProgress(
+                MegaApplication.getInstance().applicationContext,
                 chatId,
                 true,
-                passcodeManagement)
+                passcodeManagement
+            )
             return
         }
 
@@ -243,11 +253,13 @@ class ContactListViewModel @Inject constructor(
                         }
                     }
 
-                    CallUtil.openMeetingWithAudioOrVideo(MegaApplication.getInstance().applicationContext,
+                    CallUtil.openMeetingWithAudioOrVideo(
+                        MegaApplication.getInstance().applicationContext,
                         resultChatId,
                         audioEnable,
                         videoEnable,
-                        passcodeManagement)
+                        passcodeManagement
+                    )
                 }
             }
         }

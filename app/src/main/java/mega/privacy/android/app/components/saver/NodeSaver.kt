@@ -2,6 +2,7 @@ package mega.privacy.android.app.components.saver
 
 import android.Manifest.permission
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -46,7 +47,6 @@ import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.RxUtil.logErr
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getSizeString
 import mega.privacy.android.app.utils.Util.storeDownloadLocationIfNeeded
@@ -125,7 +125,7 @@ class NodeSaver(
         nodes: List<MegaOffline>,
         fromMediaViewer: Boolean = false,
     ) {
-        save {
+        save(app) {
             var totalSize = 0L
             for (node in nodes) {
                 totalSize += getTotalSize(getOfflineFile(app, node))
@@ -152,11 +152,11 @@ class NodeSaver(
         needSerialize: Boolean = false,
     ) {
         saveHandles(
-            listOf(handle),
-            highPriority,
-            isFolderLink,
-            fromMediaViewer,
-            needSerialize
+            handles = listOf(handle),
+            highPriority = highPriority,
+            isFolderLink = isFolderLink,
+            fromMediaViewer = fromMediaViewer,
+            needSerialize = needSerialize,
         )
     }
 
@@ -178,7 +178,7 @@ class NodeSaver(
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
     ) {
-        save {
+        save(app) {
             val nodes = ArrayList<MegaNode>()
             val api = if (isFolderLink) megaApiFolder else megaApi
 
@@ -217,7 +217,13 @@ class NodeSaver(
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
     ) {
-        saveNodes(listOf(node), highPriority, isFolderLink, fromMediaViewer, needSerialize)
+        saveNodes(
+            nodes = listOf(node),
+            highPriority = highPriority,
+            isFolderLink = isFolderLink,
+            fromMediaViewer = fromMediaViewer,
+            needSerialize = needSerialize,
+        )
     }
 
     /**
@@ -237,7 +243,7 @@ class NodeSaver(
         fromMediaViewer: Boolean = false,
         needSerialize: Boolean = false,
     ) {
-        save {
+        save(app) {
             val nodes = ArrayList<MegaNode>()
             for (nodeList in nodeLists) {
                 val array = nodeListToArray(nodeList)
@@ -274,7 +280,7 @@ class NodeSaver(
         downloadForPreview: Boolean = false,
         downloadByOpenWith: Boolean = false,
     ) {
-        save {
+        save(app) {
             MegaNodeSaving(
                 totalSize = nodesTotalSize(nodes = nodes),
                 highPriority = highPriority,
@@ -310,7 +316,7 @@ class NodeSaver(
                     return@Callable
                 }
 
-                checkSizeBeforeDownload(getCorrectDownloadPath(parentPath))
+                checkSizeBeforeDownload(getCorrectDownloadPath(parentPath), app)
             })
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { logErr("NodeSaver saveNode") })
@@ -373,7 +379,7 @@ class NodeSaver(
         size: Long,
         fromMediaViewer: Boolean = false,
     ) {
-        save {
+        save(app) {
             UriSaving(uri, name, size, fromMediaViewer)
         }
     }
@@ -421,7 +427,7 @@ class NodeSaver(
             Completable
                 .fromCallable {
                     storeDownloadLocationIfNeeded(parentPath)
-                    checkSizeBeforeDownload(getCorrectDownloadPath(parentPath))
+                    checkSizeBeforeDownload(getCorrectDownloadPath(parentPath), activity)
                 }
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onError = { logErr("NodeSaver handleActivityResult") })
@@ -433,9 +439,9 @@ class NodeSaver(
                 Timber.w("handleActivityResult REQUEST_CODE_TREE: result intent is null")
 
                 val message = if (resultCode != Activity.RESULT_OK) {
-                    getString(R.string.download_requires_permission)
+                    activity.getString(R.string.download_requires_permission)
                 } else {
-                    getString(R.string.no_external_SD_card_detected)
+                    activity.getString(R.string.no_external_SD_card_detected)
                 }
 
                 snackbarShower.showSnackbar(message)
@@ -463,7 +469,12 @@ class NodeSaver(
                 return false
             }
 
-            Completable.fromCallable { checkSizeBeforeDownload(getCorrectDownloadPath(parentPath)) }
+            Completable.fromCallable {
+                checkSizeBeforeDownload(
+                    getCorrectDownloadPath(parentPath),
+                    activity
+                )
+            }
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onError = { logErr("NodeSaver handleActivityResult") })
                 .addTo(compositeDisposable)
@@ -491,7 +502,7 @@ class NodeSaver(
 
         if (hasWriteExternalStoragePermission()) {
             Completable
-                .fromCallable { doSave() }
+                .fromCallable { doSave(app) }
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(onError = { logErr("NodeSaver handleRequestPermissionsResult") })
                 .addTo(compositeDisposable)
@@ -537,7 +548,7 @@ class NodeSaver(
         compositeDisposable.dispose()
     }
 
-    private fun save(savingProducer: () -> Saving?) {
+    private fun save(context: Context, savingProducer: () -> Saving?) {
         Completable
             .fromCallable(Callable {
                 val saving = savingProducer() ?: return@Callable
@@ -547,18 +558,18 @@ class NodeSaver(
                     return@Callable
                 }
 
-                doSave()
+                doSave(context)
             })
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { logErr("NodeSaver save") })
             .addTo(compositeDisposable)
     }
 
-    private fun doSave() {
+    private fun doSave(context: Context) {
         if (Util.askMe()) {
             requestLocalFolder(null, activityLauncher)
         } else {
-            checkSizeBeforeDownload(getCorrectDownloadPath())
+            checkSizeBeforeDownload(getCorrectDownloadPath(), context)
         }
     }
 
@@ -604,7 +615,7 @@ class NodeSaver(
         return false
     }
 
-    private fun checkSizeBeforeDownload(parentPath: String) {
+    private fun checkSizeBeforeDownload(parentPath: String, context: Context) {
         if (notEnoughSpace(parentPath, saving.totalSize())) {
             return
         }
@@ -612,12 +623,12 @@ class NodeSaver(
         if (TextUtils.equals(dbHandler.attributes?.askSizeDownload, false.toString())
             || saving.totalSize() < CONFIRM_SIZE_MIN_BYTES
         ) {
-            checkInstalledAppBeforeDownload(parentPath)
+            checkInstalledAppBeforeDownload(parentPath, context)
             return
         }
 
         showConfirmationDialog(
-            getString(R.string.alert_larger_file, getSizeString(saving.totalSize()))
+            context.getString(R.string.alert_larger_file, getSizeString(saving.totalSize(), app))
         ) { notShowAgain ->
             if (notShowAgain) {
                 Completable.fromCallable { dbHandler.setAttrAskSizeDownload(false.toString()) }
@@ -626,23 +637,23 @@ class NodeSaver(
                     .addTo(compositeDisposable)
             }
 
-            checkInstalledAppBeforeDownload(parentPath)
+            checkInstalledAppBeforeDownload(parentPath, context)
         }
     }
 
-    private fun checkInstalledAppBeforeDownload(parentPath: String) {
+    private fun checkInstalledAppBeforeDownload(parentPath: String, context: Context) {
         if (TextUtils.equals(dbHandler.attributes?.askNoAppDownload, false.toString())) {
-            download(getCorrectDownloadPath(parentPath))
+            download(getCorrectDownloadPath(parentPath), context)
             return
         }
 
         if (!saving.hasUnsupportedFile(app)) {
-            download(getCorrectDownloadPath(parentPath))
+            download(getCorrectDownloadPath(parentPath), context)
             return
         }
 
         showConfirmationDialog(
-            getString(R.string.alert_no_app, saving.unsupportedFileName)
+            context.getString(R.string.alert_no_app, saving.unsupportedFileName)
         ) { notShowAgain ->
             if (notShowAgain) {
                 Completable.fromCallable { dbHandler.setAttrAskNoAppDownload(false.toString()) }
@@ -650,7 +661,7 @@ class NodeSaver(
                     .subscribeBy(onError = { logErr("NodeSaver checkInstalledAppBeforeDownload") })
                     .addTo(compositeDisposable)
             }
-            download(getCorrectDownloadPath(parentPath))
+            download(getCorrectDownloadPath(parentPath), context)
         }
     }
 
@@ -667,10 +678,10 @@ class NodeSaver(
         }
     }
 
-    private fun download(parentPath: String) {
+    private fun download(parentPath: String, context: Context) {
         Completable
             .fromCallable {
-                checkParentPathAndDownload(parentPath)
+                checkParentPathAndDownload(parentPath, context)
             }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -678,7 +689,7 @@ class NodeSaver(
             .addTo(compositeDisposable)
     }
 
-    private fun checkParentPathAndDownload(parentPath: String) {
+    private fun checkParentPathAndDownload(parentPath: String, context: Context) {
         if (getStorageState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning()
             return
@@ -687,7 +698,7 @@ class NodeSaver(
         val sdCardOperator = SDCardOperator.initSDCardOperator(app, parentPath)
         if (sdCardOperator == null) {
             requestLocalFolder(
-                getString(R.string.no_external_SD_card_detected),
+                context.getString(R.string.no_external_SD_card_detected),
                 activityLauncher
             )
             return
@@ -703,7 +714,7 @@ class NodeSaver(
         }
 
         if (saving.fromMediaViewer()) {
-            snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
+            snackbarShower.showSnackbar(context.getString(R.string.general_already_downloaded))
         } else {
             autoPlayNode(app, autoPlayInfo, activityLauncher, snackbarShower)
         }

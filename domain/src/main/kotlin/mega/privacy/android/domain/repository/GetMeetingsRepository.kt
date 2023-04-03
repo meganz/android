@@ -1,8 +1,8 @@
 package mega.privacy.android.domain.repository
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.sync.Mutex
-import mega.privacy.android.domain.entity.chat.MeetingRoomItem
+import mega.privacy.android.domain.entity.meeting.MeetingParticipantsResult
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingResult
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 
 /**
  * Get Meetings repository
@@ -10,22 +10,26 @@ import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 interface GetMeetingsRepository {
 
     /**
-     * Update missing meeting item fields
+     * Get meeting participants
      *
-     * @param items
-     * @param mutex
-     * @return Flow of updating meeting room items
+     * @param chatId    Meeting to retrieve data from
+     * @return          [MeetingParticipantsResult]
      */
-    suspend fun getUpdatedMeetingItems(
-        items: MutableList<MeetingRoomItem>,
-        mutex: Mutex
-    ): Flow<MutableList<MeetingRoomItem>>
+    suspend fun getMeetingParticipants(chatId: Long): MeetingParticipantsResult
 
     /**
-     * Get updated meeting item
+     * Get meeting scheduled data
      *
-     * @param item  Item to be updated
-     * @return      Item with updated fields
+     * @param chatId    Meeting to retrieve data from
+     * @return          [ScheduledMeetingResult]
      */
-    suspend fun getUpdatedMeetingItem(item: MeetingRoomItem): MeetingRoomItem
+    suspend fun getMeetingScheduleData(chatId: Long): ScheduledMeetingResult?
+
+    /**
+     * Get scheduled meeting status
+     *
+     * @param chatId    Meeting to retrieve data from
+     * @return          [ScheduledMeetingStatus]
+     */
+    suspend fun getScheduledMeetingStatus(chatId: Long): ScheduledMeetingStatus
 }

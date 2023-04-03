@@ -23,7 +23,6 @@ import static mega.privacy.android.app.utils.MegaNodeUtil.getFolderIcon;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getNumberOfFolders;
 import static mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownDialog;
 import static mega.privacy.android.app.utils.OfflineUtils.availableOffline;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TextUtil.getFileInfo;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbAndSetViewForList;
 import static mega.privacy.android.app.utils.ThumbnailUtils.getThumbAndSetViewOrCreateForList;
@@ -1053,8 +1052,8 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
 
             holder.textViewFileSize.setVisibility(View.VISIBLE);
             holder.textViewFileSize.setText(type == FOLDER_LINK_ADAPTER
-                    ? getMegaNodeFolderLinkInfo(node)
-                    : getMegaNodeFolderInfo(node));
+                    ? getMegaNodeFolderLinkInfo(node, context)
+                    : getMegaNodeFolderInfo(node, context));
             holder.versionsIcon.setVisibility(View.GONE);
 
             setFolderListSelected(holder, position, getFolderIcon(node, type == OUTGOING_SHARES_ADAPTER ? DrawerItem.SHARED_ITEMS : DrawerItem.CLOUD_DRIVE));
@@ -1136,7 +1135,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         } else {
             Timber.d("Node is file");
             boolean isLinksRoot = type == LINKS_ADAPTER && ((ManagerActivity) context).getDeepBrowserTreeLinks() == 0;
-            holder.textViewFileSize.setText(getFileInfo(getSizeString(node.getSize()),
+            holder.textViewFileSize.setText(getFileInfo(getSizeString(node.getSize(), context),
                     formatLongDateTime(isLinksRoot ? node.getPublicLinkCreationTime() : node.getModificationTime())));
 
             if (megaApi.hasVersions(node)) {
@@ -1240,7 +1239,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
     }
 
     @Override
-    public String getSectionTitle(int position) {
+    public String getSectionTitle(int position, Context context) {
         if (getItemNode(position) != null && !getItemNode(position).equals("")) {
             return getItemNode(position).substring(0, 1);
         }
@@ -1492,7 +1491,7 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                     }
                 }
             } else {
-                subtitle = getQuantityString(R.plurals.general_num_shared_with, sl.size(), sl.size());
+                subtitle = context.getResources().getQuantityString(R.plurals.general_num_shared_with, sl.size(), sl.size());
             }
         }
 

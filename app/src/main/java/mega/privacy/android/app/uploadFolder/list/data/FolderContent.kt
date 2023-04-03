@@ -3,10 +3,6 @@ package mega.privacy.android.app.uploadFolder.list.data
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.TextUtil
-import mega.privacy.android.app.utils.TimeUtils
-import mega.privacy.android.app.utils.Util
 
 /**
  * View item which represents a Folder Content, related to upload folders, at UI level.
@@ -38,21 +34,14 @@ sealed class FolderContent(val id: Long) {
     data class Data constructor(
         val parent: Data?,
         val document: DocumentFile,
-        var isSelected: Boolean = false
+        var isSelected: Boolean = false,
+        val info: String,
     ) : FolderContent(document.uri.hashCode().toLong()) {
         val isFolder = document.isDirectory
         val name = document.name
         val uri = document.uri
         val lastModified = document.lastModified()
         val size = document.length()
-        val info: String = if (document.isDirectory) {
-            FileUtil.getFileFolderInfo(document)
-        } else {
-            TextUtil.getFileInfo(
-                Util.getSizeString(size),
-                TimeUtils.formatLongDateTime(lastModified / 1000)
-            )
-        }
         var nameCollision: NameCollision? = null
 
         override fun getSectionTitle(): String =
@@ -79,13 +68,13 @@ sealed class FolderContent(val id: Long) {
     class DiffCallback : DiffUtil.ItemCallback<FolderContent>() {
         override fun areItemsTheSame(
             oldContent: FolderContent,
-            newContent: FolderContent
+            newContent: FolderContent,
         ): Boolean =
             oldContent.id == newContent.id
 
         override fun areContentsTheSame(
             oldContent: FolderContent,
-            newContent: FolderContent
+            newContent: FolderContent,
         ): Boolean {
             val isSameData =
                 oldContent is Data && newContent is Data && oldContent.isSelected == newContent.isSelected

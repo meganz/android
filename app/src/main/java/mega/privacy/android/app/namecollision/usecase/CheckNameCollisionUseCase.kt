@@ -1,9 +1,9 @@
 package mega.privacy.android.app.namecollision.usecase
 
+import android.content.Context
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.exception.NoPendingCollisionsException
@@ -13,6 +13,7 @@ import mega.privacy.android.app.usecase.chat.GetChatMessageUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.usecase.exception.MessageDoesNotExistException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.exception.EmptyFolderException
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -45,12 +46,14 @@ class CheckNameCollisionUseCase @Inject constructor(
         node: MegaNode?,
         parentHandle: Long,
         type: NameCollisionType,
+        context: Context,
     ): Single<NameCollision> =
         Single.fromCallable {
             check(
                 node = node,
                 parentNode = getNodeUseCase.get(parentHandle).blockingGetOrNull(),
-                type = type
+                type = type,
+                context = context,
             ).blockingGet()
         }
 
@@ -62,12 +65,18 @@ class CheckNameCollisionUseCase @Inject constructor(
      * @param type          [NameCollisionType]
      * @return Single Long with the node handle with which there is a name collision.
      */
-    fun check(handle: Long, parentHandle: Long, type: NameCollisionType): Single<NameCollision> =
+    fun check(
+        handle: Long,
+        parentHandle: Long,
+        type: NameCollisionType,
+        context: Context,
+    ): Single<NameCollision> =
         Single.fromCallable {
             check(
                 node = getNodeUseCase.get(handle).blockingGetOrNull(),
                 parentHandle = parentHandle,
-                type = type
+                type = type,
+                context = context,
             ).blockingGet()
         }
 
@@ -83,6 +92,7 @@ class CheckNameCollisionUseCase @Inject constructor(
         node: MegaNode?,
         parentNode: MegaNode?,
         type: NameCollisionType,
+        context: Context,
     ): Single<NameCollision> =
         Single.create { emitter ->
             if (node == null) {
@@ -98,12 +108,14 @@ class CheckNameCollisionUseCase @Inject constructor(
                             NameCollisionType.COPY -> NameCollision.Copy.getCopyCollision(
                                 handle,
                                 node,
-                                parentHandle = parentNode!!.handle
+                                parentHandle = parentNode!!.handle,
+                                context = context,
                             )
                             NameCollisionType.MOVE -> NameCollision.Movement.getMovementCollision(
                                 handle,
                                 node,
-                                parentHandle = parentNode!!.handle
+                                parentHandle = parentNode!!.handle,
+                                context = context,
                             )
                             else -> null
                         }
@@ -172,6 +184,7 @@ class CheckNameCollisionUseCase @Inject constructor(
         nodes: List<MegaNode>,
         parentHandle: Long,
         type: NameCollisionType,
+        context: Context,
     ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
         Single.create { emitter ->
             if (nodes.isEmpty()) {
@@ -185,7 +198,12 @@ class CheckNameCollisionUseCase @Inject constructor(
             for (node in nodes) {
                 if (emitter.isDisposed) break
 
-                check(node = node, parentHandle = parentHandle, type = type).blockingSubscribeBy(
+                check(
+                    node = node,
+                    parentHandle = parentHandle,
+                    type = type,
+                    context = context
+                ).blockingSubscribeBy(
                     onError = { error ->
                         Timber.e(error, "No collision.")
                         results.add(node)
@@ -213,6 +231,7 @@ class CheckNameCollisionUseCase @Inject constructor(
         handles: LongArray,
         parentHandle: Long,
         type: NameCollisionType,
+        context: Context,
     ): Single<Pair<ArrayList<NameCollision>, LongArray>> =
         Single.create { emitter ->
             if (handles.isEmpty()) {
@@ -226,7 +245,7 @@ class CheckNameCollisionUseCase @Inject constructor(
             for (handle in handles) {
                 if (emitter.isDisposed) break
 
-                check(handle = handle, parentHandle = parentHandle, type = type)
+                check(handle = handle, parentHandle = parentHandle, type = type, context = context)
                     .blockingSubscribeBy(
                         onError = { error ->
                             Timber.e(error, "No collision.")
@@ -251,7 +270,10 @@ class CheckNameCollisionUseCase @Inject constructor(
      *  - First:    List of [NameCollision] with name collisions.
      *  - Second:   List of [MegaNode] without name collision.
      */
-    fun checkRestorations(nodes: List<MegaNode>): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
+    fun checkRestorations(
+        nodes: List<MegaNode>,
+        context: Context,
+    ): Single<Pair<ArrayList<NameCollision>, List<MegaNode>>> =
         Single.create { emitter ->
             if (nodes.isEmpty()) {
                 emitter.onError(NoPendingCollisionsException())
@@ -280,7 +302,8 @@ class CheckNameCollisionUseCase @Inject constructor(
                                 NameCollision.Movement.getMovementCollision(
                                     handle,
                                     node,
-                                    restoreHandle
+                                    restoreHandle,
+                                    context,
                                 )
                             )
                         }
@@ -359,6 +382,7 @@ class CheckNameCollisionUseCase @Inject constructor(
     fun checkFolderUploadList(
         parentHandle: Long,
         uploadContent: MutableList<FolderContent.Data>,
+        context: Context,
     ): Single<Pair<ArrayList<NameCollision>, MutableList<FolderContent.Data>>> =
         Single.create { emitter ->
             if (uploadContent.isEmpty()) {
@@ -383,7 +407,8 @@ class CheckNameCollisionUseCase @Inject constructor(
                             val collision = NameCollision.Upload.getUploadCollision(
                                 handle,
                                 item,
-                                parentHandle
+                                parentHandle,
+                                context
                             )
 
                             collisions.add(collision)

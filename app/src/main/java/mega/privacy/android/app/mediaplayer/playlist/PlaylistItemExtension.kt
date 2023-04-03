@@ -1,8 +1,8 @@
 package mega.privacy.android.app.mediaplayer.playlist
 
+import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceViewModel.Companion.TYPE_PREVIOUS
-import mega.privacy.android.app.utils.StringResourcesUtils
 import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
@@ -62,8 +62,12 @@ fun PlaylistItem.formatDuration() = formatSecondsToString(seconds = duration)
  * @param paused media whether is paused
  * @return the name of header
  */
-fun PlaylistItem.getHeaderName(isAudio: Boolean, paused: Boolean = false): String =
-    StringResourcesUtils.getString(
+fun PlaylistItem.getHeaderName(
+    isAudio: Boolean,
+    paused: Boolean = false,
+    context: Context,
+): String =
+    context.getString(
         when (type) {
             TYPE_PREVIOUS -> if (isAudio) {
                 R.string.media_player_audio_playlist_previous
@@ -102,8 +106,11 @@ private fun formatSecondsToString(seconds: Int): String {
     val minutes =
         TimeUnit.SECONDS.toMinutes(seconds.toLong()) - TimeUnit.HOURS.toMinutes(hour)
     val resultSeconds =
-        seconds.toLong() - TimeUnit.MINUTES.toSeconds(TimeUnit.SECONDS.toMinutes(
-            seconds.toLong()))
+        seconds.toLong() - TimeUnit.MINUTES.toSeconds(
+            TimeUnit.SECONDS.toMinutes(
+                seconds.toLong()
+            )
+        )
 
     return if (hour >= 1) {
         String.format("%2d:%02d:%02d", hour, minutes, resultSeconds)

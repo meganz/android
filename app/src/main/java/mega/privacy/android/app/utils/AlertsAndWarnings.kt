@@ -17,9 +17,8 @@ import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.OverDiskQuotaPaywallActivity
-import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.presentation.login.LoginActivity
 import timber.log.Timber
 
 object AlertsAndWarnings {
@@ -76,10 +75,10 @@ object AlertsAndWarnings {
         val resumeTransfersDialogBuilder =
             MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
 
-        resumeTransfersDialogBuilder.setTitle(getString(R.string.warning_resume_transfers))
-            .setMessage(getString(R.string.warning_message_resume_transfers))
+        resumeTransfersDialogBuilder.setTitle(context.getString(R.string.warning_resume_transfers))
+            .setMessage(context.getString(R.string.warning_message_resume_transfers))
             .setCancelable(false)
-            .setPositiveButton(getString(R.string.button_resume_individual_transfer)) { dialog, _ ->
+            .setPositiveButton(context.getString(R.string.button_resume_individual_transfer)) { dialog, _ ->
                 MegaApplication.getInstance().megaApi.pauseTransfers(false)
 
                 if (context is ChatActivity) {
@@ -88,7 +87,7 @@ object AlertsAndWarnings {
 
                 dialog.dismiss()
             }
-            .setNegativeButton(getString(R.string.general_cancel)) { dialog, _ ->
+            .setNegativeButton(context.getString(R.string.general_cancel)) { dialog, _ ->
                 dialog.dismiss()
             }.setOnDismissListener {
                 if (context is BaseActivity) {
@@ -131,7 +130,7 @@ object AlertsAndWarnings {
             0
         )
         removeText.visibility = View.VISIBLE
-        removeText.text = getString(R.string.context_remove_link_warning_text)
+        removeText.text = context.getString(R.string.context_remove_link_warning_text)
 
         val scaleW = Util.getScaleW(displayMetrics, displayMetrics.density)
         removeText.setTextSize(
@@ -139,10 +138,10 @@ object AlertsAndWarnings {
         )
 
         builder.setView(dialogLayout)
-            .setPositiveButton(getString(R.string.context_remove)) { _, _ ->
+            .setPositiveButton(context.getString(R.string.context_remove)) { _, _ ->
                 onPositive()
             }
-            .setNegativeButton(getString(R.string.general_cancel), null)
+            .setNegativeButton(context.getString(R.string.general_cancel), null)
             .create()
             .show()
     }
@@ -158,11 +157,11 @@ object AlertsAndWarnings {
                 .setView(customView)
                 .setMessage(message)
                 .setPositiveButton(
-                    getString(R.string.general_save_to_device)
+                    activity.getString(R.string.general_save_to_device)
                 ) { _, _ ->
                     onConfirmed(notShowAgain.isChecked)
                 }
-                .setNegativeButton(getString(R.string.general_cancel)) { _, _ -> }
+                .setNegativeButton(activity.getString(R.string.general_cancel)) { _, _ -> }
                 .create()
                 .show()
         }
@@ -175,8 +174,8 @@ object AlertsAndWarnings {
     @JvmStatic
     fun showForeignStorageOverQuotaWarningDialog(context: Context) {
         MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setMessage(getString(R.string.warning_share_owner_storage_quota))
-            .setPositiveButton(getString(R.string.general_ok), null)
+            .setMessage(context.getString(R.string.warning_share_owner_storage_quota))
+            .setPositiveButton(context.getString(R.string.general_ok), null)
             .setCancelable(false)
             .create()
             .show()
@@ -186,22 +185,28 @@ object AlertsAndWarnings {
     fun askForCustomizedPlan(context: Context, myEmail: String, accountType: Int) {
         Timber.d("askForCustomizedPlan")
         val body = StringBuilder()
-        body.append(getString(R.string.subject_mail_upgrade_plan))
+        body.append(context.getString(R.string.subject_mail_upgrade_plan))
             .append("\n\n\n\n\n\n\n")
-            .append("""${getString(R.string.settings_about_app_version)} v${getString(R.string.app_version)}""")
-            .append(getString(R.string.user_account_feedback).toString() + "  " + myEmail)
+            .append(
+                """${context.getString(R.string.settings_about_app_version)} v${
+                    context.getString(
+                        R.string.app_version
+                    )
+                }"""
+            )
+            .append(context.getString(R.string.user_account_feedback).toString() + "  " + myEmail)
 
         when (accountType) {
-            0 -> body.append(" (" + getString(R.string.my_account_free) + ")")
-            1 -> body.append(" (" + getString(R.string.my_account_pro1) + ")")
-            2 -> body.append(" (" + getString(R.string.my_account_pro2) + ")")
-            3 -> body.append(" (" + getString(R.string.my_account_pro3) + ")")
-            4 -> body.append(" (" + getString(R.string.my_account_prolite_feedback_email) + ")")
-            else -> body.append(" (" + getString(R.string.my_account_free) + ")")
+            0 -> body.append(" (" + context.getString(R.string.my_account_free) + ")")
+            1 -> body.append(" (" + context.getString(R.string.my_account_pro1) + ")")
+            2 -> body.append(" (" + context.getString(R.string.my_account_pro2) + ")")
+            3 -> body.append(" (" + context.getString(R.string.my_account_pro3) + ")")
+            4 -> body.append(" (" + context.getString(R.string.my_account_prolite_feedback_email) + ")")
+            else -> body.append(" (" + context.getString(R.string.my_account_free) + ")")
         }
 
         val emailAndroid = Constants.MAIL_SUPPORT
-        val subject = getString(R.string.title_mail_upgrade_plan)
+        val subject = context.getString(R.string.title_mail_upgrade_plan)
         val emailIntent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:$emailAndroid"))
             .putExtra(Intent.EXTRA_SUBJECT, subject)
             .putExtra(Intent.EXTRA_TEXT, body.toString())
@@ -217,9 +222,9 @@ object AlertsAndWarnings {
     @JvmStatic
     fun showTakenDownAlert(activity: Activity): AlertDialog =
         MaterialAlertDialogBuilder(activity)
-            .setTitle(getString(R.string.error_file_not_available))
-            .setMessage(getString(R.string.error_takendown_file))
-            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
+            .setTitle(activity.getString(R.string.error_file_not_available))
+            .setMessage(activity.getString(R.string.error_takendown_file))
+            .setNegativeButton(activity.getString(R.string.general_dismiss)) { _, _ ->
                 if (!activity.isFinishing) activity.finish()
             }
             .create().apply {

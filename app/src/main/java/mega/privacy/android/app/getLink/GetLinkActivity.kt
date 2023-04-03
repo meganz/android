@@ -16,7 +16,6 @@ import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants.HANDLE
 import mega.privacy.android.app.utils.Constants.HANDLE_LIST
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.isDarkMode
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
@@ -106,7 +105,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
             viewModelNode.initNode(handle)
             viewType = TYPE_NODE
         } else if (handleList != null) {
-            viewModelList.initNodes(handleList)
+            viewModelList.initNodes(handleList, this)
             viewType = TYPE_LIST
         }
     }
@@ -148,10 +147,10 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 R.id.copyright -> supportActionBar?.hide()
                 R.id.decryption_key -> {
                     supportActionBar?.title =
-                        StringResourcesUtils.getString(R.string.option_decryption_key)
+                        getString(R.string.option_decryption_key)
                 }
                 R.id.password -> {
-                    supportActionBar?.title = StringResourcesUtils.getString(
+                    supportActionBar?.title = getString(
                         if (viewModelNode.getPasswordText()
                                 .isNullOrEmpty()
                         ) R.string.set_password_protection_dialog
@@ -161,7 +160,7 @@ class GetLinkActivity : PasscodeActivity(), SnackbarShower {
                 R.id.main_get_several_links -> {
                     viewModelNode.setElevation(true)
                     supportActionBar?.apply {
-                        title = StringResourcesUtils.getQuantityString(
+                        title = resources.getQuantityString(
                             R.plurals.get_links,
                             viewModelList.getLinksNumber()
                         )

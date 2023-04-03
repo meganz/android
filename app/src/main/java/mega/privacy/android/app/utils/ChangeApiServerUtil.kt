@@ -16,8 +16,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
-import nz.mega.sdk.MegaApiJava
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
@@ -56,10 +54,16 @@ object ChangeApiServerUtil {
             else currentApiServerValue
 
         val stringsArray = ArrayList<String>()
-        stringsArray.add(PRODUCTION_SERVER_VALUE, getString(R.string.production_api_server))
-        stringsArray.add(STAGING_SERVER_VALUE, getString(R.string.staging_api_server))
-        stringsArray.add(STAGING_444_SERVER_VALUE, getString(R.string.staging444_api_server))
-        stringsArray.add(SANDBOX3_SERVER_VALUE, getString(R.string.sandbox3_api_server))
+        stringsArray.add(
+            PRODUCTION_SERVER_VALUE,
+            activity.getString(R.string.production_api_server)
+        )
+        stringsArray.add(STAGING_SERVER_VALUE, activity.getString(R.string.staging_api_server))
+        stringsArray.add(
+            STAGING_444_SERVER_VALUE,
+            activity.getString(R.string.staging444_api_server)
+        )
+        stringsArray.add(SANDBOX3_SERVER_VALUE, activity.getString(R.string.sandbox3_api_server))
 
         val itemsAdapter =
             ArrayAdapter(activity, R.layout.checked_text_view_dialog_button, stringsArray)
@@ -73,8 +77,8 @@ object ChangeApiServerUtil {
 
         val builder = MaterialAlertDialogBuilder(activity)
             .setCustomTitle(customTitle)
-            .setPositiveButton(getString(R.string.general_ok), null)
-            .setNegativeButton(getString(R.string.general_cancel), null)
+            .setPositiveButton(activity.getString(R.string.general_ok), null)
+            .setNegativeButton(activity.getString(R.string.general_cancel), null)
             .setOnDismissListener {
                 preferences.edit().putInt(API_SERVER_CHECKED, INVALID_VALUE).apply()
             }
@@ -114,7 +118,7 @@ object ChangeApiServerUtil {
     private fun changeApiServer(
         activity: Activity,
         preferences: SharedPreferences,
-        changeApiServerDialog: AlertDialog
+        changeApiServerDialog: AlertDialog,
     ) {
         val currentApiServerValue = preferences.getInt(API_SERVER, PRODUCTION_SERVER_VALUE)
         val newApiServerValue = preferences.getInt(API_SERVER_CHECKED, currentApiServerValue)

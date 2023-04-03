@@ -3,21 +3,21 @@ package mega.privacy.android.app.domain.usecase
 import android.net.Uri
 import android.provider.MediaStore
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * Default implementation of [GetSyncFileUploadUris]
  *
- * @property getUploadOption [GetUploadOption]
+ * @property getUploadOptionUseCase [GetUploadOptionUseCase]
  */
 class DefaultGetSyncFileUploadUris @Inject constructor(
-    private val getUploadOption: GetUploadOption,
+    private val getUploadOptionUseCase: GetUploadOptionUseCase,
 ) : GetSyncFileUploadUris {
     override suspend fun invoke(): List<Uri> {
         val uris = mutableListOf<Uri>()
-        when (getUploadOption()) {
+        when (getUploadOptionUseCase()) {
             UploadOption.PHOTOS -> {
                 Timber.d("Only Upload Photos")
                 uris.add(MediaStore.Images.Media.EXTERNAL_CONTENT_URI)

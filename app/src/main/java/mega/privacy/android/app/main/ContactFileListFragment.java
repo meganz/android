@@ -70,7 +70,6 @@ import mega.privacy.android.app.main.adapters.MegaNodeAdapter;
 import mega.privacy.android.app.main.listeners.FabButtonListener;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaNodeUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import nz.mega.sdk.MegaError;
 import nz.mega.sdk.MegaNode;
@@ -185,7 +184,7 @@ public class ContactFileListFragment extends ContactFileBaseFragment {
             List<MegaNode> selected = adapter.getSelectedNodes();
 
             menu.findItem(R.id.cab_menu_share_link)
-                    .setTitle(StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size()));
+                    .setTitle(getResources().getQuantityString(R.plurals.get_links, selected.size()));
 
             boolean areAllNotTakenDown = MegaNodeUtil.areAllNotTakenDown(selected);
             boolean showRename = false;

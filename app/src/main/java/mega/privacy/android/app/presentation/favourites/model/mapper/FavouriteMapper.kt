@@ -1,5 +1,7 @@
 package mega.privacy.android.app.presentation.favourites.model.mapper
 
+import android.content.Context
+import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.favourites.model.Favourite
 import mega.privacy.android.app.presentation.favourites.model.FavouriteFile
@@ -48,7 +50,7 @@ internal fun toFavourite(
     is TypedFolderNode -> {
         nodeInfo.createFolder(
             node,
-            getFolderInfo(nodeInfo, stringUtil),
+            getFolderInfo(nodeInfo),
             isAvailableOffline,
             isSelected,
         )
@@ -74,7 +76,7 @@ internal fun toFavourite(
  */
 private fun TypedFolderNode.createFolder(
     node: MegaNode,
-    folderInfo: String,
+    folderInfo: (Context) -> String,
     isAvailableOffline: Boolean,
     isSelected: Boolean,
 ) = FavouriteFolder(
@@ -98,7 +100,7 @@ private fun TypedFolderNode.createFolder(
  */
 private fun TypedFileNode.createFile(
     node: MegaNode,
-    fileInfo: String,
+    fileInfo: (Context) -> String,
     isAvailableOffline: Boolean,
     getFileIcon: (String) -> Int,
     isSelected: Boolean,
@@ -130,11 +132,13 @@ private fun FileTypeInfo.hasThumbnail(): Boolean = when (this) {
  * @return file info
  */
 private fun getFileInfo(favouriteInfo: TypedFileNode, stringUtil: StringUtilWrapper) =
-    String.format(
-        "%s · %s",
-        stringUtil.getSizeString(favouriteInfo.size),
-        stringUtil.formatLongDateTime(favouriteInfo.modificationTime)
-    )
+    { context: Context ->
+        String.format(
+            "%s · %s",
+            stringUtil.getSizeString(favouriteInfo.size, context),
+            stringUtil.formatLongDateTime(favouriteInfo.modificationTime)
+        )
+    }
 
 /**
  * Get folder info based on number of child folders and files
@@ -142,5 +146,32 @@ private fun getFileInfo(favouriteInfo: TypedFileNode, stringUtil: StringUtilWrap
  * @param stringUtil StringUtilWrapper
  * @return folder info
  */
-private fun getFolderInfo(favouriteInfo: TypedFolderNode, stringUtil: StringUtilWrapper) =
-    stringUtil.getFolderInfo(favouriteInfo.childFolderCount, favouriteInfo.childFileCount)
+private fun getFolderInfo(
+    favouriteInfo: TypedFolderNode,
+) = { context: Context ->
+    if (favouriteInfo.childFolderCount == 0 && favouriteInfo.childFileCount == 0) {
+        context.getString(R.string.file_browser_empty_folder)
+    } else if (favouriteInfo.childFolderCount == 0 && favouriteInfo.childFileCount > 0) {
+        context.resources.getQuantityString(
+            R.plurals.num_files_with_parameter,
+            favouriteInfo.childFileCount,
+            favouriteInfo.childFileCount
+        )
+    } else if (favouriteInfo.childFileCount == 0 && favouriteInfo.childFolderCount > 0) {
+        context.resources.getQuantityString(
+            R.plurals.num_folders_with_parameter,
+            favouriteInfo.childFolderCount,
+            favouriteInfo.childFolderCount
+        )
+    } else {
+        context.resources.getQuantityString(
+            R.plurals.num_folders_num_files,
+            favouriteInfo.childFolderCount,
+            favouriteInfo.childFolderCount
+        ) + context.resources.getQuantityString(
+            R.plurals.num_folders_num_files_2,
+            favouriteInfo.childFileCount,
+            favouriteInfo.childFileCount
+        )
+    }
+}

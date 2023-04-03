@@ -25,12 +25,10 @@ import mega.privacy.android.app.components.OnOffFab
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.databinding.InMeetingFragmentBinding
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
-import mega.privacy.android.app.main.megachat.chatAdapters.MegaParticipantsChatAdapter.ViewHolderParticipantsHeader
 import mega.privacy.android.app.meeting.LockableBottomSheetBehavior
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.adapter.ParticipantsAdapter
 import mega.privacy.android.app.meeting.listeners.BottomFloatingPanelListener
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import timber.log.Timber
 
@@ -235,7 +233,7 @@ class BottomFloatingPanelViewHolder(
 
         floatingPanelView.guestShareLink.apply {
             isVisible = inMeetingViewModel.isGuestLinkVisible()
-            text = inMeetingViewModel.getGuestLinkTitle()
+            text = inMeetingViewModel.getGuestLinkTitle(context)
             setCompoundDrawablesRelativeWithIntrinsicBounds(
                 if (inMeetingViewModel.isModeratorOfPrivateRoom()) R.drawable.ic_invite_contact else R.drawable.ic_social_share_white,
                 0,
@@ -283,7 +281,7 @@ class BottomFloatingPanelViewHolder(
         myOwnParticipant: Participant,
     ) {
         updateParticipants(participants, myOwnParticipant)
-        floatingPanelView.participantsNum.text = getString(
+        floatingPanelView.participantsNum.text = context.getString(
             R.string.participants_number, participants.size
         )
     }
@@ -673,13 +671,13 @@ class BottomFloatingPanelViewHolder(
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
                 floatingPanelView.fabSpeaker.enable = true
                 floatingPanelView.fabSpeaker.isOn = true
-                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
+                floatingPanelView.fabSpeakerLabel.text = context.getString(R.string.general_speaker)
             }
             AppRTCAudioManager.AudioDevice.EARPIECE -> {
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_off)
                 floatingPanelView.fabSpeaker.enable = true
                 floatingPanelView.fabSpeaker.isOn = false
-                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
+                floatingPanelView.fabSpeakerLabel.text = context.getString(R.string.general_speaker)
             }
             AppRTCAudioManager.AudioDevice.WIRED_HEADSET,
             AppRTCAudioManager.AudioDevice.BLUETOOTH,
@@ -687,13 +685,14 @@ class BottomFloatingPanelViewHolder(
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_headphone)
                 floatingPanelView.fabSpeaker.enable = true
                 floatingPanelView.fabSpeaker.isOn = true
-                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_headphone)
+                floatingPanelView.fabSpeakerLabel.text =
+                    context.getString(R.string.general_headphone)
             }
             else -> {
                 floatingPanelView.fabSpeaker.setOnIcon(R.drawable.ic_speaker_on)
                 floatingPanelView.fabSpeaker.enable = false
                 floatingPanelView.fabSpeaker.isOn = true
-                floatingPanelView.fabSpeakerLabel.text = getString(R.string.general_speaker)
+                floatingPanelView.fabSpeakerLabel.text = context.getString(R.string.general_speaker)
             }
         }
     }

@@ -2135,4 +2135,16 @@ interface MegaApiGateway {
      * @return Information about transfer queues
      */
     suspend fun getTransferData(): MegaTransferData?
+
+    /**
+     * Remove a contact to the MEGA account
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_REMOVE_CONTACT
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getEmail - Returns the email of the contact
+     *
+     * @param user     MegaUser of the contact (see MegaApi::getContact)
+     * @param listener MegaRequestListener to track this request
+     */
+    fun removeContact(user: MegaUser, listener: MegaRequestListenerInterface?)
 }

@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.folderlink
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -141,8 +142,8 @@ class FolderLinkViewModel @Inject constructor(
      * @param toHandle      Handle of destination node
      */
     @SuppressLint("CheckResult")
-    fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long) {
-        checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY)
+    fun checkNameCollision(nodes: List<MegaNode>, toHandle: Long, context: Context) {
+        checkNameCollisionUseCase.checkNodeList(nodes, toHandle, NameCollisionType.COPY, context)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { result: Pair<ArrayList<NameCollision>, List<MegaNode>>, throwable: Throwable? ->

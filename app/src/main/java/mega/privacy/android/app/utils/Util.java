@@ -17,7 +17,6 @@ import static mega.privacy.android.app.utils.Constants.NOT_SPACE_SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PHOTO_CODE;
 import static mega.privacy.android.app.utils.Constants.TAKE_PICTURE_PROFILE_CODE;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
@@ -289,14 +288,14 @@ public class Util {
         return null;
     }
 
-    public static String getNumberItemChildren(File file) {
+    public static String getNumberItemChildren(File file, Context context) {
         File[] list = file.listFiles();
         int count = 0;
         if (list != null) {
             count = list.length;
         }
 
-        return getQuantityString(R.plurals.general_num_items, count, count);
+        return context.getResources().getQuantityString(R.plurals.general_num_items, count, count);
     }
 
     public static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
@@ -536,7 +535,7 @@ public class Util {
      * @param isSpeed true if the string is a speed, false if it is a size
      * @return The speed or size string.
      */
-    private static String getUnitString(long unit, boolean isSpeed) {
+    private static String getUnitString(long unit, boolean isSpeed, Context context) {
         DecimalFormat df = new DecimalFormat("#.##");
 
         float KB = 1024;
@@ -547,19 +546,19 @@ public class Util {
         float EB = PB * 1024;
 
         if (unit < KB) {
-            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
+            return context.getString(isSpeed ? R.string.label_file_speed_byte : R.string.label_file_size_byte, Long.toString(unit));
         } else if (unit < MB) {
-            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
+            return context.getString(isSpeed ? R.string.label_file_speed_kilo_byte : R.string.label_file_size_kilo_byte, df.format(unit / KB));
         } else if (unit < GB) {
-            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
+            return context.getString(isSpeed ? R.string.label_file_speed_mega_byte : R.string.label_file_size_mega_byte, df.format(unit / MB));
         } else if (unit < TB) {
-            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
+            return context.getString(isSpeed ? R.string.label_file_speed_giga_byte : R.string.label_file_size_giga_byte, df.format(unit / GB));
         } else if (unit < PB) {
-            return StringResourcesUtils.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
+            return context.getString(isSpeed ? R.string.label_file_speed_tera_byte : R.string.label_file_size_tera_byte, df.format(unit / TB));
         } else if (unit < EB) {
-            return StringResourcesUtils.getString(R.string.label_file_size_peta_byte, df.format(unit / PB));
+            return context.getString(R.string.label_file_size_peta_byte, df.format(unit / PB));
         } else {
-            return StringResourcesUtils.getString(R.string.label_file_size_exa_byte, df.format(unit / EB));
+            return context.getString(R.string.label_file_size_exa_byte, df.format(unit / EB));
         }
     }
 
@@ -569,8 +568,8 @@ public class Util {
      * @param speed the speed to show in the string
      * @return The speed string.
      */
-    public static String getSpeedString(long speed) {
-        return getUnitString(speed, true);
+    public static String getSpeedString(long speed, Context context) {
+        return getUnitString(speed, true, context);
     }
 
     /**
@@ -579,8 +578,8 @@ public class Util {
      * @param size the size to show in the string
      * @return The size string.
      */
-    public static String getSizeString(long size) {
-        return getUnitString(size, false);
+    public static String getSizeString(long size, Context context) {
+        return getUnitString(size, false, context);
     }
 
     public static String getSizeStringGBBased(long gbSize) {
@@ -627,8 +626,8 @@ public class Util {
     public static String getProgressSize(Context context, long progress,
                                          long size) {
         return String.format("%s/%s",
-                getSizeString(progress),
-                getSizeString(size));
+                getSizeString(progress, context),
+                getSizeString(size, context));
     }
 
     /*

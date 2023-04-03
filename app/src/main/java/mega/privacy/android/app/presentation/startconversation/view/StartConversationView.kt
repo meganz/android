@@ -47,21 +47,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
-import mega.privacy.android.core.ui.controls.SearchAppBar
-import mega.privacy.android.core.ui.controls.SimpleTopAppBar
-import mega.privacy.android.app.presentation.contact.ContactItemView
+import mega.privacy.android.app.presentation.contact.view.ContactItemView
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.search.view.EmptySearchView
-import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationAction
-import mega.privacy.android.domain.entity.contacts.ContactItem
+import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
+import mega.privacy.android.core.ui.controls.SearchAppBar
+import mega.privacy.android.core.ui.controls.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.domain.entity.contacts.ContactItem
 
 @Composable
 fun StartConversationView(
@@ -160,7 +160,9 @@ fun StartConversationView(
                         }
                     }
 
-                    item(key = contact.handle) { ContactItemView(contact) { onContactClicked(contact) } }
+                    item(key = contact.handle) {
+                        ContactItemView(contact, onClick = { onContactClicked(contact) })
+                    }
                 }
             }
         }

@@ -9,8 +9,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetPendingUploadList
-import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.data.mapper.camerauploads.SyncRecordTypeIntMapper
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.SyncRecord
@@ -20,6 +18,8 @@ import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MediaLocalPathExists
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Test
@@ -37,8 +37,8 @@ class DefaultGetPendingUploadListTest {
     private val getNodeFromCloud: GetNodeFromCloud = mock()
     private val getNodeByHandle: GetNodeByHandle = mock()
     private val getParentMegaNode: GetParentMegaNode = mock()
-    private val getPrimarySyncHandle: GetPrimarySyncHandle = mock()
-    private val getSecondarySyncHandle: GetSecondarySyncHandle = mock()
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase = mock()
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase = mock()
     private val updateTimeStamp: UpdateCameraUploadTimeStamp = mock()
     private val getFingerprint: GetFingerprint = mock()
     private val mediaLocalPathExists: MediaLocalPathExists = mock()
@@ -123,8 +123,8 @@ class DefaultGetPendingUploadListTest {
             getNodeFromCloud,
             getNodeByHandle,
             getParentMegaNode,
-            getPrimarySyncHandle,
-            getSecondarySyncHandle,
+            getPrimarySyncHandleUseCase,
+            getSecondarySyncHandleUseCase,
             updateTimeStamp,
             getFingerprint,
             mediaLocalPathExists,
@@ -140,8 +140,8 @@ class DefaultGetPendingUploadListTest {
         runTest {
             val result = mock<MegaNode> {}
             whenever(getFingerprint(any())).thenReturn("local fingerprint")
-            whenever(getPrimarySyncHandle()).thenReturn(1L)
-            whenever(getSecondarySyncHandle()).thenReturn(1L)
+            whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
+            whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
@@ -162,8 +162,8 @@ class DefaultGetPendingUploadListTest {
         runTest {
             val result = mock<MegaNode> {}
             whenever(getFingerprint(any())).thenReturn("local fingerprint")
-            whenever(getPrimarySyncHandle()).thenReturn(1L)
-            whenever(getSecondarySyncHandle()).thenReturn(1L)
+            whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
+            whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
@@ -184,8 +184,8 @@ class DefaultGetPendingUploadListTest {
         runTest {
             val result = mock<MegaNode> {}
             whenever(getFingerprint(any())).thenReturn("local fingerprint")
-            whenever(getPrimarySyncHandle()).thenReturn(1L)
-            whenever(getSecondarySyncHandle()).thenReturn(1L)
+            whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
+            whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(true)
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
@@ -206,8 +206,8 @@ class DefaultGetPendingUploadListTest {
         runTest {
             val result = mock<MegaNode> {}
             whenever(getFingerprint(any())).thenReturn("local fingerprint")
-            whenever(getPrimarySyncHandle()).thenReturn(1L)
-            whenever(getSecondarySyncHandle()).thenReturn(1L)
+            whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
+            whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(null)
@@ -229,8 +229,8 @@ class DefaultGetPendingUploadListTest {
             val result = mock<MegaNode> {}
             whenever(result.handle).thenReturn(1L)
             whenever(getFingerprint(any())).thenReturn("local fingerprint")
-            whenever(getPrimarySyncHandle()).thenReturn(1L)
-            whenever(getSecondarySyncHandle()).thenReturn(1L)
+            whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
+            whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(result)
@@ -251,8 +251,8 @@ class DefaultGetPendingUploadListTest {
             val result = mock<MegaNode> {}
             whenever(result.handle).thenReturn(1L)
             whenever(getFingerprint(any())).thenReturn("local fingerprint")
-            whenever(getPrimarySyncHandle()).thenReturn(1L)
-            whenever(getSecondarySyncHandle()).thenReturn(1L)
+            whenever(getPrimarySyncHandleUseCase()).thenReturn(1L)
+            whenever(getSecondarySyncHandleUseCase()).thenReturn(1L)
             whenever(shouldCompressVideo()).thenReturn(false)
             whenever(getNodeByHandle(any())).thenReturn(result)
             whenever(getNodeFromCloud(any(), any())).thenReturn(result)

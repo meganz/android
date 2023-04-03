@@ -38,7 +38,6 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
 import mega.privacy.android.data.facade.INTENT_EXTRA_NODE_HANDLE
@@ -88,8 +87,10 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
     var errorRemove = 0
     var completedRemove = 0
     private var bottomSheetDialogFragment: VersionBottomSheetDialogFragment? = null
-    private val nodeSaver = NodeSaver(this, this, this,
-        showSaveToDeviceConfirmDialog(this))
+    private val nodeSaver = NodeSaver(
+        this, this, this,
+        showSaveToDeviceConfirmDialog(this)
+    )
     var accessLevel = 0
         private set
     private var deleteVersionConfirmationDialog: AlertDialog? = null
@@ -157,9 +158,11 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                     it.isMultipleSelect = false
                 } ?: run {
                     adapter =
-                        VersionsFileAdapter(this,
+                        VersionsFileAdapter(
+                            this,
                             nodeVersions,
-                            binding.recyclerViewVersionsFile).also {
+                            binding.recyclerViewVersionsFile
+                        ).also {
                             binding.recyclerViewVersionsFile.adapter = it
                             it.isMultipleSelect = false
                         }
@@ -177,17 +180,16 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         showSnackbar(type, binding.versionsMainLayout, content, chatId)
     }
 
-    private inner class GetVersionsSizeTask : AsyncTask<String?, Void?, String>() {
+    private inner class GetVersionsSizeTask : AsyncTask<String?, Void?, Long>() {
 
-        override fun doInBackground(vararg params: String?): String {
+        override fun doInBackground(vararg params: String?): Long {
 
             val sizeNumber: Long = nodeVersions?.sumOf { node -> node.size } ?: 0L
-            val size = Util.getSizeString(sizeNumber)
-            Timber.d("doInBackground-AsyncTask GetVersionsSizeTask: %s", size)
-            return size
+            Timber.d("doInBackground-AsyncTask GetVersionsSizeTask: $sizeNumber")
+            return sizeNumber
         }
 
-        override fun onPostExecute(size: String) {
+        override fun onPostExecute(size: Long) {
             Timber.d("GetVersionsSizeTask::onPostExecute")
             updateSize(size)
         }
@@ -295,7 +297,8 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
             (binding.recyclerViewVersionsFile.canScrollVertically(-1) &&
                     binding.recyclerViewVersionsFile.visibility == View.VISIBLE
                     ) || adapter?.isMultipleSelect ?: false,
-            outMetrics)
+            outMetrics
+        )
     }
 
     fun showOptionsPanel(sNode: MegaNode?, sPosition: Int) {
@@ -459,22 +462,34 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
             }
             if (totalRemoveSelected == 0) {
                 if (completedRemove > 0 && errorRemove == 0) {
-                    showSnackbar(resources.getQuantityString(R.plurals.versions_deleted_succesfully,
-                        completedRemove,
-                        completedRemove))
-                } else if (completedRemove > 0 && errorRemove > 0) {
-                    showSnackbar("""
-    ${
-                        resources.getQuantityString(R.plurals.versions_deleted_succesfully,
+                    showSnackbar(
+                        resources.getQuantityString(
+                            R.plurals.versions_deleted_succesfully,
                             completedRemove,
-                            completedRemove)
-                    }
+                            completedRemove
+                        )
+                    )
+                } else if (completedRemove > 0 && errorRemove > 0) {
+                    showSnackbar(
+                        """
+    ${
+                            resources.getQuantityString(
+                                R.plurals.versions_deleted_succesfully,
+                                completedRemove,
+                                completedRemove
+                            )
+                        }
     ${resources.getQuantityString(R.plurals.versions_not_deleted, errorRemove, errorRemove)}
-    """.trimIndent())
+    """.trimIndent()
+                    )
                 } else {
-                    showSnackbar(resources.getQuantityString(R.plurals.versions_not_deleted,
-                        errorRemove,
-                        errorRemove))
+                    showSnackbar(
+                        resources.getQuantityString(
+                            R.plurals.versions_not_deleted,
+                            errorRemove,
+                            errorRemove
+                        )
+                    )
                 }
             }
         } else if (request.type == MegaRequest.TYPE_RESTORE) {
@@ -511,11 +526,13 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                 }
                 mimetype.isImage -> {
                     val intent = getIntentForSingleNode(this, vNode.handle, true)
-                    putThumbnailLocation(intent,
+                    putThumbnailLocation(
+                        intent,
                         binding.recyclerViewVersionsFile,
                         position,
                         Constants.VIEWER_FROM_FILE_VERSIONS,
-                        adapter)
+                        adapter
+                    )
                     startActivity(intent)
                     overridePendingTransition(0, 0)
                 }
@@ -534,38 +551,52 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                         mediaIntent = Util.getMediaIntent(this, vNode.name)
                         internalIntent = true
                     }
-                    mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                        Constants.VERSIONS_ADAPTER)
-                    putThumbnailLocation(mediaIntent,
+                    mediaIntent.putExtra(
+                        Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                        Constants.VERSIONS_ADAPTER
+                    )
+                    putThumbnailLocation(
+                        mediaIntent,
                         binding.recyclerViewVersionsFile,
                         position,
                         Constants.VIEWER_FROM_FILE_BROWSER,
-                        adapter)
+                        adapter
+                    )
                     mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, vNode.name)
                     val localPath = FileUtil.getLocalFile(vNode)
                     if (localPath != null) {
                         val mediaFile = File(localPath)
                         if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                            val mediaFileUri = FileProvider.getUriForFile(this,
+                            val mediaFileUri = FileProvider.getUriForFile(
+                                this,
                                 Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                                mediaFile)
+                                mediaFile
+                            )
                             if (mediaFileUri == null) {
-                                showSnackbar(Constants.SNACKBAR_TYPE,
+                                showSnackbar(
+                                    Constants.SNACKBAR_TYPE,
                                     getString(R.string.general_text_error),
-                                    -1)
+                                    -1
+                                )
                             } else {
-                                mediaIntent.setDataAndType(mediaFileUri,
-                                    MimeTypeList.typeForName(vNode.name).type)
+                                mediaIntent.setDataAndType(
+                                    mediaFileUri,
+                                    MimeTypeList.typeForName(vNode.name).type
+                                )
                             }
                         } else {
                             val mediaFileUri = Uri.fromFile(mediaFile)
                             if (mediaFileUri == null) {
-                                showSnackbar(Constants.SNACKBAR_TYPE,
+                                showSnackbar(
+                                    Constants.SNACKBAR_TYPE,
                                     getString(R.string.general_text_error),
-                                    -1)
+                                    -1
+                                )
                             } else {
-                                mediaIntent.setDataAndType(mediaFileUri,
-                                    MimeTypeList.typeForName(vNode.name).type)
+                                mediaIntent.setDataAndType(
+                                    mediaFileUri,
+                                    MimeTypeList.typeForName(vNode.name).type
+                                )
                             }
                         }
                         mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -577,14 +608,18 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                             if (parsedUri != null) {
                                 mediaIntent.setDataAndType(parsedUri, mimetype.type)
                             } else {
-                                showSnackbar(Constants.SNACKBAR_TYPE,
+                                showSnackbar(
+                                    Constants.SNACKBAR_TYPE,
                                     getString(R.string.general_text_error),
-                                    -1)
+                                    -1
+                                )
                             }
                         } else {
-                            showSnackbar(Constants.SNACKBAR_TYPE,
+                            showSnackbar(
+                                Constants.SNACKBAR_TYPE,
                                 getString(R.string.general_text_error),
-                                -1)
+                                -1
+                            )
                         }
                     }
                     mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, vNode.handle)
@@ -597,9 +632,11 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                         if (MegaApiUtils.isIntentAvailable(this, mediaIntent)) {
                             startActivity(mediaIntent)
                         } else {
-                            showSnackbar(Constants.SNACKBAR_TYPE,
+                            showSnackbar(
+                                Constants.SNACKBAR_TYPE,
                                 getString(R.string.intent_not_available),
-                                -1)
+                                -1
+                            )
                             downloadNodes(listOf(vNode))
                         }
                     }
@@ -611,18 +648,26 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                 mimetype.isPdf -> {
                     val pdfIntent = Intent(this, PdfViewerActivity::class.java)
                     pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
-                    pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
-                        Constants.VERSIONS_ADAPTER)
+                    pdfIntent.putExtra(
+                        Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE,
+                        Constants.VERSIONS_ADAPTER
+                    )
                     val localPath = FileUtil.getLocalFile(vNode)
                     if (localPath != null) {
                         val mediaFile = File(localPath)
                         if (localPath.contains(Environment.getExternalStorageDirectory().path)) {
-                            pdfIntent.setDataAndType(FileProvider.getUriForFile(this,
-                                Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                                mediaFile), MimeTypeList.typeForName(vNode.name).type)
+                            pdfIntent.setDataAndType(
+                                FileProvider.getUriForFile(
+                                    this,
+                                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                                    mediaFile
+                                ), MimeTypeList.typeForName(vNode.name).type
+                            )
                         } else {
-                            pdfIntent.setDataAndType(Uri.fromFile(mediaFile),
-                                MimeTypeList.typeForName(vNode.name).type)
+                            pdfIntent.setDataAndType(
+                                Uri.fromFile(mediaFile),
+                                MimeTypeList.typeForName(vNode.name).type
+                            )
                         }
                         pdfIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     } else {
@@ -633,28 +678,36 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                             if (parsedUri != null) {
                                 pdfIntent.setDataAndType(parsedUri, mimetype.type)
                             } else {
-                                showSnackbar(Constants.SNACKBAR_TYPE,
+                                showSnackbar(
+                                    Constants.SNACKBAR_TYPE,
                                     getString(R.string.general_text_error),
-                                    -1)
+                                    -1
+                                )
                             }
                         } else {
-                            showSnackbar(Constants.SNACKBAR_TYPE,
+                            showSnackbar(
+                                Constants.SNACKBAR_TYPE,
                                 getString(R.string.general_text_error),
-                                -1)
+                                -1
+                            )
                         }
                     }
                     pdfIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, vNode.handle)
-                    putThumbnailLocation(pdfIntent,
+                    putThumbnailLocation(
+                        pdfIntent,
                         binding.recyclerViewVersionsFile,
                         position,
                         Constants.VIEWER_FROM_FILE_BROWSER,
-                        adapter)
+                        adapter
+                    )
                     if (MegaApiUtils.isIntentAvailable(this, pdfIntent)) {
                         startActivity(pdfIntent)
                     } else {
-                        Toast.makeText(this,
-                            StringResourcesUtils.getString(R.string.intent_not_available),
-                            Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            this,
+                            getString(R.string.intent_not_available),
+                            Toast.LENGTH_LONG
+                        ).show()
                         downloadNodes(listOf(vNode))
                     }
                     overridePendingTransition(0, 0)
@@ -676,9 +729,11 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
             val nodes = adapter?.selectedNodes ?: emptyList()
             val res = resources
             val format = "%d %s"
-            it.title = String.format(format,
+            it.title = String.format(
+                format,
                 nodes.size,
-                res.getQuantityString(R.plurals.general_num_files, nodes.size))
+                res.getQuantityString(R.plurals.general_num_files, nodes.size)
+            )
             try {
                 it.invalidate()
             } catch (e: NullPointerException) {
@@ -882,9 +937,10 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         showSnackbar(binding.versionsMainLayout, s!!)
     }
 
-    fun updateSize(size: String?) {
+    fun updateSize(size: Long?) {
         Timber.d("Size: %s", size)
-        versionsSize = size
+        val sizeString = size?.let { Util.getSizeString(it, this) }
+        versionsSize = sizeString
         adapter?.notifyItemChanged(1)
     }
 
@@ -908,8 +964,10 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         } else {
             title =
                 resources.getQuantityString(R.plurals.title_dialog_delete_version, removeNodes.size)
-            message = resources.getString(R.string.content_dialog_delete_multiple_version,
-                removeNodes.size)
+            message = resources.getString(
+                R.string.content_dialog_delete_multiple_version,
+                removeNodes.size
+            )
         }
         builder.setTitle(title)
             .setMessage(message)
@@ -924,14 +982,20 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         Timber.d("onSaveInstanceState")
         super.onSaveInstanceState(outState)
         outState.putLong(INTENT_EXTRA_NODE_HANDLE, node!!.handle)
-        outState.putBoolean(CHECKING_REVERT_VERSION,
-            checkPermissionRevertVersionDialog != null && checkPermissionRevertVersionDialog!!.isShowing)
+        outState.putBoolean(
+            CHECKING_REVERT_VERSION,
+            checkPermissionRevertVersionDialog != null && checkPermissionRevertVersionDialog!!.isShowing
+        )
         outState.putLong(SELECTED_NODE_HANDLE, selectedNodeHandle)
         outState.putInt(SELECTED_POSITION, selectedPosition)
-        outState.putBoolean(DELETING_VERSION_DIALOG_SHOWN,
-            deleteVersionConfirmationDialog != null && deleteVersionConfirmationDialog!!.isShowing)
-        outState.putBoolean(DELETING_HISTORY_VERSION_DIALOG_SHOWN,
-            deleteVersionHistoryDialog != null && deleteVersionHistoryDialog!!.isShowing)
+        outState.putBoolean(
+            DELETING_VERSION_DIALOG_SHOWN,
+            deleteVersionConfirmationDialog != null && deleteVersionConfirmationDialog!!.isShowing
+        )
+        outState.putBoolean(
+            DELETING_HISTORY_VERSION_DIALOG_SHOWN,
+            deleteVersionHistoryDialog != null && deleteVersionHistoryDialog!!.isShowing
+        )
         nodeSaver.saveState(outState)
     }
 

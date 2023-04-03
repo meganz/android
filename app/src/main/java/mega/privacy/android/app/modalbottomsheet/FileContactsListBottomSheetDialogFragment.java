@@ -22,7 +22,6 @@ import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.FileContactListActivity;
 import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.utils.ContactUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
 import nz.mega.sdk.MegaUser;
@@ -109,15 +108,15 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
             switch (accessLevel) {
                 case MegaShare.ACCESS_OWNER:
                 case MegaShare.ACCESS_FULL:
-                    titleMailContactPanel.setText(StringResourcesUtils.getString(R.string.file_properties_shared_folder_full_access));
+                    titleMailContactPanel.setText(getString(R.string.file_properties_shared_folder_full_access));
                     break;
 
                 case MegaShare.ACCESS_READ:
-                    titleMailContactPanel.setText(StringResourcesUtils.getString(R.string.file_properties_shared_folder_read_only));
+                    titleMailContactPanel.setText(getString(R.string.file_properties_shared_folder_read_only));
                     break;
 
                 case MegaShare.ACCESS_READWRITE:
-                    titleMailContactPanel.setText(StringResourcesUtils.getString(R.string.file_properties_shared_folder_read_write));
+                    titleMailContactPanel.setText(getString(R.string.file_properties_shared_folder_read_write));
                     break;
             }
 

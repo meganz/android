@@ -3,11 +3,15 @@ package mega.privacy.android.app.getLink
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.ChatExplorerActivityContract
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -18,9 +22,12 @@ import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.interfaces.ActivityLauncher
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
-import mega.privacy.android.app.utils.Constants.*
+import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_DISABLED
+import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED
+import mega.privacy.android.app.utils.Constants.EXTRA_SEVERAL_LINKS
+import mega.privacy.android.app.utils.Constants.REQUEST_CODE_SELECT_CHAT
+import mega.privacy.android.app.utils.Constants.TYPE_TEXT_PLAIN
 import mega.privacy.android.app.utils.MenuUtils.toggleAllMenuItemsVisibility
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.copyToClipboard
 
 /**
@@ -53,7 +60,7 @@ class GetSeveralLinksFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentGetSeveralLinksBinding.inflate(layoutInflater)
         setHasOptionsMenu(true)
@@ -158,7 +165,10 @@ class GetSeveralLinksFragment : Fragment() {
     private fun copyLinks(links: String) {
         copyToClipboard(requireActivity(), links)
         (requireActivity() as SnackbarShower).showSnackbar(
-            StringResourcesUtils.getQuantityString(R.plurals.links_copied_clipboard, viewModel.getLinksNumber())
+            requireContext().resources.getQuantityString(
+                R.plurals.links_copied_clipboard,
+                viewModel.getLinksNumber()
+            )
         )
     }
 }

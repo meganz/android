@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,7 +54,6 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 import mega.privacy.android.app.presentation.photos.view.CardListView
 import mega.privacy.android.app.presentation.photos.view.TimeSwitchBar
 import mega.privacy.android.app.presentation.photos.view.isScrollingDown
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
@@ -180,11 +180,13 @@ fun FilterFAB(
                     .padding(all = 0.dp)
             ) {
                 Icon(
-                    painter = painterResource(id = if (MaterialTheme.colors.isLight) {
-                        R.drawable.ic_filter_light
-                    } else {
-                        R.drawable.ic_filter_dark
-                    }),
+                    painter = painterResource(
+                        id = if (MaterialTheme.colors.isLight) {
+                            R.drawable.ic_filter_light
+                        } else {
+                            R.drawable.ic_filter_dark
+                        }
+                    ),
                     contentDescription = "Exit filter",
                     tint = if (!MaterialTheme.colors.isLight) {
                         Color.Black
@@ -217,7 +219,7 @@ fun CameraUploadProgressBar(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 Text(
-                    text = StringResourcesUtils.getQuantityString(
+                    text = LocalContext.current.resources.getQuantityString(
                         R.plurals.cu_upload_progress,
                         timelineViewState.pending,
                         timelineViewState.pending

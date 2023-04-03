@@ -27,7 +27,6 @@ import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.FileUtil.copyFileToDCIM
 import mega.privacy.android.app.utils.FileUtil.isFileAvailable
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
@@ -144,7 +143,7 @@ class WebViewActivity : BaseActivity() {
         for (result in grantResults.indices) {
             if (grantResults[result] == PackageManager.PERMISSION_DENIED) {
                 val warningText =
-                    StringResourcesUtils.getString(R.string.files_required_permissions_warning)
+                    getString(R.string.files_required_permissions_warning)
 
                 if (!PermissionUtils.shouldShowRequestPermissionRationale(
                         this,
@@ -346,8 +345,10 @@ class WebViewActivity : BaseActivity() {
                 @SuppressLint("SimpleDateFormat")
                 val fileName = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
 
-                file = CacheFolderManager.buildTempFile(this,
-                    fileName + getContentExtension(contentType))
+                file = CacheFolderManager.buildTempFile(
+                    this,
+                    fileName + getContentExtension(contentType)
+                )
             } catch (e: IOException) {
                 Timber.e(e, "Error creating temp file.")
             }

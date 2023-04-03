@@ -7,7 +7,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -21,13 +21,13 @@ class DefaultCompressedVideoPendingTest {
     private lateinit var underTest: CompressedVideoPending
 
     private val cameraUploadRepository = mock<CameraUploadRepository>()
-    private val getUploadVideoQuality = mock<GetUploadVideoQuality>()
+    private val getUploadVideoQuality = mock<GetUploadVideoQualityUseCase>()
 
     @Before
     fun setUp() {
         underTest = DefaultCompressedVideoPending(
             cameraUploadRepository = cameraUploadRepository,
-            getUploadVideoQuality = getUploadVideoQuality,
+            getUploadVideoQualityUseCase = getUploadVideoQuality,
         )
     }
 

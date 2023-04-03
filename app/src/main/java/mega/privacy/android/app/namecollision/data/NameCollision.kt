@@ -1,5 +1,6 @@
 package mega.privacy.android.app.namecollision.data
 
+import android.content.Context
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.utils.FileUtil.getFileFolderInfo
@@ -48,7 +49,7 @@ sealed class NameCollision : Serializable {
         override val folderContent: String? = null,
         override val lastModified: Long,
         override val parentHandle: Long,
-        override val isFile: Boolean = true
+        override val isFile: Boolean = true,
     ) : NameCollision() {
 
         companion object {
@@ -61,13 +62,21 @@ sealed class NameCollision : Serializable {
              * @param parentHandle      The parent handle of the node in which the file has to be uploaded.
              */
             @JvmStatic
-            fun getUploadCollision(collisionHandle: Long, file: File, parentHandle: Long): Upload =
+            fun getUploadCollision(
+                collisionHandle: Long,
+                file: File,
+                parentHandle: Long,
+                context: Context,
+            ): Upload =
                 Upload(
                     collisionHandle = collisionHandle,
                     absolutePath = file.absolutePath,
                     name = file.name,
                     size = if (file.isFile) file.length() else null,
-                    folderContent = if (file.isDirectory) getFileFolderInfo(file) else null,
+                    folderContent = if (file.isDirectory) getFileFolderInfo(
+                        file,
+                        context
+                    ) else null,
                     lastModified = file.lastModified(),
                     parentHandle = parentHandle
                 )
@@ -83,7 +92,7 @@ sealed class NameCollision : Serializable {
             fun getUploadCollision(
                 collisionHandle: Long,
                 shareInfo: ShareInfo,
-                parentHandle: Long
+                parentHandle: Long,
             ): Upload = Upload(
                 collisionHandle = collisionHandle,
                 absolutePath = shareInfo.fileAbsolutePath,
@@ -103,13 +112,17 @@ sealed class NameCollision : Serializable {
             fun getUploadCollision(
                 collisionHandle: Long,
                 uploadContent: FolderContent.Data,
-                parentHandle: Long
+                parentHandle: Long,
+                context: Context,
             ): Upload = Upload(
                 collisionHandle = collisionHandle,
                 absolutePath = uploadContent.uri.toString(),
                 name = uploadContent.name!!,
                 size = if (uploadContent.isFolder) null else uploadContent.size,
-                folderContent = if (uploadContent.isFolder) getFileFolderInfo(uploadContent.document) else null,
+                folderContent = if (uploadContent.isFolder) getFileFolderInfo(
+                    uploadContent.document,
+                    context
+                ) else null,
                 lastModified = uploadContent.lastModified,
                 parentHandle = parentHandle,
                 isFile = !uploadContent.isFolder
@@ -137,7 +150,7 @@ sealed class NameCollision : Serializable {
         override val folderContent: String? = null,
         override val lastModified: Long,
         override val parentHandle: Long,
-        override val isFile: Boolean
+        override val isFile: Boolean,
     ) : NameCollision() {
 
         companion object {
@@ -150,13 +163,21 @@ sealed class NameCollision : Serializable {
              * @param parentHandle      The parent handle of the node in which the file has to be copied.
              */
             @JvmStatic
-            fun getCopyCollision(collisionHandle: Long, node: MegaNode, parentHandle: Long): Copy =
+            fun getCopyCollision(
+                collisionHandle: Long,
+                node: MegaNode,
+                parentHandle: Long,
+                context: Context,
+            ): Copy =
                 Copy(
                     collisionHandle = collisionHandle,
                     nodeHandle = node.handle,
                     name = node.name,
                     size = if (node.isFile) node.size else null,
-                    folderContent = if (node.isFolder) getMegaNodeFolderInfo(node) else null,
+                    folderContent = if (node.isFolder) getMegaNodeFolderInfo(
+                        node,
+                        context
+                    ) else null,
                     lastModified = if (node.isFile) node.modificationTime else node.creationTime,
                     parentHandle = parentHandle,
                     isFile = node.isFile
@@ -188,7 +209,7 @@ sealed class NameCollision : Serializable {
         override val folderContent: String? = null,
         override val lastModified: Long,
         override val parentHandle: Long,
-        override val isFile: Boolean = true
+        override val isFile: Boolean = true,
     ) : NameCollision() {
 
         companion object {
@@ -209,7 +230,7 @@ sealed class NameCollision : Serializable {
                 chatId: Long,
                 messageId: Long,
                 node: MegaNode,
-                parentHandle: Long
+                parentHandle: Long,
             ): Import =
                 Import(
                     collisionHandle = collisionHandle,
@@ -244,7 +265,7 @@ sealed class NameCollision : Serializable {
         override val folderContent: String? = null,
         override val lastModified: Long,
         override val parentHandle: Long,
-        override val isFile: Boolean
+        override val isFile: Boolean,
     ) : NameCollision() {
 
         companion object {
@@ -260,13 +281,14 @@ sealed class NameCollision : Serializable {
             fun getMovementCollision(
                 collisionHandle: Long,
                 node: MegaNode,
-                parentHandle: Long
+                parentHandle: Long,
+                context: Context,
             ): Movement = Movement(
                 collisionHandle = collisionHandle,
                 nodeHandle = node.handle,
                 name = node.name,
                 size = if (node.isFile) node.size else null,
-                folderContent = if (node.isFolder) getMegaNodeFolderInfo(node) else null,
+                folderContent = if (node.isFolder) getMegaNodeFolderInfo(node, context) else null,
                 lastModified = if (node.isFile) node.modificationTime else node.creationTime,
                 parentHandle = parentHandle,
                 isFile = node.isFile

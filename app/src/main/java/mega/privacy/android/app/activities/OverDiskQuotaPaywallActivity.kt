@@ -57,10 +57,14 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        registerReceiver(updateAccountDetailsReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS))
-        registerReceiver(updateUserDataReceiver,
-            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_USER_DATA))
+        registerReceiver(
+            updateAccountDetailsReceiver,
+            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
+        )
+        registerReceiver(
+            updateUserDataReceiver,
+            IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_USER_DATA)
+        )
 
         viewModel.requestStorageDetailIfNeeded()
 
@@ -149,37 +153,49 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
 
         if (warningsTs == null || warningsTs.size() == 0) {
             overDiskQuotaPaywallText?.text =
-                getString(R.string.over_disk_quota_paywall_text_no_warning_dates_info,
-                    email, files.toString(), size, getProPlanNeeded())
+                getString(
+                    R.string.over_disk_quota_paywall_text_no_warning_dates_info,
+                    email, files.toString(), size, getProPlanNeeded()
+                )
         } else if (warningsTs.size() == 1) {
             overDiskQuotaPaywallText?.text =
-                resources.getQuantityString(R.plurals.over_disk_quota_paywall_text,
+                resources.getQuantityString(
+                    R.plurals.over_disk_quota_paywall_text,
                     1,
                     email,
-                    formatDate(warningsTs.get(0), DATE_LONG_FORMAT, false),
+                    formatDate(warningsTs.get(0), DATE_LONG_FORMAT, false, this),
                     files,
                     size,
-                    getProPlanNeeded())
+                    getProPlanNeeded()
+                )
         } else {
             var dates = String()
             val lastWarningIndex: Int = warningsTs.size() - 1
             for (i in 0 until lastWarningIndex) {
                 if (dates.isEmpty()) {
-                    dates += formatDate(warningsTs.get(i), DATE_LONG_FORMAT, false)
+                    dates += formatDate(
+                        warningsTs.get(i),
+                        DATE_LONG_FORMAT,
+                        false,
+                        this
+                    )
                 } else if (i != lastWarningIndex) {
-                    dates = dates + ", " + formatDate(warningsTs.get(i), DATE_LONG_FORMAT, false)
+                    dates =
+                        dates + ", " + formatDate(warningsTs.get(i), DATE_LONG_FORMAT, false, this)
                 }
             }
 
             overDiskQuotaPaywallText?.text =
-                resources.getQuantityString(R.plurals.over_disk_quota_paywall_text,
+                resources.getQuantityString(
+                    R.plurals.over_disk_quota_paywall_text,
                     warningsTs.size(),
                     email,
                     dates,
-                    formatDate(warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false),
+                    formatDate(warningsTs.get(lastWarningIndex), DATE_LONG_FORMAT, false, this),
                     files,
                     size,
-                    getProPlanNeeded())
+                    getProPlanNeeded()
+                )
         }
 
         updateDeletionWarningText()
@@ -203,8 +219,10 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
                     String.format(getString(R.string.over_disk_quota_paywall_deletion_warning_no_time_left))
             }
             else -> {
-                text = String.format(getString(R.string.over_disk_quota_paywall_deletion_warning),
-                    getHumanizedTimeMs(time))
+                text = String.format(
+                    getString(R.string.over_disk_quota_paywall_deletion_warning),
+                    getHumanizedTimeMs(time)
+                )
 
                 if (timer == null) {
                     timer = object : CountDownTimer(time, 1000) {
@@ -224,9 +242,13 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         try {
             text = text.replace("[B]", "<b>")
             text = text.replace("[/B]", "</b>")
-            text = text.replace("[M]",
-                "<font color='" + ColorUtils.getThemeColorHexString(applicationContext,
-                    R.attr.colorError) + "'>")
+            text = text.replace(
+                "[M]",
+                "<font color='" + ColorUtils.getThemeColorHexString(
+                    applicationContext,
+                    R.attr.colorError
+                ) + "'>"
+            )
             text = text.replace("[/M]", "</font>")
         } catch (e: Exception) {
             Timber.w(e, "Exception formatting string")

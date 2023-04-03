@@ -1,8 +1,8 @@
 package mega.privacy.android.app.usecase.data
 
+import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.DBUtil
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 
 /**
  * Data class containing all the info related to a movement request.
@@ -12,27 +12,27 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
  */
 data class RemoveRequestResult(
     val count: Int,
-    val errorCount: Int
+    val errorCount: Int,
 ) {
 
     val successCount = count - errorCount
     val isSingleAction = count == 1
     val isSuccess = errorCount == 0
 
-    fun getResultText(): String =
+    fun getResultText(context: Context): String =
         when {
             isSingleAction && isSuccess -> {
-                getString(R.string.context_correctly_removed)
+                context.getString(R.string.context_correctly_removed)
             }
             isSingleAction -> {
-                getString(R.string.context_no_removed)
+                context.getString(R.string.context_no_removed)
             }
             isSuccess -> {
-                getString(R.string.number_correctly_removed, count)
+                context.getString(R.string.number_correctly_removed, count)
             }
             else -> {
-                getString(R.string.number_correctly_removed, successCount) +
-                        getString(R.string.number_no_removed, errorCount)
+                context.getString(R.string.number_correctly_removed, successCount) +
+                        context.getString(R.string.number_no_removed, errorCount)
             }
         }
 

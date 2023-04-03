@@ -51,7 +51,6 @@ import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
 import mega.privacy.android.app.usecase.GetNodeUseCase;
 import mega.privacy.android.app.utils.AlertDialogUtil;
 import mega.privacy.android.app.utils.ContactUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaChatContainsMeta;
@@ -397,7 +396,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.option_info_layout:
                 if (!isOnline(requireContext())) {
-                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 
@@ -408,7 +407,7 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
             case R.id.option_invite_layout:
                 if (!isOnline(requireContext())) {
-                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, StringResourcesUtils.getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
                     return;
                 }
 

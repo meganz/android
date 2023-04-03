@@ -42,7 +42,6 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil.manageTextFileIntent
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.onNodeTapped
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
@@ -116,10 +115,14 @@ class RecentActionsFragment : Fragment() {
         showActivityButton.setOnClickListener {
             viewModel.disableHideRecentActivitySetting()
         }
-        emptySpanned = TextUtil.formatEmptyScreenText(requireContext(),
-            StringResourcesUtils.getString(R.string.context_empty_recents))
-        activityHiddenSpanned = TextUtil.formatEmptyScreenText(requireContext(),
-            StringResourcesUtils.getString(R.string.recents_activity_hidden))
+        emptySpanned = TextUtil.formatEmptyScreenText(
+            requireContext(),
+            getString(R.string.context_empty_recents)
+        )
+        activityHiddenSpanned = TextUtil.formatEmptyScreenText(
+            requireContext(),
+            getString(R.string.recents_activity_hidden)
+        )
         listView = binding.listViewRecents
         fastScroller = binding.fastscroll
 
@@ -134,10 +137,14 @@ class RecentActionsFragment : Fragment() {
             if (!item.isKeyVerified) {
                 lifecycleScope.launch {
                     viewModel.getMegaNode(item.bucket.nodes[0].id.longValue)?.let { megaNode ->
-                        Intent(requireActivity(),
-                            AuthenticityCredentialsActivity::class.java).apply {
-                            putExtra(Constants.IS_NODE_INCOMING,
-                                nodeController.nodeComesFromIncoming(megaNode))
+                        Intent(
+                            requireActivity(),
+                            AuthenticityCredentialsActivity::class.java
+                        ).apply {
+                            putExtra(
+                                Constants.IS_NODE_INCOMING,
+                                nodeController.nodeComesFromIncoming(megaNode)
+                            )
                             putExtra(Constants.EMAIL, item.bucket.userEmail)
                             requireActivity().startActivity(this)
                         }
@@ -160,8 +167,10 @@ class RecentActionsFragment : Fragment() {
                         Navigation.findNavController(requireView()).currentDestination
                     if (currentDestination != null && currentDestination.id == R.id.homepageFragment) {
                         Navigation.findNavController(requireView())
-                            .navigate(HomepageFragmentDirections.actionHomepageToRecentBucket(),
-                                NavOptions.Builder().build())
+                            .navigate(
+                                HomepageFragmentDirections.actionHomepageToRecentBucket(),
+                                NavOptions.Builder().build()
+                            )
                     }
                 }
             }
@@ -169,13 +178,17 @@ class RecentActionsFragment : Fragment() {
 
         adapter.setOnThreeDotsClickListener { node ->
             if (!Util.isOnline(context)) {
-                (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
-                    requireContext().getString(R.string.error_server_connection_problem), -1)
+                (requireActivity() as ManagerActivity).showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    requireContext().getString(R.string.error_server_connection_problem), -1
+                )
             } else {
                 lifecycleScope.launch {
                     val megaNode = viewModel.getMegaNode(node.id.longValue)
-                    (requireActivity() as ManagerActivity).showNodeOptionsPanel(megaNode,
-                        NodeOptionsBottomSheetDialogFragment.RECENTS_MODE)
+                    (requireActivity() as ManagerActivity).showNodeOptionsPanel(
+                        megaNode,
+                        NodeOptionsBottomSheetDialogFragment.RECENTS_MODE
+                    )
                 }
             }
         }
@@ -278,11 +291,15 @@ class RecentActionsFragment : Fragment() {
             intent.putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, node.name)
             intent.putExtra(Constants.INTENT_EXTRA_KEY_IS_PLAYLIST, false)
             paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                FileUtil.setLocalIntentParams(requireContext(), node, intent, localPath,
-                    false, requireActivity() as ManagerActivity)
+                FileUtil.setLocalIntentParams(
+                    requireContext(), node, intent, localPath,
+                    false, requireActivity() as ManagerActivity
+                )
             } else {
-                FileUtil.setStreamingIntentParams(requireContext(), node, megaApi, intent,
-                    requireActivity() as ManagerActivity)
+                FileUtil.setStreamingIntentParams(
+                    requireContext(), node, megaApi, intent,
+                    requireActivity() as ManagerActivity
+                )
             }
             if (paramsSetSuccessfully && FileUtil.isOpusFile(node)) {
                 intent.setDataAndType(intent.data, "audio/*")
@@ -295,22 +312,28 @@ class RecentActionsFragment : Fragment() {
             intent.putExtra(Constants.INTENT_EXTRA_KEY_INSIDE, true)
             intent.putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.RECENTS_ADAPTER)
             paramsSetSuccessfully = if (FileUtil.isLocalFile(node, megaApi, localPath)) {
-                FileUtil.setLocalIntentParams(requireContext(), node, intent, localPath,
-                    false, requireActivity() as ManagerActivity)
+                FileUtil.setLocalIntentParams(
+                    requireContext(), node, intent, localPath,
+                    false, requireActivity() as ManagerActivity
+                )
             } else {
-                FileUtil.setStreamingIntentParams(requireContext(), node, megaApi, intent,
-                    requireActivity() as ManagerActivity)
+                FileUtil.setStreamingIntentParams(
+                    requireContext(), node, megaApi, intent,
+                    requireActivity() as ManagerActivity
+                )
             }
             launchIntent(intent, paramsSetSuccessfully, node, index)
         } else if (MimeTypeList.typeForName(node.name).isOpenableTextFile(node.size)) {
             manageTextFileIntent(requireContext(), node, Constants.RECENTS_ADAPTER)
         } else {
             Timber.d("itemClick:isFile:otherOption")
-            onNodeTapped(requireActivity(),
+            onNodeTapped(
+                requireActivity(),
                 node,
                 { n: MegaNode -> (requireActivity() as ManagerActivity).saveNodeByTap(n) },
                 (requireActivity() as ManagerActivity),
-                (requireActivity() as ManagerActivity))
+                (requireActivity() as ManagerActivity)
+            )
         }
     }
 
@@ -329,18 +352,22 @@ class RecentActionsFragment : Fragment() {
         position: Int,
     ) {
         if (intent != null && !MegaApiUtils.isIntentAvailable(requireContext(), intent)) {
-            (requireActivity() as ManagerActivity).showSnackbar(Constants.SNACKBAR_TYPE,
+            (requireActivity() as ManagerActivity).showSnackbar(
+                Constants.SNACKBAR_TYPE,
                 getString(R.string.intent_not_available),
-                -1)
+                -1
+            )
             return
         }
         if (intent != null && paramsSetSuccessfully) {
             intent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, node.handle)
-            putThumbnailLocation(intent,
+            putThumbnailLocation(
+                intent,
                 listView,
                 position,
                 Constants.VIEWER_FROM_RECETS,
-                adapter)
+                adapter
+            )
             requireActivity().startActivity(intent)
             requireActivity().overridePendingTransition(0, 0)
         }

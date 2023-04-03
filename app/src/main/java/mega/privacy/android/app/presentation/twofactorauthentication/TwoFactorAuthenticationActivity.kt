@@ -179,7 +179,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             passFourth.previousDigitEditText = passThird
             passFifth.previousDigitEditText = passFourth
             passSixth.previousDigitEditText = passFifth
-            fileNameRK.text = FileUtil.getRecoveryKeyFileName()
+            fileNameRK.text = FileUtil.getRecoveryKeyFileName(binding.root.context)
 
             when {
                 scanOrCopyIsShown || newAccount -> {

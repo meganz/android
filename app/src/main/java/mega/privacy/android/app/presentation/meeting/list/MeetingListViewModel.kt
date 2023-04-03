@@ -3,20 +3,18 @@ package mega.privacy.android.app.presentation.meeting.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.meeting.gateway.RTCAudioManagerGateway
@@ -60,7 +58,7 @@ import javax.inject.Inject
  * @property megaChatApiGateway                 [MegaChatApiGateway]
  * @property rtcAudioManagerGateway             [RTCAudioManagerGateway]
  */
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MeetingListViewModel @Inject constructor(
     private val archiveChatUseCase: ArchiveChat,
@@ -80,14 +78,9 @@ class MeetingListViewModel @Inject constructor(
     private val rtcAudioManagerGateway: RTCAudioManagerGateway,
 ) : ViewModel() {
 
-    companion object {
-        private const val DEBOUNCE_TIMEOUT_MS = 250L
-    }
-
     private val state = MutableStateFlow(MeetingListState())
     private val searchQueryState = MutableStateFlow<String?>(null)
     private val is24HourFormat: Boolean by lazy { deviceGateway.is24HourFormat() }
-    private val mutex = Mutex()
 
     /**
      * Get Meeting List state
@@ -116,10 +109,9 @@ class MeetingListViewModel @Inject constructor(
      * @return  Flow of MeetingRoomItems
      */
     private fun getMeetings(): Flow<List<MeetingRoomItem>> =
-        getMeetingsUseCase(mutex)
-            .debounce(DEBOUNCE_TIMEOUT_MS) // Needed for backpressure
+        getMeetingsUseCase()
             .mapLatest { items ->
-                mutex.withLock {
+                withContext(Dispatchers.Default) {
                     items.map { item ->
                         item.copy(
                             lastMessage = getLastMessageUseCase.get(item.chatId)
@@ -145,14 +137,6 @@ class MeetingListViewModel @Inject constructor(
                         meeting.lastMessage?.contains(searchQuery, true) == true
             }
         }
-
-    /**
-     * Check if search query is empty
-     *
-     * @return  true if search query is empty, false otherwise
-     */
-    fun isSearchQueryEmpty(): Boolean =
-        searchQueryState.value.isNullOrBlank()
 
     /**
      * Get specific meeting given its chat id

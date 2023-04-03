@@ -1,17 +1,26 @@
 package mega.privacy.android.app.myAccount.usecase
 
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.core.Completable
 import mega.privacy.android.app.R
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.toThrowable
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaError.*
+import nz.mega.sdk.MegaError.API_ENOENT
+import nz.mega.sdk.MegaError.API_OK
 import javax.inject.Inject
 
+/**
+ * Confirm cancel account use case
+ *
+ * @property megaApi
+ * @property context
+ */
 class ConfirmCancelAccountUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
+    @ApplicationContext private val context: Context,
 ) {
 
     /**
@@ -30,9 +39,14 @@ class ConfirmCancelAccountUseCase @Inject constructor(
                     when (error.errorCode) {
                         API_OK -> emitter.onComplete()
                         API_ENOENT ->
-                            emitter.onError(getString(R.string.old_password_provided_incorrect).toThrowable())
+                            emitter.onError(
+                                context.getString(R.string.old_password_provided_incorrect)
+                                    .toThrowable()
+                            )
                         else ->
-                            emitter.onError(getString(R.string.general_text_error).toThrowable())
+                            emitter.onError(
+                                context.getString(R.string.general_text_error).toThrowable()
+                            )
                     }
                 })
             )

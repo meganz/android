@@ -19,8 +19,8 @@ import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.databinding.ActivityVerifyTwoFactorBinding
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.utils.Constants.ACTION_PASS_CHANGED
 import mega.privacy.android.app.utils.Constants.CANCEL_ACCOUNT_2FA
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
@@ -29,7 +29,6 @@ import mega.privacy.android.app.utils.Constants.DISABLE_2FA
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.Constants.RESULT
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import nz.mega.sdk.MegaError
@@ -175,7 +174,7 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
         }
 
         if (stringId != 0) {
-            binding.toolbar.subtitle = StringResourcesUtils.getString(stringId)
+            binding.toolbar.subtitle = getString(stringId)
         }
     }
 
@@ -258,8 +257,8 @@ class VerifyTwoFactorActivity : PasscodeActivity() {
 
         Util.showAlert(
             this,
-            StringResourcesUtils.getString(messageResId),
-            if (titleResId == INVALID_VALUE) null else StringResourcesUtils.getString(titleResId)
+            getString(messageResId),
+            if (titleResId == INVALID_VALUE) null else getString(titleResId)
         ) { callback.invoke() }
     }
 

@@ -761,4 +761,13 @@ internal class DefaultContactsRepository @Inject constructor(
             localStorageGateway.setContactNickName(it, userHandle)
         }
     }
+
+    override suspend fun removeContact(email: String): Boolean = withContext(ioDispatcher) {
+        val contact = megaApiGateway.getContact(email) ?: return@withContext false
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { true }
+            megaApiGateway.removeContact(contact, listener)
+            continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+        }
+    }
 }

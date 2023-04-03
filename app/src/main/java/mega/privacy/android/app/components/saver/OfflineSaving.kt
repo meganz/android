@@ -15,8 +15,6 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.OfflineUtils.getOfflineFile
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.post
 import mega.privacy.android.app.utils.SDCardOperator
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiAndroid
 import timber.log.Timber
 import java.io.File
@@ -75,15 +73,23 @@ class OfflineSaving(
 
         post {
             val message = if (totalFiles == 0) {
-                getQuantityString(R.plurals.empty_folders, nodes.size)
+                context.resources.getQuantityString(R.plurals.empty_folders, nodes.size)
             } else if (totalFiles == alreadyExists && totalFiles == 1) {
-                getString(R.string.general_already_downloaded)
+                context.getString(R.string.general_already_downloaded)
             } else if (totalFiles == alreadyExists) {
-                getQuantityString(R.plurals.file_already_downloaded, totalFiles, totalFiles)
+                context.resources.getQuantityString(
+                    R.plurals.file_already_downloaded,
+                    totalFiles,
+                    totalFiles
+                )
             } else if (totalFiles == 1) {
-                getString(R.string.copy_already_downloaded)
+                context.getString(R.string.copy_already_downloaded)
             } else {
-                getQuantityString(R.plurals.download_finish, totalFiles, totalFiles)
+                context.resources.getQuantityString(
+                    R.plurals.download_finish,
+                    totalFiles,
+                    totalFiles
+                )
             }
             snackbarShower?.showSnackbar(message)
         }

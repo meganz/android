@@ -7,20 +7,19 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
-import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ExportRecoveryKeyView
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.ExportRecoveryKeyView
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.permission.PermissionUtils
@@ -112,7 +111,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
         if (hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             saveRecoveryKeyToStorage()
         } else {
-            viewModel.showSnackBar(StringResourcesUtils.getString(R.string.denied_write_permissions))
+            viewModel.showSnackBar(getString(R.string.denied_write_permissions))
         }
     }
 
@@ -124,7 +123,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
     private fun onRecoveryKeyCopied(key: String?) {
         showAlert(
             this,
-            StringResourcesUtils.getString(
+            getString(
                 if (key.isNullOrBlank()) R.string.general_text_error
                 else R.string.copy_MK_confirmation
             ),
@@ -161,7 +160,7 @@ class ExportRecoveryKeyActivity : PasscodeActivity() {
             else -> R.string.general_text_error
         }
 
-        viewModel.showSnackBar(StringResourcesUtils.getString(resId))
+        viewModel.showSnackBar(getString(resId))
     }
 
     /**

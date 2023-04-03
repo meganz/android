@@ -68,7 +68,6 @@ import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.main.controllers.ChatController
-import mega.privacy.android.app.main.controllers.ContactController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.listeners.MultipleRequestListener
 import mega.privacy.android.app.main.megachat.ChatActivity
@@ -244,7 +243,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 ChatUtil.checkSpecificChatNotifications(
                     chatHandle,
                     contentContactProperties.notificationSwitch,
-                    contentContactProperties.notificationsMutedText
+                    contentContactProperties.notificationsMutedText,
+                    this@ContactInfoActivity
                 )
             }
         }
@@ -256,7 +256,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 val seconds = intent.getLongExtra(RETENTION_TIME, Constants.DISABLED_RETENTION_TIME)
                 ChatUtil.updateRetentionTimeLayout(
                     contentContactProperties.retentionTimeText,
-                    seconds
+                    seconds,
+                    this@ContactInfoActivity
                 )
             }
         }
@@ -582,7 +583,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     checkNameCollisionUseCase.checkHandleList(
                         copyHandles,
                         toHandle,
-                        NameCollisionType.COPY
+                        NameCollisionType.COPY,
+                        this,
                     )
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -1154,6 +1156,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             viewModel.state,
             Lifecycle.State.STARTED
         ) { contactInfoState: ContactInfoState ->
+            if (contactInfoState.isUserRemoved) {
+                finish()
+            }
             if (contactInfoState.error != null) {
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
@@ -1381,15 +1386,12 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    @Suppress("DEPRECATION")
     private fun showConfirmationRemoveContact() {
         Timber.d("showConfirmationRemoveContact")
         MaterialAlertDialogBuilder(this)
             .setTitle(resources.getQuantityString(R.plurals.title_confirmation_remove_contact, 1))
             .setMessage(resources.getQuantityString(R.plurals.confirmation_remove_contact, 1))
-            .setPositiveButton(R.string.general_remove) { _, _ ->
-                ContactController(this@ContactInfoActivity).removeContact(user)
-            }
+            .setPositiveButton(R.string.general_remove) { _, _ -> viewModel.removeContact() }
             .setNegativeButton(R.string.general_cancel) { _, _ -> }
             .show()
     }
@@ -1476,7 +1478,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 }
                 ChatUtil.updateRetentionTimeLayout(
                     retentionTimeText,
-                    ChatUtil.getUpdatedRetentionTimeFromAChat(chatHandle)
+                    ChatUtil.getUpdatedRetentionTimeFromAChat(chatHandle),
+                    this@ContactInfoActivity
                 )
                 if (viewModel.isOnline()) {
                     updateChatHistoryLayoutVisibility(shouldShow = true)
@@ -1488,7 +1491,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             ChatUtil.checkSpecificChatNotifications(
                 chatHandle,
                 notificationSwitch,
-                notificationsMutedText
+                notificationsMutedText,
+                this@ContactInfoActivity
             )
             makeNotificationLayoutVisible()
         }

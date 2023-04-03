@@ -3,8 +3,8 @@ package mega.privacy.android.domain.usecase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -18,22 +18,22 @@ import org.mockito.kotlin.whenever
 class DefaultIsChargingRequiredTest {
     private lateinit var underTest: IsChargingRequired
 
-    private val getVideoCompressionSizeLimit = mock<GetVideoCompressionSizeLimit>()
-    private val isChargingRequiredForVideoCompression =
-        mock<IsChargingRequiredForVideoCompression>()
+    private val getVideoCompressionSizeLimitUseCase = mock<GetVideoCompressionSizeLimitUseCase>()
+    private val isChargingRequiredForVideoCompressionUseCase =
+        mock<IsChargingRequiredForVideoCompressionUseCase>()
 
     @Before
     fun setUp() {
         underTest = DefaultIsChargingRequired(
-            getVideoCompressionSizeLimit = getVideoCompressionSizeLimit,
-            isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression,
+            getVideoCompressionSizeLimitUseCase = getVideoCompressionSizeLimitUseCase,
+            isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
         )
     }
 
     @Test
     fun `test that false is returned if isChargingRequiredForVideoCompression is set to false`() =
         runTest {
-            isChargingRequiredForVideoCompression.stub {
+            isChargingRequiredForVideoCompressionUseCase.stub {
                 onBlocking { invoke() }.thenReturn(false)
             }
 
@@ -44,8 +44,8 @@ class DefaultIsChargingRequiredTest {
     fun `test that false is returned if queue is smaller than the limit`() = runTest {
         val queueSize = 5
 
-        whenever(getVideoCompressionSizeLimit()).thenReturn(queueSize + 1)
-        isChargingRequiredForVideoCompression.stub {
+        whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(queueSize + 1)
+        isChargingRequiredForVideoCompressionUseCase.stub {
             onBlocking { invoke() }.thenReturn(true)
         }
 
@@ -56,8 +56,8 @@ class DefaultIsChargingRequiredTest {
     fun `test that true is returned if queue is larger than the limit`() = runTest {
         val queueSize = 5
 
-        whenever(getVideoCompressionSizeLimit()).thenReturn(queueSize - 1)
-        isChargingRequiredForVideoCompression.stub {
+        whenever(getVideoCompressionSizeLimitUseCase()).thenReturn(queueSize - 1)
+        isChargingRequiredForVideoCompressionUseCase.stub {
             onBlocking { invoke() }.thenReturn(true)
         }
 

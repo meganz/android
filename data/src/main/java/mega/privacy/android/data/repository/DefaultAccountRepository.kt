@@ -724,21 +724,22 @@ internal class DefaultAccountRepository @Inject constructor(
     }
 
     override suspend fun skipPasswordReminderDialog() =
-        onPasswordReminderAction { listener ->
+        onPasswordReminderAction("skipPasswordReminderDialog") { listener ->
             megaApiGateway.skipPasswordReminderDialog(listener)
         }
 
     override suspend fun blockPasswordReminderDialog() =
-        onPasswordReminderAction { listener ->
+        onPasswordReminderAction("blockPasswordReminderDialog") { listener ->
             megaApiGateway.blockPasswordReminderDialog(listener)
         }
 
     override suspend fun notifyPasswordChecked() =
-        onPasswordReminderAction { listener ->
+        onPasswordReminderAction("successPasswordReminderDialog") { listener ->
             megaApiGateway.successPasswordReminderDialog(listener)
         }
 
     private suspend fun onPasswordReminderAction(
+        methodName: String,
         block: (MegaRequestListenerInterface) -> Unit,
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
@@ -748,8 +749,10 @@ internal class DefaultAccountRepository @Inject constructor(
                         (error.errorCode == MegaError.API_OK || error.errorCode == MegaError.API_ENOENT)
                     ) {
                         continuation.resumeWith(Result.success(Unit))
+                        Timber.d("$methodName: New value of attribute USER_ATTR_PWD_REMINDER: ${request.text}")
                     } else {
                         continuation.failWithError(error)
+                        Timber.e("$methodName: MegaRequest.TYPE_SET_ATTR_USER | MegaApiJava.USER_ATTR_PWD_REMINDER ${error.errorString}")
                     }
                 },
             )

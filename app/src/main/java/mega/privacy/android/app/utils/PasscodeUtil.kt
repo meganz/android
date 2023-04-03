@@ -8,17 +8,15 @@ import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.qualifiers.ActivityContext
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.settingsActivities.PasscodeLockActivity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.REQUIRE_PASSCODE_INVALID
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder
+import mega.privacy.android.data.database.DatabaseHandler
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -50,17 +48,17 @@ class PasscodeUtil @Inject constructor(
      * @param itemChecked The option to set as selected if after rotation, invalid option otherwise.
      * @return The AlertDialog.
      */
-    fun showRequirePasscodeDialog(itemChecked: Int): AlertDialog {
+    fun showRequirePasscodeDialog(itemChecked: Int, context: Context): AlertDialog {
         val dialogBuilder =
             MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-        dialogBuilder.setTitle(getString(R.string.settings_require_passcode))
+        dialogBuilder.setTitle(context.getString(R.string.settings_require_passcode))
 
         val options = ArrayList<String>()
-        options.add(getString(R.string.action_immediately))
+        options.add(context.getString(R.string.action_immediately))
 
         options.add(
             removeFormatPlaceholder(
-                getQuantityString(
+                context.resources.getQuantityString(
                     R.plurals.plural_call_ended_messages_seconds,
                     FIVE_SECONDS_OR_MINUTES,
                     FIVE_SECONDS_OR_MINUTES
@@ -70,7 +68,7 @@ class PasscodeUtil @Inject constructor(
 
         options.add(
             removeFormatPlaceholder(
-                getQuantityString(
+                context.resources.getQuantityString(
                     R.plurals.plural_call_ended_messages_seconds,
                     TEN_SECONDS,
                     TEN_SECONDS
@@ -80,7 +78,7 @@ class PasscodeUtil @Inject constructor(
 
         options.add(
             removeFormatPlaceholder(
-                getQuantityString(
+                context.resources.getQuantityString(
                     R.plurals.plural_call_ended_messages_seconds,
                     THIRTY_SECONDS,
                     THIRTY_SECONDS
@@ -90,7 +88,7 @@ class PasscodeUtil @Inject constructor(
 
         options.add(
             removeFormatPlaceholder(
-                getQuantityString(
+                context.resources.getQuantityString(
                     R.plurals.plural_call_ended_messages_minutes,
                     ONE_MINUTE,
                     ONE_MINUTE
@@ -100,7 +98,7 @@ class PasscodeUtil @Inject constructor(
 
         options.add(
             removeFormatPlaceholder(
-                getQuantityString(
+                context.resources.getQuantityString(
                     R.plurals.plural_call_ended_messages_minutes,
                     TWO_MINUTES,
                     TWO_MINUTES
@@ -110,7 +108,7 @@ class PasscodeUtil @Inject constructor(
 
         options.add(
             removeFormatPlaceholder(
-                getQuantityString(
+                context.resources.getQuantityString(
                     R.plurals.plural_call_ended_messages_minutes,
                     FIVE_SECONDS_OR_MINUTES,
                     FIVE_SECONDS_OR_MINUTES
@@ -152,7 +150,7 @@ class PasscodeUtil @Inject constructor(
             }
         }
 
-        dialogBuilder.setNegativeButton(getString(R.string.general_cancel), null)
+        dialogBuilder.setNegativeButton(context.getString(R.string.general_cancel), null)
 
         val requirePasscodeDialog = dialogBuilder.create()
         requirePasscodeDialog.show()
@@ -214,20 +212,20 @@ class PasscodeUtil @Inject constructor(
 
         return when (requiredTime) {
             REQUIRE_PASSCODE_AFTER_5S, REQUIRE_PASSCODE_AFTER_10S, REQUIRE_PASSCODE_AFTER_30S -> removeFormatPlaceholder(
-                getQuantityString(
+                context.resources.getQuantityString(
                     R.plurals.plural_call_ended_messages_seconds,
                     requiredTimeValue,
                     requiredTimeValue
                 )
             )
             REQUIRE_PASSCODE_AFTER_1M, REQUIRE_PASSCODE_AFTER_2M, REQUIRE_PASSCODE_AFTER_5M -> removeFormatPlaceholder(
-                getQuantityString(
+                context.resources.getQuantityString(
                     R.plurals.plural_call_ended_messages_minutes,
                     requiredTimeValue,
                     requiredTimeValue
                 )
             )
-            else -> getString(R.string.action_immediately)
+            else -> context.getString(R.string.action_immediately)
         }
     }
 

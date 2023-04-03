@@ -21,7 +21,6 @@ import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.Check
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.GetCookieSettingsUseCase
 import mega.privacy.android.app.fragments.settingsFragments.cookie.usecase.UpdateCookieSettingsUseCase
 import mega.privacy.android.app.utils.ContextUtils.isValid
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import timber.log.Timber
 import javax.inject.Inject
@@ -84,17 +83,17 @@ class CookieDialogHandler @Inject constructor(
         dialog = MaterialAlertDialogBuilder(context)
             .setCancelable(false)
             .setView(R.layout.dialog_cookie_alert)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.preference_cookies_accept)) { _, _ ->
+            .setPositiveButton(context.getString(R.string.preference_cookies_accept)) { _, _ ->
                 acceptAllCookies(context)
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.settings_about_cookie_settings)) { _, _ ->
+            .setNegativeButton(context.getString(R.string.settings_about_cookie_settings)) { _, _ ->
                 context.startActivity(Intent(context, CookiePreferencesActivity::class.java))
             }
             .create()
             .apply {
                 setOnShowListener {
                     val message =
-                        StringResourcesUtils.getString(R.string.dialog_cookie_alert_message)
+                        context.getString(R.string.dialog_cookie_alert_message)
                             .replace("[A]", "<a href='https://mega.nz/cookie'>")
                             .replace("[/A]", "</a>")
                             .toSpannedHtmlText()

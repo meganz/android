@@ -312,7 +312,7 @@ interface MegaNodeUtilWrapper {
      * @param nodeLabel     [MegaNode] Label
      * @return              String resource reference
      */
-    fun getNodeLabelText(nodeLabel: Int): String?
+    fun getNodeLabelText(nodeLabel: Int, context: Context): String?
 
     /**
      * Gets the Color resource reference for the provided [MegaNode] Label
@@ -452,7 +452,7 @@ interface MegaNodeUtilWrapper {
      * @param node The file node from which to get the details.
      * @return The string so show as file info details.
      */
-    fun getFileInfo(node: MegaNode): String?
+    fun getFileInfo(node: MegaNode, context: Context): String?
 
     /**
      * Launches an Intent to open TextFileEditorActivity.

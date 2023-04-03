@@ -50,7 +50,6 @@ import mega.privacy.android.app.utils.Constants.VIEWER_FROM_ZIP_BROWSER
 import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.getScreenHeight
 import mega.privacy.android.app.zippreview.domain.FileType
@@ -88,7 +87,7 @@ class ZipBrowserActivity : PasscodeActivity() {
 
     private val onBackPressedCallback = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
-            zipBrowserViewModel.handleOnBackPressed()
+            zipBrowserViewModel.handleOnBackPressed(this@ZipBrowserActivity)
         }
     }
 
@@ -99,7 +98,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         setupViewModel()
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
         zipAdapter = ZipListAdapter { zipInfoUIO, position ->
-            zipBrowserViewModel.onZipFileClicked(zipInfoUIO, position)
+            zipBrowserViewModel.onZipFileClicked(zipInfoUIO, position, this)
         }
         recyclerView.adapter = zipAdapter
     }
@@ -126,7 +125,7 @@ class ZipBrowserActivity : PasscodeActivity() {
         actionBar?.apply {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
-            title = (StringResourcesUtils.getString(R.string.zip_browser_activity))
+            title = (getString(R.string.zip_browser_activity))
         }
 
         recyclerView = zipBrowserBinding.zipListViewBrowser.also {
@@ -173,7 +172,8 @@ class ZipBrowserActivity : PasscodeActivity() {
             //Open current zip file content
             viewModelInit(
                 zipFullPath,
-                unzipRootPath
+                unzipRootPath,
+                this@ZipBrowserActivity
             )
         }
     }
@@ -221,8 +221,8 @@ class ZipBrowserActivity : PasscodeActivity() {
      */
     private fun showAlert() {
         MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
-            .setMessage(StringResourcesUtils.getString(R.string.error_fail_to_open_file_general))
-            .setPositiveButton(StringResourcesUtils.getString(R.string.general_ok), null)
+            .setMessage(getString(R.string.error_fail_to_open_file_general))
+            .setPositiveButton(getString(R.string.general_ok), null)
             .show()
     }
 

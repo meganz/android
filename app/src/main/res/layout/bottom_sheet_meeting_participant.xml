@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="participant"
             type="mega.privacy.android.app.meeting.adapter.Participant" />
@@ -92,7 +93,7 @@
                 android:id="@+id/contact_info"
                 style="@style/BottomSheetItem"
                 android:show="@{viewModel.showContactInfoOrEditProfile()}"
-                android:text="@{viewModel.getContactItemText()}"
+                android:text="@{viewModel.getContactItemText(context)}"
                 app:drawableStartCompat="@drawable/info_ic" />
 
             <View

@@ -20,7 +20,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.utils.CallUtil.checkCameraPermission
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.REQUEST_RECORD_AUDIO
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 
@@ -42,42 +41,47 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
          */
         @JvmStatic
         fun getListIntent(context: Context): Intent =
-                Intent(context, ContactsActivity::class.java)
+            Intent(context, ContactsActivity::class.java)
 
         /**
          * Show Contact group list screen
          */
         @JvmStatic
         fun getGroupsIntent(context: Context): Intent =
-                Intent(context, ContactsActivity::class.java).apply {
-                    putExtra(EXTRA_SHOW_GROUPS, true)
-                }
+            Intent(context, ContactsActivity::class.java).apply {
+                putExtra(EXTRA_SHOW_GROUPS, true)
+            }
 
         /**
          * Show Contact sent requests screen
          */
         @JvmStatic
         fun getSentRequestsIntent(context: Context): Intent =
-                Intent(context, ContactsActivity::class.java).apply {
-                    putExtra(EXTRA_SHOW_SENT_REQUESTS, true)
-                    putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, true)
-                }
+            Intent(context, ContactsActivity::class.java).apply {
+                putExtra(EXTRA_SHOW_SENT_REQUESTS, true)
+                putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, true)
+            }
 
         /**
          * Show Contact received requests screen
          */
         @JvmStatic
         fun getReceivedRequestsIntent(context: Context): Intent =
-                Intent(context, ContactsActivity::class.java).apply {
-                    putExtra(EXTRA_SHOW_RECEIVED_REQUESTS, true)
-                    putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, false)
-                }
+            Intent(context, ContactsActivity::class.java).apply {
+                putExtra(EXTRA_SHOW_RECEIVED_REQUESTS, true)
+                putExtra(ContactRequestsFragment.EXTRA_IS_OUTGOING, false)
+            }
     }
 
     private lateinit var binding: ActivityContactsBinding
     private val showGroups by lazy { intent.getBooleanExtra(EXTRA_SHOW_GROUPS, false) }
     private val showSentRequests by lazy { intent.getBooleanExtra(EXTRA_SHOW_SENT_REQUESTS, false) }
-    private val showReceivedRequests by lazy { intent.getBooleanExtra(EXTRA_SHOW_RECEIVED_REQUESTS, false) }
+    private val showReceivedRequests by lazy {
+        intent.getBooleanExtra(
+            EXTRA_SHOW_RECEIVED_REQUESTS,
+            false
+        )
+    }
 
     private val toolbarElevation by lazy { resources.getDimension(R.dimen.toolbar_elevation) }
     private val appBarConfiguration by lazy {
@@ -125,7 +129,7 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
             )
 
             addOnDestinationChangedListener { _, _, _ ->
-                supportActionBar?.title = StringResourcesUtils.getString(
+                supportActionBar?.title = getString(
                     when (this.currentDestination?.id) {
                         R.id.contact_requests -> R.string.section_requests
                         R.id.contact_groups -> R.string.section_groups
@@ -144,10 +148,16 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
      * Get current fragment from navHostFragment
      */
     fun getCurrentFragment(): Fragment? {
-        return supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment)?.childFragmentManager?.fragments?.get(0)
+        return supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment)?.childFragmentManager?.fragments?.get(
+            0
+        )
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String?>,
+        grantResults: IntArray,
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUEST_RECORD_AUDIO -> if (grantResults.isNotEmpty() && checkCameraPermission(this)) {
@@ -179,8 +189,8 @@ class ContactsActivity : PasscodeActivity(), SnackbarShower {
     }
 
     override fun onSupportNavigateUp(): Boolean =
-            getNavController().navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+        getNavController().navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
 
     private fun getNavController(): NavController =
-            (supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment) as NavHostFragment).navController
+        (supportFragmentManager.findFragmentById(R.id.contacts_nav_host_fragment) as NavHostFragment).navController
 }

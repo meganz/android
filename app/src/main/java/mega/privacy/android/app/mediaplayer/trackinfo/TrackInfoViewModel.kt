@@ -155,7 +155,7 @@ class TrackInfoViewModel @Inject constructor(
 
             _nodeInfo.postValue(
                 AudioNodeInfo(
-                    thumbnail, true, getSizeString(file.length()),
+                    thumbnail, true, getSizeString(file.length(), context),
                     location, formatLongDateTime(file.lastModified() / 1000),
                     formatLongDateTime(file.lastModified() / 1000)
                 )
@@ -168,7 +168,7 @@ class TrackInfoViewModel @Inject constructor(
 
             _nodeInfo.postValue(
                 AudioNodeInfo(
-                    thumbnail, availableOffline(context, node), getSizeString(node.size),
+                    thumbnail, availableOffline(context, node), getSizeString(node.size, context),
                     location, formatLongDateTime(node.creationTime),
                     formatLongDateTime(node.modificationTime)
                 )

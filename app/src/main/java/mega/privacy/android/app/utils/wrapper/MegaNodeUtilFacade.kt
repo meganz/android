@@ -156,7 +156,8 @@ class MegaNodeUtilFacade @Inject constructor(
     override fun getNodeLabelDrawable(nodeLabel: Int, resources: Resources) =
         MegaNodeUtil.getNodeLabelDrawable(nodeLabel, resources)
 
-    override fun getNodeLabelText(nodeLabel: Int) = MegaNodeUtil.getNodeLabelText(nodeLabel)
+    override fun getNodeLabelText(nodeLabel: Int, context: Context) =
+        MegaNodeUtil.getNodeLabelText(nodeLabel, context)
 
     override fun getNodeLabelColor(nodeLabel: Int) = MegaNodeUtil.getNodeLabelColor(nodeLabel)
 
@@ -218,14 +219,17 @@ class MegaNodeUtilFacade @Inject constructor(
         activityLauncher: ActivityLauncher,
         snackbarShower: SnackbarShower,
     ) {
-        MegaNodeUtil.launchActionView(context,
+        MegaNodeUtil.launchActionView(
+            context,
             nodeName,
             localPath,
             activityLauncher,
-            snackbarShower)
+            snackbarShower
+        )
     }
 
-    override fun getFileInfo(node: MegaNode) = MegaNodeUtil.getFileInfo(node)
+    override fun getFileInfo(node: MegaNode, context: Context) =
+        MegaNodeUtil.getFileInfo(node, context)
 
     override fun manageTextFileIntent(context: Context, node: MegaNode, adapterType: Int) {
         MegaNodeUtil.manageTextFileIntent(context, node, adapterType)

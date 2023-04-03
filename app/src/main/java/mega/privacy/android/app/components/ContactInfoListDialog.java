@@ -1,12 +1,9 @@
 package mega.privacy.android.app.components;
 
+import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
+
 import android.app.Activity;
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.telephony.PhoneNumberUtils;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -16,6 +13,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.CheckBox;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -27,9 +29,6 @@ import java.util.Set;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.InvitationContactInfo;
 import mega.privacy.android.app.utils.TextUtil;
-
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
-import static mega.privacy.android.app.utils.Util.isScreenInPortrait;
 
 public class ContactInfoListDialog {
 
@@ -104,11 +103,11 @@ public class ContactInfoListDialog {
                 .setTitle(current.getName())
                 .setView(contentView)
                 .setCancelable(false)
-                .setPositiveButton(getString(R.string.general_ok), (dialog, which) -> {
+                .setPositiveButton(context.getString(R.string.general_ok), (dialog, which) -> {
                     dialog.dismiss();
                     listener.onSelect(selected, unSelected);
                 })
-                .setNegativeButton(getString(R.string.button_cancel), (dialog, which) -> {
+                .setNegativeButton(context.getString(R.string.button_cancel), (dialog, which) -> {
                     dialog.dismiss();
                     listener.cancel();
                 })
@@ -182,12 +181,12 @@ public class ContactInfoListDialog {
          */
         private List<String> removeDuplicateNumber(List<String> contents) {
             Set<String> set = new HashSet<>();
-            for(String content : contents) {
+            for (String content : contents) {
                 // Stripping separators only for phone numbers.
                 set.add(TextUtil.isEmail(content) ? content : PhoneNumberUtils.stripSeparators(content));
             }
 
-            return  new ArrayList<>(set);
+            return new ArrayList<>(set);
         }
 
         @NonNull

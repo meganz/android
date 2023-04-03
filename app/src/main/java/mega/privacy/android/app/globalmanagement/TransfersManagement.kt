@@ -37,7 +37,6 @@ import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.INVALID_VALUE
 import mega.privacy.android.app.utils.SDCardUtils
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
@@ -141,7 +140,9 @@ class TransfersManagement @Inject constructor(
             mBuilder.apply {
                 setSmallIcon(R.drawable.ic_stat_notify)
                 setColor(getColor(MegaApplication.getInstance(), R.color.red_600_red_300))
-                setContentTitle(getString(R.string.download_preparing_files))
+                setContentTitle(
+                    MegaApplication.getInstance().getString(R.string.download_preparing_files)
+                )
                 setAutoCancel(true)
             }
 
@@ -178,7 +179,9 @@ class TransfersManagement @Inject constructor(
             mBuilderCompat.apply {
                 setSmallIcon(R.drawable.ic_stat_notify)
                 color = getColor(MegaApplication.getInstance(), R.color.red_600_red_300)
-                setContentTitle(getString(R.string.download_preparing_files))
+                setContentTitle(
+                    MegaApplication.getInstance().getString(R.string.download_preparing_files)
+                )
                 setAutoCancel(true)
             }
 

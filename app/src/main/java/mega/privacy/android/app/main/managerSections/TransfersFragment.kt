@@ -7,17 +7,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
 import mega.privacy.android.app.R
-import mega.privacy.android.app.data.extensions.isBackgroundTransfer
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.managerFragments.TransfersBaseFragment
 import mega.privacy.android.app.fragments.managerFragments.actionMode.TransfersActionBarCallBack
 import mega.privacy.android.app.main.ManagerActivity
@@ -25,25 +26,23 @@ import mega.privacy.android.app.main.adapters.MegaTransfersAdapter
 import mega.privacy.android.app.main.adapters.RotatableAdapter
 import mega.privacy.android.app.main.adapters.SelectModeInterface
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
-import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.Constants.SNACKBAR_TYPE
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.dp2px
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
-import mega.privacy.android.data.mapper.TransferMapper
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.transfer.Transfer
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * The Fragment is used for displaying the transfer list.
  */
+@OptIn(FlowPreview::class)
 @AndroidEntryPoint
 class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     TransfersActionBarCallBack.TransfersActionCallback {
@@ -62,24 +61,21 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     @MegaApiFolder
     lateinit var megaApiFolder: MegaApiAndroid
 
-    /**
-     * Transfer mapper
-     */
-    @Inject
-    lateinit var transferMapper: TransferMapper // will remove after refactor done
-
     private var adapter: MegaTransfersAdapter? = null
 
     private var actionMode: ActionMode? = null
 
-    private var itemTouchHelper: ItemTouchHelper? = null
+    private val itemTouchHelper: ItemTouchHelper = ItemTouchHelper(
+        initItemTouchHelperCallback(
+            dragDirs = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+        )
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        super.onCreateView(inflater, container, savedInstanceState)
         return initView(inflater, container)
     }
 
@@ -88,19 +84,20 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
         binding.transfersEmptyImage.setImageResource(
             if (Util.isScreenInPortrait(requireContext())) {
                 R.drawable.empty_transfer_portrait
-            } else R.drawable.empty_transfer_landscape)
-        binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(requireContext(),
-            getString(R.string.transfers_empty_new))
-        binding.transfersEmptyImage.isVisible = false
-        binding.transfersEmptyText.isVisible = false
+            } else R.drawable.empty_transfer_landscape
+        )
+        binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(
+            requireContext(),
+            getString(R.string.transfers_empty_new)
+        )
+        val activeTransfers = viewModel.getActiveTransfers()
+        setEmptyView(activeTransfers.size)
 
         setupFlow()
-        viewModel.getAllActiveTransfers()
 
         binding.transfersListView.let { recyclerView ->
             adapter = MegaTransfersAdapter(
                 context = requireActivity(),
-                transfers = viewModel.getActiveTransfers(),
                 listView = recyclerView,
                 selectModeInterface = this,
                 transfersViewModel = viewModel,
@@ -108,30 +105,14 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                 megaApiFolder = megaApiFolder
             )
 
+            adapter?.submitList(activeTransfers)
             adapter?.setMultipleSelect(false)
             recyclerView.adapter = adapter
             recyclerView.itemAnimator = noChangeRecyclerViewItemAnimator()
         }
 
-        itemTouchHelper = ItemTouchHelper(initItemTouchHelperCallback(
-            dragDirs = ItemTouchHelper.UP or ItemTouchHelper.DOWN))
-
         enableDragAndDrop()
     }
-
-    /**
-     * Updates the state of a transfer.
-     *
-     * @param transfer transfer to update
-     */
-    fun transferUpdate(transfer: MegaTransfer) =
-        transferMapper(transfer).let {
-            viewModel.getUpdatedTransferPosition(it).let { transferPosition ->
-                if (transferPosition != INVALID_POSITION) {
-                    viewModel.updateActiveTransfer(transferPosition, it)
-                }
-            }
-        }
 
     /**
      * Changes the status (play/pause) of the button of a transfer.
@@ -139,27 +120,6 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
      * @param tag identifier of the transfer to change the status of the button
      */
     fun changeStatusButton(tag: Int) = viewModel.activeTransferChangeStatus(tag)
-
-    /**
-     * Removes a transfer when finishes.
-     *
-     * @param transferTag identifier of the transfer to remove
-     */
-    fun transferFinish(transferTag: Int) = viewModel.activeTransferFinished(transferTag)
-
-    /**
-     * Adds a transfer when starts.
-     *
-     * @param transfer transfer to add
-     */
-    fun transferStart(transfer: MegaTransfer) {
-        if (!transfer.isStreamingTransfer && !transfer.isBackgroundTransfer()) {
-            if (viewModel.getActiveTransfers().isEmpty()) {
-                requireActivity().invalidateOptionsMenu()
-            }
-            viewModel.activeTransferStart(transferMapper(transfer))
-        }
-    }
 
     /**
      * Check whether is in select mode after changing tab or drawer item.
@@ -213,7 +173,6 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
 
     override fun notifyItemChanged() = updateActionModeTitle()
 
-
     override fun getAdapter(): RotatableAdapter? = adapter
 
     override fun activateActionMode() {
@@ -221,7 +180,8 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
             if (!it.isMultipleSelect()) {
                 it.setMultipleSelect(true)
                 actionMode = (requireActivity() as AppCompatActivity).startSupportActionMode(
-                    TransfersActionBarCallBack(this))
+                    TransfersActionBarCallBack(this)
+                )
                 updateActionModeTitle()
                 disableDragAndDrop()
             }
@@ -251,7 +211,8 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
         if (bindingIsInitialized()) {
             (requireActivity() as ManagerActivity).changeAppBarElevation(
                 binding.transfersListView.canScrollVertically(DEFAULT_SCROLL_DIRECTION) ||
-                        adapter?.isMultipleSelect() == true)
+                        adapter?.isMultipleSelect() == true
+            )
         }
     }
 
@@ -262,52 +223,36 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
             Lifecycle.State.CREATED
         ).onEach { transfersState ->
             when (transfersState) {
-                is ActiveTransfersState.TransfersUpdated -> {
-                    adapter?.setTransfers(transfersState.newTransfers)
-                    setEmptyView(transfersState.newTransfers.size)
-                }
-                is ActiveTransfersState.TransferUpdated -> {
-                    adapter?.updateProgress(transfersState.index, transfersState.updatedTransfer)
-                }
                 is ActiveTransfersState.TransferMovementFinishedUpdated -> {
-                    if (transfersState.success) {
-                        adapter?.notifyItemChanged(transfersState.pos)
-                    } else {
+                    if (transfersState.success.not()) {
                         (requireActivity() as ManagerActivity).showSnackbar(
                             SNACKBAR_TYPE,
-                            getString(R.string.change_of_transfer_priority_failed,
-                                transfersState.newTransfers[transfersState.pos].fileName),
+                            getString(
+                                R.string.change_of_transfer_priority_failed,
+                                transfersState.newTransfers[transfersState.pos].fileName
+                            ),
                             MEGACHAT_INVALID_HANDLE
                         )
-                        adapter?.setTransfers(transfersState.newTransfers)
-                    }
-                }
-                is ActiveTransfersState.TransferStartUpdated -> {
-                    val transfers = transfersState.newTransfers
-                    adapter?.addItemData(transfers,
-                        transfers.indexOf(transfersState.updatedTransfer))
-
-                    if (transfers.isNotEmpty() && binding.transfersEmptyImage.isVisible) {
-                        setEmptyView(transfers.size)
                     }
                 }
                 is ActiveTransfersState.TransferFinishedUpdated -> {
                     val transfers = transfersState.newTransfers
                     Timber.d("new transfer is ${transfers.joinToString { it.fileName }}")
-                    adapter?.removeItemData(transfers, transfersState.index)
                     if (transfers.isEmpty()) {
+                        adapter?.submitList(emptyList())
                         activateActionMode()
                         destroyActionMode()
-                        setEmptyView(transfers.size)
                         requireActivity().invalidateOptionsMenu()
                     }
-                }
-                is ActiveTransfersState.TransferChangeStatusUpdated -> {
-                    adapter?.updateItemState(transfersState.transfer, transfersState.index)
                 }
                 else -> {}
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
+
+        viewLifecycleOwner.collectFlow(viewModel.activeTransfer.sample(500L)) {
+            adapter?.submitList(it)
+            setEmptyView(it.size)
+        }
     }
 
     private fun initItemTouchHelperCallback(
@@ -331,8 +276,7 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                 if (draggedTransfer == null) {
                     draggedTransfer = viewModel.getActiveTransfer(posDragged)
                 }
-                adapter?.moveItemData(
-                    viewModel.activeTransfersSwap(posDragged, newPosition), posDragged, newPosition)
+                viewModel.activeTransfersSwap(posDragged, newPosition)
                 return false
             }
 
@@ -372,13 +316,15 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
                     addElevation = true
                     resetElevation = false
                 }
-                super.onChildDraw(c,
+                super.onChildDraw(
+                    c,
                     recyclerView,
                     viewHolder,
                     dX,
                     dY,
                     actionState,
-                    isCurrentlyActive)
+                    isCurrentlyActive
+                )
             }
 
             override fun clearView(
@@ -413,11 +359,11 @@ class TransfersFragment : TransfersBaseFragment(), SelectModeInterface,
     }
 
     private fun enableDragAndDrop() {
-        itemTouchHelper?.attachToRecyclerView(binding.transfersListView)
+        itemTouchHelper.attachToRecyclerView(binding.transfersListView)
     }
 
     private fun disableDragAndDrop() =
-        itemTouchHelper?.attachToRecyclerView(null)
+        itemTouchHelper.attachToRecyclerView(null)
 
     /**
      * Is empty transfer

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.listeners;
 
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 
 import android.content.Context;
 
@@ -26,12 +25,12 @@ public class TruncateHistoryListener extends ChatBaseListener {
         if (request.getType() != MegaChatRequest.TYPE_TRUNCATE_HISTORY) return;
 
         if (e.getErrorCode() == MegaError.API_OK) {
-            Util.showSnackbar(context, getString(R.string.clear_history_success));
+            Util.showSnackbar(context, context.getString(R.string.clear_history_success));
             if (context instanceof ChatActivity) {
                 ((ChatActivity) context).hideScrollToLastMsgButton();
             }
         } else {
-            Util.showSnackbar(context, getString(R.string.clear_history_error));
+            Util.showSnackbar(context, context.getString(R.string.clear_history_error));
             Timber.e("Error clearing history: %s", e.getErrorString());
         }
     }

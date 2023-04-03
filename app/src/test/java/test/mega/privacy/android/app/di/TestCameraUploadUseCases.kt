@@ -6,7 +6,6 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.cameraupload.CameraUploadUseCases
-import mega.privacy.android.domain.usecase.camerauploads.GetCameraUploadsSyncHandles
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
@@ -19,8 +18,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetPendingUploadList
-import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
@@ -94,17 +91,6 @@ import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
-import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
-import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
-import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -283,12 +269,6 @@ object TestCameraUploadUseCases {
     fun provideClearCacheDirectory() = mock<ClearCacheDirectory>()
 
     @Provides
-    fun provideGetPrimarySyncHandle() = mock<GetPrimarySyncHandle>()
-
-    @Provides
-    fun provideGetSecondarySyncHandle() = mock<GetSecondarySyncHandle>()
-
-    @Provides
     fun provideCheckEnableCameraUploadsStatus() = mock<CheckEnableCameraUploadsStatus>()
 
     @Provides
@@ -299,9 +279,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideResetMediaUploadTimeStamps() = mock<ResetMediaUploadTimeStamps>()
-
-    @Provides
-    fun provideGetCameraUploadsSyncHandles() = mock<GetCameraUploadsSyncHandles>()
 
     @Provides
     fun provideSetupPrimaryFolder() = mock<SetupPrimaryFolder>()
@@ -367,15 +344,6 @@ object TestCameraUploadUseCases {
     fun provideCompressVideos() = mock<CompressVideos>()
 
     @Provides
-    fun provideGetUploadOption() = mock<GetUploadOption>()
-
-    @Provides
-    fun provideSetUploadOption() = mock<SetUploadOption>()
-
-    @Provides
-    fun provideGetUploadVideoQuality() = mock<GetUploadVideoQuality>()
-
-    @Provides
     fun provideDeleteCameraUploadTemporaryRootDirectory() =
         mock<DeleteCameraUploadTemporaryRootDirectory>()
 
@@ -384,36 +352,10 @@ object TestCameraUploadUseCases {
         mock<CreateCameraUploadTemporaryRootDirectory>()
 
     @Provides
-    fun provideSetUploadVideoQuality() = mock<SetUploadVideoQuality>()
-
-    @Provides
-    fun provideSetUploadVideoSyncStatus() = mock<SetUploadVideoSyncStatus>()
-
-    @Provides
-    fun provideListenToNewMedia() = mock<ListenToNewMedia>()
-
-    @Provides
-    fun provideIsChargingRequiredForVideoCompression() =
-        mock<IsChargingRequiredForVideoCompression>()
-
-    @Provides
-    fun provideSetChargingRequiredForVideoCompression() =
-        mock<SetChargingRequiredForVideoCompression>()
-
-    @Provides
-    fun provideGetVideoCompressionSizeLimit() = mock<GetVideoCompressionSizeLimit>()
-
-    @Provides
-    fun provideSetVideoCompressionSizeLimit() = mock<SetVideoCompressionSizeLimit>()
-
-    @Provides
     fun provideBroadcastCameraUploadProgress() =
         mock<BroadcastCameraUploadProgress>()
 
     @Provides
     fun provideMonitorCameraUploadsProgress() =
         mock<MonitorCameraUploadProgress>()
-
-    @Provides
-    fun provideEstablishCameraUploadsSyncHandles() = mock<EstablishCameraUploadsSyncHandles>()
 }

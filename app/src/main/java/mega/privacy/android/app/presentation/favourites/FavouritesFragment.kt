@@ -51,7 +51,6 @@ import mega.privacy.android.app.presentation.favourites.model.FavouritePlacehold
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil.formatEmptyScreenText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.callManager
@@ -527,7 +526,7 @@ class FavouritesFragment : Fragment(), HomepageSearchable {
                 it.hideKeyboardSearch()  // Make the snack bar visible to the user
                 it.showSnackbar(
                     Constants.SNACKBAR_TYPE,
-                    StringResourcesUtils.getString(R.string.error_server_connection_problem),
+                    getString(R.string.error_server_connection_problem),
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
             }

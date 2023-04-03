@@ -325,4 +325,11 @@ interface ContactsRepository {
      * @param email email id of the user
      */
     suspend fun deleteAvatar(email: String)
+
+    /**
+     * Remove the selected contact from mega account
+     *
+     * @param email email address of the user
+     */
+    suspend fun removeContact(email: String): Boolean
 }

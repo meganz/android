@@ -20,7 +20,6 @@ import mega.privacy.android.app.interfaces.ChatRoomToolbarBottomSheetDialogActio
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.chatAdapters.FileStorageChatAdapter
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.getAudioPermissionByVersion
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
@@ -70,7 +69,7 @@ class ChatRoomToolbarBottomSheetDialogFragment : BottomSheetDialogFragment() {
     ): View {
         listener = requireActivity() as ChatRoomToolbarBottomSheetDialogActionListener
         binding = BottomSheetChatRoomToolbarBinding.inflate(layoutInflater, container, false)
-        binding.textFile.text = getQuantityString(R.plurals.general_num_files, 1)
+        binding.textFile.text = resources.getQuantityString(R.plurals.general_num_files, 1)
         return binding.root
     }
 

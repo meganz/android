@@ -547,7 +547,7 @@ class UploadService : Service() {
                 )
             }
             val transferredBytes = getTransferredByte(mapProgressFileTransfers)
-            val totalBytes = Util.getSizeString(transferredBytes)
+            val totalBytes = Util.getSizeString(transferredBytes, this)
             val size = getString(R.string.general_total_size, totalBytes)
             notifyNotification(
                 notificationTitle,
@@ -752,12 +752,16 @@ class UploadService : Service() {
             if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
                 transfersManagement.checkScanningTransferOnFinish(transfer)
                 if (!transfer.isFolderTransfer) {
-                    val completedTransfer = AndroidCompletedTransfer(transfer, error)
+                    val completedTransfer = AndroidCompletedTransfer(transfer, error, this)
                     addCompletedTransfer(completedTransfer, dbH)
                     val appData = transfer.appData
                     if (!TextUtil.isTextEmpty(appData) && appData.contains(Constants.APP_DATA_TXT_FILE)) {
                         val message =
-                            getCreationOrEditorText(appData, error.errorCode == MegaError.API_OK)
+                            getCreationOrEditorText(
+                                appData = appData,
+                                isSuccess = error.errorCode == MegaError.API_OK,
+                                context = this
+                            )
                         sendBroadcast(
                             Intent(BROADCAST_ACTION_SHOW_SNACKBAR)
                                 .putExtra(SNACKBAR_TEXT, message)

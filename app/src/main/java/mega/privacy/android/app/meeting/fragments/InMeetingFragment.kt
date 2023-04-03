@@ -110,7 +110,6 @@ import mega.privacy.android.app.utils.Constants.TYPE_AUDIO
 import mega.privacy.android.app.utils.Constants.TYPE_LEFT
 import mega.privacy.android.app.utils.Constants.TYPE_VIDEO
 import mega.privacy.android.app.utils.RunOnUIThreadUtils
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -281,18 +280,18 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         if (MegaChatRoom.PRIV_MODERATOR == inMeetingViewModel.getOwnPrivileges()) {
                             showSnackbar(
                                 SNACKBAR_TYPE,
-                                StringResourcesUtils.getString(R.string.be_new_moderator),
+                                getString(R.string.be_new_moderator),
                                 MEGACHAT_INVALID_HANDLE
                             )
                         }
 
-                        inMeetingViewModel.updateOwnPrivileges()
+                        inMeetingViewModel.updateOwnPrivileges(requireContext())
                         bottomFloatingPanelViewHolder.updateShareAndInviteButton()
                     }
 
                     if (item.hasChanged(MegaChatListItem.CHANGE_TYPE_PARTICIPANTS)) {
                         Timber.d("Change in the privileges of a participant")
-                        inMeetingViewModel.updateParticipantsPrivileges().run {
+                        inMeetingViewModel.updateParticipantsPrivileges(requireContext()).run {
                             updateRemotePrivileges(this)
                         }
                     }
@@ -402,7 +401,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         Timber.d("Session in progress, clientID = ${callAndSession.second.clientid}")
                         val position =
                             inMeetingViewModel.addParticipant(
-                                callAndSession.second
+                                callAndSession.second, requireContext()
                             )
                         position?.let {
                             if (position != INVALID_POSITION) {
@@ -414,7 +413,10 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     MegaChatSession.SESSION_STATUS_DESTROYED -> {
                         Timber.d("Session destroyed, clientID = ${callAndSession.second.clientid}")
                         val position =
-                            inMeetingViewModel.removeParticipant(callAndSession.second)
+                            inMeetingViewModel.removeParticipant(
+                                callAndSession.second,
+                                requireContext()
+                            )
                         position.let {
                             if (position != INVALID_POSITION) {
                                 checkChildFragments()
@@ -901,7 +903,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 inMeetingViewModel.state.collect { (error, enabled) ->
                     if (error != null) {
-                        sharedModel.showSnackBar(StringResourcesUtils.getString(error))
+                        sharedModel.showSnackBar(getString(error))
                         bottomFloatingPanelViewHolder.checkErrorAllowAddParticipants()
                     } else if (enabled != null) {
                         bottomFloatingPanelViewHolder.updateShareAndInviteButton()
@@ -914,7 +916,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         sharedModel.currentChatId.observe(viewLifecycleOwner) {
             it?.let {
                 Timber.d("Chat has changed")
-                inMeetingViewModel.setChatId(it)
+                inMeetingViewModel.setChatId(it, requireContext())
                 chatManagement.openChatRoom(it)
             }
         }
@@ -1080,11 +1082,11 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             toolbarSubtitle?.let {
                 when (type) {
                     InMeetingViewModel.SubtitleCallType.TYPE_CONNECTING -> {
-                        it.text = StringResourcesUtils.getString(R.string.chat_connecting)
+                        it.text = getString(R.string.chat_connecting)
                     }
                     InMeetingViewModel.SubtitleCallType.TYPE_CALLING -> {
                         it.text =
-                            StringResourcesUtils.getString(R.string.outgoing_call_starting)
+                            getString(R.string.outgoing_call_starting)
                     }
                     InMeetingViewModel.SubtitleCallType.TYPE_ESTABLISHED -> {
                         it.text = ""
@@ -1109,13 +1111,13 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             }
         }
 
-        viewLifecycleOwner.collectFlow(inMeetingViewModel.getParticipantsChanges) { (type, title) ->
-            if (title.trim().isNotEmpty()) {
+        viewLifecycleOwner.collectFlow(inMeetingViewModel.getParticipantsChanges) { (type, getTitle) ->
+            if (getTitle != null) {
                 participantsChangesBanner?.apply {
                     clearAnimation()
                     hideCallWillEndInBanner()
 
-                    text = title
+                    text = getTitle(requireContext())
                     isVisible = true
                     alpha =
                         if (bottomFloatingPanelViewHolder.getState() == BottomSheetBehavior.STATE_EXPANDED) 0f
@@ -1173,7 +1175,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         it.isVisible = true
                     }
                     bannerAnotherCallSubtitle?.text =
-                        StringResourcesUtils.getString(R.string.call_in_progress_layout)
+                        getString(R.string.call_in_progress_layout)
 
                     bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
                         false
@@ -1187,7 +1189,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     }
 
                     bannerAnotherCallSubtitle?.text =
-                        StringResourcesUtils.getString(R.string.call_on_hold)
+                        getString(R.string.call_on_hold)
 
                     bottomFloatingPanelViewHolder.changeOnHoldIconDrawable(
                         true
@@ -1208,7 +1210,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         )
                     )
                     text =
-                        StringResourcesUtils.getString(R.string.calls_call_screen_poor_network_quality)
+                        getString(R.string.calls_call_screen_poor_network_quality)
                 }
             }
 
@@ -1231,7 +1233,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                         )
                     )
                     text =
-                        StringResourcesUtils.getString(R.string.reconnecting_message)
+                        getString(R.string.reconnecting_message)
                     startAnimation(blink)
                 } else {
                     clearAnimation()
@@ -1997,7 +1999,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
 
     private fun showRequestPermissionSnackBar() {
         val warningText =
-            StringResourcesUtils.getString(R.string.meeting_required_permissions_warning)
+            getString(R.string.meeting_required_permissions_warning)
         showSnackbar(PERMISSIONS_TYPE, warningText, MEGACHAT_INVALID_HANDLE)
     }
 
@@ -2371,7 +2373,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun updateParticipantInfo(peerId: Long, type: Int) {
         Timber.d("Participant's name has changed")
-        val listParticipants = inMeetingViewModel.updateParticipantsNameOrAvatar(peerId, type)
+        val listParticipants =
+            inMeetingViewModel.updateParticipantsNameOrAvatar(peerId, type, requireContext())
         if (listParticipants.isNotEmpty()) {
             gridViewCallFragment?.let {
                 if (it.isAdded) {
@@ -2567,7 +2570,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                     putExtra(INTENT_EXTRA_KEY_CHAT_ID, inMeetingViewModel.currentChatId)
                     putExtra(
                         INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
-                        StringResourcesUtils.getString(R.string.invite_participants)
+                        getString(R.string.invite_participants)
                     )
                 }
             meetingActivity.startActivityForResult(
@@ -2625,7 +2628,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
      */
     private fun checkCallStarted(chatId: Long) {
         MegaApplication.getInstance().openCallService(chatId)
-        inMeetingViewModel.setCall(chatId)
+        inMeetingViewModel.setCall(chatId, requireContext())
         checkChildFragments()
         showMuteBanner()
     }
@@ -2653,7 +2656,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         super.onResume()
         MegaApplication.getInstance().startProximitySensor()
         checkChildFragments()
-        inMeetingViewModel.checkParticipantsList()
+        inMeetingViewModel.checkParticipantsList(requireContext())
     }
 
     override fun onPause() {
@@ -2777,7 +2780,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         failedDialog = MaterialAlertDialogBuilder(
             requireContext(),
             R.style.ThemeOverlay_Mega_MaterialAlertDialog
-        ).setMessage(StringResourcesUtils.getString(R.string.meeting_is_failed_content))
+        ).setMessage(getString(R.string.meeting_is_failed_content))
             .setCancelable(false)
             .setPositiveButton(R.string.general_ok) { _, _ ->
                 rtcAudioManagerGateway.removeRTCAudioManager()
@@ -2806,7 +2809,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             collapsePanel()
 
             isVisible = true
-            text = StringResourcesUtils.getString(
+            text = getString(
                 R.string.calls_call_screen_count_down_timer_to_end_call,
                 TimeUtils.getMinutesAndSecondsFromMilliseconds(milliseconds)
             )
@@ -2815,7 +2818,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
             countDownTimerToEndCall = object :
                 CountDownTimer(milliseconds, MILLISECONDS_IN_ONE_SECOND) {
                 override fun onTick(millisUntilFinished: Long) {
-                    text = StringResourcesUtils.getString(
+                    text = getString(
                         R.string.calls_call_screen_count_down_timer_to_end_call,
                         TimeUtils.getMinutesAndSecondsFromMilliseconds(millisUntilFinished)
                     )
@@ -2839,8 +2842,8 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         }
 
         onlyMeDialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call))
-            .setMessage(StringResourcesUtils.getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
+            .setTitle(getString(R.string.calls_call_screen_dialog_title_only_you_in_the_call))
+            .setMessage(getString(R.string.calls_call_screen_dialog_description_only_you_in_the_call))
             .setPositiveButton(R.string.calls_call_screen_button_to_end_call) { _, _ ->
                 inMeetingViewModel.checkEndCall()
             }
@@ -2863,7 +2866,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
                 isVisible = true
             }
 
-            text = StringResourcesUtils.getString(
+            text = getString(
                 R.string.calls_call_screen_waiting_for_participants
             )
         }

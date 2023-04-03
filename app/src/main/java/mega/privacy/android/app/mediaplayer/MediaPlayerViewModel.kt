@@ -1,6 +1,7 @@
 package mega.privacy.android.app.mediaplayer
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Build
@@ -38,7 +39,6 @@ import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -69,7 +69,7 @@ class MediaPlayerViewModel @Inject constructor(
 
     private val collision = SingleLiveEvent<NameCollision>()
     private val throwable = SingleLiveEvent<Throwable>()
-    private val snackbarMessage = SingleLiveEvent<String>()
+    private val snackbarMessage = SingleLiveEvent<Int>()
 
     /**
      * The subtitle file info by add subtitles
@@ -89,7 +89,7 @@ class MediaPlayerViewModel @Inject constructor(
     val state: StateFlow<SubtitleDisplayState> = _state
 
     fun getCollision(): LiveData<NameCollision> = collision
-    fun onSnackbarMessage(): LiveData<String> = snackbarMessage
+    fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
     fun onExceptionThrown(): LiveData<Throwable> = throwable
 
     private val _itemToRemove = MutableLiveData<Long>()
@@ -275,12 +275,18 @@ class MediaPlayerViewModel @Inject constructor(
      * @param nodeHandle        Node handle to copy.
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
-    fun copyNode(node: MegaNode? = null, nodeHandle: Long? = null, newParentHandle: Long) {
+    fun copyNode(
+        node: MegaNode? = null,
+        nodeHandle: Long? = null,
+        newParentHandle: Long,
+        context: Context,
+    ) {
         checkNameCollision(
             node = node,
             nodeHandle = nodeHandle,
             newParentHandle = newParentHandle,
-            type = NameCollisionType.COPY
+            type = NameCollisionType.COPY,
+            context = context
         ) {
             if (node != null) {
                 copyNodeUseCase.copy(node = node, parentHandle = newParentHandle)
@@ -300,7 +306,7 @@ class MediaPlayerViewModel @Inject constructor(
             .subscribeBy(
                 onComplete = {
                     snackbarMessage.value =
-                        StringResourcesUtils.getString(R.string.context_correctly_copied)
+                        R.string.context_correctly_copied
                 },
                 onError = { error ->
                     throwable.value = error
@@ -316,11 +322,12 @@ class MediaPlayerViewModel @Inject constructor(
      * @param nodeHandle        Node handle to move.
      * @param newParentHandle   Parent handle in which the node will be moved.
      */
-    fun moveNode(nodeHandle: Long, newParentHandle: Long) {
+    fun moveNode(nodeHandle: Long, newParentHandle: Long, context: Context) {
         checkNameCollision(
             nodeHandle = nodeHandle,
             newParentHandle = newParentHandle,
-            type = NameCollisionType.MOVE
+            type = NameCollisionType.MOVE,
+            context = context,
         ) {
             moveNodeUseCase.move(handle = nodeHandle, parentHandle = newParentHandle)
                 .subscribeOn(Schedulers.io())
@@ -329,7 +336,7 @@ class MediaPlayerViewModel @Inject constructor(
                     onComplete = {
                         _itemToRemove.value = nodeHandle
                         snackbarMessage.value =
-                            StringResourcesUtils.getString(R.string.context_correctly_moved)
+                            R.string.context_correctly_moved
                     },
                     onError = { error ->
                         throwable.value = error
@@ -354,20 +361,23 @@ class MediaPlayerViewModel @Inject constructor(
         nodeHandle: Long? = null,
         newParentHandle: Long,
         type: NameCollisionType,
+        context: Context,
         completeAction: (() -> Unit),
     ) {
         if (node != null) {
             checkNameCollisionUseCase.check(
                 node = node,
                 parentHandle = newParentHandle,
-                type = type
+                type = type,
+                context = context,
             ).subscribeAndShowCollisionResult(completeAction)
         } else {
             nodeHandle?.let {
                 checkNameCollisionUseCase.check(
                     handle = it,
                     parentHandle = newParentHandle,
-                    type = type
+                    type = type,
+                    context,
                 ).subscribeAndShowCollisionResult(completeAction)
             }
         }

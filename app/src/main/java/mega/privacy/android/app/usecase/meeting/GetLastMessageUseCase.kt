@@ -10,7 +10,6 @@ import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ChatUtil.converterShortCodes
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.isTextEmpty
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
@@ -78,27 +77,27 @@ class GetLastMessageUseCase @Inject constructor(
 
             return@fromCallable when (chatListItem.lastMessageType) {
                 TYPE_INVALID, TYPE_SCHED_MEETING ->
-                    getString(R.string.no_conversation_history)
+                    context.getString(R.string.no_conversation_history)
                 LAST_MSG_LOADING ->
-                    getString(R.string.general_loading)
+                    context.getString(R.string.general_loading)
                 TYPE_NORMAL, TYPE_CHAT_TITLE, TYPE_CALL_ENDED, TYPE_TRUNCATE, TYPE_ALTER_PARTICIPANTS, TYPE_PRIV_CHANGE, TYPE_CONTAINS_META ->
                     chatController.createManagementString(chatMessage, chatRoom)
                 TYPE_CALL_STARTED ->
                     if (isMeeting) {
-                        getString(R.string.meetings_list_ongoing_call_message)
+                        context.getString(R.string.meetings_list_ongoing_call_message)
                     } else {
-                        getString(R.string.ongoing_call_messages)
+                        context.getString(R.string.ongoing_call_messages)
                     }
                 TYPE_SET_RETENTION_TIME -> {
                     val timeFormatted = ChatUtil.transformSecondsInString(chatRoom.retentionTime)
                     if (timeFormatted.isTextEmpty()) {
                         String.format(
-                            getString(R.string.retention_history_disabled),
+                            context.getString(R.string.retention_history_disabled),
                             chatListItem.getSenderName(true)
                         ).cleanHtmlText()
                     } else {
                         String.format(
-                            getString(R.string.retention_history_changed_by),
+                            context.getString(R.string.retention_history_changed_by),
                             chatListItem.getSenderName(true),
                             timeFormatted
                         ).cleanHtmlText()
@@ -106,17 +105,17 @@ class GetLastMessageUseCase @Inject constructor(
                 }
                 TYPE_PUBLIC_HANDLE_CREATE ->
                     String.format(
-                        getString(R.string.message_created_chat_link),
+                        context.getString(R.string.message_created_chat_link),
                         chatListItem.getSenderName(true)
                     ).cleanHtmlText()
                 TYPE_PUBLIC_HANDLE_DELETE ->
                     String.format(
-                        getString(R.string.message_deleted_chat_link),
+                        context.getString(R.string.message_deleted_chat_link),
                         chatListItem.getSenderName(true)
                     ).cleanHtmlText()
                 TYPE_SET_PRIVATE_MODE ->
                     String.format(
-                        getString(R.string.message_set_chat_private),
+                        context.getString(R.string.message_set_chat_private),
                         chatListItem.getSenderName(true)
                     ).cleanHtmlText()
                 TYPE_NODE_ATTACHMENT -> {
@@ -129,12 +128,15 @@ class GetLastMessageUseCase @Inject constructor(
                     "${chatListItem.getSenderName()}: $message"
                 }
                 TYPE_CONTACT_ATTACHMENT -> {
-                    val message = getString(R.string.contacts_sent, chatMessage.usersCount.toString())
+                    val message =
+                        context.getString(R.string.contacts_sent, chatMessage.usersCount.toString())
                     "${chatListItem.getSenderName()}: ${converterShortCodes(message)}"
                 }
                 TYPE_VOICE_CLIP -> {
                     val nodeList = chatMessage.megaNodeList
-                    val message = if ((nodeList?.size() ?: 0) > 0 && ChatUtil.isVoiceClip(nodeList.get(0).name)) {
+                    val message = if ((nodeList?.size()
+                            ?: 0) > 0 && ChatUtil.isVoiceClip(nodeList.get(0).name)
+                    ) {
                         val duration = ChatUtil.getVoiceClipDuration(nodeList.get(0))
                         CallUtil.milliSecondsToTimer(duration)
                     } else {
@@ -144,7 +146,7 @@ class GetLastMessageUseCase @Inject constructor(
                 }
                 else -> {
                     if (chatListItem.lastMessage.isNullOrBlank()) {
-                        getString(R.string.error_message_unrecognizable)
+                        context.getString(R.string.error_message_unrecognizable)
                     } else {
                         "${chatListItem.getSenderName()}: ${converterShortCodes(chatListItem.lastMessage)}"
                     }
@@ -157,14 +159,14 @@ class GetLastMessageUseCase @Inject constructor(
             if (includeMyName) {
                 megaChatApi.myFullname
                     ?: megaChatApi.myEmail
-                    ?: getString(R.string.chat_last_message_sender_me)
+                    ?: context.getString(R.string.chat_last_message_sender_me)
             } else {
-                getString(R.string.chat_last_message_sender_me)
+                context.getString(R.string.chat_last_message_sender_me)
             }
         } else {
             megaChatApi.getUserFullnameFromCache(lastMessageSender)
                 ?: megaChatApi.getUserEmailFromCache(lastMessageSender)
-                ?: getString(R.string.unknown_name_label)
+                ?: context.getString(R.string.unknown_name_label)
         }
 
     private fun MegaChatListItem.isMine(): Boolean =
@@ -174,23 +176,23 @@ class GetLastMessageUseCase @Inject constructor(
         when (status) {
             CALL_STATUS_TERMINATING_USER_PARTICIPATION, CALL_STATUS_USER_NO_PRESENT -> {
                 if (isRinging) {
-                    getString(R.string.notification_subtitle_incoming)
+                    context.getString(R.string.notification_subtitle_incoming)
                 } else if (isMeeting) {
-                    val message = getString(R.string.meetings_list_ongoing_call_message)
+                    val message = context.getString(R.string.meetings_list_ongoing_call_message)
                     getDurationFormatted()?.let { "$message · $it" } ?: message
                 } else {
-                    getString(R.string.ongoing_call_messages)
+                    context.getString(R.string.ongoing_call_messages)
                 }
             }
             else -> {
                 val requestSent = chatManagement.isRequestSent(callId)
                 if (requestSent) {
-                    getString(R.string.outgoing_call_starting)
+                    context.getString(R.string.outgoing_call_starting)
                 } else if (isMeeting) {
-                    val message = getString(R.string.meetings_list_ongoing_call_message)
+                    val message = context.getString(R.string.meetings_list_ongoing_call_message)
                     getDurationFormatted()?.let { "$message · $it" } ?: message
                 } else {
-                    getString(R.string.call_started_messages)
+                    context.getString(R.string.call_started_messages)
                 }
             }
         }

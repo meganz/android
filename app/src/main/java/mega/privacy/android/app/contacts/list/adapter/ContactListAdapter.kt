@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.list.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -20,7 +21,7 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 class ContactListAdapter(
     private val itemCallback: (Long) -> Unit,
     private val itemInfoCallback: (String) -> Unit,
-    private val itemMoreCallback: (Long) -> Unit
+    private val itemMoreCallback: (Long) -> Unit,
 ) : ListAdapter<ContactItem, RecyclerView.ViewHolder>(ContactItem.DiffCallback()),
     SectionTitleProvider {
 
@@ -47,7 +48,8 @@ class ContactListAdapter(
                 ContactListDataViewHolder(binding).apply {
                     binding.root.setOnClickListener {
                         if (isValidPosition(bindingAdapterPosition)) {
-                            val handle = (getItem(bindingAdapterPosition) as ContactItem.Data).handle
+                            val handle =
+                                (getItem(bindingAdapterPosition) as ContactItem.Data).handle
                             itemCallback.invoke(handle)
                         }
                     }
@@ -59,7 +61,8 @@ class ContactListAdapter(
                     }
                     binding.btnMore.setOnClickListener {
                         if (isValidPosition(bindingAdapterPosition)) {
-                            val handle = (getItem(bindingAdapterPosition) as ContactItem.Data).handle
+                            val handle =
+                                (getItem(bindingAdapterPosition) as ContactItem.Data).handle
                             itemMoreCallback.invoke(handle)
                         }
                     }
@@ -84,6 +87,6 @@ class ContactListAdapter(
             is ContactItem.Data -> VIEW_TYPE_DATA
         }
 
-    override fun getSectionTitle(position: Int): String =
+    override fun getSectionTitle(position: Int, context: Context): String =
         getItem(position).getSection()
 }

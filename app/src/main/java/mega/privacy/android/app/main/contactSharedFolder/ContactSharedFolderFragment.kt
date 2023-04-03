@@ -28,7 +28,6 @@ import mega.privacy.android.app.presentation.contact.ContactInfoViewModel
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeDialogUtil
 import mega.privacy.android.app.utils.MegaNodeUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
@@ -273,7 +272,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
             val selected = adapter?.selectedNodes ?: listOf()
             menu?.apply {
                 findItem(R.id.cab_menu_share_link)?.title =
-                    StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size)
+                    resources.getQuantityString(R.plurals.get_links, selected.size)
 
                 var showRename = false
                 var showMove = false

@@ -17,7 +17,6 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_INVITE_CONTACT_FR
 import static mega.privacy.android.app.utils.Constants.REQUEST_READ_CONTACTS;
 import static mega.privacy.android.app.utils.ContactUtil.getContactDB;
 import static mega.privacy.android.app.utils.ContactUtil.getContactNameDB;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString;
 import static mega.privacy.android.app.utils.TimeUtils.lastGreenDate;
 import static mega.privacy.android.app.utils.Util.dp2px;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
@@ -1904,7 +1903,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             } else if (contactType == CONTACT_TYPE_DEVICE) {
                 aB.setTitle(getString(R.string.invite_contacts));
                 if (addedContactsPhone.size() > 0) {
-                    aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
+                    aB.setSubtitle(getResources().getQuantityString(R.plurals.general_selection_num_contacts,
                             addedContactsPhone.size(), addedContactsPhone.size()));
                 } else {
                     aB.setSubtitle(null);
@@ -1912,7 +1911,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
             } else {
                 aB.setTitle(getString(R.string.share_with));
                 if (addedContactsShare.size() > 0) {
-                    aB.setSubtitle(getQuantityString(R.plurals.general_selection_num_contacts,
+                    aB.setSubtitle(getResources().getQuantityString(R.plurals.general_selection_num_contacts,
                             addedContactsShare.size(), addedContactsShare.size()));
                 } else {
                     aB.setSubtitle(null);
@@ -2687,7 +2686,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                     case DialogInterface.BUTTON_POSITIVE: {
                         addMEGAFilteredContact(contact);
                         addedContactsMEGA.remove(contact);
-                        newGroupHeaderList.setText(getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
+                        newGroupHeaderList.setText(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
                         adapterMEGA.setContacts(addedContactsMEGA);
                         adapterMEGAContacts.setContacts(addedContactsMEGA);
 
@@ -3032,7 +3031,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         createMyContact();
 
         addedContactsMEGA.add(myContact);
-        newGroupHeaderList.setText(getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
+        newGroupHeaderList.setText(getResources().getQuantityString(R.plurals.subtitle_of_group_chat, addedContactsMEGA.size(), addedContactsMEGA.size()));
 
         if (searchMenuItem != null) {
             searchMenuItem.setVisible(false);

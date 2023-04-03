@@ -8,7 +8,6 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.meeting.adapter.Participant
 import mega.privacy.android.app.meeting.listeners.AddContactListener
@@ -20,6 +19,7 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.TextUtil
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -543,7 +543,7 @@ class InMeetingRepository @Inject constructor(
             ChatController(context).getParticipantEmail(peerId),
             null,
             MegaContactRequest.INVITE_ACTION_ADD,
-            AddContactListener(callback)
+            AddContactListener(callback, context)
         )
     }
 

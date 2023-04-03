@@ -3,6 +3,7 @@ package mega.privacy.android.data.repository
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flowOn
@@ -337,13 +338,23 @@ internal class NodeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getInvalidHandle(): Long {
-        return megaApiGateway.getInvalidHandle()
-    }
+    override suspend fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
 
     override suspend fun getRootNode() = withContext(ioDispatcher) {
         megaApiGateway.getRootNode()?.let {
             convertToUnTypedNode(it)
         }
     }
+
+    override suspend fun removedInSharedNodesByEmail(email: String): Unit =
+        withContext(ioDispatcher) {
+            runCatching {
+                megaApiGateway.getContact(email)?.let {
+                    megaApiGateway.getInShares(it).forEach { node ->
+                        ensureActive()
+                        megaApiGateway.deleteNode(node, null)
+                    }
+                }
+            }
+        }
 }

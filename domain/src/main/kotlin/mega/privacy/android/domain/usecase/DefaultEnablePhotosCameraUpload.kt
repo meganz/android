@@ -4,9 +4,9 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
-import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import javax.inject.Inject
 
 /**
@@ -14,17 +14,17 @@ import javax.inject.Inject
  *
  * @property settingsRepository [SettingsRepository]
  * @property setCameraUploadsByWifiUseCase [SetCameraUploadsByWifiUseCase]
- * @property setChargingRequiredForVideoCompression [SetChargingRequiredForVideoCompression]
- * @property setUploadVideoQuality [SetUploadVideoQuality]
- * @property setVideoCompressionSizeLimit [SetVideoCompressionSizeLimit]
+ * @property setChargingRequiredForVideoCompressionUseCase [SetChargingRequiredForVideoCompressionUseCase]
+ * @property setUploadVideoQualityUseCase [SetUploadVideoQualityUseCase]
+ * @property setVideoCompressionSizeLimitUseCase [SetVideoCompressionSizeLimitUseCase]
  * @property cameraUploadRepository [CameraUploadRepository]
  */
 class DefaultEnablePhotosCameraUpload @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
-    private val setChargingRequiredForVideoCompression: SetChargingRequiredForVideoCompression,
-    private val setUploadVideoQuality: SetUploadVideoQuality,
-    private val setVideoCompressionSizeLimit: SetVideoCompressionSizeLimit,
+    private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
+    private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
+    private val setVideoCompressionSizeLimitUseCase: SetVideoCompressionSizeLimitUseCase,
     private val cameraUploadRepository: CameraUploadRepository,
 ) : EnablePhotosCameraUpload {
 
@@ -40,9 +40,9 @@ class DefaultEnablePhotosCameraUpload @Inject constructor(
             setCameraUploadsByWifiUseCase(!enableCellularSync)
             setCameraUploadFileType(syncVideo)
             setCameraFolderExternalSDCard(false)
-            setUploadVideoQuality(videoQuality)
-            setChargingRequiredForVideoCompression(true)
-            setVideoCompressionSizeLimit(conversionChargingOnSize)
+            setUploadVideoQualityUseCase(videoQuality)
+            setChargingRequiredForVideoCompressionUseCase(true)
+            setVideoCompressionSizeLimitUseCase(conversionChargingOnSize)
             // After target and local folder setup, then enable CU.
             setEnableCameraUpload(true)
         }

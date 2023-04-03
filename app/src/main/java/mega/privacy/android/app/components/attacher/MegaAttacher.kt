@@ -28,8 +28,6 @@ import mega.privacy.android.app.utils.Constants.SELECTED_CHATS
 import mega.privacy.android.app.utils.Constants.SELECTED_CONTACTS
 import mega.privacy.android.app.utils.Constants.SELECTED_USERS
 import mega.privacy.android.app.utils.Constants.USER_HANDLES
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import nz.mega.sdk.MegaApiAndroid
@@ -54,7 +52,8 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
     private val megaApi = app.megaApi
     private val megaChatApi = app.megaChatApi
 
-    val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase = getMonitorStorageStateEvent()
+    val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase =
+        getMonitorStorageStateEvent()
 
     /**
      * Record if an attach is ongoing.
@@ -107,7 +106,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
             return
         }
 
-        AttachmentsCopier(megaApi, nodes) { successNodes, _ ->
+        AttachmentsCopier(megaApi = megaApi, nodes = nodes, context = app) { successNodes, _ ->
             val nodesToAttach = ownerNodes + successNodes
             if (nodesToAttach.isNotEmpty()) {
                 selectChatsToAttach(nodesToAttach)
@@ -149,7 +148,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         requestCode: Int,
         resultCode: Int,
         data: Intent?,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ): Boolean {
         if (requestCode != REQUEST_CODE_SELECT_CHAT) {
             return false
@@ -196,7 +195,13 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
                     attachContactsToChats(contactHandlesToAttach, managedChatIds, snackbarShower)
                 }
                 !linkToAttach.isNullOrEmpty() -> {
-                    attachLinkToChats(linkToAttach, linkKey, linkPassword, managedChatIds, snackbarShower)
+                    attachLinkToChats(
+                        linkToAttach,
+                        linkKey,
+                        linkPassword,
+                        managedChatIds,
+                        snackbarShower
+                    )
                 }
                 !severalLinksToAttach.isNullOrEmpty() -> {
                     attachSeveralLinksToChats(severalLinksToAttach, managedChatIds, snackbarShower)
@@ -222,17 +227,21 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         nodeHandles: LongArray?,
         contactHandles: LongArray?,
         totalChats: Int,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         when {
             nodeHandles != null && nodeHandles.isNotEmpty() -> {
                 snackbarShower.showSnackbar(
-                    getQuantityString(R.plurals.num_files_not_send, nodeHandles.size, totalChats)
+                    app.resources.getQuantityString(
+                        R.plurals.num_files_not_send,
+                        nodeHandles.size,
+                        totalChats
+                    )
                 )
             }
             contactHandles != null && contactHandles.isNotEmpty() -> {
                 snackbarShower.showSnackbar(
-                    getQuantityString(
+                    app.resources.getQuantityString(
                         R.plurals.num_contacts_not_send, contactHandles.size, totalChats
                     )
                 )
@@ -250,7 +259,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
     fun handleSelectFileResult(
         data: Intent?,
         contact: MegaUser,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         if (data == null) {
             return
@@ -273,7 +282,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         data: Intent?,
         chatId: Long,
         snackbarShower: SnackbarShower,
-        attachNodeToChatListener: AttachNodeToChatListener
+        attachNodeToChatListener: AttachNodeToChatListener,
     ) {
         val nodeHandles = data?.getLongArrayExtra(NODE_HANDLES) ?: return
         if (nodeHandles.isEmpty()) {
@@ -296,7 +305,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
      */
     fun handleSelectFileResult(
         data: Intent?,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         val nodeHandles = data?.getLongArrayExtra(NODE_HANDLES) ?: return
         if (nodeHandles.isEmpty()) {
@@ -336,7 +345,11 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
                 attachNodesToChats(nodeHandles, it, snackbarShower)
             } else {
                 snackbarShower.showSnackbar(
-                    getQuantityString(R.plurals.num_files_not_send, nodeHandles.size, totalChats)
+                    app.resources.getQuantityString(
+                        R.plurals.num_files_not_send,
+                        nodeHandles.size,
+                        totalChats
+                    )
                 )
             }
         }
@@ -373,7 +386,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
     private fun processContactsAndChats(
         chatIds: LongArray?,
         contactEmails: List<String>,
-        onFinish: (List<Long>) -> Unit
+        onFinish: (List<Long>) -> Unit,
     ) {
         if (contactEmails.isNotEmpty()) {
             val users = ArrayList<MegaUser>()
@@ -426,7 +439,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         chatIds: List<Long>,
         snackbarShower: SnackbarShower,
         forceNonChatSnackbar: Boolean = false,
-        attachNodeToChatListener: AttachNodeToChatListener? = null
+        attachNodeToChatListener: AttachNodeToChatListener? = null,
     ) {
         if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
             AlertsAndWarnings.showOverDiskQuotaPaywallWarning()
@@ -460,7 +473,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
             return
         }
 
-        AttachmentsCopier(megaApi, nodes) { successNodes, _ ->
+        AttachmentsCopier(megaApi = megaApi, nodes = nodes, context = app) { successNodes, _ ->
             val nodesToAttach = ownerNodes + successNodes
             if (nodesToAttach.isNotEmpty()) {
                 attachNodesToChats(chatIds, nodesToAttach, listener)
@@ -480,7 +493,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
     private fun attachNodesToChats(
         chatIds: List<Long>,
         nodes: List<MegaNode>,
-        listener: AttachNodesListener
+        listener: AttachNodesListener,
     ) {
         for (chatId in chatIds) {
             for (node in nodes) {
@@ -499,7 +512,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
     private fun attachContactsToChats(
         contactHandles: LongArray,
         chatIds: List<Long>,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         val handleList = MegaHandleList.createInstance()
         for (handle in contactHandles) {
@@ -520,7 +533,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         key: String?,
         password: String?,
         chatIds: List<Long>,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         for (chatId in chatIds) {
             megaChatApi.sendMessage(chatId, link)
@@ -532,11 +545,11 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         }
 
         val message = if (!TextUtils.isEmpty(key)) {
-            getString(R.string.link_and_key_sent)
+            app.getString(R.string.link_and_key_sent)
         } else if (!TextUtils.isEmpty(password)) {
-            getString(R.string.link_and_password_sent)
+            app.getString(R.string.link_and_password_sent)
         } else {
-            getQuantityString(R.plurals.links_sent, 1)
+            app.resources.getQuantityString(R.plurals.links_sent, 1)
         }
 
         snackbarShower.showSnackbarWithChat(
@@ -554,7 +567,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
     private fun attachSeveralLinksToChats(
         links: List<String>,
         chatIds: List<Long>,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) {
         for (chatId in chatIds) {
             for (link in links) {
@@ -563,7 +576,7 @@ class MegaAttacher(private val activityLauncher: ActivityLauncher) {
         }
 
         snackbarShower.showSnackbarWithChat(
-            getQuantityString(R.plurals.links_sent, links.size),
+            app.resources.getQuantityString(R.plurals.links_sent, links.size),
             if (chatIds.size == 1) chatIds[0] else MEGACHAT_INVALID_HANDLE
         )
     }

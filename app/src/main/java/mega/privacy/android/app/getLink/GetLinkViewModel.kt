@@ -1,26 +1,26 @@
 package mega.privacy.android.app.getLink
 
+import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.getLink.useCase.EncryptLinkWithPasswordUseCase
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.LinksUtil
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.notifyObserver
+import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
@@ -45,6 +45,7 @@ class GetLinkViewModel @Inject constructor(
     private val dbH: DatabaseHandler,
     private val encryptLinkWithPasswordUseCase: EncryptLinkWithPasswordUseCase,
     private val exportNodeUseCase: ExportNodeUseCase,
+    @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
     private val linkText: MutableLiveData<String> = MutableLiveData()
@@ -100,9 +101,9 @@ class GetLinkViewModel @Inject constructor(
         if (!this::linkFragmentTitle.isInitialized) {
             linkFragmentTitle =
                 if (node.isExported) {
-                    getString(R.string.edit_link_option)
+                    context.getString(R.string.edit_link_option)
                 } else {
-                    getQuantityString(R.plurals.get_links, 1)
+                    context.resources.getQuantityString(R.plurals.get_links, 1)
                 }
         }
 
@@ -161,7 +162,7 @@ class GetLinkViewModel @Inject constructor(
                     isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
                     !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
                     else -> node.publicLink
-                }, getQuantityString(R.plurals.links_copied_clipboard, 1)
+                }, context.resources.getQuantityString(R.plurals.links_copied_clipboard, 1)
             )
         )
     }
@@ -172,7 +173,7 @@ class GetLinkViewModel @Inject constructor(
      * @param action Copy action to perform.
      */
     fun copyLinkKey(action: (Pair<String, String>) -> Unit) {
-        action.invoke(Pair(key, getString(R.string.key_copied_clipboard)))
+        action.invoke(Pair(key, context.getString(R.string.key_copied_clipboard)))
     }
 
     /**
@@ -185,7 +186,12 @@ class GetLinkViewModel @Inject constructor(
             return
         }
 
-        action.invoke(Pair(getPasswordText()!!, getString(R.string.password_copied_clipboard)))
+        action.invoke(
+            Pair(
+                getPasswordText()!!,
+                context.getString(R.string.password_copied_clipboard)
+            )
+        )
     }
 
     /**
@@ -264,7 +270,7 @@ class GetLinkViewModel @Inject constructor(
      */
     private fun updateLink() {
         linkText.value = when {
-            !node.isExported -> getString(R.string.link_request_status)
+            !node.isExported -> context.getString(R.string.link_request_status)
             isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
             !linkWithPassword.isNullOrEmpty() -> linkWithPassword
             else -> node.publicLink
@@ -288,7 +294,7 @@ class GetLinkViewModel @Inject constructor(
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = Constants.TYPE_TEXT_PLAIN
         intent.putExtra(Intent.EXTRA_TEXT, link ?: node.publicLink)
-        action.invoke(Intent.createChooser(intent, getString(R.string.context_get_link)))
+        action.invoke(Intent.createChooser(intent, context.getString(R.string.context_get_link)))
     }
 
     fun sendLinkToChat(
@@ -333,10 +339,10 @@ class GetLinkViewModel @Inject constructor(
      * @return The string with the info described.
      */
     private fun getLinkAndKeyOrPasswordToShare(): String =
-        if (!linkWithPassword.isNullOrEmpty()) getString(
+        if (!linkWithPassword.isNullOrEmpty()) context.getString(
             R.string.share_link_with_password, linkWithPassword, getPasswordText()
         )
-        else getString(R.string.share_link_with_key, linkWithoutKey, key)
+        else context.getString(R.string.share_link_with_key, linkWithoutKey, key)
 
     /**
      * Gets the link to share depending on the current enabled option. It can be:

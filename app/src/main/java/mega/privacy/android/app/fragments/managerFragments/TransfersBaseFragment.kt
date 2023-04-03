@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -34,7 +34,7 @@ open class TransfersBaseFragment : RotatableFragment() {
     /**
      * [TransfersViewModel] instance
      */
-    protected val viewModel by viewModels<TransfersViewModel>()
+    protected val viewModel by activityViewModels<TransfersViewModel>()
 
     /**
      * LayoutManager

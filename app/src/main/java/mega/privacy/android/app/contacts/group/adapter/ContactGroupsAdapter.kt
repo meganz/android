@@ -1,5 +1,6 @@
 package mega.privacy.android.app.contacts.group.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
@@ -15,7 +16,7 @@ import mega.privacy.android.app.utils.AvatarUtil
  * @property itemCallback   Callback to be called when an item is clicked.
  */
 class ContactGroupsAdapter constructor(
-    private val itemCallback: (Long) -> Unit
+    private val itemCallback: (Long) -> Unit,
 ) : ListAdapter<ContactGroupItem, ContactGroupsViewHolder>(ContactGroupItem.DiffCallback()),
     SectionTitleProvider {
 
@@ -42,6 +43,6 @@ class ContactGroupsAdapter constructor(
     override fun getItemId(position: Int): Long =
         getItem(position).chatId
 
-    override fun getSectionTitle(position: Int): String =
+    override fun getSectionTitle(position: Int, context: Context): String =
         AvatarUtil.getFirstLetter(getItem(position).title)
 }

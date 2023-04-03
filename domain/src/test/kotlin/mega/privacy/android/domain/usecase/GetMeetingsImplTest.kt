@@ -8,21 +8,18 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
-import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
-import mega.privacy.android.domain.entity.meeting.MonthWeekDayItem
-import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
-import mega.privacy.android.domain.entity.meeting.WeekOfMonth
-import mega.privacy.android.domain.entity.meeting.Weekday
-import mega.privacy.android.domain.repository.CallRepository
+import mega.privacy.android.domain.entity.meeting.MeetingParticipantsResult
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingResult
+import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -37,11 +34,12 @@ class GetMeetingsImplTest {
 
     private lateinit var underTest: GetMeetings
 
+    private val dispatcher = UnconfinedTestDispatcher()
     private val meetingRoomMapper = DefaultMeetingRoomMapper()
     private val getMeetingsRepository = mock<GetMeetingsRepository>()
-    private val callRepository = mock<CallRepository>()
     private val chatRepository = mock<ChatRepository>()
-    private val mutex = Mutex()
+    private val monitorChatCallUpdates = mock<MonitorChatCallUpdates>()
+    private val monitorScheduledMeetingUpdates = mock<MonitorScheduledMeetingUpdates>()
 
     private val now = Instant.now()
     private val chatRooms = generateChatRooms()
@@ -49,28 +47,29 @@ class GetMeetingsImplTest {
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(UnconfinedTestDispatcher())
+        Dispatchers.setMain(dispatcher)
 
         underTest = GetMeetingsImpl(
             chatRepository = chatRepository,
-            callRepository = callRepository,
             getMeetingsRepository = getMeetingsRepository,
             meetingRoomMapper = meetingRoomMapper,
+            monitorChatCallUpdates = monitorChatCallUpdates,
+            monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdates,
+            dispatcher = dispatcher
         )
 
         runBlocking {
             whenever(chatRepository.isChatNotifiable(any())).thenReturn(Random.nextBoolean())
             whenever(chatRepository.isChatLastMessageGeolocation(any())).thenReturn(Random.nextBoolean())
             whenever(chatRepository.monitorMutedChats()).thenReturn(emptyFlow())
-            whenever(callRepository.monitorChatCallUpdates()).thenReturn(emptyFlow())
             whenever(chatRepository.monitorChatListItemUpdates()).thenReturn(emptyFlow())
-            whenever(callRepository.monitorScheduledMeetingUpdates()).thenReturn(emptyFlow())
-            whenever(getMeetingsRepository.getUpdatedMeetingItems(any(), any())).thenReturn(emptyFlow())
-            whenever(callRepository.getNextScheduledMeetingOccurrence(any())).thenReturn(null)
             whenever(chatRepository.getMeetingChatRooms()).thenReturn(chatRooms)
-            whenever(callRepository.getScheduledMeetingsByChat(any())).thenAnswer {
-                schedMeetingRooms.firstOrNull { item -> item.chatId == it.arguments[0] as Long }
-                    ?.let(::listOf)
+            whenever(monitorChatCallUpdates()).thenReturn(emptyFlow())
+            whenever(monitorScheduledMeetingUpdates()).thenReturn(emptyFlow())
+            whenever(getMeetingsRepository.getMeetingParticipants(any())).thenReturn(MeetingParticipantsResult())
+            whenever(getMeetingsRepository.getScheduledMeetingStatus(any())).thenReturn(ScheduledMeetingStatus.NotStarted)
+            whenever(getMeetingsRepository.getMeetingScheduleData(any())).thenAnswer {
+                schedMeetingRooms.firstOrNull { item -> item.schedId == it.arguments[0] as Long }
             }
         }
     }
@@ -83,30 +82,30 @@ class GetMeetingsImplTest {
     @Test
     fun `test that first meeting before retrieving sched meetings is sorted as expected`() =
         runTest {
-            val firstResult = underTest.invoke(mutex).first()
+            val firstResult = underTest.invoke().first()
 
             assertThat(firstResult.first().chatId).isEqualTo(1L)
         }
 
     @Test
     fun `test that first meeting is sorted as expected`() = runTest {
-        val result = underTest.invoke(mutex).take(10).last()
+        val result = underTest.invoke().take(10).last()
 
         assertThat(result.first().chatId).isEqualTo(2L)
     }
 
     @Test
     fun `test that last meeting is sorted as expected`() = runTest {
-        val result = underTest.invoke(mutex).take(10).last()
+        val result = underTest.invoke().take(10).last()
 
         assertThat(result.last().chatId).isEqualTo(4L)
     }
 
     @Test
     fun `test that first non sched meeting is sorted as expected`() = runTest {
-        val result = underTest.invoke(mutex).take(10).last()
+        val result = underTest.invoke().take(10).last()
 
-        assertThat(result[3].chatId).isEqualTo(1L)
+        assertThat(result[3].chatId).isEqualTo(3L)
     }
 
     private fun generateChatRooms(): List<CombinedChatRoom> =
@@ -119,6 +118,7 @@ class GetMeetingsImplTest {
                 isArchived = false,
                 isActive = true,
             ),
+            // Sched
             CombinedChatRoom(
                 chatId = 2L,
                 title = "Chat room #2",
@@ -126,6 +126,7 @@ class GetMeetingsImplTest {
                 isArchived = false,
                 isActive = true,
             ),
+            // Sched Non Pending
             CombinedChatRoom(
                 chatId = 3L,
                 title = "Chat room #3",
@@ -141,6 +142,7 @@ class GetMeetingsImplTest {
                 isArchived = false,
                 isActive = true,
             ),
+            // Sched
             CombinedChatRoom(
                 chatId = 5L,
                 title = "Chat room #5",
@@ -150,77 +152,25 @@ class GetMeetingsImplTest {
             ),
         ).shuffled()
 
-    private fun generateSchedMeetingsRooms(): List<ChatScheduledMeeting> =
+    private fun generateSchedMeetingsRooms(): List<ScheduledMeetingResult> =
         listOf(
-            ChatScheduledMeeting(
-                chatId = 2L,
-                schedId = Random.nextLong(),
-                parentSchedId = -1L,
-                title = "Chat room #2",
-                startDateTime = now.plusSeconds(2 * 3600).epochSecond,
-                endDateTime = now.plusSeconds(2 * 7200).epochSecond,
-                rules = generateRandomChatScheduledRules(),
-                isCanceled = false,
+            ScheduledMeetingResult(
+                schedId = 2L,
+                isPending = true,
+                scheduledStartTimestamp = now.plusSeconds(2 * 3600).epochSecond,
+                scheduledEndTimestamp = now.plusSeconds(2 * 7200).epochSecond,
             ),
-            ChatScheduledMeeting(
-                chatId = 3L,
-                schedId = Random.nextLong(),
-                parentSchedId = -1L,
-                title = "Chat room #3",
-                startDateTime = now.plusSeconds(3 * 3600).epochSecond,
-                endDateTime = now.plusSeconds(3 * 7200).epochSecond,
-                rules = generateRandomChatScheduledRules(),
-                isCanceled = false,
+            ScheduledMeetingResult(
+                schedId = 3L,
+                isPending = false,
+                scheduledStartTimestamp = now.plusSeconds(3 * 3600).epochSecond,
+                scheduledEndTimestamp = now.plusSeconds(3 * 7200).epochSecond,
             ),
-            ChatScheduledMeeting(
-                chatId = 5L,
-                schedId = Random.nextLong(),
-                parentSchedId = -1L,
-                title = "Chat room #5",
-                startDateTime = now.plusSeconds(5 * 3600).epochSecond,
-                endDateTime = now.plusSeconds(5 * 7200).epochSecond,
-                rules = generateRandomChatScheduledRules(),
-                isCanceled = false,
+            ScheduledMeetingResult(
+                schedId = 5L,
+                isPending = true,
+                scheduledStartTimestamp = now.plusSeconds(5 * 3600).epochSecond,
+                scheduledEndTimestamp = now.plusSeconds(5 * 7200).epochSecond,
             ),
         )
-
-    private fun generateRandomChatScheduledRules(): ChatScheduledRules {
-        val frequencyTypes = OccurrenceFrequencyType.values()
-        val weekdays = Weekday.values()
-        val until = Random.nextLong(now.plusSeconds(Random.nextLong(86000, 600000)).epochSecond)
-
-        val weekDayList = mutableListOf<Weekday>().apply {
-            for (i in 0 until Random.nextInt(weekdays.size - 1)) {
-                add(weekdays[i])
-            }
-        }
-        val monthDayList = mutableListOf<Int>().apply {
-            for (i in 0 until Random.nextInt(30)) {
-                add(i)
-            }
-        }
-        val monthWeekDays = mutableListOf<MonthWeekDayItem>().apply {
-            for (i in 0 until Random.nextInt(5)) {
-                add(
-                    MonthWeekDayItem(
-                        weekOfMonth = WeekOfMonth.values()[Random.nextInt(WeekOfMonth.values().size - 1)],
-                        weekDaysList = mutableListOf<Weekday>().apply {
-                            for (x in 0 until Random.nextInt(weekdays.size - 1)) {
-                                add(weekdays[x])
-                            }
-                        }
-                    )
-                )
-            }
-        }
-
-        return ChatScheduledRules(
-            freq = frequencyTypes[Random.nextInt(frequencyTypes.size - 1)],
-            interval = Random.nextInt(5),
-            until = if (Random.nextBoolean()) until else 0,
-            weekDayList = if (Random.nextBoolean()) weekDayList else null,
-            monthDayList = if (Random.nextBoolean()) monthDayList else null,
-            monthWeekDayList = if (Random.nextBoolean()) monthWeekDays else null,
-        )
-    }
 }

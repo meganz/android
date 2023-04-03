@@ -5,6 +5,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -13,18 +14,16 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
+import mega.privacy.android.app.data.extensions.getInfo
 import mega.privacy.android.app.globalmanagement.TransfersManagement
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
 import mega.privacy.android.app.uploadFolder.usecase.GetFolderContentUseCase
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.EmptyFolderException
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import timber.log.Timber
 import javax.inject.Inject
@@ -41,6 +40,7 @@ class UploadFolderViewModel @Inject constructor(
     private val getFolderContentUseCase: GetFolderContentUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val transfersManagement: TransfersManagement,
+    @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
     private val currentFolder: MutableLiveData<FolderContent.Data> = MutableLiveData()
@@ -83,13 +83,18 @@ class UploadFolderViewModel @Inject constructor(
         isList: Boolean,
     ) {
         parentFolder = documentFile.name.toString()
-        currentFolder.value = FolderContent.Data(null, documentFile)
+        currentFolder.value = FolderContent.Data(
+            null, documentFile, info = documentFile.getInfo(
+                context
+            )
+        )
         selectedItems.value = mutableListOf()
         this.parentHandle = parentHandle
         this.order = order
         this.isList = isList
         setFolderItems()
     }
+
 
     /**
      * Checks if there is a search in progress.
@@ -120,7 +125,12 @@ class UploadFolderViewModel @Inject constructor(
             return
         }
 
-        getFolderContentUseCase.get(currentFolder.value!!, order, isList)
+        getFolderContentUseCase.get(
+            currentFolder = currentFolder.value!!,
+            order = order,
+            isList = isList,
+            context = context
+        )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -279,7 +289,11 @@ class UploadFolderViewModel @Inject constructor(
                 val selected = selectedItems.value?.contains(index) ?: false
 
                 if (item is FolderContent.Data && item.isSelected != selected) {
-                    val newItem = FolderContent.Data(item.parent, item.document, selected)
+                    val newItem = FolderContent.Data(
+                        item.parent, item.document, selected, info = item.document.getInfo(
+                            context
+                        )
+                    )
                     finalList.add(newItem)
                 } else {
                     finalList.add(item)
@@ -330,7 +344,13 @@ class UploadFolderViewModel @Inject constructor(
                 return
             }
 
-            getFolderContentUseCase.search(newQuery, currentFolder.value!!, order, isList)
+            getFolderContentUseCase.search(
+                query = newQuery,
+                currentFolder = currentFolder.value!!,
+                order = order,
+                isList = isList,
+                context = context
+            )
                 .subscribeOn(Schedulers.single())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -392,7 +412,7 @@ class UploadFolderViewModel @Inject constructor(
      */
     private fun checkNameCollisions(uploadResults: MutableList<FolderContent.Data>) {
         nameCollisionDisposable =
-            checkNameCollisionUseCase.checkFolderUploadList(parentHandle, uploadResults)
+            checkNameCollisionUseCase.checkFolderUploadList(parentHandle, uploadResults, context)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
@@ -428,7 +448,7 @@ class UploadFolderViewModel @Inject constructor(
                     transfersManagement.setIsProcessingFolders(false)
 
                     if (error is EmptyFolderException) {
-                        actionResult.value = getString(R.string.no_uploads_empty_folder)
+                        actionResult.value = context.getString(R.string.no_uploads_empty_folder)
                         return@subscribeBy
                     } else {
                         Timber.e(error, "Cannot upload anything")
@@ -438,7 +458,7 @@ class UploadFolderViewModel @Inject constructor(
                     transfersManagement.setIsProcessingFolders(false)
                     actionResult.value =
                         if (uploadResults == 0) null
-                        else getQuantityString(
+                        else context.resources.getQuantityString(
                             R.plurals.upload_began,
                             uploadResults,
                             uploadResults

@@ -46,7 +46,6 @@ import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.middlelayer.map.MapHandler;
 import mega.privacy.android.app.middlelayer.map.MegaLatLng;
 import mega.privacy.android.app.service.map.MapHandlerImpl;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import timber.log.Timber;
 
 @SuppressLint("MissingPermission")
@@ -104,7 +103,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
-        aB.setTitle(StringResourcesUtils.getString(R.string.title_activity_maps));
+        aB.setTitle(getString(R.string.title_activity_maps));
 
         ((ViewGroup) findViewById(R.id.parent_layout_maps)).getLayoutTransition().setDuration(500);
         ((ViewGroup) findViewById(R.id.parent_layout_maps)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
@@ -192,14 +191,14 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
             // Portrait
             currentAddress = new MapAddress(latLng,
-                    StringResourcesUtils.getString(R.string.current_location_label), addressLine);
+                    getString(R.string.current_location_label), addressLine);
 
             currentLocationName.setText(currentAddress.getName());
             currentLocationAddress.setText(currentAddress.getAddress());
 
             // Landscape
             currentAddress = new MapAddress(latLng,
-                    StringResourcesUtils.getString(R.string.current_location_landscape_label, addressLine), addressLine);
+                    getString(R.string.current_location_landscape_label, addressLine), addressLine);
 
             String textToShow = currentAddress.getName();
 
@@ -410,7 +409,7 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     public void showError() {
         showSnackbar(findViewById(R.id.parent_layout_maps),
-                StringResourcesUtils.getString(R.string.general_error));
+                getString(R.string.general_error));
     }
 
     /**

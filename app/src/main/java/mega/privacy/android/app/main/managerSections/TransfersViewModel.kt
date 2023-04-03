@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -18,11 +18,13 @@ import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
+import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToLastByTagUseCase
@@ -47,6 +49,7 @@ class TransfersViewModel @Inject constructor(
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
+    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -69,8 +72,38 @@ class TransfersViewModel @Inject constructor(
      */
     val completedState = _completedState.asStateFlow()
 
-    private var activeTransfers = mutableListOf<Transfer>()
+    private val _activeTransfers = MutableStateFlow(emptyList<Transfer>())
+
+    /**
+     * Active transfer
+     */
+    val activeTransfer = _activeTransfers.asStateFlow()
     private var completedTransfers = mutableListOf<AndroidCompletedTransfer?>()
+    private var transferCallback = 0L
+
+    init {
+        getAllActiveTransfers()
+        viewModelScope.launch {
+            monitorTransferEventsUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    if (it.transfer.isStreamingTransfer
+                        || it.transfer.isBackgroundTransfer()
+                        || it.transfer.isFolderTransfer
+                        || transferCallback > it.transfer.notificationNumber
+                    ) return@collect
+                    transferCallback = it.transfer.notificationNumber
+                    when (it) {
+                        is TransferEvent.TransferFinishEvent -> transferFinished(it.transfer)
+                        is TransferEvent.TransferStartEvent -> startTransfer(it.transfer)
+                        is TransferEvent.TransferUpdateEvent -> updateTransfer(it.transfer)
+                        is TransferEvent.TransferTemporaryErrorEvent,
+                        is TransferEvent.TransferDataEvent,
+                        -> Unit
+                    }
+                }
+        }
+    }
 
     /**
      * Set the visibility for get more quota view
@@ -99,17 +132,9 @@ class TransfersViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val transfers = getInProgressTransfersUseCase()
-                activeTransfers.clear()
-                activeTransfers.addAll(transfers)
-                _activeState.update {
-                    ActiveTransfersState.TransfersUpdated(transfers)
-                }
+                _activeTransfers.update { transfers }
             }.onFailure { exception ->
-                if (exception is ConcurrentModificationException) {
-                    Timber.e("Exception setting transfers: ${exception.message}")
-                } else {
-                    Timber.e(exception.message)
-                }
+                Timber.e(exception)
             }.onSuccess {
                 Timber.d("Active transfers correctly set.")
             }
@@ -120,7 +145,7 @@ class TransfersViewModel @Inject constructor(
      *
      * @return active transfer list
      */
-    fun getActiveTransfers() = activeTransfers
+    fun getActiveTransfers() = _activeTransfers.value.toList()
 
     /**
      * Get active transfer
@@ -128,19 +153,21 @@ class TransfersViewModel @Inject constructor(
      * @param pos the item position
      * @return active transfer item
      */
-    fun getActiveTransfer(pos: Int) = activeTransfers[pos]
+    fun getActiveTransfer(pos: Int) = activeTransfer.value.getOrNull(pos)
 
     /**
      * Update the active transfer
      *
-     * @param pos the item position
      * @param transfer updated item
      */
-    fun updateActiveTransfer(pos: Int, transfer: Transfer) {
-        activeTransfers[pos] = transfer
-        _activeState.update {
-            ActiveTransfersState.TransferUpdated(pos, transfer, activeTransfers.toList())
-        }
+    private fun updateTransfer(transfer: Transfer) {
+        val current = activeTransfer.value.toMutableList()
+        current.indexOfFirst { it.tag == transfer.tag }
+            .takeIf { pos -> pos in current.indices }
+            ?.let { pos ->
+                current[pos] = transfer
+                _activeTransfers.update { current }
+            }
     }
 
     /**
@@ -150,30 +177,10 @@ class TransfersViewModel @Inject constructor(
      * @param targetPos the target position
      * @return new [MegaTransfer] list
      */
-    fun activeTransfersSwap(currentPos: Int, targetPos: Int): List<Transfer> {
-        Collections.swap(activeTransfers, currentPos, targetPos)
-        return activeTransfers
-    }
-
-    /**
-     * Tries to update a MegaTransfer in the transfers list.
-     *
-     * @param transfer The MegaTransfer to update.
-     * @return The position of the updated transfer if success, INVALID_POSITION otherwise.
-     */
-    fun getUpdatedTransferPosition(transfer: Transfer): Int {
-        try {
-            val index = activeTransfers.indexOfFirst {
-                it.tag == transfer.tag
-            }
-            if (index != INVALID_POSITION) {
-                activeTransfers[index] = transfer
-                return index
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "IndexOutOfBoundsException trying to update a transfer.")
-        }
-        return INVALID_POSITION
+    fun activeTransfersSwap(currentPos: Int, targetPos: Int) {
+        val current = activeTransfer.value.toMutableList()
+        Collections.swap(current, currentPos, targetPos)
+        _activeTransfers.update { current }
     }
 
     /**
@@ -185,21 +192,23 @@ class TransfersViewModel @Inject constructor(
      * @param success     True if the movement finished with success, false otherwise.
      * @param transferTag Identifier of the transfer.
      */
-    fun activeTransferFinishMovement(success: Boolean, transferTag: Int) =
+    private fun activeTransferFinishMovement(success: Boolean, transferTag: Int) =
         viewModelScope.launch(ioDispatcher) {
             getTransferByTagUseCase(transferTag).let { transfer ->
                 if (transfer != null && transfer.transferState >= TransferState.STATE_COMPLETING) {
-                    val transferPosition = getUpdatedTransferPosition(transfer)
+                    val current = activeTransfer.value.toMutableList()
+                    val transferPosition = current.indexOfFirst { it.tag == transferTag }
                     if (transferPosition != INVALID_POSITION) {
-                        activeTransfers[transferPosition] = transfer
+                        current[transferPosition] = transfer
                         if (!success) {
-                            activeTransfers.sortBy { it.priority }
+                            current.sortBy { it.priority }
                         }
+                        _activeTransfers.update { current }
                         _activeState.update {
                             ActiveTransfersState.TransferMovementFinishedUpdated(
                                 success = success,
                                 pos = transferPosition,
-                                newTransfers = activeTransfers
+                                newTransfers = current
                             )
                         }
                     } else {
@@ -216,49 +225,40 @@ class TransfersViewModel @Inject constructor(
      *
      * @param transfer transfer to add
      */
-    fun activeTransferStart(transfer: Transfer) {
-        activeTransfers.add(transfer)
-        activeTransfers.sortBy { it.priority }
-        _activeState.update {
-            ActiveTransfersState.TransferStartUpdated(transfer, activeTransfers)
-        }
+    private fun startTransfer(transfer: Transfer) {
+        val current = activeTransfer.value.toMutableList()
+        current.add(transfer)
+        current.sortBy { it.priority }
+        _activeTransfers.update { current }
     }
 
     /**
      * Removes a active transfer when finishes.
      *
-     * @param transferTag identifier of the transfer to remove
+     * @param transfer
      */
-    fun activeTransferFinished(transferTag: Int) {
-        val index = activeTransfers.indexOfFirst { transfer ->
-            transfer.tag == transferTag
-        }
-        if (index != INVALID_POSITION) {
-            activeTransfers.removeIf { transfer ->
-                transfer.tag == transferTag
+    private fun transferFinished(transfer: Transfer) {
+        val current = activeTransfer.value.toMutableList()
+        current.indexOfFirst {
+            it.tag == transfer.tag
+        }.takeIf { pos -> pos in current.indices }
+            ?.let { pos ->
+                current.removeAt(pos)
+                _activeTransfers.update { current }
+                _activeState.update {
+                    ActiveTransfersState.TransferFinishedUpdated(pos, current)
+                }
             }
-            _activeState.update {
-                ActiveTransfersState.TransferFinishedUpdated(index, activeTransfers.toList())
-            }
-        }
     }
 
     /**
      * Active transfer status is changed
      */
-    fun activeTransferChangeStatus(tag: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun activeTransferChangeStatus(tag: Int) = viewModelScope.launch {
         Timber.d("tag: $tag")
-        val index = activeTransfers.indexOfFirst { transfer ->
-            transfer.tag == tag
-        }
-        if (index != INVALID_POSITION) {
-            getTransferByTagUseCase(tag)?.let { transfer ->
-                Timber.d("The transfer with index : $index has been paused/resumed, left: ${activeTransfers.size}")
-                updateActiveTransfer(index, transfer)
-                _activeState.update {
-                    ActiveTransfersState.TransferChangeStatusUpdated(index, transfer)
-                }
-            }
+        getTransferByTagUseCase(tag)?.let { transfer ->
+            Timber.d("The transfer with tag : $tag has been paused/resumed, left: ${_activeTransfers.value.size}")
+            updateTransfer(transfer)
         }
     }
 
@@ -395,13 +395,14 @@ class TransfersViewModel @Inject constructor(
         transfer: Transfer,
         newPosition: Int,
     ) = viewModelScope.launch {
+        val current = activeTransfer.value.toList()
         val result = runCatching {
             when (newPosition) {
                 0 -> moveTransferToFirstByTagUseCase(tag = transfer.tag)
-                activeTransfers.lastIndex -> moveTransferToLastByTagUseCase(tag = transfer.tag)
+                current.lastIndex -> moveTransferToLastByTagUseCase(tag = transfer.tag)
                 else -> moveTransferBeforeByTagUseCase(
                     tag = transfer.tag,
-                    prevTag = activeTransfers[newPosition + 1].tag,
+                    prevTag = current[newPosition + 1].tag,
                 )
             }
         }

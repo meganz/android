@@ -38,7 +38,6 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
@@ -91,7 +90,8 @@ class CallService : Service() {
         when (call.status) {
             MegaChatCall.CALL_STATUS_USER_NO_PRESENT, MegaChatCall.CALL_STATUS_IN_PROGRESS -> updateNotificationContent()
             MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED -> removeNotification(
-                call.chatid)
+                call.chatid
+            )
         }
     }
 
@@ -201,20 +201,26 @@ class CallService : Service() {
         var intentCall: PendingIntent? = null
         if (call.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging) {
             intentCall =
-                CallUtil.getPendingIntentMeetingRinging(this,
+                CallUtil.getPendingIntentMeetingRinging(
+                    this,
                     currentChatId,
-                    requestCode)
+                    requestCode
+                )
         } else if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
             intentCall = if (isInMeeting) {
-                PendingIntent.getBroadcast(this,
+                PendingIntent.getBroadcast(
+                    this,
                     0,
                     Intent(""),
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             } else {
-                CallUtil.getPendingIntentMeetingInProgress(this,
+                CallUtil.getPendingIntentMeetingInProgress(
+                    this,
                     currentChatId,
                     requestCode,
-                    megaApi.isEphemeralPlusPlus)
+                    megaApi.isEphemeralPlusPlus
+                )
             }
         }
 
@@ -233,11 +239,11 @@ class CallService : Service() {
 
                 val contentText =
                     if (call.status == MegaChatCall.CALL_STATUS_USER_NO_PRESENT && call.isRinging)
-                        StringResourcesUtils.getString(R.string.title_notification_incoming_call)
+                        getString(R.string.title_notification_incoming_call)
                     else if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && call.isOnHold)
-                        StringResourcesUtils.getString(R.string.call_on_hold)
+                        getString(R.string.call_on_hold)
                     else if (call.status == MegaChatCall.CALL_STATUS_IN_PROGRESS && !call.isOnHold)
-                        StringResourcesUtils.getString(R.string.title_notification_call_in_progress)
+                        getString(R.string.title_notification_call_in_progress)
                     else ""
 
                 val title = ChatUtil.getTitleChat(chat)
@@ -246,15 +252,20 @@ class CallService : Service() {
                     if (chat.isGroup)
                         createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)
                     else
-                        setProfileContactAvatar(chat.getPeerHandle(0),
+                        setProfileContactAvatar(
+                            chat.getPeerHandle(0),
                             title,
-                            ChatController(this@CallService).getParticipantEmail(chat.getPeerHandle(
-                                0)))
+                            ChatController(this@CallService).getParticipantEmail(
+                                chat.getPeerHandle(
+                                    0
+                                )
+                            )
+                        )
 
                 val actionIcon = R.drawable.ic_phone_white
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
                 val actionTitle =
-                    StringResourcesUtils.getString(R.string.button_notification_call_in_progress)
+                    getString(R.string.button_notification_call_in_progress)
 
                 val newNotification: Notification? =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -263,9 +274,11 @@ class CallService : Service() {
                             setContentTitle(title)
                             setContentIntent(pendingIntent)
                             setLargeIcon(largeIcon)
-                            addAction(actionIcon,
+                            addAction(
+                                actionIcon,
                                 actionTitle,
-                                actionPendingIntent)
+                                actionPendingIntent
+                            )
 
                             if (!TextUtil.isTextEmpty(contentText))
                                 setContentText(contentText)
@@ -278,9 +291,11 @@ class CallService : Service() {
                             setContentTitle(title)
                             setContentIntent(pendingIntent)
                             setLargeIcon(largeIcon)
-                            addAction(actionIcon,
+                            addAction(
+                                actionIcon,
                                 actionTitle,
-                                actionPendingIntent)
+                                actionPendingIntent
+                            )
 
                             if (!TextUtil.isTextEmpty(contentText))
                                 setContentText(contentText)
@@ -306,26 +321,35 @@ class CallService : Service() {
         megaChatApi.getChatRoom(currentChatId)?.let { chat ->
             megaChatApi.getChatCall(currentChatId)?.let { call ->
                 val title = ChatUtil.getTitleChat(chat)
-                val colorNotification = ContextCompat.getColor(this@CallService,
-                    R.color.red_600_red_300)
+                val colorNotification = ContextCompat.getColor(
+                    this@CallService,
+                    R.color.red_600_red_300
+                )
                 val smallIcon = R.drawable.ic_stat_notify
                 val largeIcon: Bitmap =
                     if (chat.isGroup)
                         createDefaultAvatar(MEGACHAT_INVALID_HANDLE, title)
                     else
-                        setProfileContactAvatar(chat.getPeerHandle(0),
+                        setProfileContactAvatar(
+                            chat.getPeerHandle(0),
                             title,
-                            ChatController(this@CallService).getParticipantEmail(chat.getPeerHandle(
-                                0)))
+                            ChatController(this@CallService).getParticipantEmail(
+                                chat.getPeerHandle(
+                                    0
+                                )
+                            )
+                        )
                 val actionIcon = R.drawable.ic_phone_white
                 val actionPendingIntent = getPendingIntent(call, notificationId + 1)
                 val actionTitle =
-                    StringResourcesUtils.getString(R.string.button_notification_call_in_progress)
+                    getString(R.string.button_notification_call_in_progress)
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val channel = NotificationChannel(notificationChannelId,
+                    val channel = NotificationChannel(
+                        notificationChannelId,
                         Constants.NOTIFICATION_CHANNEL_INPROGRESS_MISSED_CALLS_NAME,
-                        NotificationManager.IMPORTANCE_DEFAULT)
+                        NotificationManager.IMPORTANCE_DEFAULT
+                    )
 
                     channel.apply {
                         setShowBadge(true)
@@ -340,9 +364,11 @@ class CallService : Service() {
                     mBuilderCompatO?.apply {
                         setSmallIcon(smallIcon)
                         setAutoCancel(false)
-                        addAction(actionIcon,
+                        addAction(
+                            actionIcon,
                             actionTitle,
-                            actionPendingIntent)
+                            actionPendingIntent
+                        )
                         setOngoing(false)
                         color = colorNotification
                     }
@@ -359,9 +385,11 @@ class CallService : Service() {
                     mBuilderCompat?.apply {
                         setSmallIcon(smallIcon)
                         setAutoCancel(false)
-                        addAction(actionIcon,
+                        addAction(
+                            actionIcon,
                             actionTitle,
-                            actionPendingIntent)
+                            actionPendingIntent
+                        )
                         setOngoing(false)
                         color = colorNotification
                     }

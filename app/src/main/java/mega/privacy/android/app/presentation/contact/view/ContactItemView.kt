@@ -1,9 +1,11 @@
-package mega.privacy.android.app.presentation.contact
+package mega.privacy.android.app.presentation.contact.view
 
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +26,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import coil.compose.rememberAsyncImagePainter
@@ -33,10 +34,11 @@ import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.core.ui.controls.MarqueeText
-import mega.privacy.android.core.ui.theme.grey_alpha_012
-import mega.privacy.android.core.ui.theme.grey_alpha_054
-import mega.privacy.android.core.ui.theme.white_alpha_012
-import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
+import mega.privacy.android.core.ui.theme.extensions.conditional
+import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_012
+import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_054
+import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
@@ -46,32 +48,38 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+/**
+ * View to show a contactItem with their avatar and connection status
+ * @param contactItem that will be shown
+ * @param onClick is invoked when the view is clicked
+ * @param modifier
+ * @param statusOverride to allow change the status text, if null connection status description will be shown
+ * @param includeDivider to show or not a divider at the bottom of the view, default is true
+ */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
-    Column {
-        Row(modifier = Modifier
-            .clickable { onClick() }
-            .fillMaxWidth()
-            .padding(end = 16.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            Box {
-                ContactAvatar(
-                    contactItem = contactItem,
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .size(40.dp)
-                        .clip(CircleShape),
+internal fun ContactItemView(
+    contactItem: ContactItem,
+    onClick: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+    statusOverride: String? = null,
+    includeDivider: Boolean = true,
+) {
+    Column(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .then(
+                    if (onClick != null) {
+                        Modifier.clickable(onClick = onClick)
+                    } else {
+                        Modifier
+                    }
                 )
-                if (contactItem.areCredentialsVerified) {
-                    Image(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(10.dp),
-                        painter = painterResource(id = R.drawable.ic_verified),
-                        contentDescription = "Verified user"
-                    )
-                }
-            }
+                .fillMaxWidth()
+                .padding(end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ContactAvatarVerified(contactItem)
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val contactName = with(contactItem) {
@@ -80,7 +88,7 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
 
                     Text(
                         text = contactName,
-                        style = MaterialTheme.typography.subtitle1,
+                        style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorPrimary),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -90,34 +98,35 @@ fun ContactItemView(contactItem: ContactItem, onClick: () -> Unit) {
                     }
                 }
 
-                if (contactItem.lastSeen != null || contactItem.status != UserStatus.Invalid) {
-                    val statusText = stringResource(id = contactItem.status.text)
-                    val secondLineText =
+                val secondLineText = statusOverride
+                    ?: if (contactItem.lastSeen != null || contactItem.status != UserStatus.Invalid) {
+                        val statusText = stringResource(id = contactItem.status.text)
                         if (contactItem.status == UserStatus.Online) {
                             statusText
                         } else {
                             getLastSeenString(contactItem.lastSeen) ?: statusText
                         }
-
+                    } else null
+                secondLineText?.let {
                     MarqueeText(
                         text = secondLineText,
-                        color = if (MaterialTheme.colors.isLight) grey_alpha_054 else white_alpha_054,
-                        style = MaterialTheme.typography.subtitle2
+                        style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.grey_white_alpha_054)
                     )
                 }
             }
         }
-
-        Divider(
-            modifier = Modifier.padding(start = 72.dp),
-            color = if (MaterialTheme.colors.isLight) grey_alpha_012 else white_alpha_012,
-            thickness = 1.dp
-        )
+        if (includeDivider) {
+            Divider(
+                modifier = Modifier.padding(start = 72.dp),
+                color = MaterialTheme.colors.grey_white_alpha_012,
+                thickness = 1.dp
+            )
+        }
     }
 }
 
 @Composable
-fun getLastSeenString(lastGreen: Int?): String? {
+internal fun getLastSeenString(lastGreen: Int?): String? {
     if (lastGreen == null) return null
 
     val lastGreenCalendar = Calendar.getInstance().apply { add(Calendar.MINUTE, -lastGreen) }
@@ -197,7 +206,34 @@ fun ContactAvatar(
 }
 
 @Composable
-fun UriAvatar(modifier: Modifier, uri: String) {
+internal fun ContactAvatarVerified(
+    contactItem: ContactItem,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier,
+    ) {
+        ContactAvatar(
+            contactItem = contactItem,
+            modifier = Modifier
+                .padding(16.dp)
+                .size(40.dp)
+                .clip(CircleShape),
+        )
+        if (contactItem.areCredentialsVerified) {
+            Image(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(10.dp),
+                painter = painterResource(id = R.drawable.ic_verified),
+                contentDescription = "Verified user"
+            )
+        }
+    }
+}
+
+@Composable
+internal fun UriAvatar(modifier: Modifier, uri: String) {
     Image(
         modifier = modifier,
         painter = rememberAsyncImagePainter(model = uri),
@@ -206,7 +242,7 @@ fun UriAvatar(modifier: Modifier, uri: String) {
 }
 
 @Composable
-fun DefaultContactAvatar(modifier: Modifier = Modifier, color: Color, content: String) {
+internal fun DefaultContactAvatar(modifier: Modifier = Modifier, color: Color, content: String) {
     Box(contentAlignment = Alignment.Center,
         modifier = modifier
             .background(color = color, shape = CircleShape)
@@ -230,20 +266,23 @@ fun DefaultContactAvatar(modifier: Modifier = Modifier, color: Color, content: S
     }
 }
 
-@Preview
+@CombinedTextAndThemePreviews
 @Composable
-fun PreviewContactItem() {
+private fun PreviewContactItem() {
     ContactItemView(
-        contactItem = ContactItem(
-            handle = -1,
-            email = "email@mega.nz",
-            contactData = ContactData("Full name", "Alias", null),
-            defaultAvatarColor = "",
-            visibility = UserVisibility.Visible,
-            timestamp = 2345262L,
-            areCredentialsVerified = true,
-            status = UserStatus.Online,
-            lastSeen = null
-        )
-    ) { }
+        contactItem = contactItemForPreviews,
+        onClick = {}
+    )
 }
+
+internal val contactItemForPreviews = ContactItem(
+    handle = -1,
+    email = "email@mega.nz",
+    contactData = ContactData("Full name", "Alias", null),
+    defaultAvatarColor = "blue",
+    visibility = UserVisibility.Visible,
+    timestamp = 2345262L,
+    areCredentialsVerified = true,
+    status = UserStatus.Online,
+    lastSeen = null
+)

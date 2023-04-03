@@ -220,8 +220,8 @@ public class MegaReferralBonusesAdapter extends RecyclerView.Adapter<MegaReferra
             }
         }
 
-        holder.textViewStorage.setText(getSizeString(referralBonus.getStorage()));
-        holder.textViewTransfer.setText(getSizeString(referralBonus.getTransfer()));
+        holder.textViewStorage.setText(getSizeString(referralBonus.getStorage(), context));
+        holder.textViewTransfer.setText(getSizeString(referralBonus.getTransfer(), context));
 
         if (referralBonus.getDaysLeft() <= 15) {
             holderList.textViewDaysLeft.setTextColor(ContextCompat.getColor(context, R.color.red_800));

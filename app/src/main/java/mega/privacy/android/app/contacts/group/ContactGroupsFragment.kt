@@ -29,7 +29,6 @@ import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.MIN_ITEMS_SCROLLBAR
 import mega.privacy.android.app.utils.MenuUtils.setupSearchView
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
@@ -79,7 +78,7 @@ class ContactGroupsFragment : Fragment() {
                     .observe(viewLifecycleOwner) { chatId ->
                         if (chatId == MEGACHAT_INVALID_HANDLE) {
                             (requireActivity() as SnackbarShower).showSnackbar(
-                                StringResourcesUtils.getString(R.string.create_chat_error)
+                                getString(R.string.create_chat_error)
                             )
                         } else {
                             openGroupChatScreen(chatId)
@@ -120,9 +119,13 @@ class ContactGroupsFragment : Fragment() {
         binding.list.setHasFixedSize(true)
         binding.list.addItemDecoration(
             DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
-                setDrawable(ResourcesCompat.getDrawable(resources,
-                    R.drawable.contact_list_divider,
-                    null)!!)
+                setDrawable(
+                    ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.contact_list_divider,
+                        null
+                    )!!
+                )
             }
         )
         binding.list.addOnScrollListener(object : RecyclerView.OnScrollListener() {

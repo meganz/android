@@ -15,7 +15,7 @@
 
         <import type="mega.privacy.android.app.MimeTypeList" />
 
-        <import type="nz.mega.sdk.MegaNode"/>
+        <import type="nz.mega.sdk.MegaNode" />
 
         <import type="mega.privacy.android.app.utils.MegaNodeUtil" />
 
@@ -66,8 +66,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/saved_offline"
             app:layout_constraintTop_toTopOf="parent"
-            app:roundedCornerRadius="2dp"
-            />
+            app:roundedCornerRadius="2dp" />
 
         <TextView
             android:id="@+id/name"
@@ -124,7 +123,7 @@
             app:tint="?android:attr/textColorSecondary"
             app:layout_constraintStart_toEndOf="@id/img_favourite"
             app:layout_constraintTop_toTopOf="@id/name"
-            app:layout_constraintBottom_toBottomOf="@id/name"/>
+            app:layout_constraintBottom_toBottomOf="@id/name" />
 
         <ImageView
             android:id="@+id/taken_down"
@@ -163,7 +162,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:text='@{String.format("%s · %s", Util.getSizeString(item.node.size), TimeUtils.formatLongDateTime(item.node.modificationTime))}'
+                android:text='@{String.format("%s · %s", Util.getSizeString(item.node.size, context), TimeUtils.formatLongDateTime(item.node.modificationTime))}'
                 android:textAppearance="@style/TextAppearance.Mega.Body2.Secondary"
                 app:layout_constraintStart_toEndOf="@id/versions_icon"
                 app:layout_constraintTop_toTopOf="parent"

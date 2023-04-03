@@ -37,7 +37,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.main.controllers.AccountController
-import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.myAccount.usecase.CancelSubscriptionsUseCase
 import mega.privacy.android.app.myAccount.usecase.Check2FAUseCase
@@ -49,6 +48,7 @@ import mega.privacy.android.app.myAccount.usecase.GetUserDataUseCase
 import mega.privacy.android.app.myAccount.usecase.KillSessionUseCase
 import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
+import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
 import mega.privacy.android.app.presentation.verification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
@@ -143,7 +143,7 @@ import javax.inject.Inject
 @HiltViewModel
 @SuppressLint("StaticFieldLeak")
 class MyAccountViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
+    @ApplicationContext val context: Context,
     private val myAccountInfo: MyAccountInfo,
     @MegaApi private val megaApi: MegaApiAndroid,
     private val setAvatarUseCase: SetAvatarUseCase,
@@ -396,7 +396,7 @@ class MyAccountViewModel @Inject constructor(
 
     private fun setVersionsInfo() {
         _state.update {
-            it.copy(versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize())
+            it.copy(versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(context))
         }
     }
 
@@ -1106,7 +1106,7 @@ class MyAccountViewModel @Inject constructor(
             val isDisableFileVersions = getFileVersionsOption(forceRefresh = true)
             _state.update {
                 it.copy(
-                    versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(),
+                    versionsInfo = myAccountInfo.getFormattedPreviousVersionsSize(context),
                     isFileVersioningEnabled = isDisableFileVersions.not()
                 )
             }

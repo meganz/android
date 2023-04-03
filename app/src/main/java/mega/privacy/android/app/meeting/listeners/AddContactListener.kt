@@ -1,7 +1,7 @@
 package mega.privacy.android.app.meeting.listeners
 
+import android.content.Context
 import mega.privacy.android.app.R
-import mega.privacy.android.app.utils.StringResourcesUtils
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -14,7 +14,8 @@ import timber.log.Timber
  *
  * @property callback the callback when receive the response of adding contacts
  */
-class AddContactListener(private val callback: (String) -> Unit) : MegaRequestListenerInterface {
+class AddContactListener(private val callback: (String) -> Unit, private val context: Context) :
+    MegaRequestListenerInterface {
     override fun onRequestStart(api: MegaApiJava?, request: MegaRequest?) {}
 
     override fun onRequestUpdate(api: MegaApiJava?, request: MegaRequest?) {}
@@ -26,7 +27,7 @@ class AddContactListener(private val callback: (String) -> Unit) : MegaRequestLi
                 e.errorCode == MegaError.API_OK -> {
                     if (request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong()) {
                         callback.invoke(
-                            StringResourcesUtils.getString(
+                            context.getString(
                                 R.string.context_contact_request_sent,
                                 request.email
                             )
@@ -36,18 +37,20 @@ class AddContactListener(private val callback: (String) -> Unit) : MegaRequestLi
                 }
                 e.errorCode == MegaError.API_EEXIST -> {
                     callback.invoke(
-                        StringResourcesUtils.getString(R.string.context_contact_already_invited,
-                            request.email)
+                        context.getString(
+                            R.string.context_contact_already_invited,
+                            request.email
+                        )
                     )
                 }
                 request.number == MegaContactRequest.INVITE_ACTION_ADD.toLong() && e.errorCode == MegaError.API_EARGS -> {
                     callback.invoke(
-                        StringResourcesUtils.getString(R.string.error_own_email_as_contact)
+                        context.getString(R.string.error_own_email_as_contact)
                     )
                 }
                 else -> {
                     callback.invoke(
-                        StringResourcesUtils.getString(R.string.general_error).toString()
+                        context.getString(R.string.general_error).toString()
                     )
                 }
             }

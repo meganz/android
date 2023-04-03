@@ -28,7 +28,7 @@ public class UploadUtil {
         Timber.d("uploadTakePicture");
         File imgFile = CacheFolderManager.getCacheFile(context, CacheFolderManager.TEMPORARY_FOLDER, "picture.jpg");
         if (!isFileAvailable(imgFile)) {
-            Util.showSnackbar(context, StringResourcesUtils.getString(R.string.general_error));
+            Util.showSnackbar(context, context.getString(R.string.general_error));
             return null;
         }
 

@@ -1,19 +1,25 @@
 package mega.privacy.android.app.usecase
 
+import android.content.Context
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
-import mega.privacy.android.app.usecase.exception.*
+import mega.privacy.android.app.usecase.exception.ForeignNodeException
+import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.usecase.exception.NotEnoughQuotaMegaException
+import mega.privacy.android.app.usecase.exception.QuotaExceededMegaException
+import mega.privacy.android.app.usecase.exception.toMegaException
 import mega.privacy.android.app.utils.DBUtil
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
-import nz.mega.sdk.MegaError.*
+import nz.mega.sdk.MegaError.API_EOVERQUOTA
+import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
@@ -272,7 +278,10 @@ class MoveNodeUseCase @Inject constructor(
      * @param handles   List of MegaNode handles to move.
      * @return The movement result.
      */
-    fun moveToRubbishBin(handles: List<Long>): Single<MoveRequestResult.RubbishMovement> =
+    fun moveToRubbishBin(
+        handles: List<Long>,
+        context: Context,
+    ): Single<MoveRequestResult.RubbishMovement> =
         Single.create { emitter ->
             var errorCount = 0
             val rubbishNode = megaApi.rubbishNode
@@ -301,7 +310,8 @@ class MoveNodeUseCase @Inject constructor(
                     MoveRequestResult.RubbishMovement(
                         count = handles.size,
                         errorCount = errorCount,
-                        oldParentHandle = oldParentHandle
+                        oldParentHandle = oldParentHandle,
+                        context = context
                     ).also { resetAccountDetailsIfNeeded(it) })
             }
         }
@@ -312,7 +322,7 @@ class MoveNodeUseCase @Inject constructor(
      * @param nodes List of MegaNode to restore.
      * @return The restoration result.
      */
-    fun restore(nodes: List<MegaNode>): Single<MoveRequestResult.Restoration> =
+    fun restore(nodes: List<MegaNode>, context: Context): Single<MoveRequestResult.Restoration> =
         Single.create { emitter ->
             var errorCount = 0
             val destination: MegaNode? = if (nodes.size == 1) {
@@ -346,7 +356,8 @@ class MoveNodeUseCase @Inject constructor(
                     MoveRequestResult.Restoration(
                         count = nodes.size,
                         errorCount = errorCount,
-                        destination = destination
+                        destination = destination,
+                        context = context,
                     ).also { resetAccountDetailsIfNeeded(it) })
             }
         }

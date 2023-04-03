@@ -40,7 +40,6 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.modalbottomsheet.BaseBottomSheetDialogFragment;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.Util;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import nz.mega.sdk.MegaChatMessage;
@@ -168,13 +167,13 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
                     count++;
                     totalSize = totalSize + temp.getSize();
                 }
-                nodeInfo.setText(getSizeString(totalSize));
+                nodeInfo.setText(getSizeString(totalSize, requireContext()));
                 MegaNode node = nodeList.get(0);
                 nodeThumb.setImageResource(MimeTypeList.typeForName(node.getName()).getIconResourceId());
                 if (count == 1) {
                     nodeName.setText(node.getName());
                 } else {
-                    nodeName.setText(StringResourcesUtils.getQuantityString(R.plurals.new_general_num_files, count, count));
+                    nodeName.setText(getResources().getQuantityString(R.plurals.new_general_num_files, count, count));
                 }
 
                 if (nodeList.size() == count) {
@@ -196,7 +195,7 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
     private void showSingleNodeSelected() {
         setNodeThumbnail(requireContext(), node, nodeThumb);
         nodeName.setText(node.getName());
-        nodeInfo.setText(getSizeString(node.getSize()));
+        nodeInfo.setText(getSizeString(node.getSize(), requireContext()));
         optionView.setVisibility(View.GONE);
     }
 

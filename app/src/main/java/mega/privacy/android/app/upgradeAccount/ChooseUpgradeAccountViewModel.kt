@@ -18,7 +18,6 @@ import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_II
 import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.domain.entity.Product
@@ -108,7 +107,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
                 ContextCompat.getColor(context, R.color.orange_400_orange_300).toString()
         }
 
-        stringPrice = getString(R.string.type_month, stringPrice)
+        stringPrice = context.getString(R.string.type_month, stringPrice)
 
         try {
             stringPrice = stringPrice.replace("[A]", "<font color='$color'>")
@@ -129,7 +128,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
      * @return The formatted string.
      */
     fun generateByteString(context: Context, gb: Long, labelType: Int): Spanned {
-        var textToShow = storageOrTransferLabel(gb, labelType)
+        var textToShow = storageOrTransferLabel(gb, labelType, context)
         try {
             textToShow = textToShow.replace(
                 "[A]", "<font color='"
@@ -150,12 +149,16 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
      * @param gb        Size to show in the string.
      * @param labelType TYPE_STORAGE_LABEL or TYPE_TRANSFER_LABEL.
      */
-    private fun storageOrTransferLabel(gb: Long, labelType: Int): String {
+    private fun storageOrTransferLabel(gb: Long, labelType: Int, context: Context): String {
         return when (labelType) {
-            TYPE_STORAGE_LABEL -> getString(R.string.account_upgrade_storage_label,
-                getSizeStringGBBased(gb))
-            TYPE_TRANSFER_LABEL -> getString(R.string.account_upgrade_transfer_quota_label,
-                getSizeStringGBBased(gb))
+            TYPE_STORAGE_LABEL -> context.getString(
+                R.string.account_upgrade_storage_label,
+                getSizeStringGBBased(gb)
+            )
+            TYPE_TRANSFER_LABEL -> context.getString(
+                R.string.account_upgrade_transfer_quota_label,
+                getSizeStringGBBased(gb)
+            )
             else -> ""
         }
     }

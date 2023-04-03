@@ -1,5 +1,6 @@
 package mega.privacy.android.app.getLink
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,15 +11,14 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
-import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.getLink.data.LinkItem
 import mega.privacy.android.app.getLink.useCase.ExportNodeUseCase
 import mega.privacy.android.app.usecase.GetThumbnailUseCase
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.ThumbnailUtils.getThumbFolder
 import mega.privacy.android.app.utils.Util.getSizeString
+import mega.privacy.android.data.qualifier.MegaApi
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
@@ -37,7 +37,7 @@ import javax.inject.Inject
 class GetSeveralLinksViewModel @Inject constructor(
     @MegaApi private val megaApi: MegaApiAndroid,
     private val exportNodeUseCase: ExportNodeUseCase,
-    private val getThumbnailUseCase: GetThumbnailUseCase
+    private val getThumbnailUseCase: GetThumbnailUseCase,
 ) : BaseRxViewModel() {
 
     private val linkItemsList: MutableLiveData<List<LinkItem>> = MutableLiveData()
@@ -57,13 +57,13 @@ class GetSeveralLinksViewModel @Inject constructor(
      *
      * @param handlesList List of MegaNode identifiers.
      */
-    fun initNodes(handlesList: LongArray) {
+    fun initNodes(handlesList: LongArray, context: Context) {
         linksNumber = handlesList.size
         val links = ArrayList<LinkItem>()
         val pendingExports = ArrayList<MegaNode>()
         val pendingThumbnails = ArrayList<MegaNode>()
 
-        links.add(LinkItem.Header(getString(R.string.tab_links_shares)))
+        links.add(LinkItem.Header(context.getString(R.string.tab_links_shares)))
 
         for (handle in handlesList) {
             val node = megaApi.getNodeByHandle(handle)
@@ -89,7 +89,10 @@ class GetSeveralLinksViewModel @Inject constructor(
                         if (thumbnail?.exists() == true) thumbnail else null,
                         node.name,
                         link,
-                        if (node.isFolder) getMegaNodeFolderInfo(node) else getSizeString(node.size)
+                        if (node.isFolder) getMegaNodeFolderInfo(node, context) else getSizeString(
+                            node.size,
+                            context
+                        )
                     )
                 )
             }

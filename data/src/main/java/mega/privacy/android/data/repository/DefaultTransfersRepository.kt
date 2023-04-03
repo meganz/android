@@ -5,6 +5,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -185,6 +186,7 @@ internal class DefaultTransfersRepository @Inject constructor(
 
     override fun monitorTransferEvents(): Flow<TransferEvent> =
         megaApiGateway.globalTransfer.map { event -> transferEventMapper(event) }
+            .flowOn(ioDispatcher)
 
     override suspend fun cancelTransferByTag(transferTag: Int) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->

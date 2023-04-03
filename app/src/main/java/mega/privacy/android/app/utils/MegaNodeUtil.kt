@@ -19,6 +19,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import mega.privacy.android.app.MegaApplication
@@ -86,8 +87,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_FOLDER_CHILD
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_NONE
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.BACKUP_ROOT
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.TimeUtils.formatLongDateTime
 import mega.privacy.android.app.utils.Util.getMediaIntent
 import mega.privacy.android.app.utils.Util.getSizeString
@@ -151,7 +150,7 @@ object MegaNodeUtil {
     fun showTakenDownNodeActionNotAvailableDialog(node: MegaNode?, context: Context): Boolean {
         return if (isNodeTakenDown(node)) {
             RunOnUIThreadUtils.post {
-                showSnackbar(context, getString(R.string.error_download_takendown_node))
+                showSnackbar(context, context.getString(R.string.error_download_takendown_node))
             }
             true
         } else {
@@ -172,7 +171,8 @@ object MegaNodeUtil {
             return ""
         }
 
-        val megaApi = MegaApplication.getInstance().megaApi
+        val app = MegaApplication.getInstance()
+        val megaApi = app.megaApi
         val path = megaApi.getNodePath(nodeFolder)
 
         var rootParent = nodeFolder
@@ -183,14 +183,14 @@ object MegaNodeUtil {
 
         return when {
             rootParent!!.handle == megaApi.rootNode.handle -> {
-                return getString(R.string.section_cloud_drive) + path
+                return app.getString(R.string.section_cloud_drive) + path
             }
             rootParent.handle == megaApi.rubbishNode.handle -> {
-                return getString(R.string.section_rubbish_bin) +
+                return app.getString(R.string.section_rubbish_bin) +
                         path.replace("bin$SEPARATOR", "")
             }
             nodeFolder.isInShare -> {
-                return getString(R.string.title_incoming_shares_explorer) +
+                return app.getString(R.string.title_incoming_shares_explorer) +
                         SEPARATOR + path.substring(path.indexOf(":") + 1)
             }
             else -> ""
@@ -355,7 +355,12 @@ object MegaNodeUtil {
     fun startShareIntent(context: Context, shareIntent: Intent, link: String?) {
         shareIntent.type = TYPE_TEXT_PLAIN
         shareIntent.putExtra(Intent.EXTRA_TEXT, link)
-        context.startActivity(Intent.createChooser(shareIntent, getString(R.string.context_share)))
+        context.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                context.getString(R.string.context_share)
+            )
+        )
     }
 
     /**
@@ -377,7 +382,7 @@ object MegaNodeUtil {
             return false
         } else if (!isOnline(context)) {
             Timber.e("Error sharing node: No network connection")
-            showSnackbar(context, getString(R.string.error_server_connection_problem))
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem))
             return false
         }
 
@@ -401,7 +406,7 @@ object MegaNodeUtil {
             return false
         } else if (!isOnline(context)) {
             Timber.e("Error sharing nodes: No network connection")
-            showSnackbar(context, getString(R.string.error_server_connection_problem))
+            showSnackbar(context, context.getString(R.string.error_server_connection_problem))
             return false
         }
 
@@ -832,18 +837,25 @@ object MegaNodeUtil {
         val builder = MaterialAlertDialogBuilder(activity)
 
         builder.setMessage(
-            getQuantityString(R.plurals.confirmation_leave_share_folder, numIncomingShares)
+            activity.resources.getQuantityString(
+                R.plurals.confirmation_leave_share_folder,
+                numIncomingShares
+            )
         )
-            .setPositiveButton(getString(R.string.general_leave)) { _, _ ->
+            .setPositiveButton(activity.getString(R.string.general_leave)) { _, _ ->
                 if (onlyOneIncomingShare) {
-                    leaveIncomingShare(snackbarShower, node!!)
+                    leaveIncomingShare(
+                        snackbarShower = snackbarShower,
+                        node = node!!,
+                        context = activity
+                    )
                 } else {
                     leaveMultipleIncomingShares(activity, snackbarShower, handles!!)
                 }
                 MegaApplication.getInstance()
                     .sendBroadcast(Intent(BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE))
             }
-            .setNegativeButton(getString(R.string.general_cancel), null)
+            .setNegativeButton(activity.getString(R.string.general_cancel), null)
             .show()
     }
 
@@ -856,10 +868,16 @@ object MegaNodeUtil {
     private fun leaveIncomingShare(
         snackbarShower: SnackbarShower,
         node: MegaNode,
+        context: Context,
     ) {
         Timber.d("Node handle: ${node.handle}")
         MegaApplication.getInstance().megaApi.remove(
-            node, RemoveListener(snackbarShower, true)
+            node,
+            RemoveListener(
+                snackbarShower = snackbarShower,
+                isIncomingShare = true,
+                context = context
+            )
         )
     }
 
@@ -880,7 +898,11 @@ object MegaNodeUtil {
         val megaApi = MegaApplication.getInstance().megaApi
 
         if (handles.size == 1) {
-            leaveIncomingShare(snackbarShower, megaApi.getNodeByHandle(handles[0]))
+            leaveIncomingShare(
+                snackbarShower = snackbarShower,
+                node = megaApi.getNodeByHandle(handles[0]),
+                context = activity
+            )
             return
         }
 
@@ -983,7 +1005,7 @@ object MegaNodeUtil {
      * @return              String resource reference
      */
     @JvmStatic
-    fun getNodeLabelText(nodeLabel: Int): String? = getString(
+    fun getNodeLabelText(nodeLabel: Int, context: Context): String = context.getString(
         when (nodeLabel) {
             MegaNode.NODE_LBL_RED -> R.string.label_red
             MegaNode.NODE_LBL_ORANGE -> R.string.label_orange
@@ -1103,15 +1125,15 @@ object MegaNodeUtil {
         )
         params.gravity = Gravity.END
 
-        title.text = getString(R.string.general_error_word)
-        text.text = getString(
+        title.text = context.getString(R.string.general_error_word)
+        text.text = context.getString(
             if (isFolder) R.string.message_folder_takedown_pop_out_notification
             else R.string.message_file_takedown_pop_out_notification
         )
 
-        openButton.text = getString(R.string.context_open_link)
-        disputeButton.text = getString(R.string.dispute_takendown_file)
-        cancelButton.text = getString(R.string.general_cancel)
+        openButton.text = context.getString(R.string.context_open_link)
+        disputeButton.text = context.getString(R.string.dispute_takendown_file)
+        cancelButton.text = context.getString(R.string.general_cancel)
 
         val dialog = builder.create()
         dialog.setCancelable(false)
@@ -1204,15 +1226,15 @@ object MegaNodeUtil {
             val location = when {
                 grandParentName != null
                         && grandParentName + File.separator + parentName == OfflineUtils.OFFLINE_INBOX_DIR -> {
-                    getString(R.string.section_saved_for_offline_new)
+                    app.getString(R.string.section_saved_for_offline_new)
                 }
                 parentName == OfflineUtils.OFFLINE_DIR -> {
-                    getString(R.string.section_saved_for_offline_new)
+                    app.getString(R.string.section_saved_for_offline_new)
                 }
                 else -> {
-                    getString(
+                    app.getString(
                         R.string.location_label, parentName,
-                        getString(R.string.section_saved_for_offline_new)
+                        app.getString(R.string.section_saved_for_offline_new)
                     )
                 }
             }
@@ -1231,24 +1253,24 @@ object MegaNodeUtil {
             val location = when {
                 fromIncomingShare -> {
                     if (parent != null) {
-                        getString(
+                        app.getString(
                             R.string.location_label, parent.name,
-                            getString(R.string.tab_incoming_shares)
+                            app.getString(R.string.tab_incoming_shares)
                         )
                     } else {
-                        getString(R.string.tab_incoming_shares)
+                        app.getString(R.string.tab_incoming_shares)
                     }
                 }
                 parent == null -> {
-                    getString(R.string.tab_incoming_shares)
+                    app.getString(R.string.tab_incoming_shares)
                 }
                 inCloudDrive -> {
                     if (topAncestor.handle == parent.handle) {
-                        getTranslatedNameForParentNode(megaApi, topAncestor)
+                        getTranslatedNameForParentNode(megaApi, topAncestor, app)
                     } else {
-                        getString(
+                        app.getString(
                             R.string.location_label, parent.name,
-                            getTranslatedNameForParentNode(megaApi, topAncestor)
+                            getTranslatedNameForParentNode(megaApi, topAncestor, app)
                         )
                     }
                 }
@@ -1256,19 +1278,19 @@ object MegaNodeUtil {
                     if (node.parentHandle == myBackupHandle) {
                         // If the Node's parent handle is the same with the My Backups handle,
                         // only display the name of the Root Node
-                        getTranslatedNameForParentNode(megaApi, topAncestor)
+                        getTranslatedNameForParentNode(megaApi, topAncestor, app)
                     } else {
                         // Otherwise, include the names of both the Parent and Root Nodes
-                        getString(
+                        app.getString(
                             R.string.location_label, parent.name,
-                            getTranslatedNameForParentNode(megaApi, topAncestor)
+                            getTranslatedNameForParentNode(megaApi, topAncestor, app)
                         )
                     }
                 }
                 else -> {
-                    getString(
+                    app.getString(
                         R.string.location_label, parent.name,
-                        getString(R.string.tab_incoming_shares)
+                        app.getString(R.string.tab_incoming_shares)
                     )
                 }
             }
@@ -1323,11 +1345,12 @@ object MegaNodeUtil {
     private fun getTranslatedNameForParentNode(
         megaApi: MegaApiAndroid,
         parent: MegaNode,
+        context: Context,
     ): String {
         return when (parent.handle) {
-            megaApi.rootNode.handle -> getString(R.string.section_cloud_drive)
-            megaApi.rubbishNode.handle -> getString(R.string.section_rubbish_bin)
-            megaApi.inboxNode.handle -> getString(R.string.home_side_menu_backups_title)
+            megaApi.rootNode.handle -> context.getString(R.string.section_cloud_drive)
+            megaApi.rubbishNode.handle -> context.getString(R.string.section_rubbish_bin)
+            megaApi.inboxNode.handle -> context.getString(R.string.home_side_menu_backups_title)
             else -> parent.name
         }
     }
@@ -1467,7 +1490,7 @@ object MegaNodeUtil {
                 )
             })
         } else {
-            snackbarShower.showSnackbar(getString(R.string.message_zip_format_error))
+            snackbarShower.showSnackbar(context.getString(R.string.message_zip_format_error))
         }
     }
 
@@ -1513,7 +1536,7 @@ object MegaNodeUtil {
                 )
             }
         } catch (e: Exception) {
-            snackbarShower.showSnackbar(getString(R.string.general_already_downloaded))
+            snackbarShower.showSnackbar(context.getString(R.string.general_already_downloaded))
         }
     }
 
@@ -1547,7 +1570,7 @@ object MegaNodeUtil {
         if (isIntentAvailable(context, intentShare)) {
             activityLauncher.launchActivity(intentShare)
         } else {
-            snackbarShower.showSnackbar(getString(R.string.intent_not_available))
+            snackbarShower.showSnackbar(context.getString(R.string.intent_not_available))
         }
     }
 
@@ -1558,9 +1581,9 @@ object MegaNodeUtil {
      * @return The string so show as file info details.
      */
     @JvmStatic
-    fun getFileInfo(node: MegaNode): String? {
+    fun getFileInfo(node: MegaNode, context: Context): String? {
         return TextUtil.getFileInfo(
-            getSizeString(node.size),
+            getSizeString(node.size, context),
             formatLongDateTime(node.modificationTime)
         )
     }
@@ -1647,16 +1670,16 @@ object MegaNodeUtil {
      */
     @JvmStatic
     @Suppress("DEPRECATION")
-    fun manageURLNode(context: Context, megaApi: MegaApiAndroid, node: MegaNode) {
+    fun manageURLNode(context: Context, megaApi: MegaApiAndroid, node: MegaNode): Disposable {
         val progressDialog = android.app.ProgressDialog(context)
         progressDialog.apply {
-            setMessage(getString(R.string.link_request_status))
+            setMessage(context.getString(R.string.link_request_status))
             setCancelable(false)
             setCanceledOnTouchOutside(false)
             show()
         }
 
-        Completable.create { emitter ->
+        return Completable.create { emitter ->
             val localPath = getLocalFile(node)
             var br: BufferedReader? = null
             var shouldStopServer = false
@@ -1688,7 +1711,7 @@ object MegaNodeUtil {
                     if (isIntentAvailable(context, intent)) {
                         context.startActivity(intent)
                     } else {
-                        showSnackbar(context, getString(R.string.intent_not_available_file))
+                        showSnackbar(context, context.getString(R.string.intent_not_available_file))
                     }
 
                     stopStreamingServerIfNeeded(shouldStopServer, megaApi)
@@ -1701,7 +1724,7 @@ object MegaNodeUtil {
 
             emitter.onError(Throwable("Error getting URL"))
             stopStreamingServerIfNeeded(shouldStopServer, megaApi)
-            showSnackbar(context, getString(R.string.error_open_file_with))
+            showSnackbar(context, context.getString(R.string.error_open_file_with))
         }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -1980,8 +2003,8 @@ object MegaNodeUtil {
      *
      * @return MegaNode information
      */
-    fun MegaNode.getInfoText(): String {
-        val nodeSizeText = getSizeString(size)
+    fun MegaNode.getInfoText(context: Context): String {
+        val nodeSizeText = getSizeString(size, context)
         val nodeDateText = formatLongDateTime(getLastAvailableTime())
         return TextUtil.getFileInfo(nodeSizeText, nodeDateText)
     }
@@ -1992,7 +2015,7 @@ object MegaNodeUtil {
      * @return MegaOffline information
      */
     fun MegaOffline.getInfoText(context: Context): String {
-        val nodeSizeText = getSizeString(getSize(context))
+        val nodeSizeText = getSizeString(getSize(context), context)
         val nodeDateText = formatLongDateTime(getModificationDate(context))
         return TextUtil.getFileInfo(nodeSizeText, nodeDateText)
     }

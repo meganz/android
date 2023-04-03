@@ -65,9 +65,9 @@ class OfflineFileInfoViewModel @Inject constructor(
         add(Single
             .fromCallable {
                 val file = getOfflineFile(context, node)
-                val totalSize = getSizeString(getTotalSize(file))
+                val totalSize = getSizeString(getTotalSize(file), context)
                 val contains = if (node.isFolder) {
-                    getFileFolderInfo(file)
+                    getFileFolderInfo(file, context)
                 } else {
                     ""
                 }

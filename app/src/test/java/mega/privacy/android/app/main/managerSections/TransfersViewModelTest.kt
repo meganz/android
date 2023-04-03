@@ -15,6 +15,7 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
+import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToFirstByTagUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferToLastByTagUseCase
@@ -39,6 +40,7 @@ internal class TransfersViewModelTest {
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase = mock()
     private val getTransferByTagUseCase: GetTransferByTagUseCase = mock()
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase = mock()
+    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
 
     @Before
     fun setUp() {
@@ -56,7 +58,8 @@ internal class TransfersViewModelTest {
             moveTransferToFirstByTagUseCase = moveTransferToFirstByTagUseCase,
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
             getTransferByTagUseCase = getTransferByTagUseCase,
-            getInProgressTransfersUseCase = getInProgressTransfersUseCase
+            getInProgressTransfersUseCase = getInProgressTransfersUseCase,
+            monitorTransferEventsUseCase = monitorTransferEventsUseCase
         )
     }
 
@@ -72,7 +75,9 @@ internal class TransfersViewModelTest {
             val transfer = mock<Transfer> {
                 on { tag }.thenReturn(transferTag)
             }
+            whenever(getInProgressTransfersUseCase.invoke()).thenReturn(emptyList())
             whenever(moveTransferToFirstByTagUseCase.invoke(transferTag)).thenReturn(Unit)
+            underTest.getAllActiveTransfers()
             underTest.moveTransfer(transfer, 0)
             verify(getTransferByTagUseCase, times(1)).invoke(transferTag)
         }

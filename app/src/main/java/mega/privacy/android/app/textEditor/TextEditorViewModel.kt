@@ -25,22 +25,38 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.saver.NodeSaver
-import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.data.qualifier.MegaApi
-import mega.privacy.android.data.qualifier.MegaApiFolder
-import mega.privacy.android.domain.usecase.DownloadBackgroundFile
-import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.listeners.ExportListener
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.AlertsAndWarnings.showConfirmRemoveLinkDialog
+import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.ChatUtil.authorizeNodeIfPreview
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.FileUtil.*
+import mega.privacy.android.app.utils.Constants.BUFFER_COMP
+import mega.privacy.android.app.utils.Constants.CHAT_ID
+import mega.privacy.android.app.utils.Constants.EXTRA_SERIALIZE_STRING
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FOLDER_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
+import mega.privacy.android.app.utils.Constants.FROM_HOME_PAGE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PATH
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.MAX_BUFFER_16MB
+import mega.privacy.android.app.utils.Constants.MAX_BUFFER_32MB
+import mega.privacy.android.app.utils.Constants.MESSAGE_ID
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.RUBBISH_BIN_ADAPTER
+import mega.privacy.android.app.utils.Constants.VERSIONS_ADAPTER
+import mega.privacy.android.app.utils.Constants.ZIP_ADAPTER
+import mega.privacy.android.app.utils.FileUtil.getLocalFile
+import mega.privacy.android.app.utils.FileUtil.isFileAvailable
+import mega.privacy.android.app.utils.FileUtil.shareUri
 import mega.privacy.android.app.utils.LinksUtil.showGetLinkActivity
 import mega.privacy.android.app.utils.MegaNodeUtil.shareLink
 import mega.privacy.android.app.utils.MegaNodeUtil.shareNode
@@ -48,14 +64,28 @@ import mega.privacy.android.app.utils.MegaNodeUtil.showTakenDownNodeActionNotAva
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
+import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.app.utils.permission.PermissionUtils
+import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.data.qualifier.MegaApiFolder
 import mega.privacy.android.domain.entity.node.ViewerNode
-import nz.mega.sdk.*
+import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.DownloadBackgroundFile
+import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
+import nz.mega.sdk.MegaChatApiAndroid
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaChatRoom
+import nz.mega.sdk.MegaNode
+import nz.mega.sdk.MegaShare
 import timber.log.Timber
-import java.io.*
-import java.lang.Exception
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
+import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.inject.Inject
@@ -551,7 +581,12 @@ class TextEditorViewModel @Inject constructor(
             .subscribeBy(
                 onSuccess = { handle ->
                     collision.value =
-                        NameCollision.Upload.getUploadCollision(handle, tempFile, parentHandle)
+                        NameCollision.Upload.getUploadCollision(
+                            handle,
+                            tempFile,
+                            parentHandle,
+                            activity
+                        )
                 },
                 onError = { error ->
                     when (error) {
@@ -617,10 +652,11 @@ class TextEditorViewModel @Inject constructor(
      *
      * @param newParentHandle   Parent handle in which the node will be copied.
      */
-    fun copyNode(newParentHandle: Long) {
+    fun copyNode(newParentHandle: Long, context: Context) {
         checkNameCollision(
             newParentHandle = newParentHandle,
-            type = NameCollisionType.COPY
+            type = NameCollisionType.COPY,
+            context = context,
         ) {
             copyNodeUseCase.copy(
                 node = getNode(),
@@ -630,7 +666,7 @@ class TextEditorViewModel @Inject constructor(
                 .subscribeBy(
                     onComplete = {
                         snackbarMessage.value =
-                            StringResourcesUtils.getString(R.string.context_correctly_copied)
+                            context.getString(R.string.context_correctly_copied)
                     },
                     onError = { error ->
                         throwable.value = error
@@ -646,10 +682,11 @@ class TextEditorViewModel @Inject constructor(
      *
      * @param newParentHandle   Parent handle in which the node will be moved.
      */
-    fun moveNode(newParentHandle: Long) {
+    fun moveNode(newParentHandle: Long, context: Context) {
         checkNameCollision(
             newParentHandle = newParentHandle,
-            type = NameCollisionType.MOVE
+            type = NameCollisionType.MOVE,
+            context = context
         ) {
             moveNodeUseCase.move(
                 handle = getNode()?.handle ?: return@checkNameCollision,
@@ -659,7 +696,7 @@ class TextEditorViewModel @Inject constructor(
                 .subscribeBy(
                     onComplete = {
                         snackbarMessage.value =
-                            StringResourcesUtils.getString(R.string.context_correctly_moved)
+                            context.getString(R.string.context_correctly_moved)
                     },
                     onError = { error ->
                         throwable.value = error
@@ -680,12 +717,14 @@ class TextEditorViewModel @Inject constructor(
     private fun checkNameCollision(
         newParentHandle: Long,
         type: NameCollisionType,
+        context: Context,
         completeAction: (() -> Unit),
     ) {
         checkNameCollisionUseCase.check(
             handle = getNode()?.handle ?: return,
             parentHandle = newParentHandle,
-            type = type
+            type = type,
+            context = context,
         ).observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { collisionResult -> collision.value = collisionResult },

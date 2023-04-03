@@ -31,7 +31,6 @@ import mega.privacy.android.app.meeting.listenAction
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.showSnackbar
@@ -101,7 +100,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
         viewLifecycleOwner.collectFlow(inMeetingViewModel.updateNumParticipants) { numParticipants ->
             binding.participantSize.text =
-                StringResourcesUtils.getQuantityString(
+                resources.getQuantityString(
                     R.plurals.meeting_call_screen_meeting_info_bottom_panel_num_of_participants,
                     numParticipants,
                     numParticipants
@@ -144,12 +143,12 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
             clipboard.setPrimaryClip(clip)
             showSnackbar(
                 requireContext(),
-                StringResourcesUtils.getString(R.string.copied_meeting_link)
+                getString(R.string.copied_meeting_link)
             )
         } else {
             showSnackbar(
                 requireContext(),
-                StringResourcesUtils.getString(R.string.general_text_error)
+                getString(R.string.general_text_error)
             )
         }
     }
@@ -178,7 +177,7 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
         layout.addView(input, params)
         input.setOnLongClickListener { false }
         input.setSingleLine()
-        input.hint = StringResourcesUtils.getString(R.string.new_meeting_name)
+        input.hint = getString(R.string.new_meeting_name)
         input.setSelectAllOnFocus(true)
         input.setTextColor(getThemeColor(requireActivity(), android.R.attr.textColorSecondary))
         input.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
@@ -198,11 +197,11 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
             false
         }
         input.setImeActionLabel(
-            StringResourcesUtils.getString(R.string.change_meeting_name),
+            getString(R.string.change_meeting_name),
             EditorInfo.IME_ACTION_DONE
         )
         builder.setTitle(R.string.change_meeting_name)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.change_pass), null)
+            .setPositiveButton(getString(R.string.change_pass), null)
             .setNegativeButton(android.R.string.cancel, null)
             .setView(layout)
             .setOnDismissListener {
@@ -229,12 +228,12 @@ class MeetingInfoBottomSheetDialogFragment : BottomSheetDialogFragment() {
         when {
             TextUtil.isTextEmpty(title) -> {
                 Timber.w("Input is empty")
-                input.error = StringResourcesUtils.getString(R.string.invalid_string)
+                input.error = getString(R.string.invalid_string)
                 input.requestFocus()
             }
             !ChatUtil.isAllowedTitle(title) -> {
                 Timber.w("Title is too long")
-                input.error = StringResourcesUtils.getString(R.string.title_long)
+                input.error = getString(R.string.title_long)
                 input.requestFocus()
             }
             else -> {

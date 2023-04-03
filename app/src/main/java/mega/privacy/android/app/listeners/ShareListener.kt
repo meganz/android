@@ -5,7 +5,6 @@ import android.content.Intent
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -81,13 +80,13 @@ class ShareListener(
     private fun getSuccessMessage(typeShare: String): String {
         return when (typeShare) {
             SHARE_LISTENER -> {
-                StringResourcesUtils.getString(R.string.context_correctly_shared)
+                context.getString(R.string.context_correctly_shared)
             }
             CHANGE_PERMISSIONS_LISTENER -> {
-                StringResourcesUtils.getString(R.string.context_permissions_changed)
+                context.getString(R.string.context_permissions_changed)
             }
             REMOVE_SHARE_LISTENER -> {
-                StringResourcesUtils.getString(R.string.context_share_correctly_removed)
+                context.getString(R.string.context_share_correctly_removed)
             }
             else -> ""
         }
@@ -102,16 +101,23 @@ class ShareListener(
     private fun getErrorMessage(typeShare: String): String {
         return when (typeShare) {
             SHARE_LISTENER -> {
-                StringResourcesUtils.getString(R.string.context_no_shared_number,
-                    numberErrors)
+                context.resources.getQuantityString(
+                    R.plurals.shared_items_cloud_drive_snackbar_sharing_folder_failed,
+                    numberErrors, numberErrors
+                )
             }
             CHANGE_PERMISSIONS_LISTENER -> {
-                StringResourcesUtils.getString(
-                    R.string.number_permission_incorrectly_changed_from_shared,
-                    numberErrors)
+                context.resources.getQuantityString(
+                    R.plurals.shared_items_outgoing_shares_update_contact_permission_failed,
+                    numberErrors, numberErrors
+                )
             }
             REMOVE_SHARE_LISTENER -> {
-                StringResourcesUtils.getString(R.string.context_no_removed_shared)
+                context.resources.getQuantityString(
+                    R.plurals.shared_items_outgoing_shares_snackbar_remove_contact_access_failed,
+                    numberErrors,
+                    numberErrors
+                )
             }
             else -> ""
         }

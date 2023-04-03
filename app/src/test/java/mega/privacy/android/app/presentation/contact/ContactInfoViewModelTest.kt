@@ -32,6 +32,7 @@ import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
+import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAlias
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -65,6 +66,7 @@ class ContactInfoViewModelTest {
     private lateinit var getChatRoomByUser: GetChatRoomByUser
     private lateinit var applyContactUpdatesUseCase: ApplyContactUpdatesUseCase
     private lateinit var setUserAlias: SetUserAlias
+    private lateinit var removeContactByEmailUseCase: RemoveContactByEmailUseCase
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
     private val testHandle = 123456L
@@ -127,6 +129,7 @@ class ContactInfoViewModelTest {
             getContactFromEmail,
             applyContactUpdatesUseCase,
             setUserAlias,
+            removeContactByEmailUseCase,
             standardDispatcher,
         )
     }
@@ -149,6 +152,7 @@ class ContactInfoViewModelTest {
         getContactFromEmail = mock()
         applyContactUpdatesUseCase = mock()
         setUserAlias = mock()
+        removeContactByEmailUseCase = mock()
     }
 
     @After
@@ -271,4 +275,23 @@ class ContactInfoViewModelTest {
                 assertThat(nextState.snackBarMessage).isNull()
             }
         }
+
+    @Test
+    fun `test that when remove contact is success isUserRemoved is emitted as true`() = runTest {
+        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+        whenever(getContactFromEmail(testEmail, skipCache = true)).thenReturn(contactItem)
+        whenever(getChatRoomByUser(testHandle)).thenReturn(chatRoom)
+        whenever(removeContactByEmailUseCase(testEmail)).thenReturn(true)
+        underTest.updateContactInfo(-1L, testEmail)
+        underTest.state.test {
+            val initialState = awaitItem()
+            assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
+            assertThat(initialState.snackBarMessage).isNull()
+        }
+        underTest.removeContact()
+        underTest.state.test {
+            val nextState = awaitItem()
+            assertThat(nextState.isUserRemoved).isTrue()
+        }
+    }
 }

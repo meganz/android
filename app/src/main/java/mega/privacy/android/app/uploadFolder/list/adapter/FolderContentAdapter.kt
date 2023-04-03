@@ -1,5 +1,6 @@
 package mega.privacy.android.app.uploadFolder.list.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager.SpanSizeLookup
@@ -24,7 +25,7 @@ import mega.privacy.android.app.utils.AdapterUtils.isValidPosition
 class FolderContentAdapter(
     private val sortByViewModel: SortByHeaderViewModel,
     private val onClickCallback: (FolderContent.Data, Int) -> Unit,
-    private val onLongClickCallback: (FolderContent.Data, Int) -> Unit
+    private val onLongClickCallback: (FolderContent.Data, Int) -> Unit,
 ) : ListAdapter<FolderContent, RecyclerView.ViewHolder>(FolderContent.DiffCallback()),
     SectionTitleProvider {
 
@@ -124,7 +125,7 @@ class FolderContentAdapter(
             is FolderContent.Separator -> VIEW_TYPE_GRID_SEPARATOR
         }
 
-    override fun getSectionTitle(position: Int): String =
+    override fun getSectionTitle(position: Int, context: Context): String =
         getItem(position).getSectionTitle()
 
     /**

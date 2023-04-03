@@ -1,12 +1,12 @@
 package mega.privacy.android.app.myAccount.util
 
+import android.content.Context
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
 import mega.privacy.android.app.myAccount.MyAccountViewModel
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import mega.privacy.android.app.utils.StringUtils.formatColorTag
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.StyleUtils.setTextStyle
@@ -23,7 +23,7 @@ object MyAccountViewUtil {
         MY_ACCOUNT, MY_ACCOUNT_USAGE
     }
 
-    private val gettingInfo by lazy { getString(R.string.recovering_info) }
+    private fun getGettingInfo(context: Context) = context.getString(R.string.recovering_info)
 
     /**
      * Updates the views related to usage of storage and transfers
@@ -40,43 +40,46 @@ object MyAccountViewUtil {
         if (viewModel.getUsedStorage().isEmpty()) {
             storageProgressPercentage.isVisible = false
             storageProgressBar.progress = 0
-            storageProgress.text = gettingInfo
+            storageProgress.text = getGettingInfo(viewModel.context)
         } else {
             val usedStorage = viewModel.getUsedStoragePercentage()
             val isStorageOverQuota = usedStorage >= 100
 
             storageProgressPercentage.apply {
                 isVisible = true
-                text = getString(
+                text = viewModel.context.getString(
                     R.string.used_storage_transfer_percentage,
                     usedStorage
                 )
 
-                setTextStyle(textAppearance =
-                if (isStorageOverQuota) {
-                    R.style.TextAppearance_Mega_Body2_Medium_Red600Red300
-                } else {
-                    R.style.TextAppearance_Mega_Body2_Medium_Accent
-                }
+                setTextStyle(
+                    textAppearance =
+                    if (isStorageOverQuota) {
+                        R.style.TextAppearance_Mega_Body2_Medium_Red600Red300
+                    } else {
+                        R.style.TextAppearance_Mega_Body2_Medium_Accent
+                    }
                 )
             }
 
             storageProgressBar.apply {
                 progress = usedStorage
                 progressDrawable =
-                    ContextCompat.getDrawable(context,
+                    ContextCompat.getDrawable(
+                        context,
                         if (isStorageOverQuota) {
                             R.drawable.storage_transfer_circular_progress_bar_warning
                         } else {
                             R.drawable.storage_transfer_circular_progress_bar
-                        })
+                        }
+                    )
             }
 
-            storageProgress.text = getString(
+            storageProgress.text = viewModel.context.getString(
                 R.string.used_storage_transfer,
                 viewModel.getUsedStorage(),
                 viewModel.getTotalStorage()
-            )?.let { text ->
+            ).let { text ->
                 if (isStorageOverQuota) {
                     text.formatColorTag(storageProgress.context, 'A', R.color.red_600_red_300)
                         .toSpannedHtmlText()
@@ -92,11 +95,11 @@ object MyAccountViewUtil {
         if (viewModel.getUsedTransfer().isEmpty()) {
             transferProgressPercentage.isVisible = false
             transferProgressBar.progress = 0
-            transferProgress.text = gettingInfo
+            transferProgress.text = getGettingInfo(viewModel.context)
         } else {
             transferProgressPercentage.apply {
                 isVisible = true
-                text = getString(
+                text = viewModel.context.getString(
                     R.string.used_storage_transfer_percentage,
                     viewModel.getUsedTransferPercentage()
                 )
@@ -105,7 +108,7 @@ object MyAccountViewUtil {
             transferProgressBar.progress =
                 viewModel.getUsedTransferPercentage()
 
-            transferProgress.text = getString(
+            transferProgress.text = viewModel.context.getString(
                 R.string.used_storage_transfer,
                 viewModel.getUsedTransfer(),
                 viewModel.getTotalTransfer()
@@ -127,13 +130,15 @@ object MyAccountViewUtil {
         storageProgressBar.isVisible = false
         noPercentageStorageImage.isVisible = true
 
-        storageProgress.text = viewModel.getUsedStorage().ifEmpty { gettingInfo }
+        storageProgress.text =
+            viewModel.getUsedStorage().ifEmpty { getGettingInfo(viewModel.context) }
 
         transferProgressPercentage.isVisible = false
         transferProgressBar.isVisible = false
         noPercentageTransferImage.isVisible = true
 
-        transferProgress.text = viewModel.getUsedTransfer().ifEmpty { gettingInfo }
+        transferProgress.text =
+            viewModel.getUsedTransfer().ifEmpty { getGettingInfo(viewModel.context) }
 
         root.post { checkImagesOrProgressBarVisibility(false) }
     }
@@ -181,10 +186,10 @@ object MyAccountViewUtil {
 
         when {
             businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED -> {
-                setBusinessAlert(true, expandedView)
+                setBusinessAlert(true, expandedView, viewModel.context)
             }
             businessStatus == MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD -> {
-                setBusinessAlert(false, expandedView)
+                setBusinessAlert(false, expandedView, viewModel.context)
             }
             renewable || expirable -> {
                 setRenewOrExpiryDate(viewModel, renewable, fragment)
@@ -206,9 +211,10 @@ object MyAccountViewUtil {
             isVisible = true
             val renewalDate = TimeUtils.formatDate(
                 viewModel.getRenewTime(),
-                TimeUtils.DATE_MM_DD_YYYY_FORMAT
+                TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                context
             )
-            text = getString(R.string.account_info_renews_on, renewalDate)
+            text = viewModel.context.getString(R.string.account_info_renews_on, renewalDate)
                 .formatColorTag(context, 'A', R.color.grey_500_grey_400)
                 .formatColorTag(context, 'B', R.color.grey_087_white)
                 .toSpannedHtmlText()
@@ -231,11 +237,12 @@ object MyAccountViewUtil {
 
         renewExpiryText.apply {
             isVisible = true
-            text = getString(
+            text = viewModel.context.getString(
                 if (renewable) R.string.account_info_renews_on else R.string.account_info_expires_on,
                 TimeUtils.formatDate(
                     if (renewable) viewModel.getRenewTime() else viewModel.getExpirationTime(),
-                    TimeUtils.DATE_MM_DD_YYYY_FORMAT
+                    TimeUtils.DATE_MM_DD_YYYY_FORMAT,
+                    context
                 )
             )
 
@@ -268,12 +275,13 @@ object MyAccountViewUtil {
     private fun MyAccountPaymentInfoContainerBinding.setBusinessAlert(
         expired: Boolean,
         expandedView: Boolean,
+        context: Context,
     ) {
         renewExpiryText.isVisible = false
 
         businessStatusText.apply {
             isVisible = true
-            text = getString(
+            text = context.getString(
                 if (expired) R.string.payment_overdue_label
                 else R.string.payment_required_label
             )

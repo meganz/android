@@ -34,7 +34,6 @@ import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.*
 import mega.privacy.android.app.utils.MegaApiUtils.getMegaNodeFolderInfo
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TextUtil.isTextEmpty
 import mega.privacy.android.app.utils.ThumbnailUtils
@@ -81,7 +80,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentGetLinkBinding.inflate(layoutInflater)
         setHasOptionsMenu(true)
@@ -129,8 +128,8 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         val node = viewModel.getNode()
         binding.nodeName.text = node.name
         binding.nodeInfo.text =
-            if (node.isFolder) getMegaNodeFolderInfo(node)
-            else getSizeString(node.size)
+            if (node.isFolder) getMegaNodeFolderInfo(node, requireContext())
+            else getSizeString(node.size, requireContext())
 
         binding.learnMoreTextButton.setOnClickListener {
             checkIfShouldHidePassword()
@@ -403,17 +402,17 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
      */
     private fun showUpgradeToProWarning() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(StringResourcesUtils.getString(R.string.upgrade_pro))
-            .setMessage(StringResourcesUtils.getString(R.string.link_upgrade_pro_explanation) + "\n")
+            .setTitle(getString(R.string.upgrade_pro))
+            .setMessage(getString(R.string.link_upgrade_pro_explanation) + "\n")
             .setCancelable(false)
-            .setPositiveButton(StringResourcesUtils.getString(R.string.button_plans_almost_full_warning)) { _, _ ->
+            .setPositiveButton(getString(R.string.button_plans_almost_full_warning)) { _, _ ->
                 (requireActivity() as BaseActivity).apply {
                     navigateToUpgradeAccount()
                     finish()
                 }
             }
             .setNegativeButton(
-                StringResourcesUtils.getString(R.string.verify_account_not_now_button),
+                getString(R.string.verify_account_not_now_button),
                 null
             )
             .create()
@@ -471,12 +470,14 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         if (passwordVisible) {
             binding.passwordProtectionSetText.transformationMethod = PasswordTransformationMethod()
             binding.passwordProtectionSetToggle.setColorFilter(
-                ContextCompat.getColor(requireContext(), R.color.grey_012_white_038), PorterDuff.Mode.SRC_IN
+                ContextCompat.getColor(requireContext(), R.color.grey_012_white_038),
+                PorterDuff.Mode.SRC_IN
             )
         } else {
             binding.passwordProtectionSetText.transformationMethod = null
             binding.passwordProtectionSetToggle.setColorFilter(
-                ColorUtils.getThemeColor(requireContext(), R.attr.colorSecondary), PorterDuff.Mode.SRC_IN
+                ColorUtils.getThemeColor(requireContext(), R.attr.colorSecondary),
+                PorterDuff.Mode.SRC_IN
             )
         }
 
@@ -503,14 +504,14 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     private fun showShareKeyOrPasswordDialog(type: Int, data: Intent? = null) {
         MaterialAlertDialogBuilder(requireContext())
             .setMessage(
-                StringResourcesUtils.getString(
+                getString(
                     if (viewModel.isPasswordSet()) R.string.share_password_warning
                     else R.string.share_key_warning
                 ) + "\n"
             )
             .setCancelable(false)
             .setPositiveButton(
-                StringResourcesUtils.getString(
+                getString(
                     if (viewModel.isPasswordSet()) R.string.button_share_password
                     else R.string.button_share_key
                 )
@@ -523,7 +524,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                     }
                 }
             }
-            .setNegativeButton(StringResourcesUtils.getString(R.string.general_dismiss)) { _, _ ->
+            .setNegativeButton(getString(R.string.general_dismiss)) { _, _ ->
                 if (type == SHARE) {
                     viewModel.shareCompleteLink { intent -> startActivity(intent) }
                 } else if (type == SEND_TO_CHAT) {

@@ -36,7 +36,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import mega.privacy.android.data.model.MegaContactDB;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.activities.PasscodeActivity;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -45,7 +44,7 @@ import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaContactsAttachedAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
+import mega.privacy.android.data.model.MegaContactDB;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -158,7 +157,7 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
         aB = getSupportActionBar();
         aB.setDisplayHomeAsUpEnabled(true);
         aB.setDisplayShowHomeEnabled(true);
-        aB.setTitle(StringResourcesUtils.getString(R.string.activity_title_contacts_attached));
+        aB.setTitle(getString(R.string.activity_title_contacts_attached));
 
         aB.setSubtitle(message.getMessage().getUserHandle() == megaChatApi.getMyUserHandle() ? megaChatApi.getMyFullname()
                 : cC.getParticipantFullName(message.getMessage().getUserHandle()));

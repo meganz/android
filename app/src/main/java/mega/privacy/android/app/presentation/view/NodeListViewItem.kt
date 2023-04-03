@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package mega.privacy.android.app.presentation.view
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -17,11 +19,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
@@ -34,6 +39,7 @@ import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
+import java.text.DecimalFormat
 
 /**
  * List view item for file/folder info
@@ -142,13 +148,18 @@ internal fun NodeListViewItem(
                 }
                 Text(
                     text = if (nodeUIItem.node is FolderNode) {
-                        stringUtilWrapper.getFolderInfo(
+                        getFolderInfo(
                             nodeUIItem.node.childFolderCount,
-                            nodeUIItem.node.childFileCount
+                            nodeUIItem.node.childFileCount,
                         )
                     } else {
                         val fileItem = nodeUIItem.node as FileNode
-                        "${stringUtilWrapper.getSizeString(fileItem.size)} · ${
+                        "${
+                            getUnitString(
+                                unit = fileItem.size,
+                                isSpeed = false
+                            )
+                        } · ${
                             stringUtilWrapper.formatLongDateTime(
                                 fileItem.modificationTime
                             )
@@ -156,7 +167,8 @@ internal fun NodeListViewItem(
                     },
                     style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.textColorSecondary,
-                    modifier = Modifier.testTag(INFO_TEXT_TEST_TAG)
+                    modifier = Modifier
+                        .testTag(INFO_TEXT_TEST_TAG)
                         .padding(top = 2.dp),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -174,3 +186,71 @@ internal fun NodeListViewItem(
         )
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun getFolderInfo(numFolders: Int, numFiles: Int): String {
+    return if (numFolders == 0 && numFiles == 0) {
+        stringResource(R.string.file_browser_empty_folder)
+    } else if (numFolders == 0 && numFiles > 0) {
+        pluralStringResource(R.plurals.num_files_with_parameter, numFiles, numFiles)
+    } else if (numFiles == 0 && numFolders > 0) {
+        pluralStringResource(
+            R.plurals.num_folders_with_parameter,
+            numFolders,
+            numFolders
+        )
+    } else {
+        pluralStringResource(
+            R.plurals.num_folders_num_files,
+            numFolders,
+            numFolders
+        ) + pluralStringResource(
+            R.plurals.num_folders_num_files_2,
+            numFiles,
+            numFiles
+        )
+    }
+}
+
+@Composable
+fun getUnitString(unit: Long, isSpeed: Boolean): String? {
+    val df = DecimalFormat("#.##")
+    val KB = 1024f
+    val MB = KB * 1024
+    val GB = MB * 1024
+    val TB = GB * 1024
+    val PB = TB * 1024
+    val EB = PB * 1024
+    return if (unit < KB) {
+        stringResource(
+            if (isSpeed) R.string.label_file_speed_byte else R.string.label_file_size_byte,
+            unit.toString()
+        )
+    } else if (unit < MB) {
+        stringResource(
+            if (isSpeed) R.string.label_file_speed_kilo_byte else R.string.label_file_size_kilo_byte,
+            df.format((unit / KB).toDouble())
+        )
+    } else if (unit < GB) {
+        stringResource(
+            if (isSpeed) R.string.label_file_speed_mega_byte else R.string.label_file_size_mega_byte,
+            df.format((unit / MB).toDouble())
+        )
+    } else if (unit < TB) {
+        stringResource(
+            if (isSpeed) R.string.label_file_speed_giga_byte else R.string.label_file_size_giga_byte,
+            df.format((unit / GB).toDouble())
+        )
+    } else if (unit < PB) {
+        stringResource(
+            if (isSpeed) R.string.label_file_speed_tera_byte else R.string.label_file_size_tera_byte,
+            df.format((unit / TB).toDouble())
+        )
+    } else if (unit < EB) {
+        stringResource(R.string.label_file_size_peta_byte, df.format((unit / PB).toDouble()))
+    } else {
+        stringResource(R.string.label_file_size_exa_byte, df.format((unit / EB).toDouble()))
+    }
+}
+

@@ -149,22 +149,35 @@ class FavouriteFolderFragmentTest {
             whenever(FavouritesTestModule.getFavouriteFolderInfo(anyOrNull())).thenReturn(
                 flowOf(favouriteFolderInfo)
             )
-            whenever(FavouritesTestModule.stringUtilWrapper.getFolderInfo(any(), any())).thenReturn(
-                "")
-            whenever(FavouritesTestModule.favouriteMapper(
-                any(),
-                any(),
-                any(),
-                any(),
-                any(),
-                anyOrNull(),
-            )).thenReturn(
+            whenever(
+                FavouritesTestModule.stringUtilWrapper.getFolderInfo(
+                    any(),
+                    any(),
+                    any(),
+                )
+            ).thenReturn(
+                ""
+            )
+            whenever(
+                FavouritesTestModule.favouriteMapper(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                    anyOrNull(),
+                )
+            ).thenReturn(
                 favourite
             )
             whenever(FavouritesTestModule.getThumbnail(1)).thenReturn(null)
 
-            whenever(FavouritesTestModule.megaUtilWrapper.availableOffline(anyOrNull(),
-                anyOrNull())).thenReturn(true)
+            whenever(
+                FavouritesTestModule.megaUtilWrapper.availableOffline(
+                    anyOrNull(),
+                    anyOrNull()
+                )
+            ).thenReturn(true)
         }
     }
 

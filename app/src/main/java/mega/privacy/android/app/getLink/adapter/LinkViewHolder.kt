@@ -1,5 +1,6 @@
 package mega.privacy.android.app.getLink.adapter
 
+import android.content.Context
 import android.net.Uri
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -8,8 +9,12 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.ItemLinkBinding
 import mega.privacy.android.app.getLink.data.LinkItem
-import mega.privacy.android.app.utils.Constants.*
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
+import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_DISABLED
+import mega.privacy.android.app.utils.Constants.ALPHA_VIEW_ENABLED
+import mega.privacy.android.app.utils.Constants.ICON_MARGIN_DP
+import mega.privacy.android.app.utils.Constants.ICON_SIZE_DP
+import mega.privacy.android.app.utils.Constants.THUMB_MARGIN_DP
+import mega.privacy.android.app.utils.Constants.THUMB_SIZE_DP
 
 /**
  * RecyclerView.ViewHolder to draw data items in [LinksAdapter].
@@ -17,10 +22,10 @@ import mega.privacy.android.app.utils.StringResourcesUtils.getString
  * @property binding ItemLinkBinding necessary to draw the data item.
  */
 class LinkViewHolder(
-    private val binding: ItemLinkBinding
+    private val binding: ItemLinkBinding,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private val processing by lazy { getString(R.string.link_request_status) }
+    private fun processing(context: Context) = context.getString(R.string.link_request_status)
 
     /**
      * Draws the data item.
@@ -61,7 +66,7 @@ class LinkViewHolder(
         val link = item.link
 
         binding.nameText.text = item.name
-        binding.linkText.text = link ?: processing
+        binding.linkText.text = link ?: processing(binding.root.context)
         binding.infoText.text = item.info
         binding.root.alpha = if (link == null) ALPHA_VIEW_DISABLED else ALPHA_VIEW_ENABLED
     }

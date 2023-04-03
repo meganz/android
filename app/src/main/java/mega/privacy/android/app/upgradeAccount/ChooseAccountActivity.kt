@@ -25,7 +25,6 @@ import mega.privacy.android.app.utils.Constants.PRO_II
 import mega.privacy.android.app.utils.Constants.PRO_III
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.Constants.SCROLLING_UP_DIRECTION
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.Product
@@ -85,7 +84,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         supportActionBar?.apply {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
-            title = StringResourcesUtils.getString(R.string.choose_account_fragment)
+            title = getString(R.string.choose_account_fragment)
         }
 
         binding.billingWarningClose.setOnClickListener {
@@ -106,7 +105,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
         binding.lblCustomPlan.apply {
             isVisible = false
 
-            var textToShow = StringResourcesUtils.getString(R.string.label_custom_plan)
+            var textToShow = getString(R.string.label_custom_plan)
             val strColor =
                 Util.getHexValue(
                     ColorUtils.getThemeColor(
@@ -229,7 +228,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
     private fun setFreePlan() {
         //Currently the API side doesn't return this value, so we have to hardcode.
         var textToShowFreeStorage =
-            StringResourcesUtils.getString(R.string.account_upgrade_storage_label, "20 GB+")
+            getString(R.string.account_upgrade_storage_label, "20 GB+")
 
         try {
             textToShowFreeStorage = textToShowFreeStorage.replace(
@@ -246,7 +245,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
                 .toSpannedHtmlText()
 
         var textToShowFreeBandwidth =
-            StringResourcesUtils.getString(R.string.account_choose_free_limited_transfer_quota)
+            getString(R.string.account_choose_free_limited_transfer_quota)
 
         try {
             textToShowFreeBandwidth = textToShowFreeBandwidth
@@ -261,7 +260,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
 
         binding.bandwidthFree.text = textToShowFreeBandwidth.toSpannedHtmlText()
         binding.achievementsFree.text = "<sup><small><font color='#ff333a'>1</font></small></sup> ${
-            StringResourcesUtils.getString(
+            getString(
                 R.string.footnote_achievements
             )
         }".toSpannedHtmlText()

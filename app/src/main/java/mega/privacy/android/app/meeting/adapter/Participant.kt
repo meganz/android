@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import mega.privacy.android.app.R
 import mega.privacy.android.app.meeting.listeners.GroupVideoListener
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
-import mega.privacy.android.app.utils.StringResourcesUtils
 import timber.log.Timber
 import java.io.Serializable
 
@@ -39,7 +38,7 @@ data class Participant(
      */
     fun getDisplayName(context: Context): CharSequence {
         return if (isMe) {
-            var displayName = StringResourcesUtils.getString(R.string.meeting_me_text_bracket, name)
+            var displayName = context.getString(R.string.meeting_me_text_bracket, name)
 
             try {
                 displayName = displayName.replace(

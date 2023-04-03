@@ -32,7 +32,7 @@ import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
-import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
+import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
@@ -50,7 +50,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
     private val getDefaultAlbumPhotos: GetDefaultAlbumPhotos,
-    private val getDefaultAlbumsMap: GetDefaultAlbumsMap,
+    private val getDefaultAlbumsMapUseCase: GetDefaultAlbumsMapUseCase,
     private val getUserAlbums: GetUserAlbums,
     private val getAlbumPhotos: GetAlbumPhotos,
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
@@ -80,7 +80,7 @@ class AlbumsViewModel @Inject constructor(
 
     private fun loadAlbums() {
         currentNodeJob = viewModelScope.launch {
-            val includedSystemAlbums = getDefaultAlbumsMap()
+            val includedSystemAlbums = getDefaultAlbumsMapUseCase()
             runCatching {
                 getDefaultAlbumPhotos(
                     includedSystemAlbums.values.toList()

@@ -6,9 +6,9 @@ import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
-import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.inOrder
@@ -23,10 +23,10 @@ class DefaultEnablePhotosCameraUploadTest {
 
     private val settingsRepository = mock<SettingsRepository>()
     private val setCameraUploadsByWifiUseCase = mock<SetCameraUploadsByWifiUseCase>()
-    private val setUploadVideoQuality = mock<SetUploadVideoQuality>()
-    private val setChargingRequiredForVideoCompression =
-        mock<SetChargingRequiredForVideoCompression>()
-    private val setVideoCompressionSizeLimit = mock<SetVideoCompressionSizeLimit>()
+    private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
+    private val setChargingRequiredForVideoCompressionUseCase =
+        mock<SetChargingRequiredForVideoCompressionUseCase>()
+    private val setVideoCompressionSizeLimitUseCase = mock<SetVideoCompressionSizeLimitUseCase>()
     private val cameraUploadRepository = mock<CameraUploadRepository>()
 
     @Before
@@ -34,9 +34,9 @@ class DefaultEnablePhotosCameraUploadTest {
         underTest = DefaultEnablePhotosCameraUpload(
             settingsRepository = settingsRepository,
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
-            setUploadVideoQuality = setUploadVideoQuality,
-            setChargingRequiredForVideoCompression = setChargingRequiredForVideoCompression,
-            setVideoCompressionSizeLimit = setVideoCompressionSizeLimit,
+            setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
+            setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
+            setVideoCompressionSizeLimitUseCase = setVideoCompressionSizeLimitUseCase,
             cameraUploadRepository = cameraUploadRepository,
         )
     }
@@ -60,9 +60,9 @@ class DefaultEnablePhotosCameraUploadTest {
         val inOrder = inOrder(
             settingsRepository,
             setCameraUploadsByWifiUseCase,
-            setUploadVideoQuality,
-            setChargingRequiredForVideoCompression,
-            setVideoCompressionSizeLimit,
+            setUploadVideoQualityUseCase,
+            setChargingRequiredForVideoCompressionUseCase,
+            setVideoCompressionSizeLimitUseCase,
             cameraUploadRepository
         )
 
@@ -70,9 +70,9 @@ class DefaultEnablePhotosCameraUploadTest {
         inOrder.verify(setCameraUploadsByWifiUseCase).invoke(!expectedEnableCellularSync)
         inOrder.verify(settingsRepository).setCameraUploadFileType(expectedSyncVideo)
         inOrder.verify(settingsRepository).setCameraFolderExternalSDCard(false)
-        inOrder.verify(setUploadVideoQuality).invoke(expectedVideoQuality)
-        inOrder.verify(setChargingRequiredForVideoCompression).invoke(true)
-        inOrder.verify(setVideoCompressionSizeLimit).invoke(expectedConversionChargingOnSize)
+        inOrder.verify(setUploadVideoQualityUseCase).invoke(expectedVideoQuality)
+        inOrder.verify(setChargingRequiredForVideoCompressionUseCase).invoke(true)
+        inOrder.verify(setVideoCompressionSizeLimitUseCase).invoke(expectedConversionChargingOnSize)
         inOrder.verify(settingsRepository).setEnableCameraUpload(true)
         inOrder.verify(cameraUploadRepository).listenToNewMedia()
 

@@ -6,8 +6,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.main.listeners.MultipleForwardChatProcessor
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
@@ -16,13 +14,25 @@ import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaUser
 
+/**
+ * Create chat listener
+ *
+ * @property action
+ * @property totalCount
+ * @property snackbarShower
+ * @property onChatsCreated
+ * @property callback
+ * @constructor
+ *
+ * @param context
+ */
 class CreateChatListener(
     context: Context,
     private val action: Int = ATTACH,
     private val totalCount: Int,
     private val snackbarShower: SnackbarShower? = null,
     private val onChatsCreated: ((List<MegaChatRoom>) -> Unit)? = null,
-    private val callback: ((List<Long>, Int) -> Unit)?
+    private val callback: ((List<Long>, Int) -> Unit)?,
 ) : ChatBaseListener(context) {
 
     private var successChats = ArrayList<Long>()
@@ -42,7 +52,7 @@ class CreateChatListener(
         chats: List<MegaChatRoom>,
         usersNoChat: List<MegaUser>,
         context: Context,
-        snackbarShower: SnackbarShower
+        snackbarShower: SnackbarShower,
     ) : this(context, action, usersNoChat.size + chats.size, snackbarShower, null, null) {
         initFields(chats, usersNoChat)
     }
@@ -54,7 +64,7 @@ class CreateChatListener(
         context: Context,
         snackbarShower: SnackbarShower,
         messageHandles: LongArray,
-        chatId: Long
+        chatId: Long,
     ) : this(context, action, usersNoChat.size + chats.size, snackbarShower, null, null) {
         initFields(chats, usersNoChat)
 
@@ -68,7 +78,7 @@ class CreateChatListener(
         usersNoChat: List<MegaUser>,
         context: Context,
         snackbarShower: SnackbarShower,
-        onChatsCreated: (List<MegaChatRoom>) -> Unit
+        onChatsCreated: (List<MegaChatRoom>) -> Unit,
     ) : this(context, action, usersNoChat.size + chats.size, snackbarShower, onChatsCreated, null) {
         initFields(chats, usersNoChat)
     }
@@ -121,7 +131,7 @@ class CreateChatListener(
         when (action) {
             START_AUDIO_CALL, START_VIDEO_CALL -> {
                 if (errorCreatingChat()) {
-                    snackbarShower?.showSnackbar(getString(R.string.create_chat_error))
+                    snackbarShower?.showSnackbar(context.getString(R.string.create_chat_error))
                 } else {
                     MegaApplication.userWaitingForCall = usersNoChat[0].handle
                     MegaApplication.isWaitingForCall = true
@@ -133,7 +143,11 @@ class CreateChatListener(
                 if (errorCreatingChat()) {
                     // All send messages fail; Show error
                     snackbarShower?.showSnackbar(
-                        getQuantityString(R.plurals.num_messages_not_send, handles.size, totalCount)
+                        context.resources.getQuantityString(
+                            R.plurals.num_messages_not_send,
+                            handles.size,
+                            totalCount
+                        )
                     )
                 } else {
                     // Send messages
@@ -151,7 +165,12 @@ class CreateChatListener(
             SEND_FILE_EXPLORER_CONTENT -> {
                 if (errorCreatingChat()) {
                     // All send messages fail; Show error
-                    snackbarShower?.showSnackbar(getString(R.string.content_not_send, totalCount))
+                    snackbarShower?.showSnackbar(
+                        context.getString(
+                            R.string.content_not_send,
+                            totalCount
+                        )
+                    )
                 } else {
                     // Send content
                     onChatsCreated?.invoke(chats)
@@ -159,7 +178,7 @@ class CreateChatListener(
             }
             CONFIGURE_DND -> {
                 if (errorCreatingChat()) {
-                    snackbarShower?.showSnackbar(getString(R.string.general_text_error))
+                    snackbarShower?.showSnackbar(context.getString(R.string.general_text_error))
                 } else {
                     onChatsCreated?.invoke(chats)
                 }

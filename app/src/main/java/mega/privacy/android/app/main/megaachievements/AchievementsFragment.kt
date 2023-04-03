@@ -20,7 +20,6 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.data.extensions.getBigFormattedStorageString
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.achievement.AchievementType
@@ -166,9 +165,9 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
         referralBonusIcon = root.findViewById(R.id.referral_bonuses_icon)
 
         figureUnlockedRewardStorage = root.findViewById(R.id.unlocked_storage)
-        figureUnlockedRewardStorage.text = 0L.getBigFormattedStorageString()
+        figureUnlockedRewardStorage.text = 0L.getBigFormattedStorageString(requireContext())
         figureReferralBonusesStorage = root.findViewById(R.id.figure_unlocked_storage_text_referral)
-        figureReferralBonusesStorage.text = Util.getSizeString(0)
+        figureReferralBonusesStorage.text = Util.getSizeString(0, requireContext())
 
         val storageSpaceString = getString(R.string.storage_space).lowercase(Locale.getDefault())
         val textReferralBonusesStorage =
@@ -176,27 +175,27 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
         textReferralBonusesStorage.text = storageSpaceString
 
         figureInstallAppStorage = root.findViewById(R.id.figure_unlocked_storage_text_install_app)
-        figureInstallAppStorage.text = Util.getSizeString(0)
+        figureInstallAppStorage.text = Util.getSizeString(0, requireContext())
         textInstallAppStorage = root.findViewById(R.id.unlocked_storage_title_install_app)
         textInstallAppStorage.text = storageSpaceString
         daysLeftInstallAppText = root.findViewById(R.id.days_left_text_install_app)
         daysLeftInstallAppText.text = "..."
         figureAddPhoneStorage = root.findViewById(R.id.figure_unlocked_storage_text_add_phone)
-        figureAddPhoneStorage.text = Util.getSizeString(0)
+        figureAddPhoneStorage.text = Util.getSizeString(0, requireContext())
         textAddPhoneStorage = root.findViewById(R.id.unlocked_storage_title_add_phone)
         textAddPhoneStorage.text = storageSpaceString
         daysLeftAddPhoneText = root.findViewById(R.id.days_left_text_add_phone)
         daysLeftAddPhoneText.text = "..."
         figureRegistrationStorage =
             root.findViewById(R.id.figure_unlocked_storage_text_registration)
-        figureRegistrationStorage.text = Util.getSizeString(0)
+        figureRegistrationStorage.text = Util.getSizeString(0, requireContext())
         textRegistrationStorage = root.findViewById(R.id.unlocked_storage_title_registration)
         textRegistrationStorage.text = storageSpaceString
         daysLeftRegistrationText = root.findViewById(R.id.days_left_text_registration)
         daysLeftRegistrationText.text = "..."
         figureInstallDesktopStorage =
             root.findViewById(R.id.figure_unlocked_storage_text_install_desktop)
-        figureInstallDesktopStorage.text = Util.getSizeString(0)
+        figureInstallDesktopStorage.text = Util.getSizeString(0, requireContext())
         textInstallDesktopStorage = root.findViewById(R.id.unlocked_storage_title_install_desktop)
         textInstallDesktopStorage.text = storageSpaceString
         daysLeftInstallDesktopText = root.findViewById(R.id.days_left_text_install_desktop)
@@ -240,7 +239,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
         val actionBar = (requireActivity() as AppCompatActivity).supportActionBar
         if (actionBar != null) {
             actionBar.title =
-                StringResourcesUtils.getString(R.string.achievements_title)
+                getString(R.string.achievements_title)
         }
     }
 
@@ -310,8 +309,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
         totalTransfer += transferReferrals
         Timber.d(
             "After referrals: storage: %s transfer %s",
-            Util.getSizeString(totalStorage),
-            Util.getSizeString(totalTransfer)
+            Util.getSizeString(totalStorage, requireContext()),
+            Util.getSizeString(totalTransfer, requireContext())
         )
 
         val referralsStorageValue =
@@ -324,7 +323,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
             achievements.allAchievements.firstOrNull { it.type == AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL }?.grantStorageInBytes
 
         if (transferReferrals > 0 || storageReferrals > 0) {
-            figureReferralBonusesStorage.text = Util.getSizeString(storageReferrals)
+            figureReferralBonusesStorage.text =
+                Util.getSizeString(storageReferrals, requireContext())
             figuresReferralBonusesLayout.visibility = View.VISIBLE
             zeroFiguresReferralBonusesText.visibility = View.GONE
             Timber.d("Check if referrals are expired")
@@ -337,32 +337,32 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
         } else {
             figuresReferralBonusesLayout.visibility = View.GONE
             referralsStorageValue?.let {
-                zeroFiguresReferralBonusesText.text = StringResourcesUtils.getString(
+                zeroFiguresReferralBonusesText.text = getString(
                     R.string.figures_achievements_text_referrals,
-                    Util.getSizeString(referralsStorageValue)
+                    Util.getSizeString(referralsStorageValue, requireContext())
                 )
                 zeroFiguresReferralBonusesText.visibility = View.VISIBLE
             }
         }
 
         installAppStorageValue?.let {
-            zeroFiguresInstallAppText.text = StringResourcesUtils.getString(
+            zeroFiguresInstallAppText.text = getString(
                 R.string.figures_achievements_text,
-                Util.getSizeString(installAppStorageValue)
+                Util.getSizeString(installAppStorageValue, requireContext())
             )
         }
 
         addPhoneStorageValue?.let {
-            zeroFiguresAddPhoneText.text = StringResourcesUtils.getString(
+            zeroFiguresAddPhoneText.text = getString(
                 R.string.figures_achievements_text,
-                Util.getSizeString(addPhoneStorageValue)
+                Util.getSizeString(addPhoneStorageValue, requireContext())
             )
         }
 
         installDesktopStorageValue?.let {
-            zeroFiguresInstallDesktopText.text = StringResourcesUtils.getString(
+            zeroFiguresInstallDesktopText.text = getString(
                 R.string.figures_achievements_text,
-                Util.getSizeString(installDesktopStorageValue)
+                Util.getSizeString(installDesktopStorageValue, requireContext())
             )
         }
 
@@ -376,7 +376,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
 
                 val storageInstallApp = award.rewardedStorageInBytes
                 if (storageInstallApp > 0) {
-                    figureInstallAppStorage.text = Util.getSizeString(storageInstallApp)
+                    figureInstallAppStorage.text =
+                        Util.getSizeString(storageInstallApp, requireContext())
                     figureInstallAppStorage.visibility = View.VISIBLE
                     textInstallAppStorage.visibility = View.VISIBLE
                 } else {
@@ -406,7 +407,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                 }
 
                 if (diffDays > 0) {
-                    daysLeftInstallAppText.text = StringResourcesUtils.getString(
+                    daysLeftInstallAppText.text = getString(
                         R.string.general_num_days_left,
                         diffDays.toInt()
                     )
@@ -414,8 +415,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                     totalTransfer += transferInstallApp
                     Timber.d(
                         "After mobile install: storage: %s transfer %s",
-                        Util.getSizeString(totalStorage),
-                        Util.getSizeString(totalTransfer)
+                        Util.getSizeString(totalStorage, requireContext()),
+                        Util.getSizeString(totalTransfer, requireContext())
                     )
                 } else {
                     daysLeftInstallAppText.background = ContextCompat.getDrawable(
@@ -431,7 +432,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                         Util.scaleHeightPx(4, resources.displayMetrics)
                     )
                     daysLeftInstallAppText.text =
-                        StringResourcesUtils.getString(R.string.expired_label)
+                        getString(R.string.expired_label)
                 }
             } else if (type == AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE) {
                 Timber.d("MEGA_ACHIEVEMENT_ADD_PHONE")
@@ -439,7 +440,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                 zeroFiguresAddPhoneText.visibility = View.GONE
                 val storageAddPhone = award.rewardedStorageInBytes
                 if (storageAddPhone > 0) {
-                    figureAddPhoneStorage.text = Util.getSizeString(storageAddPhone)
+                    figureAddPhoneStorage.text =
+                        Util.getSizeString(storageAddPhone, requireContext())
                     figureAddPhoneStorage.visibility = View.VISIBLE
                     textAddPhoneStorage.visibility = View.VISIBLE
                 } else {
@@ -471,7 +473,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                 }
 
                 if (diffDays > 0) {
-                    daysLeftAddPhoneText.text = StringResourcesUtils.getString(
+                    daysLeftAddPhoneText.text = getString(
                         R.string.general_num_days_left,
                         diffDays.toInt()
                     )
@@ -479,8 +481,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                     totalTransfer += transferAddPhone
                     Timber.d(
                         "After phone added: storage: %s transfer %s",
-                        Util.getSizeString(totalStorage),
-                        Util.getSizeString(totalTransfer)
+                        Util.getSizeString(totalStorage, requireContext()),
+                        Util.getSizeString(totalTransfer, requireContext())
                     )
                 } else {
                     daysLeftAddPhoneText.background = ContextCompat.getDrawable(
@@ -496,7 +498,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                         Util.scaleHeightPx(4, resources.displayMetrics)
                     )
                     daysLeftAddPhoneText.text =
-                        StringResourcesUtils.getString(R.string.expired_label)
+                        getString(R.string.expired_label)
                 }
             } else if (type == AchievementType.MEGA_ACHIEVEMENT_DESKTOP_INSTALL) {
                 Timber.d("MEGA_ACHIEVEMENT_DESKTOP_INSTALL")
@@ -504,7 +506,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                 zeroFiguresInstallDesktopText.visibility = View.GONE
                 val storageInstallDesktop = award.rewardedStorageInBytes
                 if (storageInstallDesktop > 0) {
-                    figureInstallDesktopStorage.text = Util.getSizeString(storageInstallDesktop)
+                    figureInstallDesktopStorage.text =
+                        Util.getSizeString(storageInstallDesktop, requireContext())
                     textInstallDesktopStorage.visibility = View.VISIBLE
                     textInstallDesktopStorage.visibility = View.VISIBLE
                 } else {
@@ -536,7 +539,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                 }
 
                 if (diffDays > 0) {
-                    daysLeftInstallDesktopText.text = StringResourcesUtils.getString(
+                    daysLeftInstallDesktopText.text = getString(
                         R.string.general_num_days_left,
                         diffDays.toInt()
                     )
@@ -544,8 +547,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                     totalTransfer += transferInstallDesktop
                     Timber.d(
                         "After desktop install: storage: %s transfer %s",
-                        Util.getSizeString(totalStorage),
-                        Util.getSizeString(totalTransfer)
+                        Util.getSizeString(totalStorage, requireContext()),
+                        Util.getSizeString(totalTransfer, requireContext())
                     )
                 } else {
                     daysLeftInstallDesktopText.background = ContextCompat.getDrawable(
@@ -561,7 +564,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                         Util.scaleHeightPx(4, resources.displayMetrics)
                     )
                     daysLeftInstallDesktopText.text =
-                        StringResourcesUtils.getString(R.string.expired_label)
+                        getString(R.string.expired_label)
                 }
             } else if (type == AchievementType.MEGA_ACHIEVEMENT_WELCOME) {
                 Timber.d("MEGA_ACHIEVEMENT_WELCOME")
@@ -569,7 +572,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                 separatorRegistration.visibility = View.VISIBLE
                 val storageRegistration = award.rewardedStorageInBytes
                 if (storageRegistration > 0) {
-                    figureRegistrationStorage.text = Util.getSizeString(storageRegistration)
+                    figureRegistrationStorage.text =
+                        Util.getSizeString(storageRegistration, requireContext())
                     figureRegistrationStorage.visibility = View.VISIBLE
                     textRegistrationStorage.visibility = View.VISIBLE
                 } else {
@@ -600,7 +604,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                 }
 
                 if (diffDays > 0) {
-                    daysLeftRegistrationText.text = StringResourcesUtils.getString(
+                    daysLeftRegistrationText.text = getString(
                         R.string.general_num_days_left,
                         diffDays.toInt()
                     )
@@ -621,7 +625,7 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
                         Util.scaleHeightPx(4, resources.displayMetrics)
                     )
                     daysLeftRegistrationText.text =
-                        StringResourcesUtils.getString(R.string.expired_label)
+                        getString(R.string.expired_label)
                 }
             } else {
                 Timber.d("MEGA_ACHIEVEMENT: $type")
@@ -630,7 +634,8 @@ class AchievementsFragment : Fragment(), View.OnClickListener {
 
         val storageQuota = achievements.currentStorageInBytes
         Timber.d("My calculated totalTransfer: $totalStorage")
-        figureUnlockedRewardStorage.text = storageQuota.getBigFormattedStorageString()
+        figureUnlockedRewardStorage.text =
+            storageQuota.getBigFormattedStorageString(requireContext())
         Timber.d("My calculated totalTransfer: $totalTransfer")
     }
 }

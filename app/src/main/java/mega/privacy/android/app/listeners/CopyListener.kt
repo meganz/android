@@ -13,8 +13,6 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQu
 import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.Constants.ACTION_OVERQUOTA_STORAGE
 import mega.privacy.android.app.utils.Constants.ACTION_PRE_OVERQUOTA_STORAGE
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatMessage
@@ -126,7 +124,7 @@ class CopyListener(
                 COPY -> {
                     when (e.errorCode) {
                         MegaError.API_OK -> {
-                            snackbarShower.showSnackbar(getString(R.string.context_correctly_copied))
+                            snackbarShower.showSnackbar(context.getString(R.string.context_correctly_copied))
                         }
                         MegaError.API_EOVERQUOTA -> {
                             if (api.isForeignNode(request.parentHandle)) {
@@ -147,7 +145,7 @@ class CopyListener(
                             }
                         }
                         else -> {
-                            snackbarShower.showSnackbar(getString(R.string.context_no_copied))
+                            snackbarShower.showSnackbar(context.getString(R.string.context_no_copied))
                         }
                     }
                 }
@@ -155,8 +153,13 @@ class CopyListener(
                     if (counter == 0) {
                         if (error > 0) {
                             Intent(BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES).run {
-                                putExtra(BroadcastConstants.ERROR_MESSAGE_TEXT,
-                                    getQuantityString(R.plurals.error_forwarding_messages, error))
+                                putExtra(
+                                    BroadcastConstants.ERROR_MESSAGE_TEXT,
+                                    context.resources.getQuantityString(
+                                        R.plurals.error_forwarding_messages,
+                                        error
+                                    )
+                                )
                                 context.sendBroadcast(this)
                             }
                         } else {
@@ -170,7 +173,10 @@ class CopyListener(
                         if (error > 0) {
                             exportListener?.errorImportingNodes() ?: run {
                                 snackbarShower.showSnackbar(
-                                    getQuantityString(R.plurals.context_link_export_error, error)
+                                    context.resources.getQuantityString(
+                                        R.plurals.context_link_export_error,
+                                        error
+                                    )
                                 )
                             }
                         } else {

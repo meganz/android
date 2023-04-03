@@ -20,8 +20,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetInboxNode
-import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
@@ -51,7 +49,9 @@ import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -106,8 +106,8 @@ class ManagerViewModelTest {
         onBlocking { invoke() }.thenReturn(
             flow { awaitCancellation() })
     }
-    private val getPrimarySyncHandle = mock<GetPrimarySyncHandle>()
-    private val getSecondarySyncHandle = mock<GetSecondarySyncHandle>()
+    private val getPrimarySyncHandleUseCase = mock<GetPrimarySyncHandleUseCase>()
+    private val getSecondarySyncHandleUseCase = mock<GetSecondarySyncHandleUseCase>()
     private val checkCameraUpload = mock<CheckCameraUpload>()
     private val getCloudSortOrder =
         mock<GetCloudSortOrder> { onBlocking { invoke() }.thenReturn(SortOrder.ORDER_ALPHABETICAL_ASC) }
@@ -167,7 +167,8 @@ class ManagerViewModelTest {
         mock<RequireTwoFactorAuthenticationUseCase>()
     private val setLatestTargetPath = mock<SetLatestTargetPath>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
-    private val establishCameraUploadsSyncHandles = mock<EstablishCameraUploadsSyncHandles>()
+    private val establishCameraUploadsSyncHandlesUseCase =
+        mock<EstablishCameraUploadsSyncHandlesUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -187,8 +188,8 @@ class ManagerViewModelTest {
             getInboxNode = getInboxNode,
             monitorStorageStateEventUseCase = monitorStorageState,
             monitorViewType = monitorViewType,
-            getPrimarySyncHandle = getPrimarySyncHandle,
-            getSecondarySyncHandle = getSecondarySyncHandle,
+            getPrimarySyncHandleUseCase = getPrimarySyncHandleUseCase,
+            getSecondarySyncHandleUseCase = getSecondarySyncHandleUseCase,
             checkCameraUpload = checkCameraUpload,
             getCloudSortOrder = getCloudSortOrder,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
@@ -205,9 +206,9 @@ class ManagerViewModelTest {
             requireTwoFactorAuthenticationUseCase = requireTwoFactorAuthenticationUseCase,
             setLatestTargetPath = setLatestTargetPath,
             monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
-            listenToNewMedia = mock(),
+            listenToNewMediaUseCase = mock(),
             monitorUserUpdates = monitorUserUpdates,
-            establishCameraUploadsSyncHandles = establishCameraUploadsSyncHandles,
+            establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
         )
     }
 
@@ -491,6 +492,6 @@ class ManagerViewModelTest {
             whenever(monitorUserUpdates()).thenReturn(userUpdates.asFlow())
             testScheduler.advanceUntilIdle()
 
-            verify(establishCameraUploadsSyncHandles).invoke()
+            verify(establishCameraUploadsSyncHandlesUseCase).invoke()
         }
 }

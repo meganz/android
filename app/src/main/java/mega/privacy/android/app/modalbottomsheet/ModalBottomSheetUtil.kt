@@ -18,7 +18,6 @@ import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil.manageURLNode
 import mega.privacy.android.app.utils.MegaNodeUtil.setupStreamingServer
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.ThumbnailUtils
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaNode
@@ -69,16 +68,22 @@ object ModalBottomSheetUtil {
         val localPath = FileUtil.getLocalFile(node)
         if (localPath != null) {
             val mediaFile = File(localPath)
-            mediaIntent.setDataAndType(FileProvider.getUriForFile(app,
-                Constants.AUTHORITY_STRING_FILE_PROVIDER,
-                mediaFile), MimeTypeList.typeForName(node.name).type)
+            mediaIntent.setDataAndType(
+                FileProvider.getUriForFile(
+                    app,
+                    Constants.AUTHORITY_STRING_FILE_PROVIDER,
+                    mediaFile
+                ), MimeTypeList.typeForName(node.name).type
+            )
             mediaIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } else {
             setupStreamingServer(megaApi, context)
             val url = megaApi.httpServerGetLocalLink(node)
             if (url == null) {
-                Util.showSnackbar(context,
-                    StringResourcesUtils.getString(R.string.error_open_file_with))
+                Util.showSnackbar(
+                    context,
+                    context.getString(R.string.error_open_file_with)
+                )
             } else {
                 mediaIntent.setDataAndType(Uri.parse(url), mimeType)
             }
@@ -90,8 +95,10 @@ object ModalBottomSheetUtil {
         } else if (this != null && nodeDownloader != null && localPath == null) {
             return this.showCannotOpenFileDialog(context, node, nodeDownloader)
         } else {
-            Util.showSnackbar(context,
-                StringResourcesUtils.getString(R.string.intent_not_available_file))
+            Util.showSnackbar(
+                context,
+                context.getString(R.string.intent_not_available_file)
+            )
         }
 
         return null
@@ -115,7 +122,8 @@ object ModalBottomSheetUtil {
         MaterialAlertDialogBuilder(context)
             .setTitle(getString(R.string.dialog_cannot_open_file_title))
             .setMessage(getString(R.string.dialog_cannot_open_file_text))
-            .setPositiveButton(getString(R.string.context_download)
+            .setPositiveButton(
+                getString(R.string.context_download)
             ) { _, _ ->
                 nodeDownloader(node)
                 this.dismissAllowingStateLoss()
@@ -174,8 +182,13 @@ object ModalBottomSheetUtil {
             params.height = params.width
             val margin = Util.dp2px(Constants.THUMB_MARGIN_DP.toFloat())
             params.setMargins(margin, margin, margin, margin)
-            nodeThumb.setImageBitmap(ThumbnailUtils.getRoundedBitmap(context, thumb, Util.dp2px(
-                Constants.THUMB_CORNER_RADIUS_DP)))
+            nodeThumb.setImageBitmap(
+                ThumbnailUtils.getRoundedBitmap(
+                    context, thumb, Util.dp2px(
+                        Constants.THUMB_CORNER_RADIUS_DP
+                    )
+                )
+            )
         } else {
             params.width = Util.dp2px(Constants.ICON_SIZE_DP.toFloat())
             params.height = params.width

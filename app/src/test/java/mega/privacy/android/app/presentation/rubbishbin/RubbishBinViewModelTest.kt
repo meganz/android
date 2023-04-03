@@ -14,10 +14,12 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -42,6 +44,7 @@ class RubbishBinViewModelTest {
     private val getNodeByHandle = mock<GetNodeByHandle>()
     private val setViewType = mock<SetViewType>()
     private val monitorViewType = mock<MonitorViewType>()
+    private val getCloudSortOrder = mock<GetCloudSortOrder>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -60,7 +63,8 @@ class RubbishBinViewModelTest {
             getRubbishBinChildren = getRubbishBinChildren,
             getNodeByHandle = getNodeByHandle,
             setViewType = setViewType,
-            monitorViewType = monitorViewType
+            monitorViewType = monitorViewType,
+            getCloudSortOrder = getCloudSortOrder
         )
     }
 
@@ -107,6 +111,8 @@ class RubbishBinViewModelTest {
             whenever(getRubbishBinChildren(newValue)).thenReturn(
                 listOf(mock(), mock())
             )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
             val update = mapOf<Node, List<NodeChanges>>(
                 mock<Node>() to emptyList(),
                 mock<Node>() to emptyList()
@@ -187,6 +193,7 @@ class RubbishBinViewModelTest {
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             underTest.refreshNodes()
             underTest.onLongItemClicked(
                 NodeUIItem(
@@ -214,6 +221,8 @@ class RubbishBinViewModelTest {
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
             underTest.refreshNodes()
             underTest.onLongItemClicked(
                 NodeUIItem(
@@ -248,6 +257,8 @@ class RubbishBinViewModelTest {
             whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
                 listOf(nodesListItem1, nodesListItem2)
             )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
             underTest.refreshNodes()
             underTest.onLongItemClicked(
                 NodeUIItem(

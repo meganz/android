@@ -5,7 +5,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.kotlin.blockingSubscribeBy
 import mega.privacy.android.app.ShareInfo
 import mega.privacy.android.app.components.textFormatter.TextFormatterUtils.INVALID_INDEX
-import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.app.data.extensions.getInfo
 import mega.privacy.android.app.namecollision.data.NameCollisionChoice
 import mega.privacy.android.app.namecollision.data.NameCollisionResult
 import mega.privacy.android.app.uploadFolder.list.data.FolderContent
@@ -15,6 +15,7 @@ import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.usecase.UploadUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.RxUtil.blockingGetOrNull
+import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.exception.EmptyFolderException
 import mega.privacy.android.domain.exception.EmptySearchException
@@ -47,7 +48,10 @@ class GetFolderContentUseCase @Inject constructor(
      * @param currentFolder Current FolderContent Data from which the content has to be get.
      * @return Single with the list of FolderContent Data representing files and folders.
      */
-    private fun get(currentFolder: FolderContent.Data): Single<List<FolderContent.Data>> =
+    private fun get(
+        currentFolder: FolderContent.Data,
+        context: Context,
+    ): Single<List<FolderContent.Data>> =
         Single.create { emitter ->
             val listFiles = currentFolder.document.listFiles()
             if (listFiles.isEmpty()) {
@@ -56,7 +60,13 @@ class GetFolderContentUseCase @Inject constructor(
                 val folderContentList = mutableListOf<FolderContent.Data>()
 
                 listFiles.forEach { file ->
-                    folderContentList.add(FolderContent.Data(currentFolder, file))
+                    folderContentList.add(
+                        FolderContent.Data(
+                            currentFolder,
+                            file,
+                            info = file.getInfo(context = context)
+                        )
+                    )
                 }
 
                 emitter.onSuccess(folderContentList)
@@ -77,9 +87,10 @@ class GetFolderContentUseCase @Inject constructor(
         currentFolder: FolderContent.Data,
         order: SortOrder,
         isList: Boolean,
+        context: Context,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
-            get(currentFolder).blockingSubscribeBy(
+            get(currentFolder, context).blockingSubscribeBy(
                 onError = { error -> emitter.onError(error) },
                 onSuccess = { results ->
                     completeAndReorder(results, order, isList).blockingSubscribeBy(
@@ -133,15 +144,17 @@ class GetFolderContentUseCase @Inject constructor(
 
                 val results = ArrayList<UploadFolderResult>()
 
-                get(folderItem).blockingSubscribeBy(
+                get(folderItem, context).blockingSubscribeBy(
                     onError = { error -> emitter.onError(error) },
                     onSuccess = { folderContent ->
                         folderContent.forEach { item ->
                             getContentToUpload(context, newParentNode, item)
                                 .blockingSubscribeBy(
                                     onError = { error ->
-                                        Timber.w(error,
-                                            "Ignored error")
+                                        Timber.w(
+                                            error,
+                                            "Ignored error"
+                                        )
                                     },
                                     onSuccess = { urisResult ->
                                         results.addAll(urisResult)
@@ -552,16 +565,17 @@ class GetFolderContentUseCase @Inject constructor(
     private fun search(
         query: String,
         currentFolder: FolderContent.Data,
+        context: Context,
     ): Single<MutableList<FolderContent.Data>> =
         Single.create { emitter ->
             val searchResults = mutableListOf<FolderContent.Data>()
 
-            get(currentFolder).blockingSubscribeBy(
+            get(currentFolder, context = context).blockingSubscribeBy(
                 onError = { error -> emitter.onError(error) },
                 onSuccess = { folderContentList ->
                     folderContentList.forEach { item ->
                         if (item.isFolder) {
-                            search(query, item).blockingSubscribeBy(
+                            search(query, item, context).blockingSubscribeBy(
                                 onError = { error -> Timber.w(error, "Ignored error") },
                                 onSuccess = { results -> searchResults.addAll(results) }
                             )
@@ -596,9 +610,10 @@ class GetFolderContentUseCase @Inject constructor(
         currentFolder: FolderContent.Data,
         order: SortOrder,
         isList: Boolean,
+        context: Context,
     ): Single<MutableList<FolderContent>> =
         Single.create { emitter ->
-            search(query, currentFolder).blockingSubscribeBy(
+            search(query, currentFolder, context).blockingSubscribeBy(
                 onError = { error -> emitter.onError(error) },
                 onSuccess = { results ->
                     completeAndReorder(results, order, isList).blockingSubscribeBy(

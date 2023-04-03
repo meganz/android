@@ -36,18 +36,18 @@ import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadOption
-import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQuality
-import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
-import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompression
+import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadOption
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQuality
-import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatus
-import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimit
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import javax.inject.Inject
 
 /**
@@ -58,23 +58,23 @@ import javax.inject.Inject
  * @property clearCacheDirectory Clear all the contents of the internal cache directory
  * @property disableCameraUploadsInDatabase Disable Camera Uploads by manipulating values in the database
  * @property disableMediaUploadSettings Disable Media Uploads by manipulating a certain value in the database
- * @property getUploadOption Retrieves the upload option of Camera Uploads
- * @property getUploadVideoQuality Retrieves the Video Quality of Videos to be uploaded
- * @property getVideoCompressionSizeLimit Retrieve the maximum video file size that can be compressed
+ * @property getUploadOptionUseCase Retrieves the upload option of Camera Uploads
+ * @property getUploadVideoQualityUseCase Retrieves the Video Quality of Videos to be uploaded
+ * @property getVideoCompressionSizeLimitUseCase Retrieve the maximum video file size that can be compressed
  * @property isCameraUploadsByWifiUseCase Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
- * @property isChargingRequiredForVideoCompression Checks whether compressing videos require the device to be charged or not
+ * @property isChargingRequiredForVideoCompressionUseCase Checks whether compressing videos require the device to be charged or not
  * @property monitorConnectivityUseCase Monitor the device online status
  * @property resetCameraUploadTimeStamps Reset the Primary and Secondary Timestamps
  * @property resetMediaUploadTimeStamps Reset the Secondary Timestamps
  * @property restorePrimaryTimestamps Restore the Primary Timestamps
  * @property restoreSecondaryTimestamps Restore the Secondary Timestamps
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
- * @property setChargingRequiredForVideoCompression Sets whether compressing videos require the device to be charged or not
+ * @property setChargingRequiredForVideoCompressionUseCase Sets whether compressing videos require the device to be charged or not
  * @property setLocationTagsEnabledUseCase Sets whether Location Tags should be embedded in each Photo to be uploaded or not
- * @property setUploadOption Sets the new upload option of Camera Uploads
- * @property setUploadVideoQuality Sets the new Video Quality of Videos to be uploaded
- * @property setUploadVideoSyncStatus Sets the new Sync Status of Videos to be uploaded
- * @property setVideoCompressionSizeLimit Sets the maximum video file size that can be compressed
+ * @property setUploadOptionUseCase Sets the new upload option of Camera Uploads
+ * @property setUploadVideoQualityUseCase Sets the new Video Quality of Videos to be uploaded
+ * @property setUploadVideoSyncStatusUseCase Sets the new Sync Status of Videos to be uploaded
+ * @property setVideoCompressionSizeLimitUseCase Sets the maximum video file size that can be compressed
  * @property setupDefaultSecondaryFolder Sets up a default Secondary Folder of Camera Uploads
  * @property setupPrimaryFolder Sets up the Primary Folder of Camera Uploads
  * @property setupSecondaryFolder Sets up the Secondary Folder of Camera Uploads
@@ -86,23 +86,23 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val clearCacheDirectory: ClearCacheDirectory,
     private val disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase,
     private val disableMediaUploadSettings: DisableMediaUploadSettings,
-    private val getUploadOption: GetUploadOption,
-    private val getUploadVideoQuality: GetUploadVideoQuality,
-    private val getVideoCompressionSizeLimit: GetVideoCompressionSizeLimit,
+    private val getUploadOptionUseCase: GetUploadOptionUseCase,
+    private val getUploadVideoQualityUseCase: GetUploadVideoQualityUseCase,
+    private val getVideoCompressionSizeLimitUseCase: GetVideoCompressionSizeLimitUseCase,
     private val isCameraUploadsByWifiUseCase: IsCameraUploadsByWifiUseCase,
-    private val isChargingRequiredForVideoCompression: IsChargingRequiredForVideoCompression,
+    private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
     private val restoreSecondaryTimestamps: RestoreSecondaryTimestamps,
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
-    private val setChargingRequiredForVideoCompression: SetChargingRequiredForVideoCompression,
+    private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
     private val setLocationTagsEnabledUseCase: SetLocationTagsEnabledUseCase,
-    private val setUploadOption: SetUploadOption,
-    private val setUploadVideoQuality: SetUploadVideoQuality,
-    private val setUploadVideoSyncStatus: SetUploadVideoSyncStatus,
-    private val setVideoCompressionSizeLimit: SetVideoCompressionSizeLimit,
+    private val setUploadOptionUseCase: SetUploadOptionUseCase,
+    private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
+    private val setUploadVideoSyncStatusUseCase: SetUploadVideoSyncStatusUseCase,
+    private val setVideoCompressionSizeLimitUseCase: SetVideoCompressionSizeLimitUseCase,
     private val setupDefaultSecondaryFolder: SetupDefaultSecondaryFolder,
     private val setupPrimaryFolder: SetupPrimaryFolder,
     private val setupSecondaryFolder: SetupSecondaryFolder,
@@ -337,7 +337,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * @param uploadOption The new [UploadOption]
      */
     fun changeUploadOption(uploadOption: UploadOption) = viewModelScope.launch {
-        setUploadOption(uploadOption)
+        setUploadOptionUseCase(uploadOption)
         refreshUploadOption()
     }
 
@@ -360,8 +360,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun changeUploadVideoQuality(value: Int) = viewModelScope.launch {
         VideoQuality.values().find { it.value == value }?.let { videoQuality ->
-            setUploadVideoQuality(videoQuality)
-            setUploadVideoSyncStatus(
+            setUploadVideoQualityUseCase(videoQuality)
+            setUploadVideoSyncStatusUseCase(
                 if (videoQuality == VideoQuality.ORIGINAL) {
                     SyncStatus.STATUS_PENDING
                 } else {
@@ -380,7 +380,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun changeChargingRequiredForVideoCompression(chargingRequired: Boolean) =
         viewModelScope.launch {
-            setChargingRequiredForVideoCompression(chargingRequired)
+            setChargingRequiredForVideoCompressionUseCase(chargingRequired)
             refreshChargingRequiredForVideoCompression()
         }
 
@@ -390,7 +390,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * @param size The new video compression size limit
      */
     fun changeVideoCompressionSizeLimit(size: Int) = viewModelScope.launch {
-        setVideoCompressionSizeLimit(size)
+        setVideoCompressionSizeLimitUseCase(size)
         refreshVideoCompressionSizeLimit()
     }
 
@@ -401,11 +401,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
         viewModelScope.launch {
             val areLocationTagsIncluded = async { areLocationTagsEnabledUseCase() }
             val isChargingRequiredForVideoCompression =
-                async { isChargingRequiredForVideoCompression() }
+                async { isChargingRequiredForVideoCompressionUseCase() }
             val uploadConnectionType = async { getUploadConnectionType() }
-            val getUploadOption = async { getUploadOption() }
-            val videoCompressionSizeLimit = async { getVideoCompressionSizeLimit() }
-            val videoQuality = async { getUploadVideoQuality() }
+            val getUploadOption = async { getUploadOptionUseCase() }
+            val videoCompressionSizeLimit = async { getVideoCompressionSizeLimitUseCase() }
+            val videoQuality = async { getUploadVideoQualityUseCase() }
             _state.update {
                 it.copy(
                     areLocationTagsIncluded = areLocationTagsIncluded.await(),
@@ -433,7 +433,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Upload Connection type is set
      */
     private suspend fun refreshUploadOption() {
-        val uploadOption = getUploadOption()
+        val uploadOption = getUploadOptionUseCase()
         _state.update { it.copy(uploadOption = uploadOption) }
     }
 
@@ -451,7 +451,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * Video Quality has been set
      */
     private suspend fun refreshUploadVideoQuality() {
-        val videoQuality = getUploadVideoQuality()
+        val videoQuality = getUploadVideoQualityUseCase()
         _state.update { it.copy(videoQuality = videoQuality) }
     }
 
@@ -460,7 +460,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * a change to require charging for video compression is found
      */
     private suspend fun refreshChargingRequiredForVideoCompression() {
-        val isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression()
+        val isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompressionUseCase()
         _state.update {
             it.copy(isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression)
         }
@@ -471,7 +471,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      * maximum video compression size limit changes
      */
     private suspend fun refreshVideoCompressionSizeLimit() {
-        val videoCompressionSizeLimit = getVideoCompressionSizeLimit()
+        val videoCompressionSizeLimit = getVideoCompressionSizeLimitUseCase()
         _state.update { it.copy(videoCompressionSizeLimit = videoCompressionSizeLimit) }
     }
 

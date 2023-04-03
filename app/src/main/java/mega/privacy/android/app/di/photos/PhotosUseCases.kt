@@ -13,11 +13,7 @@ import mega.privacy.android.domain.repository.SettingsRepository
 import mega.privacy.android.domain.usecase.DefaultEnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.DefaultFilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.DefaultFilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.DefaultFilterFavourite
-import mega.privacy.android.domain.usecase.DefaultFilterGIF
-import mega.privacy.android.domain.usecase.DefaultFilterRAW
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumPhotos
-import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.DefaultGetPreview
 import mega.privacy.android.domain.usecase.DefaultGetThumbnail
 import mega.privacy.android.domain.usecase.DefaultGetTypedNodesFromFolder
@@ -31,11 +27,7 @@ import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.FilterFavourite
-import mega.privacy.android.domain.usecase.FilterGIF
-import mega.privacy.android.domain.usecase.FilterRAW
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
-import mega.privacy.android.domain.usecase.GetDefaultAlbumsMap
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPreview
 import mega.privacy.android.domain.usecase.GetThumbnail
@@ -74,18 +66,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindGetDefaultAlbumPhotos(useCase: DefaultGetDefaultAlbumPhotos): GetDefaultAlbumPhotos
-
-    @Binds
-    abstract fun bindFilterFavourite(useCase: DefaultFilterFavourite): FilterFavourite
-
-    @Binds
-    abstract fun bindFilterGIF(useCase: DefaultFilterGIF): FilterGIF
-
-    @Binds
-    abstract fun bindFilterRAW(useCase: DefaultFilterRAW): FilterRAW
-
-    @Binds
-    abstract fun bindGetDefaultAlbumsMap(useCase: DefaultGetDefaultAlbumsMap): GetDefaultAlbumsMap
 
     @Binds
     abstract fun bindGetTypedNodesFromFolder(useCase: DefaultGetTypedNodesFromFolder): GetTypedNodesFromFolder

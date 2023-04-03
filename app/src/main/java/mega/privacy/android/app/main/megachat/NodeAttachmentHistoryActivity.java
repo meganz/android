@@ -105,7 +105,6 @@ import mega.privacy.android.app.usecase.CopyNodeUseCase;
 import mega.privacy.android.app.utils.AlertsAndWarnings;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.app.utils.MegaProgressDialogUtil;
-import mega.privacy.android.app.utils.StringResourcesUtils;
 import mega.privacy.android.app.utils.permission.PermissionUtils;
 import mega.privacy.android.domain.entity.StorageState;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1188,7 +1187,7 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
                                         showSnackbar(SNACKBAR_TYPE, copyThrowable == null
                                                         ? copyRequestMessageMapper.invoke(copyResult)
-                                                        : StringResourcesUtils.getString(R.string.import_success_error),
+                                                        : getString(R.string.import_success_error),
                                                 MEGACHAT_INVALID_HANDLE);
                                     });
                         }

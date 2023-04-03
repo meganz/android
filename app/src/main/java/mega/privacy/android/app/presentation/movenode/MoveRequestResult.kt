@@ -1,11 +1,10 @@
 package mega.privacy.android.app.presentation.movenode
 
+import android.content.Context
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult.GeneralMovement
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult.Restoration
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult.RubbishMovement
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 
@@ -68,6 +67,7 @@ sealed class MoveRequestResult(
         count: Int,
         errorCount: Int,
         oldParentHandle: Long?,
+        private val context: Context,
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount,
@@ -76,30 +76,34 @@ sealed class MoveRequestResult(
         override fun getResultText(): String =
             when {
                 count == 1 && isSuccess -> {
-                    getString(R.string.context_correctly_moved_to_rubbish)
+                    context.getString(R.string.context_correctly_moved_to_rubbish)
                 }
                 count == 1 -> {
-                    getString(R.string.context_no_moved)
+                    context.getString(R.string.context_no_moved)
                 }
                 isSuccess -> {
-                    getQuantityString(R.plurals.number_correctly_moved_to_rubbish, count, count)
+                    context.resources.getQuantityString(
+                        R.plurals.number_correctly_moved_to_rubbish,
+                        count,
+                        count
+                    )
                 }
                 count == errorCount -> {
-                    getQuantityString(
+                    context.resources.getQuantityString(
                         R.plurals.number_incorrectly_moved_to_rubbish,
                         errorCount,
                         errorCount
                     )
                 }
                 errorCount == 1 -> {
-                    getQuantityString(
+                    context.resources.getQuantityString(
                         R.plurals.nodes_correctly_and_node_incorrectly_moved_to_rubbish,
                         successCount,
                         successCount
                     )
                 }
                 successCount == 1 -> {
-                    getQuantityString(
+                    context.resources.getQuantityString(
                         R.plurals.node_correctly_and_nodes_incorrectly_moved_to_rubbish,
                         errorCount,
                         errorCount
@@ -107,13 +111,13 @@ sealed class MoveRequestResult(
                 }
                 else -> {
                     StringBuilder().append(
-                        getQuantityString(
+                        context.resources.getQuantityString(
                             R.plurals.number_correctly_moved_to_rubbish,
                             successCount,
                             successCount
                         )
                     ).append(". ").append(
-                        getQuantityString(
+                        context.resources.getQuantityString(
                             R.plurals.number_incorrectly_moved_to_rubbish,
                             errorCount,
                             errorCount
@@ -130,6 +134,7 @@ sealed class MoveRequestResult(
         count: Int,
         errorCount: Int,
         val destination: MegaNode?,
+        private val context: Context,
     ) : MoveRequestResult(
         count = count,
         errorCount = errorCount
@@ -139,37 +144,40 @@ sealed class MoveRequestResult(
                 count == 1 && isSuccess -> {
 
                     if (destination != null) {
-                        getString(R.string.context_correctly_node_restored, destination.name)
+                        context.getString(
+                            R.string.context_correctly_node_restored,
+                            destination.name
+                        )
                     } else {
-                        getString(R.string.context_correctly_moved)
+                        context.getString(R.string.context_correctly_moved)
                     }
                 }
                 count == 1 -> {
-                    getString(R.string.context_no_restored)
+                    context.getString(R.string.context_no_restored)
                 }
                 isSuccess -> {
-                    getQuantityString(
+                    context.resources.getQuantityString(
                         R.plurals.number_correctly_restored_from_rubbish,
                         count,
                         count
                     )
                 }
                 count == errorCount -> {
-                    getQuantityString(
+                    context.resources.getQuantityString(
                         R.plurals.number_incorrectly_restored_from_rubbish,
                         errorCount,
                         errorCount
                     )
                 }
                 errorCount == 1 -> {
-                    getQuantityString(
+                    context.resources.getQuantityString(
                         R.plurals.nodes_correctly_and_node_incorrectly_restored_from_rubbish,
                         successCount,
                         successCount
                     )
                 }
                 successCount == 1 -> {
-                    getQuantityString(
+                    context.resources.getQuantityString(
                         R.plurals.node_correctly_and_nodes_incorrectly_restored_from_rubbish,
                         errorCount,
                         errorCount
@@ -177,13 +185,13 @@ sealed class MoveRequestResult(
                 }
                 else -> {
                     StringBuilder().append(
-                        getQuantityString(
+                        context.resources.getQuantityString(
                             R.plurals.number_correctly_restored_from_rubbish,
                             successCount,
                             successCount
                         )
                     ).append(". ").append(
-                        getQuantityString(
+                        context.resources.getQuantityString(
                             R.plurals.number_incorrectly_restored_from_rubbish,
                             errorCount,
                             errorCount

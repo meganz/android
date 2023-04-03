@@ -12,6 +12,7 @@ import mega.privacy.android.core.ui.theme.dark_grey
 import mega.privacy.android.core.ui.theme.green_400
 import mega.privacy.android.core.ui.theme.green_500
 import mega.privacy.android.core.ui.theme.grey_alpha_012
+import mega.privacy.android.core.ui.theme.grey_alpha_038
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_060
 import mega.privacy.android.core.ui.theme.grey_alpha_087
@@ -128,11 +129,28 @@ val Colors.red_800_red_400: Color
     get() = if (isLight) red_800 else red_400
 
 /**
+ * Color for [grey_alpha_012] when light and [white_alpha_012] when dark
+ */
+val Colors.grey_white_alpha_012: Color
+    get() = if (isLight) grey_alpha_012 else white_alpha_012
+
+/**
+ * Color for [grey_alpha_038] when light and [white_alpha_038] when dark
+ */
+val Colors.grey_white_alpha_038: Color
+    get() = if (isLight) grey_alpha_038 else white_alpha_038
+
+/**
+ * Color for grey alpha when light [grey_alpha_054] and when dark [white_alpha_054]
+ */
+val Colors.grey_white_alpha_054: Color
+    get() = if (isLight) grey_alpha_054 else white_alpha_054
+
+/**
  * Color for grey alpha when light [grey_alpha_060] and when dark [white_alpha_060]
  */
 val Colors.grey_white_alpha_060: Color
     get() = if (isLight) grey_alpha_060 else white_alpha_060
-
 /**
  * Color for grey alpha when light [grey_alpha_087] and yellow when dark [yellow_700]
  */

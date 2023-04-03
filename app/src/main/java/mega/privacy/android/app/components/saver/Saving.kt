@@ -45,7 +45,7 @@ abstract class Saving : Parcelable {
         parentPath: String,
         externalSDCard: Boolean,
         sdCardOperator: SDCardOperator?,
-        snackbarShower: SnackbarShower?
+        snackbarShower: SnackbarShower?,
     ): AutoPlayInfo
 
 
@@ -53,7 +53,7 @@ abstract class Saving : Parcelable {
 
     companion object {
         @Parcelize
-        object NOTHING  : Saving() {
+        object NOTHING : Saving() {
             override fun totalSize() = 0L
 
             override fun hasUnsupportedFile(context: Context): Boolean = false
@@ -66,7 +66,7 @@ abstract class Saving : Parcelable {
                 parentPath: String,
                 externalSDCard: Boolean,
                 sdCardOperator: SDCardOperator?,
-                snackbarShower: SnackbarShower?
+                snackbarShower: SnackbarShower?,
             ) = AutoPlayInfo.NO_AUTO_PLAY
 
             override fun isDownloadForPreview(): Boolean = false

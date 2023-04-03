@@ -39,7 +39,6 @@ import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewFolderDialogSta
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.checkNewTextFileDialogState
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewFolderDialog
 import mega.privacy.android.app.utils.MegaNodeDialogUtil.showNewTxtFileDialog
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util.checkTakePicture
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import nz.mega.documentscanner.DocumentScannerActivity
@@ -123,7 +122,7 @@ internal class ManagerUploadBottomSheetDialogActionHandler @Inject constructor(
                         intent.getStringExtra(DocumentScannerActivity.EXTRA_PICKED_SAVE_DESTINATION)
                     val fileIntent =
                         Intent(managerActivity, FileExplorerActivity::class.java).apply {
-                            if (StringResourcesUtils.getString(R.string.section_chat) == savedDestination) {
+                            if (activity.getString(R.string.section_chat) == savedDestination) {
                                 action = FileExplorerActivity.ACTION_UPLOAD_TO_CHAT
                             } else {
                                 action = FileExplorerActivity.ACTION_SAVE_TO_CLOUD

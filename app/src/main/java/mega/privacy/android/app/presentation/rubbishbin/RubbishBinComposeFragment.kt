@@ -14,10 +14,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
+import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.view.NodesView
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -51,8 +54,6 @@ class RubbishBinComposeFragment : Fragment() {
 
     private val viewModel: RubbishBinViewModel by activityViewModels()
 
-    private val sortOrderViewModel: SortByHeaderViewModel by activityViewModels()
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -72,9 +73,12 @@ class RubbishBinComposeFragment : Fragment() {
                         onMenuClick = { },
                         onItemClicked = viewModel::onItemClicked,
                         onLongClick = viewModel::onLongItemClicked,
-                        sortOrder = sortOrderViewModel.order.first.name,
+                        sortOrder = getString(
+                            SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
+                                ?: R.string.sortby_name
+                        ),
                         isListView = uiState.currentViewType == ViewType.LIST,
-                        onSortOrderClick = { },
+                        onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                     )
                 }
@@ -87,5 +91,12 @@ class RubbishBinComposeFragment : Fragment() {
      */
     fun onBackPressed() {
 
+    }
+
+    /**
+     * Shows the Sort by panel.
+     */
+    private fun showSortByPanel() {
+        (requireActivity() as ManagerActivity).showNewSortByPanel(Constants.ORDER_CLOUD)
     }
 }

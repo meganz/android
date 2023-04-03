@@ -23,8 +23,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.domain.usecase.GetInboxNode
-import mega.privacy.android.app.domain.usecase.GetPrimarySyncHandle
-import mega.privacy.android.app.domain.usecase.GetSecondarySyncHandle
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.featuretoggle.AppFeatures
@@ -65,8 +63,10 @@ import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
-import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandles
-import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMedia
+import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
@@ -87,8 +87,8 @@ import javax.inject.Inject
  * @property savedStateHandle
  * @property monitorStorageStateEventUseCase
  * @property monitorViewType
- * @property getPrimarySyncHandle
- * @property getSecondarySyncHandle
+ * @property getPrimarySyncHandleUseCase
+ * @property getSecondarySyncHandleUseCase
  * @property checkCameraUpload
  * @property getCloudSortOrder
  * @property monitorConnectivityUseCase
@@ -121,8 +121,8 @@ class ManagerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val monitorViewType: MonitorViewType,
-    private val getPrimarySyncHandle: GetPrimarySyncHandle,
-    private val getSecondarySyncHandle: GetSecondarySyncHandle,
+    private val getPrimarySyncHandleUseCase: GetPrimarySyncHandleUseCase,
+    private val getSecondarySyncHandleUseCase: GetSecondarySyncHandleUseCase,
     private val checkCameraUpload: CheckCameraUpload,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -139,9 +139,9 @@ class ManagerViewModel @Inject constructor(
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val setLatestTargetPath: SetLatestTargetPath,
     private val monitorSecurityUpgradeInApp: MonitorSecurityUpgradeInApp,
-    private val listenToNewMedia: ListenToNewMedia,
+    private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
-    private val establishCameraUploadsSyncHandles: EstablishCameraUploadsSyncHandles,
+    private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
 ) : ViewModel() {
 
     /**
@@ -234,7 +234,7 @@ class ManagerViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            listenToNewMedia()
+            listenToNewMediaUseCase()
         }
         viewModelScope.launch {
             monitorUserUpdates()
@@ -244,7 +244,7 @@ class ManagerViewModel @Inject constructor(
                         "The Camera Uploads Sync Handles have been changed in the API + " +
                                 "Refresh the Sync Handles"
                     )
-                    establishCameraUploadsSyncHandles()
+                    establishCameraUploadsSyncHandlesUseCase()
                 }
         }
     }
@@ -433,8 +433,8 @@ class ManagerViewModel @Inject constructor(
      */
     fun checkCameraUploadFolder(shouldDisable: Boolean, updatedNodes: List<Node>?) {
         viewModelScope.launch {
-            val primaryHandle = getPrimarySyncHandle()
-            val secondaryHandle = getSecondarySyncHandle()
+            val primaryHandle = getPrimarySyncHandleUseCase()
+            val secondaryHandle = getSecondarySyncHandleUseCase()
             updatedNodes?.let {
                 val nodeMap = it.associateBy { node -> node.id.longValue }
                 // If CU and MU folder don't change then return.
@@ -501,7 +501,10 @@ class ManagerViewModel @Inject constructor(
      */
     fun checkToShow2FADialog(newAccount: Boolean, firstLogin: Boolean) {
         viewModelScope.launch {
-            val result = requireTwoFactorAuthenticationUseCase(newAccount = newAccount, firstLogin = firstLogin)
+            val result = requireTwoFactorAuthenticationUseCase(
+                newAccount = newAccount,
+                firstLogin = firstLogin,
+            )
             _state.update { it.copy(show2FADialog = result) }
         }
     }

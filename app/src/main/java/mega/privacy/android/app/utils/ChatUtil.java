@@ -37,7 +37,6 @@ import static mega.privacy.android.app.utils.ContactUtil.isContact;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
 import static mega.privacy.android.app.utils.FileUtil.shareFile;
 import static mega.privacy.android.app.utils.MegaNodeUtil.startShareIntent;
-import static mega.privacy.android.app.utils.StringResourcesUtils.getString;
 import static mega.privacy.android.app.utils.TextUtil.isTextEmpty;
 import static mega.privacy.android.app.utils.TextUtil.removeFormatPlaceholder;
 import static mega.privacy.android.app.utils.TimeUtils.getCorrectStringDependingOnOptionSelected;
@@ -75,6 +74,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SwitchCompat;
@@ -109,12 +109,12 @@ import mega.privacy.android.app.main.controllers.ChatController;
 import mega.privacy.android.app.main.listeners.ManageReactionListener;
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage;
 import mega.privacy.android.app.main.megachat.ChatActivity;
-import mega.privacy.android.data.model.ChatSettings;
 import mega.privacy.android.app.main.megachat.GroupChatInfoActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
 import mega.privacy.android.app.main.megachat.PendingMessageSingle;
 import mega.privacy.android.app.main.megachat.RemovedMessage;
 import mega.privacy.android.app.textEditor.TextEditorActivity;
+import mega.privacy.android.data.model.ChatSettings;
 import mega.privacy.android.domain.entity.VideoQuality;
 import nz.mega.sdk.AndroidGfxProcessor;
 import nz.mega.sdk.MegaApiAndroid;
@@ -990,7 +990,7 @@ public class ChatUtil {
      * Method to display a dialog to mute a list of chats.
      *
      * @param context Context of Activity.
-     * @param chatIds  Chat IDs.
+     * @param chatIds Chat IDs.
      */
     public static void createMuteNotificationsAlertDialogOfChats(Activity context, List<Long> chatIds) {
         ArrayList<MegaChatListItem> chats = (ArrayList<MegaChatListItem>) chatIds.stream().map(chatId ->
@@ -1144,9 +1144,9 @@ public class ChatUtil {
      * @param notificationsSwitch   The SwitchCompat.
      * @param notificationsSubTitle The TextView with the info.
      */
-    public static void checkSpecificChatNotifications(long chatHandle, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle) {
+    public static void checkSpecificChatNotifications(long chatHandle, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle, @NonNull Context context) {
         if (MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting() != null) {
-            updateSwitchButton(chatHandle, notificationsSwitch, notificationsSubTitle);
+            updateSwitchButton(chatHandle, notificationsSwitch, notificationsSubTitle, context);
         }
     }
 
@@ -1157,7 +1157,7 @@ public class ChatUtil {
      * @param notificationsSwitch   The SwitchCompat.
      * @param notificationsSubTitle The TextView with the info.
      */
-    public static void updateSwitchButton(long chatId, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle) {
+    public static void updateSwitchButton(long chatId, final SwitchCompat notificationsSwitch, final TextView notificationsSubTitle, @NonNull Context context) {
         MegaPushNotificationSettings push = MegaApplication.getPushNotificationSettingManagement().getPushNotificationSetting();
         if (push == null)
             return;
@@ -1168,7 +1168,7 @@ public class ChatUtil {
             notificationsSubTitle.setVisibility(View.VISIBLE);
             notificationsSubTitle.setText(timestampMute == 0 ?
                     MegaApplication.getInstance().getString(R.string.mute_chatroom_notification_option_off) :
-                    getCorrectStringDependingOnOptionSelected(timestampMute));
+                    getCorrectStringDependingOnOptionSelected(timestampMute, context));
         } else {
             notificationsSwitch.setChecked(true);
             notificationsSubTitle.setVisibility(View.GONE);
@@ -1237,8 +1237,8 @@ public class ChatUtil {
      * @param message MegaChatMessage containing meta with type CONTAINS_META_INVALID.
      * @return String to show for invalid meta message.
      */
-    public static String getInvalidMetaMessage(MegaChatMessage message) {
-        String invalidMetaMessage = getString(R.string.error_meta_message_invalid);
+    public static String getInvalidMetaMessage(MegaChatMessage message, @NonNull Context context) {
+        String invalidMetaMessage = context.getString(R.string.error_meta_message_invalid);
 
         if (message == null) {
             return invalidMetaMessage;
@@ -1516,12 +1516,12 @@ public class ChatUtil {
      *
      * @param time The retention time in seconds.
      */
-    public static void updateRetentionTimeLayout(final TextView retentionTimeText, long time) {
+    public static void updateRetentionTimeLayout(final TextView retentionTimeText, long time, @NonNull Context context) {
         String timeFormatted = transformSecondsInString(time);
         if (isTextEmpty(timeFormatted)) {
             retentionTimeText.setVisibility(View.GONE);
         } else {
-            String subtitleText = getString(R.string.subtitle_properties_manage_chat) + " " + timeFormatted;
+            String subtitleText = context.getString(R.string.subtitle_properties_manage_chat) + " " + timeFormatted;
             retentionTimeText.setText(subtitleText);
             retentionTimeText.setVisibility(View.VISIBLE);
         }
@@ -1529,21 +1529,21 @@ public class ChatUtil {
 
     public static void showConfirmationLeaveChat(Context context, long chatId, ChatManagementCallback chatManagementCallback) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
-                .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
-                .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
+        builder.setTitle(context.getString(R.string.title_confirmation_leave_group_chat))
+                .setMessage(context.getString(R.string.confirmation_leave_group_chat))
+                .setPositiveButton(context.getString(R.string.general_leave), (dialog, which)
                         -> chatManagementCallback.confirmLeaveChat(chatId))
-                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .setNegativeButton(context.getString(R.string.general_cancel), null)
                 .show();
     }
 
     public static void showConfirmationLeaveChats(Context context, final List<MegaChatListItem> chats, ChatManagementCallback chatManagementCallback) {
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(context, R.style.ThemeOverlay_Mega_MaterialAlertDialog);
-        builder.setTitle(StringResourcesUtils.getString(R.string.title_confirmation_leave_group_chat))
-                .setMessage(StringResourcesUtils.getString(R.string.confirmation_leave_group_chat))
-                .setPositiveButton(StringResourcesUtils.getString(R.string.general_leave), (dialog, which)
+        builder.setTitle(context.getString(R.string.title_confirmation_leave_group_chat))
+                .setMessage(context.getString(R.string.confirmation_leave_group_chat))
+                .setPositiveButton(context.getString(R.string.general_leave), (dialog, which)
                         -> chatManagementCallback.confirmLeaveChats(chats))
-                .setNegativeButton(StringResourcesUtils.getString(R.string.general_cancel), null)
+                .setNegativeButton(context.getString(R.string.general_cancel), null)
                 .show();
     }
 
@@ -1796,12 +1796,12 @@ public class ChatUtil {
     public static void removeAttachmentMessage(Activity activity, long chatId,
                                                MegaChatMessage message) {
         new MaterialAlertDialogBuilder(activity)
-                .setMessage(getString(R.string.confirmation_delete_one_attachment))
-                .setPositiveButton(getString(R.string.context_remove), (dialog, which) -> {
+                .setMessage(activity.getString(R.string.confirmation_delete_one_attachment))
+                .setPositiveButton(activity.getString(R.string.context_remove), (dialog, which) -> {
                     new ChatController(activity).deleteMessage(message, chatId);
                     activity.finish();
                 })
-                .setNegativeButton(getString(R.string.general_cancel), null);
+                .setNegativeButton(activity.getString(R.string.general_cancel), null);
     }
 
     /**
@@ -1976,7 +1976,7 @@ public class ChatUtil {
     /**
      * Method to check if all user's contacts are participants of the chat.
      *
-     * @param chatId     Chat id
+     * @param chatId Chat id
      * @return True if all user's contacts are participants of the chat room or false otherwise.
      */
     public static boolean areAllMyContactsChatParticipants(Long chatId) {

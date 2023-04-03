@@ -65,7 +65,6 @@ import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccessAndNotTakenDown
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
 import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
@@ -342,7 +341,7 @@ class SearchFragment : RotatableFragment() {
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             val selected = adapter.selectedNodes
             menu?.findItem(R.id.cab_menu_share_link)?.title =
-                StringResourcesUtils.getQuantityString(R.plurals.get_links, selected.size)
+                requireContext().resources.getQuantityString(R.plurals.get_links, selected.size)
 
             val unselect = menu?.findItem(R.id.cab_menu_unselect_all)
             var showDownload = false

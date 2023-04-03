@@ -14,7 +14,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
-import mega.privacy.android.app.utils.StringResourcesUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
@@ -99,8 +98,12 @@ class InfoAchievementsFragment : Fragment() {
             }
 
         if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_MOBILE_INSTALL) {
-            icon.setImageDrawable(ContextCompat.getDrawable(requireContext(),
-                R.drawable.ic_install_mobile_big))
+            icon.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_install_mobile_big
+                )
+            )
             if (awardId == -1) {
                 Timber.w("No award for the achievement $achievementType")
                 val grantedStorage = achievements.allAchievements.first {
@@ -112,8 +115,10 @@ class InfoAchievementsFragment : Fragment() {
                     awardId
                 )
                 setFirstParagraphText(
-                    StringResourcesUtils.getString(R.string.paragraph_info_achievement_install_mobile_app,
-                        Util.getSizeString(grantedStorage))
+                    getString(
+                        R.string.paragraph_info_achievement_install_mobile_app,
+                        Util.getSizeString(grantedStorage, context)
+                    )
                 )
             } else {
                 val awardedStorage = achievements.awardedAchievements.first {
@@ -125,13 +130,19 @@ class InfoAchievementsFragment : Fragment() {
                     awardId
                 )
                 setFirstParagraphText(
-                    StringResourcesUtils.getString(R.string.result_paragraph_info_achievement_install_mobile_app,
-                        awardedStorage)
+                    getString(
+                        R.string.result_paragraph_info_achievement_install_mobile_app,
+                        awardedStorage
+                    )
                 )
             }
         } else if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_ADD_PHONE) {
-            icon.setImageDrawable(ContextCompat.getDrawable(requireContext(),
-                R.drawable.il_verify_phone_drawer))
+            icon.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.il_verify_phone_drawer
+                )
+            )
             if (awardId == -1) {
                 Timber.d("No award for the achievement $achievementType")
                 val grantedStorage = achievements.allAchievements.first {
@@ -143,8 +154,10 @@ class InfoAchievementsFragment : Fragment() {
                     awardId
                 )
                 setFirstParagraphText(
-                    StringResourcesUtils.getString(R.string.paragraph_info_achievement_add_phone,
-                        Util.getSizeString(grantedStorage))
+                    getString(
+                        R.string.paragraph_info_achievement_add_phone,
+                        Util.getSizeString(grantedStorage, context)
+                    )
                 )
             } else {
                 val awardedStorage = achievements.awardedAchievements.first {
@@ -156,13 +169,19 @@ class InfoAchievementsFragment : Fragment() {
                     awardId
                 )
                 setFirstParagraphText(
-                    StringResourcesUtils.getString(R.string.result_paragraph_info_achievement_add_phone,
-                        Util.getSizeString(awardedStorage))
+                    getString(
+                        R.string.result_paragraph_info_achievement_add_phone,
+                        Util.getSizeString(awardedStorage, context)
+                    )
                 )
             }
         } else if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_DESKTOP_INSTALL) {
-            icon.setImageDrawable(ContextCompat.getDrawable(requireContext(),
-                R.drawable.ic_install_mega_big))
+            icon.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_install_mega_big
+                )
+            )
             if (awardId == -1) {
                 Timber.w("No award for the achievement $achievementType")
                 val grantedStorage = achievements.allAchievements.first {
@@ -174,8 +193,10 @@ class InfoAchievementsFragment : Fragment() {
                     awardId
                 )
                 setFirstParagraphText(
-                    StringResourcesUtils.getString(R.string.paragraph_info_achievement_install_desktop,
-                        Util.getSizeString(grantedStorage))
+                    getString(
+                        R.string.paragraph_info_achievement_install_desktop,
+                        Util.getSizeString(grantedStorage, context)
+                    )
                 )
             } else {
                 val awardedStorage = achievements.awardedAchievements.first {
@@ -187,8 +208,10 @@ class InfoAchievementsFragment : Fragment() {
                     awardId
                 )
                 setFirstParagraphText(
-                    StringResourcesUtils.getString(R.string.result_paragraph_info_achievement_install_desktop,
-                        Util.getSizeString(awardedStorage))
+                    getString(
+                        R.string.result_paragraph_info_achievement_install_desktop,
+                        Util.getSizeString(awardedStorage, context)
+                    )
                 )
             }
         } else if (achievementType == MegaAchievementsDetails.MEGA_ACHIEVEMENT_WELCOME) {
@@ -196,15 +219,21 @@ class InfoAchievementsFragment : Fragment() {
                 it.awardId == awardId
             }.rewardedStorageInBytes
 
-            icon.setImageDrawable(ContextCompat.getDrawable(requireContext(),
-                R.drawable.ic_registration_big))
+            icon.setImageDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_registration_big
+                )
+            )
             setTitleView(
                 awardedStorage,
                 awardId
             )
             setFirstParagraphText(
-                getString(R.string.result_paragraph_info_achievement_registration,
-                    Util.getSizeString(awardedStorage))
+                getString(
+                    R.string.result_paragraph_info_achievement_registration,
+                    Util.getSizeString(awardedStorage, context)
+                )
             )
         }
     }
@@ -227,29 +256,45 @@ class InfoAchievementsFragment : Fragment() {
             checkIcon.visibility = View.GONE
             title.apply {
                 text =
-                    StringResourcesUtils.getString(R.string.figures_achievements_text,
-                        Util.getSizeString(storageValue))
-                setBackgroundColor(ContextCompat.getColor(requireContext(),
-                    android.R.color.transparent))
+                    getString(
+                        R.string.figures_achievements_text,
+                        Util.getSizeString(storageValue, context)
+                    )
+                setBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        android.R.color.transparent
+                    )
+                )
             }
             sectionTitle.visibility = View.VISIBLE
         } else {
             title.apply {
                 background = if (diffDays <= 15) {
-                    setTextColor(ContextCompat.getColor(requireContext(),
-                        R.color.red_600_red_300))
-                    ContextCompat.getDrawable(requireContext(),
-                        R.drawable.expired_border)
+                    setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.red_600_red_300
+                        )
+                    )
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.expired_border
+                    )
                 } else {
-                    ContextCompat.getDrawable(requireContext(),
-                        R.drawable.bonus_ts_border)
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.bonus_ts_border
+                    )
                 }
 
                 text = if (diffDays > 0) {
-                    StringResourcesUtils.getQuantityString(R.plurals.account_achievements_bonus_expiration_date,
-                        diffDays.toInt(), diffDays.toInt())
+                    resources.getQuantityString(
+                        R.plurals.account_achievements_bonus_expiration_date,
+                        diffDays.toInt(), diffDays.toInt()
+                    )
                 } else {
-                    StringResourcesUtils.getString(R.string.expired_label)
+                    getString(R.string.expired_label)
                 }
             }
         }

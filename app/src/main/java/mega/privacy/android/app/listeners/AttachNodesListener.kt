@@ -7,8 +7,6 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.interfaces.showSnackbar
 import mega.privacy.android.app.interfaces.showSnackbarWithChat
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
-import mega.privacy.android.app.utils.StringResourcesUtils.getQuantityString
-import mega.privacy.android.app.utils.StringResourcesUtils.getString
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
@@ -43,13 +41,16 @@ class AttachNodesListener(
                 if (successCount > 0) {
                     if (forceNonChatSnackbar) {
                         snackbarShower.showSnackbar(
-                            getQuantityString(R.plurals.files_send_to_chat_success, successCount)
+                            context.resources.getQuantityString(
+                                R.plurals.files_send_to_chat_success,
+                                successCount
+                            )
                         )
                     } else {
                         snackbarShower.showSnackbarWithChat(null, snackbarChatId)
                     }
                 } else {
-                    snackbarShower.showSnackbar(getString(R.string.files_send_to_chat_error))
+                    snackbarShower.showSnackbar(context.getString(R.string.files_send_to_chat_error))
                 }
 
                 onFinish()
