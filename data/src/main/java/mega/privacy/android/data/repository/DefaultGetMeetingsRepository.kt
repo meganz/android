@@ -138,13 +138,13 @@ internal class DefaultGetMeetingsRepository @Inject constructor(
             }
 
     override suspend fun getScheduledMeetingStatus(chatId: Long): ScheduledMeetingStatus =
-        getChatCall(chatId)?.status?.let { status ->
-            when (status) {
+        getChatCall(chatId)?.let { call ->
+            when (call.status) {
                 ChatCallStatus.Connecting,
                 ChatCallStatus.Joining,
                 ChatCallStatus.InProgress,
-                -> ScheduledMeetingStatus.Joined
-                ChatCallStatus.UserNoPresent -> ScheduledMeetingStatus.NotJoined
+                -> ScheduledMeetingStatus.Joined(call.duration)
+                ChatCallStatus.UserNoPresent -> ScheduledMeetingStatus.NotJoined(call.duration)
                 else -> ScheduledMeetingStatus.NotStarted
             }
         } ?: ScheduledMeetingStatus.NotStarted

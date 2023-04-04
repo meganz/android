@@ -11,8 +11,10 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
@@ -22,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.MeetingListState
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
@@ -32,6 +35,7 @@ import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Meeting list view
@@ -76,8 +80,9 @@ private fun ListView(
     onItemSelected: (Long) -> Unit,
 ) {
     val listState = rememberLazyListState()
-    val listTouched = remember { mutableStateOf(false) }
-    val showHeaders = state.meetings.any(MeetingRoomItem::isPending)
+    var tick by remember { mutableStateOf(0) }
+    var listInteraction by remember { mutableStateOf(false) }
+    var showHeaders by remember { mutableStateOf(false) }
     val isSelectionEnabled = state.selectedMeetings.isNotEmpty()
 
     LazyColumn(
@@ -86,7 +91,7 @@ private fun ListView(
             .testTag("MeetingListView")
             .pointerInput(Unit) {
                 detectTapGestures(
-                    onPress = { listTouched.value = true }
+                    onPress = { listInteraction = true }
                 )
             }
     ) {
@@ -95,7 +100,6 @@ private fun ListView(
             key = { _, item -> item.chatId }
         ) { index: Int, item: MeetingRoomItem ->
             val isSelected = isSelectionEnabled && state.selectedMeetings.contains(item.chatId)
-
             if (showHeaders) {
                 val previousItem = state.meetings.getOrNull(index - 1)
                 MeetingHeader(
@@ -108,6 +112,7 @@ private fun ListView(
                 meeting = item,
                 isSelected = isSelected,
                 isSelectionEnabled = isSelectionEnabled,
+                timestampUpdate = if (item.hasOngoingCall()) tick else null,
                 onItemClick = onItemClick,
                 onItemMoreClick = onItemMoreClick,
                 onItemSelected = onItemSelected,
@@ -120,8 +125,14 @@ private fun ListView(
     }
 
     LaunchedEffect(state.meetings) {
-        if (!listTouched.value) {
+        if (!listInteraction) {
             listState.scrollToItem(0)
+        }
+        showHeaders = state.meetings.any(MeetingRoomItem::isPending)
+        val ongoingCall = state.meetings.any(MeetingRoomItem::hasOngoingCall)
+        while (ongoingCall) {
+            delay(1.seconds)
+            tick++
         }
     }
 }

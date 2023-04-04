@@ -51,6 +51,7 @@ internal fun MeetingItemView(
     meeting: MeetingRoomItem,
     isSelected: Boolean,
     isSelectionEnabled: Boolean,
+    timestampUpdate: Int?,
     onItemClick: (Long) -> Unit,
     onItemMoreClick: (Long) -> Unit,
     onItemSelected: (Long) -> Unit,
@@ -177,10 +178,12 @@ internal fun MeetingItemView(
                     top.linkTo(txtTitle.top)
                     bottom.linkTo(txtTitle.bottom)
                     visibility =
-                        if (meeting.scheduledMeetingStatus == ScheduledMeetingStatus.NotJoined)
-                            Visibility.Visible
-                        else
+                        if (meeting.scheduledMeetingStatus == null
+                            || meeting.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted
+                        )
                             Visibility.Gone
+                        else
+                            Visibility.Visible
                 },
         )
 
@@ -209,6 +212,7 @@ internal fun MeetingItemView(
 
         MiddleTextView(
             meeting = meeting,
+            timestampUpdate = timestampUpdate,
             modifier = Modifier.constrainAs(txtMiddle) {
                 linkTo(
                     start = imgLastMessage.end,
@@ -274,27 +278,31 @@ internal fun MeetingItemView(
 }
 
 @Composable
-private fun MiddleTextView(meeting: MeetingRoomItem, modifier: Modifier) {
+private fun MiddleTextView(meeting: MeetingRoomItem, timestampUpdate: Int?, modifier: Modifier) {
     val meetingScheduledTimestamp = meeting.scheduledTimestampFormatted
     val meetingLastMessage = meeting.lastMessage
-    val textMessage = if (meeting.isPending && !meetingScheduledTimestamp.isNullOrBlank()) {
-        when {
-            meeting.isRecurringDaily -> stringResource(
-                R.string.meetings_list_scheduled_meeting_daily_label,
-                meetingScheduledTimestamp
-            )
-            meeting.isRecurringWeekly -> stringResource(
-                R.string.meetings_list_scheduled_meeting_weekly_label,
-                meetingScheduledTimestamp
-            )
-            meeting.isRecurringMonthly -> stringResource(
-                R.string.meetings_list_scheduled_meeting_monthly_label,
-                meetingScheduledTimestamp
-            )
-            else -> meetingScheduledTimestamp
-        }
-    } else {
-        meetingLastMessage
+
+    val textMessage = when {
+        meeting.isPending && !meetingScheduledTimestamp.isNullOrBlank() ->
+            when {
+                meeting.isRecurringDaily -> stringResource(
+                    R.string.meetings_list_scheduled_meeting_daily_label,
+                    meetingScheduledTimestamp
+                )
+                meeting.isRecurringWeekly -> stringResource(
+                    R.string.meetings_list_scheduled_meeting_weekly_label,
+                    meetingScheduledTimestamp
+                )
+                meeting.isRecurringMonthly -> stringResource(
+                    R.string.meetings_list_scheduled_meeting_monthly_label,
+                    meetingScheduledTimestamp
+                )
+                else -> meetingScheduledTimestamp
+            }
+        timestampUpdate != null && meeting.hasOngoingCall() ->
+            "$meetingLastMessage · ${meeting.getCallDuration()}"
+        else ->
+            meetingLastMessage
     }
 
     val textColor = if (meeting.isPending) {
@@ -415,6 +423,8 @@ private fun AvatarView(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "PreviewMeetingItemView")
 @Composable
 private fun PreviewMeetingItemView() {
+    val meetingStatus =
+        if (Random.nextBoolean()) ScheduledMeetingStatus.NotJoined(Random.nextLong(70)) else null
     val meeting = MeetingRoomItem(
         chatId = Random.nextLong(),
         title = "Photos Sprint #${Random.nextInt()}",
@@ -426,12 +436,13 @@ private fun PreviewMeetingItemView() {
         isMuted = Random.nextBoolean(),
         isRecurringMonthly = Random.nextBoolean(),
         isPublic = Random.nextBoolean(),
-        scheduledMeetingStatus = if (Random.nextBoolean()) ScheduledMeetingStatus.NotJoined else null
+        scheduledMeetingStatus = meetingStatus
     )
     MeetingItemView(
         meeting = meeting,
         isSelected = Random.nextBoolean(),
         isSelectionEnabled = Random.nextBoolean(),
+        timestampUpdate = 0,
         onItemClick = {},
         onItemMoreClick = {},
     ) {}

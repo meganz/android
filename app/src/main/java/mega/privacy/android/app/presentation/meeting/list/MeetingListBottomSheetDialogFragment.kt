@@ -99,11 +99,11 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 currentMeeting?.let { room ->
                     room.scheduledMeetingStatus?.let { scheduledMeetingStatus ->
                         when (scheduledMeetingStatus) {
-                            ScheduledMeetingStatus.NotStarted -> viewModel.startSchedMeeting(
+                            is ScheduledMeetingStatus.NotStarted -> viewModel.startSchedMeeting(
                                 room.chatId,
                                 room.schedId
                             )
-                            ScheduledMeetingStatus.NotJoined -> viewModel.joinSchedMeeting(
+                            is ScheduledMeetingStatus.NotJoined -> viewModel.joinSchedMeeting(
                                 room.chatId
                             )
                             else -> {}
@@ -193,13 +193,13 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
         binding.btnStartOrJoinSchedMeeting.isVisible =
             room.isActive && room.scheduledMeetingStatus != null &&
-                    room.scheduledMeetingStatus != ScheduledMeetingStatus.Joined
+                    room.scheduledMeetingStatus !is ScheduledMeetingStatus.Joined
         binding.dividerStartOrJoinSchedMeeting.isVisible =
             binding.btnStartOrJoinSchedMeeting.isVisible
 
         room.scheduledMeetingStatus?.let { scheduledMeetingStatus ->
             when (scheduledMeetingStatus) {
-                ScheduledMeetingStatus.NotStarted -> {
+                is ScheduledMeetingStatus.NotStarted -> {
                     binding.btnStartOrJoinSchedMeeting.setText(R.string.meetings_list_start_scheduled_meeting_option)
                     binding.btnStartOrJoinSchedMeeting.setCompoundDrawablesRelativeWithIntrinsicBounds(
                         R.drawable.start_sched_icon,
@@ -208,7 +208,7 @@ class MeetingListBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         0
                     )
                 }
-                ScheduledMeetingStatus.NotJoined -> {
+                is ScheduledMeetingStatus.NotJoined -> {
                     binding.btnStartOrJoinSchedMeeting.setText(R.string.meetings_list_join_scheduled_meeting_option)
                     binding.btnStartOrJoinSchedMeeting.setCompoundDrawablesRelativeWithIntrinsicBounds(
                         R.drawable.join_sched_icon,

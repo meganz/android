@@ -126,8 +126,8 @@ class ChatViewModel @Inject constructor(
             _state.value.schedId == null || _state.value.schedId == megaChatApiGateway.getChatInvalidHandle() -> startCall(
                 video = video
             )
-            _state.value.scheduledMeetingStatus == ScheduledMeetingStatus.NotStarted -> startSchedMeeting()
-            _state.value.scheduledMeetingStatus == ScheduledMeetingStatus.NotJoined -> answerCall(
+            _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotStarted -> startSchedMeeting()
+            _state.value.scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined -> answerCall(
                 _state.value.chatId,
                 video = false,
                 audio = true
@@ -189,18 +189,19 @@ class ChatViewModel @Inject constructor(
                 scheduledMeetingList?.let { list ->
                     list.forEach { scheduledMeetReceived ->
                         if (scheduledMeetReceived.parentSchedId == chatApiGateway.getChatInvalidHandle()) {
-                            var scheduledMeetingStatus = ScheduledMeetingStatus.NotStarted
+                            var scheduledMeetingStatus: ScheduledMeetingStatus =
+                                ScheduledMeetingStatus.NotStarted
                             if (!scheduledMeetReceived.isPast()) {
                                 Timber.d("Has scheduled meeting")
                                 getChatCall(scheduledMeetReceived.chatId)?.let { call ->
-                                    when (call.status) {
-                                        ChatCallStatus.UserNoPresent -> scheduledMeetingStatus =
-                                            ScheduledMeetingStatus.NotJoined
+                                    scheduledMeetingStatus = when (call.status) {
+                                        ChatCallStatus.UserNoPresent ->
+                                            ScheduledMeetingStatus.NotJoined(call.duration)
                                         ChatCallStatus.Connecting,
                                         ChatCallStatus.Joining,
                                         ChatCallStatus.InProgress,
-                                        -> scheduledMeetingStatus = ScheduledMeetingStatus.Joined
-                                        else -> {}
+                                        -> ScheduledMeetingStatus.Joined(call.duration)
+                                        else -> ScheduledMeetingStatus.NotStarted
                                     }
                                 }
                             }
@@ -239,18 +240,14 @@ class ChatViewModel @Inject constructor(
                 .collectLatest { call ->
                     Timber.d("Monitor chat call updated, changes ${call.changes}")
                     if (call.changes == ChatCallChanges.Status && _state.value.schedIsPending) {
-                        var scheduledMeetingStatus = ScheduledMeetingStatus.NotStarted
-                        when (call.status) {
-                            ChatCallStatus.UserNoPresent -> {
-                                scheduledMeetingStatus = ScheduledMeetingStatus.NotJoined
-                            }
+                        val scheduledMeetingStatus = when (call.status) {
+                            ChatCallStatus.UserNoPresent ->
+                                ScheduledMeetingStatus.NotJoined(call.duration)
                             ChatCallStatus.Connecting,
                             ChatCallStatus.Joining,
                             ChatCallStatus.InProgress,
-                            -> {
-                                scheduledMeetingStatus = ScheduledMeetingStatus.Joined
-                            }
-                            else -> {}
+                            -> ScheduledMeetingStatus.Joined(call.duration)
+                            else -> ScheduledMeetingStatus.NotStarted
                         }
                         _state.update {
                             it.copy(

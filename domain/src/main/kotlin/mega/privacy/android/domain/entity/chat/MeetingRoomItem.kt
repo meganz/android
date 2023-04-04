@@ -1,6 +1,9 @@
 package mega.privacy.android.domain.entity.chat
 
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
+import java.time.Duration
+import java.time.Instant
+import java.util.concurrent.TimeUnit
 
 /**
  * Meeting room item
@@ -73,4 +76,28 @@ data class MeetingRoomItem constructor(
 
     fun isRecurring(): Boolean =
         isRecurringDaily || isRecurringWeekly || isRecurringMonthly
+
+    fun hasOngoingCall(): Boolean =
+        (scheduledMeetingStatus is ScheduledMeetingStatus.Joined
+                && scheduledMeetingStatus.callStartTimestamp != null)
+                || (scheduledMeetingStatus is ScheduledMeetingStatus.NotJoined
+                && scheduledMeetingStatus.callStartTimestamp != null)
+
+    fun getCallDuration(): String? =
+        when (scheduledMeetingStatus) {
+            is ScheduledMeetingStatus.Joined -> scheduledMeetingStatus.callStartTimestamp
+            is ScheduledMeetingStatus.NotJoined -> scheduledMeetingStatus.callStartTimestamp
+            else -> null
+        }?.let { timestamp ->
+            Duration.between(
+                Instant.ofEpochSecond(timestamp),
+                Instant.now()
+            ).seconds
+        }?.let { duration ->
+            String.format(
+                "%02d:%02d",
+                TimeUnit.SECONDS.toMinutes(duration) % 60,
+                TimeUnit.SECONDS.toSeconds(duration) % 60
+            )
+        }
 }

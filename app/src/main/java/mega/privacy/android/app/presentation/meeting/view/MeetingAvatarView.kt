@@ -10,8 +10,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -111,10 +113,10 @@ private fun AvatarView(
     placeholderColor: Color,
     avatarTimestamp: Long? = null,
 ) {
-    val visiblePlaceholder = remember { mutableStateOf(true) }
+    var showPlaceHolder by remember { mutableStateOf(true) }
     AsyncImage(
         modifier = modifier.placeholder(
-            visible = visiblePlaceholder.value,
+            visible = showPlaceHolder,
             color = placeholderColor,
             shape = CircleShape,
             highlight = PlaceholderHighlight.shimmer(placeholderColor),
@@ -124,7 +126,7 @@ private fun AvatarView(
             .data(avatarUri)
             .build(),
         contentDescription = "User avatar",
-        onSuccess = { visiblePlaceholder.value = false }
+        onSuccess = { showPlaceHolder = false }
     )
 }
 

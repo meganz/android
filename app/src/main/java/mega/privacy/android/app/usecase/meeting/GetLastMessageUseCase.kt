@@ -35,7 +35,6 @@ import nz.mega.sdk.MegaChatMessage.TYPE_SET_PRIVATE_MODE
 import nz.mega.sdk.MegaChatMessage.TYPE_SET_RETENTION_TIME
 import nz.mega.sdk.MegaChatMessage.TYPE_TRUNCATE
 import nz.mega.sdk.MegaChatMessage.TYPE_VOICE_CLIP
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 /**
@@ -178,8 +177,7 @@ class GetLastMessageUseCase @Inject constructor(
                 if (isRinging) {
                     context.getString(R.string.notification_subtitle_incoming)
                 } else if (isMeeting) {
-                    val message = context.getString(R.string.meetings_list_ongoing_call_message)
-                    getDurationFormatted()?.let { "$message · $it" } ?: message
+                    context.getString(R.string.meetings_list_ongoing_call_message)
                 } else {
                     context.getString(R.string.ongoing_call_messages)
                 }
@@ -189,21 +187,11 @@ class GetLastMessageUseCase @Inject constructor(
                 if (requestSent) {
                     context.getString(R.string.outgoing_call_starting)
                 } else if (isMeeting) {
-                    val message = context.getString(R.string.meetings_list_ongoing_call_message)
-                    getDurationFormatted()?.let { "$message · $it" } ?: message
+                    context.getString(R.string.meetings_list_ongoing_call_message)
                 } else {
                     context.getString(R.string.call_started_messages)
                 }
             }
-        }
-
-    private fun MegaChatCall.getDurationFormatted(): String? =
-        duration.takeIf { it > 0 }?.let { callDuration ->
-            String.format(
-                "%02d:%02d",
-                TimeUnit.SECONDS.toMinutes(callDuration) % 60,
-                TimeUnit.SECONDS.toSeconds(callDuration) % 60
-            )
         }
 
     private fun String.cleanHtmlText(): String =
