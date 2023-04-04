@@ -1,6 +1,8 @@
 package mega.privacy.android.app.presentation.slideshow.model
 
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
+import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 
 /**
  * Slideshow ViewState
@@ -14,8 +16,8 @@ import mega.privacy.android.domain.entity.photos.Photo
 data class SlideshowViewState(
     val items: List<Photo> = emptyList(),
     val currentPlayingChunkedIndex: Int = 0,
-    val order: SlideshowOrder = SlideshowOrder.Newest,
-    val speed: SlideshowSpeed = SlideshowSpeed.DEFAULT,
+    val order: SlideshowOrder? = null,
+    val speed: SlideshowSpeed? = null,
     val repeat: Boolean = true,
 )
 

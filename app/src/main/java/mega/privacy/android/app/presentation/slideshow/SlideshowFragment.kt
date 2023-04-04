@@ -60,7 +60,6 @@ import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.PhotosViewModel
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
-import mega.privacy.android.app.presentation.slideshow.model.SlideshowOrder
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
@@ -71,6 +70,8 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_070
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Photo
+import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
+import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.usecase.GetThemeMode
 import javax.inject.Inject
 
@@ -157,8 +158,8 @@ class SlideshowFragment : Fragment() {
         val scrollState = rememberScaffoldState()
         val pagerState = rememberPagerState()
         val items = slideshowViewState.items
-        val order = slideshowViewState.order
-        val speed = slideshowViewState.speed
+        val order = slideshowViewState.order ?: SlideshowOrder.Shuffle
+        val speed = slideshowViewState.speed ?: SlideshowSpeed.Normal
         val repeat = slideshowViewState.repeat
         var isPlaying by remember {
             mutableStateOf(true)
@@ -176,7 +177,7 @@ class SlideshowFragment : Fragment() {
             if (isPlaying) {
                 while (true) {
                     yield()
-                    delay(speed.second * 1000L)
+                    delay(speed.duration * 1000L)
                     tween<Float>(600)
                     if (isPlaying) {
                         pagerState.animateScrollToPage(

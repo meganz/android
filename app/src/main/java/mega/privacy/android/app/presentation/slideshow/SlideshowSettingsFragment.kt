@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
@@ -21,6 +22,8 @@ import javax.inject.Inject
 class SlideshowSettingsFragment : Fragment() {
 
     private lateinit var imageViewerActivity: ImageViewerActivity
+
+    private val slideshowViewModel: SlideshowViewModel by viewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -41,7 +44,9 @@ class SlideshowSettingsFragment : Fragment() {
                     initialValue = ThemeMode.System
                 )
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    SlideshowSettingsView()
+                    SlideshowSettingsView(
+                        slideshowViewModel = slideshowViewModel,
+                    )
                 }
             }
         }

@@ -32,7 +32,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.slideshow.SlideshowViewModel
 import mega.privacy.android.core.ui.controls.LabelledSwitch
 import mega.privacy.android.core.ui.controls.MegaDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -47,10 +50,15 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.core.ui.theme.white_alpha_087
+import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
+import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun SlideshowSettingsView() {
+fun SlideshowSettingsView(
+    slideshowViewModel: SlideshowViewModel,
+) {
+    val state by slideshowViewModel.state.collectAsStateWithLifecycle()
     val isLight = MaterialTheme.colors.isLight
     val settingsTitleFontSize = 16.sp
     val settingsSubtitleFontSize = 14.sp
@@ -58,23 +66,8 @@ fun SlideshowSettingsView() {
     val settingsSubtitleColour = grey_alpha_054.takeIf { isLight } ?: white_alpha_054
     val settingsDividerColour = grey_alpha_012.takeIf { isLight } ?: white_alpha_012
 
-    val speedOptions = mapOf(
-        0 to stringResource(id = R.string.slideshow_speed_slow,),
-        1 to stringResource(id = R.string.slideshow_speed_normal),
-        2 to stringResource(id = R.string.slideshow_speed_fast),
-    )
-
-    val orderOptions = mapOf(
-        1 to stringResource(id = R.string.slideshow_order_shuffle),
-        0 to stringResource(id = R.string.sortby_date_newest),
-        2 to stringResource(id = R.string.sortby_date_oldest),
-    )
-
     var openSpeedDialog by rememberSaveable { mutableStateOf(false) }
     var openOrderDialog by rememberSaveable { mutableStateOf(false) }
-    val selectedSpeed = remember { mutableStateOf(1) }
-    val selectedOrder = remember { mutableStateOf(1) }
-    val repeatEnabled = remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -94,8 +87,7 @@ fun SlideshowSettingsView() {
                 color = settingsTitleColour,
             )
             Text(
-                text = speedOptions[selectedSpeed.value]
-                    ?: stringResource(id = R.string.slideshow_speed_normal),
+                text = state.speed?.displayName().orEmpty(),
                 color = settingsSubtitleColour,
                 fontSize = settingsSubtitleFontSize
             )
@@ -116,8 +108,7 @@ fun SlideshowSettingsView() {
                 color = settingsTitleColour,
             )
             Text(
-                text = orderOptions[selectedOrder.value]
-                    ?: stringResource(id = R.string.slideshow_order_shuffle),
+                text = state.order?.displayName().orEmpty(),
                 color = settingsSubtitleColour,
                 fontSize = settingsSubtitleFontSize
             )
@@ -134,8 +125,8 @@ fun SlideshowSettingsView() {
         ) {
             LabelledSwitch(
                 label = stringResource(R.string.slideshow_setting_repeat),
-                checked = repeatEnabled.value,
-                onCheckChanged = { repeatEnabled.value = !repeatEnabled.value },
+                checked = state.repeat,
+                onCheckChanged = { slideshowViewModel.saveRepeatSetting(!state.repeat) },
                 modifier = Modifier
                     .fillMaxWidth(),
             )
@@ -146,20 +137,20 @@ fun SlideshowSettingsView() {
         if (openSpeedDialog) {
             SlideshowSpeedDialog(
                 onDialogDismissed = { openSpeedDialog = false },
-                options = speedOptions,
-                selectedOption = selectedSpeed.value,
+                options = SlideshowSpeed.values(),
+                selectedOption = state.speed ?: SlideshowSpeed.Normal,
             ) {
-                selectedSpeed.value = it
+                slideshowViewModel.saveSpeedSetting(it)
             }
         }
 
         if (openOrderDialog) {
             SlideshowOrderDialog(
                 onDialogDismissed = { openOrderDialog = false },
-                options = orderOptions,
-                selectedOption = selectedOrder.value,
+                options = SlideshowOrder.values(),
+                selectedOption = state.order ?: SlideshowOrder.Shuffle,
             ) {
-                selectedOrder.value = it
+                slideshowViewModel.saveOrderSetting(it)
             }
         }
     }
@@ -168,9 +159,9 @@ fun SlideshowSettingsView() {
 @Composable
 private fun SlideshowSpeedDialog(
     onDialogDismissed: () -> Unit = {},
-    options: Map<Int, String> = mapOf(),
-    selectedOption: Int = 0,
-    onOptionSelected: (Int) -> Unit = {},
+    options: Array<SlideshowSpeed> = arrayOf(),
+    selectedOption: SlideshowSpeed? = null,
+    onOptionSelected: (SlideshowSpeed) -> Unit = {},
 ) {
     val isLight = MaterialTheme.colors.isLight
 
@@ -193,13 +184,13 @@ private fun SlideshowSpeedDialog(
         body = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.size(12.dp))
-                options.forEach { (index, option) ->
-                    val isSelected = index == selectedOption
+                options.forEach { option ->
+                    val isSelected = option == selectedOption
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                onOptionSelected(index)
+                                onOptionSelected(option)
                                 onDialogDismissed()
                             }
                             .padding(vertical = 12.dp),
@@ -211,7 +202,7 @@ private fun SlideshowSpeedDialog(
                         )
                         Spacer(modifier = Modifier.size(16.dp))
                         Text(
-                            text = option,
+                            text = option.displayName(),
                             color = if (isLight) {
                                 grey_alpha_087.takeIf { isSelected } ?: grey_alpha_054
                             } else {
@@ -229,9 +220,9 @@ private fun SlideshowSpeedDialog(
 @Composable
 private fun SlideshowOrderDialog(
     onDialogDismissed: () -> Unit = {},
-    options: Map<Int, String> = mapOf(),
-    selectedOption: Int = 0,
-    onOptionSelected: (Int) -> Unit = {},
+    options: Array<SlideshowOrder> = arrayOf(),
+    selectedOption: SlideshowOrder? = null,
+    onOptionSelected: (SlideshowOrder) -> Unit = {},
 ) {
     val isLight = MaterialTheme.colors.isLight
 
@@ -254,13 +245,13 @@ private fun SlideshowOrderDialog(
         body = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Spacer(modifier = Modifier.size(12.dp))
-                options.forEach { (index, option) ->
-                    val isSelected = index == selectedOption
+                options.forEach { option ->
+                    val isSelected = option == selectedOption
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                onOptionSelected(index)
+                                onOptionSelected(option)
                                 onDialogDismissed()
                             }
                             .padding(vertical = 12.dp),
@@ -272,7 +263,7 @@ private fun SlideshowOrderDialog(
                         )
                         Spacer(modifier = Modifier.size(16.dp))
                         Text(
-                            text = option,
+                            text = option.displayName(),
                             color = if (isLight) {
                                 grey_alpha_087.takeIf { isSelected } ?: grey_alpha_054
                             } else {
@@ -285,6 +276,20 @@ private fun SlideshowOrderDialog(
             }
         }
     )
+}
+
+@Composable
+private fun SlideshowOrder.displayName(): String = when (this) {
+    SlideshowOrder.Shuffle -> stringResource(id = R.string.slideshow_order_shuffle)
+    SlideshowOrder.Newest -> stringResource(id = R.string.sortby_date_newest)
+    SlideshowOrder.Oldest -> stringResource(id = R.string.sortby_date_oldest)
+}
+
+@Composable
+private fun SlideshowSpeed.displayName(): String = when (this) {
+    SlideshowSpeed.Slow -> stringResource(id = R.string.slideshow_speed_slow)
+    SlideshowSpeed.Normal -> stringResource(id = R.string.slideshow_speed_normal)
+    SlideshowSpeed.Fast -> stringResource(id = R.string.slideshow_speed_fast)
 }
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -300,7 +305,7 @@ fun PreviewSlideshowSettingsView() {
     var repeat by remember { mutableStateOf(false) }
     AndroidTheme(isSystemInDarkTheme()) {
         Scaffold {
-            SlideshowSettingsView()
+            SlideshowSettingsView(viewModel())
         }
     }
 }
