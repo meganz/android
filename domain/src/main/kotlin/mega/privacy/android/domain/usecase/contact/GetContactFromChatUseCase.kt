@@ -9,7 +9,7 @@ import javax.inject.Inject
  */
 class GetContactFromChatUseCase @Inject constructor(
     private val contactsRepository: ContactsRepository,
-    private val getContactFromEmail: GetContactFromEmail,
+    private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
 ) {
     /**
      * invoke
@@ -21,6 +21,6 @@ class GetContactFromChatUseCase @Inject constructor(
      */
     suspend operator fun invoke(chatId: Long, skipCache: Boolean): ContactItem? {
         val handle = contactsRepository.getUserEmailFromChat(chatId)
-        return handle?.let { getContactFromEmail(it, skipCache) }
+        return handle?.let { getContactFromEmailUseCase(it, skipCache) }
     }
 }

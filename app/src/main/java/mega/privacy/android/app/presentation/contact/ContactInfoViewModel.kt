@@ -37,16 +37,16 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.GetChatRoomByUser
+import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
-import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
+import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
+import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
-import mega.privacy.android.domain.usecase.contact.SetUserAlias
+import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
@@ -67,12 +67,12 @@ import javax.inject.Inject
  * @property monitorContactUpdates              [MonitorContactUpdates]
  * @property requestLastGreen                   [RequestLastGreen]
  * @property getChatRoom                        [GetChatRoom]
- * @property getUserOnlineStatusByHandle        [GetUserOnlineStatusByHandle]
- * @property getChatRoomByUser                  [GetChatRoomByUser]
+ * @property getUserOnlineStatusByHandleUseCase [GetUserOnlineStatusByHandleUseCase]
+ * @property getChatRoomByUserUseCase           [GetChatRoomByUserUseCase]
  * @property getContactFromChatUseCase          [GetContactFromChatUseCase]
- * @property getContactFromEmail                [GetContactFromEmail]
+ * @property getContactFromEmailUseCase         [GetContactFromEmailUseCase]
  * @property applyContactUpdatesUseCase         [ApplyContactUpdatesUseCase]
- * @property setUserAlias                       [SetUserAlias]
+ * @property setUserAliasUseCase                [SetUserAliasUseCase]
  * @property removeContactByEmailUseCase        [RemoveContactByEmailUseCase]
  */
 @HiltViewModel
@@ -86,14 +86,14 @@ class ContactInfoViewModel @Inject constructor(
     private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
     private val monitorContactUpdates: MonitorContactUpdates,
-    private val getUserOnlineStatusByHandle: GetUserOnlineStatusByHandle,
+    private val getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase,
     private val requestLastGreen: RequestLastGreen,
     private val getChatRoom: GetChatRoom,
-    private val getChatRoomByUser: GetChatRoomByUser,
+    private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase,
     private val getContactFromChatUseCase: GetContactFromChatUseCase,
-    private val getContactFromEmail: GetContactFromEmail,
+    private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
     private val applyContactUpdatesUseCase: ApplyContactUpdatesUseCase,
-    private val setUserAlias: SetUserAlias,
+    private val setUserAliasUseCase: SetUserAliasUseCase,
     private val removeContactByEmailUseCase: RemoveContactByEmailUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -159,7 +159,7 @@ class ContactInfoViewModel @Inject constructor(
     fun refreshUserInfo() = viewModelScope.launch {
         val email = state.value.email ?: return@launch
         runCatching {
-            getContactFromEmail(email, isOnline())
+            getContactFromEmailUseCase(email, isOnline())
         }.onSuccess {
             _state.update { state -> state.copy(contactItem = it) }
             it?.handle?.let { handle -> runCatching { requestLastGreen(handle) } }
@@ -260,7 +260,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun getUserStatusAndRequestForLastGreen() = viewModelScope.launch {
         val handle = state.value.contactItem?.handle ?: return@launch
-        runCatching { getUserOnlineStatusByHandle(handle) }.onSuccess { status ->
+        runCatching { getUserOnlineStatusByHandleUseCase(handle) }.onSuccess { status ->
             if (status.isAwayOrOffline()) {
                 requestLastGreen(handle)
             }
@@ -278,7 +278,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun updateLastGreen(userHandle: Long, lastGreen: Int) = viewModelScope.launch {
         runCatching {
-            getUserOnlineStatusByHandle(userHandle = userHandle)
+            getUserOnlineStatusByHandleUseCase(userHandle = userHandle)
         }.onSuccess { status ->
             _state.update {
                 it.copy(
@@ -301,11 +301,11 @@ class ContactInfoViewModel @Inject constructor(
         var chatRoom: ChatRoom? = null
         if (isFromContacts) {
             runCatching {
-                email?.let { mail -> getContactFromEmail(mail, isOnline()) }
+                email?.let { mail -> getContactFromEmailUseCase(mail, isOnline()) }
             }.onSuccess { contact ->
                 userInfo = contact
                 chatRoom = runCatching {
-                    contact?.handle?.let { getChatRoomByUser(it) }
+                    contact?.handle?.let { getChatRoomByUserUseCase(it) }
                 }.getOrNull()
             }
         } else {
@@ -351,7 +351,7 @@ class ContactInfoViewModel @Inject constructor(
         val handle = state.value.contactItem?.handle
         if (handle == null || (nickName != null && nickName == newNickname)) return@launch
         runCatching {
-            setUserAlias(newNickname, handle)
+            setUserAliasUseCase(newNickname, handle)
         }.onSuccess { alias ->
             _state.update {
                 it.copy(

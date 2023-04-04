@@ -24,17 +24,14 @@ import mega.privacy.android.domain.usecase.account.DefaultUpdateCurrentUserName
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
 import mega.privacy.android.domain.usecase.contact.DefaultReloadContactDatabase
 import mega.privacy.android.domain.usecase.contact.GetContactEmail
-import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
 import mega.privacy.android.domain.usecase.contact.GetContactItem
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserAliases
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserLastName
 import mega.privacy.android.domain.usecase.contact.GetUserFirstName
 import mega.privacy.android.domain.usecase.contact.GetUserLastName
-import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
 import mega.privacy.android.domain.usecase.contact.InviteContact
 import mega.privacy.android.domain.usecase.contact.ReloadContactDatabase
-import mega.privacy.android.domain.usecase.contact.SetUserAlias
 
 /**
  * Contacts module.
@@ -139,17 +136,5 @@ internal abstract class ContactsModule {
         @Provides
         fun provideContactItem(contactsRepository: ContactsRepository): GetContactItem =
             GetContactItem(contactsRepository::getContactItem)
-
-        @Provides
-        fun provideGetUserOnlineStatusByHandle(contactsRepository: ContactsRepository): GetUserOnlineStatusByHandle =
-            GetUserOnlineStatusByHandle(contactsRepository::getUserOnlineStatusByHandle)
-
-        @Provides
-        fun provideGetContactItemFromUserEmail(contactsRepository: ContactsRepository): GetContactFromEmail =
-            GetContactFromEmail(contactsRepository::getContactItemFromUserEmail)
-
-        @Provides
-        fun provideSetUserAlias(contactsRepository: ContactsRepository): SetUserAlias =
-            SetUserAlias(contactsRepository::setUserAlias)
     }
 }

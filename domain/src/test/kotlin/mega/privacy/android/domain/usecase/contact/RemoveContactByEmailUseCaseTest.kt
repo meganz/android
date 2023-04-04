@@ -8,7 +8,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.ContactsRepository
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.GetChatRoomByUser
+import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.meeting.HangChatCallUseCase
 import mega.privacy.android.domain.usecase.meeting.IsParticipatingInChatCallUseCase
 import org.junit.Test
@@ -23,8 +23,8 @@ class RemoveContactByEmailUseCaseTest {
     private val nodeRepository: NodeRepository = mock()
     private val hangChatCallUseCase: HangChatCallUseCase = mock()
     private val callRepository: CallRepository = mock()
-    private val getChatRoomByUser: GetChatRoomByUser = mock()
-    private val getContactFromEmail: GetContactFromEmail = mock()
+    private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase = mock()
+    private val getContactFromEmailUseCase: GetContactFromEmailUseCase = mock()
     private val contactsRepository: ContactsRepository = mock()
     private val isParticipatingInChatCallUseCase: IsParticipatingInChatCallUseCase = mock()
     private val contactItem: ContactItem = mock {
@@ -41,8 +41,8 @@ class RemoveContactByEmailUseCaseTest {
         nodeRepository,
         hangChatCallUseCase,
         callRepository,
-        getChatRoomByUser,
-        getContactFromEmail,
+        getChatRoomByUserUseCase,
+        getContactFromEmailUseCase,
         contactsRepository,
         isParticipatingInChatCallUseCase
     )
@@ -51,8 +51,8 @@ class RemoveContactByEmailUseCaseTest {
     fun `test that hang chat call is executed if user is participating in any call`() = runTest {
         whenever(isParticipatingInChatCallUseCase()).thenReturn(true)
         whenever(nodeRepository.removedInSharedNodesByEmail(testEmail)).thenAnswer { }
-        whenever(getContactFromEmail(testEmail, false)).thenReturn(contactItem)
-        whenever(getChatRoomByUser(contactItem.handle)).thenReturn(chatRoom)
+        whenever(getContactFromEmailUseCase(testEmail, false)).thenReturn(contactItem)
+        whenever(getChatRoomByUserUseCase(contactItem.handle)).thenReturn(chatRoom)
         whenever(callRepository.getChatCall(chatRoom.chatId)).thenReturn(chatCall)
         whenever(contactsRepository.removeContact(testEmail)).thenAnswer { }
         underTest(testEmail)
@@ -64,8 +64,8 @@ class RemoveContactByEmailUseCaseTest {
         runTest {
             whenever(isParticipatingInChatCallUseCase()).thenReturn(false)
             whenever(nodeRepository.removedInSharedNodesByEmail(testEmail)).thenAnswer { }
-            whenever(getContactFromEmail(testEmail, false)).thenReturn(contactItem)
-            whenever(getChatRoomByUser(contactItem.handle)).thenReturn(chatRoom)
+            whenever(getContactFromEmailUseCase(testEmail, false)).thenReturn(contactItem)
+            whenever(getChatRoomByUserUseCase(contactItem.handle)).thenReturn(chatRoom)
             whenever(callRepository.getChatCall(chatRoom.chatId)).thenReturn(chatCall)
             whenever(contactsRepository.removeContact(testEmail)).thenAnswer { }
             underTest(testEmail)

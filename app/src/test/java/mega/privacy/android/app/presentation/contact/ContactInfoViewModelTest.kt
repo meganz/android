@@ -25,16 +25,16 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.GetChatRoomByUser
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
-import mega.privacy.android.domain.usecase.contact.GetContactFromEmail
-import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandle
+import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
+import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
-import mega.privacy.android.domain.usecase.contact.SetUserAlias
+import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import org.junit.After
@@ -59,14 +59,14 @@ class ContactInfoViewModelTest {
     private lateinit var cameraGateway: CameraGateway
     private lateinit var chatManagement: ChatManagement
     private lateinit var monitorContactUpdates: MonitorContactUpdates
-    private lateinit var getUserOnlineStatusByHandle: GetUserOnlineStatusByHandle
+    private lateinit var getUserOnlineStatusByHandleUseCase: GetUserOnlineStatusByHandleUseCase
     private lateinit var requestLastGreen: RequestLastGreen
     private lateinit var getChatRoom: GetChatRoom
-    private lateinit var getContactFromEmail: GetContactFromEmail
+    private lateinit var getContactFromEmailUseCase: GetContactFromEmailUseCase
     private lateinit var getContactFromChatUseCase: GetContactFromChatUseCase
-    private lateinit var getChatRoomByUser: GetChatRoomByUser
+    private lateinit var getChatRoomByUserUseCase: GetChatRoomByUserUseCase
     private lateinit var applyContactUpdatesUseCase: ApplyContactUpdatesUseCase
-    private lateinit var setUserAlias: SetUserAlias
+    private lateinit var setUserAliasUseCase: SetUserAliasUseCase
     private lateinit var removeContactByEmailUseCase: RemoveContactByEmailUseCase
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
@@ -123,14 +123,14 @@ class ContactInfoViewModelTest {
             cameraGateway,
             chatManagement,
             monitorContactUpdates,
-            getUserOnlineStatusByHandle,
+            getUserOnlineStatusByHandleUseCase,
             requestLastGreen,
             getChatRoom,
-            getChatRoomByUser,
+            getChatRoomByUserUseCase,
             getContactFromChatUseCase,
-            getContactFromEmail,
+            getContactFromEmailUseCase,
             applyContactUpdatesUseCase,
-            setUserAlias,
+            setUserAliasUseCase,
             removeContactByEmailUseCase,
             standardDispatcher,
             testScope,
@@ -147,14 +147,14 @@ class ContactInfoViewModelTest {
         cameraGateway = mock()
         chatManagement = mock()
         monitorContactUpdates = mock()
-        getUserOnlineStatusByHandle = mock()
+        getUserOnlineStatusByHandleUseCase = mock()
         requestLastGreen = mock()
         getChatRoom = mock()
-        getChatRoomByUser = mock()
+        getChatRoomByUserUseCase = mock()
         getContactFromChatUseCase = mock()
-        getContactFromEmail = mock()
+        getContactFromEmailUseCase = mock()
         applyContactUpdatesUseCase = mock()
-        setUserAlias = mock()
+        setUserAliasUseCase = mock()
         removeContactByEmailUseCase = mock()
     }
 
@@ -164,8 +164,10 @@ class ContactInfoViewModelTest {
     }
 
     private suspend fun initUserInfo() {
-        whenever(getContactFromEmail(email = testEmail, skipCache = true)).thenReturn(contactItem)
-        whenever(getChatRoomByUser(contactItem.handle)).thenReturn(chatRoom)
+        whenever(getContactFromEmailUseCase(email = testEmail, skipCache = true)).thenReturn(
+            contactItem
+        )
+        whenever(getChatRoomByUserUseCase(contactItem.handle)).thenReturn(chatRoom)
         whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
         underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
     }
@@ -185,7 +187,7 @@ class ContactInfoViewModelTest {
     fun `test that get user status and request last green does not trigger last green when user status is online`() =
         runTest {
             initUserInfo()
-            whenever(getUserOnlineStatusByHandle(testHandle)).thenReturn(UserStatus.Online)
+            whenever(getUserOnlineStatusByHandleUseCase(testHandle)).thenReturn(UserStatus.Online)
             underTest.getUserStatusAndRequestForLastGreen()
             underTest.state.test {
                 assertThat(awaitItem().userStatus).isEqualTo(UserStatus.Online)
@@ -197,7 +199,7 @@ class ContactInfoViewModelTest {
     fun `test that get user status and request last green triggers last green when user status is away`() =
         runTest {
             initUserInfo()
-            whenever(getUserOnlineStatusByHandle(anyLong())).thenReturn(UserStatus.Away)
+            whenever(getUserOnlineStatusByHandleUseCase(anyLong())).thenReturn(UserStatus.Away)
             underTest.getUserStatusAndRequestForLastGreen()
             underTest.state.test {
                 assertThat(awaitItem().userStatus).isEqualTo(UserStatus.Away)
@@ -208,7 +210,7 @@ class ContactInfoViewModelTest {
     @Test
     fun `test when update last green method is called state is updated with the last green value`() =
         runTest {
-            whenever(getUserOnlineStatusByHandle(testHandle)).thenReturn(UserStatus.Online)
+            whenever(getUserOnlineStatusByHandleUseCase(testHandle)).thenReturn(UserStatus.Online)
             underTest.updateLastGreen(testHandle, lastGreen = 5)
             underTest.state.test {
                 val nextState = awaitItem()
@@ -241,8 +243,13 @@ class ContactInfoViewModelTest {
     fun `test when contact info screen launched from chats emits title`() =
         runTest {
             whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
-            whenever(getContactFromEmail(testEmail, skipCache = true)).thenReturn(contactItem)
-            whenever(getChatRoomByUser(testHandle)).thenReturn(chatRoom)
+            whenever(
+                getContactFromEmailUseCase(
+                    testEmail,
+                    skipCache = true
+                )
+            ).thenReturn(contactItem)
+            whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
             underTest.updateContactInfo(-1L, testEmail)
             underTest.state.test {
                 val nextState = awaitItem()
@@ -256,9 +263,14 @@ class ContactInfoViewModelTest {
     fun `test when new nickname is given the nick name added snack bar message is emitted`() =
         runTest {
             whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
-            whenever(getContactFromEmail(testEmail, skipCache = true)).thenReturn(contactItem)
-            whenever(getChatRoomByUser(testHandle)).thenReturn(chatRoom)
-            whenever(setUserAlias("Spider Man", testHandle)).thenReturn("Spider Man")
+            whenever(
+                getContactFromEmailUseCase(
+                    testEmail,
+                    skipCache = true
+                )
+            ).thenReturn(contactItem)
+            whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
+            whenever(setUserAliasUseCase("Spider Man", testHandle)).thenReturn("Spider Man")
             underTest.updateContactInfo(-1L, testEmail)
             underTest.state.test {
                 val initialState = awaitItem()
@@ -282,8 +294,8 @@ class ContactInfoViewModelTest {
     @Test
     fun `test that when remove contact is success isUserRemoved is emitted as true`() = runTest {
         whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
-        whenever(getContactFromEmail(testEmail, skipCache = true)).thenReturn(contactItem)
-        whenever(getChatRoomByUser(testHandle)).thenReturn(chatRoom)
+        whenever(getContactFromEmailUseCase(testEmail, skipCache = true)).thenReturn(contactItem)
+        whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
         whenever(removeContactByEmailUseCase(testEmail)).thenReturn(true)
         underTest.updateContactInfo(-1L, testEmail)
         underTest.state.test {
