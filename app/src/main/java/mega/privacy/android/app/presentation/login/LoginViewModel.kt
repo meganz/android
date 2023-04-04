@@ -183,6 +183,14 @@ class LoginViewModel @Inject constructor(
         _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Tour) }
 
     /**
+     * Mark handled pending to show fragment
+     *
+     */
+    fun markHandledPendingToShowFragment() {
+        _state.update { state -> state.copy(isPendingToShowFragment = null) }
+    }
+
+    /**
      * Updates state with a new intentAction.
      *
      * @param pendingAction Intent action.
