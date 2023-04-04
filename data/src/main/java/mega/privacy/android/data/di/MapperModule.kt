@@ -22,7 +22,6 @@ import mega.privacy.android.data.mapper.CurrencyMapper
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.FileDurationMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
-import mega.privacy.android.data.mapper.FolderLoginStatusMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.LocalPricingMapper
@@ -34,7 +33,6 @@ import mega.privacy.android.data.mapper.MegaPurchaseMapper
 import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
-import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
@@ -91,7 +89,6 @@ import mega.privacy.android.data.mapper.toCountry
 import mega.privacy.android.data.mapper.toCountryCallingCodes
 import mega.privacy.android.data.mapper.toDuration
 import mega.privacy.android.data.mapper.toEvent
-import mega.privacy.android.data.mapper.toFolderLoginStatus
 import mega.privacy.android.data.mapper.toImage
 import mega.privacy.android.data.mapper.toInviteContactRequest
 import mega.privacy.android.data.mapper.toLocalPricing
@@ -484,11 +481,5 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideVideoAttachmentMapper(): VideoAttachmentMapper = ::toVideoAttachment
-
-        /**
-         * Provides FolderLoginStatus mapper
-         */
-        @Provides
-        fun provideFolderLoginStatusMapper(): FolderLoginStatusMapper = ::toFolderLoginStatus
     }
 }

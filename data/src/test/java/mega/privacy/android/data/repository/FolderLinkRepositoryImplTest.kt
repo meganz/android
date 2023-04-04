@@ -17,7 +17,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.FolderLoginStatusMapper
 import mega.privacy.android.data.mapper.NodeMapper
-import mega.privacy.android.data.mapper.toFolderLoginStatus
+import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.exception.SynchronisationException
@@ -72,7 +72,7 @@ class FolderLinkRepositoryImplTest {
     fun `test that status is returned correctly`() = runTest {
         val folderLink = "test"
         val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
-        val expectedResult = toFolderLoginStatus(megaError)
+        val expectedResult = FolderLoginStatus.SUCCESS
 
         whenever(folderLoginStatusMapper(megaError)).thenReturn(expectedResult)
 
