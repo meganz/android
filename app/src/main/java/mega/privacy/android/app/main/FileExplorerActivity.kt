@@ -2054,9 +2054,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 credentials = UserCredentials(lastEmail, gSession, "", "", myUserHandle)
                 dbH.saveCredentials(credentials ?: return)
                 binding.fileLoggingInLayout.isVisible = false
-                if (isLoggingIn) {
-                    afterLoginAndFetch()
-                }
+                afterLoginAndFetch()
                 isLoggingIn = false
             }
         }
