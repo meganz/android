@@ -185,8 +185,10 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         LiveEventBus.config().enableLogger(false)
 
         // Setup handler and RxJava for uncaught exceptions.
-        Thread.setDefaultUncaughtExceptionHandler { _: Thread?, e: Throwable? ->
-            handleUncaughtException(e)
+        if (!BuildConfig.DEBUG) {
+            Thread.setDefaultUncaughtExceptionHandler { _: Thread?, e: Throwable? ->
+                handleUncaughtException(e)
+            }
         }
         RxJavaPlugins.setErrorHandler { throwable: Throwable? -> handleUncaughtException(throwable) }
 
