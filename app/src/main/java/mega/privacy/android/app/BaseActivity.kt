@@ -1035,7 +1035,11 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
         //Check if the call is recently
         Timber.d("Check the last call to getAccountDetails")
         lifecycleScope.launch {
-            getAccountDetailsUseCase(false)
+            runCatching {
+                getAccountDetailsUseCase(false)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 

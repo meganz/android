@@ -677,13 +677,17 @@ class MyAccountViewModel @Inject constructor(
         when (requestCode) {
             REQUEST_CODE_REFRESH -> {
                 viewModelScope.launch {
-                    getAccountDetailsUseCase(true)
-                    getExtendedAccountDetail(
-                        forceRefresh = true,
-                        sessions = true,
-                        purchases = false,
-                        transactions = false
-                    )
+                    runCatching {
+                        getAccountDetailsUseCase(true)
+                        getExtendedAccountDetail(
+                            forceRefresh = true,
+                            sessions = true,
+                            purchases = false,
+                            transactions = false
+                        )
+                    }.onFailure {
+                        Timber.e(it)
+                    }
                     LiveEventBus.get<Boolean>(EVENT_REFRESH).post(true)
                 }
             }
@@ -1244,14 +1248,20 @@ class MyAccountViewModel @Inject constructor(
      */
     fun refreshAccountInfo() {
         viewModelScope.launch {
-            getAccountDetailsUseCase(forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty())
-            getExtendedAccountDetail(
-                forceRefresh = false,
-                sessions = true,
-                purchases = false,
-                transactions = false
-            )
-            getPaymentMethod(false)
+            runCatching {
+                getAccountDetailsUseCase(
+                    forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty()
+                )
+                getExtendedAccountDetail(
+                    forceRefresh = false,
+                    sessions = true,
+                    purchases = false,
+                    transactions = false
+                )
+                getPaymentMethod(false)
+            }.onFailure {
+                Timber.e(it)
+            }
         }
     }
 

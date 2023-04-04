@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.shareIn
@@ -121,10 +121,10 @@ class SettingsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             merge(
-                flowOf(getAccountDetailsUseCase(false)).map {
+                flow { emit(getAccountDetailsUseCase(false)) }.map {
                     updateAccountState(it)
                 },
-                flowOf(isMultiFactorAuthAvailable())
+                flow { emit(isMultiFactorAuthAvailable()) }
                     .map { available ->
                         { state: SettingsState -> state.copy(multiFactorVisible = available) }
                     },
@@ -134,7 +134,7 @@ class SettingsViewModel @Inject constructor(
                 }.map { enabled ->
                     { state: SettingsState -> state.copy(autoAcceptChecked = enabled) }
                 },
-                flowOf(fetchMultiFactorAuthSetting())
+                flow { emit(fetchMultiFactorAuthSetting()) }
                     .map { enabled ->
                         { state: SettingsState -> state.copy(multiFactorAuthChecked = enabled) }
                     },
@@ -175,7 +175,9 @@ class SettingsViewModel @Inject constructor(
                             )
                         }
                     },
-            ).collect {
+            ).catch {
+                Timber.e(it)
+            }.collect {
                 state.update(it)
             }
         }
@@ -200,7 +202,13 @@ class SettingsViewModel @Inject constructor(
         }
 
     fun refreshAccount() = viewModelScope.launch {
-        state.update(updateAccountState(getAccountDetailsUseCase(true)))
+        runCatching {
+            getAccountDetailsUseCase(true)
+        }.onSuccess {
+            state.update(updateAccountState(it))
+        }.onFailure {
+            Timber.e(it)
+        }
     }
 
     fun toggleAutoAcceptPreference() = viewModelScope.launch {
