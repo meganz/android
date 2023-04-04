@@ -3,6 +3,8 @@ package mega.privacy.android.domain.usecase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
+import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -11,7 +13,7 @@ import org.mockito.kotlin.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultGetFavouriteSortOrderTest {
-    private lateinit var underTest: GetFavouriteSortOrder
+    private lateinit var underTest: GetFavouriteSortOrderUseCase
 
     private val getCloudSortOrder = mock<GetCloudSortOrder> {
         onBlocking {
@@ -19,13 +21,13 @@ class DefaultGetFavouriteSortOrderTest {
         }.thenReturn(SortOrder.ORDER_DEFAULT_ASC)
     }
 
-    private val mapFavouriteSortOrder = mock<MapFavouriteSortOrder>()
+    private val mapFavouriteSortOrder = mock<MapFavouriteSortOrderUseCase>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetFavouriteSortOrder(
+        underTest = GetFavouriteSortOrderUseCase(
             getCloudSortOrder = getCloudSortOrder,
-            mapFavouriteSortOrder = mapFavouriteSortOrder,
+            mapFavouriteSortOrderUseCase = mapFavouriteSortOrder,
         )
     }
 

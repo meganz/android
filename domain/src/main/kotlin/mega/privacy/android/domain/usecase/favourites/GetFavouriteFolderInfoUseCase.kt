@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.favourites
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.emitAll
@@ -9,19 +9,23 @@ import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.ParentNotAFolderException
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.AddNodeType
 import javax.inject.Inject
 
 /**
- * The use case implementation class to get children nodes by node
- * @param nodeRepository NodeRepository
+ * The use case for getting children nodes by node
  */
-class DefaultGetFavouriteFolderInfo @Inject constructor(
+class GetFavouriteFolderInfoUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val addNodeType: AddNodeType,
-) : GetFavouriteFolderInfo {
-
+) {
+    /**
+     * Get children nodes by node
+     * @param parentHandle parent node handle
+     * @return Flow<FavouriteFolderInfo>
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun invoke(parentHandle: Long) =
+    operator fun invoke(parentHandle: Long) =
         flow {
             emit(getFavouriteFolderInfo(parentHandle))
             emitAll(nodeRepository.monitorNodeUpdates().mapLatest {

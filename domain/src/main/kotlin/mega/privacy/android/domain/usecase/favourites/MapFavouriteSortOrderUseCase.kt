@@ -1,14 +1,20 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.favourites
 
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import javax.inject.Inject
 
 /**
- * Default map favourite sort order
+ * Get favourite sort order for sort order
  */
-class DefaultMapFavouriteSortOrder @Inject constructor() : MapFavouriteSortOrder {
-    override fun invoke(sortOrder: SortOrder) = when (sortOrder) {
+class MapFavouriteSortOrderUseCase @Inject constructor() {
+    /**
+     * Invoke
+     *
+     * @param sortOrder
+     * @return Favourite sort order
+     */
+    operator fun invoke(sortOrder: SortOrder) = when (sortOrder) {
         SortOrder.ORDER_DEFAULT_ASC -> FavouriteSortOrder.Name(false)
         SortOrder.ORDER_DEFAULT_DESC -> FavouriteSortOrder.Name(true)
         SortOrder.ORDER_SIZE_ASC -> FavouriteSortOrder.Size(false)

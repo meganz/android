@@ -44,13 +44,13 @@ import mega.privacy.android.domain.exception.VersionsNotDeletedException
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
-import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
@@ -112,7 +112,7 @@ internal class FileInfoViewModelTest {
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle = mock()
     private val getNodeLocationInfo: GetNodeLocationInfo = mock()
     private val getOutShares: GetOutShares = mock()
-    private val isAvailableOffline: IsAvailableOffline = mock()
+    private val isAvailableOffline: IsAvailableOfflineUseCase = mock()
     private val setNodeAvailableOffline: SetNodeAvailableOffline = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val setOutgoingPermissions: SetOutgoingPermissions = mock()
@@ -161,7 +161,7 @@ internal class FileInfoViewModelTest {
             getNodeVersionsByHandle = getNodeVersionsByHandle,
             getNodeLocationInfo = getNodeLocationInfo,
             getOutShares = getOutShares,
-            isAvailableOffline = isAvailableOffline,
+            isAvailableOfflineUseCase = isAvailableOffline,
             setNodeAvailableOffline = setNodeAvailableOffline,
             getNodeAccessPermission = getNodeAccessPermission,
             setOutgoingPermissions = setOutgoingPermissions,

@@ -8,6 +8,8 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -15,8 +17,8 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultIsAvailableOfflineTest {
-    private lateinit var underTest: IsAvailableOffline
+class IsAvailableOfflineUseCaseTest {
+    private lateinit var underTest: IsAvailableOfflineUseCase
 
 
     private val file = mock<File>()
@@ -32,15 +34,16 @@ class DefaultIsAvailableOfflineTest {
     private val offlineNodeInformation = mock<OfflineNodeInformation>()
     private val nodeRepository = mock<NodeRepository> {
         onBlocking { getOfflineNodeInformation(nodeId) }.thenReturn(
-            offlineNodeInformation)
+            offlineNodeInformation
+        )
     }
-    private val getOfflineFile = mock<GetOfflineFile> {
+    private val getOfflineFile = mock<GetOfflineFileUseCase> {
         onBlocking { invoke(offlineNodeInformation) }.thenReturn(file)
     }
 
     @Before
     fun setUp() {
-        underTest = DefaultIsAvailableOffline(
+        underTest = IsAvailableOfflineUseCase(
             nodeRepository = nodeRepository,
             getOfflineFile = getOfflineFile,
         )

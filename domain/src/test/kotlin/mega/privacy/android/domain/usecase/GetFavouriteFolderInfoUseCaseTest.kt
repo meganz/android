@@ -12,14 +12,15 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.exception.ParentNotAFolderException
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
-class DefaultGetFavouriteFolderInfoTest {
-    lateinit var underTest: GetFavouriteFolderInfo
+class GetFavouriteFolderInfoUseCaseTest {
+    lateinit var underTest: GetFavouriteFolderInfoUseCase
 
     private val nodeRepository = mock<NodeRepository>()
 
@@ -27,7 +28,7 @@ class DefaultGetFavouriteFolderInfoTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetFavouriteFolderInfo(
+        underTest = GetFavouriteFolderInfoUseCase(
             nodeRepository = nodeRepository,
             addNodeType = addNodeType
         )
@@ -59,8 +60,8 @@ class DefaultGetFavouriteFolderInfoTest {
         whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(emptyList())
 
         underTest(nodeId.longValue).test {
-            assertThat(awaitItem()?.name).isEqualTo(first)
-            assertThat(awaitItem()?.name).isEqualTo(second)
+            assertThat(awaitItem().name).isEqualTo(first)
+            assertThat(awaitItem().name).isEqualTo(second)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -77,7 +78,7 @@ class DefaultGetFavouriteFolderInfoTest {
         whenever(nodeRepository.getNodeChildren(folderNode)).thenReturn(children)
 
         underTest(nodeId.longValue).test {
-            assertThat(awaitItem()?.children).isNotEmpty()
+            assertThat(awaitItem().children).isNotEmpty()
             cancelAndIgnoreRemainingEvents()
         }
     }

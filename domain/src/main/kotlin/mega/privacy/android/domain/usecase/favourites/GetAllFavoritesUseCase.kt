@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.favourites
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.mapLatest
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.AddNodeType
 import javax.inject.Inject
 
 
@@ -19,14 +20,17 @@ import javax.inject.Inject
  * @property nodeRepository
  * @property addNodeType
  */
-class DefaultGetAllFavorites @Inject constructor(
+class GetAllFavoritesUseCase @Inject constructor(
     private val favouritesRepository: FavouritesRepository,
     private val nodeRepository: NodeRepository,
     private val addNodeType: AddNodeType,
-) : GetAllFavorites {
-
+) {
+    /**
+     * get favourites
+     * @return Flow<List<FavouriteInfo>>
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun invoke(): Flow<List<TypedNode>> =
+    operator fun invoke(): Flow<List<TypedNode>> =
         flow {
             emit(favouritesRepository.getAllFavorites())
             emitAll(nodeRepository.monitorNodeUpdates()

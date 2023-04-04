@@ -10,7 +10,7 @@ import mega.privacy.android.app.utils.wrapper.MegaNodeUtilWrapper
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.IsAvailableOffline
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -30,7 +30,7 @@ class GetNodeLocationInfoTest {
     private lateinit var underTest: GetNodeLocationInfo
     private val megaNodeUtilWrapper = mock<MegaNodeUtilWrapper>()
     private val nodeRepository = mock<NodeRepository>()
-    private val isAvailableOffline = mock<IsAvailableOffline>()
+    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase>()
 
     private val node = mock<TypedNode> {
         on { id }.thenReturn(nodeId)
@@ -45,14 +45,14 @@ class GetNodeLocationInfoTest {
         underTest = DefaultGetNodeLocationInfo(
             megaNodeUtilWrapper,
             nodeRepository,
-            isAvailableOffline,
+            isAvailableOfflineUseCase,
         )
     }
 
     @Test
     fun `test if node has owner util wrapper is called with inComingShare true`() = runTest {
         whenever(nodeRepository.getOwnerIdFromInShare(nodeId, true)).thenReturn(mock())
-        whenever(isAvailableOffline(node)).thenReturn(false)
+        whenever(isAvailableOfflineUseCase(node)).thenReturn(false)
         underTest(node)
         verify(megaNodeUtilWrapper).getNodeLocationInfo(any(), eq(true), eq(handle))
     }
@@ -60,7 +60,7 @@ class GetNodeLocationInfoTest {
     @Test
     fun `test if node has no owner util wrapper is called with inComingShare false`() = runTest {
         whenever(nodeRepository.getOwnerIdFromInShare(nodeId, true)).thenReturn(null)
-        whenever(isAvailableOffline(node)).thenReturn(false)
+        whenever(isAvailableOfflineUseCase(node)).thenReturn(false)
         underTest(node)
         verify(megaNodeUtilWrapper).getNodeLocationInfo(any(), eq(false), eq(handle))
     }
@@ -69,7 +69,7 @@ class GetNodeLocationInfoTest {
     fun `test if node is available offline util wrapper is called with proper value as adapter type`() =
         runTest {
             whenever(nodeRepository.getOwnerIdFromInShare(nodeId, true)).thenReturn(null)
-            whenever(isAvailableOffline(node)).thenReturn(true)
+            whenever(isAvailableOfflineUseCase(node)).thenReturn(true)
             underTest(node)
             verify(megaNodeUtilWrapper).getNodeLocationInfo(
                 eq(Constants.OFFLINE_ADAPTER),
@@ -82,7 +82,7 @@ class GetNodeLocationInfoTest {
     fun `test if node is not available offline util wrapper is called with proper value as adapter type`() =
         runTest {
             whenever(nodeRepository.getOwnerIdFromInShare(nodeId, true)).thenReturn(null)
-            whenever(isAvailableOffline(node)).thenReturn(false)
+            whenever(isAvailableOfflineUseCase(node)).thenReturn(false)
             underTest(node)
             verify(megaNodeUtilWrapper).getNodeLocationInfo(
                 AdditionalMatchers.not(eq(Constants.OFFLINE_ADAPTER)),

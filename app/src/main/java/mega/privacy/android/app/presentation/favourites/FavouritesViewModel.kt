@@ -23,40 +23,40 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.usecase.GetAllFavorites
-import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
-import mega.privacy.android.domain.usecase.IsAvailableOffline
-import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
+import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
+import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCase
+import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.RemoveFavourites
 import javax.inject.Inject
 
 /**
  * Favourites view model
  *
- * @property getAllFavorites
+ * @property getAllFavoritesUseCase
  * @property favouriteMapper
  * @property stringUtilWrapper
- * @property removeFavourites
- * @property getSortOrder
- * @property fetchNode
- * @property mapOrder
+ * @property removeFavouritesUseCase
+ * @property getFavouriteSortOrderUseCase
+ * @property fetchNodeWrapper
+ * @property mapFavouriteSortOrderUseCase
  * @property headerMapper
  * @property monitorConnectivityUseCase
- * @property isAvailableOffline
+ * @property isAvailableOfflineUseCase
  */
 @HiltViewModel
 class FavouritesViewModel @Inject constructor(
-    private val getAllFavorites: GetAllFavorites,
+    private val getAllFavoritesUseCase: GetAllFavoritesUseCase,
     private val favouriteMapper: FavouriteMapper,
     private val stringUtilWrapper: StringUtilWrapper,
-    private val removeFavourites: RemoveFavourites,
-    private val getSortOrder: GetFavouriteSortOrder,
-    private val fetchNode: FetchNodeWrapper,
-    private val mapOrder: MapFavouriteSortOrder,
+    private val removeFavouritesUseCase: RemoveFavouritesUseCase,
+    private val getFavouriteSortOrderUseCase: GetFavouriteSortOrderUseCase,
+    private val fetchNodeWrapper: FetchNodeWrapper,
+    private val mapFavouriteSortOrderUseCase: MapFavouriteSortOrderUseCase,
     private val headerMapper: HeaderMapper,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
-    private val isAvailableOffline: IsAvailableOffline,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
 ) : ViewModel() {
 
     private val query = MutableStateFlow<String?>(null)
@@ -74,13 +74,15 @@ class FavouritesViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            order = MutableStateFlow(getSortOrder())
-            combine(order,
+            order = MutableStateFlow(getFavouriteSortOrderUseCase())
+            combine(
+                order,
                 query,
-                getAllFavorites(),
+                getAllFavoritesUseCase(),
                 selected,
                 monitorConnectivityUseCase(),
-                ::mapToFavourite).collectLatest { newState ->
+                ::mapToFavourite
+            ).collectLatest { newState ->
                 _state.update { newState }
             }
         }
@@ -128,7 +130,7 @@ class FavouritesViewModel @Inject constructor(
 
     /**
      * Filter the items that matches the query
-     * @param query search query
+     * @param queryString search query
      */
     fun searchQuery(queryString: String) {
         query.update { queryString }
@@ -168,7 +170,7 @@ class FavouritesViewModel @Inject constructor(
      */
     fun favouritesRemoved(nodeHandles: List<Long>) {
         viewModelScope.launch {
-            removeFavourites(nodeHandles)
+            removeFavouritesUseCase(nodeHandles)
         }
     }
 
@@ -187,11 +189,13 @@ class FavouritesViewModel @Inject constructor(
     private suspend fun List<TypedNode>.mapTypedNodesListToFavourites(selectedNodes: Set<NodeId>): List<Favourite> =
         mapNotNull { favouriteInfo ->
             val nodeId = favouriteInfo.id
-            val node = this@FavouritesViewModel.fetchNode(nodeId.longValue) ?: return@mapNotNull null
+            val node =
+                this@FavouritesViewModel.fetchNodeWrapper(nodeId.longValue)
+                    ?: return@mapNotNull null
             this@FavouritesViewModel.favouriteMapper(
                 node,
                 favouriteInfo,
-                isAvailableOffline(favouriteInfo),
+                isAvailableOfflineUseCase(favouriteInfo),
                 stringUtilWrapper,
                 selectedNodes.contains(nodeId),
             ) { name ->
@@ -201,7 +205,6 @@ class FavouritesViewModel @Inject constructor(
 
     /**
      * Sort order for FavouriteInfo list and place the folders at the top
-     * @param this@sortOrder favouriteInfo list
      * @param order sort order
      * @return List<FavouriteInfo>
      */
@@ -243,7 +246,8 @@ class FavouritesViewModel @Inject constructor(
     ): Int {
         val otherFolder = other as? TypedFolderNode ?: return compareFolderToFile(order)
         return if (order is FavouriteSortOrder.Label) label.compareTo(otherFolder.label) else name.compareTo(
-            otherFolder.name)
+            otherFolder.name
+        )
     }
 
     private fun compareFolderToFile(order: FavouriteSortOrder) = if (order.sortDescending) 1 else -1
@@ -251,10 +255,10 @@ class FavouritesViewModel @Inject constructor(
     /**
      * On order change
      *
-     * @param order
+     * @param sortOrder
      */
     fun onOrderChange(sortOrder: SortOrder) {
-        if (this::order.isInitialized) order.update { mapOrder(sortOrder) }
+        if (this::order.isInitialized) order.update { mapFavouriteSortOrderUseCase(sortOrder) }
     }
 
 }

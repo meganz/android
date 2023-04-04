@@ -30,26 +30,28 @@ import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
+import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
 import javax.inject.Inject
 
 /**
  * The view model regarding favourite folder
- * @param context Context
- * @param getFavouriteFolderInfo DefaultGetChildrenByNode
- * @param favouriteMapper FavouriteMapper
- * @param stringUtilWrapper StringUtilWrapper
- * @param savedStateHandle SavedStateHandle
+ * @property context Context
+ * @property ioDispatcher CoroutineDispatcher
+ * @property getFavouriteFolderInfoUseCase GetFavouriteFolderInfoUseCase
+ * @property favouriteMapper FavouriteMapper
+ * @property stringUtilWrapper StringUtilWrapper
+ * @property megaUtilWrapper MegaUtilWrapper
+ * @property fetchNodeWrapper FetchNodeWrapper
  */
 @HiltViewModel
 class FavouriteFolderViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val getFavouriteFolderInfo: GetFavouriteFolderInfo,
+    private val getFavouriteFolderInfoUseCase: GetFavouriteFolderInfoUseCase,
     private val favouriteMapper: FavouriteMapper,
     private val stringUtilWrapper: StringUtilWrapper,
     private val megaUtilWrapper: MegaUtilWrapper,
-    private val fetchNode: FetchNodeWrapper,
+    private val fetchNodeWrapper: FetchNodeWrapper,
     savedStateHandle: SavedStateHandle,
 ) :
     ViewModel() {
@@ -91,7 +93,7 @@ class FavouriteFolderViewModel @Inject constructor(
         // Cancel the previous job avoid to repeatedly observed
         currentNodeJob?.cancel()
         currentNodeJob = viewModelScope.launch {
-            getFavouriteFolderInfo(parentHandle).collectLatest { folderInfo ->
+            getFavouriteFolderInfoUseCase(parentHandle).collectLatest { folderInfo ->
                 currentFavouriteFolderInfo = folderInfo
                 _childrenNodesState.update {
                     folderInfo?.run {
@@ -119,7 +121,8 @@ class FavouriteFolderViewModel @Inject constructor(
             ChildrenNodesLoadState.Success(
                 title = name,
                 children = children.mapNotNull { favouriteInfo ->
-                    val node = fetchNode(favouriteInfo.id.longValue) ?: return@mapNotNull null
+                    val node =
+                        fetchNodeWrapper(favouriteInfo.id.longValue) ?: return@mapNotNull null
                     FavouriteListItem(
                         favourite = favouriteMapper(
                             node,

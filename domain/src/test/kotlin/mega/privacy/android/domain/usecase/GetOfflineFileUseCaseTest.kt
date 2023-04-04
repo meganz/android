@@ -7,14 +7,15 @@ import mega.privacy.android.domain.entity.offline.InboxOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.IncomingShareOfflineNodeInformation
 import mega.privacy.android.domain.entity.offline.OtherOfflineNodeInformation
 import mega.privacy.android.domain.repository.FileSystemRepository
+import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetOfflineFileTest {
-    private lateinit var underTest: GetOfflineFile
+class GetOfflineFileUseCaseTest {
+    private lateinit var underTest: GetOfflineFileUseCase
 
     private val fileName = "fileName"
     private val offlinePath = "Offline path"
@@ -28,7 +29,7 @@ class DefaultGetOfflineFileTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetOfflineFile(
+        underTest = GetOfflineFileUseCase(
             fileSystemRepository = fileSystemRepository
         )
     }
@@ -170,7 +171,8 @@ class DefaultGetOfflineFileTest {
                 handle = handle,
                 incomingHandle = incomingHandle
             )
-            val expected = offlinePath + File.separator + incomingHandle + File.separator + path + File.separator + fileName
+            val expected =
+                offlinePath + File.separator + incomingHandle + File.separator + path + File.separator + fileName
 
             val actual = underTest(input)
 

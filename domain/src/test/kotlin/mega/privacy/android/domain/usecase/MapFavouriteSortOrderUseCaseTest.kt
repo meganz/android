@@ -5,12 +5,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
+import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCase
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultMapFavouriteSortOrderTest {
-    private val underTest: MapFavouriteSortOrder =
-        DefaultMapFavouriteSortOrder()
+class MapFavouriteSortOrderUseCaseTest {
+    private val underTest: MapFavouriteSortOrderUseCase =
+        MapFavouriteSortOrderUseCase()
 
     @Test
     fun `test that ORDER_DEFAULT_ASC returns FavouriteSortOrder Name with sortDescending false`() =

@@ -5,7 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.offline.OfflineNodeInformation
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.NodeRepository
-import mega.privacy.android.domain.usecase.GetOfflineFile
+import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -21,7 +21,7 @@ class DefaultGetImageByOfflineNodeHandleTest {
 
     private val nodeRepository = mock<NodeRepository>()
     private val imageRepository = mock<ImageRepository>()
-    private val getOfflineFile = mock<GetOfflineFile>()
+    private val getOfflineFileUseCase = mock<GetOfflineFileUseCase>()
 
     private val nodeHandle = 1L
     private val highPriority = false
@@ -30,7 +30,11 @@ class DefaultGetImageByOfflineNodeHandleTest {
     @Before
     fun setUp() {
         underTest =
-            DefaultGetImageByOfflineNodeHandle(nodeRepository, getOfflineFile, imageRepository)
+            DefaultGetImageByOfflineNodeHandle(
+                nodeRepository,
+                getOfflineFileUseCase,
+                imageRepository
+            )
     }
 
     @Test
@@ -42,13 +46,13 @@ class DefaultGetImageByOfflineNodeHandleTest {
             whenever(nodeRepository.getOfflineNodeInformation(nodeHandle)).thenReturn(
                 offlineNodeInformation
             )
-            whenever(getOfflineFile(offlineNodeInformation)).thenReturn(file)
+            whenever(getOfflineFileUseCase(offlineNodeInformation)).thenReturn(file)
             underTest.invoke(
                 nodeHandle = nodeHandle,
                 highPriority = highPriority,
             )
             verify(nodeRepository, times(1)).getOfflineNodeInformation(nodeHandle)
-            verify(getOfflineFile, times(1)).invoke(offlineNodeInformation)
+            verify(getOfflineFileUseCase, times(1)).invoke(offlineNodeInformation)
         }
     }
 
@@ -73,7 +77,7 @@ class DefaultGetImageByOfflineNodeHandleTest {
             whenever(nodeRepository.getOfflineNodeInformation(nodeHandle)).thenReturn(
                 offlineNodeInformation
             )
-            whenever(getOfflineFile(offlineNodeInformation)).thenReturn(file)
+            whenever(getOfflineFileUseCase(offlineNodeInformation)).thenReturn(file)
             underTest.invoke(
                 nodeHandle = nodeHandle,
                 highPriority = highPriority,
@@ -90,7 +94,7 @@ class DefaultGetImageByOfflineNodeHandleTest {
             whenever(nodeRepository.getOfflineNodeInformation(nodeHandle)).thenReturn(
                 offlineNodeInformation
             )
-            whenever(getOfflineFile(offlineNodeInformation)).thenReturn(file)
+            whenever(getOfflineFileUseCase(offlineNodeInformation)).thenReturn(file)
             underTest.invoke(
                 nodeHandle = nodeHandle,
                 highPriority = highPriority,

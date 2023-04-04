@@ -30,7 +30,7 @@ import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
-import mega.privacy.android.domain.usecase.RemoveFavourites
+import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
@@ -58,7 +58,7 @@ class AlbumsViewModelTest {
         mock<GetFeatureFlagValueUseCase> { onBlocking { invoke(any()) }.thenReturn(true) }
     private val getDefaultAlbumsMapUseCase = mock<GetDefaultAlbumsMapUseCase>()
     private val getProscribedAlbumNamesUseCase = mock<GetProscribedAlbumNamesUseCase>()
-    private val removeFavourites = mock<RemoveFavourites>()
+    private val removeFavouritesUseCase = mock<RemoveFavouritesUseCase>()
     private val getNodeListByIds = mock<GetNodeListByIds>()
     private val createAlbumUseCase = mock<CreateAlbumUseCase>()
     private val removeAlbumsUseCase = mock<RemoveAlbumsUseCase>()
@@ -79,8 +79,8 @@ class AlbumsViewModelTest {
             getAlbumPhotos = getAlbumPhotos,
             getProscribedAlbumNamesUseCase = getProscribedAlbumNamesUseCase,
             uiAlbumMapper = uiAlbumMapper,
-            getFeatureFlagUseCase = getFeatureFlagUseCase,
-            removeFavourites = removeFavourites,
+            getFeatureFlagValueUseCase = getFeatureFlagUseCase,
+            removeFavouritesUseCase = removeFavouritesUseCase,
             getNodeListByIds = getNodeListByIds,
             createAlbumUseCase = createAlbumUseCase,
             removeAlbumsUseCase = removeAlbumsUseCase,

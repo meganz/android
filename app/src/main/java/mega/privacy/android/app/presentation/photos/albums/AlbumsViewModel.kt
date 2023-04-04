@@ -36,7 +36,7 @@ import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
 import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
-import mega.privacy.android.domain.usecase.RemoveFavourites
+import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
@@ -55,8 +55,8 @@ class AlbumsViewModel @Inject constructor(
     private val getAlbumPhotos: GetAlbumPhotos,
     private val getProscribedAlbumNamesUseCase: GetProscribedAlbumNamesUseCase,
     private val uiAlbumMapper: UIAlbumMapper,
-    private var getFeatureFlagUseCase: GetFeatureFlagValueUseCase,
-    private val removeFavourites: RemoveFavourites,
+    private var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val removeFavouritesUseCase: RemoveFavouritesUseCase,
     private val getNodeListByIds: GetNodeListByIds,
     private val createAlbumUseCase: CreateAlbumUseCase,
     private val removeAlbumsUseCase: RemoveAlbumsUseCase,
@@ -121,7 +121,7 @@ class AlbumsViewModel @Inject constructor(
     private fun loadUserAlbums() {
         albumJob?.cancel()
         albumJob = viewModelScope.launch {
-            if (!getFeatureFlagUseCase(AppFeatures.UserAlbums)) {
+            if (!getFeatureFlagValueUseCase(AppFeatures.UserAlbums)) {
                 _state.update {
                     it.copy(showAlbums = true)
                 }
@@ -503,7 +503,7 @@ class AlbumsViewModel @Inject constructor(
 
     fun removeFavourites() {
         viewModelScope.launch {
-            removeFavourites(_state.value.selectedPhotos.map { it.id }.toList())
+            removeFavouritesUseCase(_state.value.selectedPhotos.map { it.id }.toList())
         }
         _state.update {
             it.copy(selectedPhotos = emptySet())

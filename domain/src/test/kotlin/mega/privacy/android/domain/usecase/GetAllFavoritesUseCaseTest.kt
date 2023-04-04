@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.FavouritesRepository
 import mega.privacy.android.domain.repository.NodeRepository
+import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -18,8 +19,8 @@ import org.mockito.kotlin.whenever
 import kotlin.test.assertTrue
 
 @ExperimentalCoroutinesApi
-class DefaultGetAllFavoritesTest {
-    lateinit var underTest: GetAllFavorites
+class GetAllFavoritesUseCaseTest {
+    lateinit var underTest: GetAllFavoritesUseCase
     private val favouritesRepository = mock<FavouritesRepository>()
 
     private val addNodeType = mock<AddNodeType> {
@@ -37,7 +38,7 @@ class DefaultGetAllFavoritesTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAllFavorites(
+        underTest = GetAllFavoritesUseCase(
             favouritesRepository = favouritesRepository,
             nodeRepository = nodeRepository,
             addNodeType = addNodeType,

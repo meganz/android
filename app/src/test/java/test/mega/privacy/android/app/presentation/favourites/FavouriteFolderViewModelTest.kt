@@ -19,7 +19,7 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.app.utils.wrapper.FetchNodeWrapper
 import mega.privacy.android.domain.entity.FavouriteFolderInfo
 import mega.privacy.android.domain.entity.node.TypedNode
-import mega.privacy.android.domain.usecase.GetFavouriteFolderInfo
+import mega.privacy.android.domain.usecase.favourites.GetFavouriteFolderInfoUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -35,7 +35,7 @@ import kotlin.test.assertTrue
 class FavouriteFolderViewModelTest {
     private lateinit var underTest: FavouriteFolderViewModel
 
-    private val getFavouriteFolderInfo = mock<GetFavouriteFolderInfo>()
+    private val getFavouriteFolderInfo = mock<GetFavouriteFolderInfoUseCase>()
     private val stringUtilWrapper = mock<StringUtilWrapper>()
     private val favouriteMapper = mock<FavouriteMapper>()
 
@@ -69,12 +69,12 @@ class FavouriteFolderViewModelTest {
         underTest = FavouriteFolderViewModel(
             context = mock(),
             ioDispatcher = UnconfinedTestDispatcher(),
-            getFavouriteFolderInfo = getFavouriteFolderInfo,
+            getFavouriteFolderInfoUseCase = getFavouriteFolderInfo,
             stringUtilWrapper = stringUtilWrapper,
             megaUtilWrapper = megaUtilWrapper,
             savedStateHandle = SavedStateHandle(),
             favouriteMapper = favouriteMapper,
-            fetchNode = fetchNodeWrapper,
+            fetchNodeWrapper = fetchNodeWrapper,
         )
     }
 

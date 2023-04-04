@@ -76,7 +76,7 @@ class FavouritesFragmentTest {
     @Test
     fun test_that_the_empty_view_is_displayed_when_favourites_is_empty() {
         runBlocking {
-            whenever(FavouritesTestModule.getAllFavourites()).thenReturn(
+            whenever(FavouritesTestModule.getAllFavoritesUseCase()).thenReturn(
                 flowOf(emptyList())
             )
         }
@@ -172,7 +172,7 @@ class FavouritesFragmentTest {
             whenever(TestMapperModule.sortOrderIntMapper(SortOrder.ORDER_DEFAULT_ASC)).thenReturn(
                 MegaApiJava.ORDER_DEFAULT_ASC
             )
-            whenever(FavouritesTestModule.getAllFavourites()).thenReturn(
+            whenever(FavouritesTestModule.getAllFavoritesUseCase()).thenReturn(
                 flowOf(list)
             )
             whenever(

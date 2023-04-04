@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.favourites
 
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -8,11 +8,20 @@ import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 
-class DefaultIsAvailableOffline @Inject constructor(
+/**
+ * Is available offline
+ */
+class IsAvailableOfflineUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
-    private val getOfflineFile: GetOfflineFile,
-) : IsAvailableOffline {
-    override suspend fun invoke(node: TypedNode): Boolean {
+    private val getOfflineFile: GetOfflineFileUseCase,
+) {
+    /**
+     * Invoke
+     *
+     * @param node
+     * @return true if the file is available offline and up to date
+     */
+    suspend operator fun invoke(node: TypedNode): Boolean {
         val nodeInformation = nodeRepository.getOfflineNodeInformation(node.id) ?: return false
         val offlineFolder = getOfflineFile(nodeInformation).takeIf { it.exists() } ?: return false
         return node is FolderNode || localFileIsUpToDate(offlineFolder, node)

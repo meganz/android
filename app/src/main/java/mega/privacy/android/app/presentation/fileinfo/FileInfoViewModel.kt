@@ -45,13 +45,13 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.usecase.GetFolderTreeInfo
 import mega.privacy.android.domain.usecase.GetNodeById
 import mega.privacy.android.domain.usecase.GetPreview
-import mega.privacy.android.domain.usecase.IsAvailableOffline
 import mega.privacy.android.domain.usecase.IsNodeInInbox
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeVersionsByHandle
@@ -99,7 +99,7 @@ class FileInfoViewModel @Inject constructor(
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle,
     private val getOutShares: GetOutShares,
     private val getNodeLocationInfo: GetNodeLocationInfo,
-    private val isAvailableOffline: IsAvailableOffline,
+    private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val setNodeAvailableOffline: SetNodeAvailableOffline,
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val setOutgoingPermissions: SetOutgoingPermissions,
@@ -514,7 +514,7 @@ class FileInfoViewModel @Inject constructor(
                 isNodeInInbox = isNodeInInbox(typedNode.id.longValue),
                 isNodeInRubbish = isNodeInRubbish,
                 jobInProgressState = null,
-                isAvailableOffline = isAvailableOffline(typedNode),
+                isAvailableOffline = isAvailableOfflineUseCase(typedNode),
                 isAvailableOfflineEnabled = !typedNode.isTakenDown && !isNodeInRubbish,
                 thumbnailUriString = (typedNode as? TypedFileNode)?.thumbnailPath
                     ?.let {

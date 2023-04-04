@@ -41,9 +41,6 @@ import test.mega.privacy.android.app.launchFragmentInHiltContainer
 @RunWith(AndroidJUnit4::class)
 @Ignore("Ignore the unstable test. Will add the tests back once stability issue is resolved.")
 class FavouriteFolderFragmentTest {
-    companion object {
-        const val KEY_PARENT_HANDLE_ARGUMENT = "parentHandle"
-    }
 
     @get: Rule
     val hiltRule = HiltAndroidRule(this)
@@ -73,7 +70,7 @@ class FavouriteFolderFragmentTest {
     @Test
     fun test_that_the_empty_view_is_displayed_when_children_of_current_folder_is_empty() {
         runBlocking {
-            whenever(FavouritesTestModule.getFavouriteFolderInfo(1)).thenReturn(
+            whenever(FavouritesTestModule.getFavouriteFolderInfoUseCase(1)).thenReturn(
                 flowOf(FavouriteFolderInfo(emptyList(), "test name", 1, 1))
             )
         }
@@ -146,7 +143,7 @@ class FavouriteFolderFragmentTest {
         runBlocking {
             whenever(TestWrapperModule.fetchNodeWrapper(anyOrNull())).thenReturn(node)
 
-            whenever(FavouritesTestModule.getFavouriteFolderInfo(anyOrNull())).thenReturn(
+            whenever(FavouritesTestModule.getFavouriteFolderInfoUseCase(anyOrNull())).thenReturn(
                 flowOf(favouriteFolderInfo)
             )
             whenever(
@@ -185,4 +182,8 @@ class FavouriteFolderFragmentTest {
     private fun recycleView() = onView(withId(R.id.file_list_view_browser))
     private fun loadingView() = onView(withId(R.id.favourite_progressbar))
     private fun snackBarView() = onView(withId(com.google.android.material.R.id.snackbar_text))
+
+    companion object {
+        const val KEY_PARENT_HANDLE_ARGUMENT = "parentHandle"
+    }
 }

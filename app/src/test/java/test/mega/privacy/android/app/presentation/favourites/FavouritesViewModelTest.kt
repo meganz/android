@@ -25,10 +25,10 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.favourite.FavouriteSortOrder
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.usecase.GetAllFavorites
-import mega.privacy.android.domain.usecase.GetFavouriteSortOrder
-import mega.privacy.android.domain.usecase.IsAvailableOffline
-import mega.privacy.android.domain.usecase.MapFavouriteSortOrder
+import mega.privacy.android.domain.usecase.favourites.GetAllFavoritesUseCase
+import mega.privacy.android.domain.usecase.favourites.GetFavouriteSortOrderUseCase
+import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
+import mega.privacy.android.domain.usecase.favourites.MapFavouriteSortOrderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
@@ -43,11 +43,15 @@ class FavouritesViewModelTest {
     private lateinit var underTest: FavouritesViewModel
 
     private val stringUtilWrapper =
-        mock<StringUtilWrapper> { on { getFolderInfo(
-            any(),
-            any(),
-            any(),
-        ) }.thenReturn("info") }
+        mock<StringUtilWrapper> {
+            on {
+                getFolderInfo(
+                    any(),
+                    any(),
+                    any(),
+                )
+            }.thenReturn("info")
+        }
     private val favouriteMapper = mock<FavouriteMapper> {
         on { invoke(any(), any(), any(), any(), any(), any()) }
             .thenAnswer {
@@ -57,7 +61,7 @@ class FavouritesViewModelTest {
                 }
             }
     }
-    private val getSortOrder = mock<GetFavouriteSortOrder> {
+    private val getFavouriteSortOrderUseCase = mock<GetFavouriteSortOrderUseCase> {
         onBlocking { invoke() }.thenReturn(FavouriteSortOrder.ModifiedDate(false))
     }
 
@@ -66,9 +70,9 @@ class FavouritesViewModelTest {
     private val fetchNodeWrapper =
         mock<FetchNodeWrapper> { onBlocking { invoke(any()) }.thenReturn(megaNode) }
 
-    private val mapFavouriteSortOrder = mock<MapFavouriteSortOrder>()
+    private val mapFavouriteSortOrderUseCase = mock<MapFavouriteSortOrderUseCase>()
 
-    private val isAvailableOffline = mock<IsAvailableOffline> {
+    private val isAvailableOfflineUseCase = mock<IsAvailableOfflineUseCase> {
         onBlocking { invoke(any()) }.thenReturn(false)
     }
 
@@ -84,7 +88,7 @@ class FavouritesViewModelTest {
         }
     }
     private val getAllFavorites =
-        mock<GetAllFavorites> { on { invoke() }.thenReturn(flowOf(descendingTimeNodes)) }
+        mock<GetAllFavoritesUseCase> { on { invoke() }.thenReturn(flowOf(descendingTimeNodes)) }
 
     private val scheduler = TestCoroutineScheduler()
 
@@ -99,16 +103,16 @@ class FavouritesViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
         underTest = FavouritesViewModel(
-            getAllFavorites = getAllFavorites,
+            getAllFavoritesUseCase = getAllFavorites,
             stringUtilWrapper = stringUtilWrapper,
-            getSortOrder = getSortOrder,
-            removeFavourites = mock(),
+            getFavouriteSortOrderUseCase = getFavouriteSortOrderUseCase,
+            removeFavouritesUseCase = mock(),
             favouriteMapper = favouriteMapper,
-            fetchNode = fetchNodeWrapper,
-            mapOrder = mapFavouriteSortOrder,
+            fetchNodeWrapper = fetchNodeWrapper,
+            mapFavouriteSortOrderUseCase = mapFavouriteSortOrderUseCase,
             headerMapper = ::toHeader,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            isAvailableOffline = isAvailableOffline
+            isAvailableOfflineUseCase = isAvailableOfflineUseCase
         )
     }
 
@@ -158,8 +162,8 @@ class FavouritesViewModelTest {
     @Test
     fun `test that sort order is changed when set from event`() = runTest {
         val sortOrder = FavouriteSortOrder.ModifiedDate(false)
-        whenever(getSortOrder()).thenReturn(sortOrder)
-        whenever(mapFavouriteSortOrder(any())).thenReturn(sortOrder.copy(sortDescending = !sortOrder.sortDescending))
+        whenever(getFavouriteSortOrderUseCase()).thenReturn(sortOrder)
+        whenever(mapFavouriteSortOrderUseCase(any())).thenReturn(sortOrder.copy(sortDescending = !sortOrder.sortDescending))
 
         underTest.favouritesState.test {
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
@@ -225,7 +229,11 @@ class FavouritesViewModelTest {
     @Test
     fun `test that sorted list retain their filter`() = runTest {
         val timeDescendingOddOnly = timeDescending.filter { it.mod(2) != 0 }
-        whenever(mapFavouriteSortOrder(any())).thenReturn(FavouriteSortOrder.ModifiedDate(true))
+        whenever(mapFavouriteSortOrderUseCase(any())).thenReturn(
+            FavouriteSortOrder.ModifiedDate(
+                true
+            )
+        )
         underTest.favouritesState.test {
             assertThat(awaitItem()).isInstanceOf(FavouriteLoadState.Loading::class.java)
             val items = awaitItem()
