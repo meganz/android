@@ -17,6 +17,7 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.featuretoggle.AppFeatures
+import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
@@ -29,17 +30,18 @@ import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
-import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
-import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
-import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
+import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
+import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
+import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
-import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -62,6 +64,7 @@ class AlbumsViewModel @Inject constructor(
     private val removeAlbumsUseCase: RemoveAlbumsUseCase,
     private val removePhotosFromAlbumUseCase: RemovePhotosFromAlbumUseCase,
     private val updateAlbumNameUseCase: UpdateAlbumNameUseCase,
+    private val getNextDefaultAlbumNameUseCase: GetNextDefaultAlbumNameUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -364,22 +367,20 @@ class AlbumsViewModel @Inject constructor(
      * Get the default album title
      */
     fun setPlaceholderAlbumTitle(placeholderTitle: String) {
-        val allUserAlbumsTitle: List<String> = getAllUserAlbumsNames()
-        var i = 0
-        var currentDefaultTitle = placeholderTitle
-
-        while (currentDefaultTitle in allUserAlbumsTitle) {
-            currentDefaultTitle = placeholderTitle + " (${++i})"
-        }
-
         _state.update {
-            it.copy(createAlbumPlaceholderTitle = currentDefaultTitle)
+            it.copy(
+                createAlbumPlaceholderTitle = getNextDefaultAlbumNameUseCase(
+                    defaultName = placeholderTitle,
+                    currentNames = getAllUserAlbumsNames()
+                )
+            )
         }
     }
 
     private fun getAllUserAlbumsNames() = _state.value.albums.filter {
         it.id is Album.UserAlbum
     }.map { it.title }
+        .filterIsInstance<AlbumTitle.StringTitle>().map { it.title }
 
     private suspend fun checkTitleValidity(
         title: String,

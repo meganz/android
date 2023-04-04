@@ -14,7 +14,7 @@ import mega.privacy.android.domain.entity.photos.Photo
  */
 data class UIAlbum(
     val id: Album,
-    val title: String,
+    val title: AlbumTitle,
     val count: Int,
     val coverPhoto: Photo?,
     val photos: List<Photo>,

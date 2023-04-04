@@ -73,9 +73,6 @@ import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.utils.Util.dp2px
-import mega.privacy.android.domain.entity.photos.Album
-import mega.privacy.android.domain.entity.photos.AlbumId
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.core.ui.controls.MegaDialog
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.button
@@ -86,6 +83,9 @@ import mega.privacy.android.core.ui.theme.teal_200
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.domain.entity.photos.Album
+import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.Photo
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -287,7 +287,7 @@ fun AlbumsView(
                                         setPadding(0, dp2px(10f), 0, dp2px(3f))
                                     }
                                 },
-                                update = { it.text = album.title },
+                                update = { it.text = album.title.getTitleString(it.context) },
                             )
 
                             Text(

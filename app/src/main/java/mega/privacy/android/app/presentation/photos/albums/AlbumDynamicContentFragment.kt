@@ -19,9 +19,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -268,7 +268,7 @@ class AlbumDynamicContentFragment : Fragment() {
     fun getCurrentAlbumTitle(): String {
         val currentUIAlbum = albumsViewModel.state.value.currentUIAlbum
         return if (context != null && currentUIAlbum != null) {
-            currentUIAlbum.title
+            currentUIAlbum.title.getTitleString(requireContext())
         } else {
             getString(R.string.tab_title_album)
         }

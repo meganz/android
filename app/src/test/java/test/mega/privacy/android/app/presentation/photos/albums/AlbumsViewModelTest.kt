@@ -15,6 +15,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
+import mega.privacy.android.app.presentation.photos.albums.model.AlbumTitle
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.model.mapper.UIAlbumMapper
 import mega.privacy.android.domain.entity.FileTypeInfo
@@ -23,15 +24,16 @@ import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.photos.PhotoPredicate
-import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
-import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetUserAlbums
-import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.favourites.RemoveFavouritesUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
+import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
+import mega.privacy.android.domain.usecase.photos.GetDefaultAlbumsMapUseCase
+import mega.privacy.android.domain.usecase.photos.GetNextDefaultAlbumNameUseCase
 import mega.privacy.android.domain.usecase.photos.GetProscribedAlbumNamesUseCase
+import mega.privacy.android.domain.usecase.photos.RemoveAlbumsUseCase
 import mega.privacy.android.domain.usecase.photos.RemovePhotosFromAlbumUseCase
 import mega.privacy.android.domain.usecase.photos.UpdateAlbumNameUseCase
 import org.junit.After
@@ -87,6 +89,7 @@ class AlbumsViewModelTest {
             removePhotosFromAlbumUseCase = removePhotosFromAlbumUseCase,
             updateAlbumNameUseCase = updateAlbumNameUseCase,
             defaultDispatcher = UnconfinedTestDispatcher(),
+            getNextDefaultAlbumNameUseCase = GetNextDefaultAlbumNameUseCase(),
         )
     }
 
@@ -123,7 +126,7 @@ class AlbumsViewModelTest {
 
             whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
                 UIAlbum(
-                    title = "Favourite",
+                    title = AlbumTitle.StringTitle("Favourite"),
                     count = 0,
                     coverPhoto = null,
                     photos = emptyList(),
@@ -132,7 +135,7 @@ class AlbumsViewModelTest {
             )
             whenever(uiAlbumMapper(any(), eq(Album.GifAlbum))).thenReturn(
                 UIAlbum(
-                    title = "GIFs",
+                    title = AlbumTitle.StringTitle("GIFs"),
                     count = 0,
                     coverPhoto = null,
                     photos = emptyList(),
@@ -141,7 +144,7 @@ class AlbumsViewModelTest {
             )
             whenever(uiAlbumMapper(any(), eq(Album.RawAlbum))).thenReturn(
                 UIAlbum(
-                    title = "RAW",
+                    title = AlbumTitle.StringTitle("RAW"),
                     count = 0,
                     coverPhoto = null,
                     photos = emptyList(),
@@ -168,7 +171,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
             UIAlbum(
-                title = "Favourites",
+                title = AlbumTitle.StringTitle("Favourites"),
                 count = 0,
                 coverPhoto = null,
                 photos = emptyList(),
@@ -177,7 +180,7 @@ class AlbumsViewModelTest {
         )
         whenever(uiAlbumMapper(any(), eq(Album.GifAlbum))).thenReturn(
             UIAlbum(
-                title = "GIFs",
+                title = AlbumTitle.StringTitle("GIFs"),
                 count = 0,
                 coverPhoto = null,
                 photos = emptyList(),
@@ -205,7 +208,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
             UIAlbum(
-                title = "Favourites",
+                title = AlbumTitle.StringTitle("Favourites"),
                 count = 0,
                 coverPhoto = null,
                 photos = emptyList(),
@@ -233,7 +236,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
             UIAlbum(
-                title = "Favourites",
+                title = AlbumTitle.StringTitle("Favourites"),
                 count = 0,
                 coverPhoto = null,
                 photos = emptyList(),
@@ -242,7 +245,7 @@ class AlbumsViewModelTest {
         )
         whenever(uiAlbumMapper(any(), eq(Album.GifAlbum))).thenReturn(
             UIAlbum(
-                title = "GIFs",
+                title = AlbumTitle.StringTitle("GIFs"),
                 count = 0,
                 coverPhoto = null,
                 photos = emptyList(),
@@ -251,7 +254,7 @@ class AlbumsViewModelTest {
         )
         whenever(uiAlbumMapper(any(), eq(Album.RawAlbum))).thenReturn(
             UIAlbum(
-                title = "RAW",
+                title = AlbumTitle.StringTitle("RAW"),
                 count = 0,
                 coverPhoto = null,
                 photos = emptyList(),
@@ -289,7 +292,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(testPhotosList, Album.FavouriteAlbum)).thenReturn(
             UIAlbum(
-                title = "Favourites",
+                title = AlbumTitle.StringTitle("Favourites"),
                 count = testPhotosList.size,
                 coverPhoto = createImage(id = 1L, modificationTime = LocalDateTime.MAX),
                 photos = testPhotosList,
@@ -317,7 +320,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
             UIAlbum(
-                title = newAlbum1.title,
+                title = AlbumTitle.StringTitle(newAlbum1.title),
                 count = 0,
                 coverPhoto = newAlbum1.cover,
                 photos = emptyList(),
@@ -327,7 +330,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(any(), eq(newAlbum2))).thenReturn(
             UIAlbum(
-                title = newAlbum2.title,
+                title = AlbumTitle.StringTitle(newAlbum2.title),
                 count = 0,
                 coverPhoto = newAlbum2.cover,
                 photos = emptyList(),
@@ -337,7 +340,7 @@ class AlbumsViewModelTest {
 
         whenever(uiAlbumMapper(any(), eq(newAlbum3))).thenReturn(
             UIAlbum(
-                title = newAlbum3.title,
+                title = AlbumTitle.StringTitle(newAlbum3.title),
                 count = 0,
                 coverPhoto = newAlbum3.cover,
                 photos = emptyList(),
@@ -416,7 +419,7 @@ class AlbumsViewModelTest {
             val newUserAlbum = createUserAlbum(title = "New album")
             whenever(uiAlbumMapper(any(), eq(newUserAlbum))).thenReturn(
                 UIAlbum(
-                    title = newUserAlbum.title,
+                    title = AlbumTitle.StringTitle(newUserAlbum.title),
                     count = 0,
                     coverPhoto = newUserAlbum.cover,
                     photos = emptyList(),
@@ -452,7 +455,7 @@ class AlbumsViewModelTest {
 
             whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
                 UIAlbum(
-                    title = newAlbum1.title,
+                    title = AlbumTitle.StringTitle(newAlbum1.title),
                     count = 0,
                     coverPhoto = newAlbum1.cover,
                     photos = emptyList(),
@@ -462,7 +465,7 @@ class AlbumsViewModelTest {
 
             whenever(uiAlbumMapper(any(), eq(newAlbum2))).thenReturn(
                 UIAlbum(
-                    title = newAlbum2.title,
+                    title = AlbumTitle.StringTitle(newAlbum2.title),
                     count = 0,
                     coverPhoto = newAlbum2.cover,
                     photos = emptyList(),
@@ -501,7 +504,7 @@ class AlbumsViewModelTest {
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
             whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
                 UIAlbum(
-                    title = "Favourites",
+                    title = AlbumTitle.StringTitle("Favourites"),
                     count = 0,
                     coverPhoto = null,
                     photos = emptyList(),
@@ -537,7 +540,7 @@ class AlbumsViewModelTest {
 
             whenever(uiAlbumMapper(any(), eq(Album.FavouriteAlbum))).thenReturn(
                 UIAlbum(
-                    title = "Favourites",
+                    title = AlbumTitle.StringTitle("Favourites"),
                     count = 0,
                     coverPhoto = null,
                     photos = emptyList(),
@@ -589,7 +592,7 @@ class AlbumsViewModelTest {
             whenever(getProscribedAlbumNamesUseCase()).thenReturn(proscribedStrings)
             whenever(uiAlbumMapper(any(), eq(newAlbum1))).thenReturn(
                 UIAlbum(
-                    title = newAlbum1.title,
+                    title = AlbumTitle.StringTitle(newAlbum1.title),
                     count = 0,
                     coverPhoto = newAlbum1.cover,
                     photos = emptyList(),
