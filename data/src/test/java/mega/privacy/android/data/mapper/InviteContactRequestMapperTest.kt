@@ -3,36 +3,36 @@ package mega.privacy.android.data.mapper
 import com.google.common.truth.Truth
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import nz.mega.sdk.MegaError
-import org.junit.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.mock
+import java.util.stream.Stream
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InviteContactRequestMapperTest {
+    private val underTest: InviteContactRequestMapper = InviteContactRequestMapper()
 
-    @Test
-    fun `test that mega error API_OK returns Sent enum`() {
-        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
-        val expectedResult = InviteContactRequest.Sent
-        Truth.assertThat(toInviteContactRequest(megaError)).isEqualTo(expectedResult)
+    @ParameterizedTest(name = "test {0} is mapped correctly")
+    @MethodSource("provideParameters")
+    fun `test mapped correctly`(expected: InviteContactRequest, raw: MegaError) {
+        val actual = underTest(raw)
+        Truth.assertThat(actual).isEqualTo(expected)
     }
 
-    @Test
-    fun `test that mega error API_EEXIST returns AlreadyContact enum`() {
-        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EEXIST) }
-        val expectedResult = InviteContactRequest.AlreadyContact
-        Truth.assertThat(toInviteContactRequest(megaError)).isEqualTo(expectedResult)
-    }
-
-    @Test
-    fun `test that mega error API_EARGS returns InvalidEmail enum`() {
-        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }
-        val expectedResult = InviteContactRequest.InvalidEmail
-        Truth.assertThat(toInviteContactRequest(megaError)).isEqualTo(expectedResult)
-    }
-
-    @Test
-    fun `test that mega error API_EACCESS returns InvalidStatus enum`() {
-        val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EACCESS) }
-        val expectedResult = InviteContactRequest.InvalidStatus
-        Truth.assertThat(toInviteContactRequest(megaError)).isEqualTo(expectedResult)
-    }
+    private fun provideParameters(): Stream<Arguments> = Stream.of(
+        Arguments.of(
+            InviteContactRequest.Sent,
+            mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }),
+        Arguments.of(
+            InviteContactRequest.AlreadyContact,
+            mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EEXIST) }),
+        Arguments.of(
+            InviteContactRequest.InvalidEmail,
+            mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EARGS) }),
+        Arguments.of(
+            InviteContactRequest.InvalidStatus,
+            mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_EACCESS) })
+    )
 }
