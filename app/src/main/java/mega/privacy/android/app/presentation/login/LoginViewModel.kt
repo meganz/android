@@ -180,6 +180,14 @@ class LoginViewModel @Inject constructor(
         _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Tour) }
 
     /**
+     * Mark handled pending to show fragment
+     *
+     */
+    fun markHandledPendingToShowFragment() {
+        _state.update { state -> state.copy(isPendingToShowFragment = null) }
+    }
+
+    /**
      * Sets [ACTION_FORCE_RELOAD_ACCOUNT] as pendingAction.
      */
     fun setForceReloadAccountAsPendingAction() {
