@@ -37,7 +37,6 @@ import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.PaymentMethodTypeMapper
 import mega.privacy.android.data.mapper.PaymentPlatformTypeMapper
 import mega.privacy.android.data.mapper.PricingMapper
-import mega.privacy.android.data.mapper.ScannedContactLinkResultMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapperImpl
 import mega.privacy.android.data.mapper.SortOrderMapper
@@ -100,7 +99,6 @@ import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPaymentPlatformType
 import mega.privacy.android.data.mapper.toPricing
-import mega.privacy.android.data.mapper.toScannedContactLinkResult
 import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionOptionList
@@ -459,13 +457,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideFileDurationMapper(): FileDurationMapper = ::toDuration
-
-        /**
-         * Provides scanned contact link result mapper
-         */
-        @Provides
-        fun provideScannedContactLinkResultMapper(): ScannedContactLinkResultMapper =
-            ::toScannedContactLinkResult
 
         /**
          * Provides VideoAttachment mapper

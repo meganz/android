@@ -24,7 +24,7 @@ import kotlin.contracts.ExperimentalContracts
  * Implementation of [QRCodeRepository]
  */
 @ExperimentalContracts
-class DefaultQRCodeRepository @Inject constructor(
+internal class DefaultQRCodeRepository @Inject constructor(
     private val cacheFolderGateway: CacheFolderGateway,
     private val megaApiGateway: MegaApiGateway,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,

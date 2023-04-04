@@ -13,7 +13,8 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ScannedContactLinkResultMapper
-import mega.privacy.android.data.mapper.toScannedContactLinkResult
+import mega.privacy.android.domain.entity.qrcode.QRCodeQueryResults
+import mega.privacy.android.domain.entity.qrcode.ScannedContactLinkResult
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import org.junit.Before
@@ -70,7 +71,13 @@ class DefaultQRCodeRepositoryTest {
         }
         val megaError = mock<MegaError> { on { errorCode }.thenReturn(MegaError.API_OK) }
 
-        val expectedResult = toScannedContactLinkResult(megaRequest, megaError, false)
+        val expectedResult = ScannedContactLinkResult(
+            "abc xyz",
+            contactEmail,
+            handle,
+            false,
+            QRCodeQueryResults.CONTACT_QUERY_OK
+        )
 
         whenever(scannedContactLinkResultMapper(megaRequest, megaError, false))
             .thenReturn(expectedResult)

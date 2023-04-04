@@ -9,6 +9,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 
 class ScannedContactLinkResultMapperTest {
+    private val underTest: ScannedContactLinkResultMapper = ScannedContactLinkResultMapper()
 
     @Test
     fun `test that mega request and mega error returns ScannedContactLinkResult`() {
@@ -28,8 +29,7 @@ class ScannedContactLinkResultMapperTest {
             QRCodeQueryResults.CONTACT_QUERY_OK
         )
 
-        val actualResult = toScannedContactLinkResult(megaRequest, megaError, false)
-
+        val actualResult = underTest(megaRequest, megaError, false)
         Truth.assertThat(actualResult).isEqualTo(expectedResult)
     }
 }
