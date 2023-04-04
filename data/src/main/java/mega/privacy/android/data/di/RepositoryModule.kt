@@ -43,6 +43,7 @@ import mega.privacy.android.data.repository.GlobalStatesRepository
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.data.repository.MegaNodeRepositoryImpl
 import mega.privacy.android.data.repository.NodeRepositoryImpl
+import mega.privacy.android.data.repository.SlideshowRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
@@ -74,6 +75,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.QRCodeRepository
 import mega.privacy.android.domain.repository.RecentActionsRepository
 import mega.privacy.android.domain.repository.SettingsRepository
+import mega.privacy.android.domain.repository.SlideshowRepository
 import mega.privacy.android.domain.repository.SortOrderRepository
 import mega.privacy.android.domain.repository.StatisticsRepository
 import mega.privacy.android.domain.repository.StreamingServerRepository
@@ -88,6 +90,9 @@ import kotlin.contracts.ExperimentalContracts
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class RepositoryModule {
+    @Binds
+    abstract fun bindSlideshowRepository(implementation: SlideshowRepositoryImpl): SlideshowRepository
+
     @Binds
     abstract fun bindAlbumRepository(repository: DefaultAlbumRepository): AlbumRepository
 

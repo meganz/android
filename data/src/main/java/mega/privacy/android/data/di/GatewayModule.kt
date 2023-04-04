@@ -60,6 +60,7 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.preferences.AccountPreferencesDataStore
@@ -70,6 +71,7 @@ import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore
 import mega.privacy.android.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.data.preferences.LoggingPreferencesDataStore
+import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
 import mega.privacy.android.data.preferences.StatisticsPreferencesDataStore
 import mega.privacy.android.data.preferences.UIPreferencesDatastore
 import javax.inject.Singleton
@@ -77,6 +79,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal abstract class GatewayModule {
+    @Binds
+    abstract fun bindSlideshowPreferencesGateway(implementation: SlideshowPreferencesDataStore): SlideshowPreferencesGateway
+
     @Binds
     abstract fun bindAssetsGateway(implementation: AssetsFacade): AssetsGateway
 
