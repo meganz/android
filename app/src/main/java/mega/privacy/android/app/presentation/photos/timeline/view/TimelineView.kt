@@ -29,6 +29,7 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -75,13 +76,19 @@ fun TimelineView(
     val isBarVisible by remember {
         derivedStateOf { lazyGridState.firstVisibleItemIndex == 0 }
     }
-    val isScrollingDown = lazyGridState.isScrollingDown()
+    val isScrollingDown by lazyGridState.isScrollingDown()
 
     if (timelineViewState.enableCameraUploadPageShowing) {
         enableCUView()
     } else if (timelineViewState.loadPhotosDone && timelineViewState.currentShowingPhotos.isEmpty()) {
         emptyView()
     } else {
+        LaunchedEffect(timelineViewState.scrollStartIndex, timelineViewState.scrollStartOffset) {
+            lazyGridState.scrollToItem(
+                timelineViewState.scrollStartIndex,
+                timelineViewState.scrollStartOffset
+            )
+        }
         // Load Photos
         Box {
             when (timelineViewState.selectedTimeBarTab) {

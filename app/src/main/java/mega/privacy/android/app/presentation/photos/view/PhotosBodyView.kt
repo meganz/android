@@ -17,6 +17,7 @@ import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +40,7 @@ import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewS
 /**
  * Main Photos Body View
  */
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun PhotosBodyView(
     tabs: List<PhotosTab> = listOf(),
@@ -58,16 +60,14 @@ fun PhotosBodyView(
             timelineLazyGridState.firstVisibleItemIndex == 0
         }
     }
-    val isScrollingDownTimeline =
-        timelineLazyGridState.isScrollingDown()
+    val isScrollingDownTimeline by timelineLazyGridState.isScrollingDown()
 
     val isBarVisibleAlbums by remember {
         derivedStateOf {
             albumsLazyGridState.firstVisibleItemIndex == 0
         }
     }
-    val isScrollingDownAlbums =
-        albumsLazyGridState.isScrollingDown()
+    val isScrollingDownAlbums by albumsLazyGridState.isScrollingDown()
 
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -175,7 +175,7 @@ fun PagerView(
 }
 
 @Composable
-internal fun LazyGridState.isScrollingDown(): Boolean {
+internal fun LazyGridState.isScrollingDown(): State<Boolean> {
     var nextIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
     var nextScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
     return remember(this) {
@@ -189,5 +189,5 @@ internal fun LazyGridState.isScrollingDown(): Boolean {
                 nextScrollOffset = firstVisibleItemScrollOffset
             }
         }
-    }.value
+    }
 }

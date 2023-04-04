@@ -383,17 +383,7 @@ class PhotosFragment : Fragment() {
                 else
                     rememberPagerState(initialPage = photosViewState.selectedTab.ordinal)
         }
-        timelineLazyGridState =
-            rememberSaveable(
-                timelineViewState.scrollStartIndex,
-                timelineViewState.scrollStartOffset,
-                saver = LazyGridState.Saver
-            ) {
-                LazyGridState(
-                    timelineViewState.scrollStartIndex,
-                    timelineViewState.scrollStartOffset
-                )
-            }
+        timelineLazyGridState = rememberLazyGridState()
 
         albumsLazyGridState = rememberLazyGridState()
 
