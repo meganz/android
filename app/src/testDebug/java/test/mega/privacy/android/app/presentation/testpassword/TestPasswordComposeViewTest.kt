@@ -2,12 +2,14 @@ package test.mega.privacy.android.app.presentation.testpassword
 
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.test.espresso.Espresso.pressBack
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidTest
 import de.palm.composestateevents.triggered
@@ -15,6 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
 import mega.privacy.android.app.presentation.testpassword.model.TestPasswordUIState
 import mega.privacy.android.app.presentation.testpassword.view.Constants.BACKUP_BUTTON_TAG
+import mega.privacy.android.app.presentation.testpassword.view.Constants.BOTTOM_SHEET_TITLE
 import mega.privacy.android.app.presentation.testpassword.view.Constants.CLOSE_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.CONFIRM_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.DISMISS_BUTTON_TAG
@@ -49,7 +52,6 @@ class TestPasswordComposeViewTest {
         composeTestRule.setContent {
             TestPasswordComposeView(
                 uiState = uiState,
-                onBackupRecoveryClick = {},
                 onResetUserMessage = {},
                 onCheckCurrentPassword = {},
                 onTestPasswordClick = {},
@@ -61,7 +63,10 @@ class TestPasswordComposeViewTest {
                 onFinishedCopyingRecoveryKey = {},
                 onResetFinishedCopyingRecoveryKey = {},
                 onExhaustedPasswordAttempts = {},
-                onResetExhaustedPasswordAttempts = {}
+                onResetExhaustedPasswordAttempts = {},
+                onSaveRecoveryKey = {},
+                onCopyRecoveryKey = {},
+                onPrintRecoveryKey = {}
             )
         }
     }
@@ -225,5 +230,19 @@ class TestPasswordComposeViewTest {
         composeTestRule.onNodeWithTag(DISMISS_BUTTON_TAG)
             .assertIsDisplayed()
             .assertIsNotEnabled()
+    }
+
+    @Test
+    fun `test that screen should not go back when recovery bottom sheet is visible and back action triggered`() {
+        setComposeContent(TestPasswordUIState())
+
+        composeTestRule.onNodeWithTag(BACKUP_BUTTON_TAG).performClick()
+
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TITLE).assertIsDisplayed()
+
+        pressBack()
+
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_TITLE).assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag(BACKUP_BUTTON_TAG).assertIsDisplayed()
     }
 }

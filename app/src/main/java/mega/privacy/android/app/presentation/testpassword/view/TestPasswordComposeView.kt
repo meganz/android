@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.testpassword.view
 
 import android.content.res.Configuration
 import androidx.activity.OnBackPressedDispatcher
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
@@ -9,7 +10,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -32,9 +32,12 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
@@ -46,11 +49,13 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -77,6 +82,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.changepassword.model.TestPasswordAttribute
 import mega.privacy.android.app.presentation.testpassword.model.PasswordState
@@ -86,6 +93,8 @@ import mega.privacy.android.app.presentation.testpassword.view.Constants.CLOSE_B
 import mega.privacy.android.app.presentation.testpassword.view.Constants.CONFIRM_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.DISMISS_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.PASSWORD_REMINDER_APP_BAR_TAG
+import mega.privacy.android.app.presentation.testpassword.view.Constants.PASSWORD_REMINDER_DESC_TAG
+import mega.privacy.android.app.presentation.testpassword.view.Constants.PASSWORD_REMINDER_DISMISS_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.PASSWORD_REMINDER_LAYOUT_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.PASSWORD_TEXT_FIELD_FOOTER_ICON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.PASSWORD_TEXT_FIELD_FOOTER_TAG
@@ -95,8 +104,6 @@ import mega.privacy.android.app.presentation.testpassword.view.Constants.PROGRES
 import mega.privacy.android.app.presentation.testpassword.view.Constants.SEE_PASSWORD_TEST_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_APP_BAR_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_BUTTON_TAG
-import mega.privacy.android.app.presentation.testpassword.view.Constants.PASSWORD_REMINDER_DESC_TAG
-import mega.privacy.android.app.presentation.testpassword.view.Constants.PASSWORD_REMINDER_DISMISS_BUTTON_TAG
 import mega.privacy.android.app.presentation.testpassword.view.Constants.TEST_PASSWORD_LAYOUT_TAG
 import mega.privacy.android.core.ui.controls.MegaTextField
 import mega.privacy.android.core.ui.controls.SimpleTopAppBar
@@ -202,15 +209,39 @@ internal object Constants {
      * Test tag for see password icon
      */
     const val SEE_PASSWORD_TEST_TAG = "see_password_test_tag"
+
+    /**
+     * Test tag for see bottom sheet title
+     * @see RecoveryKeyBottomSheet
+     */
+    const val BOTTOM_SHEET_TITLE = "bottom_sheet_title"
+
+    /**
+     * Test tag for see bottom sheet print menu
+     * @see RecoveryKeyBottomSheet
+     */
+    const val BOTTOM_SHEET_PRINT = "bottom_sheet_print"
+
+    /**
+     * Test tag for see bottom sheet copy menu
+     * @see RecoveryKeyBottomSheet
+     */
+    const val BOTTOM_SHEET_COPY = "bottom_sheet_copy"
+
+    /**
+     * Test tag for see bottom sheet save menu
+     * @see RecoveryKeyBottomSheet
+     */
+    const val BOTTOM_SHEET_SAVE = "bottom_sheet_save"
 }
 
 /**
  * Test Password Feature in Jetpack Compose
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun TestPasswordComposeView(
     uiState: TestPasswordUIState,
-    onBackupRecoveryClick: () -> Unit,
     onResetUserMessage: () -> Unit,
     onCheckCurrentPassword: (String) -> Unit,
     onTestPasswordClick: () -> Unit,
@@ -223,6 +254,9 @@ internal fun TestPasswordComposeView(
     onResetFinishedCopyingRecoveryKey: () -> Unit,
     onExhaustedPasswordAttempts: () -> Unit,
     onResetExhaustedPasswordAttempts: () -> Unit,
+    onPrintRecoveryKey: () -> Unit,
+    onCopyRecoveryKey: () -> Unit,
+    onSaveRecoveryKey: () -> Unit,
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
@@ -253,10 +287,7 @@ internal fun TestPasswordComposeView(
     Scaffold(
         scaffoldState = rememberScaffoldState(),
         topBar = {
-            TestPasswordScreenAppBar(
-                uiState = uiState,
-                onBackPressedDispatcher = onBackPressedDispatcher
-            )
+
         },
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState) { data ->
@@ -268,28 +299,65 @@ internal fun TestPasswordComposeView(
             }
         }
     ) { padding ->
-        Box(
+        val coroutineScope = rememberCoroutineScope()
+        val modalSheetState = rememberModalBottomSheetState(
+            initialValue = ModalBottomSheetValue.Hidden,
+            confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded },
+            skipHalfExpanded = true,
+        )
+
+        BackHandler(enabled = modalSheetState.isVisible) {
+            coroutineScope.launch { modalSheetState.hide() }
+        }
+
+        ConstraintLayout(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
         ) {
+            val (appbar, tpLayout, prLayout, loading) = createRefs()
+
+            TestPasswordScreenAppBar(
+                modifier = Modifier.constrainAs(appbar) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                },
+                uiState = uiState,
+                onBackPressedDispatcher = onBackPressedDispatcher
+            )
+
             if (uiState.isUITestPasswordMode) {
                 TestPasswordModeLayout(
-                    modifier = Modifier.testTag(TEST_PASSWORD_LAYOUT_TAG),
+                    modifier = Modifier
+                        .constrainAs(tpLayout) {
+                            top.linkTo(appbar.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .testTag(TEST_PASSWORD_LAYOUT_TAG),
                     uiState = uiState,
+                    modalSheetState = modalSheetState,
+                    coroutineScope = coroutineScope,
                     onBackPressedDispatcher = onBackPressedDispatcher,
-                    onBackupRecoveryClick = onBackupRecoveryClick,
                     onCheckCurrentPassword = onCheckCurrentPassword,
                     onResetPasswordVerificationState = onResetPasswordVerificationState,
                     onDismiss = onDismiss,
                 )
             } else {
                 PasswordReminderModeLayout(
-                    modifier = Modifier.testTag(PASSWORD_REMINDER_LAYOUT_TAG),
+                    modifier = Modifier
+                        .constrainAs(prLayout) {
+                            top.linkTo(appbar.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                        .testTag(PASSWORD_REMINDER_LAYOUT_TAG),
                     uiState = uiState,
+                    modalSheetState = modalSheetState,
+                    coroutineScope = coroutineScope,
                     onBackPressedDispatcher = onBackPressedDispatcher,
                     onTestPasswordClick = onTestPasswordClick,
-                    onBackupRecoveryClick = onBackupRecoveryClick,
                     onCheckboxValueChanged = onCheckboxValueChanged,
                     onDismiss = onDismiss
                 )
@@ -298,30 +366,43 @@ internal fun TestPasswordComposeView(
             if (uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier
+                        .constrainAs(loading) {
+                            top.linkTo(appbar.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            bottom.linkTo(parent.bottom)
+                        }
                         .testTag(PROGRESS_LOADING_TAG)
-                        .align(Alignment.Center)
                         .size(44.dp),
                     color = teal_300
                 )
             }
         }
+
+        RecoveryKeyBottomSheet(
+            modalSheetState = modalSheetState,
+            onPrint = onPrintRecoveryKey,
+            onCopy = onCopyRecoveryKey,
+            onSave = onSaveRecoveryKey
+        )
     }
 }
 
 @Composable
 private fun TestPasswordScreenAppBar(
+    modifier: Modifier,
     uiState: TestPasswordUIState,
     onBackPressedDispatcher: OnBackPressedDispatcher?,
 ) {
     if (uiState.isUITestPasswordMode) {
         TestPasswordModeAppBar(
-            modifier = Modifier.testTag(TEST_PASSWORD_APP_BAR_TAG),
+            modifier = modifier.testTag(TEST_PASSWORD_APP_BAR_TAG),
             isEnabled = uiState.isLoading.not(),
             onBackPressedDispatcher = onBackPressedDispatcher
         )
     } else {
         PasswordReminderModeAppBar(
-            modifier = Modifier.testTag(PASSWORD_REMINDER_APP_BAR_TAG),
+            modifier = modifier.testTag(PASSWORD_REMINDER_APP_BAR_TAG),
             isEnabled = uiState.isLoading.not(),
             isIconVisible = uiState.isLogoutMode,
             onBackPressedDispatcher = onBackPressedDispatcher
@@ -405,13 +486,15 @@ private fun TestPasswordModeAppBar(
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun PasswordReminderModeLayout(
     modifier: Modifier,
     uiState: TestPasswordUIState,
+    modalSheetState: ModalBottomSheetState,
+    coroutineScope: CoroutineScope,
     onBackPressedDispatcher: OnBackPressedDispatcher?,
     onTestPasswordClick: () -> Unit,
-    onBackupRecoveryClick: () -> Unit,
     onCheckboxValueChanged: (Boolean) -> Unit,
     onDismiss: (Boolean) -> Unit,
 ) {
@@ -525,7 +608,9 @@ private fun PasswordReminderModeLayout(
                     top.linkTo(testPasswordButton.bottom, margin = 20.dp)
                     start.linkTo(parent.start)
                 },
-            onClick = onBackupRecoveryClick,
+            onClick = {
+                coroutineScope.launch { modalSheetState.show() }
+            },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = MaterialTheme.colors.teal_300_200,
                 contentColor = MaterialTheme.colors.surface
@@ -574,13 +659,14 @@ private fun PasswordReminderModeLayout(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun TestPasswordModeLayout(
     modifier: Modifier,
     uiState: TestPasswordUIState,
+    modalSheetState: ModalBottomSheetState,
+    coroutineScope: CoroutineScope,
     onBackPressedDispatcher: OnBackPressedDispatcher?,
-    onBackupRecoveryClick: () -> Unit,
     onCheckCurrentPassword: (String) -> Unit,
     onResetPasswordVerificationState: () -> Unit,
     onDismiss: (Boolean) -> Unit,
@@ -644,7 +730,9 @@ private fun TestPasswordModeLayout(
                 .testTag(BACKUP_BUTTON_TAG)
                 .padding(top = 12.dp),
             text = stringResource(id = R.string.action_export_master_key),
-            onClick = onBackupRecoveryClick,
+            onClick = {
+                coroutineScope.launch { modalSheetState.show() }
+            },
             isEnabled = uiState.isLoading.not()
         )
 
@@ -859,7 +947,6 @@ private fun TestPasswordComposeViewPreview() {
                 isUITestPasswordMode = false,
                 isCurrentPassword = PasswordState.Initial
             ),
-            onBackupRecoveryClick = {},
             onResetUserMessage = {},
             onCheckCurrentPassword = {},
             onTestPasswordClick = {},
@@ -871,7 +958,10 @@ private fun TestPasswordComposeViewPreview() {
             onFinishedCopyingRecoveryKey = {},
             onResetFinishedCopyingRecoveryKey = {},
             onExhaustedPasswordAttempts = {},
-            onResetExhaustedPasswordAttempts = {}
+            onResetExhaustedPasswordAttempts = {},
+            onPrintRecoveryKey = {},
+            onCopyRecoveryKey = {},
+            onSaveRecoveryKey = {},
         )
     }
 }

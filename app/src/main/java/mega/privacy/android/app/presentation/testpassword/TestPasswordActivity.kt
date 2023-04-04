@@ -21,8 +21,6 @@ import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.controllers.AccountController
 import mega.privacy.android.app.main.controllers.AccountController.Companion.logout
-import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.RecoveryKeyBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.testpassword.view.TestPasswordComposeView
@@ -67,14 +65,6 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
 
     private val activity = this@TestPasswordActivity
     private val viewModel: TestPasswordViewModel by viewModels()
-    private val backupRecoveryKeyAction = object : BackupRecoveryKeyAction {
-        override fun print() = printRecoveryKey()
-        override fun copyToClipboard() = copyRecoveryKey()
-        override fun saveToFile() = saveRecoveryKeyToStorage()
-    }
-    private val recoveryKeyBottomSheetDialogFragment by lazy(LazyThreadSafetyMode.NONE) {
-        RecoveryKeyBottomSheetDialogFragment(backupRecoveryKeyAction)
-    }
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             if (psaWebBrowser != null && psaWebBrowser?.consumeBack() == true) return
@@ -137,7 +127,6 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
         AndroidTheme(isDark = themeMode.isDarkMode()) {
             TestPasswordComposeView(
                 uiState = uiState,
-                onBackupRecoveryClick = ::onBackupRecoveryClick,
                 onResetUserMessage = viewModel::resetUserMessage,
                 onCheckCurrentPassword = viewModel::checkForCurrentPassword,
                 onTestPasswordClick = viewModel::switchToTestPasswordLayout,
@@ -149,7 +138,10 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
                 onFinishedCopyingRecoveryKey = ::showCopyDialog,
                 onResetFinishedCopyingRecoveryKey = viewModel::resetFinishedCopyingRecoveryKey,
                 onExhaustedPasswordAttempts = ::navigateToChangePassword,
-                onResetExhaustedPasswordAttempts = viewModel::resetPasswordAttemptsState
+                onResetExhaustedPasswordAttempts = viewModel::resetPasswordAttemptsState,
+                onPrintRecoveryKey = ::printRecoveryKey,
+                onCopyRecoveryKey = ::copyRecoveryKey,
+                onSaveRecoveryKey = ::saveRecoveryKeyToStorage
             )
         }
     }
@@ -175,14 +167,6 @@ class TestPasswordActivity : PasscodeActivity(), MegaRequestListenerInterface {
         } else {
             finish()
         }
-    }
-
-    private fun onBackupRecoveryClick() {
-        if (recoveryKeyBottomSheetDialogFragment.isBottomSheetDialogShown()) return
-        recoveryKeyBottomSheetDialogFragment.show(
-            supportFragmentManager,
-            recoveryKeyBottomSheetDialogFragment.tag
-        )
     }
 
     /**
