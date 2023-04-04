@@ -48,7 +48,7 @@ import mega.privacy.android.domain.entity.node.FolderNode
 internal fun NodeGridViewItem(
     modifier: Modifier,
     nodeUIItem: NodeUIItem,
-    onMenuClick: () -> Unit,
+    onMenuClick: (NodeUIItem) -> Unit,
     onItemClicked: (NodeUIItem) -> Unit,
     onLongClick: (NodeUIItem) -> Unit,
 ) {
@@ -74,7 +74,7 @@ internal fun NodeGridViewItem(
                 painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                 contentDescription = "3 dots",
                 modifier = Modifier
-                    .clickable { onMenuClick.invoke() }
+                    .clickable { onMenuClick.invoke(nodeUIItem) }
                     .constrainAs(menuImage) {
                         end.linkTo(parent.end)
                         top.linkTo(parent.top)
@@ -153,7 +153,7 @@ internal fun NodeGridViewItem(
                     painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
                     contentDescription = "3 dots",
                     modifier = Modifier
-                        .clickable { onMenuClick.invoke() }
+                        .clickable { onMenuClick.invoke(nodeUIItem) }
                         .constrainAs(menuImage) {
                             end.linkTo(parent.end)
                         }

@@ -56,7 +56,7 @@ internal fun NodeListViewItem(
     modifier: Modifier,
     nodeUIItem: NodeUIItem,
     stringUtilWrapper: StringUtilWrapper,
-    onMenuClick: () -> Unit,
+    onMenuClick: (NodeUIItem) -> Unit,
     onItemClicked: (NodeUIItem) -> Unit,
     onLongClick: (NodeUIItem) -> Unit,
 ) {
@@ -176,7 +176,7 @@ internal fun NodeListViewItem(
             }
 
             Spacer(modifier = Modifier.weight(1f))
-            MenuItem(onMenuClick)
+            MenuItem(onMenuClick, nodeUIItem)
         }
         Divider(
             modifier = Modifier

@@ -72,14 +72,15 @@ internal fun getPainter(nodeUIItem: FolderNode): Painter {
 
 /**
  * This method will create menu item image
- * @param onMenuClick click listenr of menu item
+ * @param onMenuClick click listener of menu item
+ * @param nodeUIItem Node on which click has been performed
  */
 @Composable
-internal fun MenuItem(onMenuClick: () -> Unit) {
+internal fun MenuItem(onMenuClick: (NodeUIItem) -> Unit, nodeUIItem: NodeUIItem) {
     Image(
         painter = painterResource(id = R.drawable.ic_dots_vertical_grey),
         contentDescription = "3 dots",
-        modifier = Modifier.clickable { onMenuClick.invoke() }
+        modifier = Modifier.clickable { onMenuClick.invoke(nodeUIItem) }
     )
 }
 
@@ -96,7 +97,7 @@ internal fun MenuItem(onMenuClick: () -> Unit) {
 private fun NodeGridView(
     modifier: Modifier,
     nodeUIItems: List<NodeUIItem>,
-    onMenuClick: () -> Unit,
+    onMenuClick: (NodeUIItem) -> Unit,
     onItemClicked: (NodeUIItem) -> Unit,
     onLongClick: (NodeUIItem) -> Unit,
     spanCount: Int = 2,
@@ -160,7 +161,7 @@ private fun NodeListView(
     modifier: Modifier,
     nodeUIItemList: List<NodeUIItem>,
     stringUtilWrapper: StringUtilWrapper,
-    onMenuClick: () -> Unit,
+    onMenuClick: (NodeUIItem) -> Unit,
     onItemClicked: (NodeUIItem) -> Unit,
     onLongClick: (NodeUIItem) -> Unit,
     sortOrder: String,
@@ -215,7 +216,7 @@ fun NodesView(
     modifier: Modifier,
     nodeUIItems: List<NodeUIItem>,
     stringUtilWrapper: StringUtilWrapper,
-    onMenuClick: () -> Unit,
+    onMenuClick: (NodeUIItem) -> Unit,
     onItemClicked: (NodeUIItem) -> Unit,
     onLongClick: (NodeUIItem) -> Unit,
     sortOrder: String,

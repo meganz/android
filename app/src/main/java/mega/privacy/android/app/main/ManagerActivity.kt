@@ -6807,6 +6807,21 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
     }
 
+    fun showNodeOptionsPanel(
+        nodeId: NodeId?,
+        mode: Int = NodeOptionsBottomSheetDialogFragment.DEFAULT_MODE,
+        shareData: ShareData? = null,
+    ) {
+        Timber.d("showNodeOptionsPanel")
+        if (nodeId == null || bottomSheetDialogFragment.isBottomSheetDialogShown()) return
+        bottomSheetDialogFragment = NodeOptionsBottomSheetDialogFragment.newInstance(
+            nodeId = nodeId,
+            shareData = shareData,
+            mode = mode,
+        )
+        bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)
+    }
+
     fun showNodeLabelsPanel(node: NodeId) {
         Timber.d("showNodeLabelsPanel")
         if (bottomSheetDialogFragment.isBottomSheetDialogShown()) {

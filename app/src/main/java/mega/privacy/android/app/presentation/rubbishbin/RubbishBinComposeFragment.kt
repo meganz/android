@@ -17,6 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.view.NodesView
@@ -70,7 +71,7 @@ class RubbishBinComposeFragment : Fragment() {
                         modifier = Modifier.padding(horizontal = 8.dp),
                         nodeUIItems = uiState.nodeList,
                         stringUtilWrapper = stringUtilWrapper,
-                        onMenuClick = { },
+                        onMenuClick = ::showOptionsMenuForItem,
                         onItemClicked = viewModel::onItemClicked,
                         onLongClick = viewModel::onLongItemClicked,
                         sortOrder = getString(
@@ -98,5 +99,12 @@ class RubbishBinComposeFragment : Fragment() {
      */
     private fun showSortByPanel() {
         (requireActivity() as ManagerActivity).showNewSortByPanel(Constants.ORDER_CLOUD)
+    }
+
+    /**
+     * Shows Options menu for item clicked
+     */
+    private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem) {
+        (requireActivity() as ManagerActivity).showNodeOptionsPanel(nodeId = nodeUIItem.id)
     }
 }
