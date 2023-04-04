@@ -1604,8 +1604,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         val isHeartBeatAlive: Boolean = MegaApplication.isIsHeartBeatAlive
         rootNode = megaApi.rootNode
         if (rootNode == null || LoginActivity.isBackFromLoginPage || isHeartBeatAlive) {
-            Timber.d("Action: %s", intent.action)
-            if (!handleRedirectIntentActions(intent.action)) {
+            Timber.d("Action: %s", intent?.action)
+            if (!handleRedirectIntentActions(intent?.action)) {
                 refreshSession()
             }
             return true
