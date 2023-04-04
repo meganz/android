@@ -102,7 +102,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var optionVideoQuality: ListPreference? = null
     private var optionChargingOnVideoCompression: SwitchPreferenceCompat? = null
     private var optionVideoCompressionSize: Preference? = null
-    private var keepFileNames: TwoLineCheckPreference? = null
+    private var optionKeepUploadFileNames: TwoLineCheckPreference? = null
     private var localCameraUploadFolder: Preference? = null
     private var megaCameraFolder: Preference? = null
     private var secondaryMediaFolderOn: Preference? = null
@@ -111,7 +111,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var businessCameraUploadsAlertDialog: AlertDialog? = null
     private var cameraUpload = false
     private var secondaryUpload = false
-    private var fileNames = false
     private var camSyncLocalPath: String? = ""
     private var isExternalSDCardCU = false
     private var camSyncHandle: Long? = null
@@ -240,8 +239,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         optionVideoCompressionSize = findPreference(KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE)
         optionVideoCompressionSize?.onPreferenceClickListener = this
 
-        keepFileNames = findPreference(KEY_KEEP_FILE_NAMES)
-        keepFileNames?.onPreferenceClickListener = this
+        optionKeepUploadFileNames = findPreference(KEY_KEEP_FILE_NAMES)
+        optionKeepUploadFileNames?.onPreferenceClickListener = this
 
         localCameraUploadFolder = findPreference(KEY_CAMERA_UPLOAD_CAMERA_FOLDER)
         localCameraUploadFolder?.onPreferenceClickListener = this
@@ -270,7 +269,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             }
             dbH.setCamSyncEnabled(false)
             cameraUpload = false
-            fileNames = false
         } else {
             cameraUpload = prefs.camSyncEnabled.toBoolean()
             if (prefs.cameraFolderExternalSDCard != null) {
@@ -291,12 +289,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 }
             } else {
                 nodeForCameraSyncDoesNotExist()
-            }
-            fileNames = if (prefs.keepFileNames == null) {
-                dbH.setKeepFileNames(false)
-                false
-            } else {
-                prefs.keepFileNames.toBoolean()
             }
 
             camSyncLocalPath = prefs.camSyncLocalPath
@@ -343,15 +335,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 it.summary = camSyncLocalPath
                 preferenceScreen.addPreference(it)
             }
-            keepFileNames?.let {
-                it.isChecked = fileNames
-                preferenceScreen.addPreference(it)
-            }
             checkSecondaryMediaFolder()
         } else {
             Timber.d("Camera Uploads Off")
             cameraUploadOnOff?.isChecked = false
-            keepFileNames?.let { preferenceScreen.removePreference(it) }
             secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
 
             viewModel.setCameraUploadsRunning(false)
@@ -418,10 +405,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             }
             KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE -> showResetCompressionQueueSizeDialog()
             KEY_KEEP_FILE_NAMES -> {
-                fileNames = keepFileNames?.isChecked ?: false
-                dbH.setKeepFileNames(fileNames)
+                val keepFileNames = optionKeepUploadFileNames?.isChecked ?: false
+                viewModel.keepUploadFileNames(keepFileNames)
                 Toast.makeText(
-                    context,
+                    requireContext(),
                     getString(R.string.message_keep_device_name),
                     Toast.LENGTH_SHORT
                 ).show()
@@ -705,6 +692,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     videoCompressionSizeLimit = it.videoCompressionSizeLimit,
                     videoQuality = it.videoQuality,
                 )
+                handleKeepUploadFileNames(
+                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    areUploadFileNamesKept = it.areUploadFileNamesKept,
+                )
                 handleBusinessAccountPrompt(it.shouldShowBusinessAccountPrompt)
                 handleBusinessAccountSuspendedPrompt(it.shouldShowBusinessAccountSuspendedPrompt)
                 handleTriggerCameraUploads(it.shouldTriggerCameraUploads)
@@ -892,6 +883,28 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     preferenceScreen.removePreference(this)
                     ""
                 }
+        }
+    }
+
+    /**
+     * Handles the "Keep file names as in the device" option visibility and content when a UI State
+     * change happens
+     *
+     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param areUploadFileNamesKept Whether the File Names are kept or not when uploading content
+     */
+    private fun handleKeepUploadFileNames(
+        isCameraUploadsRunning: Boolean,
+        areUploadFileNamesKept: Boolean,
+    ) {
+        optionKeepUploadFileNames?.run {
+            isChecked = if (isCameraUploadsRunning) {
+                preferenceScreen.addPreference(this)
+                areUploadFileNamesKept
+            } else {
+                preferenceScreen.removePreference(this)
+                false
+            }
         }
     }
 
@@ -1383,7 +1396,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         dbH.setCamSyncEnabled(true)
 
         cameraUploadOnOff?.isChecked = true
-        keepFileNames?.let { preferenceScreen.addPreference(it) }
         megaCameraFolder?.let { preferenceScreen.addPreference(it) }
         secondaryMediaFolderOn?.let { preferenceScreen.addPreference(it) }
 
@@ -1418,7 +1430,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         viewModel.setCameraUploadsRunning(false)
 
         localCameraUploadFolder?.let { preferenceScreen.removePreference(it) }
-        keepFileNames?.let { preferenceScreen.removePreference(it) }
         megaCameraFolder?.let { preferenceScreen.removePreference(it) }
         secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
 

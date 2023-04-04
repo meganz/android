@@ -36,6 +36,7 @@ import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
@@ -44,6 +45,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVi
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
@@ -54,23 +56,25 @@ import javax.inject.Inject
  * [ViewModel] class for SettingsCameraUploadsFragment
  *
  * @property areLocationTagsEnabledUseCase When uploading Photos, this checks whether Location Tags should be embedded in each Photo or not
- * @property checkEnableCameraUploadsStatus Check the Camera Uploads status before enabling
- * @property clearCacheDirectory Clear all the contents of the internal cache directory
- * @property disableCameraUploadsInDatabase Disable Camera Uploads by manipulating values in the database
- * @property disableMediaUploadSettings Disable Media Uploads by manipulating a certain value in the database
+ * @property areUploadFileNamesKeptUseCase Checks whether the File Names are kept or not when uploading content
+ * @property checkEnableCameraUploadsStatus Checks the Camera Uploads status before enabling
+ * @property clearCacheDirectory Clears all the contents of the internal cache directory
+ * @property disableCameraUploadsInDatabase Disables Camera Uploads by manipulating values in the database
+ * @property disableMediaUploadSettings Disables Media Uploads by manipulating a certain value in the database
  * @property getUploadOptionUseCase Retrieves the upload option of Camera Uploads
  * @property getUploadVideoQualityUseCase Retrieves the Video Quality of Videos to be uploaded
- * @property getVideoCompressionSizeLimitUseCase Retrieve the maximum video file size that can be compressed
+ * @property getVideoCompressionSizeLimitUseCase Retrieves the maximum video file size that can be compressed
  * @property isCameraUploadsByWifiUseCase Checks whether Camera Uploads can only be run on Wi-Fi / Wi-Fi or Mobile Data
  * @property isChargingRequiredForVideoCompressionUseCase Checks whether compressing videos require the device to be charged or not
- * @property monitorConnectivityUseCase Monitor the device online status
- * @property resetCameraUploadTimeStamps Reset the Primary and Secondary Timestamps
- * @property resetMediaUploadTimeStamps Reset the Secondary Timestamps
- * @property restorePrimaryTimestamps Restore the Primary Timestamps
- * @property restoreSecondaryTimestamps Restore the Secondary Timestamps
+ * @property monitorConnectivityUseCase Monitors the device online status
+ * @property resetCameraUploadTimeStamps Resets the Primary and Secondary Timestamps
+ * @property resetMediaUploadTimeStamps Resets the Secondary Timestamps
+ * @property restorePrimaryTimestamps Restores the Primary Timestamps
+ * @property restoreSecondaryTimestamps Restores the Secondary Timestamps
  * @property setCameraUploadsByWifiUseCase Sets whether Camera Uploads can only run through Wi-Fi / Wi-Fi or Mobile Data
  * @property setChargingRequiredForVideoCompressionUseCase Sets whether compressing videos require the device to be charged or not
  * @property setLocationTagsEnabledUseCase Sets whether Location Tags should be embedded in each Photo to be uploaded or not
+ * @property setUploadFileNamesKeptUseCase Sets whether the File Names of files to be uploaded will be kept or not
  * @property setUploadOptionUseCase Sets the new upload option of Camera Uploads
  * @property setUploadVideoQualityUseCase Sets the new Video Quality of Videos to be uploaded
  * @property setUploadVideoSyncStatusUseCase Sets the new Sync Status of Videos to be uploaded
@@ -82,6 +86,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
     private val areLocationTagsEnabledUseCase: AreLocationTagsEnabledUseCase,
+    private val areUploadFileNamesKeptUseCase: AreUploadFileNamesKeptUseCase,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
     private val clearCacheDirectory: ClearCacheDirectory,
     private val disableCameraUploadsInDatabase: DisableCameraUploadsInDatabase,
@@ -99,6 +104,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setCameraUploadsByWifiUseCase: SetCameraUploadsByWifiUseCase,
     private val setChargingRequiredForVideoCompressionUseCase: SetChargingRequiredForVideoCompressionUseCase,
     private val setLocationTagsEnabledUseCase: SetLocationTagsEnabledUseCase,
+    private val setUploadFileNamesKeptUseCase: SetUploadFileNamesKeptUseCase,
     private val setUploadOptionUseCase: SetUploadOptionUseCase,
     private val setUploadVideoQualityUseCase: SetUploadVideoQualityUseCase,
     private val setUploadVideoSyncStatusUseCase: SetUploadVideoSyncStatusUseCase,
@@ -395,11 +401,22 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     }
 
     /**
+     * Sets whether the File Names of files to be uploaded will be kept or not
+     *
+     * @param keepFileNames true if the File Names should now be left as is, and false if otherwise
+     */
+    fun keepUploadFileNames(keepFileNames: Boolean) = viewModelScope.launch {
+        setUploadFileNamesKeptUseCase(keepFileNames)
+        refreshUploadFilesNamesKept()
+    }
+
+    /**
      * When [SettingsCameraUploadsViewModel] is instantiated, initialize the UI Elements
      */
     private fun initializeSettings() {
         viewModelScope.launch {
             val areLocationTagsIncluded = async { areLocationTagsEnabledUseCase() }
+            val areUploadFileNamesKept = async { areUploadFileNamesKeptUseCase() }
             val isChargingRequiredForVideoCompression =
                 async { isChargingRequiredForVideoCompressionUseCase() }
             val uploadConnectionType = async { getUploadConnectionType() }
@@ -409,6 +426,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     areLocationTagsIncluded = areLocationTagsIncluded.await(),
+                    areUploadFileNamesKept = areUploadFileNamesKept.await(),
                     isChargingRequiredForVideoCompression = isChargingRequiredForVideoCompression.await(),
                     uploadConnectionType = uploadConnectionType.await(),
                     uploadOption = getUploadOption.await(),
@@ -473,6 +491,15 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private suspend fun refreshVideoCompressionSizeLimit() {
         val videoCompressionSizeLimit = getVideoCompressionSizeLimitUseCase()
         _state.update { it.copy(videoCompressionSizeLimit = videoCompressionSizeLimit) }
+    }
+
+    /**
+     * Updates the value of [SettingsCameraUploadsState.areUploadFileNamesKept] whenever File Name
+     * changes for uploads are found
+     */
+    private suspend fun refreshUploadFilesNamesKept() {
+        val areUploadFileNamesKept = areUploadFileNamesKeptUseCase()
+        _state.update { it.copy(areUploadFileNamesKept = areUploadFileNamesKept) }
     }
 
     /**

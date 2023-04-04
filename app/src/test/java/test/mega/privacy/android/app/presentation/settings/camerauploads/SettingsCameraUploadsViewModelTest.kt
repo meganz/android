@@ -29,6 +29,7 @@ import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.AreUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVi
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetUploadFileNamesKeptUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
@@ -60,6 +62,7 @@ class SettingsCameraUploadsViewModelTest {
     private lateinit var underTest: SettingsCameraUploadsViewModel
 
     private val areLocationTagsEnabledUseCase = mock<AreLocationTagsEnabledUseCase>()
+    private val areUploadFileNamesKeptUseCase = mock<AreUploadFileNamesKeptUseCase>()
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
     private val clearCacheDirectory = mock<ClearCacheDirectory>()
     private val disableCameraUploadsInDatabase = mock<DisableCameraUploadsInDatabase>()
@@ -78,6 +81,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setChargingRequiredForVideoCompressionUseCase =
         mock<SetChargingRequiredForVideoCompressionUseCase>()
     private val setLocationTagsEnabledUseCase = mock<SetLocationTagsEnabledUseCase>()
+    private val setUploadFileNamesKeptUseCase = mock<SetUploadFileNamesKeptUseCase>()
     private val setUploadOptionUseCase = mock<SetUploadOptionUseCase>()
     private val setUploadVideoQualityUseCase = mock<SetUploadVideoQualityUseCase>()
     private val setUploadVideoSyncStatusUseCase = mock<SetUploadVideoSyncStatusUseCase>()
@@ -102,6 +106,7 @@ class SettingsCameraUploadsViewModelTest {
     private fun setupUnderTest() {
         underTest = SettingsCameraUploadsViewModel(
             areLocationTagsEnabledUseCase = areLocationTagsEnabledUseCase,
+            areUploadFileNamesKeptUseCase = areUploadFileNamesKeptUseCase,
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             clearCacheDirectory = clearCacheDirectory,
             disableCameraUploadsInDatabase = disableCameraUploadsInDatabase,
@@ -119,6 +124,7 @@ class SettingsCameraUploadsViewModelTest {
             setCameraUploadsByWifiUseCase = setCameraUploadsByWifiUseCase,
             setChargingRequiredForVideoCompressionUseCase = setChargingRequiredForVideoCompressionUseCase,
             setLocationTagsEnabledUseCase = setLocationTagsEnabledUseCase,
+            setUploadFileNamesKeptUseCase = setUploadFileNamesKeptUseCase,
             setUploadOptionUseCase = setUploadOptionUseCase,
             setUploadVideoQualityUseCase = setUploadVideoQualityUseCase,
             setUploadVideoSyncStatusUseCase = setUploadVideoSyncStatusUseCase,
@@ -137,6 +143,7 @@ class SettingsCameraUploadsViewModelTest {
             val state = awaitItem()
             assertThat(state.accessMediaLocationRationaleText).isNull()
             assertThat(state.areLocationTagsIncluded).isFalse()
+            assertThat(state.areUploadFileNamesKept).isFalse()
             assertThat(state.isCameraUploadsRunning).isFalse()
             assertThat(state.isChargingRequiredForVideoCompression).isFalse()
             assertThat(state.shouldShowBusinessAccountPrompt).isFalse()
@@ -430,6 +437,27 @@ class SettingsCameraUploadsViewModelTest {
         verify(setVideoCompressionSizeLimitUseCase).invoke(newSize)
         underTest.state.test {
             assertThat(awaitItem().videoCompressionSizeLimit).isEqualTo(newSize)
+        }
+    }
+
+    @Test
+    fun `test that the file names should now be kept when uploading content`() =
+        testKeepUploadFileNames(true)
+
+    @Test
+    fun `test that the file names should no longer be kept when uploading content`() =
+        testKeepUploadFileNames(false)
+
+    private fun testKeepUploadFileNames(keepFileNames: Boolean) = runTest {
+        whenever(areUploadFileNamesKeptUseCase()).thenReturn(keepFileNames)
+
+        setupUnderTest()
+
+        underTest.keepUploadFileNames(keepFileNames)
+
+        verify(setUploadFileNamesKeptUseCase, times(1)).invoke(keepFileNames)
+        underTest.state.test {
+            assertThat(awaitItem().areUploadFileNamesKept).isEqualTo(keepFileNames)
         }
     }
 

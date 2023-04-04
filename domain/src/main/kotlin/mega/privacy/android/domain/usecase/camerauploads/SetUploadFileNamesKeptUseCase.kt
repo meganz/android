@@ -5,6 +5,8 @@ import javax.inject.Inject
 
 /**
  * Use Case that sets whether the File Names of files to be uploaded will be kept or not
+ *
+ * @property cameraUploadRepository [CameraUploadRepository]
  */
 class SetUploadFileNamesKeptUseCase @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
