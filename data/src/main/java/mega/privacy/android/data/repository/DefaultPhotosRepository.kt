@@ -322,7 +322,7 @@ internal class DefaultPhotosRepository @Inject constructor(
      */
     private suspend fun mapPhotoNodesToVideos(megaNodes: List<MegaNode>): List<Photo> {
         return megaNodes.filter {
-            it.isValidPhotoNode()
+            it.isValidPhotoNode() && fileTypeInfoMapper(it) is VideoFileTypeInfo
         }.map { megaNode ->
             mapMegaNodeToVideo(megaNode)
         }
