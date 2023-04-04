@@ -9,6 +9,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -33,6 +34,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetChatRoomByUser
@@ -94,6 +96,7 @@ class ContactInfoViewModel @Inject constructor(
     private val setUserAlias: SetUserAlias,
     private val removeContactByEmailUseCase: RemoveContactByEmailUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    @ApplicationScope private val applicationScope: CoroutineScope,
 ) : BaseRxViewModel() {
 
     /**
@@ -373,7 +376,7 @@ class ContactInfoViewModel @Inject constructor(
      * InShares are removed and existing calls are closed
      * Exits from contact info page if succeeds
      */
-    fun removeContact() = viewModelScope.launch {
+    fun removeContact() = applicationScope.launch {
         val isRemoved = state.value.email?.let { email -> removeContactByEmailUseCase(email) }
         _state.update {
             it.copy(isUserRemoved = isRemoved ?: false)

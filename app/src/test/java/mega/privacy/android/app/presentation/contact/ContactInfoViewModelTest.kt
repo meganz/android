@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.contact
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -69,6 +70,7 @@ class ContactInfoViewModelTest {
     private lateinit var removeContactByEmailUseCase: RemoveContactByEmailUseCase
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
+    private val testScope = CoroutineScope(UnconfinedTestDispatcher())
     private val testHandle = 123456L
     private val testEmail = "test@gmail.com"
     private val contactData = ContactData(
@@ -131,6 +133,7 @@ class ContactInfoViewModelTest {
             setUserAlias,
             removeContactByEmailUseCase,
             standardDispatcher,
+            testScope,
         )
     }
 
