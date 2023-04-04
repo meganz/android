@@ -2083,7 +2083,7 @@ public class ChatActivity extends PasscodeActivity
 
             ScheduledMeetingStatus schedMeetStatus = chatState.getScheduledMeetingStatus();
 
-            if (chatRoom.isActive() && !chatRoom.isArchived() && schedMeetStatus != null && (schedMeetStatus instanceof ScheduledMeetingStatus.NotStarted ||
+            if (chatRoom != null && chatRoom.isActive() && !chatRoom.isArchived() && schedMeetStatus != null && (schedMeetStatus instanceof ScheduledMeetingStatus.NotStarted ||
                     schedMeetStatus instanceof ScheduledMeetingStatus.NotJoined)) {
                 startOrJoinMeetingBanner.setText(schedMeetStatus instanceof ScheduledMeetingStatus.NotStarted ?
                         R.string.meetings_chat_room_start_scheduled_meeting_option :
