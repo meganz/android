@@ -9,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
-import android.os.LocaleList
 import android.os.Looper
 import android.text.TextUtils
 import android.util.DisplayMetrics
@@ -58,6 +57,7 @@ import mega.privacy.android.app.meeting.activity.MeetingActivity
 import mega.privacy.android.app.myAccount.MyAccountActivity
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.billing.BillingViewModel
+import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.verification.SMSVerificationActivity
 import mega.privacy.android.app.psa.Psa
@@ -665,43 +665,9 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        /**
-         * When selecting a non supported locale and then a supported locale in the language settings
-         * causes a strange error in which the order of the two locales get randomly flipped.
-         * This causes some resources to be loaded in the supported language and others in the
-         * default language. I don't know what causes that to happen, but this code removes
-         * unsupported locales from the configuration as a measure to prevent the strange behaviour.
-         **/
-
-        val supportedLanguages = listOf(
-            "en",
-            "ar",
-            "de",
-            "es",
-            "fr",
-            "id",
-            "jt",
-            "ja",
-            "ko",
-            "nl",
-            "pl",
-            "pt",
-            "ro",
-            "ru",
-            "th",
-            "vi",
-            "zh",
-        )
-
-        newBase?.resources?.configuration?.let {
-            val locales = it.locales
-            val newLocales = (0 until locales.size()).mapNotNull { i ->
-                locales[i].takeIf { locale -> supportedLanguages.contains(locale.language) }
-            }.toTypedArray()
-            it.setLocales(LocaleList(*newLocales))
-        }
-        super.attachBaseContext(newBase)
+        super.attachBaseContext(SupportedLanguageContextWrapper(newBase))
     }
+
 
     override fun onDestroy() {
         composite.clear()
