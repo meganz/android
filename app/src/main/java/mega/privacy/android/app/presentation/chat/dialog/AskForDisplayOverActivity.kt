@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.LocaleList
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.compose.setContent
@@ -19,6 +18,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.presentation.chat.dialog.view.AskForDisplayOverDialog
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.locale.SupportedLanguageContextWrapper
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -105,41 +105,6 @@ class AskForDisplayOverActivity : AppCompatActivity() {
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        /**
-         * When selecting a non supported locale and then a supported locale in the language settings
-         * causes a strange error in which the order of the two locales get randomly flipped.
-         * This causes some resources to be loaded in the supported language and others in the
-         * default language. I don't know what causes that to happen, but this code removes
-         * unsupported locales from the configuration as a measure to prevent the strange behaviour.
-         **/
-
-        val supportedLanguages = listOf(
-            "en",
-            "ar",
-            "de",
-            "es",
-            "fr",
-            "id",
-            "jt",
-            "ja",
-            "ko",
-            "nl",
-            "pl",
-            "pt",
-            "ro",
-            "ru",
-            "th",
-            "vi",
-            "zh",
-        )
-
-        newBase?.resources?.configuration?.let {
-            val locales = it.locales
-            val newLocales = (0 until locales.size()).mapNotNull { i ->
-                locales[i].takeIf { locale -> supportedLanguages.contains(locale.language) }
-            }.toTypedArray()
-            it.setLocales(LocaleList(*newLocales))
-        }
-        super.attachBaseContext(newBase)
+        super.attachBaseContext(SupportedLanguageContextWrapper(newBase))
     }
 }
