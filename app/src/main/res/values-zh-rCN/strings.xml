@@ -584,8 +584,6 @@
     <string name="general_confirm_button">确认</string>
     <!-- On “add phone number” page, an error message will be shown if user click next button without select country code. -->
     <string name="verify_account_invalid_country_code">请选择一个国家地区代码</string>
-    <!-- On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end. -->
-    <string name="verify_account_not_loading_country_code">无法获取国家地区代码。</string>
     <!-- error message if user click next button without enter a valid phone number -->
     <string name="verify_account_invalid_phone_number">请填写一个有效的手机号码。</string>
     <!-- Label tell user to enter received txt to below input boxes -->
@@ -994,7 +992,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">移除参与者</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">使用端到端（由用户控制）加密，保护您的聊天内容，为您的聊天提供基本安全保障：</string>
+    <string name="mega_info_empty_screen">通过零知识加密保护您的聊天内容，提供必要的安全保障：</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">我们的系统能确保接收到的资料是由真实的发件人发送，且其内容在传输过程中不会被篡改。</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1411,7 +1409,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">邀请朋友，并获得奖励</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">单次成功邀请可获得%1$s存储空间。有效期为365天。</string>
+    <string name="figures_achievements_text_referrals">单次邀请可获得%1$s存储空间。有效期为365天。</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s存储空间。有效期为365天。</string>
     <!-- title of the section for unlocked rewards -->
@@ -1439,7 +1437,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">如何运作</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">邀请您的好友创建一个MEGA免费帐户并安装MEGA手机应用程序。每次成功完成注册并安装应用程序后，您都将获得免费存储空间作为奖励。</string>
+    <string name="first_paragraph_achievement_invite_friends">邀请您的好友创建一个免费MEGA帐户并安装MEGA手机应用程序。每次完成注册并安装应用程序后，您都将获得免费存储空间作为奖励。</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">免费存储空间奖励仅适用于已安装MEGA手机应用程序或MEGA桌面应用程序的新邀请用户。</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1834,7 +1832,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">启用扩展网址预览</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">增强MEGA chat使用体验。系统将在没有端到端加密情况下对链接内容进行检索。</string>
+    <string name="text_enable_rich_links">增强MEGA chat使用体验。系统将在没有零知识加密情况下对链接内容进行检索。</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">请输入一个较强的密码</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2978,7 +2976,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro会员用户可以独享链接额外安全保护，使您的帐户更加安全。</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">我们的端到端加密系统需要为此文件或文件夹自动生成唯一密钥。 默认情况下会创建带有此密钥的链接，您也可以单独导出解密密钥进而增加安全性。</string>
+    <string name="decryption_key_explanation">我们的零知识加密系统需要为此文件或文件夹自动生成唯一密钥。 默认情况下会创建带有此密钥的链接，您也可以单独导出解密密钥进而增加安全性。</string>
     <!-- Reset password label -->
     <string name="reset_password_label">重置密码</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3312,7 +3310,7 @@
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA会议</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">端到端加密视频会议</string>
+    <string name="content_tour_five">零知识加密视频会议</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">请输入一个有效的会议链接</string>
     <!-- Guest leave call-->
@@ -4366,9 +4364,9 @@
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s更新了[/A][B]定期会议日期[/B]</string>
     <!-- This is the title of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_title">安全升级</string>
+    <string name="shared_items_security_upgrade_dialog_title">账户安全升级</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">您账户的安全性现已升级。这只会发生一次。如果以前你在此账户看到过这个消息，请按取消。</string>
+    <string name="shared_items_security_upgrade_dialog_content">我们正在升级您帐户的安全性。您应该只会看到这条消息一次。如果您之前已经看过这条消息，请首先确认这是针对此帐户而非您拥有的其他MEGA帐户。\n\n如果您确定并且这是您第二次在这个帐户看到此消息，请停止使用此帐户。</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="other">您正在分享以下文件夹：%s</item>
@@ -4483,4 +4481,88 @@
     <string name="slideshow_order_shuffle">随机</string>
     <!-- Slideshow repeat preference -->
     <string name="slideshow_setting_repeat">循环播放</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_title">选择一个字幕文件</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_button_add_subtitles">添加字幕</string>
+    <!-- The message for select subtitle file page when subtitle file is empty. -->
+    <string name="media_player_video_select_subtitle_file_empty_message">未找到字幕</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="other">已离开%1$d个共享文件夹</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">无法离开%1$d个共享文件夹</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">已离开%1$d个共享文件夹，&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">无法离开%1$d个共享文件夹</item>
+    </plurals>
+    <!-- Text shown in the list of meetings when there is a call in progress -->
+    <string name="meetings_list_ongoing_call_message">正在会议中</string>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
+    <plurals name="general_move_node_snackbar_success">
+        <item quantity="other">已移动%1$d个项目</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
+    <plurals name="general_move_node_snackbar_fail">
+        <item quantity="other">无法移动%1$d个项目</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_success">
+        <item quantity="other">已移动%1$d个项目，&#160;</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_fail">
+        <item quantity="other">无法移动%1$d个项目</item>
+    </plurals>
+    <!-- Text hint of option to add meeting name in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_name_hint">会议名称</string>
+    <!-- Title of option to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_label">重复</string>
+    <!-- Title of option to send calendar invite in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">发送日历邀请</string>
+    <!-- Title of option to add description in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_add_description_label">添加说明</string>
+    <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_empty_meeting_name_error">会议名称为必填项</string>
+    <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">输入少于30&#160;个字符</string>
+    <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">输入少于4,000&#160;个字符</string>
+    <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">已安排会议</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_never_label">尚无互动</string>
+    <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_calendar_select_date_label">选择日期</string>
+    <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">放弃此会议？</string>
+    <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">继续编辑</string>
+    <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">放弃</string>
+    <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
+        <item quantity="other">已添加%1$d位参与者</item>
+    </plurals>
+    <!-- error message when sharing a folder(s) fails to be completed-->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
+        <item quantity="other">无法共享%1$d个文件夹</item>
+    </plurals>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="other">无法移除%1$d个联系人的访问权限</item>
+    </plurals>
+    <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
+    <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
+        <item quantity="other">无法更新%1$d个联系人的权限</item>
+    </plurals>
+    <!--This is the label of the button of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">好的，明白了</string>
 </resources>

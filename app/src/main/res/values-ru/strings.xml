@@ -617,8 +617,6 @@
     <string name="general_confirm_button">Подтвердить</string>
     <!-- On “add phone number” page, an error message will be shown if user click next button without select country code. -->
     <string name="verify_account_invalid_country_code">Пожалуйста, выберите код региона</string>
-    <!-- On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end. -->
-    <string name="verify_account_not_loading_country_code">Коды регионов не могут быть получены.</string>
     <!-- error message if user click next button without enter a valid phone number -->
     <string name="verify_account_invalid_phone_number">Пожалуйста, укажите действительный номер телефона.</string>
     <!-- Label tell user to enter received txt to below input boxes -->
@@ -1051,7 +1049,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">Удалить участников</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">Защитите чат сквозным (управляемым пользователем) шифрованием, обеспечивающим основные гарантии безопасности:</string>
+    <string name="mega_info_empty_screen">Защитите чат шифрованием с нулевым разглашением, обеспечивающим основные гарантии безопасности:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">Система гарантирует, что полученные данные действительно от указанного отправителя, и их содержимое не было изменено во время пересылки.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1513,7 +1511,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Приглашайте друзей и получайте награды</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s места на диске за каждое успешное приглашение. Действительно 365 дней.</string>
+    <string name="figures_achievements_text_referrals">%1$s на диске за каждое приглашение. Действительно 365 дней.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s места на диске. Действительно 365 дней.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1541,7 +1539,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Как это работает</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Приглашайте друзей зарегистрироваться бесплатно в MEGA и установить мобильное приложение. За каждую регистрацию и установку вы получите бонусное место на диске.</string>
+    <string name="first_paragraph_achievement_invite_friends">Приглашайте друзей бесплатно зарегистрироваться в MEGA и установить мобильное приложение. За каждую регистрацию и установку вы получите бонусное место на диске.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Бонус с бесплатным хранилищем применяется только за новые приглашения и установку мобильного или настольного приложения MEGA.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1972,7 +1970,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Включить превью URL</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Расширьте возможности MEGA chat. Содержимое URL-адреса будет извлекаться без сквозного шифрования.</string>
+    <string name="text_enable_rich_links">Расширьте возможности MEGA chat. Содержимое URL-адреса будет извлекаться без шифрования с нулевым разглашением.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Введите более сложный пароль</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -3227,7 +3225,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Пользователи MEGA Pro имеют эксклюзивный доступ к дополнительным функциям защиты ссылок, которые делают ваш аккаунт ещё безопаснее.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Наша система сквозного шифрования требует, чтобы для этого файла или папки автоматически генерировался уникальный ключ. Ссылка с этим ключом создается по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
+    <string name="decryption_key_explanation">Наша система шифрования с нулевым разглашением требует, чтобы для этого файла или папки автоматически генерировался уникальный ключ. Ссылка с этим ключом создаётся по умолчанию, но вы можете экспортировать ключ дешифрования отдельно для дополнительного уровня безопасности.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Сбросить пароль</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3391,28 +3389,28 @@
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully moved to the rubbish bin and 1 or multiple nodes have not been moved successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_moved_to_rubbish">
-        <item quantity="one">1 элемент перемещён в Корзину, но ещё один не перемещён. Попробуйте ещё раз позже.</item>
-        <item quantity="few">1 элемент перемещен в Корзину, но ещё %d элемента не перемещено. Попробуйте ещё раз позже.</item>
-        <item quantity="many">1 элемент перемещен в Корзину, но ещё %d элементов не перемещено. Попробуйте ещё раз позже.</item>
-        <item quantity="other">1 элемент перемещен в Корзину, но ещё %d элемента не перемещено. Попробуйте ещё раз позже.</item>
+        <item quantity="one">1 элемент перемещён в Корзину, но другой не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="few">1 элемент перемещён в Корзину, но ещё %d элемента не перемещено. Попробуйте ещё раз позже.</item>
+        <item quantity="many">1 элемент перемещён в Корзину, но ещё %d элементов не перемещено. Попробуйте ещё раз позже.</item>
+        <item quantity="other">1 элемент перемещён в Корзину, но ещё %d элемента не перемещено. Попробуйте ещё раз позже.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully moved to the rubbish bin and 1 node has not been moved successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_moved_to_rubbish">
-        <item quantity="one">%d элемент перемещён в Корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
-        <item quantity="few">%d элемента перемещено в Корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
-        <item quantity="many">%d элементов перемещено в Корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
-        <item quantity="other">%d элемента перемещено в Корзину, но ещё 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="one">%d элемент перемещён в Корзину, но другой не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="few">%d элемента перемещено в Корзину, но 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="many">%d элементов перемещено в Корзину, но 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
+        <item quantity="other">%d элемента перемещено в Корзину, но 1 элемент не перемещён. Попробуйте ещё раз позже.</item>
     </plurals>
     <!-- Message displayed when 1 node (file or folder) has been successfully restored from the rubbish bin and 1 or multiple nodes have not been restored successfully. Placeholder: number of nodes -->
     <plurals name="node_correctly_and_nodes_incorrectly_restored_from_rubbish">
-        <item quantity="one">1 элемент восстановлен, но ещё один не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="one">1 элемент восстановлен, но другой не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="few">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
         <item quantity="many">1 элемент восстановлен, но ещё %d элементов не восстановлено. Попробуйте ещё раз позже.</item>
         <item quantity="other">1 элемент восстановлен, но ещё %d элемента не восстановлено. Попробуйте ещё раз позже.</item>
     </plurals>
     <!-- Message displayed when 1 or multiple nodes (files and folders) have been successfully restored from the rubbish bin and 1 node has not been restored successfully. Placeholder: number of nodes -->
     <plurals name="nodes_correctly_and_node_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d элемент восстановлен, но ещё один не восстановлен. Попробуйте ещё раз позже.</item>
+        <item quantity="one">%d элемент восстановлен, но другой не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="few">%d элемента восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="many">%d элементов восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
         <item quantity="other">%d элемента восстановлено, но ещё 1 элемент не восстановлен. Попробуйте ещё раз позже.</item>
@@ -3606,7 +3604,7 @@
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA-встреча</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">Видеовстреча со сквозным шифрованием</string>
+    <string name="content_tour_five">Зашифрованная с нулевым разглашением видеовстреча</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Пожалуйста, введите действительную ссылку на встречу</string>
     <!-- Guest leave call-->
@@ -3836,7 +3834,7 @@
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
     <string name="meeting_call_screen_one_participant_left_call">%1$s отключился</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s и %2$s покинули звонок</string>
+    <string name="meeting_call_screen_two_participants_left_call">%1$s и %2$s отключились</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="one">%1$s и ещё %2$d присоединились</item>
@@ -3846,10 +3844,10 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s и ещё %2$d покинули звонок</item>
-        <item quantity="few">%1$s и ещё %2$d покинули звонок</item>
-        <item quantity="many">%1$s и ещё %2$d покинули звонок</item>
-        <item quantity="other">%1$s и ещё %2$d покинули звонок</item>
+        <item quantity="one">%1$s и ещё %2$d отключились</item>
+        <item quantity="few">%1$s и ещё %2$d отключились</item>
+        <item quantity="many">%1$s и ещё %2$d отключились</item>
+        <item quantity="other">%1$s и ещё %2$d отключились</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">Удалить безвозвратно</string>
@@ -3922,7 +3920,7 @@
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">Копировать и переименовать</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">Применить для следующих %1$d конфликтов</string>
+    <string name="file_apply_for_all">Применить для следующих конфликтов (%1$d)</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">Объединить существующую папку с копируемой.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -4240,7 +4238,7 @@
     <string name="scheduled_meetings_meeting_link_copied">Ссылка скопирована в буфер обмена</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one">Альбом «‎%s»‎ удалён</item>
+        <item quantity="one">Альбом «%s» удалён</item>
         <item quantity="few">Удалено %d альбома</item>
         <item quantity="many">Удалено %d альбомов</item>
         <item quantity="other">Удалено %d альбома</item>
@@ -4924,9 +4922,9 @@
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s изменил[/A][B] дату повторяющейся встречи[/B]</string>
     <!-- This is the title of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_title">Обновление параметров безопасности</string>
+    <string name="shared_items_security_upgrade_dialog_title">Повышение безопасности аккаунта</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">Параметры безопасности вашего аккаунта сейчас обновляются. Это произойдёт только один раз. Если вы уже видели это сообщение для этого аккаунта, нажмите «Отмена».</string>
+    <string name="shared_items_security_upgrade_dialog_content">Мы повышаем безопасность вашего аккаунта. Это сообщение должно появиться только один раз. Если вы видели его раньше, сначала убедитесь, что оно появлялось для этого аккаунта MEGA, а не для другого.\n\nЕсли вы уверены и видите это сообщение для этого аккаунта во второй раз, прекратите использовать этот аккаунт.</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="one">В настоящее время у вас открыт общий доступ к следующей папке: %s</item>
@@ -5008,7 +5006,7 @@
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
     <plurals name="general_copy_snackbar_success">
         <item quantity="one">Скопирован %1$d элемент</item>
-        <item quantity="few">Скопировано %1$d элемента</item>
+        <item quantity="few">Скопированы %1$d элемента</item>
         <item quantity="many">Скопировано %1$d элементов</item>
         <item quantity="other">Скопировано %1$d элемента</item>
     </plurals>
@@ -5025,7 +5023,7 @@
     -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Скопирован %1$d элемент,&#160;</item>
-        <item quantity="few">Скопировано %1$d элемента,&#160;</item>
+        <item quantity="few">Скопированы %1$d элемента,&#160;</item>
         <item quantity="many">Скопировано %1$d элементов,&#160;</item>
         <item quantity="other">Скопировано %1$d элемента,&#160;</item>
     </plurals>
@@ -5068,4 +5066,124 @@
     <string name="slideshow_order_shuffle">Перемешивать</string>
     <!-- Slideshow repeat preference -->
     <string name="slideshow_setting_repeat">Повтор</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_title">Выберите файл субтитров</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_button_add_subtitles">Добавить субтитры</string>
+    <!-- The message for select subtitle file page when subtitle file is empty. -->
+    <string name="media_player_video_select_subtitle_file_empty_message">Субтитры не найдены</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="one">Покинута %1$d общая папка</item>
+        <item quantity="few">Покинуты %1$d общие папки</item>
+        <item quantity="many">Покинуто %1$d общих папок</item>
+        <item quantity="other">Покинуто %1$d общей папки</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">Не удалось покинуть %1$d общую папку</item>
+        <item quantity="few">Не удалось покинуть %1$d общие папки</item>
+        <item quantity="many">Не удалось покинуть %1$d общих папок</item>
+        <item quantity="other">Не удалось покинуть %1$d общей папки</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">Покинута %1$d общая папка,&#160;</item>
+        <item quantity="few">Покинуты %1$d общие папки,&#160;</item>
+        <item quantity="many">Покинуто %1$d общих папок,&#160;</item>
+        <item quantity="other">Покинуто %1$d общей папки,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">не удалось покинуть %1$d общую папку</item>
+        <item quantity="few">не удалось покинуть %1$d общие папки</item>
+        <item quantity="many">не удалось покинуть %1$d общих папок</item>
+        <item quantity="other">не удалось покинуть %1$d общей папки</item>
+    </plurals>
+    <!-- Text shown in the list of meetings when there is a call in progress -->
+    <string name="meetings_list_ongoing_call_message">Идёт встреча</string>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
+    <plurals name="general_move_node_snackbar_success">
+        <item quantity="one">Перемещён %1$d элемент</item>
+        <item quantity="few">Перемещены %1$d элемента</item>
+        <item quantity="many">Перемещено %1$d элементов</item>
+        <item quantity="other">Перемещено %1$d элемента</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
+    <plurals name="general_move_node_snackbar_fail">
+        <item quantity="one">%1$d элемент не удалось переместить</item>
+        <item quantity="few">%1$d элемента не удалось переместить</item>
+        <item quantity="many">%1$d элементов не удалось переместить</item>
+        <item quantity="other">%1$d элемента не удалось переместить</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_success">
+        <item quantity="one">Перемещён %1$d элемент,&#160;</item>
+        <item quantity="few">Перемещены %1$d элемента,&#160;</item>
+        <item quantity="many">Перемещено %1$d элементов,&#160;</item>
+        <item quantity="other">Перемещено %1$d элемента,&#160;</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_fail">
+        <item quantity="one">%1$d элемент не удалось переместить</item>
+        <item quantity="few">%1$d элемента не удалось переместить</item>
+        <item quantity="many">%1$d элементов не удалось переместить</item>
+        <item quantity="other">%1$d элемента не удалось переместить</item>
+    </plurals>
+    <!-- Text hint of option to add meeting name in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_name_hint">Название встречи</string>
+    <!-- Title of option to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_label">Повторение</string>
+    <!-- Title of option to send calendar invite in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Отправить приглашение в календарь</string>
+    <!-- Title of option to add description in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_add_description_label">Добавить описание</string>
+    <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_empty_meeting_name_error">Укажите название встречи</string>
+    <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Введите меньше 30&#160;символов</string>
+    <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Введите меньше 4 000&#160;символов</string>
+    <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Встреча запланирована</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_never_label">Никогда</string>
+    <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_calendar_select_date_label">Выбор даты</string>
+    <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Отменить эту встречу?</string>
+    <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">Продолжить редактирование</string>
+    <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">Не сохранять</string>
+    <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
+        <item quantity="one">Добавлен %1$d участник</item>
+        <item quantity="few">Добавлены %1$d участника</item>
+        <item quantity="many">Добавлено %1$d участников</item>
+        <item quantity="other">Добавлено %1$d участника</item>
+    </plurals>
+    <!-- error message when sharing a folder(s) fails to be completed-->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
+        <item quantity="one">Не удалось поделиться %1$d папкой</item>
+        <item quantity="few">Не удалось поделиться %1$d папками</item>
+        <item quantity="many">Не удалось поделиться %1$d папками</item>
+        <item quantity="other">Не удалось поделиться %1$d папки</item>
+    </plurals>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="one">Не удалось закрыть доступ %1$d контакту.</item>
+        <item quantity="few">Не удалось закрыть доступ %1$d контактам.</item>
+        <item quantity="many">Не удалось закрыть доступ %1$d контактам.</item>
+        <item quantity="other">Не удалось закрыть доступ %1$d контакта.</item>
+    </plurals>
+    <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
+    <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
+        <item quantity="one">Не удалось обновить разрешения для %1$d контакта</item>
+        <item quantity="few">Не удалось обновить разрешения для %1$d контактов</item>
+        <item quantity="many">Не удалось обновить разрешения для %1$d контактов</item>
+        <item quantity="other">Не удалось обновить разрешения для %1$d контакта</item>
+    </plurals>
+    <!--This is the label of the button of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">Понятно</string>
 </resources>

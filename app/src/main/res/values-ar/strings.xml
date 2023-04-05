@@ -459,7 +459,7 @@
         <item quantity="other">تم نقل %d عنصر</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">%d items weren’t moved</string>
+    <string name="number_incorrectly_moved">لم يتم نقل %d عنصر</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">نقل إلى سلة المحذوفات</string>
     <!-- error message -->
@@ -475,7 +475,7 @@
     <!-- error message -->
     <string name="context_no_removed">خطأ. لم يتم إزالتها من MEGA</string>
     <!-- success message when moving a node -->
-    <string name="number_correctly_removed">%d items removed from MEGA</string>
+    <string name="number_correctly_removed">تمت إزالة %d عنصر من ميغا MEGA</string>
     <!-- error message when moving a node -->
     <string name="number_no_removed">لم تتم إزالة  %d عنصر</string>
     <!-- Success message when left shared folders -->
@@ -639,8 +639,6 @@
     <string name="general_confirm_button">تأكيد</string>
     <!-- On “add phone number” page, an error message will be shown if user click next button without select country code. -->
     <string name="verify_account_invalid_country_code">الرجاء تحديد رمز المنطقة</string>
-    <!-- On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end. -->
-    <string name="verify_account_not_loading_country_code">لا يمكن إظهار رموز المنطقة.</string>
     <!-- error message if user click next button without enter a valid phone number -->
     <string name="verify_account_invalid_phone_number">يرجى تقديم رقم هاتف صالح.</string>
     <!-- Label tell user to enter received txt to below input boxes -->
@@ -1089,7 +1087,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">إزالة مشاركين</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">تحمي محادثاتك بتشفير طرف إلى طرف (متحكم به من قبل المستخدم)، وتزودك بضمانات السلامة الأساسية:</string>
+    <string name="mega_info_empty_screen">تحمي محادثاتك مع تشفير المعرفة الصفرية التي توفر ضمانات أمان أساسية:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">يضمن النظام أن البيانات المستلمة هي حقا من المرسل المحدد، ولم يتم التلاعب بمحتواها أثناء النقل.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1609,7 +1607,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">كيف تعمل</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">قم بدعوة أصدقائك لإنشاء حساب مجاني على ميغا MEGA ولتثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile. سوف تتلقى مساحة تخزين مجانية كمكافأة لكل عملية تسجيل وتثبيت تطبيق ناجح.</string>
+    <string name="first_paragraph_achievement_invite_friends">قم بدعوة أصدقائك لإنشاء حساب ميغا MEGA مجاني ولتثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile. ستتلقى مساحة تخزين مجانية كمكافأة مقابل كل اشتراك وتثبيت للتطبيق.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">تنطبق مكافأة التخزين المجانية على الدعوات الجديدة فقط وحين يتم تثبيت تطبيق ميغا للهاتف المحمول MEGA Mobile أو تطبيق ميغا للحاسب المكتبي MEGA Desktop App.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -2064,7 +2062,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">تمكين الروابط الإلكترونية المعززة URL</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">تعزيز تجربة المحادثات MEGA chat من خلال إظهار محتوى الرابط دون تشفير من طرف الى طرف</string>
+    <string name="text_enable_rich_links">تعزيز تجربة محادثات ميغا MEGA Chat. سيتم إظهار محتوى الرابط لكن دون تشفير المعرفة الصفرية</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">يرجى ادخال كلمة مرور قوية</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2212,7 +2210,7 @@
     <!-- Title of the section Archived chats -->
     <string name="archived_chats_title_section">تمت الارشفة</string>
     <!-- Text of the option to show the arhived chat, it shows the number of archived chats -->
-    <string name="archived_chats_show_option">Archived (%d)</string>
+    <string name="archived_chats_show_option">مؤرشفة (%d)</string>
     <!-- Title of the option on the chat list to archive a chat -->
     <string name="archive_chat_option">الأرشيف</string>
     <!-- Title of the option on the chat list to unarchive a chat -->
@@ -2228,7 +2226,7 @@
     <!-- Message shown when a chat is successfully unarchived, it shows the name of the chat -->
     <string name="success_unarchive_chat">تمت إعادة %s من الأرشفة</string>
     <!-- Error message shown when a chat has not be unarchived, it shows the name of the chat -->
-    <string name="error_unarchive_chat">Error. %s wasn’t unarchived. Try again.</string>
+    <string name="error_unarchive_chat">خطأ. لم يتم أرشفة %s . حاول مرة أخرى.</string>
     <!-- Subtitle of chat screen when the chat is inactive -->
     <string name="inactive_chat">المحادثات الغير نشطة</string>
     <!-- Subtitle of chat screen when the chat is archived -->
@@ -2823,8 +2821,12 @@
     <string name="version_history_deleted_erroneously">لم يتم حذف النسخ السابقة.</string>
     <!-- Confirmation message after deleted file versions, version items -->
     <plurals name="versions_deleted_succesfully">
-        <item quantity="one">%d version deleted</item>
-        <item quantity="other">%d versions deleted</item>
+        <item quantity="zero">تم حذف %d نسخة</item>
+        <item quantity="one">تم حذف %d نسخة</item>
+        <item quantity="two">تم حذف %d نسختين</item>
+        <item quantity="few">تم حذف %d نسخ</item>
+        <item quantity="many">تم حذف %d نسخة</item>
+        <item quantity="other">تم حذف %d نسخة</item>
     </plurals>
     <!-- Alert shown when several versions are not deleted successfully -->
     <plurals name="versions_not_deleted">
@@ -3389,7 +3391,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">يتمتع مستخدمو ميغا برو MEGA Pro بوصول حصري إلى ميزات إضافية لأمان الروابط مما يجعل حسابك أكثر أمانًا.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">يتطلب نظام التشفير من طرف إلى طرف لدينا مفتاحًا فريدًا يتم إنشاؤه تلقائيًا لهذا الملف أو المجلد. يتم إنشاء رابط مع هذا المفتاح افتراضيًا، ولكن يمكنك تصدير مفتاح فك التشفير بشكل منفصل للحصول على طبقة أمان إضافية.</string>
+    <string name="decryption_key_explanation">يتطلب نظام تشفير المعرفة الصفرية الخاص بنا مفتاحًا فريدًا يتم إنشاؤه تلقائيًا لهذا الملف أو المجلد. يتم إنشاء رابط بهذا المفتاح تلقائياً ولكن يمكنك تصدير مفتاح فك التشفير بشكل منفصل للحصول على طبقة أمان إضافية.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">إعادة تعيين كلمة المرور</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3595,23 +3597,39 @@
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_correctly_moved_to_rubbish">
-        <item quantity="one">%d item moved to Rubbish bin</item>
-        <item quantity="other">%d items moved to Rubbish bin</item>
+        <item quantity="zero">تم نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="one">تم نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="two">تم نقل %d عنصرين إلى سلة المحذوفات</item>
+        <item quantity="few">تم نقل %d عناصر إلى سلة المحذوفات</item>
+        <item quantity="many">تم نقل %d عنصراً إلى سلة المحذوفات</item>
+        <item quantity="other">تم نقل %d عنصر إلى سلة المحذوفات</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being moved to the rubbish bin and all nodes have not been successfully moved. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_moved_to_rubbish">
-        <item quantity="one">%d item wasn’t moved to the Rubbish bin</item>
-        <item quantity="other">%d items weren’t moved to Rubbish bin</item>
+        <item quantity="zero">لم يتم نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="one">لم يتم نقل %d عنصر إلى سلة المحذوفات</item>
+        <item quantity="two">لم يتم نقل %d عنصرين إلى سلة المحذوفات</item>
+        <item quantity="few">لم يتم نقل %d عناصر إلى سلة المحذوفات</item>
+        <item quantity="many">لم يتم نقل %d عنصراً إلى سلة المحذوفات</item>
+        <item quantity="other">لم يتم نقل %d عنصر إلى سلة المحذوفات</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_correctly_restored_from_rubbish">
-        <item quantity="one">%d item restored</item>
-        <item quantity="other">%d items restored</item>
+        <item quantity="zero">تمت استعادة %d عنصر</item>
+        <item quantity="one">تمت استعادة %d عنصر</item>
+        <item quantity="two">تمت استعادة %d عنصرين</item>
+        <item quantity="few">تمت استعادة %d عناصر</item>
+        <item quantity="many">تمت استعادة %d عنصراً</item>
+        <item quantity="other">تمت استعادة %d عنصر</item>
     </plurals>
     <!-- Message displayed when nodes (files and folders) are being restored from the rubbish bin and all nodes have not been successfully restored. Placeholder: number of nodes -->
     <plurals name="number_incorrectly_restored_from_rubbish">
-        <item quantity="one">%d item wasn’t restored</item>
-        <item quantity="other">%d items weren’t restored</item>
+        <item quantity="zero">لم تتم استعادة %d عنصر</item>
+        <item quantity="one">لم تتم استعادة %d عنصر</item>
+        <item quantity="two">لم تتم استعادة %d عنصرين</item>
+        <item quantity="few">لم تتم استعادة %d عناصر</item>
+        <item quantity="many">لم تتم استعادة %d عنصراً</item>
+        <item quantity="other">لم تتم استعادة %d عنصر</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
     <string name="action_change_anyway">تغيير على أي حال</string>
@@ -3662,13 +3680,21 @@
     <string name="action_copy_all">نسخ الكل</string>
     <!-- Confirmation shown informing links have been sent to the selected chats -->
     <plurals name="links_sent">
-        <item quantity="one">Link sent</item>
-        <item quantity="other">Links sent</item>
+        <item quantity="zero">تم إرسال الرابط</item>
+        <item quantity="one">تم إرسال الرابط</item>
+        <item quantity="two">تم إرسال الروابط</item>
+        <item quantity="few">تم إرسال الروابط</item>
+        <item quantity="many">تم إرسال الروابط</item>
+        <item quantity="other">تم إرسال الروابط</item>
     </plurals>
     <!-- Confirmation shown informing links have been copied to the clipboard -->
     <plurals name="links_copied_clipboard">
-        <item quantity="one">Copied link to clipboard</item>
-        <item quantity="other">Copied links to clipboard</item>
+        <item quantity="zero">تم نسخ الرابط الى الحافظة</item>
+        <item quantity="one">تم نسخ الرابط الى الحافظة</item>
+        <item quantity="two">تم نسخ الروابط الى الحافظة</item>
+        <item quantity="few">تم نسخ الروابط الى الحافظة</item>
+        <item quantity="many">تم نسخ الروابط الى الحافظة</item>
+        <item quantity="other">تم نسخ الروابط الى الحافظة</item>
     </plurals>
     <!-- Plural string used as button label or title of the screen to get only one or several links at the same time. -->
     <plurals name="get_links">
@@ -3774,7 +3800,7 @@
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">اجتماع ميغا MEGA</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">اجتماع فيديو مشفر من طرف إلى طرف</string>
+    <string name="content_tour_five">اجتماع فيديو مشفر بتشفير المعرفة الصفرية</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">الرجاء إدخال رابط صالح للاجتماع</string>
     <!-- Guest leave call-->
@@ -3846,7 +3872,7 @@
     <!-- Warning shown informing the contact has been previously invited. The placeholder is to show the name of the contact. -->
     <string name="contact_already_invited">لقد قمت بالفعل بدعوة %1$s</string>
     <!-- Warning shown informing the contact request has been sent and can be managed in sent requests section. -->
-    <string name="contact_invited">Invite sent. See Sent requests.</string>
+    <string name="contact_invited">تم إرسال الدعوة. انظر الطلبات المرسلة.</string>
     <!-- Message when file available offline. -->
     <string name="file_available_offline">الملف متاح بدون اتصال</string>
     <!-- Message when file removed from offline. -->
@@ -4004,7 +4030,7 @@
     <!-- Message shown when one participant left the call. The placeholder is to include the participant name -->
     <string name="meeting_call_screen_one_participant_left_call">%1$s غادر المكالمة</string>
     <!-- Message shown when two participants joined the call. The first placeholder is the name of the first participant left. The second placeholder is the name of the second participant left -->
-    <string name="meeting_call_screen_two_participants_left_call">%1$s and %2$s left the call</string>
+    <string name="meeting_call_screen_two_participants_left_call">قام %1$s و %2$s بمغادرة المكالمة</string>
     <!-- Message shown when more than two participants joined the call. The placeholder is to include the name of the first participant and the number of extra participants joined -->
     <plurals name="meeting_call_screen_more_than_two_participants_joined_call">
         <item quantity="zero">انضم %1$s و %2$d آخر</item>
@@ -4016,8 +4042,12 @@
     </plurals>
     <!-- Message shown when more than two participants left the call. The placeholder is to include the name of the first participant and the number of extra participants left -->
     <plurals name="meeting_call_screen_more_than_two_participants_left_call">
-        <item quantity="one">%1$s and %2$d other left the call</item>
-        <item quantity="other">%1$s and %2$d others left the call</item>
+        <item quantity="zero">قام %1$s و %2$d آخر بمغادرة المكالمة</item>
+        <item quantity="one">قام %1$s و %2$d آخر بمغادرة المكالمة</item>
+        <item quantity="two">قام %1$s و  %2$d آخران بمغادرة المكالمة</item>
+        <item quantity="few">قام %1$s و %2$d آخرون بمغادرة المكالمة</item>
+        <item quantity="many">قام %1$s و %2$d آخرون بمغادرة المكالمة</item>
+        <item quantity="other">قام %1$s و %2$d آخرون بمغادرة المكالمة</item>
     </plurals>
     <!-- Bottom menu option to delete permanently an item from Rubbish Bin -->
     <string name="rubbish_bin_bottom_menu_option_delete">حذف بشكل دائم</string>
@@ -4090,7 +4120,7 @@
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">انسخ وغير الاسم</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">قم بتطبيق هذا الخيار على %1$d التعارضات التالية</string>
+    <string name="file_apply_for_all">قم بتطبيق هذا الخيار على %1$d تعارضات التالية</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">ادمج المجلد الموجود في الوجهة مع المجلد الذي تنسخه.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -4381,8 +4411,12 @@
     <string name="photos_album_selection_title">إضافة عناصر إلى ”%s“</string>
     <!-- Message after photos are successfully added in album -->
     <plurals name="photos_album_selection_added">
-        <item quantity="one">Added %1$d item to “%2$s“</item>
-        <item quantity="other">Added %1$d items to “%2$s”</item>
+        <item quantity="zero">تمت إضافة %1$d عنصر إلى ”%2$s“</item>
+        <item quantity="one">تمت إضافة %1$d عنصر إلى ”%2$s“</item>
+        <item quantity="two">تمت إضافة %1$d عنصرين إلى ”%2$s“</item>
+        <item quantity="few">تمت إضافة %1$d عناصر إلى ”%2$s“</item>
+        <item quantity="many">تمت إضافة %1$d عنصراً إلى ”%2$s“</item>
+        <item quantity="other">تمت إضافة %1$d عنصر إلى ”%2$s“</item>
     </plurals>
     <!-- Text that indicates that there’s no photo to show in user album in Photos Section-->
     <string name="photos_user_album_empty_album">[A]ألبوم[/A] [B]فارغ[/B]</string>
@@ -4415,7 +4449,7 @@
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
         <item quantity="zero">تم حذف %d ألبوم</item>
-        <item quantity="one">تم حذف الألبوم ”%s“</item>
+        <item quantity="one">تم حذف ”%s“ ألبوم</item>
         <item quantity="two">تم حذف %d ألبومين</item>
         <item quantity="few">تم حذف %d ألبومات</item>
         <item quantity="many">تم حذف %d ألبوماً</item>
@@ -4472,8 +4506,12 @@
     <string name="settings_camera_uploads_grant_media_permissions_negative_button">لا تمنح</string>
     <!--  -->
     <plurals name="photos_album_photos_removal_snackbar_message">
-        <item quantity="one">Removed %1$d item from “%2$s”</item>
-        <item quantity="other">Removed %1$d items from “%2$s”</item>
+        <item quantity="zero">تم إزالة %1$d عنصر من ”%2$s“</item>
+        <item quantity="one">تم إزالة %1$d عنصر من ”%2$s“</item>
+        <item quantity="two">تم إزالة %1$d عنصرين من ”%2$s“</item>
+        <item quantity="few">تم إزالة %1$d عناصر من ”%2$s“</item>
+        <item quantity="many">تم إزالة %1$d عنصراً من ”%2$s“</item>
+        <item quantity="other">تم إزالة %1$d عنصر من ”%2$s“</item>
     </plurals>
     <!-- Label to describe one off meetings -->
     <string name="meetings_list_one_off_meeting_label">اجتماع لمرة واحدة</string>
@@ -4486,19 +4524,19 @@
     <!--Resume of playback position dialog for playing video from beginning. -->
     <string name="video_playback_position_dialog_restart_button">إعادة تشغيل</string>
     <!-- User Alert notification for new scheduled meeting. %s placeholder is for the email of whom has invited you to the scheduled meeting. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com invited you to a meeting scheduled for: -->
-    <string name="notification_subtitle_scheduled_meeting_new">[A]%s [/A][B]invited you to a meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_new">قام [A]%s[/A][B] بدعوتك إلى اجتماع مجدول بتاريخ: [/B]</string>
     <!-- User Alert notification for canceled scheduled meeting -->
-    <string name="notification_subtitle_scheduled_meeting_canceled">[A]%s cancelled[/A][B] the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_canceled">قام [A]%s بإلغاء [/A][B] الاجتماع المجدول بتاريخ: [/B]</string>
     <!-- User Alert notification for scheduled meeting title change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_title">[A]%s updated[/A][B] the meeting name from “%s” to [/B]“[A]%s[/A]”</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_title">قام [A]%s بتحديث[/A][B] اسم الاجتماع من ”%s“ إلى [/B]”[A]%s[/A]”</string>
     <!-- User Alert notification for scheduled meeting date change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_date">[A]%s updated[/A][B] the meeting date[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_date">قام [A]%s بتحديث[/A][B] تاريخ الاجتماع[/B]</string>
     <!-- User Alert notification for scheduled meeting time change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_time">[A]%s updated[/A][B] the meeting time[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_time">قام [A]%s بتحديث[/A][B] وقت الاجتماع[/B]</string>
     <!-- User Alert notification for scheduled meeting description change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_description">[A]%s updated[/A][B] the meeting description[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_description">قام [A]%s بتحديث[/A][B] وصف الاجتماع[/B]</string>
     <!-- User Alert notification for scheduled meeting fields change -->
-    <string name="notification_subtitle_scheduled_meeting_updated_multiple">[A]%s updated[/A][B] the details of the meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_updated_multiple">قام [A]%s بتحديث[/A][B] تفاصيل الاجتماع المجدول بتاريخ:[/B]</string>
     <!-- Title of the dialog when permission is denied and it's required to upload content -->
     <string name="dialog_title_media_permissions_denied">تم رفض إمكانية الوصول</string>
     <!-- Content of the dialog when permission is denied and it's required to upload content -->
@@ -4518,68 +4556,92 @@
     <!-- Label of button in recurring meeting info when more occurrences can be shown -->
     <string name="meetings_recurring_meeting_info_see_more_occurrences_button">شاهد المزيد</string>
     <!-- Label for scheduled monthly meetings -->
-    <string name="meetings_list_scheduled_meeting_monthly_label">%s monthly</string>
+    <string name="meetings_list_scheduled_meeting_monthly_label">%s شهرياً</string>
     <!-- Label for scheduled daily meetings -->
-    <string name="meetings_list_scheduled_meeting_daily_label">%s daily</string>
+    <string name="meetings_list_scheduled_meeting_daily_label">%s يومياً</string>
     <!-- User Alert notification for new scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_new">[A]%s [/A][B]invited you to a recurring meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_new">قام [A]%s[/A][B] بدعوتك إلى اجتماع متكرر مجدول بتاريخ: [/B]</string>
     <!-- User Alert notification for scheduled recurring meeting description change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">[A]%s updated[/A][B] the recurring meeting description[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_description">قام [A]%s بتحديث[/A][B] وصف الاجتماع المتكرر[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting fields change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">[A]%s updated[/A][B] the details of the recurring meeting scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_multiple">قام [A]%s بتحديث[/A][B] تفاصيل الاجتماع المتكرر  المجدول بتاريخ:[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting occurrence change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">[A]%s updated[/A][B] an occurrence to:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_occurrence">قام [A]%s بتحديث[/A][B] أحد التكرارات إلى: [/B]</string>
     <!-- User Alert notification for scheduled recurring meeting time change -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">[A]%s updated[/A][B] the recurring meeting time[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_time">قام [A]%s بتحديث[/A][B] وقت الاجتماع المتكرر[/B]</string>
     <!-- User Alert notification for scheduled recurring meeting frequency change -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_frequency"></string>
     <!-- User Alert notification for canceled scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">[A]%s cancelled[/A][B] the meeting and all its occurrences[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_canceled">قام [A]%s بإلغاء[/A][B] الاجتماع و كل تكراراته[/B]</string>
     <!-- User Alert notification for canceled occurrences of a scheduled recurring meeting -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">[A]%s cancelled[/A][B] the occurrence scheduled for:[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_occurrence_canceled">قام [A]%s بإلغاء [/A][B] التكرار المجدول بتاريخ: [/B]</string>
     <!-- Error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_message">This link hasn’t been generated with the account you’re currently logged into. Log in to the account related to this link to verify your email address.</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_message">لم يتم إنشاء هذا الرابط مع الحساب الذي سجلت الدخول إليه حاليًا. قم بتسجيل الدخول إلى الحساب المرتبط بهذا الرابط للتحقق من عنوان بريدك الإلكتروني.</string>
     <!-- Title of the error message for the alert shown when opening a change email verification link with an account that not corresponds to the link -->
-    <string name="account_change_email_error_not_logged_with_correct_account_title">Unable to update email address</string>
+    <string name="account_change_email_error_not_logged_with_correct_account_title">تعذر تحديث عنوان البريد الإلكتروني</string>
     <!-- Select album cover -->
     <string name="photos_album_select_cover">اختر غلاف الألبوم</string>
     <!-- Album cover updated -->
     <string name="photos_album_cover_updated">تم تحديث غلاف الألبوم</string>
     <!-- One off meeting date and time description. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Wed, 6 Jul 2022 from 09:00 to 10:00 -->
-    <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_one_off">[A]%1$s[/A] من [B]%2$s إلى %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting without ending date. %1$s is the placeholder for the start date, %2$s for the start time and %3$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 26 January 2023 from 13:00 to 13:30 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">Every day effective [A]%1$s[/A] from [B]%2$s to %3$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_forever">كل يوم اعتباراً من تاريخ [A]%1$s[/A] من [B]%2$s إلى %3$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a daily recurring meeting with ending date. %1$s is the placeholder for the start date, %2$s for the end date, %3$s for the start time and %4$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Everyday, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
-    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">Every day effective [A]%1$s until %2$s[/A] from [B]%3$s to %4$s[/B]</string>
+    <string name="notification_subtitle_scheduled_meeting_recurring_daily_until">كل يوم اعتباراً من تاريخ [A]%1$s حتى %2$s[/A] من [B] %3$s إلى %4$s[/B]</string>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting with ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
-        <item quantity="one">%1$s every week effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s every %2$d weeks effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="zero">%1$s كل %2$d أسبوع اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="one">%1$s كل أسبوع اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="two">%1$s كل %2$d أسبوعين اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="few">%1$s كل %2$d أسابيع اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="many">%1$s كل %2$d أسبوعاً اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="other">%1$s كل %2$d أسبوع اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting without ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever">
-        <item quantity="one">%1$s every week effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">%1$s every %2$d weeks effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="zero">%1$s كل %2$d أسبوع اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="one">%1$s كل أسبوع اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="two">%1$s كل %2$d أسبوعين اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="few">%1$s كل %2$d أسابيع اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="many">%1$s كل %2$d أسبوعاً اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="other">%1$s كل %2$d أسبوع اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days with ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the end date, %6$s for the start time and %7$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_until">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s until %5$s[/A] from [B]%6$s to %7$s[/B]</item>
+        <item quantity="zero">%1$s و %2$s كل %3$d أسبوع اعتباراً من تاريخ [A]%4$s حتى %5$s[/A] من [B]%6$s إلى %7$s[/B]</item>
+        <item quantity="one">%1$s و %2$s كل أسبوع اعتباراً من تاريخ [A]%4$s حتى %5$s[/A] من [B]%6$s إلى %7$s[/B]</item>
+        <item quantity="two">%1$s و %2$s كل %3$d أسبوعين اعتباراً من تاريخ [A]%4$s حتى  %5$s[/A] من [B]%6$s إلى %7$s[/B]</item>
+        <item quantity="few">%1$s و %2$s كل %3$d أسابيع اعتباراً من تاريخ [A]%4$s حتى %5$s[/A] من [B]%6$s إلى %7$s[/B]</item>
+        <item quantity="many">%1$s و %2$s كل %3$d أسبوعاً اعتباراً من تاريخ [A]%4$s حتى %5$s[/A] من [B]%6$s إلى %7$s[/B]</item>
+        <item quantity="other">%1$s و %2$s كل %3$d أسبوع اعتباراً من تاريخ [A]%4$s حتى %5$s[/A] من [B]%6$s إلى %7$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting on multiple days without ending date. %1$s is the placeholder for list of days of the week (less the last one), %2$s for the last day of the list, %3$d for the period of weeks (in case of plural), %4$s for the start date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday and Friday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_several_days_forever">
-        <item quantity="one">%1$s and %2$s every week effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">%1$s and %2$s every %3$d weeks effective [A]%4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="zero">%1$s و %2$s كل %3$d أسبوع اعتباراً من تاريخ [A]%4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="one">%1$s و %2$s كل أسبوع اعتباراً من تاريخ [A]%4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="two">%1$s و %2$s كل %3$d أسبوعين اعتباراً من تاريخ [A]%4$s[/A] من [B]%5$sإلى %6$s[/B]</item>
+        <item quantity="few">%1$s و %2$s كل %3$d أسابيع اعتباراً من تاريخ [A]%4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="many">%1$s و %2$s كل %3$d أسبوعاً اعتباراً من تاريخ [A]%4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="other">%1$s و %2$s كل %3$d أسبوع اعتباراً من تاريخ [A]%4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting with ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the end date, %5$s for the start time and %6$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_until">
-        <item quantity="one">Day %1$d of every month effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
-        <item quantity="other">Day %1$d of every %2$d months effective [A]%3$s until %4$s[/A] from [B]%5$s to %6$s[/B]</item>
+        <item quantity="zero">اليوم %1$d من كل %2$d شهر اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="one">اليوم %1$d من كل شهر اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="two">اليوم %1$d من كل %2$d شهرين اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="few">اليوم %1$d من كل %2$d أشهر اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="many">اليوم %1$d من كل %2$d شهراً اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
+        <item quantity="other">اليوم %1$d من كل %2$d شهر اعتباراً من تاريخ [A]%3$s حتى %4$s[/A] من [B]%5$s إلى %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting without ending date. %1$s is the placeholder for the day of the month, %2$d for the period of months (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Day 10 of every month, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_single_day_forever">
-        <item quantity="one">Day %1$d of every month effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
-        <item quantity="other">Day %1$d of every %2$d months effective [A]%3$s[/A] from [B]%4$s to %5$s[/B]</item>
+        <item quantity="zero">اليوم %1$d من كل %2$d شهر اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="one">اليوم %1$d من كل شهر اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="two">اليوم %1$d من كل %2$d شهرين اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="few">اليوم %1$d من كل %2$d أشهر اعتباراً من تاريخ [A]%3$s [/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="many">اليوم %1$d من كل %2$d شهراً اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
+        <item quantity="other">اليوم %1$d من كل %2$d شهر اعتباراً من تاريخ [A]%3$s[/A] من [B]%4$s إلى %5$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a monthly recurring meeting on first Monday with ending date. %1$d is the placeholder for the period of months (in case of plural), %2$s for the start date, %3$s for the end date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: First Monday of every 2 months, effective 2 February 2023 until 2 August 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_monthly_ordinal_day_until_monday_first">
@@ -4946,15 +5008,15 @@
     <!-- In app notification description text representing the meeting repeats every Sunday -->
     <string name="notification_scheduled_meeting_week_day_sun">الأحد</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs today. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Today, 6 Jul 2022 from 09:00 to 10:00 -->
-    <string name="meetings_one_off_occurrence_info_today">Today, %1$s from %2$s to %3$s</string>
+    <string name="meetings_one_off_occurrence_info_today">اليوم، %1$s من %2$s إلى %3$s</string>
     <!-- Subtitle of one-off meeting info screen when the occurrence occurs tomorrow. %1$s is the placeholder for the date, %2$s for the start time and %3$s for the end time - e.g: Tomorrow, 6 Jul 2022 from 09:00 to 10:00 -->
-    <string name="meetings_one_off_occurrence_info_tomorrow">Tomorrow, %1$s from %2$s to %3$s</string>
+    <string name="meetings_one_off_occurrence_info_tomorrow">غداً، %1$s من %2$s إلى %3$s</string>
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
-    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s updated[/A][B] the recurring meeting date[/B]</string>
+    <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">قام [A]%1$s بتحديث[/A][B] تاريخ الاجتماع المتكرر[/B]</string>
     <!-- This is the title of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_title">ترقية الأمان</string>
+    <string name="shared_items_security_upgrade_dialog_title">ترقية أمان الحساب</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">يتم الآن ترقية الأمان في حسابك. هذا سيحدث مرة واحدة فقط. إذا كنت قد رأيت هذه الرسالة لهذا الحساب من قبل، فانقر فوق إلغاء.</string>
+    <string name="shared_items_security_upgrade_dialog_content">نحن بصدد ترقية أمان حسابك. يجب أن ترى هذه الرسالة مرة واحدة فقط. إذا كنت قد شاهدتها من قبل، فتأكد أولاً من أنها مخصصة لهذا الحساب وليس لحساب ميغا MEGA آخر لديك.\n\nإذا كنت متأكدًا وهذه هي المرة الثانية التي ترى فيها هذه الرسالة لهذا الحساب فتوقف عن استخدام هذا الحساب .</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="zero">أنت تشارك حاليًا المجلد التالي: %s</item>
@@ -5002,21 +5064,21 @@
     <!-- In app notification description text representing the meeting repeats every Sunday. This text is used in the middle of the sentence. -->
     <string name="notification_scheduled_meeting_week_day_sentence_middle_sun">الأحد</string>
     <!-- Album selection dialog title -->
-    <string name="photos_album_selection_dialog_title">Cannot select more</string>
+    <string name="photos_album_selection_dialog_title">لا يمكن تحديد المزيد</string>
     <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">You can add only up to 150 items at a time to an album.</string>
+    <string name="photos_album_selection_dialog_body">يمكنك إضافة ما يصل إلى 150 عنصرًا فقط في المرة الواحدة إلى الألبوم.</string>
     <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">لا يمكن التحقق من جهة الاتصال</string>
     <!--  -->
-    <string name="shared_items_contact_not_in_contact_list_dialog_content">You can’t verify %s as they’re not in your contact list. Wait for them to accept your invitation first.</string>
+    <string name="shared_items_contact_not_in_contact_list_dialog_content">لا يمكنك التحقق من %s لأنه ليس في قائمة جهات الاتصال الخاصة بك. انتظر حتى يقبل دعوتك أولاً.</string>
     <!-- Option of a scheduled meeting in meeting list to start the meeting -->
     <string name="meetings_list_start_scheduled_meeting_option">بدء</string>
     <!-- Answer for confirmation dialog. -->
     <string name="general_camelcase_ok">موافق</string>
     <!-- Warning shown in Info view, when the file was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_file_warning">This file has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_file_warning">تمت إزالة هذا الملف وفقًا [A]لسياسة إرشادات الإزالة[/A] الخاصة بنا.</string>
     <!-- Warning shown in Info view, when the folder was taken down. The placeholders [A] and [/A] will be replaced to create the hyperlink to our Takedown policy. -->
-    <string name="cloud_drive_info_taken_down_folder_warning">This folder has been taken down in accordance with our [A]Takedown Guidance Policy[/A].</string>
+    <string name="cloud_drive_info_taken_down_folder_warning">تمت إزالة هذا المجلد وفقًا [A]لسياسة إرشادات الإزالة[/A] الخاصة بنا.</string>
     <!-- Option of a scheduled meeting in meeting list to join the meeting -->
     <string name="meetings_list_join_scheduled_meeting_option">الانضمام</string>
     <!-- Option of a scheduled meeting in chat room to start the meeting -->
@@ -5069,7 +5131,7 @@
     <!-- The Off option to disable subtitles in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
     <string name="media_player_video_enable_subtitle_dialog_option_off">ايقاف</string>
     <!-- The Add subtitle option in the enable subtitle dialog. When user taps on Subtitle icon to enable them this dialog will be shown. -->
-    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">Add subtitles&#8230;</string>
+    <string name="media_player_video_enable_subtitle_dialog_option_add_subtitle">أضف ترجمات...</string>
     <!-- Slideshow settings page title -->
     <string name="slideshow_settings_page_title">خيارات عرض الشرائح</string>
     <!-- Slideshow speed preference -->
@@ -5086,4 +5148,100 @@
     <string name="slideshow_order_shuffle">عشوائي</string>
     <!-- Slideshow repeat preference -->
     <string name="slideshow_setting_repeat">تكراري</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_title">حدد ملف الترجمة</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_button_add_subtitles">أضف ترجمات</string>
+    <!-- The message for select subtitle file page when subtitle file is empty. -->
+    <string name="media_player_video_select_subtitle_file_empty_message">لم يتم العثور على أية ترجمات</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="one">Left %1$d shared folder</item>
+        <item quantity="other">Left %1$d shared folders</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">Couldn’t leave %1$d shared folder</item>
+        <item quantity="other">Couldn’t leave %1$d shared folders</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">Left %1$d shared folder,&#160;</item>
+        <item quantity="other">Left %1$d shared folders,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">couldn’t leave %1$d shared folder</item>
+        <item quantity="other">couldn’t leave %1$d shared folders</item>
+    </plurals>
+    <!-- Text shown in the list of meetings when there is a call in progress -->
+    <string name="meetings_list_ongoing_call_message">الاجتماع جارٍ الآن</string>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
+    <plurals name="general_move_node_snackbar_success">
+        <item quantity="one">Moved %1$d item</item>
+        <item quantity="other">Moved %1$d items</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
+    <plurals name="general_move_node_snackbar_fail">
+        <item quantity="one">Couldn’t move %1$d item</item>
+        <item quantity="other">Couldn’t move %1$d items</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_success">
+        <item quantity="one">Moved %1$d item,&#160;</item>
+        <item quantity="other">Moved %1$d items,&#160;</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_fail">
+        <item quantity="one">couldn’t move %1$d item</item>
+        <item quantity="other">couldn’t move %1$d items</item>
+    </plurals>
+    <!-- Text hint of option to add meeting name in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_name_hint">اسم الاجتماع</string>
+    <!-- Title of option to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_label">التكرار</string>
+    <!-- Title of option to send calendar invite in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">إرسال دعوة للتقويم</string>
+    <!-- Title of option to add description in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_add_description_label">إضافة وصف</string>
+    <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_empty_meeting_name_error">اسم الاجتماع مطلوب</string>
+    <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter fewer than 30&#160;characters</string>
+    <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 4,000&#160;characters</string>
+    <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting scheduled</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_never_label">أبداً</string>
+    <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_calendar_select_date_label">Select date</string>
+    <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Discard this meeting?</string>
+    <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">استمر في التعديل</string>
+    <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">تجاهل</string>
+    <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
+        <item quantity="one">Added %1$d participant</item>
+        <item quantity="other">Added %1$d participants</item>
+    </plurals>
+    <!-- error message when sharing a folder(s) fails to be completed-->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
+        <item quantity="one">Couldn’t share %1$d folder</item>
+        <item quantity="other">Couldn’t share %1$d folders</item>
+    </plurals>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="one">Couldn’t remove access of %1$d contact</item>
+        <item quantity="other">Couldn’t remove access of %1$d contacts</item>
+    </plurals>
+    <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
+    <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
+        <item quantity="one">Couldn’t update permissions for %1$d contact</item>
+        <item quantity="other">Couldn’t update permissions for %1$d contacts</item>
+    </plurals>
+    <!--This is the label of the button of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">حسنًا، فهمت ذلك</string>
 </resources>

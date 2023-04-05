@@ -3318,7 +3318,7 @@
     <!-- Item menu option upon right click on meeting. -->
     <string name="context_meeting">Meeting</string>
     <!-- Menu option that allows the user to start/join meeting. -->
-    <string name="start_join_meeting">Start or Join meeting</string>
+    <string name="start_join_meeting">Start or join meeting</string>
     <!-- Label that create a meeting -->
     <string name="new_meeting">New meeting</string>
     <!-- Label that join a meeting -->
@@ -4552,7 +4552,7 @@
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">Account security upgrade</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">We’re upgrading your account’s security. You should see this message only once. If you’ve seen it before, first make sure it has been for this account and not for another MEGA account you have.\n\nIf you’re sure and it’s the second time you’re seeing this message for this account, don’t tap OK. Close this message and stop using this account.</string>
+    <string name="shared_items_security_upgrade_dialog_content">We’re upgrading your account’s security. You should see this message only once. If you’ve seen it before, first make sure it has been for this account and not for another MEGA account you have.\n\nIf you’re sure and it’s the second time you’re seeing this message for this account, stop using this account.</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="one">You’re currently sharing the following folder: %s</item>
@@ -4633,12 +4633,18 @@
         <item quantity="one">Couldn’t copy %1$d item</item>
         <item quantity="other">Couldn’t copy %1$d items</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail` ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the success part
+    Space after "," is required because it will be concatenated with `general_copy_snackbar_concat_fail`
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_success">
         <item quantity="one">Copied %1$d item,&#160;</item>
         <item quantity="other">Copied %1$d items,&#160;</item>
     </plurals>
-    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items -->
+    <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when some copy request are successful and some failed, this is the failed part
+    this will be concatenated with `general_copy_snackbar_concat_success` as the trailing text
+    ** eg: Copied 1 item, couldn't copy 1 item || Copied 2 items, couldn't copy 1 item || Copied 2 items, couldn't copy 3 items
+    -->
     <plurals name="general_copy_snackbar_concat_fail">
         <item quantity="one">couldn’t copy %1$d item</item>
         <item quantity="other">couldn’t copy %1$d items</item>

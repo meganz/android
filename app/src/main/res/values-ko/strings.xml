@@ -584,8 +584,6 @@
     <string name="general_confirm_button">확인</string>
     <!-- On “add phone number” page, an error message will be shown if user click next button without select country code. -->
     <string name="verify_account_invalid_country_code">국가 코드를 선택하세요</string>
-    <!-- On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end. -->
-    <string name="verify_account_not_loading_country_code">국가 코드를 얻어올 수 없었습니다.</string>
     <!-- error message if user click next button without enter a valid phone number -->
     <string name="verify_account_invalid_phone_number">유효한 전화번호를 입력하세요.</string>
     <!-- Label tell user to enter received txt to below input boxes -->
@@ -994,7 +992,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">참여자 제거</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">당신의 대화를 필수적인 안전 보증을 제공하는 종단간(이용자 제어) 암호화로 보호하세요:</string>
+    <string name="mega_info_empty_screen">당신의 대화를 필수적인 안전 보증을 제공하는, 영지식 암호화로 보호하세요:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">시스템이 명시된 발송자로부터 데이터를 수신하였으며, 그 내용이 전송중 조작되지 않았음을 보증합니다.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1411,7 +1409,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">친구를 초대하고 보상을 받으세요</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">성공한 초대마다 %1$s의 저장소. 365일간 이용 가능.</string>
+    <string name="figures_achievements_text_referrals">각 초대마다 %1$s의 저장소. 365일간 이용 가능</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s의 용량. 365일간 이용 가능</string>
     <!-- title of the section for unlocked rewards -->
@@ -1439,7 +1437,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">작동 원리</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">친구를 초대하여 MEGA 무료 계정을 만들고 MEGA 모바일 앱을 설치하게 하세요. 성공적인 가입과 앱 설치마다 당신은 무료 저장소를 보너스로 받게 됩니다.</string>
+    <string name="first_paragraph_achievement_invite_friends">친구를 초대하여 무료 MEGA 계정을 만들고 MEGA 모바일 앱을 설치하게 하세요. 가입과 앱 설치마다 당신은 무료 저장소를 보너스로 받게 됩니다.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">무료 저장소 보너스는 새 초대에만 적용되며 MEGA 모바일 앱 또는 MEGA 데스크톱 앱이 설치되어야 합니다.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1834,7 +1832,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">고급 URL 미리 보기 활성화</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">MEGA chat 경험을 향상하세요. URL 컨텐츠가 종단간 암호화 없이 수신됩니다.</string>
+    <string name="text_enable_rich_links">MEGA Chat 경험을 향상하세요. URL 컨텐츠가 영지식 암호화 없이 수신됩니다.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">더 강력한 암호를 입력하세요</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2978,7 +2976,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">MEGA Pro 이용자는 계정을 더욱 안전하게 만드는 추가적인 링크 보안 기능에 대한 독점적 접근이 가능합니다.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">우리의 종단간 암호화 시스템은 이 파일 또는 폴더를 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키에 대한 링크는 자동으로 생성되지만, 보안을 위해 복호화 키를 별도로 내보낼 수 있습니다.</string>
+    <string name="decryption_key_explanation">우리의 영지식 암호화 시스템은 이 파일 또는 폴더를 위해 자동으로 생성된 고유의 키를 필요로 합니다. 이 키에 대한 링크는 자동으로 생성되지만, 보안을 위해 복호화 키를 별도로 내보낼 수 있습니다.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">암호 재설정</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3312,7 +3310,7 @@
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA 회의</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">종단간 암호화 영상 회의</string>
+    <string name="content_tour_five">영지식 암호화 화상 회의</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">올바른 회의 링크를 입력하세요</string>
     <!-- Guest leave call-->
@@ -3622,7 +3620,7 @@
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">복사하고 이름 바꾸기</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">다음 %1$d 충돌에도 이 선택 적용</string>
+    <string name="file_apply_for_all">다음 %1$d개의 충돌에도 이 선택 적용</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">복사하려는 폴더와 대상 위치의 폴더를 합칩니다.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -3925,7 +3923,7 @@
     <string name="scheduled_meetings_meeting_link_copied">클립보드에 링크 복사됨</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="other">사진첩 %d개 삭제함</item>
+        <item quantity="other">사진첩 %d개 삭제됨</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
@@ -4366,9 +4364,9 @@
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s 님이 [B]반복 회의 날짜[/B]를 수정[/A]하였습니다</string>
     <!-- This is the title of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_title">보안 업그레이드</string>
+    <string name="shared_items_security_upgrade_dialog_title">계정 보안 업그레이드</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">계정의 보안이 업그레이드 되는 중입니다. 이것은 한번만 실행됩니다. 만약 이 계정에서 이 메시지를 본 적이 있다면, 취소를 탭하세요.</string>
+    <string name="shared_items_security_upgrade_dialog_content">우리가 당신 계정의 보안을 업그레이드 하고 있습니다. 당신은 이 메시지를 한번만 보아야 합니다. 만약 이전에 본 적이 있다면, 이 계정이 아니라 다른 MEGA 계정에서 본 것이 아닌지 확인하세요.\n\n만약 이 계정에서 이 메시지를 두번째 보는 것이 확실하다면, 이 계정의 이용을 멈추세요.</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="other">다음의 폴더를 공유하고 있습니다: %s</item>
@@ -4483,4 +4481,88 @@
     <string name="slideshow_order_shuffle">무작위</string>
     <!-- Slideshow repeat preference -->
     <string name="slideshow_setting_repeat">반복</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_title">자막 파일 선택</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_button_add_subtitles">자막 추가</string>
+    <!-- The message for select subtitle file page when subtitle file is empty. -->
+    <string name="media_player_video_select_subtitle_file_empty_message">발견된 자막이 없습니다</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="other">%1$d개의 공유된 폴더를 나갔습니다</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="other">%1$d개의 공유된 폴더를 나갈 수 없었습니다</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="other">%1$d개의 공유된 폴더를 나갔습니다,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="other">%1$d개의 공유된 폴더를 나갈 수 없었습니다</item>
+    </plurals>
+    <!-- Text shown in the list of meetings when there is a call in progress -->
+    <string name="meetings_list_ongoing_call_message">회의가 진행 중입니다</string>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
+    <plurals name="general_move_node_snackbar_success">
+        <item quantity="other">%1$d개의 항목을 이동했습니다</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
+    <plurals name="general_move_node_snackbar_fail">
+        <item quantity="other">%1$d개의 항목을 이동하지 못 했습니다</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_success">
+        <item quantity="other">%1$d개의 항목을 이동했습니다,&#160;</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_fail">
+        <item quantity="other">%1$d개의 항목을 이동하지 못 했습니다</item>
+    </plurals>
+    <!-- Text hint of option to add meeting name in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_name_hint">회의 이름</string>
+    <!-- Title of option to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_label">되풀이</string>
+    <!-- Title of option to send calendar invite in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">달력 초대 보내기</string>
+    <!-- Title of option to add description in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_add_description_label">설명 추가</string>
+    <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_empty_meeting_name_error">회의 이름은 필수입니다</string>
+    <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter fewer than 30&#160;characters</string>
+    <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 4,000&#160;characters</string>
+    <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">회의가 예약되었습니다</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_never_label">절대 안 함</string>
+    <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_calendar_select_date_label">날짜 선택</string>
+    <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">회의를 취소하겠습니까?</string>
+    <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">계속 편집</string>
+    <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">폐기</string>
+    <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
+        <item quantity="other">%1$d명의 참여자를 추가하였습니다</item>
+    </plurals>
+    <!-- error message when sharing a folder(s) fails to be completed-->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
+        <item quantity="other">%1$d개의 폴더를 공유할 수 없습니다</item>
+    </plurals>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="other">%1$d개의 연락처에 대한 접근을 제거할 수 없습니다</item>
+    </plurals>
+    <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
+    <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
+        <item quantity="other">%1$d개의 연락처에 대한 권한을 업데이트할 수 없습니다</item>
+    </plurals>
+    <!--This is the label of the button of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">예, 알겠습니다</string>
 </resources>

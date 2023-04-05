@@ -617,8 +617,6 @@
     <string name="general_confirm_button">Potwierdź</string>
     <!-- On “add phone number” page, an error message will be shown if user click next button without select country code. -->
     <string name="verify_account_invalid_country_code">Wybierz kod regionu</string>
-    <!-- On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end. -->
-    <string name="verify_account_not_loading_country_code">Nie udało się pobrać kodów regionów.</string>
     <!-- error message if user click next button without enter a valid phone number -->
     <string name="verify_account_invalid_phone_number">Podaj poprawny numer telefonu.</string>
     <!-- Label tell user to enter received txt to below input boxes -->
@@ -1051,7 +1049,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">Usuń uczestnika</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">Chroń swoje rozmowy wykorzystując szyfrowanie, zapewniające:</string>
+    <string name="mega_info_empty_screen">Chroni Twój czat za pomocą szyfrowania bez wiedzy, zapewniając istotne gwarancje bezpieczeństwa:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">System zapewnia weryfikację, że przesyłane dane pochodzą od zweyfikowanej osoby i że zawartość nie została zmieniona poczas transferu danych.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1513,7 +1511,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Zaproś znajomych i odbierz nagrody</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s pamięci masowej za każde udane zaproszenie. Ważny przez 365 dni.</string>
+    <string name="figures_achievements_text_referrals">%1$s pamięci dla każdego zaproszenia. Ważny przez 365 dni.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s przechowywania danych. Ważny przez 365 dni.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1541,7 +1539,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Jak to działa</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Zaproś swoich znajomych do założenia konta MEGA Free i zainstalowania aplikacji MEGA Mobile App. Za każde pomyślne założenie konta i instalację aplikacji otrzymasz bonus w postaci darmowego miejsca do przechowywania danych.</string>
+    <string name="first_paragraph_achievement_invite_friends">Zaproś swoich znajomych do założenia bezpłatnego konta MEGA i zainstalowania aplikacji mobilnej MEGA. Za każdą rejestrację i instalację aplikacji otrzymasz jako bonus bezpłatne przechowywanie.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Premia za bezpłatne przechowywanie dotyczy tylko nowych zaproszeń, w których zainstalowana jest aplikacja MEGA Mobile lub MEGA Desktop.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1972,7 +1970,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">Włącz podgląd linków</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">Zwiększ możliwości MEGA chat. Linki będą pobierane bez szyfrowania.</string>
+    <string name="text_enable_rich_links">Wzmocnij wrażenia MEGA Czatu. Zawartość URL będzie pobierana bez szyfrowania z zerową świadomością.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">Wprowadź mocniejsze hasło</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -3227,7 +3225,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">Użytkownicy MEGA Pro mają wyłączny dostęp do dodatkowych funkcji bezpieczeństwa linków, dzięki którym Twoje konto jest jeszcze bardziej bezpieczne.</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">Nasz system szyfrowania typu end-to-end wymaga unikalnego klucza generowanego automatycznie dla tego pliku lub katalogu. Łącze z tym kluczem jest tworzone domyślnie, ale można wyeksportować klucz deszyfrowania osobno, aby uzyskać dodatkową warstwę bezpieczeństwa.</string>
+    <string name="decryption_key_explanation">Nasz system szyfrowania bez wiedzy wymaga unikalnego klucza generowanego automatycznie dla tego pliku lub folderu. Łącze z tym kluczem jest tworzone domyślnie, ale możesz wyeksportować klucz deszyfrujący osobno, aby uzyskać dodatkową warstwę bezpieczeństwa.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">Zresetuj hasło</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3606,7 +3604,7 @@
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA spotkanie</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">Spotkanie wideo szyfrowane od końca do końca</string>
+    <string name="content_tour_five">Szyfrowane spotkanie wideo z zerową świadomością</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Proszę wpisać prawidłowy link spotkania</string>
     <!-- Guest leave call-->
@@ -3922,7 +3920,7 @@
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">Skopiuj i zmień nazwę</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">Zastosuj tę opcję przy następnych %1$d konfliktach</string>
+    <string name="file_apply_for_all">Zastosuj tę opcję do kolejnych %1$d konfliktów</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">Połącz katalog w miejscu docelowym z katalogiem, który jest kopiowany.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -4240,10 +4238,10 @@
     <string name="scheduled_meetings_meeting_link_copied">Link skopiowany do schowka</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one">Album “%s” został usunięty</item>
-        <item quantity="few">Usunięto %d albumów</item>
-        <item quantity="many">Usunięto %d albumów</item>
-        <item quantity="other">Usunięto %d albumów</item>
+        <item quantity="one">“%s” usunięty</item>
+        <item quantity="few">%d albumy usunięte</item>
+        <item quantity="many">%d albumy usunięte</item>
+        <item quantity="other">%d albumy usunięte</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
@@ -4924,9 +4922,9 @@
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s zaktualizował[/A][B] termin spotkania rekurencyjnego[/B]</string>
     <!-- This is the title of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_title">Aktualizacja bezpieczeństwa</string>
+    <string name="shared_items_security_upgrade_dialog_title">Aktualizacja zabezpieczeń konta</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">Bezpieczeństwo Twojego konta jest teraz aktualizowane. Będzie to miało miejsce tylko raz. Jeśli już wcześniej widziałeś ten komunikat dla tego konta, kliknij Anuluj.</string>
+    <string name="shared_items_security_upgrade_dialog_content">Ulepszamy zabezpieczenia Twojego konta. Tę wiadomość powinieneś zobaczyć tylko raz. Jeśli widziałeś ją już wcześniej, najpierw upewnij się, że dotyczyła ona tego konta, a nie innego posiadanego przez Ciebie konta MEGA.\n\nJeśli jesteś pewien i po raz drugi widzisz tę wiadomość dla tego konta, przestań z niego korzystać.</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="one">Obecnie udostępniasz następujący folder: %s</item>
@@ -5068,4 +5066,124 @@
     <string name="slideshow_order_shuffle">Losowa</string>
     <!-- Slideshow repeat preference -->
     <string name="slideshow_setting_repeat">Powtarzalna</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_title">Wybierz plik napisów</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_button_add_subtitles">Dodaj napisy</string>
+    <!-- The message for select subtitle file page when subtitle file is empty. -->
+    <string name="media_player_video_select_subtitle_file_empty_message">Nie znaleziono napisów</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="one">Opuszczono %1$d udostępniony katalog</item>
+        <item quantity="few">Opuszczono %1$d udostępnione katalogi</item>
+        <item quantity="many">Opuszczono %1$d udostępnione katalogi</item>
+        <item quantity="other">Opuszczono %1$d udostępnione katalogi</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">Nie udało się opuścić %1$d udostępnionego katalogu</item>
+        <item quantity="few">Nie udało się opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="many">Nie udało się opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="other">Nie udało się opuścić %1$d udostępnionych katalogów</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">Opuszczono %1$d udostępniony katalog,&#160;</item>
+        <item quantity="few">Opuszczono %1$d udostępnione katalogi,&#160;</item>
+        <item quantity="many">Opuszczono %1$d udostępnione katalogi,&#160;</item>
+        <item quantity="other">Opuszczono %1$d udostępnione katalogi,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">nie udało się&#160;opuścić %1$d udostępnionego katalogu</item>
+        <item quantity="few">nie udało się&#160;opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="many">nie udało się&#160;opuścić %1$d udostępnionych katalogów</item>
+        <item quantity="other">nie udało się&#160;opuścić %1$d udostępnionych katalogów</item>
+    </plurals>
+    <!-- Text shown in the list of meetings when there is a call in progress -->
+    <string name="meetings_list_ongoing_call_message">Spotkanie w toku</string>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
+    <plurals name="general_move_node_snackbar_success">
+        <item quantity="one">Przeniesiono %1$d element</item>
+        <item quantity="few">Przeniesiono %1$d elementów</item>
+        <item quantity="many">Przeniesiono %1$d elementów</item>
+        <item quantity="other">Przeniesiono %1$d elementów</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
+    <plurals name="general_move_node_snackbar_fail">
+        <item quantity="one">Nie udało się przenieść %1$d elementu</item>
+        <item quantity="few">Nie udało się przenieść %1$d elementów</item>
+        <item quantity="many">Nie udało się przenieść %1$d elementów</item>
+        <item quantity="other">Nie udało się przenieść %1$d elementów</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_success">
+        <item quantity="one">Przeniesiono %1$d element,&#160;</item>
+        <item quantity="few">Przeniesiono %1$d elementów,&#160;</item>
+        <item quantity="many">Przeniesiono %1$d elementów,&#160;</item>
+        <item quantity="other">Przeniesiono %1$d elementów,&#160;</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_fail">
+        <item quantity="one">nie udało się&#160;przenieść %1$d element</item>
+        <item quantity="few">nie udało się&#160;przenieść %1$d elementów</item>
+        <item quantity="many">nie udało się&#160;przenieść %1$d elementów</item>
+        <item quantity="other">nie udało się&#160;przenieść %1$d elementów</item>
+    </plurals>
+    <!-- Text hint of option to add meeting name in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_name_hint">Nazwa spotkania</string>
+    <!-- Title of option to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_label">Powtarzalność</string>
+    <!-- Title of option to send calendar invite in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Wyślij zaproszenie do kalendarza</string>
+    <!-- Title of option to add description in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_add_description_label">Dodaj opis</string>
+    <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_empty_meeting_name_error">Nazwa spotkania jest wymagana</string>
+    <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Wpisz mniej niż 30&#160;znaków</string>
+    <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Wpisz mniej niż 4 000&#160;znaków</string>
+    <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Spotkanie zostało zaplanowane</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_never_label">Nigdy</string>
+    <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_calendar_select_date_label">Wybierz datę</string>
+    <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Odrzucić to spotkanie?</string>
+    <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">Kontynuuj edycję</string>
+    <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">Odrzuć</string>
+    <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
+        <item quantity="one">Dodano %1$d uczestnika</item>
+        <item quantity="few">Dodano %1$d uczestników</item>
+        <item quantity="many">Dodano %1$d uczestników</item>
+        <item quantity="other">Dodano %1$d uczestników</item>
+    </plurals>
+    <!-- error message when sharing a folder(s) fails to be completed-->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
+        <item quantity="one">Nie można udostępnić %1$d katalogu</item>
+        <item quantity="few">Nie można udostępnić %1$d katalogów</item>
+        <item quantity="many">Nie można udostępnić %1$d katalogów</item>
+        <item quantity="other">Nie można udostępnić %1$d katalogów</item>
+    </plurals>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="one">Nie można usunąć dostępu do %1$d kontaktu</item>
+        <item quantity="few">Nie można usunąć dostępu do %1$d kontaktów</item>
+        <item quantity="many">Nie można usunąć dostępu do %1$d kontaktów</item>
+        <item quantity="other">Nie można usunąć dostępu do %1$d kontaktów</item>
+    </plurals>
+    <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
+    <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
+        <item quantity="one">Nie można było zaktualizować uprawnień dla %1$d kontaktu</item>
+        <item quantity="few">Nie można było zaktualizować uprawnień dla %1$d kontaktów</item>
+        <item quantity="many">Nie można było zaktualizować uprawnień dla %1$d kontaktów</item>
+        <item quantity="other">Nie można było zaktualizować uprawnień dla %1$d kontaktów</item>
+    </plurals>
+    <!--This is the label of the button of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, rozumiem.</string>
 </resources>

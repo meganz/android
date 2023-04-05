@@ -584,8 +584,6 @@
     <string name="general_confirm_button">ยืนยัน</string>
     <!-- On “add phone number” page, an error message will be shown if user click next button without select country code. -->
     <string name="verify_account_invalid_country_code">กรุณาเลือกรหัสภูมิภาค</string>
-    <!-- On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end. -->
-    <string name="verify_account_not_loading_country_code">ไม่สามารถดึงรหัสภูมิภาคได้</string>
     <!-- error message if user click next button without enter a valid phone number -->
     <string name="verify_account_invalid_phone_number">กรุณากรอกหมายเลขโทรศัพท์ให้ถูกต้อง</string>
     <!-- Label tell user to enter received txt to below input boxes -->
@@ -994,7 +992,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">นำผู้เข้าร่วมออก</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">ปกป้องแชทของคุณด้วยการเข้ารหัสลับแบบต้นทางถึงปลายทาง (ผู้ใช้ควบคุมเอง) ให้การรับรองความปลอดภัยที่สำคัญ:</string>
+    <string name="mega_info_empty_screen">Protects your chat with zero-knowledge encryption, providing essential safety assurances:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">ระบบจะตรวจสอบว่าข้อมูลที่ได้รับเป็นจริงจากผู้ส่งที่ระบุและไม่มีการจัดการเนื้อหาระหว่างการส่งใด ๆ ทั้งสิ้น</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1411,7 +1409,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">เชิญเพื่อนและรับรางวัล</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">รับพื้นที่เก็บข้อมูล %1$s ทุกครั้งเมื่อส่งคำเชิญให้เพื่อนได้สำเร็จ มีอายุใช้งาน 365 วัน</string>
+    <string name="figures_achievements_text_referrals">%1$s of storage for each invite. Valid for 365 days.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">พื้นที่เก็บข้อมูล %1$s มีอายุใช้งาน 365 วัน</string>
     <!-- title of the section for unlocked rewards -->
@@ -1439,7 +1437,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">วิธีการทำงาน</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">เชิญเพื่อนของคุณให้สร้างบัญชี MEGA ฟรีและติดตั้งแอป MEGA บนมือถือ คุณจะได้รับพื้นที่เก็บข้อมูลฟรีเป็นโบนัสทุกครั้งเมื่อเพื่อนของคุณลงทะเบียนและติดตั้งแอป</string>
+    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">โบนัสพื้นที่เก็บข้อมูลฟรี เฉพาะคำเชิญใหม่และติดตั้งแอป MEGA บนมือถือหรือแอป MEGA เดสก์ทอปเท่านั้น</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1834,7 +1832,7 @@
     <!-- Title of the dialog to enable the rich links previews on chat -->
     <string name="title_enable_rich_links">เปิดใช้งานตัวอย่าง URL</string>
     <!-- Text of the dialog to enable the rich links previews on chat -->
-    <string name="text_enable_rich_links">เพิ่มประสบการณ์ MEGA chat โดยที่เนื้อหา URL จะได้รับการดึงข้อมูลโดยไม่มีการเข้ารหัสลับแบบต้นทางถึงปลายทาง</string>
+    <string name="text_enable_rich_links">Enhance the MEGA Chat experience. URL content will be retrieved without zero-knowledge encryption.</string>
     <!-- when the user tries to creates a MEGA account or tries to change his password and the password strength is very weak -->
     <string name="error_password">กรุณากรอกรหัสผ่านที่คาดเดายากกว่านี้</string>
     <!-- title of the notification for an acceptance of a contact request -->
@@ -2978,7 +2976,7 @@
     <!-- Explanation of a warning recommending upgrade to Pro in relation to link available options -->
     <string name="link_upgrade_pro_explanation">ผู้ใช้ MEGA Pro สามารถเข้าถึงฟีเจอร์ด้านความปลอดภัยของลิงก์เพิ่มเติมได้โดยเฉพาะทำให้บัญชีของคุณปลอดภัยยิ่งขึ้น</string>
     <!-- Meaning of links decryption key -->
-    <string name="decryption_key_explanation">ระบบเข้ารหัสจากต้นทางถึงปลายทางของเรา มีการใช้คีย์เฉพาะที่สร้างขึ้นสำหรับไฟล์หรือโฟลเดอร์นี้โดยอัตโนมัติ ลิงก์ที่มีคีย์นี้จะถูกสร้างขึ้นตามค่าเริ่มต้น แต่คุณสามารถส่งออกคีย์ถอดรหัสแบบแยกต่างหากเพื่อเพิ่มระดับความปลอดภัยได้</string>
+    <string name="decryption_key_explanation">Our zero-knowledge encryption system requires a unique key automatically generated for this file or folder. A link with this key is created by default, but you can export the decryption key separately for an added layer of security.</string>
     <!-- Reset password label -->
     <string name="reset_password_label">รีเซ็ตรหัสผ่าน</string>
     <!-- Warning show to the user when has enable to send the decryption key of a link separately and tries to share the link -->
@@ -3312,7 +3310,7 @@
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA การประชุม</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">การประชุมทางวิดีโอที่เข้ารหัสตั้งแต่ต้นทางถึงปลายทาง</string>
+    <string name="content_tour_five">Zero-knowledge encrypted video meeting</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">กรุณากรอกลิงก์การประชุมให้ถูกต้อง</string>
     <!-- Guest leave call-->
@@ -3622,7 +3620,7 @@
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">คัดลอกและเปลี่ยนชื่อ</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">ใช้ตัวเลือกนี้กับ %1$d ข้อขัดแย้งต่อไป</string>
+    <string name="file_apply_for_all">Apply this option to the next %1$d conflicts</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">รวมโฟลเดอร์ที่ปลายทางกับโฟลเดอร์ที่คุณกำลังคัดลอก</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -3925,7 +3923,8 @@
     <string name="scheduled_meetings_meeting_link_copied">คัดลอกลิงก์ไปไว้ที่คลิปบอร์ดแล้ว</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="other">ลบอัลบั้ม %d รายการออกแล้ว</item>
+        <item quantity="one">“%s” deleted</item>
+        <item quantity="other">%d albums deleted</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
@@ -4366,9 +4365,9 @@
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$s อัปเดต[/A][B]เวลาการประชุมที่เป็นกิจวัตรใหม่แล้ว[/B]</string>
     <!-- This is the title of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_title">อัปเกรดความปลอดภัย</string>
+    <string name="shared_items_security_upgrade_dialog_title">Account security upgrade</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">การรักษาความปลอดภัยบัญชีของคุณกำลังอัปเกรดอยู่ การอัปเกรดนี้จะเกิดขึ้นเพียงครั้งเดียวเท่านั้น หากคุณเคยเห็นข้อความบนบัญชีนี้มาก่อนแล้ว กรุณาแตะ ยกเลิก</string>
+    <string name="shared_items_security_upgrade_dialog_content">We’re upgrading your account’s security. You should see this message only once. If you’ve seen it before, first make sure it has been for this account and not for another MEGA account you have.\n\nIf you’re sure and it’s the second time you’re seeing this message for this account, stop using this account.</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="other">คุณกำลังแชร์โฟลเดอร์ต่อไปนี้: %s</item>
@@ -4483,4 +4482,100 @@
     <string name="slideshow_order_shuffle">สลับ</string>
     <!-- Slideshow repeat preference -->
     <string name="slideshow_setting_repeat">เล่นซํ้า</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_title">Select a subtitle file</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_button_add_subtitles">Add subtitles</string>
+    <!-- The message for select subtitle file page when subtitle file is empty. -->
+    <string name="media_player_video_select_subtitle_file_empty_message">No subtitles found</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="one">Left %1$d shared folder</item>
+        <item quantity="other">Left %1$d shared folders</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">Couldn’t leave %1$d shared folder</item>
+        <item quantity="other">Couldn’t leave %1$d shared folders</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">Left %1$d shared folder,&#160;</item>
+        <item quantity="other">Left %1$d shared folders,&#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">couldn’t leave %1$d shared folder</item>
+        <item quantity="other">couldn’t leave %1$d shared folders</item>
+    </plurals>
+    <!-- Text shown in the list of meetings when there is a call in progress -->
+    <string name="meetings_list_ongoing_call_message">Meeting in progress</string>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
+    <plurals name="general_move_node_snackbar_success">
+        <item quantity="one">Moved %1$d item</item>
+        <item quantity="other">Moved %1$d items</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
+    <plurals name="general_move_node_snackbar_fail">
+        <item quantity="one">Couldn’t move %1$d item</item>
+        <item quantity="other">Couldn’t move %1$d items</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_success">
+        <item quantity="one">Moved %1$d item,&#160;</item>
+        <item quantity="other">Moved %1$d items,&#160;</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_fail">
+        <item quantity="one">couldn’t move %1$d item</item>
+        <item quantity="other">couldn’t move %1$d items</item>
+    </plurals>
+    <!-- Text hint of option to add meeting name in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_name_hint">Meeting name</string>
+    <!-- Title of option to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_label">Recurrence</string>
+    <!-- Title of option to send calendar invite in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">ส่งไปคำเชิญปฏิทิน</string>
+    <!-- Title of option to add description in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_add_description_label">Add description</string>
+    <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_empty_meeting_name_error">ต้องระบุชื่อเรื่องการประชุม</string>
+    <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter fewer than 30&#160;characters</string>
+    <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 4,000&#160;characters</string>
+    <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting scheduled</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_never_label">ไม่มีวันที่สิ้นสุด</string>
+    <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_calendar_select_date_label">Select date</string>
+    <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Discard this meeting?</string>
+    <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">แก้ไขต่อ</string>
+    <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">ละทิ้ง</string>
+    <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
+        <item quantity="one">Added %1$d participant</item>
+        <item quantity="other">Added %1$d participants</item>
+    </plurals>
+    <!-- error message when sharing a folder(s) fails to be completed-->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
+        <item quantity="one">Couldn’t share %1$d folder</item>
+        <item quantity="other">Couldn’t share %1$d folders</item>
+    </plurals>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="one">Couldn’t remove access of %1$d contact</item>
+        <item quantity="other">Couldn’t remove access of %1$d contacts</item>
+    </plurals>
+    <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
+    <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
+        <item quantity="one">Couldn’t update permissions for %1$d contact</item>
+        <item quantity="other">Couldn’t update permissions for %1$d contacts</item>
+    </plurals>
+    <!--This is the label of the button of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">ตกลง เข้าใจแล้ว</string>
 </resources>

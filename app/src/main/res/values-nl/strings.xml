@@ -595,8 +595,6 @@
     <string name="general_confirm_button">Bevestigen</string>
     <!-- On “add phone number” page, an error message will be shown if user click next button without select country code. -->
     <string name="verify_account_invalid_country_code">Selecteer een regio code</string>
-    <!-- On “Add phone number” page, a toast error message will be shown if the country code cannot be fetched from back end. -->
-    <string name="verify_account_not_loading_country_code">Regio codes konden niet worden opgehaald.</string>
     <!-- error message if user click next button without enter a valid phone number -->
     <string name="verify_account_invalid_phone_number">Vul alstublieft een geldig telefoonnummer in.</string>
     <!-- Label tell user to enter received txt to below input boxes -->
@@ -1013,7 +1011,7 @@
     <!-- Menu item to remove a participants from a chat -->
     <string name="remove_participant_menu_item">Deelnemer verwijderen</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
-    <string name="mega_info_empty_screen">Beschermt uw gesprek met end-to-end (gebruikers gecontroleerde) encryptie, wat zorgt voor noodzakelijke veiligheid zekerheid:</string>
+    <string name="mega_info_empty_screen">Beschermt uw gesprek met zero-knowledge codering, wat zorgt voor noodzakelijke beveiliging zekerheid:</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
     <string name="mega_authenticity_empty_screen">Het systeem zorgt ervoor dat de ontvangen gegevens werkelijk van de gespecificeerde afzender zijn, en dat de inhoud niet is gemanipuleerd tijdens doorvoering.</string>
     <!-- Message about MEGA when there are no message in the chat screen -->
@@ -1445,7 +1443,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Nodig vrienden uit en krijg beloningen</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s aan opslag voor elke succesvolle uitnodiging. Geldig voor 365 dagen.</string>
+    <string name="figures_achievements_text_referrals">%1$s aan opslag voor elke uitnodiging. Geldig voor 365 dagen.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s aan opslag. Geldig voor 365 dagen.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1473,7 +1471,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Hoe het werkt</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Nodig uw vrienden uit om een ​​gratis MEGA-account aan te maken en een MEGA-Mobile Applicatie te installeren. U ontvangt gratis opslagruimte als bonus voor elke succesvolle aanmelding en applicatie-installatie.</string>
+    <string name="first_paragraph_achievement_invite_friends">Nodig uw vrienden uit om een ​​gratis MEGA-account aan te maken en een MEGA Mobile Applicatie te installeren. U ontvangt gratis opslagruimte als bonus voor elke succesvolle aanmelding en applicatie-installatie.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Gratis opslagbonus alleen van toepassing op nieuwe uitnodigingen en waar MEGA Mobile Applicatie of MEGA Desktop Applicatie is geïnstalleerd.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -3410,7 +3408,7 @@
     <!-- Title of fifth tour screen -->
     <string name="title_tour_five">MEGA vergadering</string>
     <!-- Content of fourth tour screen -->
-    <string name="content_tour_five">End-to-end gecodeerde video vergadering</string>
+    <string name="content_tour_five">Zero-knowledge gecodeerde video vergadering</string>
     <!-- Error shown when it tries to open an invalid meeting link and the text view is empty -->
     <string name="invalid_meeting_link_empty">Voer een geldige vergaderingslink in</string>
     <!-- Guest leave call-->
@@ -4030,8 +4028,8 @@
     <string name="scheduled_meetings_meeting_link_copied">Gekopieerd naar klembord</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one">“%s” album is verwijderd</item>
-        <item quantity="other">%d albums waren verwijderd</item>
+        <item quantity="one">“%s” verwijderd</item>
+        <item quantity="other">%d albums verwijderd</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
@@ -4552,9 +4550,9 @@
     <!-- User Alert notification for scheduled recurring meeting date change. %1$s placeholder is for the email of whom has modified the meeting occurrence's date. [A][A/] and [B][/B] format placeholders are to bold text if required - e.g: zadiesmith@hotmail.com updated the recurring meeting date -->
     <string name="notification_subtitle_scheduled_recurring_meeting_updated_date">[A]%1$sheeft de [B]herhalende vergaderdatum[/B] bijgewerkt[/A]</string>
     <!-- This is the title of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_title">Beveiligingsupgrade</string>
+    <string name="shared_items_security_upgrade_dialog_title">Accountbeveiligingsupgrade</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">De beveiliging van uw account wordt nu geupgraded. Dit gebeurd alleen éénmalig. Als u dit bericht voor dit account eerder heeft gezien, druk Annuleren.</string>
+    <string name="shared_items_security_upgrade_dialog_content">We upgraden de beveiliging van uw account. U zou dit bericht slechts één keer moeten zien. Als u het al eerder hebt gezien, controleer dan eerst of het voor dit account was en niet voor een ander MEGA-account dat u heeft \n\nAls u het zeker weet en het is de tweede keer dat u dit bericht voor dit account ziet, stop dan met het gebruik van dit account .</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="one">U bent de volgende map aan het delen: %s</item>
@@ -4678,4 +4676,100 @@
     <string name="slideshow_order_shuffle">Shuffle</string>
     <!-- Slideshow repeat preference -->
     <string name="slideshow_setting_repeat">Herhalen</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_title">Selecteer een ondertiteling bestand</string>
+    <!-- The title for select subtitle file page. When user taps on "Add subtitle" to open the select subtitle file page. -->
+    <string name="media_player_video_select_subtitle_file_button_add_subtitles">Ondertiteling toevoegen</string>
+    <!-- The message for select subtitle file page when subtitle file is empty. -->
+    <string name="media_player_video_select_subtitle_file_empty_message">Geen ondertiteling gevonden</string>
+    <!-- Success message when left shared folders -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
+        <item quantity="one">%1$d gedeelde map verlaten</item>
+        <item quantity="other">%1$d gedeelde mappen verlaten</item>
+    </plurals>
+    <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
+        <item quantity="one">Kon %1$d gedeelde map niet verlaten</item>
+        <item quantity="other">Kon %1$d gedeelde map niet verlaten</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
+        <item quantity="one">Verliet %1$d gedeelde map, &#160;</item>
+        <item quantity="other">Verliet %1$d gedeelde mappen, &#160;</item>
+    </plurals>
+    <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
+    <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
+        <item quantity="one">Kon %1$d gedeelde map niet verlaten</item>
+        <item quantity="other">Kon %1$d gedeelde mappen niet verlaten</item>
+    </plurals>
+    <!-- Text shown in the list of meetings when there is a call in progress -->
+    <string name="meetings_list_ongoing_call_message">Vergadering bezig</string>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
+    <plurals name="general_move_node_snackbar_success">
+        <item quantity="one">%1$d item verplaatst</item>
+        <item quantity="other">%1$d items verplaatst</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
+    <plurals name="general_move_node_snackbar_fail">
+        <item quantity="one">Kon %1$d item niet verplaatsen</item>
+        <item quantity="other">Kon %1$d items niet verplaatsen</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_success">
+        <item quantity="one">%1$d item verplaatst, &#160;</item>
+        <item quantity="other">%1$d items verplaatst, &#160;</item>
+    </plurals>
+    <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
+    <plurals name="general_move_node_snackbar_concat_fail">
+        <item quantity="one">Kon %1$d item niet verplaatsen</item>
+        <item quantity="other">Kon %1$d items niet verplaatsen</item>
+    </plurals>
+    <!-- Text hint of option to add meeting name in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_name_hint">Vergadernaam</string>
+    <!-- Title of option to set a recurrence in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_recurrence_label">Herhaling</string>
+    <!-- Title of option to send calendar invite in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_send_calendar_invite_label">Verstuur kalender uitnodiging</string>
+    <!-- Title of option to add description in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_add_description_label">Omschrijving toevoegen</string>
+    <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_empty_meeting_name_error">Vergadernaam is vereist</string>
+    <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Voer minder dan 30&#160;tekens in</string>
+    <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Voer minder dan 4000&#160;tekens in</string>
+    <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Vergadering gepland</string>
+    <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
+    <string name="meetings_schedule_meeting_recurrence_never_label">Nooit</string>
+    <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
+    <string name="meetings_schedule_meeting_calendar_select_date_label">Selecteer datum</string>
+    <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Deze vergadering verwijderen?</string>
+    <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">Doorgaan met bewerken</string>
+    <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">Weggooien</string>
+    <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
+    <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
+        <item quantity="one">%1$d deelnemer toegevoegd</item>
+        <item quantity="other">%1$d deelnemers toegevoegd</item>
+    </plurals>
+    <!-- error message when sharing a folder(s) fails to be completed-->
+    <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
+        <item quantity="one">Kon %1$d map niet delen</item>
+        <item quantity="other">Kon %1$d mappen niet delen</item>
+    </plurals>
+    <!-- error message when removing access of contact(s) to a selected folder -->
+    <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
+        <item quantity="one">Kon toegang van %1$d contact niet verwijderen</item>
+        <item quantity="other">Kon toegang van %1$d contacten niet verwijderen</item>
+    </plurals>
+    <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
+    <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
+        <item quantity="one">Kon toestemmingen voor  contact niet updaten%1$d</item>
+        <item quantity="other">Kon toestemmingen voor %1$d contacten niet updaten</item>
+    </plurals>
+    <!--This is the label of the button of upgrade security dialog -->
+    <string name="shared_items_security_upgrade_dialog_button_ok_got_it">Ok, ik snap het</string>
 </resources>
