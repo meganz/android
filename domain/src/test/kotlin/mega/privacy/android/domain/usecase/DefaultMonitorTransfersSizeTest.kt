@@ -39,7 +39,8 @@ internal class DefaultMonitorTransfersSizeTest {
         priority = BigInteger.ONE,
         handle = 1L,
         speed = 1L,
-        appData = ""
+        appData = "",
+        isForeignOverQuota = false
     )
 
     @Before

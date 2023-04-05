@@ -6,6 +6,10 @@ package mega.privacy.android.domain.exception
  *
  * @param errorCode
  * @param errorString
+ * @param value
  */
-class QuotaExceededMegaException(errorCode: Int, errorString: String? = null) :
-    MegaException(errorCode, errorString)
+class QuotaExceededMegaException(
+    errorCode: Int,
+    errorString: String? = null,
+    val value: Long = 0L,
+) : MegaException(errorCode, errorString)

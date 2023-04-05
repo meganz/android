@@ -52,9 +52,8 @@ class TransfersManagementViewModel @Inject constructor(
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersSize: MonitorTransfersSize,
 ) : ViewModel() {
-    private val _transfersInfo = MutableStateFlow(TransfersInfo())
+    private val _state = MutableStateFlow(TransferManagementUiState())
     private val shouldShowCompletedTab = SingleLiveEvent<Boolean>()
-    private val transfersSizeInfoState = MutableStateFlow(TransfersSizeInfo())
 
     /**
      * is network connected
@@ -64,7 +63,7 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * Transfers info
      */
-    val transfersInfo = _transfersInfo.asStateFlow()
+    val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -72,7 +71,6 @@ class TransfersManagementViewModel @Inject constructor(
                 .flowOn(ioDispatcher)
                 .sample(500L)
                 .collect { transfersInfo ->
-                    transfersSizeInfoState.value = transfersInfo
                     getPendingDownloadAndUpload(transfersInfo)
                 }
         }
@@ -87,7 +85,14 @@ class TransfersManagementViewModel @Inject constructor(
      * Checks transfers info.
      */
     fun checkTransfersInfo(transferType: TransferType) {
-        getPendingDownloadAndUpload(transfersSizeInfoState.value.copy(transferType = transferType))
+        val transfersInfo = state.value.transfersInfo
+        getPendingDownloadAndUpload(
+            TransfersSizeInfo(
+                transferType = transferType,
+                totalSizeTransferred = transfersInfo.totalSizeTransferred,
+                totalSizePendingTransfer = transfersInfo.totalSizePendingTransfer,
+            )
+        )
     }
 
     /**
@@ -98,14 +103,16 @@ class TransfersManagementViewModel @Inject constructor(
             val numPendingDownloadsNonBackground = getNumPendingDownloadsNonBackground()
             val numPendingUploads = getNumPendingUploads()
 
-            _transfersInfo.update {
-                TransfersInfo(
-                    transferType = transfersSizeInfo.transferType,
-                    numPendingDownloadsNonBackground = numPendingDownloadsNonBackground,
-                    numPendingUploads = numPendingUploads,
-                    areTransfersPaused = areAllTransfersPaused(),
-                    totalSizeTransferred = transfersSizeInfo.totalSizeTransferred,
-                    totalSizePendingTransfer = transfersSizeInfo.totalSizePendingTransfer
+            _state.update {
+                it.copy(
+                    transfersInfo = TransfersInfo(
+                        transferType = transfersSizeInfo.transferType,
+                        numPendingDownloadsNonBackground = numPendingDownloadsNonBackground,
+                        numPendingUploads = numPendingUploads,
+                        areTransfersPaused = areAllTransfersPaused(),
+                        totalSizeTransferred = transfersSizeInfo.totalSizeTransferred,
+                        totalSizePendingTransfer = transfersSizeInfo.totalSizePendingTransfer
+                    )
                 )
             }
         }
@@ -126,7 +133,7 @@ class TransfersManagementViewModel @Inject constructor(
      */
     fun checkTransfersState() = viewModelScope.launch {
         areAllTransfersPaused().let { paused ->
-            _transfersInfo.update { it.copy(areTransfersPaused = paused) }
+            _state.update { it.copy(transfersInfo = it.transfersInfo.copy(areTransfersPaused = paused)) }
             if (paused) {
                 broadcastPausedTransfers()
             }
@@ -134,14 +141,8 @@ class TransfersManagementViewModel @Inject constructor(
     }
 
     /**
-     * Num pending transfers
-     */
-    val numPendingTransfers: Int
-        get() = transfersInfo.value.numPendingTransfers
-
-    /**
      * Are transfers paused
      */
     val areTransfersPaused: Boolean
-        get() = transfersInfo.value.areTransfersPaused
+        get() = state.value.transfersInfo.areTransfersPaused
 }

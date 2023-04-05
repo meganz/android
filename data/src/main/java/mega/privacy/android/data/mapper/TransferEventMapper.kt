@@ -2,6 +2,8 @@ package mega.privacy.android.data.mapper
 
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
+import nz.mega.sdk.MegaError
 import javax.inject.Inject
 
 /**
@@ -25,10 +27,21 @@ internal class TransferEventMapper @Inject constructor(
         is GlobalTransfer.OnTransferStart -> TransferEvent.TransferStartEvent(
             transferMapper(event.transfer)
         )
-        is GlobalTransfer.OnTransferTemporaryError -> TransferEvent.TransferTemporaryErrorEvent(
-            transferMapper(event.transfer),
-            exceptionMapper(event.error)
-        )
+        is GlobalTransfer.OnTransferTemporaryError -> {
+            val exception = if (event.error.errorCode == MegaError.API_EOVERQUOTA) {
+                QuotaExceededMegaException(
+                    event.error.errorCode,
+                    event.error.errorString,
+                    event.error.value,
+                )
+            } else {
+                exceptionMapper(event.error)
+            }
+            TransferEvent.TransferTemporaryErrorEvent(
+                transferMapper(event.transfer),
+                exception
+            )
+        }
         is GlobalTransfer.OnTransferUpdate -> TransferEvent.TransferUpdateEvent(
             transferMapper(event.transfer)
         )

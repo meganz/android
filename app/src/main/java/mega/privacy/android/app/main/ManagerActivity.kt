@@ -1178,7 +1178,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             // Apply the previous Appbar elevation(e.g. before rotation) after all views have been created
             handler.postDelayed({ changeAppBarElevation(true, elevationCause) }, 100)
         }
-        setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout), this)
+        setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout))
         setupTransferPager()
         setupAudioPlayerController()
         megaApi.getAccountAchievements(this)
@@ -1592,7 +1592,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 result
             )
         }
-        transfersViewModel.onGetShouldCompletedTab().observe(
+        transfersManagementViewModel.onGetShouldCompletedTab().observe(
             this
         ) { showCompleted: Boolean -> updateTransfersTab(showCompleted) }
     }
@@ -3951,7 +3951,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         hideTransfersWidget()
         drawerItem = DrawerItem.TRANSFERS
         setBottomNavigationMenuItemChecked(NO_BNV)
-        transfersViewModel.checkIfShouldShowCompletedTab()
+        transfersManagementViewModel.checkIfShouldShowCompletedTab()
         setToolbarTitle()
         showFabButton()
         closeDrawer()
@@ -9295,28 +9295,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {}
 
-    override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
-        Timber.w("onTransferTemporaryError: %d - %d", transfer.nodeHandle, transfer.tag)
-        if (e.errorCode == MegaError.API_EOVERQUOTA) {
-            if (e.value != 0L) {
-                Timber.d("TRANSFER OVER QUOTA ERROR: %s", e.errorCode)
-                updateTransfersWidget()
-            } else {
-                Timber.w("STORAGE OVER QUOTA ERROR: %d", e.errorCode)
-                //work around - SDK does not return over quota error for folder upload,
-                //so need to be notified from global listener
-                if (transfer.type == MegaTransfer.TYPE_UPLOAD) {
-                    if (transfer.isForeignOverquota) {
-                        return
-                    }
-                    Timber.d("Over quota")
-                    val uploadServiceIntent = Intent(this, UploadService::class.java)
-                    uploadServiceIntent.action = Constants.ACTION_OVERQUOTA_STORAGE
-                    ContextCompat.startForegroundService(this, uploadServiceIntent)
-                }
-            }
-        }
-    }
+    override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {}
 
     override fun onTransferData(
         api: MegaApiJava,

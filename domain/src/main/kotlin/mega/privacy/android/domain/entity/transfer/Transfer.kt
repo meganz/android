@@ -20,6 +20,7 @@ import java.math.BigInteger
  * @property isFolderTransfer
  * @property priority
  * @property appData
+ * @property isForeignOverQuota
  */
 data class Transfer(
     val totalBytes: Long,
@@ -36,6 +37,7 @@ data class Transfer(
     val isFolderTransfer: Boolean,
     val priority: BigInteger,
     val appData: String,
+    val isForeignOverQuota: Boolean,
 ) {
     /**
      * Is background transfer

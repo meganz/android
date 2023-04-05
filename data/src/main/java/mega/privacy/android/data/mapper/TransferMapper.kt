@@ -10,6 +10,11 @@ import javax.inject.Inject
  * [MegaTransfer] to [Transfer] mapper
  */
 class TransferMapper @Inject constructor() {
+    /**
+     * Invoke
+     *
+     * @param transfer
+     */
     operator fun invoke(transfer: MegaTransfer) = Transfer(
         tag = transfer.tag,
         transferType = mapTransferType(transfer.type),
@@ -24,7 +29,8 @@ class TransferMapper @Inject constructor() {
         isStreamingTransfer = transfer.isStreamingTransfer,
         notificationNumber = transfer.notificationNumber,
         speed = transfer.speed,
-        appData = transfer.appData.orEmpty()
+        appData = transfer.appData.orEmpty(),
+        isForeignOverQuota = transfer.isForeignOverquota
     )
 
     private fun mapTransferType(transferType: Int): TransferType = when (transferType) {

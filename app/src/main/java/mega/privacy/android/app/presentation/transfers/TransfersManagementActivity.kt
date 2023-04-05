@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.transfers
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -8,12 +7,14 @@ import android.view.View
 import android.widget.RelativeLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.UploadService
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.transferWidget.TransfersWidget
@@ -22,11 +23,17 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SHOW_SCANNING_TRA
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.ManagerActivity.Companion.TRANSFERS_TAB
+import mega.privacy.android.app.main.managerSections.TransfersViewModel
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.ACTION_SHOW_TRANSFERS
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.domain.entity.transfer.Transfer
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.entity.transfer.TransferType
+import mega.privacy.android.domain.exception.MegaException
+import mega.privacy.android.domain.exception.QuotaExceededMegaException
 import timber.log.Timber
 
 /**
@@ -46,7 +53,8 @@ open class TransfersManagementActivity : PasscodeActivity() {
     private var scanningTransfersDialog: AlertDialog? = null
     private var cancelTransfersDialog: AlertDialog? = null
 
-    val transfersViewModel: TransfersManagementViewModel by viewModels()
+    protected val transfersManagementViewModel: TransfersManagementViewModel by viewModels()
+    protected val transfersViewModel: TransfersViewModel by viewModels()
 
     private var scanningDialogTimer: CountDownTimer? = null
 
@@ -80,7 +88,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Registers the transfers BroadcastReceivers and observers.
      */
     private fun setupObservers() {
-        collectFlow(transfersViewModel.online) { online ->
+        collectFlow(transfersManagementViewModel.online) { online ->
             if (online) {
                 transfersManagement.resetNetworkTimer()
             } else {
@@ -92,8 +100,38 @@ open class TransfersManagementActivity : PasscodeActivity() {
             updateTransfersWidget(TransferType.NONE)
         }
 
-        collectFlow(transfersViewModel.transfersInfo) { transfersInfo ->
-            transfersWidget?.update(transfersInfo = transfersInfo)
+        collectFlow(transfersManagementViewModel.state) { state ->
+            transfersWidget?.update(transfersInfo = state.transfersInfo)
+        }
+
+        collectFlow(
+            transfersViewModel.monitorTransferEvent,
+            Lifecycle.State.CREATED
+        ) {
+            if (it is TransferEvent.TransferTemporaryErrorEvent) {
+                handleTransferTemporaryError(it.transfer, it.error)
+            }
+        }
+    }
+
+    private fun handleTransferTemporaryError(transfer: Transfer, error: MegaException) {
+        Timber.w("onTransferTemporaryError: ${transfer.handle} - ${transfer.tag}")
+        if (error is QuotaExceededMegaException) {
+            if (error.value != 0L) {
+                Timber.d("TRANSFER OVER QUOTA ERROR: ${error.errorCode}")
+                updateTransfersWidget()
+            } else {
+                Timber.w("STORAGE OVER QUOTA ERROR: ${error.errorCode}")
+                //work around - SDK does not return over quota error for folder upload,
+                //so need to be notified from global listener
+                if (transfer.transferType == TransferType.TYPE_UPLOAD) {
+                    if (transfer.isForeignOverQuota) return
+                    val uploadServiceIntent = Intent(this, UploadService::class.java).apply {
+                        action = Constants.ACTION_OVERQUOTA_STORAGE
+                    }
+                    ContextCompat.startForegroundService(this, uploadServiceIntent)
+                }
+            }
         }
     }
 
@@ -160,28 +198,14 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * @param transfersWidgetLayout RelativeLayout view to set
      */
     protected fun setTransfersWidgetLayout(transfersWidgetLayout: RelativeLayout) {
-        setTransfersWidgetLayout(transfersWidgetLayout, null)
-    }
-
-    /**
-     * Sets a view as transfers widget.
-     *
-     * @param transfersWidgetLayout RelativeLayout view to set
-     * @param context               Current Context.
-     *                              Only used to identify if the view belongs to the ManagerActivity.
-     */
-    protected fun setTransfersWidgetLayout(
-        transfersWidgetLayout: RelativeLayout,
-        context: Context?,
-    ) {
         transfersWidget =
-            TransfersWidget(context ?: this, megaApi, transfersWidgetLayout, transfersManagement)
+            TransfersWidget(this, megaApi, transfersWidgetLayout, transfersManagement)
 
         transfersWidgetLayout.findViewById<View>(R.id.transfers_button)
             .setOnClickListener {
-                if (context is ManagerActivity) {
-                    context.drawerItem = DrawerItem.TRANSFERS
-                    context.selectDrawerItem(context.drawerItem)
+                if (this is ManagerActivity) {
+                    drawerItem = DrawerItem.TRANSFERS
+                    selectDrawerItem(this.drawerItem)
                 } else {
                     openTransfersSection()
                 }
@@ -223,7 +247,7 @@ open class TransfersManagementActivity : PasscodeActivity() {
             return
         }
 
-        transfersViewModel.checkTransfersInfo(transferType)
+        transfersManagementViewModel.checkTransfersInfo(transferType)
     }
 
     /**
@@ -317,15 +341,15 @@ open class TransfersManagementActivity : PasscodeActivity() {
      * Updates the transfers widget.
      */
     fun updateTransfersWidget() {
-        transfersViewModel.checkTransfersInfo(TransferType.NONE)
-        transfersWidget?.update(transfersViewModel.transfersInfo.value)
+        transfersManagementViewModel.checkTransfersInfo(TransferType.NONE)
+        transfersWidget?.update(transfersManagementViewModel.state.value.transfersInfo)
     }
 
     /**
      * Updates the state of the transfers widget.
      */
     fun updateTransfersWidgetState() {
-        transfersViewModel.checkTransfersState()
+        transfersManagementViewModel.checkTransfersState()
     }
 
     /**

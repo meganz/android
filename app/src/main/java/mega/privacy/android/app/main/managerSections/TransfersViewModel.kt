@@ -78,6 +78,14 @@ class TransfersViewModel @Inject constructor(
      * Active transfer
      */
     val activeTransfer = _activeTransfers.asStateFlow()
+
+    /**
+     * Monitor transfer event
+     */
+    val monitorTransferEvent = monitorTransferEventsUseCase()
+        .catch { Timber.e(it) }
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed())
+
     private var completedTransfers = mutableListOf<AndroidCompletedTransfer?>()
     private var transferCallback = 0L
 
