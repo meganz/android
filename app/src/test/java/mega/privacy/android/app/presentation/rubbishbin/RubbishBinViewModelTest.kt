@@ -10,11 +10,12 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import nz.mega.sdk.MegaNode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -41,7 +43,6 @@ class RubbishBinViewModelTest {
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private val getRubbishBinParentNodeHandle = mock<GetParentNodeHandle>()
     private val getRubbishBinChildren = mock<GetRubbishBinChildren>()
-    private val getNodeByHandle = mock<GetNodeByHandle>()
     private val setViewType = mock<SetViewType>()
     private val monitorViewType = mock<MonitorViewType>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
@@ -61,7 +62,6 @@ class RubbishBinViewModelTest {
             monitorNodeUpdates = monitorNodeUpdates,
             getRubbishBinParentNodeHandle = getRubbishBinParentNodeHandle,
             getRubbishBinChildren = getRubbishBinChildren,
-            getNodeByHandle = getNodeByHandle,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
             getCloudSortOrder = getCloudSortOrder
@@ -183,8 +183,8 @@ class RubbishBinViewModelTest {
     @Test
     fun `test when when nodeUIItem is long clicked, then it updates selected item by 1`() =
         runTest {
-            val nodesListItem1 = mock<Node>()
-            val nodesListItem2 = mock<Node>()
+            val nodesListItem1 = mock<FolderNode>()
+            val nodesListItem2 = mock<FileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
@@ -204,15 +204,55 @@ class RubbishBinViewModelTest {
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedNodes).isEqualTo(1)
+                Truth.assertThat(state.selectedFolderNodes).isEqualTo(1)
+                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
+                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(1)
             }
         }
 
     @Test
     fun `test that when item is clicked and some items are already selected on list then checked index gets decremented by 1`() =
         runTest {
-            val nodesListItem1 = mock<Node>()
-            val nodesListItem2 = mock<Node>()
+            val nodesListItem1 = mock<FolderNode>()
+            val nodesListItem2 = mock<FileNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(mock(), mock())
+            )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.onItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.selectedFolderNodes).isEqualTo(0)
+                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
+                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(0)
+            }
+        }
+
+    @Test
+    fun `test that when selected item gets clicked then checked index gets incremented by 1`() =
+        runTest {
+            val nodesListItem1 = mock<FileNode>()
+            val nodesListItem2 = mock<FolderNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
@@ -234,21 +274,30 @@ class RubbishBinViewModelTest {
             underTest.onItemClicked(
                 NodeUIItem(
                     nodesListItem2,
-                    isSelected = true,
+                    isSelected = false,
                     isInvisible = false
                 )
             )
             underTest.state.test {
                 val state = awaitItem()
-                Truth.assertThat(state.selectedNodes).isEqualTo(0)
+                Truth.assertThat(state.selectedFolderNodes).isEqualTo(1)
+                Truth.assertThat(state.selectedFileNodes).isEqualTo(1)
+                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(2)
             }
         }
 
     @Test
-    fun `test that when selected item gets clicked then checked index gets incremented by 1`() =
+    fun `test that on clicking on change view type to Grid it calls setViewType atleast once`() =
         runTest {
-            val nodesListItem1 = mock<Node>()
-            val nodesListItem2 = mock<Node>()
+            underTest.onChangeViewTypeClicked()
+            verify(setViewType, times(1)).invoke(ViewType.GRID)
+        }
+
+    @Test
+    fun `test when user selects all nodes then sum of selected items is equal to size of list`() =
+        runTest {
+            val nodesListItem1 = mock<FolderNode>()
+            val nodesListItem2 = mock<FileNode>()
             whenever(nodesListItem1.id.longValue).thenReturn(1L)
             whenever(nodesListItem2.id.longValue).thenReturn(2L)
             whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
@@ -260,30 +309,95 @@ class RubbishBinViewModelTest {
             whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
 
             underTest.refreshNodes()
-            underTest.onLongItemClicked(
-                NodeUIItem(
-                    nodesListItem1,
-                    isSelected = true,
-                    isInvisible = false
-                )
+            underTest.selectAllNodes()
+            val totalSelectedNodes =
+                underTest.state.value.selectedFileNodes + underTest.state.value.selectedFileNodes
+            Truth.assertThat(totalSelectedNodes).isEqualTo(underTest.state.value.nodeList.size)
+            Truth.assertThat(totalSelectedNodes)
+                .isEqualTo(underTest.state.value.selectedNodeHandles.size)
+            Truth.assertThat(underTest.state.value.isInSelection).isTrue()
+        }
+
+    @Test
+    fun `test when user clears all selected nodes then sum of selected items is 0`() =
+        runTest {
+            val nodesListItem1 = mock<FolderNode>()
+            val nodesListItem2 = mock<FileNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(mock(), mock())
             )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.clearAllSelectedNodes()
+            val totalSelectedNodes =
+                underTest.state.value.selectedFileNodes + underTest.state.value.selectedFileNodes
+            Truth.assertThat(totalSelectedNodes).isEqualTo(0)
+            Truth.assertThat(totalSelectedNodes)
+                .isEqualTo(0)
+            Truth.assertThat(underTest.state.value.isInSelection).isFalse()
+            Truth.assertThat(underTest.state.value.selectedMegaNodes).isNull()
+        }
+
+    @Test
+    fun `when restore items are clicked then list of selected mega nodes is equal to list of selected node handle`() =
+        runTest {
+            val nodesListItem1 = mock<FolderNode>()
+            val nodesListItem2 = mock<FileNode>()
+            val megaNode1 = mock<MegaNode>()
+            val megaNode2 = mock<MegaNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(megaNode1.handle).thenReturn(1L)
+            whenever(megaNode2.handle).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(megaNode1, megaNode2)
+            )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.selectAllNodes()
+            underTest.onRestoreClicked()
+            Truth.assertThat(underTest.state.value.selectedNodeHandles.size)
+                .isEqualTo(underTest.state.value.selectedMegaNodes?.size)
+        }
+
+    @Test
+    fun `test that when any file item is clicked and no other item is selected then it updates meganode in state`() =
+        runTest {
+            val nodesListItem1 = mock<FolderNode>()
+            val nodesListItem2 = mock<FileNode>()
+            val megaNode1 = mock<MegaNode>()
+            val megaNode2 = mock<MegaNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(megaNode1.handle).thenReturn(1L)
+            whenever(megaNode2.handle).thenReturn(2L)
+            whenever(getRubbishBinChildrenNode(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(megaNode1, megaNode2)
+            )
+            whenever(getRubbishBinChildren(underTest.state.value.rubbishBinHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
             underTest.onItemClicked(
                 NodeUIItem(
-                    nodesListItem1,
+                    node = nodesListItem1,
                     isSelected = false,
                     isInvisible = false
                 )
             )
-            underTest.state.test {
-                val state = awaitItem()
-                Truth.assertThat(state.selectedNodes).isEqualTo(2)
-            }
-        }
-
-    @Test
-    fun `test that on clicking on change view type to Grid it calls setViewType atleast once`() =
-        runTest {
-            underTest.onChangeViewTypeClicked()
-            verify(setViewType, times(1)).invoke(ViewType.GRID)
+            Truth.assertThat(underTest.state.value.megaNode).isNotNull()
+            Truth.assertThat(underTest.state.value.itemIndex).isNotEqualTo(-1)
         }
 }

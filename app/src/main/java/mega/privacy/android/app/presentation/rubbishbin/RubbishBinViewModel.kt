@@ -7,13 +7,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.preference.ViewType
@@ -21,6 +22,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import nz.mega.sdk.MegaNode
 import java.util.Stack
 import javax.inject.Inject
 
@@ -31,7 +33,6 @@ import javax.inject.Inject
  * @param monitorNodeUpdates Monitor node updates
  * @param getRubbishBinParentNodeHandle [GetParentNodeHandle] Fetch parent handle
  * @param getRubbishBinChildren [GetRubbishBinChildren] Fetch Rubbish Bin [Node]
- * @param getNodeByHandle [GetNodeByHandle] Get MegaNode from Handle
  * @param setViewType [SetViewType] to set view type
  * @param monitorViewType [MonitorViewType] check view type
  */
@@ -41,7 +42,6 @@ class RubbishBinViewModel @Inject constructor(
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val getRubbishBinParentNodeHandle: GetParentNodeHandle,
     private val getRubbishBinChildren: GetRubbishBinChildren,
-    private val getNodeByHandle: GetNodeByHandle,
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
@@ -209,10 +209,11 @@ class RubbishBinViewModel @Inject constructor(
         if (_state.value.isInSelection) {
             updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
         } else {
+            val megaNode = _state.value.nodes.find { it.handle == nodeUIItem.id.longValue }
             viewModelScope.launch {
                 _state.update {
                     it.copy(
-                        megaNode = getNodeByHandle(nodeUIItem.id.longValue),
+                        megaNode = megaNode,
                         itemIndex = index
                     )
                 }
@@ -226,14 +227,19 @@ class RubbishBinViewModel @Inject constructor(
      * @param nodeUIItem [NodeUIItem]
      */
     fun onLongItemClicked(nodeUIItem: NodeUIItem) {
+        nodeUIItem.isSelected = true
         val index =
             _state.value.nodeList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
         val newNodesList = _state.value.nodeList.updateItemAt(index = index, item = nodeUIItem)
+        val selectedNodeList = _state.value.selectedNodeHandles.toMutableList()
+        selectedNodeList.add(nodeUIItem.id.longValue)
         _state.update {
             it.copy(
-                selectedNodes = 1,
+                selectedFileNodes = if (nodeUIItem.node is FileNode) it.selectedFileNodes + 1 else it.selectedFileNodes,
+                selectedFolderNodes = if (nodeUIItem.node is FolderNode) it.selectedFolderNodes + 1 else it.selectedFolderNodes,
                 nodeList = newNodesList,
-                isInSelection = true
+                isInSelection = true,
+                selectedNodeHandles = selectedNodeList
             )
         }
     }
@@ -245,16 +251,32 @@ class RubbishBinViewModel @Inject constructor(
      */
     private fun updateNodeInSelectionState(nodeUIItem: NodeUIItem, index: Int) {
         nodeUIItem.isSelected = !nodeUIItem.isSelected
-        val totalSelectedNode = if (nodeUIItem.isSelected) {
-            _state.value.selectedNodes + 1
+        var totalSelectedFileNode = _state.value.selectedFileNodes
+        var totalSelectedFolderNode = _state.value.selectedFolderNodes
+        val selectedNodeHandle = _state.value.selectedNodeHandles.toMutableList()
+        if (nodeUIItem.isSelected) {
+            if (nodeUIItem.node is FolderNode) {
+                totalSelectedFolderNode = _state.value.selectedFolderNodes + 1
+            } else if (nodeUIItem.node is FileNode) {
+                totalSelectedFileNode = _state.value.selectedFileNodes + 1
+            }
+            selectedNodeHandle.add(nodeUIItem.node.id.longValue)
         } else {
-            _state.value.selectedNodes - 1
+            if (nodeUIItem.node is FolderNode) {
+                totalSelectedFolderNode = _state.value.selectedFolderNodes - 1
+            } else if (nodeUIItem.node is FileNode) {
+                totalSelectedFileNode = _state.value.selectedFileNodes - 1
+            }
+            selectedNodeHandle.remove(nodeUIItem.node.id.longValue)
         }
         val newNodesList = _state.value.nodeList.updateItemAt(index = index, item = nodeUIItem)
         _state.update {
             it.copy(
-                selectedNodes = totalSelectedNode,
-                nodeList = newNodesList
+                selectedFolderNodes = totalSelectedFolderNode,
+                selectedFileNodes = totalSelectedFileNode,
+                nodeList = newNodesList,
+                isInSelection = totalSelectedFolderNode > 0 || totalSelectedFileNode > 0,
+                selectedNodeHandles = selectedNodeHandle
             )
         }
     }
@@ -264,11 +286,21 @@ class RubbishBinViewModel @Inject constructor(
      */
     fun selectAllNodes() {
         val selectedNodeList = selectAllNodesUiList()
+        var totalFolderNode = 0
+        var totalFileNode = 0
+        val selectedNodeHandle = mutableListOf<Long>()
+        selectedNodeList.forEach {
+            if (it.node is FileNode) totalFolderNode++
+            if (it.node is FolderNode) totalFileNode++
+            selectedNodeHandle.add(it.node.id.longValue)
+        }
         _state.update {
             it.copy(
                 nodeList = selectedNodeList,
                 isInSelection = true,
-                selectedNodes = selectedNodeList.size
+                selectedFolderNodes = totalFolderNode,
+                selectedFileNodes = totalFileNode,
+                selectedNodeHandles = selectedNodeHandle
             )
         }
     }
@@ -290,6 +322,60 @@ class RubbishBinViewModel @Inject constructor(
             when (_state.value.currentViewType) {
                 ViewType.LIST -> setViewType(ViewType.GRID)
                 ViewType.GRID -> setViewType(ViewType.LIST)
+            }
+        }
+    }
+
+    /**
+     * Clear the selections of items from NodesUiList and reset count of other Nodes
+     */
+    fun clearAllSelectedNodes() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    nodeList = clearNodeUiItemList(),
+                    selectedFileNodes = 0,
+                    selectedFolderNodes = 0,
+                    isInSelection = false,
+                    selectedNodeHandles = emptyList(),
+                    selectedMegaNodes = null
+                )
+            }
+        }
+    }
+
+    /**
+     * Clear the selections of items from NodesUiList
+     */
+    private fun clearNodeUiItemList(): List<NodeUIItem> {
+        return _state.value.nodeList.map {
+            it.copy(isSelected = false)
+        }
+    }
+
+    /**
+     * This method will get List of [MegaNode] from handle to restore data
+     */
+    fun onRestoreClicked() {
+        val megaNodeList = mutableListOf<MegaNode>()
+        _state.value.selectedNodeHandles.forEach {
+            val selectedMegaNode = state.value.nodes.find { megaNode -> megaNode.handle == it }
+            selectedMegaNode?.let { megaNode ->
+                megaNodeList.add(megaNode)
+            }
+        }
+        updateSelectedMegaNode(megaNodeList)
+    }
+
+    /**
+     * Update selected mega node to state
+     */
+    private fun updateSelectedMegaNode(selectedMegaNode: List<MegaNode>?) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    selectedMegaNodes = selectedMegaNode
+                )
             }
         }
     }
