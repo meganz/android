@@ -22,7 +22,6 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
-import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -35,6 +34,7 @@ import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare.ACCESS_READ
+import nz.mega.sdk.MegaUser
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -57,7 +57,7 @@ class NodeRepositoryImplTest {
     private val megaExceptionMapper: MegaExceptionMapper = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
     private val cacheFolderGateway: CacheFolderGateway = mock()
-    private val nodeMapper: NodeMapper = mock()
+    private val nodeMapper: NodeMapper = NodeMapper()
     private val fileTypeInfoMapper: FileTypeInfoMapper = mock()
     private val offlineNodeInformationMapper: OfflineNodeInformationMapper = mock()
     private val fileGateway: FileGateway = mock()
@@ -66,7 +66,6 @@ class NodeRepositoryImplTest {
     private val nodeUpdateMapper: NodeUpdateMapper = mock()
     private val folderNode: TypedFolderNode = mock()
     private val accessPermissionMapper: AccessPermissionMapper = mock()
-    private val accessPermissionIntMapper: AccessPermissionIntMapper = mock()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
 
     @Before
@@ -90,7 +89,6 @@ class NodeRepositoryImplTest {
             streamingGateway = streamingGateway,
             nodeUpdateMapper = nodeUpdateMapper,
             accessPermissionMapper = accessPermissionMapper,
-            accessPermissionIntMapper = accessPermissionIntMapper,
             nodeShareKeyResultMapper = nodeShareKeyResultMapper
         )
     }
@@ -177,6 +175,21 @@ class NodeRepositoryImplTest {
             assertThat(actual).isEqualTo(expected)
         }
 
+    @Test
+    fun `test when getInShare called with valid email node list is returned`() = runTest {
+        val testEmail = "test@mega.nz"
+        val user = mock<MegaUser> {
+            on { email }.thenReturn(testEmail)
+        }
+        val megaNode = mockMegaNodeForConversion()
+        val nodeList = listOf(megaNode)
+        whenever(megaApiGateway.getContact(testEmail)).thenReturn(user)
+        whenever(megaApiGateway.getInShares(user)).thenReturn(nodeList)
+        val actual = underTest.getInShares(testEmail)
+        assertThat(actual.size).isEqualTo(1)
+        assertThat(actual[0].base64Id).isEqualTo("base64Handle")
+    }
+
     private suspend fun mockFolderInfoResponse() {
         val fileNode: MegaNode = mock()
         whenever(folderNode.id).thenReturn(nodeId)
@@ -195,6 +208,35 @@ class NodeRepositoryImplTest {
                 mock(), response, mock()
             )
         }
+    }
+
+    private suspend fun mockMegaNodeForConversion(): MegaNode {
+        val megaNode = mock<MegaNode> {
+            on { handle }.thenReturn(987L)
+            on { name }.thenReturn("name")
+            on { size }.thenReturn(8)
+            on { label }.thenReturn(10)
+            on { parentHandle }.thenReturn(123456)
+            on { base64Handle }.thenReturn("base64Handle")
+            on { creationTime }.thenReturn(123456789)
+            on { modificationTime }.thenReturn(1234567890)
+            on { isFavourite }.thenReturn(true)
+            on { isExported }.thenReturn(true)
+            on { publicLink }.thenReturn("public_link")
+            on { publicLinkCreationTime }.thenReturn(1234567)
+            on { isTakenDown }.thenReturn(true)
+            on { isInShare }.thenReturn(true)
+            on { fingerprint }.thenReturn("finger_print")
+            on { isNodeKeyDecrypted }.thenReturn(true)
+            on { hasPreview() }.thenReturn(true)
+        }
+        whenever(cacheFolderGateway.getThumbnailCacheFilePath(megaNode)).thenReturn("thumbnail_path")
+        whenever(megaApiGateway.hasVersion(megaNode)).thenReturn(true)
+        whenever(megaApiGateway.getNumChildFolders(megaNode)).thenReturn(2)
+        whenever(megaApiGateway.getNumChildFiles(megaNode)).thenReturn(3)
+        whenever(megaApiGateway.isPendingShare(megaNode)).thenReturn(true)
+        whenever(megaApiGateway.isInRubbish(megaNode)).thenReturn(true)
+        return megaNode
     }
 
     companion object {

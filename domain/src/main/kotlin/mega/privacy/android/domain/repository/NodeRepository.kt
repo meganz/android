@@ -213,4 +213,12 @@ interface NodeRepository {
      * @param email email of selected user
      */
     suspend fun removedInSharedNodesByEmail(email: String)
+
+    /**
+     * Gets list of InShares for the specific user
+     *
+     * @param email email of the selected user
+     * @return [UnTypedNode] returns list of nodes or empty
+     */
+    suspend fun getInShares(email: String): List<UnTypedNode>
 }

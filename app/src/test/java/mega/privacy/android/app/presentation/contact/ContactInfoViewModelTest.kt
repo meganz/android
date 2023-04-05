@@ -23,6 +23,7 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -37,6 +38,7 @@ import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -68,6 +70,7 @@ class ContactInfoViewModelTest {
     private lateinit var applyContactUpdatesUseCase: ApplyContactUpdatesUseCase
     private lateinit var setUserAliasUseCase: SetUserAliasUseCase
     private lateinit var removeContactByEmailUseCase: RemoveContactByEmailUseCase
+    private lateinit var getInSharesUseCase: GetInSharesUseCase
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -132,6 +135,7 @@ class ContactInfoViewModelTest {
             applyContactUpdatesUseCase,
             setUserAliasUseCase,
             removeContactByEmailUseCase,
+            getInSharesUseCase,
             standardDispatcher,
             testScope,
         )
@@ -156,6 +160,7 @@ class ContactInfoViewModelTest {
         applyContactUpdatesUseCase = mock()
         setUserAliasUseCase = mock()
         removeContactByEmailUseCase = mock()
+        getInSharesUseCase = mock()
     }
 
     @After
@@ -307,6 +312,28 @@ class ContactInfoViewModelTest {
         underTest.state.test {
             val nextState = awaitItem()
             assertThat(nextState.isUserRemoved).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that if get in share is success the value is updated in state`() = runTest {
+        val nodeList = mock<List<UnTypedNode>> {
+            on { size }.thenReturn(5)
+        }
+        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+        whenever(getContactFromEmailUseCase(testEmail, skipCache = true)).thenReturn(contactItem)
+        whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
+        whenever(getInSharesUseCase(testEmail)).thenReturn(nodeList)
+        underTest.updateContactInfo(-1L, testEmail)
+        underTest.state.test {
+            val initialState = awaitItem()
+            assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
+            assertThat(initialState.snackBarMessage).isNull()
+        }
+        underTest.getInShares()
+        underTest.state.test {
+            val nextState = awaitItem()
+            assertThat(nextState.inShares.size).isEqualTo(5)
         }
     }
 }

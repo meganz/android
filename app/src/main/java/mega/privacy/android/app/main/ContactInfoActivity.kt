@@ -34,7 +34,6 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
-import androidx.palette.graphics.Palette
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -110,6 +109,7 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificati
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.node.UnTypedNode
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
@@ -200,7 +200,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private var sendFileMenuItem: MenuItem? = null
     private var isShareFolderExpanded = false
     private var sharedFoldersFragment: ContactSharedFolderFragment? = null
-    private var contactInfoActivity: ContactInfoActivity? = null
     private var selectedNode: MegaNode? = null
     private var moveToRubbish = false
     private var bottomSheetDialogFragment: ContactFileListBottomSheetDialogFragment? = null
@@ -296,8 +295,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     viewModel.parentHandle?.let { handle -> it.setNodes(handle) }
                 }
             }
-            val nodes = megaApi.getInShares(user)
-            setFoldersButtonText(nodes)
+            viewModel.getInShares()
         }
 
         override fun onReloadNeeded(api: MegaApiJava) {}
@@ -325,14 +323,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             if (request.type == MegaChatRequest.TYPE_CREATE_CHATROOM) {
                 if (e.errorCode == MegaChatError.ERROR_OK) {
                     Timber.d("Chat created ---> open it!")
-                    val intent = Intent(this@ContactInfoActivity, ChatActivity::class.java)
-                        .setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
-                        .putExtra(Constants.CHAT_ID, request.chatHandle)
-                    if (!viewModel.isFromContacts) {
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
-                    this@ContactInfoActivity.startActivity(intent)
-                    finish()
+                    navigateToChatActivity(request.chatHandle)
                 } else {
                     Timber.d("ERROR WHEN CREATING CHAT ${e.errorString}")
                     showSnackbar(
@@ -352,6 +343,17 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
+    private fun navigateToChatActivity(handle: Long) {
+        val intent = Intent(this@ContactInfoActivity, ChatActivity::class.java)
+            .setAction(Constants.ACTION_CHAT_SHOW_MESSAGES)
+            .putExtra(Constants.CHAT_ID, handle)
+        if (!viewModel.isFromContacts) {
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        this@ContactInfoActivity.startActivity(intent)
+        finish()
+    }
+
     /**
      * onRequest start callback of @MegaRequestListenerInterface
      */
@@ -364,18 +366,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     override fun onRequestFinish(api: MegaApiJava, request: MegaRequest, e: MegaError) {
         Timber.d("onRequestFinish: ${request.type}, ${request.requestString}")
-        if (request.type == MegaRequest.TYPE_GET_ATTR_USER) {
-            Timber.d("MegaRequest.TYPE_GET_ATTR_USER")
-            if (e.errorCode == MegaError.API_OK) {
-                getUserAttributeSuccess(request)
-            }
-        } else if (request.type == MegaRequest.TYPE_CREATE_FOLDER) {
-            createFolderResponse(e)
-        } else if (request.type == MegaRequest.TYPE_MOVE) {
-            moveRequestResponse(e, api, request)
-        } else if (request.type == MegaRequest.TYPE_REMOVE_CONTACT) {
-            Timber.d("Contact removed")
-            finish()
+        when (request.type) {
+            MegaRequest.TYPE_CREATE_FOLDER -> createFolderResponse(e)
+            MegaRequest.TYPE_MOVE -> moveRequestResponse(e, api, request)
         }
     }
 
@@ -430,30 +423,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             }
             showSnackbar(Constants.SNACKBAR_TYPE, message, -1)
             it.setNodes()
-        }
-    }
-
-
-    private fun getUserAttributeSuccess(request: MegaRequest) {
-        val avatar = buildAvatarFile(this@ContactInfoActivity, "${request.email}.jpg")
-        val imBitmap: Bitmap?
-        if (avatar?.exists() == true) {
-            if (avatar.length() > 0) {
-                val bOpts = BitmapFactory.Options()
-                imBitmap = BitmapFactory.decodeFile(avatar.absolutePath, bOpts)
-                if (imBitmap == null) {
-                    avatar.delete()
-                } else {
-                    collapsingAppBar.toolbarImage.setImageBitmap(imBitmap)
-                    if (!imBitmap.isRecycled) {
-                        val palette = Palette.from(imBitmap).generate()
-                        val swatch = palette.darkVibrantSwatch
-                        collapsingAppBar.imageLayout.setBackgroundColor(
-                            (swatch ?: return).bodyTextColor
-                        )
-                    }
-                }
-            }
         }
     }
 
@@ -524,7 +493,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        contactInfoActivity = this
         if (shouldRefreshSessionDueToSDK() || shouldRefreshSessionDueToKarere()) {
             return
         }
@@ -573,10 +541,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     )
                 } else {
                     statusDialog =
-                        createProgressDialog(
-                            this,
-                            getString(R.string.context_copying)
-                        )
+                        createProgressDialog(this, getString(R.string.context_copying))
                     val copyHandles = result?.first
                     val toHandle = result?.second
                     if (copyHandles == null || toHandle == null) return@registerForActivityResult
@@ -797,9 +762,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         if (viewModel.isOnline()) {
             Timber.d("online -- network connection")
             with(contentContactProperties) {
-                user?.let {
-                    val nodes = megaApi.getInShares(it)
-                    setFoldersButtonText(nodes)
+                emailText.text?.let {
                     updateShareContactLayoutVisibility(shouldShow = true)
                     updateSharedFolderLayoutVisibility(shouldShow = true)
                     updateChatOptionsLayoutVisibility(shouldShow = true)
@@ -871,8 +834,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun sharedFilesClicked() {
         val nodeHistoryIntent = Intent(this, NodeAttachmentHistoryActivity::class.java)
-        val chatId = chat?.chatId
-        chatId?.let {
+        chat?.chatId?.let {
             nodeHistoryIntent.putExtra("chatId", it)
         }
         startActivity(nodeHistoryIntent)
@@ -1105,19 +1067,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 megaChatApi.createChat(false, peers, megaChatRequestListenerInterface)
             } else {
                 Timber.d("There is already a chat, open it!")
-                if (viewModel.isFromContacts) {
-                    val intentOpenChat = Intent(this, ChatActivity::class.java)
-                    intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                    intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
-                    this.startActivity(intentOpenChat)
-                } else {
-                    val intentOpenChat = Intent(this, ChatActivity::class.java)
-                    intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-                    intentOpenChat.putExtra(Constants.CHAT_ID, chat.chatId)
-                    intentOpenChat.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    this.startActivity(intentOpenChat)
-                }
-                finish()
+                navigateToChatActivity(chat.chatId)
             }
         }
     }
@@ -1179,6 +1129,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             updateVerifyCredentialsLayout(contactInfoState)
             updateUserStatusChanges(contactInfoState)
             updateBasicInfo(contactInfoState)
+            setFoldersButtonText(contactInfoState.inShares)
         }
     }
 
@@ -1439,9 +1390,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             findViewById<View>(R.id.shared_folder_list_container) as RelativeLayout
         if (isShareFolderExpanded) {
             sharedFolderLayout.visibility = View.GONE
-            user?.let {
-                setFoldersButtonText(megaApi.getInShares(it))
-            }
         } else {
             sharedFolderLayout.visibility = View.VISIBLE
             contentContactProperties.shareFoldersButton.setText(R.string.general_close)
@@ -1675,19 +1623,16 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    private fun setFoldersButtonText(nodes: ArrayList<MegaNode>?) {
-        if (nodes != null) {
-            contentContactProperties.apply {
-                shareFoldersButton.text = resources.getQuantityString(
-                    R.plurals.num_folders_with_parameter,
-                    nodes.size,
-                    nodes.size
-                )
-                if (nodes.size == 0) {
-                    shareFoldersButton.isClickable = false
-                    sharedFoldersLayout.isClickable = false
-                }
-            }
+    private fun setFoldersButtonText(nodes: List<UnTypedNode>) {
+        contentContactProperties.apply {
+            shareFoldersButton.text = resources.getQuantityString(
+                R.plurals.num_folders_with_parameter,
+                nodes.size,
+                nodes.size
+            )
+            val isClickable = nodes.isNotEmpty()
+            shareFoldersButton.isClickable = isClickable
+            sharedFoldersLayout.isClickable = isClickable
         }
     }
 

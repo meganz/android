@@ -5,6 +5,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.node.UnTypedNode
 
 /**
  * Contact info UI state
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
  * @property isOnline               Checks if connected to internet
  * @property snackBarMessage        One time snack bar message to be shown to the user
  * @property isUserRemoved          Checks if selected user is removed from contacts
+ * @property inShares               In shares for the user
  */
 data class ContactInfoState(
     val error: Int? = null,
@@ -33,6 +35,7 @@ data class ContactInfoState(
     val isOnline: Boolean = false,
     val snackBarMessage: Int? = null,
     val isUserRemoved: Boolean = false,
+    val inShares: List<UnTypedNode> = emptyList(),
 ) {
 
     /**

@@ -29,7 +29,6 @@ import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
-import mega.privacy.android.data.mapper.shares.AccessPermissionIntMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -91,7 +90,6 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val streamingGateway: StreamingGateway,
     private val nodeUpdateMapper: NodeUpdateMapper,
     private val accessPermissionMapper: AccessPermissionMapper,
-    private val accessPermissionIntMapper: AccessPermissionIntMapper,
     private val nodeShareKeyResultMapper: NodeShareKeyResultMapper,
 ) : NodeRepository {
 
@@ -351,4 +349,14 @@ internal class NodeRepositoryImpl @Inject constructor(
                 }
             }
         }
+
+    override suspend fun getInShares(email: String): List<UnTypedNode> = withContext(ioDispatcher) {
+        runCatching {
+            megaApiGateway.getContact(email)?.let {
+                megaApiGateway.getInShares(it).map { node ->
+                    convertToUnTypedNode(node)
+                }
+            }
+        }.getOrNull() ?: emptyList()
+    }
 }

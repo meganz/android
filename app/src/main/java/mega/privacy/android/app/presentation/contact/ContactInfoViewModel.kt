@@ -37,10 +37,10 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetChatRoom
-import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
 import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
@@ -49,6 +49,7 @@ import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -74,6 +75,7 @@ import javax.inject.Inject
  * @property applyContactUpdatesUseCase         [ApplyContactUpdatesUseCase]
  * @property setUserAliasUseCase                [SetUserAliasUseCase]
  * @property removeContactByEmailUseCase        [RemoveContactByEmailUseCase]
+ * @property getInSharesUseCase                 [GetInSharesUseCase]
  */
 @HiltViewModel
 class ContactInfoViewModel @Inject constructor(
@@ -95,6 +97,7 @@ class ContactInfoViewModel @Inject constructor(
     private val applyContactUpdatesUseCase: ApplyContactUpdatesUseCase,
     private val setUserAliasUseCase: SetUserAliasUseCase,
     private val removeContactByEmailUseCase: RemoveContactByEmailUseCase,
+    private val getInSharesUseCase: GetInSharesUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : BaseRxViewModel() {
@@ -208,10 +211,7 @@ class ContactInfoViewModel @Inject constructor(
 
             Timber.d("There is a call, open it")
             CallUtil.openMeetingInProgress(
-                MegaApplication.getInstance().applicationContext,
-                chatId,
-                true,
-                passcodeManagement
+                MegaApplication.getInstance().applicationContext, chatId, true, passcodeManagement
             )
             return
         }
@@ -325,6 +325,7 @@ class ContactInfoViewModel @Inject constructor(
             )
         }
         updateAvatar(userInfo)
+        getInShares()
     }
 
     private fun updateAvatar(userInfo: ContactItem?) = viewModelScope.launch(ioDispatcher) {
@@ -381,5 +382,14 @@ class ContactInfoViewModel @Inject constructor(
         _state.update {
             it.copy(isUserRemoved = isRemoved ?: false)
         }
+    }
+
+    /**
+     * Gets the in shared nodes for the user
+     * value is updated to contact info state
+     */
+    fun getInShares() = viewModelScope.launch {
+        val email = state.value.email ?: return@launch
+        _state.update { it.copy(inShares = getInSharesUseCase(email)) }
     }
 }
