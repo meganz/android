@@ -20,6 +20,7 @@ import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.data.facade.PermissionFacade
+import mega.privacy.android.data.facade.SDCardFacade
 import mega.privacy.android.data.facade.TelephonyFacade
 import mega.privacy.android.data.facade.VerifyPurchaseFacade
 import mega.privacy.android.data.facade.VideoCompressionFacade
@@ -42,6 +43,7 @@ import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.PermissionGateway
+import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
@@ -220,4 +222,14 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindVideoCompressorGateway(implementation: VideoCompressionFacade): VideoCompressorGateway
+
+    /**
+     * Provides the default implementation to [SDCardGateway]
+     *
+     * @param implementation [SDCardFacade]
+     *
+     * @return [SDCardGateway]
+     */
+    @Binds
+    abstract fun bindSDCardGateway(implementation: SDCardFacade): SDCardGateway
 }

@@ -13,6 +13,7 @@ import androidx.documentfile.provider.DocumentFile;
 import java.io.File;
 import java.util.ArrayList;
 
+import kotlin.coroutines.Continuation;
 import mega.privacy.android.app.AndroidCompletedTransfer;
 import mega.privacy.android.app.LegacyDatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
@@ -27,25 +28,15 @@ public class SDCardUtils {
     public static final int APP_DATA_TARGET_URI_POSITION = 2;
     public static final int APP_DATA_SD_CARD_PARTS = 2;
 
-    public static final String COLON_ASCII = "%3A";
-
     /**
-     * Check if a uri is root uri, a SD card root uri must end with ":"(in ASCII, it's "%3A").
-     * And:
-     * 1. ":" is INVALID character for folder name in both local file system and cloud drive.
-     * So there will never be a non-root uri like "content://com.android.externalstorage.documents/tree/2BA3-12F1%3AAlarms%2Fyu%3A"
-     * <p>
-     * 2. "%" in ASCII is "%25",
-     * so the uri for a folder with name "X%3A" is alright,
-     * the uri will be "content://com.android.externalstorage.documents/tree/2BA3-12F1%3AAlarms%2Fyu%253A"
+     * Retrieves the Root SD Card path
      *
-     * @param uri The uri to check.
-     * @return true, if it's not a root uri, otherwise, false.
+     * @param path the File path
+     * @return the Root SD Card path
+     * @deprecated This function is no longer acceptable to retrieve the Root SD Card path. Use
+     * {@link mega.privacy.android.data.gateway.SDCardGateway#getRootSDCardPath(String, Continuation)}
+     * instead
      */
-    public static boolean isNotRootUri(Uri uri) {
-        return !uri.toString().endsWith(COLON_ASCII);
-    }
-
     public static String getSDCardRoot(String path) {
         int i = 0, x = 0;
         char[] chars = path.toCharArray();
@@ -61,6 +52,18 @@ public class SDCardUtils {
         return path.substring(0, x);
     }
 
+    /**
+     * Checks whether the Local Folder is inside the SD Card or not
+     *
+     * @param context   The Context
+     * @param localPath The Folder Local Path
+     * @return true if the Local Folder is inside the SD Card, and false if otherwise
+     * @deprecated This function is no longer acceptable to check whether the Local Folder is inside
+     * the SD Card or not. Use
+     * {@link mega.privacy.android.data.gateway.SDCardGateway#doesFolderExists(String, Continuation)}
+     * instead
+     */
+    @Deprecated
     public static boolean isLocalFolderOnSDCard(Context context, String localPath) {
         File[] fs = context.getExternalFilesDirs(null);
         if (fs.length > 1 && fs[1] != null) {
@@ -75,7 +78,11 @@ public class SDCardUtils {
      *
      * @param treeUri the Uri to get the name of the folder
      * @return The name of the SD card folder.
+     * @deprecated This function is no longer acceptable to retrieve the SD Card Directory Name. Use
+     * {@link mega.privacy.android.data.gateway.SDCardGateway#getDirectoryName(Uri, Continuation)}
+     * instead
      */
+    @Deprecated
     public static String getSDCardDirName(Uri treeUri) {
         DocumentFile pickedDir = DocumentFile.fromTreeUri(MegaApplication.getInstance(), treeUri);
         return pickedDir != null && pickedDir.canWrite() ? pickedDir.getName() : null;
