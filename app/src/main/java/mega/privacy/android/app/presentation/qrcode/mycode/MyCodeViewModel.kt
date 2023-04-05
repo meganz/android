@@ -90,6 +90,7 @@ class MyCodeViewModel @Inject constructor(
                         it.copy(
                             qrCodeBitmap = qrCodeBitmap,
                             contactLink = contactLink,
+                            hasQRCodeBeenDeleted = false
                         )
                     }
                     return@launch
@@ -122,6 +123,7 @@ class MyCodeViewModel @Inject constructor(
                             it.copy(
                                 contactLink = newContactLink,
                                 qrCodeBitmap = combinedBitmap,
+                                hasQRCodeBeenDeleted = false
                             )
                         }
                     }
@@ -237,6 +239,7 @@ class MyCodeViewModel @Inject constructor(
                             it.copy(
                                 contactLink = contactLink,
                                 qrCodeBitmap = qrCodeBitmap,
+                                hasQRCodeBeenDeleted = false,
                             )
                         }
                     }
@@ -303,6 +306,7 @@ class MyCodeViewModel @Inject constructor(
                         it.copy(
                             contactLink = null,
                             qrCodeBitmap = null,
+                            hasQRCodeBeenDeleted = true
                         )
                     }
                 },

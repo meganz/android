@@ -22,7 +22,6 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.FragmentMycodeBinding
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.utils.ColorUtils.changeStatusBarColorForElevation
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import timber.log.Timber
@@ -81,7 +80,11 @@ class MyCodeFragment : Fragment() {
             binding.qrCodeRelativeContainer.layoutParams = params
         }
 
-        createQRCode()
+        // With Compose Scaffold, Fragment is always destroyed and re-created after switching tab,
+        // so check here to make sure no createQRCode if it is just been deleted
+        if (!viewModel.uiState.value.hasQRCodeBeenDeleted) {
+            createQRCode()
+        }
 
         return binding.root
     }
@@ -89,11 +92,6 @@ class MyCodeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupFlow()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     private fun setupFlow() {
@@ -120,11 +118,13 @@ class MyCodeFragment : Fragment() {
                         }
                         binding.qrCodeButtonCopyLink.isEnabled = isInProgress.not()
 
-                        val buttonStringId =
-                            contactLink?.let { R.string.button_copy_link }
-                                ?: R.string.button_create_qr
+                        val buttonStringId = if (contactLink != null && !hasQRCodeBeenDeleted) {
+                            R.string.button_copy_link
+                        } else {
+                            R.string.button_create_qr
+                        }
                         binding.qrCodeButtonCopyLink.text =
-                            requireContext().getFormattedStringOrDefault(buttonStringId)
+                            getString(buttonStringId)
                     }
                 }
             }
@@ -167,7 +167,7 @@ class MyCodeFragment : Fragment() {
             try {
                 temp = createProgressDialog(
                     requireContext(),
-                    requireContext().getFormattedStringOrDefault(R.string.generatin_qr)
+                    getString(R.string.generatin_qr)
                 )
                 temp.show()
             } catch (e: Exception) {
@@ -185,7 +185,7 @@ class MyCodeFragment : Fragment() {
     private fun showSnackBar(@StringRes textResId: Int) {
         (requireActivity() as QRCodeActivity).showSnackbar(
             binding.root,
-            requireContext().getFormattedStringOrDefault(textResId)
+            getString(textResId)
         )
     }
 

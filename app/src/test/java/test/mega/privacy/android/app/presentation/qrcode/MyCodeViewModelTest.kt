@@ -106,6 +106,7 @@ class MyCodeViewModelTest {
                 assertThat(isInProgress).isFalse()
                 assertThat(snackBarMessage).isNull()
                 assertThat(localQRCodeFile).isNull()
+                assertThat(hasQRCodeBeenDeleted).isFalse()
             }
         }
     }
@@ -124,7 +125,7 @@ class MyCodeViewModelTest {
     }
 
     @Test
-    fun `test that snack bar message is shown when copy contact link is successful`() = runTest {
+    fun `test that message is shown when copy contact link is successful`() = runTest {
         prepareQRCode()
         underTest.copyContactLink()
         underTest.uiState.test {
@@ -284,6 +285,36 @@ class MyCodeViewModelTest {
                 assertThat(contactLink).isEqualTo(contactLink)
                 assertThat(isInProgress).isFalse()
                 assertThat(snackBarMessage).isEqualTo(R.string.qrcode_reset_successfully)
+            }
+        }
+    }
+
+    @Test
+    fun `test that QR Code can be deleted successfully`() = runTest {
+        prepareQRCode()
+
+        underTest.deleteQR()
+        underTest.uiState.test {
+            val state = awaitItem()
+            with(state) {
+                assertThat(contactLink).isNull()
+                assertThat(qrCodeBitmap).isNull()
+                assertThat(hasQRCodeBeenDeleted).isTrue()
+            }
+        }
+    }
+
+    @Test
+    fun `test that error message is shown when delete QR code fails`() = runTest {
+        prepareQRCode()
+
+        whenever(deleteQRCode(any())).thenAnswer { throw Exception() }
+
+        underTest.deleteQR()
+        underTest.uiState.test {
+            val state = awaitItem()
+            with(state) {
+                assertThat(snackBarMessage).isEqualTo(R.string.qrcode_delete_not_successfully)
             }
         }
     }

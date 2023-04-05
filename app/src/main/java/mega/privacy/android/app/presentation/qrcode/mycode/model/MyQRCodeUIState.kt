@@ -46,4 +46,9 @@ data class MyQRCodeUIState(
      * avatar content
      */
     val avatarContent: AvatarContent? = null,
+
+    /**
+     * Whether user has deleted the QR code
+     */
+    val hasQRCodeBeenDeleted: Boolean = false
 )
