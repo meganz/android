@@ -211,11 +211,5 @@ class MyCodeFragment : Fragment() {
         const val AVATAR_BORDER_WIDTH = 3
 
         private const val RELATIVE_WIDTH = 280
-
-        @JvmStatic
-        fun newInstance(): MyCodeFragment {
-            Timber.d("newInstance")
-            return MyCodeFragment()
-        }
     }
 }

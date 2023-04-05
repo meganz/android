@@ -182,7 +182,7 @@ private fun MyQRTabs(
                     )
                 },
                 selectedContentColor = MaterialTheme.colors.red_600_red_300,
-                unselectedContentColor = MaterialTheme.colors.textColorSecondary
+                unselectedContentColor = MaterialTheme.colors.textColorSecondary,
             )
         }
     }
