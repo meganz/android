@@ -119,8 +119,7 @@ internal class MegaApiFacade @Inject constructor(
         get() = megaApi.myEmail
     override val isBusinessAccount: Boolean
         get() = megaApi.isBusinessAccount
-    override val isMasterBusinessAccount: Boolean
-        get() = megaApi.isMasterBusinessAccount
+
     override val isEphemeralPlusPlus: Boolean
         get() = megaApi.isEphemeralPlusPlus
     override val accountAuth: String
@@ -129,6 +128,10 @@ internal class MegaApiFacade @Inject constructor(
         get() = megaApi.myCredentials
     override val dumpSession: String?
         get() = megaApi.dumpSession()
+
+    override suspend fun isMasterBusinessAccount(): Boolean = megaApi.isMasterBusinessAccount
+
+    override suspend fun getBusinessStatus(): Int = megaApi.businessStatus
 
     override suspend fun areTransfersPaused(): Boolean =
         megaApi.areTransfersPaused(MegaTransfer.TYPE_DOWNLOAD) ||

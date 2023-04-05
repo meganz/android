@@ -5,14 +5,14 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.repository.AndroidBillingRepository
+import mega.privacy.android.data.repository.CallRepositoryImpl
+import mega.privacy.android.data.repository.ChatRepositoryImpl
 import mega.privacy.android.data.repository.DefaultAccountRepository
 import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
 import mega.privacy.android.data.repository.DefaultBillingRepository
-import mega.privacy.android.data.repository.CallRepositoryImpl
 import mega.privacy.android.data.repository.DefaultCameraUploadRepository
 import mega.privacy.android.data.repository.DefaultChatParticipantsRepository
-import mega.privacy.android.data.repository.ChatRepositoryImpl
 import mega.privacy.android.data.repository.DefaultClipboardRepository
 import mega.privacy.android.data.repository.DefaultContactsRepository
 import mega.privacy.android.data.repository.DefaultFavouritesRepository
@@ -47,10 +47,12 @@ import mega.privacy.android.data.repository.SlideshowRepositoryImpl
 import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
+import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository
 import mega.privacy.android.domain.repository.BillingRepository
+import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.repository.CallRepository
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.repository.ChatParticipantsRepository
@@ -232,5 +234,9 @@ internal abstract class RepositoryModule {
 
     @Binds
     abstract fun bindFolderLinkRepository(implementation: FolderLinkRepositoryImpl): FolderLinkRepository
+
+    @Binds
+    abstract fun bindBusinessRepository(implementation: BusinessRepositoryImpl): BusinessRepository
+
 
 }

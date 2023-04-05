@@ -135,7 +135,7 @@ internal class DefaultAccountRepository @Inject constructor(
             user?.email ?: megaChatApiGateway.getMyEmail(),
             megaChatApiGateway.getMyFullname(),
             megaApiGateway.isBusinessAccount,
-            megaApiGateway.isMasterBusinessAccount,
+            megaApiGateway.isMasterBusinessAccount(),
             accountTypeMapper(myAccountInfoFacade.accountTypeId),
             myAccountInfoFacade.accountTypeString,
         )

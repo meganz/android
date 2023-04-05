@@ -146,7 +146,19 @@ interface MegaApiGateway {
     /**
      * Is master business account
      */
-    val isMasterBusinessAccount: Boolean
+    suspend fun isMasterBusinessAccount(): Boolean
+
+    /**
+     * Get business status
+     *
+     * @return business status for the current account
+     *
+     *      public static final int BUSINESS_STATUS_EXPIRED = -1;
+     *      public static final int BUSINESS_STATUS_INACTIVE = 0;
+     *      public static final int BUSINESS_STATUS_ACTIVE = 1;
+     *      public static final int BUSINESS_STATUS_GRACE_PERIOD = 2;
+     */
+    suspend fun getBusinessStatus(): Int
 
     /**
      * Is ephemeral plus plus account.

@@ -58,6 +58,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import kotlin.contracts.ExperimentalContracts
@@ -153,7 +154,10 @@ class DefaultAccountRepositoryTest {
     @Test
     fun `test that get account does not throw exception if email is null`() = runTest {
         whenever(accountInfoWrapper.accountTypeId).thenReturn(-1)
-        whenever(megaApiGateway.getLoggedInUser()).thenReturn(null)
+        megaApiGateway.stub {
+            onBlocking { isMasterBusinessAccount() }.thenReturn(false)
+            onBlocking { getLoggedInUser() }.thenReturn(null)
+        }
         whenever(accountInfoWrapper.accountTypeString).thenReturn("Free")
 
         assertThat(underTest.getUserAccount()).isNotNull()
@@ -163,7 +167,10 @@ class DefaultAccountRepositoryTest {
     fun `test that user id is included in account info if user is logged in`() = runTest {
         val expectedUserId = 4L
         val user = mock<MegaUser> { on { handle }.thenReturn(expectedUserId) }
-        whenever(megaApiGateway.getLoggedInUser()).thenReturn(user)
+        megaApiGateway.stub {
+            onBlocking { isMasterBusinessAccount() }.thenReturn(false)
+            onBlocking { getLoggedInUser() }.thenReturn(user)
+        }
 
         assertThat(underTest.getUserAccount().userId).isEqualTo(UserId(expectedUserId))
     }
