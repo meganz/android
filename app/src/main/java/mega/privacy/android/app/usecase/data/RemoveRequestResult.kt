@@ -15,26 +15,44 @@ data class RemoveRequestResult(
     val errorCount: Int,
 ) {
 
-    val successCount = count - errorCount
-    val isSingleAction = count == 1
-    val isSuccess = errorCount == 0
+    private val successCount = count - errorCount
+    private val isSuccess = errorCount == 0
+    private val isFailed = errorCount == count
 
-    fun getResultText(context: Context): String =
-        when {
-            isSingleAction && isSuccess -> {
-                context.getString(R.string.context_correctly_removed)
-            }
-            isSingleAction -> {
-                context.getString(R.string.context_no_removed)
-            }
-            isSuccess -> {
-                context.getString(R.string.number_correctly_removed, count)
-            }
-            else -> {
-                context.getString(R.string.number_correctly_removed, successCount) +
-                        context.getString(R.string.number_no_removed, errorCount)
-            }
+    /**
+     * Show strings based on count and errorCount when items have been deleted from RubbishBin
+     * @param context [Context]
+     */
+    fun getResultText(context: Context): String = when {
+        isSuccess -> {
+            context.resources.getQuantityString(
+                R.plurals.rubbish_bin_remove_items_snackbar_success,
+                successCount,
+                successCount
+            )
         }
+        isFailed -> {
+            context.resources.getQuantityString(
+                R.plurals.rubbish_bin_remove_items_snackbar_fail,
+                errorCount,
+                errorCount
+            )
+        }
+        else -> {
+            "${
+                context.resources.getQuantityString(
+                    R.plurals.rubbish_bin_remove_items_snackbar_success_concat,
+                    successCount,
+                    successCount
+                )
+            }${
+                context.resources.getQuantityString(
+                    R.plurals.rubbish_bin_remove_items_snackbar_fail_concat, errorCount, errorCount
+                )
+            }"
+        }
+    }
+
 
     /**
      * Resets the account details timestamp if some request finished with success.

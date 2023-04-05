@@ -5813,9 +5813,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { result: RemoveRequestResult, throwable: Throwable? ->
                         if (throwable == null) {
-                            val notValidView = (result.isSingleAction
-                                    && result.isSuccess) && this@ManagerActivity.rubbishBinState().rubbishBinHandle == handleList[0]
-                            showRestorationOrRemovalResult(notValidView, result.getResultText(this))
+                            val notValidView = (result.count == 1
+                                    && result.errorCount == 0) && this@ManagerActivity.rubbishBinState().rubbishBinHandle == handleList[0]
+                            showRestorationOrRemovalResult(notValidView, result.getResultText(context = this@ManagerActivity))
                         }
                     }
             }

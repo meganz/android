@@ -4772,4 +4772,24 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, got it</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="one">Permanently removed %1$d item</item>
+        <item quantity="other">Permanently removed %1$d items</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="one">Couldn’t permanently remove %1$d item</item>
+        <item quantity="other">Couldn’t permanently remove %1$d items</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="one">Permanently removed %1$d item,&#160;</item>
+        <item quantity="other">Permanently removed %1$d items,&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="one">couldn’t permanently remove %1$d item</item>
+        <item quantity="other">couldn’t permanently remove %1$d items</item>
+    </plurals>
 </resources>
