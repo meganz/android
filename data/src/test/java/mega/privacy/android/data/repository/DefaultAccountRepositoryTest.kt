@@ -29,6 +29,7 @@ import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.toAccountType
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
@@ -200,19 +201,6 @@ class DefaultAccountRepositoryTest {
                 awaitComplete()
             }
         }
-
-    @Test
-    fun `test that is business account active returns true if api returns true`() =
-        runTest {
-            whenever(megaApiGateway.isBusinessAccountActive()).thenReturn(true)
-            assertThat(underTest.isBusinessAccountActive()).isTrue()
-        }
-
-    @Test
-    fun `test that is business account active returns false if api returns false`() = runTest {
-        whenever(megaApiGateway.isBusinessAccountActive()).thenReturn(false)
-        assertThat(underTest.isBusinessAccountActive()).isFalse()
-    }
 
     @Test
     fun `test that get subscription options returns successfully if no error is thrown`() =

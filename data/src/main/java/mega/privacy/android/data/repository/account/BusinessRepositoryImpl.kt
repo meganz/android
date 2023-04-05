@@ -20,4 +20,8 @@ internal class BusinessRepositoryImpl @Inject constructor(
     override suspend fun getBusinessStatus() = withContext(ioDispatcher) {
         businessAccountStatusMapper(megaApiGateway.getBusinessStatus())
     }
+
+    override suspend fun isBusinessAccountActive(): Boolean = withContext(ioDispatcher) {
+        megaApiGateway.isBusinessAccountActive()
+    }
 }

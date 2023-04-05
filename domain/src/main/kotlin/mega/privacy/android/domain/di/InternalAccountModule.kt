@@ -5,6 +5,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.DefaultGetAccountAchievements
 import mega.privacy.android.domain.usecase.DefaultIsUserLoggedIn
@@ -71,8 +72,8 @@ internal abstract class InternalAccountModule {
          * Provides the Use Case [IsBusinessAccountActive]
          */
         @Provides
-        fun provideIsBusinessAccountActive(accountRepository: AccountRepository): IsBusinessAccountActive =
-            IsBusinessAccountActive(accountRepository::isBusinessAccountActive)
+        fun provideIsBusinessAccountActive(repository: BusinessRepository): IsBusinessAccountActive =
+            IsBusinessAccountActive(repository::isBusinessAccountActive)
 
         /**
          * Provides the Use Case [GetMyCredentials]

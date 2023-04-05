@@ -1,4 +1,4 @@
-package mega.privacy.android.data.repository
+package mega.privacy.android.data.repository.account
 
 import android.app.NotificationManager
 import android.content.Context
@@ -263,10 +263,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 )
             }
         }
-
-    override suspend fun isBusinessAccountActive(): Boolean = withContext(ioDispatcher) {
-        megaApiGateway.isBusinessAccountActive()
-    }
 
     override suspend fun getSubscriptionOptions(): List<SubscriptionOption> =
         withContext(ioDispatcher) {

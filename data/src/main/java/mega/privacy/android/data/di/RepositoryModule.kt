@@ -7,7 +7,6 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.repository.AndroidBillingRepository
 import mega.privacy.android.data.repository.CallRepositoryImpl
 import mega.privacy.android.data.repository.ChatRepositoryImpl
-import mega.privacy.android.data.repository.DefaultAccountRepository
 import mega.privacy.android.data.repository.DefaultAlbumRepository
 import mega.privacy.android.data.repository.DefaultAvatarRepository
 import mega.privacy.android.data.repository.DefaultBillingRepository
@@ -48,6 +47,7 @@ import mega.privacy.android.data.repository.StreamingServerRepositoryImpl
 import mega.privacy.android.data.repository.TransfersRepository
 import mega.privacy.android.data.repository.ViewTypeRepositoryImpl
 import mega.privacy.android.data.repository.account.BusinessRepositoryImpl
+import mega.privacy.android.data.repository.account.DefaultAccountRepository
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.AlbumRepository
 import mega.privacy.android.domain.repository.AvatarRepository

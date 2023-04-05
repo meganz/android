@@ -93,13 +93,6 @@ interface AccountRepository {
      */
     suspend fun retryPendingConnections(disconnect: Boolean)
 
-    /**
-     * Checks whether the user's Business Account is currently active or not
-     *
-     * @return True if the user's Business Account is currently active, or
-     * false if inactive or if the user is not under a Business Account
-     */
-    suspend fun isBusinessAccountActive(): Boolean
 
     /**
      * Get the List of SubscriptionOptions
