@@ -246,6 +246,7 @@ class RecentActionsViewModelTest {
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = null,
                 accountTypeString = "",
+                isAchievementsEnabled = false
             )
             whenever(getAccountDetailsUseCase(false)).thenReturn(userAccount)
             whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
@@ -268,6 +269,7 @@ class RecentActionsViewModelTest {
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = null,
                 accountTypeString = "",
+                isAchievementsEnabled = false
             )
             whenever(getAccountDetailsUseCase(false)).thenReturn(userAccount)
             whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))

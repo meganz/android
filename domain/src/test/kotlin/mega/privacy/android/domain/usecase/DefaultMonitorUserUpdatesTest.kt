@@ -33,6 +33,7 @@ class DefaultMonitorUserUpdatesTest {
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = null,
                 accountTypeString = "",
+                isAchievementsEnabled = false
             )
         )
     }

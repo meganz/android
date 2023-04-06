@@ -58,6 +58,7 @@ class DefaultCanDeleteAccountTest {
             isMasterBusinessAccount = isMasterBusinessAccount,
             accountTypeIdentifier = AccountType.FREE,
             accountTypeString = "",
+            isAchievementsEnabled = false
         )
 }
 

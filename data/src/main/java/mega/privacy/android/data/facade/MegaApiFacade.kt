@@ -128,6 +128,10 @@ internal class MegaApiFacade @Inject constructor(
         get() = megaApi.myCredentials
     override val dumpSession: String?
         get() = megaApi.dumpSession()
+    override val businessStatus: Int
+        get() = megaApi.businessStatus
+    override val isAchievementsEnabled: Boolean
+        get() = megaApi.isAchievementsEnabled
 
     override suspend fun isMasterBusinessAccount(): Boolean = megaApi.isMasterBusinessAccount
 

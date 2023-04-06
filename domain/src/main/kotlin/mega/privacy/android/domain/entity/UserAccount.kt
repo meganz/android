@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.user.UserId
  * @property isMasterBusinessAccount
  * @property accountTypeIdentifier
  * @property accountTypeString
+ * @property isAchievementsEnabled
  */
 data class UserAccount constructor(
     val userId: UserId?,
@@ -21,4 +22,5 @@ data class UserAccount constructor(
     val isMasterBusinessAccount: Boolean,
     val accountTypeIdentifier: AccountType?,
     val accountTypeString: String,
+    val isAchievementsEnabled: Boolean
 )

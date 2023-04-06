@@ -11,6 +11,7 @@ internal val TEST_USER_ACCOUNT = UserAccount(
     isBusinessAccount = false,
     isMasterBusinessAccount = false,
     accountTypeIdentifier = AccountType.FREE,
-    accountTypeString = "Free"
+    accountTypeString = "Free",
+    isAchievementsEnabled = false
 )
 

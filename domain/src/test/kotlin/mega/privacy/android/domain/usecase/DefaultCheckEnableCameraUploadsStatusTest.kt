@@ -31,7 +31,8 @@ class DefaultCheckEnableCameraUploadsStatusTest {
         isBusinessAccount = false,
         isMasterBusinessAccount = false,
         accountTypeIdentifier = AccountType.PRO_I,
-        accountTypeString = ""
+        accountTypeString = "",
+        isAchievementsEnabled = false
     )
 
     @Before

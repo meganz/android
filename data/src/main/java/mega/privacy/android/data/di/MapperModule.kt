@@ -47,7 +47,6 @@ import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.mapper.SubscriptionOptionListMapper
 import mega.privacy.android.data.mapper.SubscriptionStatusMapper
 import mega.privacy.android.data.mapper.SyncStatusIntMapper
-import mega.privacy.android.data.mapper.UserAccountMapper
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
@@ -277,13 +276,6 @@ internal abstract class MapperModule {
         fun provideMimeTypeMapper(): MimeTypeMapper = { extension ->
             getMimeType(extension, MimeTypeMap.getSingleton()::getMimeTypeFromExtension)
         }
-
-
-        /**
-         * Provide user account mapper
-         */
-        @Provides
-        fun provideUserAccountMapper(): UserAccountMapper = ::UserAccount
 
         /**
          * Provide local pricing mapper

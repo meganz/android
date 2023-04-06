@@ -181,6 +181,17 @@ interface MegaApiGateway {
     val dumpSession: String?
 
     /**
+     * User business status
+     */
+    val businessStatus: Int
+
+    /**
+     * Checks whether MEGA Achievements are enabled for the open account
+     * @return True if enabled, false otherwise.
+     */
+    val isAchievementsEnabled: Boolean
+
+    /**
      * Are transfers paused (downloads and uploads)
      */
     suspend fun areTransfersPaused(): Boolean
