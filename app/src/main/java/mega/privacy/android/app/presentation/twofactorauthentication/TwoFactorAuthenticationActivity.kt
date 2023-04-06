@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.twofactorauthentication
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
@@ -19,11 +20,16 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.arch.extensions.collectFlow
@@ -32,15 +38,18 @@ import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.ActivityTwoFactorAuthenticationBinding
 import mega.privacy.android.app.databinding.Dialog2faHelpBinding
 import mega.privacy.android.app.databinding.DialogNoAuthenticationAppsBinding
+import mega.privacy.android.app.main.FileStorageActivity
 import mega.privacy.android.app.main.ManagerActivity
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.twofactorauthentication.extensions.toSeedArray
 import mega.privacy.android.app.presentation.twofactorauthentication.model.AuthenticationState
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.app.utils.ColorUtils
-import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.app.utils.Util
+import mega.privacy.android.app.utils.permission.PermissionUtils
+import org.jetbrains.anko.toast
 import timber.log.Timber
 
 /**
@@ -67,6 +76,27 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
     private var isHelpDialogShown = false
     private var isNoAppsDialogShown = false
     private var imm: InputMethodManager? = null
+
+    private val downloadFolderActivityResult =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val dataIntent = result.data
+            if (result.resultCode == RESULT_OK && dataIntent != null) {
+                exportRecoveryKey(dataIntent)
+            }
+        }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (grantResults.isEmpty() || requestCode != ExportRecoveryKeyActivity.WRITE_STORAGE_TO_SAVE_RK) {
+            Timber.w("Permissions ${permissions[0]} not granted")
+        }
+
+        onPermissionAsked()
+    }
 
     private val onBackPressedCallback: OnBackPressedCallback =
         object : OnBackPressedCallback(true) {
@@ -236,6 +266,33 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
         }
     }
 
+    /**
+     * Action when permission has been asked to the user
+     * Will save to storage if permission granted
+     * else it will display a Snackbar telling that the user denied the request
+     */
+    private fun onPermissionAsked() {
+        if (PermissionUtils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            saveRecoveryKeyToStorage()
+        } else {
+            showSnackbar(getString(R.string.denied_write_permissions))
+        }
+    }
+
+    /**
+     * Open folder selection, where user can select the location the recovery key will be stored.
+     */
+    private fun saveRecoveryKeyToStorage() {
+        val intent = Intent(
+            this@TwoFactorAuthenticationActivity,
+            FileStorageActivity::class.java
+        ).apply {
+            action = FileStorageActivity.Mode.PICK_FOLDER.action
+            putExtra(FileStorageActivity.EXTRA_SAVE_RECOVERY_KEY, true)
+        }
+        downloadFolderActivityResult.launch(intent)
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         Timber.d("onSaveInstanceState")
@@ -251,6 +308,46 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             putBoolean("isHelpDialogShown", isHelpDialogShown)
         }
     }
+
+    /**
+     * Action when User finished choosing folder to save recovery key
+     * Will show SnackBar message from Compose
+     */
+    private fun exportRecoveryKey(result: Intent) = lifecycleScope.launch {
+        val key = viewModel.getRecoveryKey()
+        when {
+            key.isNullOrBlank() -> {
+                showSnackbar(getString(R.string.general_text_error))
+            }
+            isSaveToTextFileSuccessful(key, result) -> {
+                val intent =
+                    Intent(
+                        this@TwoFactorAuthenticationActivity,
+                        ManagerActivity::class.java
+                    )
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                startActivity(intent)
+                finish()
+                toast(R.string.save_MK_confirmation)
+            }
+            else -> {
+                showSnackbar(getString(R.string.general_text_error))
+            }
+        }
+    }
+
+    /**
+     * Saving the recovery key to text file
+     * @return is save successful as [Boolean]
+     */
+    private suspend fun isSaveToTextFileSuccessful(key: String, result: Intent): Boolean =
+        withContext(Dispatchers.IO) {
+            FileUtil.saveTextOnContentUri(
+                this@TwoFactorAuthenticationActivity.contentResolver,
+                result.data,
+                key
+            )
+        }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -446,15 +543,7 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
                 clearAllPins()
             }
             listOf(containerRk2fa, buttonExportRk).forEach {
-                it.setOnClickListener {
-                    update2FASetting()
-                    val intent =
-                        Intent(this@TwoFactorAuthenticationActivity, ManagerActivity::class.java)
-                    intent.action = Constants.ACTION_RECOVERY_KEY_EXPORTED
-                    intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    startActivity(intent)
-                    finish()
-                }
+                it.setOnClickListener { chooseRecoverySaveLocation() }
             }
             buttonDismissRk.setOnClickListener {
                 update2FASetting()
@@ -484,6 +573,22 @@ class TwoFactorAuthenticationActivity : PasscodeActivity() {
             pinsViewsList.forEachIndexed { index, currentPin ->
                 addTextChangedListener(index, currentPin, index == pinsViewsList.lastIndex)
             }
+        }
+    }
+
+    /**
+     * Action when save button is clicked. Will save to storage if permission granted
+     * else will ask for permission to write external storage
+     */
+    private fun chooseRecoverySaveLocation() {
+        if (PermissionUtils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            saveRecoveryKeyToStorage()
+        } else {
+            PermissionUtils.requestPermission(
+                this,
+                ExportRecoveryKeyActivity.WRITE_STORAGE_TO_SAVE_RK,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
         }
     }
 

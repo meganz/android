@@ -13,8 +13,10 @@ import mega.privacy.android.app.presentation.twofactorauthentication.model.Authe
 import mega.privacy.android.app.presentation.twofactorauthentication.model.TwoFactorAuthenticationUIState
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
+import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetMultiFactorAuthCode
 import mega.privacy.android.domain.usecase.IsMasterKeyExported
+import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import javax.inject.Inject
 
@@ -28,6 +30,8 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
     private val getMultiFactorAuthCode: GetMultiFactorAuthCode,
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val qrCodeMapper: QRCodeMapper,
+    private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
+    private val setMasterKeyExportedUseCase: SetMasterKeyExportedUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TwoFactorAuthenticationUIState())
@@ -41,6 +45,16 @@ class TwoFactorAuthenticationViewModel @Inject constructor(
         getMasterKeyStatus()
     }
 
+    /**
+     * Exports the Recovery Key
+     */
+    suspend fun getRecoveryKey(): String? {
+        return getExportMasterKeyUseCase().also { key ->
+            if (key.isNullOrBlank().not()) {
+                setMasterKeyExportedUseCase()
+            }
+        }
+    }
 
     /**
      * Generate the QR code for the 2fa

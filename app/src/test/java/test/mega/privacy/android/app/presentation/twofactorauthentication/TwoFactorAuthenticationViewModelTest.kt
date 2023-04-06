@@ -6,6 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -15,8 +16,10 @@ import mega.privacy.android.app.presentation.twofactorauthentication.model.Authe
 import mega.privacy.android.domain.exception.EnableMultiFactorAuthException
 import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.usecase.EnableMultiFactorAuth
+import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetMultiFactorAuthCode
 import mega.privacy.android.domain.usecase.IsMasterKeyExported
+import mega.privacy.android.domain.usecase.SetMasterKeyExportedUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import org.junit.After
 import org.junit.Before
@@ -24,6 +27,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import kotlin.random.Random
@@ -37,6 +42,8 @@ internal class TwoFactorAuthenticationViewModelTest {
     private val getMultiFactorAuthCode = mock<GetMultiFactorAuthCode>()
     private val getCurrentUserEmail = mock<GetCurrentUserEmail>()
     private val qrCodeMapper = mock<QRCodeMapper>()
+    private val getExportMasterKeyUseCase = mock<GetExportMasterKeyUseCase>()
+    private val setMasterKeyExportedUseCase = mock<SetMasterKeyExportedUseCase>()
 
     @Before
     fun setup() {
@@ -47,13 +54,35 @@ internal class TwoFactorAuthenticationViewModelTest {
             isMasterKeyExported,
             getMultiFactorAuthCode,
             getCurrentUserEmail,
-            qrCodeMapper
+            qrCodeMapper,
+            getExportMasterKeyUseCase,
+            setMasterKeyExportedUseCase
         )
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `test that setMasterKeyExported should not be called when recovery key is empty and vice versa`() {
+        val fakeRC = "kgQLOWMHGsdWq873562"
+
+        fun verify(key: String?, expectedInvocation: Int) = runTest {
+            whenever(getExportMasterKeyUseCase()).thenReturn(key)
+
+            underTest.getRecoveryKey()
+
+            advanceUntilIdle()
+
+            verify(setMasterKeyExportedUseCase, times(expectedInvocation))
+                .invoke()
+        }
+
+        verify(key = null, expectedInvocation = 0)
+        verify(key = fakeRC, expectedInvocation = 1)
+
     }
 
     @Test

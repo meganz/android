@@ -289,13 +289,6 @@ class AccountController @Inject constructor(
     }
 
     companion object {
-        @JvmStatic
-        fun saveRkToFileSystem(activity: Activity) {
-            val intent = Intent(activity, FileStorageActivity::class.java)
-                .setAction(FileStorageActivity.Mode.PICK_FOLDER.action)
-                .putExtra(FileStorageActivity.EXTRA_SAVE_RECOVERY_KEY, true)
-            activity.startActivityForResult(intent, Constants.REQUEST_DOWNLOAD_FOLDER)
-        }
 
         @Deprecated(
             message = "It has been deprecated in favour of LocalLogoutAppUseCase",

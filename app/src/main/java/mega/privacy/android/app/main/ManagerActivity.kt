@@ -3163,10 +3163,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     markNotificationsSeen(true)
                     openContactLink(intent.getLongExtra(Constants.CONTACT_HANDLE, -1))
                 }
-                Constants.ACTION_RECOVERY_KEY_EXPORTED -> {
-                    Timber.d("ACTION_RECOVERY_KEY_EXPORTED")
-                    exportRecoveryKey()
-                }
                 Constants.ACTION_REQUEST_DOWNLOAD_FOLDER_LOGOUT -> {
                     val parentPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
                     if (parentPath != null) {
@@ -7233,10 +7229,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             checkIfShouldCloseSearchView(oldDrawerItem)
             selectDrawerItem(drawerItem)
         }
-    }
-
-    private fun exportRecoveryKey() {
-        AccountController.saveRkToFileSystem(this)
     }
 
     fun showConfirmationRemoveFromOffline(node: MegaOffline, onConfirmed: Runnable) {
