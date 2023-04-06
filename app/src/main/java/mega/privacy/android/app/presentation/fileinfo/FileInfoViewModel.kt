@@ -507,7 +507,7 @@ class FileInfoViewModel @Inject constructor(
                 getContactItemFromInShareFolder(folderNode = it, skipCache = false)
             }
             val isNodeInRubbish = isNodeInRubbish(typedNode.id.longValue)
-            uiState.copy(
+            uiState.copyWithTypedNode(
                 typedNode = typedNode,
             ).copy(
                 iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
@@ -543,7 +543,7 @@ class FileInfoViewModel @Inject constructor(
         updateState {
             //we need to update the typedNode to get changes, for instance, on outgoing shares
             typedNode = getNodeById(typedNode.id)
-            it.copy(
+            it.copyWithTypedNode(
                 typedNode = typedNode
             ).copy(
                 iconResource = getNodeIcon(typedNode, _uiState.value.origin.fromShares),
@@ -565,14 +565,14 @@ class FileInfoViewModel @Inject constructor(
         updateState {
             //we need to update the typedNode to get changes in timeStamps
             typedNode = getNodeById(typedNode.id)
-            it.copy(typedNode = typedNode)
+            it.copyWithTypedNode(typedNode = typedNode)
         }
     }
 
     private fun updateFolderTreeInfo() {
         (typedNode as? TypedFolderNode)?.let { folder ->
             updateState {
-                it.copy(folderTreeInfo = getFolderTreeInfo(folder))
+                it.copyWithFolderTreeInfo(folderTreeInfo = getFolderTreeInfo(folder))
             }
         }
     }
@@ -603,7 +603,7 @@ class FileInfoViewModel @Inject constructor(
     private fun updateTitle() {
         updateState {
             typedNode = getNodeById(typedNode.id)
-            it.copy(typedNode = typedNode)
+            it.copyWithTypedNode(typedNode = typedNode)
         }
     }
 

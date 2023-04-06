@@ -8,7 +8,6 @@ import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.TypedFileNode
-import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import nz.mega.sdk.MegaShare
@@ -84,16 +83,14 @@ data class FileInfoViewState(
     /**
      * Creates a copy of this view state with the info that can be extracted directly from typedNode
      */
-    fun copy(typedNode: TypedNode) = this.copy(
+    fun copyWithTypedNode(typedNode: TypedNode) = this.copy(
         title = typedNode.name,
         isFile = typedNode is FileNode,
-        sizeInBytes = folderTreeInfo?.let {
-            it.totalCurrentSizeInBytes + it.sizeOfPreviousVersionsInBytes
-        } ?: (typedNode as? FileNode)?.size ?: 0,
-        isAvailableOfflineAvailable = if (typedNode is TypedFolderNode) {
-            (folderTreeInfo?.numberOfFiles ?: 0) > 0
-        } else {
+        sizeInBytes = (typedNode as? FileNode)?.size ?: this.sizeInBytes,
+        isAvailableOfflineAvailable = if (typedNode is FileNode) {
             true
+        } else {
+            this.isAvailableOfflineAvailable
         },
         isTakenDown = typedNode.isTakenDown,
         isExported = typedNode.exportedData != null,
@@ -103,6 +100,15 @@ data class FileInfoViewState(
         creationTime = typedNode.creationTime,
         modificationTime = (typedNode as? TypedFileNode)?.modificationTime,
         hasPreview = (typedNode as? TypedFileNode)?.hasPreview == true
+    )
+
+    /**
+     * Creates a copy of this view state with the info that can be extracted directly from folderTreeInfo
+     */
+    fun copyWithFolderTreeInfo(folderTreeInfo: FolderTreeInfo) = this.copy(
+        folderTreeInfo = folderTreeInfo,
+        sizeInBytes = folderTreeInfo.totalCurrentSizeInBytes + folderTreeInfo.sizeOfPreviousVersionsInBytes,
+        isAvailableOfflineAvailable = folderTreeInfo.numberOfFiles > 0,
     )
 
     /**
