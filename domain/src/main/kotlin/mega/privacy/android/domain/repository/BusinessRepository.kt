@@ -20,4 +20,11 @@ interface BusinessRepository {
      * false if inactive or if the user is not under a Business Account
      */
     suspend fun isBusinessAccountActive(): Boolean
+
+    /**
+     * Checks whether the user's Account is a master business account
+     *
+     * @return True if the user's account is a master business account
+     */
+    suspend fun isMasterBusinessAccount(): Boolean
 }

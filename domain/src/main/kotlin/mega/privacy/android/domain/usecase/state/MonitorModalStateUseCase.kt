@@ -1,12 +1,16 @@
 package mega.privacy.android.domain.usecase.state
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.state.ModalState
 import mega.privacy.android.domain.entity.verification.UnVerified
+import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
@@ -26,6 +30,7 @@ class MonitorModalStateUseCase @Inject constructor(
     private val monitorStorageStateEventUseCase: MonitorStorageStateEventUseCase,
     private val isFirstLaunchUseCase: IsFirstLaunchUseCase,
     private val requireTwoFactorAuthenticationUseCase: RequireTwoFactorAuthenticationUseCase,
+    private val businessRepository: BusinessRepository,
 ) {
     /**
      * Invoke
@@ -44,51 +49,100 @@ class MonitorModalStateUseCase @Inject constructor(
         newAccountState: StateFlow<Boolean>,
         getUpgradeAccount: () -> Boolean?,
         getAccountType: () -> Int?,
-    ): Flow<ModalState?> {
-        return combine(
-            monitorVerificationStatus()
-                .map { it is UnVerified && it.canRequestOptInVerification },
-            monitorStorageStateEventUseCase().map { it.storageState },
-            firsLoginState,
-            askPermissionState,
-            newAccountState,
-        ) { canVerify, storageState, newLogin, askPermissions, isNewAccount ->
-
-            val update = determineUpgradeRequiredState(
-                storageState,
-                newLogin,
-                getUpgradeAccount,
-                getAccountType,
-            )
+    ): Flow<ModalState> {
+        return flow {
+            val newLogin = firsLoginState.value
             val firstLaunch = isFirstLaunchUseCase()
+            val isNewAccount = newAccountState.value
+            val askPermissions = askPermissionState.value
             val freshLogin = newLogin || firstLaunch
 
-            when {
-                update != null -> {
-                    update
-                }
-                requireTwoFactorAuthenticationUseCase(
-                    newAccount = newLogin,
-                    firstLogin = isNewAccount
-                ) -> {
-                    ModalState.RequestTwoFactorAuthentication
-                }
-                requiresPhoneVerification(
-                    isFreshLogin = freshLogin,
-                    shouldRequestPermissions = askPermissions,
-                    isNewAccount = isNewAccount,
-                    canVerify = canVerify,
-                ) -> {
-                    ModalState.VerifyPhoneNumber
-                }
-                firstLaunch || askPermissions -> {
-                    ModalState.RequestInitialPermissions
-                }
-                newLogin -> ModalState.FirstLogin
-                else -> {
-                    null
-                }
+            checkBusinessStatus(newLogin)
+            checkUpgradeRequiredStatus(newLogin, getUpgradeAccount, getAccountType)
+            checkTwoFactorAuthenticationsStatus(
+                newLogin,
+                isNewAccount,
+            )
+            checkPhoneVerificationStatus(freshLogin, askPermissions, isNewAccount)
+            checkInitialPermissionStatus(firstLaunch, askPermissions)
+
+            if (newLogin) {
+                emit(ModalState.FirstLogin)
             }
+        }
+
+    }
+
+    private suspend fun FlowCollector<ModalState>.checkBusinessStatus(
+        newLogin: Boolean,
+    ) {
+        val businessAccountStatus = businessRepository.getBusinessStatus()
+        if (newLogin && businessAccountStatus == BusinessAccountStatus.Expired) {
+            emit(ModalState.ExpiredBusinessAccount)
+        }
+
+        if (newLogin && businessAccountStatus == BusinessAccountStatus.GracePeriod && businessRepository.isMasterBusinessAccount()) {
+            emit(ModalState.ExpiredBusinessAccountGracePeriod)
+        }
+    }
+
+    private suspend fun FlowCollector<ModalState>.checkInitialPermissionStatus(
+        firstLaunch: Boolean,
+        askPermissions: Boolean,
+    ) {
+        if (firstLaunch || askPermissions) {
+            emit(ModalState.RequestInitialPermissions)
+        }
+    }
+
+    private suspend fun FlowCollector<ModalState>.checkUpgradeRequiredStatus(
+        newLogin: Boolean,
+        getUpgradeAccount: () -> Boolean?,
+        getAccountType: () -> Int?,
+    ) {
+        val storageState = monitorStorageStateEventUseCase().value.storageState
+        val upgradeAccount: Boolean =
+            getUpgradeAccount() ?: return
+        val accountType: Int =
+            getAccountType() ?: free
+        when {
+            upgradeAccount && accountType != free -> {
+                emit(ModalState.UpgradeRequired(accountType))
+            }
+            upgradeAccount && newLogin && storageState == StorageState.PayWall -> {
+                emit(ModalState.UpgradeRequired(null))
+            }
+        }
+    }
+
+    private suspend fun FlowCollector<ModalState>.checkPhoneVerificationStatus(
+        freshLogin: Boolean,
+        askPermissions: Boolean,
+        isNewAccount: Boolean,
+    ) {
+        val canVerify = monitorVerificationStatus()
+            .map { it is UnVerified && it.canRequestOptInVerification }.first()
+        if (requiresPhoneVerification(
+                isFreshLogin = freshLogin,
+                shouldRequestPermissions = askPermissions,
+                isNewAccount = isNewAccount,
+                canVerify = canVerify,
+            )
+        ) {
+            emit(ModalState.VerifyPhoneNumber)
+        }
+    }
+
+    private suspend fun FlowCollector<ModalState>.checkTwoFactorAuthenticationsStatus(
+        newLogin: Boolean,
+        isNewAccount: Boolean,
+    ) {
+        if (requireTwoFactorAuthenticationUseCase(
+                newAccount = newLogin,
+                firstLogin = isNewAccount
+            )
+        ) {
+            emit(ModalState.RequestTwoFactorAuthentication)
         }
     }
 
@@ -99,28 +153,6 @@ class MonitorModalStateUseCase @Inject constructor(
         canVerify: Boolean,
     ) = (isFreshLogin || shouldRequestPermissions) && (!isNewAccount && canVerify)
 
-    private fun determineUpgradeRequiredState(
-        storageState: StorageState,
-        firstLogin: Boolean,
-        getUpgradeAccount: () -> Boolean?,
-        getAccountType: () -> Int?,
-    ): ModalState.UpgradeRequired? {
-        val upgradeAccount: Boolean =
-            getUpgradeAccount() ?: return null
-        val accountType: Int =
-            getAccountType() ?: free
-        return when {
-            upgradeAccount && accountType != free -> {
-                ModalState.UpgradeRequired(accountType)
-            }
-            upgradeAccount && firstLogin && storageState == StorageState.PayWall -> {
-                ModalState.UpgradeRequired(null)
-            }
-            else -> {
-                null
-            }
-        }
-    }
 
     private val free = 0
 }

@@ -10,6 +10,7 @@ sealed interface ModalState {
      * Upgrade required
      *
      * @property accountType
+     * @constructor Create empty Upgrade required
      */
     data class UpgradeRequired(val accountType: Int?) : ModalState
 
@@ -28,9 +29,18 @@ sealed interface ModalState {
      */
     object RequestTwoFactorAuthentication : ModalState
 
-
     /**
      * FirstLogin
      */
     object FirstLogin : ModalState
+
+    /**
+     * ExpiredBusinessAccountGracePeriod
+     */
+    object ExpiredBusinessAccountGracePeriod : ModalState
+
+    /**
+     * ExpiredBusinessAccount
+     */
+    object ExpiredBusinessAccount : ModalState
 }

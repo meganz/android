@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.usecase.state
 
+import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -8,16 +9,18 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.state.ModalState
 import mega.privacy.android.domain.entity.verification.UnVerified
 import mega.privacy.android.domain.entity.verification.VerificationStatus
 import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
+import mega.privacy.android.domain.repository.BusinessRepository
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.environment.IsFirstLaunchUseCase
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -46,26 +49,30 @@ class MonitorModalStateUseCaseTest {
     private val isFirstLaunchUseCase =
         mock<IsFirstLaunchUseCase> { onBlocking { invoke() }.thenReturn(false) }
 
-    private val requiresTwoFactorAuthentication = mock<RequireTwoFactorAuthenticationUseCase>()
+    private val requiresTwoFactorAuthentication = mock<RequireTwoFactorAuthenticationUseCase> {
+        onBlocking { invoke(any(), any()) }.thenReturn(false)
+    }
 
     private val firsLoginState = MutableStateFlow(false)
     private val askPermissionState = MutableStateFlow(false)
     private val newAccountState = MutableStateFlow(false)
     private val getUpgradeAccount: () -> Boolean? = mock()
     private val getAccountType: () -> Int? = mock()
+    private val businessRepository = mock<BusinessRepository>()
 
-    @Before
+    @BeforeEach
     fun setUp() {
         underTest = MonitorModalStateUseCase(
             monitorVerificationStatus = { monitorVerificationStatus },
             monitorStorageStateEventUseCase = monitorStorageState,
             isFirstLaunchUseCase = isFirstLaunchUseCase,
             requireTwoFactorAuthenticationUseCase = requiresTwoFactorAuthentication,
+            businessRepository = businessRepository,
         )
     }
 
     @Test
-    fun `test that modal state is VerifyPhoneNumber if unverified and canRequestOptInVerification is true`() {
+    internal fun `test that modal state is VerifyPhoneNumber if unverified and canRequestOptInVerification is true`() {
         runTest {
             setSavedStateVariables(firstLogin = true)
             requiresTwoFactorAuthentication.stub {
@@ -87,12 +94,13 @@ class MonitorModalStateUseCaseTest {
                 getAccountType = getAccountType,
             ).test {
                 assertThat(awaitItem()).isEqualTo(ModalState.VerifyPhoneNumber)
+                cancelAndConsumeRemainingEvents()
             }
         }
     }
 
     @Test
-    fun `test that modal state is not VerifyPhoneNumber if a phone number has already been verified`() =
+    internal fun `test that modal state is not VerifyPhoneNumber if a phone number has already been verified`() =
         runTest {
             requiresTwoFactorAuthentication.stub {
                 onBlocking { invoke(any(), any()) }.thenReturn(false)
@@ -114,12 +122,12 @@ class MonitorModalStateUseCaseTest {
                 getUpgradeAccount = getUpgradeAccount,
                 getAccountType = getAccountType,
             ).test {
-                assertThat(awaitItem()).isNotEqualTo(ModalState.VerifyPhoneNumber)
+                awaitComplete()
             }
         }
 
     @Test
-    fun `test that a non free account requiring update returns require update modal state with the account type id`() =
+    internal fun `test that a non free account requiring update returns require update modal state with the account type id`() =
         runTest {
             val expectedAccountType = 3
             setSavedStateVariables(
@@ -140,11 +148,12 @@ class MonitorModalStateUseCaseTest {
                             expectedAccountType
                         )
                     )
+                    awaitComplete()
                 }
         }
 
     @Test
-    fun `test that a free account requiring update, with a storages state of paywall, and on first login, returns require update modal with null account type id`() {
+    internal fun `test that a free account requiring update, with a storages state of paywall, and on first login, returns require update modal with null account type id`() {
         runTest {
             setSavedStateVariables(
                 upgradeAccount = true,
@@ -178,12 +187,13 @@ class MonitorModalStateUseCaseTest {
                 assertThat(awaitItem()).isEqualTo(
                     ModalState.UpgradeRequired(null)
                 )
+                cancelAndConsumeRemainingEvents()
             }
         }
     }
 
     @Test
-    fun `test that if no update is required and two factor is required, two factor required modal is returned`() =
+    internal fun `test that if no update is required and two factor is required, two factor required modal is returned`() =
         runTest {
             setSavedStateVariables()
             requiresTwoFactorAuthentication.stub {
@@ -200,11 +210,12 @@ class MonitorModalStateUseCaseTest {
                 assertThat(awaitItem()).isEqualTo(
                     ModalState.RequestTwoFactorAuthentication
                 )
+                awaitComplete()
             }
         }
 
     @Test
-    fun `test that verify phone number modal is returned for a non new account on first launch `() =
+    internal fun `test that verify phone number modal is returned for a non new account on first launch `() =
         runTest {
             setSavedStateVariables(newAccount = false)
             isFirstLaunchUseCase.stub { onBlocking { invoke() }.thenReturn(true) }
@@ -229,11 +240,12 @@ class MonitorModalStateUseCaseTest {
                 assertThat(awaitItem()).isEqualTo(
                     ModalState.VerifyPhoneNumber
                 )
+                cancelAndConsumeRemainingEvents()
             }
         }
 
     @Test
-    fun `test that verify phone number modal is returned for a non new account on first login `() =
+    internal fun `test that verify phone number modal is returned for a non new account on first login `() =
         runTest {
             setSavedStateVariables(
                 newAccount = false,
@@ -261,11 +273,12 @@ class MonitorModalStateUseCaseTest {
                 assertThat(awaitItem()).isEqualTo(
                     ModalState.VerifyPhoneNumber
                 )
+                cancelAndConsumeRemainingEvents()
             }
         }
 
     @Test
-    fun `test that verify phone number modal is returned for a non new account when ask permission is true `() =
+    internal fun `test that verify phone number modal is returned for a non new account when ask permission is true `() =
         runTest {
             setSavedStateVariables(
                 newAccount = false,
@@ -293,11 +306,12 @@ class MonitorModalStateUseCaseTest {
                 assertThat(awaitItem()).isEqualTo(
                     ModalState.VerifyPhoneNumber
                 )
+                cancelAndConsumeRemainingEvents()
             }
         }
 
     @Test
-    fun `test that request permission modal state is returned and drawer item set to ASK_PERMISSIONS if first launch but can verify phone is false`() =
+    internal fun `test that request permission modal state is returned and drawer item set to ASK_PERMISSIONS if first launch but can verify phone is false`() =
         runTest {
             setSavedStateVariables(
                 newAccount = false,
@@ -326,11 +340,12 @@ class MonitorModalStateUseCaseTest {
                 assertThat(state).isEqualTo(
                     ModalState.RequestInitialPermissions
                 )
+                awaitComplete()
             }
         }
 
     @Test
-    fun `test that request permission modal state is returned and drawer item set to ASK_PERMISSIONS if first launch and a new account`() =
+    internal fun `test that request permission modal state is returned and drawer item set to ASK_PERMISSIONS if first launch and a new account`() =
         runTest {
             setSavedStateVariables(
                 newAccount = true,
@@ -359,11 +374,12 @@ class MonitorModalStateUseCaseTest {
                 assertThat(state).isEqualTo(
                     ModalState.RequestInitialPermissions
                 )
+                awaitComplete()
             }
         }
 
     @Test
-    fun `test that request permission modal state is returned and drawer item set to ASK_PERMISSIONS if askPermission is true and new account is true`() =
+    internal fun `test that request permission modal state is returned and drawer item set to ASK_PERMISSIONS if askPermission is true and new account is true`() =
         runTest {
             setSavedStateVariables(
                 newAccount = true,
@@ -392,11 +408,12 @@ class MonitorModalStateUseCaseTest {
                 assertThat(state).isEqualTo(
                     ModalState.RequestInitialPermissions
                 )
+                awaitComplete()
             }
         }
 
     @Test
-    fun `test that first login modal state is returned if no other saved instance values are set and can verify us false`() =
+    internal fun `test that first login modal state is returned if no other saved instance values are set and can verify us false`() =
         runTest {
             setSavedStateVariables(
                 firstLogin = true,
@@ -424,6 +441,72 @@ class MonitorModalStateUseCaseTest {
                 assertThat(state).isEqualTo(
                     ModalState.FirstLogin
                 )
+                awaitComplete()
+            }
+        }
+
+    @Test
+    internal fun `test that expired business status is returned on first login if business account status is expired`() =
+        runTest {
+            businessRepository.stub {
+                onBlocking { getBusinessStatus() }.thenReturn(BusinessAccountStatus.Expired)
+            }
+            setSavedStateVariables(firstLogin = true)
+            underTest(
+                firsLoginState = firsLoginState,
+                askPermissionState = askPermissionState,
+                newAccountState = newAccountState,
+                getUpgradeAccount = getUpgradeAccount,
+                getAccountType = getAccountType,
+            ).test {
+                val state = awaitItem()
+                assertThat(state).isEqualTo(
+                    ModalState.ExpiredBusinessAccount
+                )
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    internal fun `test that expired business account grace period status is returned on first login if status is grace period and account is master business account`() =
+        runTest {
+            businessRepository.stub {
+                onBlocking { getBusinessStatus() }.thenReturn(BusinessAccountStatus.GracePeriod)
+                onBlocking { isMasterBusinessAccount() }.thenReturn(true)
+            }
+            setSavedStateVariables(firstLogin = true)
+            underTest(
+                firsLoginState = firsLoginState,
+                askPermissionState = askPermissionState,
+                newAccountState = newAccountState,
+                getUpgradeAccount = getUpgradeAccount,
+                getAccountType = getAccountType,
+            ).test {
+                val state = awaitItem()
+                assertThat(state).isEqualTo(
+                    ModalState.ExpiredBusinessAccountGracePeriod
+                )
+                cancelAndConsumeRemainingEvents()
+            }
+        }
+
+    @Test
+    internal fun `test that expired business account grace period status is NOT returned if account is not master business account`() =
+        runTest {
+            businessRepository.stub {
+                onBlocking { getBusinessStatus() }.thenReturn(BusinessAccountStatus.GracePeriod)
+                onBlocking { isMasterBusinessAccount() }.thenReturn(false)
+            }
+            setSavedStateVariables(firstLogin = true)
+            underTest(
+                firsLoginState = firsLoginState,
+                askPermissionState = askPermissionState,
+                newAccountState = newAccountState,
+                getUpgradeAccount = getUpgradeAccount,
+                getAccountType = getAccountType,
+            ).test {
+                val events = cancelAndConsumeRemainingEvents()
+                assertThat(events).doesNotContain(Event.Item(ModalState.ExpiredBusinessAccountGracePeriod))
             }
         }
 
