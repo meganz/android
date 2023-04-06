@@ -10,7 +10,6 @@ import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
-import mega.privacy.android.domain.entity.user.BusinessStatus
 import mega.privacy.android.domain.entity.user.UserCredentials
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.exception.MegaException
@@ -93,13 +92,6 @@ interface AccountRepository {
      * @param disconnect True if should disconnect megaChatApi, false otherwise.
      */
     suspend fun retryPendingConnections(disconnect: Boolean)
-
-
-    /**
-     * Get the status of a business account.
-     * @return Returns the business account status as [BusinessStatus]
-     * */
-    suspend fun getBusinessAccountStatus(): BusinessStatus?
 
     /**
      * Get the List of SubscriptionOptions

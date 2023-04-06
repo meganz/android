@@ -8,7 +8,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.facade.AccountInfoWrapper
-import mega.privacy.android.data.fake.userAccount
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
@@ -30,10 +29,8 @@ import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.mapper.toAccountType
-import mega.privacy.android.data.mapper.user.BusinessStatusMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.repository.account.DefaultAccountRepository
-import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyPoint
@@ -79,7 +76,7 @@ class DefaultAccountRepositoryTest {
     private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val megaApiFolderGateway = mock<MegaApiFolderGateway>()
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
-    private val userAccountMapper = mock<UserAccountMapper>()
+    private val userAccountMapper = UserAccountMapper()
     private val accountTypeMapper = mock<AccountTypeMapper>()
     private val currencyMapper = ::Currency
     private val subscriptionOptionListMapper = mock<SubscriptionOptionListMapper>()
@@ -93,8 +90,6 @@ class DefaultAccountRepositoryTest {
     private val accountPreferencesGateway = mock<AccountPreferencesGateway>()
     private val cacheFolderGateway = mock<CacheFolderGateway>()
     private val passwordStrengthMapper = mock<PasswordStrengthMapper>()
-    private val businessStatusMapper = mock<BusinessStatusMapper>()
-
     private val myAccountCredentialsMapper = mock<MyAccountCredentialsMapper>()
 
     private val pricing = mock<MegaPricing> {
@@ -152,7 +147,6 @@ class DefaultAccountRepositoryTest {
             cacheFolderGateway = cacheFolderGateway,
             passwordStrengthMapper = passwordStrengthMapper,
             appEventGateway = appEventGateway,
-            businessStatusMapper = businessStatusMapper
         )
 
         whenever(megaChatApiGateway.getMyEmail()).thenReturn(mockEmail)
@@ -162,32 +156,13 @@ class DefaultAccountRepositoryTest {
     fun `test that get account does not throw exception if email is null`() = runTest {
         val expectedUserIdObj = null
         val expectedAccountTypeString = "Free"
-        val expectedName = "Name"
-        val expectedAccountType = null
 
         whenever(accountInfoWrapper.accountTypeId).thenReturn(-1)
         megaApiGateway.stub {
             onBlocking { isMasterBusinessAccount() }.thenReturn(false)
             onBlocking { getLoggedInUser() }.thenReturn(expectedUserIdObj)
-            onBlocking { isBusinessAccount }.thenReturn(false)
-            onBlocking { isAchievementsEnabled }.thenReturn(false)
         }
         whenever(accountInfoWrapper.accountTypeString).thenReturn(expectedAccountTypeString)
-        whenever(megaChatApiGateway.getMyFullname()).thenReturn(expectedName)
-        whenever(accountTypeMapper(any())).thenReturn(expectedAccountType)
-
-        whenever(
-            userAccountMapper(
-                userId = expectedUserIdObj,
-                email = mockEmail,
-                fullName = expectedName,
-                isBusinessAccount = false,
-                isMasterBusinessAccount = false,
-                accountTypeIdentifier = expectedAccountType,
-                accountTypeString = expectedAccountTypeString,
-                isAchievementsEnabled = false
-            )
-        ).thenReturn(mock())
 
         assertThat(underTest.getUserAccount()).isNotNull()
     }
@@ -197,32 +172,13 @@ class DefaultAccountRepositoryTest {
         val expectedUserId = 4L
         val expectedUserIdObj = UserId(expectedUserId)
         val expectedAccountTypeString = "Free"
-        val expectedName = "Name"
-        val expectedAccountType = null
 
         val user = mock<MegaUser> { on { handle }.thenReturn(expectedUserId) }
         megaApiGateway.stub {
             onBlocking { isMasterBusinessAccount() }.thenReturn(false)
             onBlocking { getLoggedInUser() }.thenReturn(user)
-            onBlocking { isBusinessAccount }.thenReturn(false)
-            onBlocking { isAchievementsEnabled }.thenReturn(false)
         }
         whenever(accountInfoWrapper.accountTypeString).thenReturn(expectedAccountTypeString)
-        whenever(megaChatApiGateway.getMyFullname()).thenReturn(expectedName)
-        whenever(accountTypeMapper(any())).thenReturn(expectedAccountType)
-
-        whenever(
-            userAccountMapper(
-                userId = expectedUserIdObj,
-                email = mockEmail,
-                fullName = expectedName,
-                isBusinessAccount = false,
-                isMasterBusinessAccount = false,
-                accountTypeIdentifier = expectedAccountType,
-                accountTypeString = expectedAccountTypeString,
-                isAchievementsEnabled = false
-            )
-        ).thenReturn(userAccount(expectedUserIdObj))
 
         assertThat(underTest.getUserAccount().userId).isEqualTo(expectedUserIdObj)
     }

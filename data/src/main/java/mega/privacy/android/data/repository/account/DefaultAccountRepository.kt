@@ -44,7 +44,6 @@ import mega.privacy.android.data.mapper.changepassword.PasswordStrengthMapper
 import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
-import mega.privacy.android.data.mapper.user.BusinessStatusMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
@@ -52,7 +51,6 @@ import mega.privacy.android.domain.entity.account.AccountDetail
 import mega.privacy.android.domain.entity.achievement.AchievementType
 import mega.privacy.android.domain.entity.achievement.AchievementsOverview
 import mega.privacy.android.domain.entity.achievement.MegaAchievement
-import mega.privacy.android.domain.entity.user.BusinessStatus
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.exception.ChangeEmailException
 import mega.privacy.android.domain.exception.ChatNotInitializedErrorStatus
@@ -128,7 +126,6 @@ internal class DefaultAccountRepository @Inject constructor(
     private val cacheFolderGateway: CacheFolderGateway,
     private val accountPreferencesGateway: AccountPreferencesGateway,
     private val passwordStrengthMapper: PasswordStrengthMapper,
-    private val businessStatusMapper: BusinessStatusMapper,
     private val appEventGateway: AppEventGateway,
 ) : AccountRepository {
     override suspend fun getUserAccount(): UserAccount = withContext(ioDispatcher) {
@@ -267,10 +264,6 @@ internal class DefaultAccountRepository @Inject constructor(
                 )
             }
         }
-
-    override suspend fun getBusinessAccountStatus(): BusinessStatus? = withContext(ioDispatcher) {
-        businessStatusMapper(megaApiGateway.businessStatus)
-    }
 
     override suspend fun getSubscriptionOptions(): List<SubscriptionOption> =
         withContext(ioDispatcher) {
