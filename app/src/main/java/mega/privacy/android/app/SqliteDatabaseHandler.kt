@@ -4349,6 +4349,12 @@ class SqliteDatabaseHandler(
         }
     }
 
+    override val cuBackupID: Long?
+        get() = cuBackup?.backupId
+
+    override val muBackupID: Long?
+        get() = muBackup?.backupId
+
     override val cuBackup: Backup?
         get() = getBackupByType(MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS)
     override val muBackup: Backup?

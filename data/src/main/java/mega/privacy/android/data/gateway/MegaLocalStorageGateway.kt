@@ -717,4 +717,17 @@ interface MegaLocalStorageGateway {
      * @return [Int] the number of rows effected
      */
     suspend fun setContactNickName(nickName: String, handle: Long): Int
+
+    /**
+     * Get Camera upload Backup ID
+     * @return [Long]
+     */
+    suspend fun getCuBackUpId(): Long?
+
+
+    /**
+     * Get Media upload Backup ID
+     * @return [Long]
+     */
+    suspend fun getMuBackUpId(): Long?
 }

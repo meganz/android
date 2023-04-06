@@ -2170,4 +2170,41 @@ interface MegaApiGateway {
      * @param listener MegaRequestListener to track this request
      */
     fun removeContact(user: MegaUser, listener: MegaRequestListenerInterface?)
+
+    /**
+     * @param backupId backup id identifying the backup
+     * @param status   backup state
+     * @param progress backup progress
+     * @param ups      Number of pending upload transfers
+     * @param downs    Number of pending download transfers
+     * @param ts       Last action timestamp
+     * @param lastNode Last node handle to be synced
+     * @param listener MegaRequestListener to track this request
+     *                 Send heartbeat associated with an existing backup
+     *                 <p>
+     *                 The client should call this method regularly for every registered backup, in order to
+     *                 inform about the status of the backup.
+     *                 <p>
+     *                 Progress, last timestamp and last node are not always meaningful (ie. when the Camera
+     *                 Uploads starts a new batch, there isn't a last node, or when the CU up to date and
+     *                 inactive for long time, the progress doesn't make sense). In consequence, these parameters
+     *                 are optional. They will not be sent to API if they take the following values:
+     *                 - lastNode = INVALID_HANDLE
+     *                 - lastTs = -1
+     *                 - progress = -1
+     *                 <p>
+     *                 The associated request type with this request is MegaRequest::TYPE_BACKUP_PUT_HEART_BEAT
+     *                 Valid data in the MegaRequest object received on callbacks:
+     *                 - MegaRequest::getParentHandle - Returns the backupId
+     *                 - MegaRequest::getAccess - Returns the backup state
+     *                 - MegaRequest::getNumDetails - Returns the backup substate
+     *                 - MegaRequest::getParamType - Returns the number of pending upload transfers
+     *                 - MegaRequest::getTransferTag - Returns the number of pending download transfers
+     *                 - MegaRequest::getNumber - Returns the last action timestamp
+     *                 - MegaRequest::getNodeHandle - Returns the last node handle to be synced
+     */
+    fun sendBackupHeartbeat(
+        backupId: Long, status: Int, progress: Int, ups: Int, downs: Int,
+        ts: Long, lastNode: Long, listener: MegaRequestListenerInterface?,
+    )
 }

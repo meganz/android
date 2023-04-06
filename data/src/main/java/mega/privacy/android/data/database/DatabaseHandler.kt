@@ -17,6 +17,20 @@ interface DatabaseHandler {
         const val MAX_TRANSFERS = 100
     }
 
+    /**
+     * Camera upload backup ID
+     *
+     * @return [Long].
+     */
+    val cuBackupID: Long?
+
+    /**
+     * Media upload backup id
+     *
+     *   @return [Long].
+     */
+    val muBackupID: Long?
+
     val myEmail: String?
 
     //get the credential of last login
@@ -320,6 +334,6 @@ interface DatabaseHandler {
      */
     suspend fun getOfflineInformationList(
         nodePath: String,
-        searchQuery: String?
+        searchQuery: String?,
     ): List<OfflineInformation>
 }

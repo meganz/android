@@ -602,4 +602,33 @@ interface CameraUploadRepository {
      *
      */
     suspend fun listenToNewMedia()
+
+    /**
+     * Get Camera upload Backup ID
+     * @return [Long]
+     */
+    suspend fun getCuBackUpId(): Long?
+
+
+    /**
+     * Get Media upload Backup ID
+     * @return [Long]
+     */
+    suspend fun getMuBackUpId(): Long?
+
+
+    /**
+     * Send heartbeat associated with an existing backup
+     * @param backupId backup id identifying the backup
+     * @param status   backup state
+     * @param progress backup progress
+     * @param ups      Number of pending upload transfers
+     * @param downs    Number of pending download transfers
+     * @param ts       Last action timestamp
+     * @param lastNode Last node handle to be synced
+     */
+    suspend fun sendBackupHeartbeat(
+        backupId: Long, status: Int, progress: Int, ups: Int, downs: Int,
+        ts: Long, lastNode: Long,
+    )
 }

@@ -1093,4 +1093,17 @@ internal class MegaApiFacade @Inject constructor(
         listener?.let {
             megaApi.removeContact(user, it)
         } ?: megaApi.removeContact(user)
+
+    override fun sendBackupHeartbeat(
+        backupId: Long,
+        status: Int,
+        progress: Int,
+        ups: Int,
+        downs: Int,
+        ts: Long,
+        lastNode: Long,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.sendBackupHeartbeat(backupId, status, progress, ups, downs, ts, lastNode, listener)
+    }
 }

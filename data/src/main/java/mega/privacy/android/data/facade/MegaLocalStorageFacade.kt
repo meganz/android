@@ -401,6 +401,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setContactNickName(nickName: String, handle: Long) =
         dbHandler.setContactNickname(nickname = nickName, handle = handle)
 
+    override suspend fun getCuBackUpId() = dbHandler.cuBackupID
+
+    override suspend fun getMuBackUpId() = dbHandler.muBackupID
+
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200
     }
