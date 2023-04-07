@@ -61,7 +61,10 @@ class RemoveListener(
                     Intent(BroadcastConstants.BROADCAST_ACTION_SHOW_SNACKBAR).run {
                         putExtra(
                             BroadcastConstants.SNACKBAR_TEXT,
-                            context.getString(R.string.share_left)
+                            context.resources.getQuantityString(
+                                R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success,
+                                1, 1
+                            )
                         )
                         MegaApplication.getInstance().sendBroadcast(this)
                     }
