@@ -5,9 +5,7 @@ import static mega.privacy.android.app.utils.Constants.MULTIPLE_LEAVE_SHARE;
 import static mega.privacy.android.app.utils.Constants.MULTIPLE_SEND_RUBBISH;
 import static mega.privacy.android.app.utils.DBUtil.resetAccountDetailsTimeStamp;
 import static mega.privacy.android.app.utils.Util.showSnackbar;
-
 import android.content.Context;
-
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.megachat.ChatActivity;
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity;
@@ -109,21 +107,21 @@ public class MultipleRequestListener implements MegaRequestListenerInterface {
                                     message = context.getResources().
                                             getQuantityString(
                                                     R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail,
-                                                    error);
+                                                    error, error);
                                 } else {
                                     String correctlyLeft = context.getResources().getQuantityString(
                                             R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success_concat,
-                                            max_items - error);
+                                            max_items - error, max_items - error);
                                     String notLeft = context.getResources().getQuantityString(
                                             R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_fail_concat,
-                                            error);
+                                            error, error);
                                     message = correctlyLeft.concat(notLeft);
                                 }
                             }
                         } else {
                             message = context.getResources().
                                     getQuantityString(R.plurals.shared_items_incoming_shares_snackbar_leaving_shares_success,
-                                            max_items);
+                                            max_items, max_items);
                         }
                     }
 
