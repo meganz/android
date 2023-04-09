@@ -585,21 +585,23 @@ class MediaPlayerServiceViewModel @Inject constructor(
             recreateAndUpdatePlaylistItems()
 
             if (thumbnail != null && !thumbnail.exists() && node != null) {
-                if (isMegaApiFolder(type = type)) {
-                    getThumbnailFromMegaApiFolder(nodeHandle = node.id.longValue,
-                        path = thumbnail.absolutePath)?.let { nodeHandle ->
-                        if (nodeHandle == playingHandle) {
-                            postPlayingThumbnail()
+                runCatching {
+                    if (isMegaApiFolder(type = type)) {
+                        getThumbnailFromMegaApiFolder(nodeHandle = node.id.longValue,
+                            path = thumbnail.absolutePath)?.let { nodeHandle ->
+                            if (nodeHandle == playingHandle) {
+                                postPlayingThumbnail()
+                            }
+                        }
+                    } else {
+                        getThumbnailFromMegaApi(nodeHandle = node.id.longValue,
+                            path = thumbnail.absolutePath)?.let { nodeHandle ->
+                            if (nodeHandle == playingHandle) {
+                                postPlayingThumbnail()
+                            }
                         }
                     }
-                } else {
-                    getThumbnailFromMegaApi(nodeHandle = node.id.longValue,
-                        path = thumbnail.absolutePath)?.let { nodeHandle ->
-                        if (nodeHandle == playingHandle) {
-                            postPlayingThumbnail()
-                        }
-                    }
-                }
+                }.onFailure { Timber.e(it) }
             } else {
                 postPlayingThumbnail()
             }
@@ -739,21 +741,23 @@ class MediaPlayerServiceViewModel @Inject constructor(
         if (nodesWithoutThumbnail.isNotEmpty() && monitorConnectivityUseCase().value) {
             sharingScope.launch(ioDispatcher) {
                 nodesWithoutThumbnail.map {
-                    if (isMegaApiFolder(type = type)) {
-                        getThumbnailFromMegaApiFolder(nodeHandle = it.first,
-                            path = it.second.absolutePath)?.let { nodeHandle ->
-                            if (nodeHandle == playingHandle) {
-                                postPlayingThumbnail()
+                    runCatching {
+                        if (isMegaApiFolder(type = type)) {
+                            getThumbnailFromMegaApiFolder(nodeHandle = it.first,
+                                path = it.second.absolutePath)?.let { nodeHandle ->
+                                if (nodeHandle == playingHandle) {
+                                    postPlayingThumbnail()
+                                }
+                            }
+                        } else {
+                            getThumbnailFromMegaApi(nodeHandle = it.first,
+                                path = it.second.absolutePath)?.let { nodeHandle ->
+                                if (nodeHandle == playingHandle) {
+                                    postPlayingThumbnail()
+                                }
                             }
                         }
-                    } else {
-                        getThumbnailFromMegaApi(nodeHandle = it.first,
-                            path = it.second.absolutePath)?.let { nodeHandle ->
-                            if (nodeHandle == playingHandle) {
-                                postPlayingThumbnail()
-                            }
-                        }
-                    }
+                    }.onFailure { Timber.e(it) }
                 }
             }
         }
