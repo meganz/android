@@ -262,4 +262,8 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override val cacheDir: File
         get() = cacheFolderGateway.cacheDir
+
+    override suspend fun getFingerprint(filePath: String) = withContext(ioDispatcher) {
+        megaApiGateway.getFingerprint(filePath)
+    }
 }

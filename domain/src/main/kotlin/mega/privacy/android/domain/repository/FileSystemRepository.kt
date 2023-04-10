@@ -118,4 +118,12 @@ interface FileSystemRepository {
      * Returns cache directory of the app
      */
     val cacheDir: File
+
+    /**
+     * Get the fingerprint of a file by path
+     *
+     * @param filePath file path
+     * @return fingerprint
+     */
+    suspend fun getFingerprint(filePath: String): String?
 }
