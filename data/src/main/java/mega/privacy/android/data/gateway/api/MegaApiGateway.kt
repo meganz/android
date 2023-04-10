@@ -36,6 +36,11 @@ interface MegaApiGateway {
     fun getInvalidHandle(): Long
 
     /**
+     * Get Invalid Backup type
+     */
+    fun getInvalidBackupType(): Int
+
+    /**
      * Is Multi factor auth available
      *
      * @return true if available, else false
@@ -2206,5 +2211,48 @@ interface MegaApiGateway {
     fun sendBackupHeartbeat(
         backupId: Long, status: Int, progress: Int, ups: Int, downs: Int,
         ts: Long, lastNode: Long, listener: MegaRequestListenerInterface?,
+    )
+
+    /**
+     * @param backupId    backup id identifying the backup to be updated
+     * @param backupType  back up type requested for the service
+     * @param targetNode  MEGA folder to hold the backups
+     * @param localFolder Local path of the folder
+     * @param state       backup state
+     * @param subState    backup subState
+     * @param listener    MegaRequestListener to track this request
+     *                    Update the information about a registered backup for Backup Centre
+     *                    <p>
+     *                    Possible types of backups:
+     *                    BACKUP_TYPE_INVALID = -1,
+     *                    BACKUP_TYPE_CAMERA_UPLOADS = 3,
+     *                    BACKUP_TYPE_MEDIA_UPLOADS = 4,   // Android has a secondary CU
+     *                    <p>
+     *                    Params that keep the same value are passed with invalid value to avoid to send to the server
+     *                    Invalid values:
+     *                    - type: BACKUP_TYPE_INVALID
+     *                    - nodeHandle: UNDEF
+     *                    - localFolder: nullptr
+     *                    - deviceId: nullptr
+     *                    - state: -1
+     *                    - subState: -1
+     *                    - extraData: nullptr
+     *                    <p>
+     *                    If you want to update the backup name, use \c MegaApi::setBackupName.
+     *                    <p>
+     *                    The associated request type with this request is MegaRequest::TYPE_BACKUP_PUT
+     *                    Valid data in the MegaRequest object received on callbacks:
+     *                    - MegaRequest::getParentHandle - Returns the backupId
+     *                    - MegaRequest::getTotalBytes - Returns the backup type
+     *                    - MegaRequest::getNodeHandle - Returns the target node of the backup
+     *                    - MegaRequest::getFile - Returns the path of the local folder
+     *                    - MegaRequest::getAccess - Returns the backup state
+     *                    - MegaRequest::getNumDetails - Returns the backup substate
+     *                    - MegaRequest::getListener - Returns the MegaRequestListener to track this request
+     */
+    fun updateBackup(
+        backupId: Long, backupType: Int, targetNode: Long, localFolder: String?,
+        backupName: String, state: Int, subState: Int,
+        listener: MegaRequestListenerInterface?,
     )
 }

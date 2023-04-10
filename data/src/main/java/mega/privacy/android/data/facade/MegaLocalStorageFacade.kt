@@ -8,6 +8,7 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
@@ -404,6 +405,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun getCuBackUpId() = dbHandler.cuBackupID
 
     override suspend fun getMuBackUpId() = dbHandler.muBackupID
+
+    override suspend fun getBackupById(id: Long) = dbHandler.getBackupById(id)
+
+    override suspend fun updateBackup(backup: Backup) = dbHandler.updateBackup(backup)
 
     companion object {
         private const val DEFAULT_CONVENTION_QUEUE_SIZE = 200

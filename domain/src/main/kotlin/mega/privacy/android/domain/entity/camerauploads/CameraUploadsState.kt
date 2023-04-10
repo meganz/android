@@ -8,8 +8,8 @@ package mega.privacy.android.domain.entity.camerauploads
  * @param lastSecondaryTimeStamp
  * @param lastPrimaryHandle
  * @param lastSecondaryHandle
- * @param primaryTotalUploadedBytes
- * @param secondaryTotalUploadedBytes
+ * @param primaryTotalUploadBytes
+ * @param secondaryTotalUploadBytes
  * @param totalToUpload
  * @param totalUploaded
  */
@@ -20,8 +20,8 @@ data class CameraUploadsState(
     var lastSecondaryTimeStamp: Long = -1,
     var lastPrimaryHandle: Long = -1,
     var lastSecondaryHandle: Long = -1,
-    var primaryTotalUploadedBytes: Long = 0,
-    val secondaryTotalUploadedBytes: Long = 0,
+    var primaryTotalUploadBytes: Long = 0,
+    var secondaryTotalUploadBytes: Long = 0,
     var totalToUpload: Int = 0,
     var totalUploaded: Int = 0,
 )

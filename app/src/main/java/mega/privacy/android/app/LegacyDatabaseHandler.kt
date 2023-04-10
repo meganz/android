@@ -5,9 +5,9 @@ import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
-import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.utils.contacts.MegaContactGetter
 import mega.privacy.android.data.database.DatabaseHandler
+import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 
 /**
@@ -116,6 +116,4 @@ interface LegacyDatabaseHandler : DatabaseHandler {
     fun findPendingMessagesNotSent(idChat: Long): ArrayList<AndroidMegaChatMessage>
     fun addSDTransfer(transfer: SDTransfer): Long
     fun saveBackup(backup: Backup): Boolean
-    fun getBackupById(id: Long): Backup?
-    fun updateBackup(backup: Backup?)
 }

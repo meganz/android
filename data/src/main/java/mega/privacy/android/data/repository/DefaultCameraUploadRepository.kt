@@ -37,6 +37,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.exception.UnknownException
@@ -95,6 +96,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
 ) : CameraUploadRepository {
 
     override fun getInvalidHandle(): Long = megaApiGateway.getInvalidHandle()
+
+    override fun getInvalidBackupType(): Int = megaApiGateway.getInvalidBackupType()
 
     override suspend fun getPrimarySyncHandle(): Long? = withContext(ioDispatcher) {
         localStorageGateway.getCamSyncHandle()
@@ -635,7 +638,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         downs: Int,
         ts: Long,
         lastNode: Long,
-    ): Unit = withContext(ioDispatcher) {
+    ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
             val listener = continuation.getRequestListener { }
             megaApiGateway.sendBackupHeartbeat(
@@ -652,5 +655,40 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                 megaApiGateway.removeRequestListener(listener)
             }
         }
+    }
+
+    override suspend fun updateBackup(
+        backupId: Long,
+        backupType: Int,
+        targetNode: Long,
+        localFolder: String?,
+        backupName: String,
+        state: Int,
+        subState: Int,
+    ) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = continuation.getRequestListener { it.parentHandle }
+            megaApiGateway.updateBackup(
+                backupId,
+                backupType,
+                targetNode,
+                localFolder,
+                backupName,
+                state,
+                subState,
+                listener,
+            )
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun getBackupById(id: Long) = withContext(ioDispatcher) {
+        localStorageGateway.getBackupById(id)
+    }
+
+    override suspend fun updateLocalBackup(backup: Backup) = withContext(ioDispatcher) {
+        localStorageGateway.updateBackup(backup)
     }
 }

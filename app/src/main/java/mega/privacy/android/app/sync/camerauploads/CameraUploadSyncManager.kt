@@ -10,7 +10,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.KEY_REENABLE_WHICH_
 import mega.privacy.android.app.constants.SettingsConstants
 import mega.privacy.android.app.di.getDbHandler
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
-import mega.privacy.android.app.sync.Backup
 import mega.privacy.android.app.sync.HeartbeatStatus
 import mega.privacy.android.app.utils.CameraUploadUtil
 import mega.privacy.android.app.utils.Constants.INVALID_NON_NULL_VALUE
@@ -20,6 +19,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS
@@ -178,6 +178,9 @@ object CameraUploadSyncManager {
                         backupName = name,
                         state = BackupState.fromValue(access),
                         subState = numDetails,
+                        extraData = INVALID_NON_NULL_VALUE,
+                        targetFolderPath = INVALID_NON_NULL_VALUE
+
                     )
                     Timber.d("Save Backup $backup to local cache.")
                     databaseHandler.saveBackup(backup)
@@ -513,7 +516,6 @@ object CameraUploadSyncManager {
             Timber.w("Invalid sync id, value: $backupId")
             return
         }
-
         megaApi.updateBackup(
             backupId,
             BACKUP_TYPE_INVALID,
@@ -534,15 +536,15 @@ object CameraUploadSyncManager {
             if (error.errorCode == MegaError.API_OK) {
                 // Update local cache
                 with(request) {
-                    val backup = databaseHandler.getBackupById(parentHandle)
-
+                    var backup = databaseHandler.getBackupById(parentHandle)
                     if (backup != null && !backup.outdated) {
-                        backup.apply {
-                            if (nodeHandle != INVALID_HANDLE) this.targetNode = nodeHandle
-                            if (file != null) this.localFolder = file
-                            if (access != INVALID_VALUE) state = BackupState.fromValue(access)
-                            if (name != null) this.backupName = name
-                        }
+                        backup =
+                            backup.copy(
+                                targetNode = if (nodeHandle != INVALID_HANDLE) nodeHandle else backup.targetNode,
+                                localFolder = if (file != null) file else backup.localFolder,
+                                state = if (access != INVALID_VALUE) BackupState.fromValue(access) else backup.state,
+                                backupName = if (name != null) name else backup.backupName
+                            )
                         databaseHandler.updateBackup(backup)
                         Timber.d("Successful callback: update $backup")
                     }

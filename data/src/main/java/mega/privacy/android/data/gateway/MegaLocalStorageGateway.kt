@@ -6,6 +6,7 @@ import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.user.UserCredentials
 
 /**
@@ -730,4 +731,16 @@ interface MegaLocalStorageGateway {
      * @return [Long]
      */
     suspend fun getMuBackUpId(): Long?
+
+    /**
+     * Get upload backup by Id
+     * @return [Backup]
+     */
+    suspend fun getBackupById(id: Long): Backup?
+
+    /**
+     * Update backup
+     * @param backup [Backup]
+     */
+    suspend fun updateBackup(backup: Backup)
 }

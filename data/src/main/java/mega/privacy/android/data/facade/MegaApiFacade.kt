@@ -57,6 +57,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun getInvalidHandle(): Long = MegaApiAndroid.INVALID_HANDLE
 
+    override fun getInvalidBackupType() = MegaApiAndroid.BACKUP_TYPE_INVALID
+
     override fun multiFactorAuthAvailable(): Boolean = megaApi.multiFactorAuthAvailable()
 
     override fun multiFactorAuthEnabled(email: String?, listener: MegaRequestListenerInterface?) {
@@ -1105,5 +1107,27 @@ internal class MegaApiFacade @Inject constructor(
         listener: MegaRequestListenerInterface?,
     ) {
         megaApi.sendBackupHeartbeat(backupId, status, progress, ups, downs, ts, lastNode, listener)
+    }
+
+    override fun updateBackup(
+        backupId: Long,
+        backupType: Int,
+        targetNode: Long,
+        localFolder: String?,
+        backupName: String,
+        state: Int,
+        subState: Int,
+        listener: MegaRequestListenerInterface?,
+    ) {
+        megaApi.updateBackup(
+            backupId,
+            backupType,
+            targetNode,
+            localFolder,
+            backupName,
+            state,
+            subState,
+            listener
+        )
     }
 }

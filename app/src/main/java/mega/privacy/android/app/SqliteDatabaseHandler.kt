@@ -17,8 +17,6 @@ import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
 import mega.privacy.android.app.main.megachat.PendingMessageSingle
 import mega.privacy.android.app.objects.SDTransfer
-import mega.privacy.android.app.sync.Backup
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removePrimaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.removeSecondaryBackup
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.setPrimaryBackup
@@ -42,10 +40,12 @@ import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
@@ -4380,8 +4380,7 @@ class SqliteDatabaseHandler(
 
     override fun setBackupAsOutdated(id: Long) {
         getBackupById(id)?.let { backup ->
-            backup.outdated = true
-            updateBackup(backup)
+            updateBackup(backup.copy(outdated = true))
         }
     }
 
@@ -4463,8 +4462,8 @@ class SqliteDatabaseHandler(
         db.execSQL(deleteSQL(id))
     }
 
-    override fun updateBackup(backup: Backup?) {
-        db.execSQL(updateSQL(backup!!))
+    override fun updateBackup(backup: Backup) {
+        db.execSQL(updateSQL(backup))
     }
 
     override fun clearBackups() {

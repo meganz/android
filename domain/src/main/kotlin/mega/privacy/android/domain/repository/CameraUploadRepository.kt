@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import java.util.Queue
 
@@ -22,6 +23,12 @@ interface CameraUploadRepository {
      * Get Invalid Handle
      */
     fun getInvalidHandle(): Long
+
+
+    /**
+     * Get Invalid Backup type
+     */
+    fun getInvalidBackupType(): Int
 
     /**
      * Get Camera Uploads Primary handle
@@ -631,4 +638,31 @@ interface CameraUploadRepository {
         backupId: Long, status: Int, progress: Int, ups: Int, downs: Int,
         ts: Long, lastNode: Long,
     )
+
+    /**
+     * Update the information about a registered backup for Backup Centre
+     * @param backupId    backup id identifying the backup to be updated
+     * @param backupType  back up type requested for the service
+     * @param targetNode  MEGA folder to hold the backups
+     * @param localFolder Local path of the folder
+     * @param state       backup state
+     * @param subState    backup subState
+     */
+    suspend fun updateBackup(
+        backupId: Long, backupType: Int, targetNode: Long, localFolder: String?,
+        backupName: String, state: Int, subState: Int,
+    ): Long
+
+    /**
+     * Get upload backup by Id
+     * @return [Backup]
+     */
+    suspend fun getBackupById(id: Long): Backup?
+
+
+    /**
+     * Update backup
+     * @param backup [Backup]
+     */
+    suspend fun updateLocalBackup(backup: Backup)
 }

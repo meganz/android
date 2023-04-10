@@ -9,6 +9,7 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
+import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.user.UserCredentials
 
 interface DatabaseHandler {
@@ -336,4 +337,19 @@ interface DatabaseHandler {
         nodePath: String,
         searchQuery: String?,
     ): List<OfflineInformation>
+
+    /**
+     * Get Backup by id
+     *
+     * @param id
+     * @return [Backup]
+     */
+    fun getBackupById(id: Long): Backup?
+
+    /**
+     * update backup
+     *
+     * @param backup [Backup]
+     */
+    fun updateBackup(backup: Backup)
 }
