@@ -231,6 +231,7 @@ internal fun MeetingItemView(
 
         BottomTextView(
             meeting = meeting,
+            timestampUpdate = timestampUpdate,
             modifier = Modifier.constrainAs(txtBottom) {
                 start.linkTo(parent.start, 72.dp)
                 bottom.linkTo(parent.bottom)
@@ -278,7 +279,7 @@ internal fun MeetingItemView(
 }
 
 @Composable
-private fun MiddleTextView(meeting: MeetingRoomItem, timestampUpdate: Int?, modifier: Modifier) {
+private fun MiddleTextView(modifier: Modifier, meeting: MeetingRoomItem, timestampUpdate: Int?) {
     val meetingScheduledTimestamp = meeting.scheduledTimestampFormatted
     val meetingLastMessage = meeting.lastMessage
 
@@ -327,8 +328,8 @@ private fun MiddleTextView(meeting: MeetingRoomItem, timestampUpdate: Int?, modi
 }
 
 @Composable
-private fun BottomTextView(modifier: Modifier, meeting: MeetingRoomItem) {
-    val textMessage: String?
+private fun BottomTextView(modifier: Modifier, meeting: MeetingRoomItem, timestampUpdate: Int?) {
+    var textMessage: String?
     val textColor: Color
     when {
         meeting.isPending -> {
@@ -348,6 +349,10 @@ private fun BottomTextView(modifier: Modifier, meeting: MeetingRoomItem) {
             textMessage = meeting.lastTimestampFormatted
             textColor = MaterialTheme.colors.textColorSecondary
         }
+    }
+
+    if (timestampUpdate != null && !textMessage.isNullOrBlank() && meeting.hasOngoingCall()) {
+        textMessage = "$textMessage · ${meeting.getCallDuration()}"
     }
 
     Text(
