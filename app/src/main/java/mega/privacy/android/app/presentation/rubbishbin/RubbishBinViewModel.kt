@@ -193,7 +193,7 @@ class RubbishBinViewModel @Inject constructor(
                 return@forEach
             }
         }
-        refreshNodes()
+        setPendingRefreshNodes()
     }
 
     /**
@@ -378,5 +378,17 @@ class RubbishBinViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun setPendingRefreshNodes() {
+        _state.update { it.copy(isPendingRefresh = true) }
+    }
+
+    /**
+     * Mark handled pending refresh
+     *
+     */
+    fun markHandledPendingRefresh() {
+        _state.update { it.copy(isPendingRefresh = false) }
     }
 }

@@ -99,7 +99,7 @@ class InboxViewModelTest {
     }
 
     @Test
-    fun `test that nodes are refreshed when receiving a node update`() = runTest {
+    fun `test that isPendingRefresh is true when receiving a node update`() = runTest {
         setupData()
         setUnderTest()
 
@@ -108,8 +108,7 @@ class InboxViewModelTest {
 
         underTest.state.test {
             val state = awaitItem()
-            assertThat(state.hideMultipleItemSelection).isTrue()
-            assertThat(state.nodes).isEqualTo(listOf(retrievedNode))
+            assertThat(state.isPendingRefresh).isTrue()
         }
     }
 

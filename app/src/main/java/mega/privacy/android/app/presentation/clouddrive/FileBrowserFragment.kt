@@ -33,8 +33,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
@@ -61,10 +64,10 @@ import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.managerSections.RotatableFragment
 import mega.privacy.android.app.presentation.extensions.serializable
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
+import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.presentation.photos.mediadiscovery.MediaDiscoveryFragment
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager
-import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.utils.CloudStorageOptionControlUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorHexString
 import mega.privacy.android.app.utils.Constants
@@ -98,6 +101,7 @@ import javax.inject.Inject
 /**
  * A [RotatableFragment] that displays the user's content
  */
+@OptIn(FlowPreview::class)
 @AndroidEntryPoint
 class FileBrowserFragment : RotatableFragment() {
 
@@ -567,6 +571,16 @@ class FileBrowserFragment : RotatableFragment() {
 
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
             handleViewType(state.viewType)
+        }
+
+        viewLifecycleOwner.collectFlow(fileBrowserViewModel.state.map { it.isPendingRefresh }
+            .sample(500L)) { isPendingRefresh ->
+            if (isPendingRefresh) {
+                fileBrowserViewModel.apply {
+                    refreshNodes()
+                    markHandledPendingRefresh()
+                }
+            }
         }
 
         fileBrowserViewModel.state.flowWithLifecycle(

@@ -73,14 +73,7 @@ class InboxViewModel @Inject constructor(
      */
     private fun observeNodeUpdates() = viewModelScope.launch {
         monitorNodeUpdates().collect {
-            _state.update { inboxState ->
-                refreshNodes().let { updatedNodes ->
-                    inboxState.copy(
-                        hideMultipleItemSelection = true,
-                        nodes = updatedNodes,
-                    )
-                }
-            }
+            _state.update { it.copy(isPendingRefresh = true) }
         }
     }
 
@@ -126,6 +119,21 @@ class InboxViewModel @Inject constructor(
                 refreshNodes().let { updatedNodes ->
                     inboxState.copy(nodes = updatedNodes)
                 }
+            }
+        }
+    }
+
+    /**
+     * Refresh inbox nodes and hide selection
+     *
+     */
+    fun refreshInboxNodesAndHideSelection() = viewModelScope.launch {
+        refreshNodes().let { updatedNodes ->
+            _state.update {
+                it.copy(
+                    hideMultipleItemSelection = true,
+                    nodes = updatedNodes,
+                )
             }
         }
     }
@@ -273,4 +281,12 @@ class InboxViewModel @Inject constructor(
      * Get Cloud Sort Order
      */
     fun getOrder() = runBlocking { getCloudSortOrder() }
+
+    /**
+     * Mark handled pending refresh
+     *
+     */
+    fun markHandledPendingRefresh() {
+        _state.update { it.copy(isPendingRefresh = false) }
+    }
 }

@@ -17,6 +17,7 @@ import nz.mega.sdk.MegaNode
  *  @property itemIndex index of item clicked
  *  @property currentViewType ViewType The current ViewType used by the UI
  *  @property sortOrder [SortOrder] of current list
+ *  @property isPendingRefresh
  *  @property selectedNodeHandles List of selected node handles
  *  @property selectedMegaNodes List of selected [MegaNode]
  */
@@ -33,5 +34,6 @@ data class RubbishBinState(
     val currentViewType: ViewType = ViewType.LIST,
     val sortOrder: SortOrder = SortOrder.ORDER_NONE,
     val selectedNodeHandles: List<Long> = emptyList(),
-    val selectedMegaNodes: List<MegaNode>? = null
+    val selectedMegaNodes: List<MegaNode>? = null,
+    val isPendingRefresh: Boolean = false,
 )

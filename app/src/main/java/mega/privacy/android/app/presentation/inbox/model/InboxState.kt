@@ -10,6 +10,7 @@ import nz.mega.sdk.MegaNode
  * @property nodes List of Inbox Nodes
  * @property shouldExitInbox Whether the User should leave the Inbox screen or not
  * @property triggerBackPress Whether the User has triggered a Back Press behavior or not
+ * @property isPendingRefresh
  */
 data class InboxState(
     val hideMultipleItemSelection: Boolean = false,
@@ -17,4 +18,5 @@ data class InboxState(
     val nodes: List<MegaNode> = emptyList(),
     val shouldExitInbox: Boolean = false,
     val triggerBackPress: Boolean = false,
+    val isPendingRefresh: Boolean = false,
 )

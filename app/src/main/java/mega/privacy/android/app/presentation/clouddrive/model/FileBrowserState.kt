@@ -13,6 +13,7 @@ import nz.mega.sdk.MegaNode
  * @property nodes List of FileBrowser Nodes
  * @property parentHandle Parent Handle of current Node
  * @property mediaHandle MediaHandle of current Node
+ * @property isPendingRefresh
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -21,4 +22,5 @@ data class FileBrowserState(
     val nodes: List<MegaNode> = emptyList(),
     val parentHandle: Long? = null,
     val mediaHandle: Long = -1L,
+    val isPendingRefresh: Boolean = false,
 )

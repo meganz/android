@@ -9275,8 +9275,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         cancelAllTransfersMenuItem?.isVisible = false
                     }
                 }
-                onNodesCloudDriveUpdate()
-                onNodesInboxUpdate()
                 onNodesSearchUpdate()
                 refreshSharesFragments()
                 sharesPageAdapter.notifyDataSetChanged()

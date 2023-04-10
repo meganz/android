@@ -33,9 +33,13 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -70,6 +74,7 @@ import javax.inject.Inject
 /**
  * Fragment is for Rubbish Bin
  */
+@OptIn(FlowPreview::class)
 @AndroidEntryPoint
 class RubbishBinFragment : Fragment() {
 
@@ -248,6 +253,19 @@ class RubbishBinFragment : Fragment() {
         DragToExitSupport.observeDragSupportEvents(viewLifecycleOwner,
             recyclerView,
             Constants.VIEWER_FROM_RUBBISH_BIN)
+        setupObserver()
+    }
+
+    private fun setupObserver() {
+        viewLifecycleOwner.collectFlow(rubbishBinViewModel.state.map { it.isPendingRefresh }
+            .sample(500L)) { isPendingRefresh ->
+            if (isPendingRefresh) {
+                rubbishBinViewModel.apply {
+                    refreshNodes()
+                    markHandledPendingRefresh()
+                }
+            }
+        }
     }
 
     /**

@@ -31,9 +31,13 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -70,6 +74,7 @@ import javax.inject.Inject
 /**
  * An instance of [RotatableFragment] that displays all content that were backed up by the user
  */
+@OptIn(FlowPreview::class)
 @AndroidEntryPoint
 class InboxFragment : RotatableFragment() {
 
@@ -206,7 +211,6 @@ class InboxFragment : RotatableFragment() {
             }
             adapter?.isMultipleSelect = false
             recyclerView?.adapter = adapter
-            observeUiState()
             v
         } else {
             Timber.d("InboxFragment is on a GridView")
@@ -251,7 +255,6 @@ class InboxFragment : RotatableFragment() {
                 it.spanSizeLookup = adapter?.getSpanSizeLookup(it.spanCount)
             }
             recyclerView?.adapter = adapter
-            observeUiState()
             v
         }
     }
@@ -262,6 +265,7 @@ class InboxFragment : RotatableFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeDragSupportEvents(viewLifecycleOwner, recyclerView, Constants.VIEWER_FROM_INBOX)
+        observeUiState()
     }
 
     /**
@@ -447,6 +451,14 @@ class InboxFragment : RotatableFragment() {
                         onBackPressedHandled()
                     }
                 }
+            }
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.state.map { it.isPendingRefresh }
+            .sample(500L)) { isPendingRefresh ->
+            if (isPendingRefresh) {
+                viewModel.refreshInboxNodesAndHideSelection()
+                viewModel.markHandledPendingRefresh()
             }
         }
     }

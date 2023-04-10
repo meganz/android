@@ -60,6 +60,7 @@ class FileBrowserViewModel @Inject constructor(
 
     init {
         monitorMediaDiscovery()
+        refreshNodes()
         monitorFileBrowserChildrenNodes()
     }
 
@@ -86,7 +87,6 @@ class FileBrowserViewModel @Inject constructor(
      */
     private fun monitorFileBrowserChildrenNodes() {
         viewModelScope.launch {
-            refreshNodes()
             monitorNodeUpdates().collect {
                 checkForNodeIsInRubbish(it.changes)
             }
@@ -113,7 +113,11 @@ class FileBrowserViewModel @Inject constructor(
                 }
             }
         }
-        refreshNodes()
+        setPendingRefreshNodes()
+    }
+
+    private fun setPendingRefreshNodes() {
+        _state.update { it.copy(isPendingRefresh = true) }
     }
 
     /**
@@ -227,5 +231,13 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun setCurrentViewType(newViewType: ViewType) {
         _state.update { it.copy(currentViewType = newViewType) }
+    }
+
+    /**
+     * Mark handled pending refresh
+     *
+     */
+    fun markHandledPendingRefresh() {
+        _state.update { it.copy(isPendingRefresh = false) }
     }
 }
