@@ -105,6 +105,6 @@ class AskForDisplayOverActivity : AppCompatActivity() {
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        super.attachBaseContext(SupportedLanguageContextWrapper(newBase))
+        super.attachBaseContext(SupportedLanguageContextWrapper.wrap(newBase))
     }
 }
