@@ -665,7 +665,7 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        super.attachBaseContext(SupportedLanguageContextWrapper(newBase))
+        super.attachBaseContext(SupportedLanguageContextWrapper.wrap(newBase))
     }
 
 
