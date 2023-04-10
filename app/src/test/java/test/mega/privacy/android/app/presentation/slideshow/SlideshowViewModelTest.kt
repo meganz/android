@@ -18,6 +18,7 @@ import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.SaveSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.SaveSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.SaveSlideshowSpeedSettingUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -37,6 +38,7 @@ class SlideshowViewModelTest {
     private val saveSlideshowOrderSettingUseCase: SaveSlideshowOrderSettingUseCase = mock()
     private val saveSlideshowSpeedSettingUseCase: SaveSlideshowSpeedSettingUseCase = mock()
     private val saveSlideshowRepeatSettingUseCase: SaveSlideshowRepeatSettingUseCase = mock()
+    private val getImageByNodeHandle: GetImageByNodeHandle = mock()
 
     @Before
     fun setUp() {
@@ -60,6 +62,7 @@ class SlideshowViewModelTest {
         saveSlideshowOrderSettingUseCase = saveSlideshowOrderSettingUseCase,
         saveSlideshowSpeedSettingUseCase = saveSlideshowSpeedSettingUseCase,
         saveSlideshowRepeatSettingUseCase = saveSlideshowRepeatSettingUseCase,
+        getImageByNodeHandle = getImageByNodeHandle
     )
 
     @Test

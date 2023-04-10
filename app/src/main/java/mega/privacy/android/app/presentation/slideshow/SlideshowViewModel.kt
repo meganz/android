@@ -22,6 +22,7 @@ import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.SaveSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.SaveSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.SaveSlideshowSpeedSettingUseCase
+import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
 import javax.inject.Inject
 
 /**
@@ -37,6 +38,7 @@ class SlideshowViewModel @Inject constructor(
     private val saveSlideshowOrderSettingUseCase: SaveSlideshowOrderSettingUseCase,
     private val saveSlideshowSpeedSettingUseCase: SaveSlideshowSpeedSettingUseCase,
     private val saveSlideshowRepeatSettingUseCase: SaveSlideshowRepeatSettingUseCase,
+    private val getImageByNodeHandle: GetImageByNodeHandle,
 ) : ViewModel() {
     private val _state = MutableStateFlow(SlideshowViewState())
     val state = _state.asStateFlow()
@@ -82,6 +84,19 @@ class SlideshowViewModel @Inject constructor(
                 currentPlayingChunkedIndex.inc()
             }
         }
+
+    suspend fun downloadFullSizeImage(
+        nodeHandle: Long,
+        fullSize: Boolean = true,
+        highPriority: Boolean = false,
+        resetDownloads: () -> Unit = {},
+    ) = getImageByNodeHandle(
+        nodeHandle = nodeHandle,
+        fullSize = fullSize,
+        highPriority = highPriority,
+        resetDownloads = resetDownloads,
+    )
+
 
     private fun monitorOrderSetting() = monitorSlideshowOrderSettingUseCase()
         .onEach { order ->

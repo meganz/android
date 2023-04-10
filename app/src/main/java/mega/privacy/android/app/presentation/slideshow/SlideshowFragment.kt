@@ -58,8 +58,6 @@ import kotlinx.coroutines.yield
 import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.photos.PhotosViewModel
-import mega.privacy.android.app.presentation.photos.model.PhotoDownload
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
@@ -82,7 +80,6 @@ import javax.inject.Inject
 class SlideshowFragment : Fragment() {
     private val slideshowViewModel: SlideshowViewModel by viewModels()
     private val imageViewerViewModel: ImageViewerViewModel by activityViewModels()
-    private val photosViewModel: PhotosViewModel by viewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -97,9 +94,7 @@ class SlideshowFragment : Fragment() {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
-                    SlideshowBody(
-                        photoDownload = photosViewModel::downloadPhoto
-                    )
+                    SlideshowBody()
                 }
             }
         }
@@ -151,9 +146,7 @@ class SlideshowFragment : Fragment() {
 
     @OptIn(ExperimentalPagerApi::class)
     @Composable
-    private fun SlideshowBody(
-        photoDownload: PhotoDownload,
-    ) {
+    private fun SlideshowBody() {
         val slideshowViewState by slideshowViewModel.state.collectAsStateWithLifecycle()
         val scrollState = rememberScaffoldState()
         val pagerState = rememberPagerState()
@@ -224,7 +217,6 @@ class SlideshowFragment : Fragment() {
             playItems = playItems,
             pagerState = pagerState,
             photoState = photoState,
-            photoDownload = photoDownload,
             isPlaying = isPlaying,
             onClick = { isPlaying = !isPlaying }
         )
@@ -237,7 +229,6 @@ class SlideshowFragment : Fragment() {
         playItems: List<Photo>,
         pagerState: PagerState,
         photoState: PhotoState,
-        photoDownload: PhotoDownload,
         isPlaying: Boolean,
         onClick: () -> Unit,
     ) {
@@ -257,19 +248,16 @@ class SlideshowFragment : Fragment() {
                     key = { playItems[it].id }
                 ) { index ->
 
-                    val imageState = produceState<String?>(initialValue = null) {
+                    val photo = playItems[index]
+                    val imageState =
+                        produceState<String?>(initialValue = null) {
 
-                        val photo = playItems[index]
-                        val isPreview = true
-                        photoDownload(
-                            isPreview,
-                            photo,
-                        ) { downloadSuccess ->
-                            if (downloadSuccess) {
-                                value = photo.previewFilePath
+                            slideshowViewModel.downloadFullSizeImage(
+                                nodeHandle = photo.id
+                            ).collect { imageResult ->
+                                value = imageResult.getHighestResolutionAvailableUri()
                             }
                         }
-                    }
 
                     PhotoBox(
                         state = photoState,

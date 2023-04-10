@@ -553,9 +553,9 @@ internal class DefaultImageRepository @Inject constructor(
 
             val imageResult = ImageResult(
                 isVideo = node.isVideo(),
-                thumbnailUri = thumbnailFile?.takeIf { it.exists() }?.toUri().toString(),
-                previewUri = previewFile?.takeIf { it.exists() }?.toUri().toString(),
-                fullSizeUri = fullFile.takeIf { it.exists() }?.toUri().toString(),
+                thumbnailUri = thumbnailFile?.takeIf { it.exists() }?.toUri()?.toString(),
+                previewUri = previewFile?.takeIf { it.exists() }?.toUri()?.toString(),
+                fullSizeUri = fullFile.takeIf { it.exists() }?.toUri()?.toString(),
             )
 
             if (imageResult.isVideo && imageResult.fullSizeUri != null && previewFile == null) {

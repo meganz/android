@@ -4,11 +4,12 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.NetworkRepository
+import javax.inject.Inject
 
 /**
  * Default Implementation of [GetImageByNodeHandle]
  */
-class DefaultGetImageByNodeHandle(
+class DefaultGetImageByNodeHandle @Inject constructor(
     private val networkRepository: NetworkRepository,
     private val imageRepository: ImageRepository,
 ) : GetImageByNodeHandle {
