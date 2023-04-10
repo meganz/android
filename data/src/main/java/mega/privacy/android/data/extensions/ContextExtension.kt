@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Size
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
@@ -16,6 +17,7 @@ import timber.log.Timber
  * expose Broadcast Receivers as Flow
  */
 internal fun Context.registerReceiverAsFlow(
+    flags: Int,
     vararg intentFilterActions: String,
 ) = callbackFlow {
     val receiver = object : BroadcastReceiver() {
@@ -28,11 +30,17 @@ internal fun Context.registerReceiverAsFlow(
         Timber.d("Broadcast Receiver registered for $it")
         intentFilter.addAction(it)
     }
-    registerReceiver(receiver, intentFilter)
+    ContextCompat.registerReceiver(
+        this@registerReceiverAsFlow,
+        receiver,
+        intentFilter,
+        flags
+    )
     awaitClose {
         unregisterReceiver(receiver)
     }
 }.buffer(capacity = Channel.UNLIMITED)
+
 
 /**
  * Get the Screen size

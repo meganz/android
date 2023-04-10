@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.data.gateway.BroadcastReceiverGateway
+import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -53,7 +53,7 @@ class ChatRepositoryImplTest {
     private val combinedChatRoomMapper = mock<CombinedChatRoomMapper>()
     private val chatListItemMapper = mock<ChatListItemMapper>()
     private val sharingScope = mock<CoroutineScope>()
-    private val broadcastReceiverGateway = mock<BroadcastReceiverGateway>()
+    private val deviceEventGateway = mock<DeviceEventGateway>()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val chatId = Random.nextLong()
     private val userHandle = Random.nextLong()
@@ -81,7 +81,7 @@ class ChatRepositoryImplTest {
             chatListItemMapper = chatListItemMapper,
             sharingScope = sharingScope,
             ioDispatcher = testDispatcher,
-            broadcastReceiverGateway = broadcastReceiverGateway,
+            deviceEventGateway = deviceEventGateway,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)

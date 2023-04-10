@@ -98,7 +98,7 @@ class DefaultCameraUploadRepositoryTest {
             cameraUploadsHandlesMapper = cameraUploadsHandlesMapper,
             ioDispatcher = UnconfinedTestDispatcher(),
             appEventGateway = appEventGateway,
-            broadcastReceiverGateway = mock(),
+            deviceEventGateway = mock(),
             videoQualityIntMapper = ::videoQualityToInt,
             videoQualityMapper = ::toVideoQuality,
             syncStatusIntMapper = ::syncStatusToInt,

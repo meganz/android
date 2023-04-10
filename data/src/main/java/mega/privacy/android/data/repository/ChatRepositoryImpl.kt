@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
-import mega.privacy.android.data.gateway.BroadcastReceiverGateway
+import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -65,7 +65,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatListItemMapper                 [ChatListItemMapper]
  * @property sharingScope                       [CoroutineScope]
  * @property ioDispatcher                       [CoroutineDispatcher]
- * @property broadcastReceiverGateway           [BroadcastReceiverGateway]
+ * @property deviceEventGateway           [DeviceEventGateway]
  */
 internal class ChatRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
@@ -77,7 +77,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val chatListItemMapper: ChatListItemMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val broadcastReceiverGateway: BroadcastReceiverGateway,
+    private val deviceEventGateway: DeviceEventGateway,
 ) : ChatRepository {
 
     override fun notifyChatLogout(): Flow<Boolean> =
@@ -343,7 +343,7 @@ internal class ChatRepositoryImpl @Inject constructor(
         }
 
     override fun monitorMutedChats(): Flow<Boolean> =
-        broadcastReceiverGateway.monitorMutedChats
+        deviceEventGateway.monitorMutedChats
 
     override fun monitorMyEmail(): Flow<String?> = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnUsersUpdate>()

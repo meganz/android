@@ -7,11 +7,11 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.facade.AppEventFacade
 import mega.privacy.android.data.facade.AssetsFacade
 import mega.privacy.android.data.facade.BillingFacade
-import mega.privacy.android.data.facade.BroadcastReceiverFacade
 import mega.privacy.android.data.facade.CacheFacade
 import mega.privacy.android.data.facade.CacheFolderFacade
 import mega.privacy.android.data.facade.CameraUploadMediaFacade
 import mega.privacy.android.data.facade.ClipboardFacade
+import mega.privacy.android.data.facade.DeviceEventFacade
 import mega.privacy.android.data.facade.FileAttributeFacade
 import mega.privacy.android.data.facade.FileFacade
 import mega.privacy.android.data.facade.FileManagementPreferencesFacade
@@ -30,13 +30,13 @@ import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.AppInfoGateway
 import mega.privacy.android.data.gateway.AssetsGateway
 import mega.privacy.android.data.gateway.BillingGateway
-import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.gateway.DefaultAppInfoGateway
 import mega.privacy.android.data.gateway.DefaultStreamingGateway
+import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
@@ -185,11 +185,11 @@ internal abstract class GatewayModule {
     abstract fun bindAppEventGateway(implementation: AppEventFacade): AppEventGateway
 
     /**
-     * Provide default implementation of [BroadcastReceiverGateway]
+     * Provide default implementation of [DeviceEventGateway]
      */
     @Binds
     @Singleton
-    abstract fun bindBroadcastReceiverGateway(implementation: BroadcastReceiverFacade): BroadcastReceiverGateway
+    abstract fun bindDeviceEventGateway(implementation: DeviceEventFacade): DeviceEventGateway
 
 
     /**

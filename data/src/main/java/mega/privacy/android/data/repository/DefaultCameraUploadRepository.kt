@@ -10,9 +10,9 @@ import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
-import mega.privacy.android.data.gateway.BroadcastReceiverGateway
 import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
+import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
@@ -64,7 +64,7 @@ import kotlin.coroutines.Continuation
  * @property mediaStoreFileTypeUriMapper [MediaStoreFileTypeUriMapper]
  * @property ioDispatcher [CoroutineDispatcher]
  * @property appEventGateway [AppEventGateway]
- * @property broadcastReceiverGateway [BroadcastReceiverGateway]
+ * @property deviceEventGateway [DeviceEventGateway]
  * @property workerGateway [WorkerGateway]
  * @property videoQualityMapper [VideoQualityMapper]
  * @property syncStatusIntMapper [SyncStatusIntMapper]
@@ -81,7 +81,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
     private val mediaStoreFileTypeUriMapper: MediaStoreFileTypeUriMapper,
     private val appEventGateway: AppEventGateway,
-    private val broadcastReceiverGateway: BroadcastReceiverGateway,
+    private val deviceEventGateway: DeviceEventGateway,
     private val workerGateway: WorkerGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityIntMapper: VideoQualityIntMapper,
@@ -553,9 +553,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun broadcastCameraUploadProgress(progress: Int, pending: Int) =
         appEventGateway.broadcastCameraUploadProgress(progress, pending)
 
-    override fun monitorBatteryInfo() = broadcastReceiverGateway.monitorBatteryInfo
+    override fun monitorBatteryInfo() = deviceEventGateway.monitorBatteryInfo
 
-    override fun monitorChargingStoppedInfo() = broadcastReceiverGateway.monitorChargingStoppedState
+    override fun monitorChargingStoppedInfo() = deviceEventGateway.monitorChargingStoppedState
 
     override suspend fun renameNode(nodeHandle: Long, newName: String): Unit =
         withContext(ioDispatcher) {

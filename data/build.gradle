@@ -69,6 +69,7 @@ dependencies {
     implementation lib.coroutines.core
     implementation google.gson
     implementation google.zxing
+    implementation androidx.java.core
     implementation androidx.exifinterface
     implementation androidx.datastore.preferences
     implementation androidx.preferences
