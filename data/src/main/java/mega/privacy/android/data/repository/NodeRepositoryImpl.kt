@@ -31,6 +31,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
@@ -359,4 +360,12 @@ internal class NodeRepositoryImpl @Inject constructor(
             }
         }.getOrNull() ?: emptyList()
     }
+
+
+    override suspend fun getFileTypeInfo(nodeId: NodeId): FileTypeInfo? =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeHandle = nodeId.longValue)?.let { megaNode ->
+                return@withContext fileTypeInfoMapper(megaNode)
+            }
+        }
 }

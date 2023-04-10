@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
@@ -221,4 +222,13 @@ interface NodeRepository {
      * @return [UnTypedNode] returns list of nodes or empty
      */
     suspend fun getInShares(email: String): List<UnTypedNode>
+
+
+    /**
+     * Get FileTypeInfo given NodeId
+     *
+     * @param nodeId
+     * @return FileTypeInfo if found else null
+     */
+    suspend fun getFileTypeInfo(nodeId: NodeId): FileTypeInfo?
 }
