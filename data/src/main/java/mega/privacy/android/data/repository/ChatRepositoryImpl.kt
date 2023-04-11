@@ -21,9 +21,9 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
+import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
-import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.ChatUpdate
@@ -131,7 +131,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             if (error.errorCode == MegaChatError.ERROR_OK) {
                 continuation.resumeWith(Result.success(request.flag))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestSetOpenInviteCompleted")
             }
         }
 
@@ -152,7 +152,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             if (error.errorCode == MegaChatError.ERROR_OK) {
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestCompleted")
             }
         }
 
@@ -247,7 +247,7 @@ internal class ChatRepositoryImpl @Inject constructor(
             if (error.errorCode == MegaChatError.ERROR_OK || error.errorCode == MegaChatError.ERROR_NOENT) {
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestQueryChatLinkCompleted")
             }
         }
 
@@ -277,7 +277,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                     }
                 }
                 MegaError.API_EARGS -> continuation.resumeWith(Result.success(InviteContactRequest.InvalidEmail))
-                else -> continuation.failWithError(error)
+                else -> continuation.failWithError(error, "onRequestInviteContactCompleted")
             }
         }
 
@@ -391,7 +391,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                                 if (error.errorCode == MegaChatError.ERROR_OK) {
                                     continuation.resume(Unit)
                                 } else {
-                                    continuation.failWithError(error)
+                                    continuation.failWithError(error, "signalPresenceActivity")
                                 }
                             }
                         )
@@ -411,7 +411,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                             if (error.errorCode == MegaChatError.ERROR_OK) {
                                 continuation.resume(Unit)
                             } else {
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "archiveChat")
                             }
                         }
                     )

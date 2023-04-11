@@ -56,7 +56,7 @@ internal class DefaultVerificationRepository @Inject constructor(
 
     override suspend fun getCountryCallingCodes() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
+            val listener = continuation.getRequestListener("getCountryCallingCodes") {
                 return@getRequestListener countryCallingCodeMapper(it.megaStringListMap)
             }
             megaApiGateway.getCountryCallingCodes(listener)
@@ -133,7 +133,7 @@ internal class DefaultVerificationRepository @Inject constructor(
                         continuation.resumeWith(Result.success(Unit))
                     } else {
                         Timber.e("Calling resetSMSVerifiedPhoneNumber failed with error code ${error.errorCode}")
-                        continuation.failWithError(error)
+                        continuation.failWithError(error, "resetSMSVerifiedPhoneNumber")
                     }
                 }
             )

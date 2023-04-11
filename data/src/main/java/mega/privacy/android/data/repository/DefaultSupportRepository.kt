@@ -32,7 +32,7 @@ internal class DefaultSupportRepository @Inject constructor(
                     if (error.errorCode == MegaError.API_OK) {
                         continuation.resumeWith(Result.success(Unit))
                     } else {
-                        continuation.failWithError(error)
+                        continuation.failWithError(error, "logTicket")
                     }
                 }
             ))
@@ -69,13 +69,13 @@ internal class DefaultSupportRepository @Inject constructor(
     private fun onUploadFileFinish(channel: SendChannel<Float>): (MegaTransfer, MegaError) -> Unit =
         { _, error ->
             val exception =
-                error.takeUnless { it.errorCode == MegaError.API_OK }?.toException()
+                error.takeUnless { it.errorCode == MegaError.API_OK }?.toException("onUploadFileFinish")
             channel.close(exception)
         }
 
     private fun onUploadError(): (MegaTransfer, MegaError) -> Unit =
         { _, error ->
-            Timber.w(error.toException(),
+            Timber.w(error.toException("onUploadError"),
                 "A temporary error occurred whilst uploading log files to support")
         }
 

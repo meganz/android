@@ -36,7 +36,7 @@ class ResetPhoneNumberUseCase @Inject constructor(
                             .post(true)
                         continuation.resumeWith(Result.success(Unit))
                     }
-                    else -> continuation.failWithError(error)
+                    else -> continuation.failWithError(error, "ResetPhoneNumberUseCase")
                 }
             })
             megaApi.resetSmsVerifiedPhoneNumber(listener)

@@ -117,7 +117,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                             )
                         } else {
                             Timber.e("Error creating new album: ${error.errorString}")
-                            continuation.failWithError(error)
+                            continuation.failWithError(error, "createAlbum")
                         }
                     }
                 )
@@ -264,7 +264,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                                 if (error.errorCode == MegaError.API_OK) {
                                     continuation.resumeWith(Result.success(Unit))
                                 } else {
-                                    continuation.failWithError(error)
+                                    continuation.failWithError(error, "removeAlbums")
                                 }
                             }
                         ),
@@ -295,7 +295,7 @@ internal class DefaultAlbumRepository @Inject constructor(
         newName: String,
     ): String = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
+            val listener = continuation.getRequestListener("updateAlbumName") {
                 return@getRequestListener it.text
             }
             megaApiGateway.updateSetName(

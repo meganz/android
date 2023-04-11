@@ -61,7 +61,7 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                             if (error.errorCode == MegaError.API_OK) {
                                 continuation.resumeWith(Result.success(request.recentActions))
                             } else {
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "getMegaRecentAction")
                             }
                         }
                     ))

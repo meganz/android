@@ -149,7 +149,7 @@ internal class DefaultAvatarRepository @Inject constructor(
                                 if (error.errorCode == MegaError.API_ENOENT && file.exists()) {
                                     file.delete()
                                 }
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "getAvatarFile")
                             }
                         }
                     ))

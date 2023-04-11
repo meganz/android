@@ -152,7 +152,7 @@ internal class DefaultAccountRepository @Inject constructor(
                     if (error.errorCode == MegaError.API_OK) {
                         continuation.resumeWith(Result.success(request))
                     } else {
-                        continuation.failWithError(error)
+                        continuation.failWithError(error, "requestAccount")
                     }
                 },
             )
@@ -190,7 +190,7 @@ internal class DefaultAccountRepository @Inject constructor(
         if (request.isType(MegaRequest.TYPE_MULTI_FACTOR_AUTH_CHECK)) {
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request.flag))
-            } else continuation.failWithError(error)
+            } else continuation.failWithError(error, "onMultiFactorAuthCheckRequestFinish")
         }
     }
 
@@ -223,7 +223,7 @@ internal class DefaultAccountRepository @Inject constructor(
                             error.errorString
                         )
                     )
-                    else -> continuation.failWithError(error)
+                    else -> continuation.failWithError(error, "onDeleteAccountRequestFinished")
                 }
             }
         }
@@ -256,7 +256,10 @@ internal class DefaultAccountRepository @Inject constructor(
                                     MegaChatError.ERROR_ACCESS -> continuation.resumeWith(
                                         Result.failure(ChatNotInitializedErrorStatus())
                                     )
-                                    else -> continuation.failWithError(error)
+                                    else -> continuation.failWithError(
+                                        error,
+                                        "retryPendingConnections"
+                                    )
                                 }
                             }
                         }
@@ -277,7 +280,7 @@ internal class DefaultAccountRepository @Inject constructor(
                                 )
                             )
                         } else {
-                            continuation.failWithError(error)
+                            continuation.failWithError(error, "getSubscriptionOptions")
                         }
                     }
                 ))
@@ -308,7 +311,7 @@ internal class DefaultAccountRepository @Inject constructor(
                                     )
                                 )
                             } else {
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "getAccountAchievements")
                             }
                         })
                 )
@@ -336,7 +339,7 @@ internal class DefaultAccountRepository @Inject constructor(
                     if (error.errorCode == MegaError.API_OK) {
                         continuation.resumeWith(Result.success(request))
                     } else {
-                        continuation.failWithError(error)
+                        continuation.failWithError(error, "getSpecificAccountDetail")
                     }
                 },
             )
@@ -360,7 +363,7 @@ internal class DefaultAccountRepository @Inject constructor(
                     if (error.errorCode == MegaError.API_OK) {
                         continuation.resumeWith(Result.success(request))
                     } else {
-                        continuation.failWithError(error)
+                        continuation.failWithError(error, "getExtendedAccountDetails")
                     }
                 },
             )
@@ -460,7 +463,7 @@ internal class DefaultAccountRepository @Inject constructor(
                                 )
                             )
                         } else {
-                            continuation.failWithError(error)
+                            continuation.failWithError(error, "getAccountAchievementsOverview")
                         }
                     })
                 megaApiGateway.getAccountAchievements(listener)
@@ -568,7 +571,7 @@ internal class DefaultAccountRepository @Inject constructor(
                         else -> {
                             Timber.w("MegaRequest.TYPE_QUERY_SIGNUP_LINK error $error")
                             continuation.resumeWith(
-                                Result.failure(QuerySignupLinkException.Unknown(error.toException()))
+                                Result.failure(QuerySignupLinkException.Unknown(error.toException("querySignupLink")))
                             )
                         }
                     }
@@ -662,7 +665,8 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun changePassword(newPassword: String) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { it.newPassword == newPassword }
+            val listener =
+                continuation.getRequestListener("changePassword") { it.newPassword == newPassword }
             megaApiGateway.changePassword(newPassword, listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
@@ -676,7 +680,8 @@ internal class DefaultAccountRepository @Inject constructor(
         masterKey: String?,
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { it.email.isNotBlank() }
+            val listener =
+                continuation.getRequestListener("resetPasswordFromLink") { it.email.isNotBlank() }
             megaApiGateway.resetPasswordFromLink(link, newPassword, masterKey, listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
@@ -697,7 +702,7 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun is2FAEnabled() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { it.flag }
+            val listener = continuation.getRequestListener("is2FAEnabled") { it.flag }
             megaApiGateway.multiFactorAuthEnabled(megaApiGateway.accountEmail, listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)
@@ -748,7 +753,7 @@ internal class DefaultAccountRepository @Inject constructor(
                         continuation.resumeWith(Result.success(Unit))
                         Timber.d("$methodName: New value of attribute USER_ATTR_PWD_REMINDER: ${request.text}")
                     } else {
-                        continuation.failWithError(error)
+                        continuation.failWithError(error, "onPasswordReminderAction")
                         Timber.e("$methodName: MegaRequest.TYPE_SET_ATTR_USER | MegaApiJava.USER_ATTR_PWD_REMINDER ${error.errorString}")
                     }
                 },
@@ -763,7 +768,8 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun upgradeSecurity() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { return@getRequestListener }
+            val listener =
+                continuation.getRequestListener("upgradeSecurity") { return@getRequestListener }
             megaApiGateway.upgradeSecurity(listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)

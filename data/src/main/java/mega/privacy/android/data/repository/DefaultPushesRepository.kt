@@ -59,7 +59,7 @@ internal class DefaultPushesRepository @Inject constructor(
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request.text))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestRegisterPushNotificationsCompleted")
             }
         }
 
@@ -73,7 +73,8 @@ internal class DefaultPushesRepository @Inject constructor(
     override suspend fun pushReceived(beep: Boolean): ChatRequest =
         withContext(ioDispatcher) {
             suspendCoroutine { continuation ->
-                megaChatApi.pushReceived(beep,
+                megaChatApi.pushReceived(
+                    beep,
                     OptionalMegaChatRequestListenerInterface(
                         onRequestFinish = onRequestPushReceivedCompleted(continuation)
                     )
@@ -93,10 +94,10 @@ internal class DefaultPushesRepository @Inject constructor(
                 if (!megaApi.isEphemeralPlusPlus) {
                     continuation.resumeWith(Result.success(chatRequestMapper(request)))
                 } else {
-                    continuation.failWithError(error)
+                    continuation.failWithError(error, "onRequestPushReceivedCompleted")
                 }
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestPushReceivedCompleted")
             }
         }
 

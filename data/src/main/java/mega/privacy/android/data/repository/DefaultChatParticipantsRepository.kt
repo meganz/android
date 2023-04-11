@@ -6,8 +6,8 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
 import mega.privacy.android.data.mapper.chat.ChatPermissionsMapper
+import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.chat.ChatParticipant
 import mega.privacy.android.domain.entity.contacts.ContactData
@@ -120,7 +120,7 @@ internal class DefaultChatParticipantsRepository @Inject constructor(
                             if (error.errorCode == MegaError.API_OK) {
                                 continuation.resume(peerList)
                             } else {
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "getChatParticipantsHandles")
                             }
                         }
                     ))

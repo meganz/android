@@ -58,7 +58,7 @@ internal class DefaultTransfersRepository @Inject constructor(
                             if (error.errorCode == MegaError.API_OK) {
                                 continuation.resumeWith(Result.success(Unit))
                             } else {
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "cancelTransfer")
                             }
                         }
                     }
@@ -125,7 +125,7 @@ internal class DefaultTransfersRepository @Inject constructor(
                         if (error.errorCode == MegaError.API_OK) {
                             continuation.resumeWith(Result.success(Unit))
                         } else {
-                            continuation.failWithError(error)
+                            continuation.failWithError(error, "cancelAllUploadTransfers")
                         }
                     }
                 }
@@ -195,7 +195,7 @@ internal class DefaultTransfersRepository @Inject constructor(
                     if (error.errorCode == MegaError.API_OK) {
                         continuation.resumeWith(Result.success(Unit))
                     } else {
-                        continuation.failWithError(error)
+                        continuation.failWithError(error, "cancelTransferByTag")
                     }
                 }
             )

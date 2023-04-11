@@ -8,4 +8,5 @@ import nz.mega.sdk.MegaError
  *
  * @return
  */
-fun MegaError.toException(): MegaException = MegaException(errorCode, errorString)
+fun MegaError.toException(methodName: String) =
+    MegaException(errorCode, errorString, methodName)

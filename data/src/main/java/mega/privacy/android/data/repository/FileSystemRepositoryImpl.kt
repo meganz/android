@@ -107,13 +107,13 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                         cancelToken = null,
                         listener = OptionalMegaTransferListenerInterface(
                             onTransferTemporaryError = { _, error ->
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "downloadBackgroundFile")
                             },
                             onTransferFinish = { _, error ->
                                 if (error.errorCode == MegaError.API_OK) {
                                     continuation.resumeWith(Result.success(file.absolutePath))
                                 } else {
-                                    continuation.failWithError(error)
+                                    continuation.failWithError(error, "downloadBackgroundFile")
                                 }
                             }
                         )
@@ -167,7 +167,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
         val megaNode = megaApiGateway.getRootNode()
         megaNode?.let { parentMegaNode ->
             suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener { it.nodeHandle }
+                val listener = continuation.getRequestListener("createFolder") { it.nodeHandle }
                 megaApiGateway.createFolder(name, parentMegaNode, listener)
                 continuation.invokeOnCancellation {
                     megaApiGateway.removeRequestListener(listener)
@@ -178,7 +178,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun setMyChatFilesFolder(nodeHandle: Long) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
+            val listener = continuation.getRequestListener("setMyChatFilesFolder") {
                 chatFilesFolderUserAttributeMapper(it.megaStringMap)?.let { value ->
                     megaApiGateway.base64ToHandle(value)
                         .takeIf { handle -> handle != megaApiGateway.getInvalidHandle() }
@@ -204,7 +204,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
                     when (error.errorCode) {
                         MegaError.API_OK -> continuation.resumeWith(Result.success(request.flag))
                         MegaError.API_ENOENT -> continuation.resumeWith(Result.success(true))
-                        else -> continuation.failWithError(error)
+                        else -> continuation.failWithError(error, "fetchFileVersionsOption")
                     }
                 }
             )

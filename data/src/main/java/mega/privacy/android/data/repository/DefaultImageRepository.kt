@@ -122,7 +122,7 @@ internal class DefaultImageRepository @Inject constructor(
                                     if (error.errorCode == MegaError.API_OK) {
                                         continuation.resumeWith(Result.success(thumbnail))
                                     } else {
-                                        continuation.failWithError(error)
+                                        continuation.failWithError(error, "getThumbnailFromServer")
                                     }
                                 }
                             )
@@ -164,7 +164,7 @@ internal class DefaultImageRepository @Inject constructor(
                                     if (error.errorCode == MegaError.API_OK) {
                                         continuation.resumeWith(Result.success(preview))
                                     } else {
-                                        continuation.failWithError(error)
+                                        continuation.failWithError(error, "getPreviewFromServer")
                                     }
                                 }
                             )
@@ -409,7 +409,7 @@ internal class DefaultImageRepository @Inject constructor(
                             continuation.resumeWithException(IllegalArgumentException("Invalid key for public node"))
                         }
                     } else {
-                        continuation.failWithException(error.toException())
+                        continuation.failWithException(error.toException("getPublicNode"))
                     }
                 }
             )

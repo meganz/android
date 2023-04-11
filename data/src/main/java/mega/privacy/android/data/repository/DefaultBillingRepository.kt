@@ -79,7 +79,7 @@ internal class DefaultBillingRepository @Inject constructor(
                     if (error.errorCode == MegaError.API_OK) {
                         continuation.resumeWith(Result.success(PaymentMethodFlags(request.number)))
                     } else {
-                        continuation.failWithError(error)
+                        continuation.failWithError(error, "fetchPaymentMethodFlags")
                     }
                 },
             )
@@ -92,7 +92,7 @@ internal class DefaultBillingRepository @Inject constructor(
 
     private suspend fun fetchPricing(): Pricing = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
+            val listener = continuation.getRequestListener("fetchPricing") {
                 pricingMapper(it.pricing, it.currency)
             }
             megaApiGateway.getPricing(listener)
@@ -104,7 +104,7 @@ internal class DefaultBillingRepository @Inject constructor(
 
     private suspend fun fetchNumberOfSubscription(): Long = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
+            val listener = continuation.getRequestListener("fetchNumberOfSubscription"){
                 it.number
             }
             megaApiGateway.creditCardQuerySubscriptions(listener)

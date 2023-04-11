@@ -13,9 +13,9 @@ import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterfa
 import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
-import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
+import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
@@ -193,7 +193,10 @@ internal class CallRepositoryImpl @Inject constructor(
 
                                 continuation.resume(occurrences)
                             } else {
-                                continuation.failWithError(error)
+                                continuation.failWithError(
+                                    error,
+                                    "fetchScheduledMeetingOccurrencesByChat"
+                                )
                             }
                         }
                     )
@@ -267,7 +270,7 @@ internal class CallRepositoryImpl @Inject constructor(
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
             } else {
                 Timber.e("Error: ${error.errorString}")
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestCompleted")
             }
         }
 

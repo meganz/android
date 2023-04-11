@@ -162,7 +162,7 @@ internal class DefaultContactsRepository @Inject constructor(
             if (error.errorCode == MegaChatError.ERROR_OK) {
                 continuation.resumeWith(Result.success(request.chatHandle))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestCreateChatCompleted")
             }
         }
 
@@ -225,7 +225,7 @@ internal class DefaultContactsRepository @Inject constructor(
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request.name))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestGetUserAliasCompleted")
             }
         }
 
@@ -267,7 +267,7 @@ internal class DefaultContactsRepository @Inject constructor(
                             if (error.errorCode == MegaError.API_OK) {
                                 continuation.resumeWith(Result.success(request.file))
                             } else {
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "getContactAvatar")
                             }
                         }
                     ))
@@ -289,7 +289,7 @@ internal class DefaultContactsRepository @Inject constructor(
                             if (error.errorCode == MegaError.API_OK) {
                                 continuation.resume(request.email)
                             } else {
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "getUserEmail")
                             }
                         }
                     ))
@@ -371,7 +371,7 @@ internal class DefaultContactsRepository @Inject constructor(
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestGetUserNameCompleted")
             }
         }
 
@@ -498,7 +498,7 @@ internal class DefaultContactsRepository @Inject constructor(
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request.megaStringMap))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestGetAliasesCompleted")
             }
         }
 
@@ -536,7 +536,7 @@ internal class DefaultContactsRepository @Inject constructor(
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(request.password))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onGetUserCredentialsCompleted")
             }
         }
 
@@ -564,7 +564,7 @@ internal class DefaultContactsRepository @Inject constructor(
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(Unit))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onResetCredentialsCompleted")
             }
         }
 
@@ -586,7 +586,7 @@ internal class DefaultContactsRepository @Inject constructor(
             if (error.errorCode == MegaError.API_OK) {
                 continuation.resumeWith(Result.success(Unit))
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onVerifyCredentialsCompleted")
             }
         }
 
@@ -650,7 +650,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private suspend fun getCurrentUserNameAttribute(attribute: Int): String =
         withContext(ioDispatcher) {
             return@withContext suspendCancellableCoroutine { continuation ->
-                val listener = continuation.getRequestListener {
+                val listener = continuation.getRequestListener("getCurrentUserNameAttribute") {
                     it.text.orEmpty()
                 }
                 megaApiGateway.getUserAttribute(attribute, listener)
@@ -717,7 +717,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getContactEmail(handle: Long): String = withContext(ioDispatcher) {
         suspendCancellableCoroutine<String> { continuation ->
-            val listener = continuation.getRequestListener {
+            val listener = continuation.getRequestListener("getContactEmail") {
                 return@getRequestListener it.email
             }
             megaApiGateway.getUserEmail(handle, listener)
@@ -748,7 +748,7 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun setUserAlias(name: String?, userHandle: Long) = withContext(ioDispatcher) {
         suspendCancellableCoroutine<String> { continuation ->
-            val listener = continuation.getRequestListener {
+            val listener = continuation.getRequestListener("setUserAlias") {
                 return@getRequestListener it.text
             }
             megaApiGateway.setUserAlias(
@@ -765,7 +765,7 @@ internal class DefaultContactsRepository @Inject constructor(
     override suspend fun removeContact(email: String): Boolean = withContext(ioDispatcher) {
         val contact = megaApiGateway.getContact(email) ?: return@withContext false
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { true }
+            val listener = continuation.getRequestListener("removeContact") { true }
             megaApiGateway.removeContact(contact, listener)
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }

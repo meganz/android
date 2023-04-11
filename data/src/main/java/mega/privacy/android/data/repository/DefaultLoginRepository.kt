@@ -115,7 +115,7 @@ internal class DefaultLoginRepository @Inject constructor(
                 continuation.resumeWith(Result.success(Unit))
             } else {
                 Timber.e("Fast login error: ${error.errorString}")
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onFastLoginFinish")
             }
         }
 
@@ -138,7 +138,7 @@ internal class DefaultLoginRepository @Inject constructor(
                 continuation.resumeWith(Result.success(Unit))
             } else {
                 Timber.e("Fetch nodes error: ${error.errorString}")
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onFetchNodesFinish")
             }
         }
 
@@ -148,7 +148,7 @@ internal class DefaultLoginRepository @Inject constructor(
 
     override suspend fun localLogout() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {}
+            val listener = continuation.getRequestListener("localLogout") {}
 
             megaApiGateway.localLogout(listener)
 
@@ -160,7 +160,7 @@ internal class DefaultLoginRepository @Inject constructor(
 
     override suspend fun logout() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { }
+            val listener = continuation.getRequestListener("logout") { }
 
             megaApiGateway.logout(listener)
 
@@ -172,7 +172,7 @@ internal class DefaultLoginRepository @Inject constructor(
 
     override suspend fun chatLogout() = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getChatRequestListener { }
+            val listener = continuation.getChatRequestListener("chatLogout") { }
 
             megaChatApiGateway.logout(listener)
 
@@ -256,7 +256,7 @@ internal class DefaultLoginRepository @Inject constructor(
                         }
                         else -> {
                             Timber.w("MegaRequest.TYPE_LOGIN error $error")
-                            close(LoginUnknownStatus(error.toException()))
+                            close(LoginUnknownStatus(error.toException("loginRequest")))
                         }
                     }
                 }
@@ -301,14 +301,14 @@ internal class DefaultLoginRepository @Inject constructor(
                     }
                     MegaError.API_EACCESS -> {
                         Timber.e("Error API_EACCESS")
-                        close(FetchNodesErrorAccess(error.toException()))
+                        close(FetchNodesErrorAccess(error.toException("fetchNodesFlow")))
                     }
                     MegaError.API_EBLOCKED -> {
                         Timber.w("Suspended account - Reason: ${request.number}")
                         close(FetchNodesBlockedAccount())
                     }
                     else -> {
-                        close(FetchNodesUnknownStatus(error.toException()))
+                        close(FetchNodesUnknownStatus(error.toException("fetchNodesFlow")))
                     }
                 }
 

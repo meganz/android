@@ -40,8 +40,9 @@ fun <T> Continuation<T>.failWithException(
  */
 fun <T> Continuation<T>.failWithError(
     error: MegaError,
+    methodName: String,
 ) {
-    resumeWith(Result.failure(error.toException()))
+    resumeWith(Result.failure(error.toException(methodName)))
 }
 
 /**
@@ -54,15 +55,16 @@ fun <T> Continuation<T>.failWithError(
  */
 fun <T> Continuation<T>.failWithError(
     error: MegaChatError,
+    methodName: String,
 ) {
-    resumeWith(Result.failure(MegaException(error.errorCode, error.errorString)))
+    resumeWith(Result.failure(MegaException(error.errorCode, error.errorString, methodName)))
 }
 
 /**
  * get a request Listener
  */
 fun <T> Continuation<T>.getRequestListener(
-    methodName: String? = null,
+    methodName: String,
     block: (request: MegaRequest) -> T,
 ): MegaRequestListenerInterface {
     val listener = OptionalMegaRequestListenerInterface(
@@ -71,10 +73,8 @@ fun <T> Continuation<T>.getRequestListener(
                 this.resumeWith(Result.success(block(request)))
             } else {
                 // log the error code when calling SDK api, it helps us easy to find the cause
-                methodName?.let {
-                    Timber.e("Calling $methodName failed with error code ${error.errorCode}")
-                }
-                this.failWithError(error)
+                Timber.e("Calling $methodName failed with error code ${error.errorCode}")
+                this.failWithError(error, methodName)
             }
         }
     )
@@ -85,7 +85,7 @@ fun <T> Continuation<T>.getRequestListener(
  * Gets a chat request Listener.
  */
 fun <T> Continuation<T>.getChatRequestListener(
-    methodName: String? = null,
+    methodName: String,
     block: (request: MegaChatRequest) -> T,
 ): MegaChatRequestListenerInterface {
     val listener = OptionalMegaChatRequestListenerInterface(
@@ -94,10 +94,8 @@ fun <T> Continuation<T>.getChatRequestListener(
                 this.resumeWith(Result.success(block(request)))
             } else {
                 // log the error code when calling SDK api, it helps us easy to find the cause
-                methodName?.let {
-                    Timber.e("Calling $methodName failed with error code ${error.errorCode}")
-                }
-                this.failWithError(error)
+                Timber.e("Calling $methodName failed with error code ${error.errorCode}")
+                this.failWithError(error, methodName)
             }
         }
     )

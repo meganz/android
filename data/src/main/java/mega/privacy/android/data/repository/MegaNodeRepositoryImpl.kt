@@ -94,7 +94,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
                         if (error.errorCode == MegaError.API_OK && request.type == MegaRequest.TYPE_COPY) {
                             continuation.resumeWith(Result.success(NodeId(request.nodeHandle)))
                         } else {
-                            continuation.failWithError(error)
+                            continuation.failWithError(error, "copyNode")
                         }
                     }
                 )
@@ -125,7 +125,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
         newNodeName: String?,
     ): NodeId = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {
+            val listener = continuation.getRequestListener("moveNode") {
                 NodeId(it.nodeHandle)
             }
             megaApiGateway.moveNode(
@@ -163,7 +163,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
             throw IllegalArgumentException("Node needs to be in the rubbish bin before deleting it")
         }
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener {}
+            val listener = continuation.getRequestListener("deleteNodeByHandle") {}
             megaApiGateway.deleteNode(
                 node = node,
                 listener = listener
@@ -200,7 +200,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
                     )
                 )
             } else {
-                continuation.failWithError(error)
+                continuation.failWithError(error, "onRequestFolderInfoCompleted")
             }
         }
 
@@ -293,7 +293,7 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
                             if (error.errorCode == MegaError.API_OK && request.type == MegaRequest.TYPE_SET_ATTR_NODE) {
                                 continuation.resumeWith(Result.success(Unit))
                             } else {
-                                continuation.failWithError(error)
+                                continuation.failWithError(error, "setOriginalFingerprint")
                             }
                         }
                     )
@@ -337,7 +337,8 @@ internal class MegaNodeRepositoryImpl @Inject constructor(
 
     override suspend fun createShareKey(megaNode: MegaNode) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { return@getRequestListener }
+            val listener =
+                continuation.getRequestListener("createShareKey") { return@getRequestListener }
             megaApiGateway.openShareDialog(megaNode, listener)
             continuation.invokeOnCancellation {
                 megaApiGateway.removeRequestListener(listener)

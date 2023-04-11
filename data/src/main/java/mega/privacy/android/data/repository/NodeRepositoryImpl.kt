@@ -134,7 +134,7 @@ internal class NodeRepositoryImpl @Inject constructor(
                                 if (error.errorCode == MegaError.API_OK) {
                                     continuation.resumeWith(Result.success(NodeId(request.nodeHandle)))
                                 } else {
-                                    continuation.failWithError(error)
+                                    continuation.failWithError(error, "getBackupFolderId")
                                 }
                             }
                         }
@@ -200,7 +200,7 @@ internal class NodeRepositoryImpl @Inject constructor(
             suspendCoroutine { continuation ->
                 megaApiGateway.getFolderInfo(
                     megaNode,
-                    continuation.getRequestListener {
+                    continuation.getRequestListener("getFolderTreeInfo") {
                         with(it.megaFolderInfo) {
                             FolderTreeInfo(
                                 numberOfFiles = numFiles,
@@ -219,7 +219,9 @@ internal class NodeRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             megaApiGateway.getMegaNodeByHandle(nodeVersionToDelete.longValue)?.let { version ->
                 suspendCancellableCoroutine { continuation ->
-                    megaApiGateway.deleteVersion(version, continuation.getRequestListener {})
+                    megaApiGateway.deleteVersion(
+                        version,
+                        continuation.getRequestListener("deleteNodeVersionByHandle") {})
                 }
             } ?: throw SynchronisationException("Non null node found be null when fetched from api")
         }

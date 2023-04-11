@@ -468,7 +468,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                 )
             )
         } else {
-            continuation.failWithError(error)
+            continuation.failWithError(error, "onSetupFolderRequestFinish")
         }
     }
 
@@ -488,7 +488,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
                         }
 
                         else -> {
-                            continuation.failWithError(error)
+                            continuation.failWithError(error, "getCameraUploadsSyncHandles")
                         }
                     }
                 }
@@ -562,7 +562,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             val node = megaApiGateway.getMegaNodeByHandle(nodeHandle)
             node?.let {
                 suspendCancellableCoroutine { continuation ->
-                    val listener = continuation.getRequestListener { return@getRequestListener }
+                    val listener =
+                        continuation.getRequestListener("renameNode") { return@getRequestListener }
                     megaApiGateway.renameNode(it, newName, listener)
                     continuation.invokeOnCancellation {
                         megaApiGateway.removeRequestListener(listener)
@@ -640,7 +641,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         lastNode: Long,
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { }
+            val listener = continuation.getRequestListener("sendBackupHeartbeat") { }
             megaApiGateway.sendBackupHeartbeat(
                 backupId,
                 status,
@@ -667,7 +668,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         subState: Int,
     ) = withContext(ioDispatcher) {
         suspendCancellableCoroutine { continuation ->
-            val listener = continuation.getRequestListener { it.parentHandle }
+            val listener = continuation.getRequestListener("updateBackup") { it.parentHandle }
             megaApiGateway.updateBackup(
                 backupId,
                 backupType,
