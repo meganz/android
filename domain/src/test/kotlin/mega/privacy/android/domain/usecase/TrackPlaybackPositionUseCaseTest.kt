@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.repository.MediaPlayerRepository
+import mega.privacy.android.domain.usecase.mediaplayer.TrackPlaybackPositionUseCase
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -21,8 +22,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultTrackPlaybackPositionTest {
-    private lateinit var underTest: TrackPlaybackPosition
+class TrackPlaybackPositionUseCaseTest {
+    private lateinit var underTest: TrackPlaybackPositionUseCase
 
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
 
@@ -33,8 +34,10 @@ class DefaultTrackPlaybackPositionTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        underTest = DefaultTrackPlaybackPosition(mediaPlayerRepository = mediaPlayerRepository,
-            getTicker = getTicker)
+        underTest = TrackPlaybackPositionUseCase(
+            mediaPlayerRepository = mediaPlayerRepository,
+            getTicker = getTicker
+        )
     }
 
     @After
@@ -74,8 +77,10 @@ class DefaultTrackPlaybackPositionTest {
 
             val getCurrentPlaybackInformation =
                 mock<() -> PlaybackInformation> {
-                    on { invoke() }.thenReturn(playbackInfo,
-                        playbackInfoPassOneSecond)
+                    on { invoke() }.thenReturn(
+                        playbackInfo,
+                        playbackInfoPassOneSecond
+                    )
                 }
 
             underTest(getCurrentPlaybackInformation)
@@ -103,8 +108,10 @@ class DefaultTrackPlaybackPositionTest {
 
         val getCurrentPlaybackInformation =
             mock<() -> PlaybackInformation> {
-                on { invoke() }.thenReturn(currentPlaybackInfo,
-                    nextPlaybackInfo)
+                on { invoke() }.thenReturn(
+                    currentPlaybackInfo,
+                    nextPlaybackInfo
+                )
             }
         underTest(getCurrentPlaybackInformation)
 

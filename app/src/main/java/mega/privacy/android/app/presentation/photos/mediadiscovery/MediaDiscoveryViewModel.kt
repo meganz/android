@@ -37,9 +37,9 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandle
-import mega.privacy.android.domain.usecase.MegaApiHttpServerIsRunning
-import mega.privacy.android.domain.usecase.MegaApiHttpServerSetMaxBufferSize
-import mega.privacy.android.domain.usecase.MegaApiHttpServerStart
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
 import mega.privacy.android.domain.usecase.SetCameraSortOrder
 import mega.privacy.android.domain.usecase.SetMediaDiscoveryView
@@ -58,9 +58,9 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val setMediaDiscoveryView: SetMediaDiscoveryView,
     private val getNodeByHandle: GetNodeByHandle,
     private val getFingerprint: GetFingerprint,
-    private val httpServerIsRunning: MegaApiHttpServerIsRunning,
-    private val httpServerStart: MegaApiHttpServerStart,
-    private val httpServerSetMaxBufferSize: MegaApiHttpServerSetMaxBufferSize,
+    private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
+    private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
+    private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
     private val getFileUrlByNodeHandle: GetFileUrlByNodeHandle,
 ) : ViewModel() {
 
@@ -295,12 +295,12 @@ class MediaDiscoveryViewModel @Inject constructor(
         isNeedsMoreBufferSize: Boolean,
         intent: Intent,
     ): Intent {
-        if (httpServerIsRunning() == 0) {
-            httpServerStart()
+        if (megaApiHttpServerIsRunningUseCase() == 0) {
+            megaApiHttpServerStartUseCase()
             intent.putExtra(INTENT_EXTRA_KEY_NEED_STOP_HTTP_SERVER, true)
         }
 
-        httpServerSetMaxBufferSize(
+        megaApiHttpServerSetMaxBufferSizeUseCase(
             if (isNeedsMoreBufferSize) {
                 MAX_BUFFER_32MB
             } else {
