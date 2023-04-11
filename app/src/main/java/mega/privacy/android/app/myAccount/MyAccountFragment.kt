@@ -16,17 +16,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
-import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.databinding.FragmentMyAccountBinding
 import mega.privacy.android.app.databinding.MyAccountPaymentInfoContainerBinding
 import mega.privacy.android.app.databinding.MyAccountUsageContainerBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.Scrollable
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.PhoneNumberBottomSheetDialogFragment
@@ -112,9 +109,8 @@ class MyAccountFragment : Fragment(), Scrollable {
         super.onViewCreated(view, savedInstanceState)
 
         lifecycleScope.launch {
-            val monitorPhoneFlagEnabled = getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)
-            setupView(monitorPhoneFlagEnabled)
-            setupObservers(monitorPhoneFlagEnabled)
+            setupView()
+            setupObservers()
         }
 
         if (savedInstanceState != null) {
@@ -124,7 +120,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         }
     }
 
-    private fun setupView(monitorPhoneFlagEnabled: Boolean) {
+    private fun setupView() {
         binding.scrollView.setOnScrollChangeListener { _, _, _, _, _ ->
             checkScroll()
         }
@@ -137,7 +133,6 @@ class MyAccountFragment : Fragment(), Scrollable {
             findNavController().navigate(R.id.action_my_account_to_edit_profile)
         }
 
-        if (!monitorPhoneFlagEnabled) setupPhoneNumber()
         setupAccountDetails()
 
         binding.backupRecoveryKeyLayout.setOnClickListener {
@@ -158,7 +153,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         viewModel.setElevation(withElevation)
     }
 
-    private fun setupObservers(monitorPhoneFlagEnabled: Boolean) {
+    private fun setupObservers() {
         viewLifecycleOwner.collectFlow(viewModel.state) { state ->
             binding.nameText.text = state.name
             binding.emailText.text = state.email
@@ -171,20 +166,13 @@ class MyAccountFragment : Fragment(), Scrollable {
                 )
             }
 
-            if (monitorPhoneFlagEnabled) {
-                setupPhoneNumber(
-                    canVerifyPhoneNumber = state.canVerifyPhoneNumber,
-                    alreadyRegisteredPhoneNumber = state.verifiedPhoneNumber != null,
-                    registeredPhoneNumber = state.verifiedPhoneNumber,
-                )
-            }
+            setupPhoneNumber(
+                canVerifyPhoneNumber = state.canVerifyPhoneNumber,
+                alreadyRegisteredPhoneNumber = state.verifiedPhoneNumber != null,
+                registeredPhoneNumber = state.verifiedPhoneNumber,
+            )
 
             setProfileAvatar(state.avatar, state.avatarColor)
-        }
-
-        if (!monitorPhoneFlagEnabled) {
-            LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-                .observe(viewLifecycleOwner) { setupPhoneNumber() }
         }
 
         viewModel.onUpdateAccountDetails().observe(viewLifecycleOwner) { setupAccountDetails() }

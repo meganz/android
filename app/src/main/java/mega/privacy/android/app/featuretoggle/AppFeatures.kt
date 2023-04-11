@@ -35,14 +35,6 @@ enum class AppFeatures(override val description: String, private val defaultValu
     AddSubtitle("Enable the feature that adding subtitle", false),
 
     /**
-     * Monitor phone number
-     */
-    MonitorPhoneNumber(
-        "Switch to using the new notification mechanism for monitoring the verified phone number.",
-        true
-    ),
-
-    /**
      * To switch into new photos modularization architecture or not toggle
      */
     PhotosCompose(

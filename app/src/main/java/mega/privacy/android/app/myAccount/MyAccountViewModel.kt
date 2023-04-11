@@ -30,7 +30,6 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.generalusecase.FilePrepareUseCase
 import mega.privacy.android.app.globalmanagement.MyAccountInfo
 import mega.privacy.android.app.interfaces.SnackbarShower
@@ -50,7 +49,6 @@ import mega.privacy.android.app.myAccount.usecase.QueryRecoveryLinkUseCase
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.qrcode.QRCodeActivity
 import mega.privacy.android.app.presentation.testpassword.TestPasswordActivity
-import mega.privacy.android.app.presentation.verification.usecase.ResetPhoneNumberUseCase
 import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR
@@ -160,7 +158,6 @@ class MyAccountViewModel @Inject constructor(
     private val cancelSubscriptionsUseCase: CancelSubscriptionsUseCase,
     private val getMyAvatarFile: GetMyAvatarFile,
     private val checkPasswordReminderUseCase: CheckPasswordReminderUseCase,
-    private val resetPhoneNumberUseCase: ResetPhoneNumberUseCase,
     private val resetSMSVerifiedPhoneNumber: ResetSMSVerifiedPhoneNumber,
     private val getUserDataUseCase: GetUserDataUseCase,
     private val getFileVersionsOption: GetFileVersionsOption,
@@ -242,15 +239,13 @@ class MyAccountViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)) {
-                monitorVerificationStatus().collect { status ->
-                    _state.update {
-                        it.copy(
-                            verifiedPhoneNumber = (status.phoneNumber as? VerifiedPhoneNumber.PhoneNumber)
-                                ?.phoneNumberString,
-                            canVerifyPhoneNumber = status.canRequestOptInVerification,
-                        )
-                    }
+            monitorVerificationStatus().collect { status ->
+                _state.update {
+                    it.copy(
+                        verifiedPhoneNumber = (status.phoneNumber as? VerifiedPhoneNumber.PhoneNumber)
+                            ?.phoneNumberString,
+                        canVerifyPhoneNumber = status.canRequestOptInVerification,
+                    )
                 }
             }
         }
@@ -1076,25 +1071,14 @@ class MyAccountViewModel @Inject constructor(
      */
     fun resetPhoneNumber(isModify: Boolean, snackbarShower: SnackbarShower, action: () -> Unit) {
         resetJob = viewModelScope.launch {
-            if (getFeatureFlagValueUseCase(AppFeatures.MonitorPhoneNumber)) {
-                runCatching { resetSMSVerifiedPhoneNumber() }
-                    .onSuccess {
-                        getUserData(isModify, snackbarShower, action)
-                    }
-                    .onFailure {
-                        Timber.e(it, "Reset phone number failed")
-                        snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_fail))
-                    }
-            } else {
-                runCatching { resetPhoneNumberUseCase() }
-                    .onSuccess {
-                        getUserData(isModify, snackbarShower, action)
-                    }
-                    .onFailure {
-                        Timber.e(it, "Reset phone number failed")
-                        snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_fail))
-                    }
-            }
+            runCatching { resetSMSVerifiedPhoneNumber() }
+                .onSuccess {
+                    getUserData(isModify, snackbarShower, action)
+                }
+                .onFailure {
+                    Timber.e(it, "Reset phone number failed")
+                    snackbarShower.showSnackbar(context.getString(R.string.remove_phone_number_fail))
+                }
         }
     }
 

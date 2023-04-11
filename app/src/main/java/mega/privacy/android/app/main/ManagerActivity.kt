@@ -132,7 +132,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
-import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH_PHONE_NUMBER
 import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
@@ -2201,10 +2200,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun registerEventBusObservers() {
-        if (!isFeatureEnabled(AppFeatures.MonitorPhoneNumber)) {
-            LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-                .observeForever(refreshAddPhoneNumberButtonObserver)
-        }
         LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
             .observe(this, callStatusObserver)
         LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
@@ -2399,11 +2394,9 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 viewModel.setShouldAlertUserAboutSecurityUpgrade(false);
             }
             enabledFeatures = managerState.enabledFlags
-            if (enabledFeatures?.contains(AppFeatures.MonitorPhoneNumber) == true) {
-                canVerifyPhoneNumber = managerState.canVerifyPhoneNumber
-                if (!canVerifyPhoneNumber) {
-                    hideAddPhoneNumberButton()
-                }
+            canVerifyPhoneNumber = managerState.canVerifyPhoneNumber
+            if (!canVerifyPhoneNumber) {
+                hideAddPhoneNumberButton()
             }
             updateInboxSectionVisibility(managerState.hasInboxChildren)
             stopUploadProcessAndSendBroadcast(
@@ -2565,11 +2558,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     }
 
     private fun canVerifyPhoneNumber(): Boolean {
-        return if (isFeatureEnabled(AppFeatures.MonitorPhoneNumber)) {
-            canVerifyPhoneNumber
-        } else {
-            Util.canVoluntaryVerifyPhoneNumber()
-        }
+        return canVerifyPhoneNumber
     }
 
     private fun isRubbishBinComposeEnabled(): Boolean {
@@ -3317,8 +3306,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         unregisterReceiver(updateMyAccountReceiver)
         unregisterReceiver(receiverUpdateOrder)
         unregisterReceiver(chatArchivedReceiver)
-        LiveEventBus.get(EVENT_REFRESH_PHONE_NUMBER, Boolean::class.java)
-            .removeObserver(refreshAddPhoneNumberButtonObserver)
         unregisterReceiver(receiverCUAttrChanged)
         unregisterReceiver(transferFinishReceiver)
         LiveEventBus.get(EVENT_REFRESH, Boolean::class.java)
@@ -4294,7 +4281,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else {
                     appBarLayout.visibility = View.VISIBLE
                     if (getPhotosFragment() == null) {
-                        photosFragment = PhotosFragment.newInstance(viewModel.state.value.isFirstLogin)
+                        photosFragment =
+                            PhotosFragment.newInstance(viewModel.state.value.isFirstLogin)
                     } else {
                         refreshFragment(FragmentTag.PHOTOS.tag)
                     }
@@ -5827,7 +5815,10 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         if (throwable == null) {
                             val notValidView = (result.count == 1
                                     && result.errorCount == 0) && this@ManagerActivity.rubbishBinState().rubbishBinHandle == handleList[0]
-                            showRestorationOrRemovalResult(notValidView, result.getResultText(context = this@ManagerActivity))
+                            showRestorationOrRemovalResult(
+                                notValidView,
+                                result.getResultText(context = this@ManagerActivity)
+                            )
                         }
                     }
             }
