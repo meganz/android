@@ -13,13 +13,21 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.TypedFolderNode
+import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodes
+import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolder
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import org.junit.After
@@ -28,6 +36,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestRule
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @ExperimentalCoroutinesApi
@@ -43,6 +52,9 @@ class FolderLinkViewModelTest {
     private val hasCredentials: HasCredentials = mock()
     private val rootNodeExistsUseCase: RootNodeExistsUseCase = mock()
     private val setViewType: SetViewType = mock()
+    private val fetchFolderNodesUseCase: FetchFolderNodesUseCase = mock()
+    private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
+    private val getFolderLinkChildrenNodes: GetFolderLinkChildrenNodes = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -68,7 +80,10 @@ class FolderLinkViewModelTest {
             copyRequestMessageMapper,
             hasCredentials,
             rootNodeExistsUseCase,
-            setViewType
+            setViewType,
+            fetchFolderNodesUseCase,
+            getFolderParentNodeUseCase,
+            getFolderLinkChildrenNodes
         )
     }
 
@@ -83,6 +98,15 @@ class FolderLinkViewModelTest {
             assertThat(initial.collisions).isNull()
             assertThat(initial.copyResultText).isNull()
             assertThat(initial.copyThrowable).isNull()
+            assertThat(initial.shouldLogin).isNull()
+            assertThat(initial.hasDbCredentials).isFalse()
+            assertThat(initial.nodesList).isEmpty()
+            assertThat(initial.rootNode).isNull()
+            assertThat(initial.parentNode).isNull()
+            assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
+            assertThat(initial.title).isEqualTo("")
+            assertThat(initial.isMultipleSelect).isFalse()
+            assertThat(initial.finishActivity).isFalse()
             assertThat(initial.errorDialogTitle).isEqualTo(-1)
             assertThat(initial.errorDialogContent).isEqualTo(-1)
             assertThat(initial.snackBarMessage).isEqualTo(-1)
@@ -197,4 +221,140 @@ class FolderLinkViewModelTest {
             assertThat(newValue.copyThrowable).isNull()
         }
     }
+
+    @Test
+    fun `test that askForDecryptionKeyDialog values are reset `() = runTest {
+        underTest.state.test {
+            underTest.resetAskForDecryptionKeyDialog()
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.askForDecryptionKeyDialog).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that setViewType is called with GRID when current view type is list`() = runTest {
+        assertThat(underTest.state.value.currentViewType).isEqualTo(ViewType.LIST)
+        underTest.onChangeViewTypeClicked()
+        verify(setViewType).invoke(ViewType.GRID)
+    }
+
+    @Test
+    fun `test that fetch nodes returns correct result`() = runTest {
+        val base64Handle = "1234"
+        val rootNodeName = "RootNode"
+        val rootNode = mock<TypedFolderNode>()
+        val parentNode = mock<TypedFolderNode>()
+        val node1 = mock<TypedNode>()
+        val node2 = mock<TypedNode>()
+        val childrenNodes = listOf(node1, node2)
+        val fetchFolderNodeResult = FetchFolderNodesResult(rootNode, parentNode, childrenNodes)
+
+        whenever(rootNode.name).thenReturn(rootNodeName)
+        whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+
+        underTest.state.test {
+            underTest.fetchNodes(base64Handle)
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.isNodesFetched).isTrue()
+            assertThat(newValue.nodesList.size).isEqualTo(childrenNodes.size)
+            assertThat(newValue.rootNode).isEqualTo(rootNode)
+            assertThat(newValue.parentNode).isEqualTo(parentNode)
+            assertThat(newValue.title).isEqualTo(rootNodeName)
+        }
+    }
+
+    @Test
+    fun `test that onItemLongClick selects the clicked nodes`() = runTest {
+        val base64Handle = "1234"
+        val childNode = mock<TypedNode>()
+        val childrenNodes = listOf(childNode)
+        val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+        val nodeUIItem = NodeUIItem(childNode, isSelected = false, isInvisible = false)
+
+        whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+
+        underTest.state.test {
+            underTest.fetchNodes(base64Handle)
+            underTest.onItemLongClick(nodeUIItem)
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.isMultipleSelect).isTrue()
+            assertThat(newValue.nodesList[0].isSelected).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that onSelectAllClicked selects all the nodes`() = runTest {
+        val base64Handle = "1234"
+        val childrenNodes = listOf<TypedNode>(mock(), mock())
+        val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+
+        whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+
+        underTest.state.test {
+            underTest.fetchNodes(base64Handle)
+            underTest.onSelectAllClicked()
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.isMultipleSelect).isTrue()
+            newValue.nodesList.forEach {
+                assertThat(it.isSelected).isTrue()
+            }
+        }
+    }
+
+    @Test
+    fun `test that onClearAllClicked unselects all the nodes`() = runTest {
+        val base64Handle = "1234"
+        val childrenNodes = listOf<TypedNode>(mock(), mock())
+        val fetchFolderNodeResult = FetchFolderNodesResult(mock(), mock(), childrenNodes)
+
+        whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+
+        underTest.state.test {
+            underTest.fetchNodes(base64Handle)
+            underTest.onSelectAllClicked()
+            var newValue = expectMostRecentItem()
+            assertThat(newValue.isMultipleSelect).isTrue()
+            newValue.nodesList.forEach {
+                assertThat(it.isSelected).isTrue()
+            }
+            underTest.onClearAllClicked()
+            newValue = expectMostRecentItem()
+            assertThat(newValue.isMultipleSelect).isFalse()
+            newValue.nodesList.forEach {
+                assertThat(it.isSelected).isFalse()
+            }
+        }
+    }
+
+    @Test
+    fun `test that handleBackPress returns correct result`() = runTest {
+        val base64Handle = "1234"
+        val newChildHandle = 1234L
+        val newParentNodeName = "New Parent"
+        val oldParentNode = mock<TypedFolderNode>()
+        val newParentNode = mock<TypedFolderNode>()
+        val oldChildNode = mock<TypedNode>()
+        val newChildNode = mock<TypedNode>()
+        val oldChildrenNodes = listOf(oldChildNode)
+        val newChildrenNodes = listOf(newChildNode)
+        val fetchFolderNodeResult =
+            FetchFolderNodesResult(mock(), oldParentNode, oldChildrenNodes)
+
+        whenever(newParentNode.name).thenReturn(newParentNodeName)
+        whenever(newChildNode.id.longValue).thenReturn(newChildHandle)
+        whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+        whenever(getFolderParentNodeUseCase(oldParentNode.id)).thenReturn(newParentNode)
+        whenever(getFolderLinkChildrenNodes(newParentNode.id.longValue, null))
+            .thenReturn(newChildrenNodes)
+
+        underTest.state.test {
+            underTest.fetchNodes(base64Handle)
+            underTest.handleBackPress()
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.parentNode).isEqualTo(newParentNode)
+            assertThat(newValue.title).isEqualTo(newParentNodeName)
+            assertThat(newValue.nodesList[0].id.longValue).isEqualTo(newChildHandle)
+        }
+    }
+
 }

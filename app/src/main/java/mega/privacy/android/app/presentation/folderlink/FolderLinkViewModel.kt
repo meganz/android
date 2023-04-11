@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.folderlink
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,20 +18,27 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.errorDialogContentId
 import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
+import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodes
+import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
 import mega.privacy.android.domain.usecase.folderlink.LoginToFolder
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -47,6 +55,9 @@ class FolderLinkViewModel @Inject constructor(
     private val hasCredentials: HasCredentials,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val setViewType: SetViewType,
+    private val fetchFolderNodesUseCase: FetchFolderNodesUseCase,
+    private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
+    private val getFolderLinkChildrenNodes: GetFolderLinkChildrenNodes,
 ) : ViewModel() {
 
     /**
@@ -75,6 +86,21 @@ class FolderLinkViewModel @Inject constructor(
      */
     val onViewTypeChanged: Flow<ViewType>
         get() = monitorViewType()
+
+    init {
+        checkViewType()
+    }
+
+    /**
+     * This method will monitor view type and update it on state
+     */
+    private fun checkViewType() {
+        viewModelScope.launch {
+            monitorViewType().collect { viewType ->
+                _state.update { it.copy(currentViewType = viewType) }
+            }
+        }
+    }
 
     /**
      * Performs Login to folder
@@ -125,6 +151,40 @@ class FolderLinkViewModel @Inject constructor(
     }
 
     /**
+     * Decrypt the url and login to folder
+     *
+     * @param mKey  Decryption key
+     * @param url   Url to decrypt and login
+     */
+    fun decrypt(mKey: String?, url: String?) {
+        if (TextUtils.isEmpty(mKey)) return
+        var urlWithKey = ""
+
+        url?.let {
+            if (it.contains("#F!")) {
+                // old folder link format
+                urlWithKey = if (mKey?.startsWith("!") == true) {
+                    Timber.d("Decryption key with exclamation!")
+                    "$url$mKey"
+                } else {
+                    "$url!$mKey"
+                }
+            } else if (it.contains("${Constants.SEPARATOR}folder${Constants.SEPARATOR}")) {
+                // new folder link format
+                urlWithKey = if (mKey?.startsWith("#") == true) {
+                    Timber.d("Decryption key with hash!")
+                    "$url$mKey"
+                } else {
+                    "$url#$mKey"
+                }
+            }
+        }
+
+        Timber.d("Folder link to import: $urlWithKey")
+        folderLogin(urlWithKey, true)
+    }
+
+    /**
      * Update whether nodes are fetched or not
      *
      * @param value Whether nodes are fetched
@@ -132,6 +192,15 @@ class FolderLinkViewModel @Inject constructor(
     fun updateIsNodesFetched(value: Boolean) {
         _state.update {
             it.copy(isNodesFetched = value)
+        }
+    }
+
+    /**
+     * Reset the askForDecryptionKeyDialog boolean
+     */
+    fun resetAskForDecryptionKeyDialog() {
+        _state.update {
+            it.copy(askForDecryptionKeyDialog = false)
         }
     }
 
@@ -214,6 +283,148 @@ class FolderLinkViewModel @Inject constructor(
         val viewType = if (isList) ViewType.LIST else ViewType.GRID
         viewModelScope.launch {
             setViewType(viewType)
+        }
+    }
+
+    /**
+     * Fetch the nodes to show
+     *
+     * @param folderSubHandle   Handle of the folder to fetch the nodes for
+     */
+    fun fetchNodes(folderSubHandle: String) {
+        viewModelScope.launch {
+            runCatching { fetchFolderNodesUseCase(folderSubHandle) }
+                .onSuccess { result ->
+                    _state.update {
+                        it.copy(
+                            isNodesFetched = true,
+                            nodesList = result.childrenNodes.map { typedNode ->
+                                NodeUIItem(typedNode, isSelected = false, isInvisible = false)
+                            },
+                            rootNode = result.rootNode,
+                            parentNode = result.parentNode,
+                            title = result.rootNode?.name ?: ""
+                        )
+                    }
+                }
+                .onFailure { throwable ->
+                    var errorTitle = FetchFolderNodesException.GenericError().errorDialogTitleId
+                    var errorContent = FetchFolderNodesException.GenericError().errorDialogContentId
+                    var snackBarContent = FetchFolderNodesException.GenericError().snackBarMessageId
+                    if (throwable is FetchFolderNodesException) {
+                        errorTitle = throwable.errorDialogTitleId
+                        errorContent = throwable.errorDialogContentId
+                        snackBarContent = throwable.snackBarMessageId
+                    }
+                    _state.update {
+                        it.copy(
+                            isNodesFetched = true,
+                            errorDialogTitle = errorTitle,
+                            errorDialogContent = errorContent,
+                            snackBarMessage = snackBarContent
+                        )
+                    }
+                }
+        }
+    }
+
+    /**
+     * Handle item long click
+     *
+     * @param nodeUIItem    Item that is long clicked
+     */
+    fun onItemLongClick(nodeUIItem: NodeUIItem) {
+        val list = _state.value.nodesList
+        list.firstOrNull { it.id.longValue == nodeUIItem.id.longValue }
+            ?.apply { isSelected = !isSelected }
+
+        val isMultipleSelect = list.count { it.isSelected } > 0
+
+        _state.update {
+            it.copy(nodesList = list, isMultipleSelect = isMultipleSelect)
+        }
+    }
+
+    /**
+     * Get all the selected nodes
+     */
+    fun getSelectedNodes(): List<NodeUIItem> = _state.value.nodesList.filter { it.isSelected }
+
+    /**
+     * Handle select all clicked
+     */
+    fun onSelectAllClicked() {
+        val list = _state.value.nodesList
+        list.forEach { it.isSelected = true }
+        _state.update {
+            it.copy(nodesList = list, isMultipleSelect = true)
+        }
+    }
+
+    /**
+     * Handle clear all clicked
+     */
+    fun onClearAllClicked() {
+        val list = _state.value.nodesList
+        list.forEach { it.isSelected = false }
+        _state.update {
+            it.copy(nodesList = list, isMultipleSelect = false)
+        }
+    }
+
+    /**
+     * Handle switch between grid and list
+     */
+    fun onChangeViewTypeClicked() {
+        viewModelScope.launch {
+            when (_state.value.currentViewType) {
+                ViewType.LIST -> setViewType(ViewType.GRID)
+                ViewType.GRID -> setViewType(ViewType.LIST)
+            }
+        }
+    }
+
+    /**
+     * Handle back press
+     */
+    fun handleBackPress() {
+        viewModelScope.launch {
+            state.value.parentNode?.let { parentNode ->
+                runCatching { getFolderParentNodeUseCase(parentNode.id) }
+                    .onSuccess { newParentNode ->
+                        runCatching { getFolderLinkChildrenNodes(newParentNode.id.longValue, null) }
+                            .onSuccess { children ->
+                                _state.update {
+                                    it.copy(
+                                        nodesList = children.map { typedNode ->
+                                            NodeUIItem(
+                                                typedNode,
+                                                isSelected = false,
+                                                isInvisible = false
+                                            )
+                                        },
+                                        parentNode = newParentNode,
+                                        title = newParentNode.name
+                                    )
+                                }
+                            }
+                            .onFailure {
+                                FetchFolderNodesException.GenericError().let {
+                                    _state.update {
+                                        it.copy(
+                                            errorDialogTitle = it.errorDialogTitle,
+                                            errorDialogContent = it.errorDialogContent,
+                                            snackBarMessage = it.snackBarMessage
+                                        )
+                                    }
+                                }
+                            }
+                    }
+                    .onFailure {
+                        Timber.w("parentNode == NULL")
+                        _state.update { it.copy(finishActivity = true) }
+                    }
+            }
         }
     }
 }

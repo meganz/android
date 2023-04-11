@@ -60,7 +60,6 @@ import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.main.adapters.MegaNodeAdapter
 import mega.privacy.android.app.modalbottomsheet.FolderLinkBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
@@ -118,7 +117,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
      * Selected node
      */
     var selectedNode: MegaNode? = null
-    private var folderLinkActivity: FolderLinkActivity? = this
     private var url: String? = null
     private var folderHandle: String? = null
     private var folderKey: String? = null
@@ -130,13 +128,11 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private var adapterList: MegaNodeAdapter? = null
     private var lastPositionStack: Stack<Int>? = null
     private var toHandle: Long = 0
-    private var fragmentHandle: Long = -1
     private var statusDialog: AlertDialog? = null
     private val orderGetChildren = SortOrder.ORDER_DEFAULT_ASC
     private var actionMode: ActionMode? = null
     private var pN: MegaNode? = null
     private var fileLinkFolderLink = false
-    private var handleListM = ArrayList<Long>()
     private var bottomSheetDialogFragment: FolderLinkBottomSheetDialogFragment? = null
     private var mKey: String? = null
     private val nodeSaver = NodeSaver(
@@ -311,11 +307,10 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
             }
 
             toHandle = intent.getLongExtra("IMPORT_TO", 0)
-            fragmentHandle = intent.getLongExtra("fragmentH", -1)
             statusDialog =
                 createProgressDialog(
                     this,
-                    getFormattedStringOrDefault(R.string.general_importing)
+                    getString(R.string.general_importing)
                 )
             statusDialog?.show()
 
@@ -377,6 +372,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
 
     override fun onDialogPositiveClick(key: String?) {
         mKey = key
+        viewModel.resetAskForDecryptionKeyDialog()
         decrypt()
     }
 
@@ -537,7 +533,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
             setDisplayShowHomeEnabled(true)
-            title = "MEGA - ${getFormattedStringOrDefault(R.string.general_loading)}"
+            title = "MEGA - ${getString(R.string.general_loading)}"
         }
 
         setTransfersWidgetLayout(findViewById(R.id.transfers_widget_layout))
@@ -550,7 +546,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
             } else {
                 folderLinkListEmptyImage.setImageResource(R.drawable.empty_folder_portrait)
             }
-            var textToShow = getFormattedStringOrDefault(R.string.file_browser_empty_folder_new)
+            var textToShow = getString(R.string.file_browser_empty_folder_new)
             try {
                 textToShow = textToShow.replace(
                     "[A]",
@@ -720,12 +716,17 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
     private fun askForDecryptionKeyDialog() {
         Timber.d("askForDecryptionKeyDialog")
         val builder = DecryptAlertDialog.Builder()
-        builder.setListener(this)
-            .setTitle(getFormattedStringOrDefault(R.string.alert_decryption_key))
+        val decryptAlertDialog = builder.setListener(this)
+            .setTitle(getString(R.string.alert_decryption_key))
             .setPosText(R.string.general_decryp).setNegText(R.string.general_cancel)
-            .setMessage(getFormattedStringOrDefault(R.string.message_decryption_key))
+            .setMessage(getString(R.string.message_decryption_key))
             .setErrorMessage(R.string.invalid_decryption_key).setKey(mKey)
-            .build().show(supportFragmentManager, TAG_DECRYPT)
+            .build()
+
+        decryptAlertDialog.dialog?.setOnDismissListener {
+            viewModel.resetAskForDecryptionKeyDialog()
+        }
+        decryptAlertDialog.show(supportFragmentManager, TAG_DECRYPT)
     }
 
     override fun onDestroy() {
@@ -982,9 +983,9 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         val builder =
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_Mega_MaterialAlertDialog)
         builder.apply {
-            setTitle(getFormattedStringOrDefault(title))
-            setMessage(getFormattedStringOrDefault(message))
-            setPositiveButton(getFormattedStringOrDefault(android.R.string.ok)) { dialog, _ ->
+            setTitle(getString(title))
+            setMessage(getString(message))
+            setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                 dialog.dismiss()
                 val closedChat = isClosedChat
                 if (closedChat) {
@@ -1297,7 +1298,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     } else {
                         Toast.makeText(
                             this@FolderLinkActivity,
-                            getFormattedStringOrDefault(R.string.intent_not_available),
+                            getString(R.string.intent_not_available),
                             Toast.LENGTH_LONG
                         ).show()
                         downloadNodes(listOf(node))
@@ -1316,8 +1317,6 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                             Constants.REQUEST_WRITE_STORAGE,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE
                         )
-                        handleListM.clear()
-                        handleListM.add(node.handle)
                         return
                     }
                     adapterList.notifyDataSetChanged()
@@ -1369,7 +1368,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
         showSnackbar(
             Constants.SNACKBAR_TYPE,
             binding.folderLinkFragmentContainer,
-            getFormattedStringOrDefault(message)
+            getString(message)
         )
     }
 

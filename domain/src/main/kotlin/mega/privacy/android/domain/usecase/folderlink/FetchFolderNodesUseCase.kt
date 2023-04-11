@@ -58,7 +58,7 @@ class FetchFolderNodesUseCase @Inject constructor(
                 } else {
                     throw FetchFolderNodesException.GenericError()
                 }
-            }.onFailure { throw it }
+            }.onFailure { throw FetchFolderNodesException.GenericError() }
 
         return folderNodesResult
     }
