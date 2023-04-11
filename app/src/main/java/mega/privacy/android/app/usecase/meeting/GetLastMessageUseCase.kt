@@ -66,12 +66,12 @@ class GetLastMessageUseCase @Inject constructor(
             val chatListItem = requireNotNull(megaChatApi.getChatListItem(chatId))
             val chatRoom by lazy { megaChatApi.getChatRoom(chatId) }
             val chatMessage by lazy { megaChatApi.getMessage(chatId, chatListItem.lastMessageId) }
-            val isMeeting by lazy {
-                megaChatApi.getScheduledMeetingsByChat(chatId)?.isNotEmpty() == true
-            }
+            val isMeeting by lazy { megaChatApi.getChatRoom(chatId)?.isMeeting == true }
 
-            megaChatApi.getChatCall(chatId)?.let { chatCall ->
-                return@fromCallable chatCall.getChatCallStatusMessage(isMeeting)
+            if (megaChatApi.hasCallInChatRoom(chatId)) {
+                megaChatApi.getChatCall(chatId)?.let { chatCall ->
+                    return@fromCallable chatCall.getChatCallStatusMessage(isMeeting)
+                }
             }
 
             return@fromCallable when (chatListItem.lastMessageType) {

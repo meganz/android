@@ -212,7 +212,7 @@ internal fun MeetingItemView(
 
         MiddleTextView(
             meeting = meeting,
-            timestampUpdate = timestampUpdate,
+            timestampUpdate = timestampUpdate.takeIf { !meeting.isPending },
             modifier = Modifier.constrainAs(txtMiddle) {
                 linkTo(
                     start = imgLastMessage.end,
@@ -231,7 +231,7 @@ internal fun MeetingItemView(
 
         BottomTextView(
             meeting = meeting,
-            timestampUpdate = timestampUpdate,
+            timestampUpdate = timestampUpdate.takeIf { meeting.isPending },
             modifier = Modifier.constrainAs(txtBottom) {
                 start.linkTo(parent.start, 72.dp)
                 bottom.linkTo(parent.bottom)
