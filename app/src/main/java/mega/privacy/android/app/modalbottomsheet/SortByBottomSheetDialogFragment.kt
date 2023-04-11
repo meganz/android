@@ -22,7 +22,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetSortByBinding
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.FileExplorerActivity
-import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER
 import mega.privacy.android.app.utils.Constants.EVENT_ORDER_CHANGE
@@ -33,18 +32,23 @@ import mega.privacy.android.app.utils.Constants.ORDER_CLOUD
 import mega.privacy.android.app.utils.Constants.ORDER_FAVOURITES
 import mega.privacy.android.app.utils.Constants.ORDER_OFFLINE
 import mega.privacy.android.app.utils.Constants.ORDER_OTHERS
-import mega.privacy.android.app.utils.callManager
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.domain.entity.SortOrder
 import java.util.Locale
 import javax.inject.Inject
 
+/**
+ * A [BaseBottomSheetDialogFragment] that displays a list of Sort Options
+ */
 @AndroidEntryPoint
 class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     companion object {
         private const val ORDER_TYPE = "ORDER_TYPE"
 
+        /**
+         * Specify behavior when this Fragment is initialized
+         */
         @JvmStatic
         fun newInstance(orderType: Int): SortByBottomSheetDialogFragment {
             val fragment = SortByBottomSheetDialogFragment()
@@ -73,6 +77,9 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     lateinit var sortOrderIntMapper: SortOrderIntMapper
 
 
+    /**
+     * onCreateView()
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -84,6 +91,9 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         return contentView
     }
 
+    /**
+     * onViewCreated()
+     */
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val sortByName = getString(R.string.sortby_name)
@@ -221,9 +231,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                 sortByHeaderViewModel.offlineSortOrder.value,
                             )
                         )
-                    if (requireActivity() is ManagerActivity) {
-                        (requireActivity() as ManagerActivity).refreshCloudOrder()
-                    } else if (requireActivity() is FileExplorerActivity) {
+                    if (requireActivity() is FileExplorerActivity) {
                         updateFileExplorerOrder(sortOrderIntMapper(order))
                     }
                 }
@@ -240,9 +248,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                 sortByHeaderViewModel.offlineSortOrder.value,
                             )
                         )
-                    if (requireActivity() is ManagerActivity) {
-                        (requireActivity() as ManagerActivity).refreshOthersOrder()
-                    } else if (requireActivity() is FileExplorerActivity) {
+                    if (requireActivity() is FileExplorerActivity) {
                         updateFileExplorerOrder(sortOrderIntMapper(order))
                     }
                 }
@@ -256,10 +262,6 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                 order
                             )
                         )
-
-                    callManager { manager ->
-                        manager.refreshOthersOrder()
-                    }
                 }
             }
 
