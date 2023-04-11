@@ -22,7 +22,7 @@ import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.DeleteQRCode
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
-import mega.privacy.android.domain.usecase.GetMyAvatarColor
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetQRCodeFile
 import mega.privacy.android.domain.usecase.ResetContactLink
@@ -53,7 +53,7 @@ class MyCodeViewModelTest {
     private val resetContactLink: ResetContactLink = mock()
     private val qrCodeMapper: QRCodeMapper = mock()
     private val avatarMapper: AvatarMapper = mock()
-    private val getMyAvatarColor: GetMyAvatarColor = mock()
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
     private val getMyAvatarFile: GetMyAvatarFile = mock()
     private val getCurrentUserFullName: GetCurrentUserFullName = mock()
     private val context: Context = mock()
@@ -86,7 +86,7 @@ class MyCodeViewModelTest {
             resetContactLink = resetContactLink,
             qrCodeMapper = qrCodeMapper,
             avatarMapper = avatarMapper,
-            getMyAvatarColor = getMyAvatarColor,
+            getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFile = getMyAvatarFile,
             getCurrentUserFullName = getCurrentUserFullName,
             loadBitmapFromFile = loadBitmapFromFileMapper,

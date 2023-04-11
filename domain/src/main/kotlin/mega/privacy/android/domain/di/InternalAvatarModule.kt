@@ -4,7 +4,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
 import mega.privacy.android.domain.repository.AvatarRepository
-import mega.privacy.android.domain.usecase.GetMyAvatarColor
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.account.UpdateMyAvatarWithNewEmail
@@ -16,10 +15,6 @@ internal abstract class InternalAvatarModule {
         @Provides
         fun provideGetMyAvatarFile(repository: AvatarRepository): GetMyAvatarFile =
             GetMyAvatarFile(repository::getMyAvatarFile)
-
-        @Provides
-        fun provideGetMyAvatarColor(repository: AvatarRepository): GetMyAvatarColor =
-            GetMyAvatarColor(repository::getMyAvatarColor)
 
         @Provides
         fun provideGetMonitorMyAvatarFile(repository: AvatarRepository): MonitorMyAvatarFile =

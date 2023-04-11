@@ -23,7 +23,7 @@ import mega.privacy.android.domain.usecase.CopyToClipBoard
 import mega.privacy.android.domain.usecase.CreateContactLink
 import mega.privacy.android.domain.usecase.DeleteQRCode
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
-import mega.privacy.android.domain.usecase.GetMyAvatarColor
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetQRCodeFile
 import mega.privacy.android.domain.usecase.ResetContactLink
@@ -43,7 +43,7 @@ class MyCodeViewModel @Inject constructor(
     private val resetContactLink: ResetContactLink,
     private val avatarMapper: AvatarMapper,
     private val qrCodeMapper: QRCodeMapper,
-    private val getMyAvatarColor: GetMyAvatarColor,
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val getCurrentUserFullName: GetCurrentUserFullName,
     private val getMyAvatarFile: GetMyAvatarFile,
     private val loadBitmapFromFile: LoadBitmapFromFileMapper,
@@ -189,12 +189,12 @@ class MyCodeViewModel @Inject constructor(
                 loadBitmapFromFile(avatarFile)
                     ?.let { getCircleBitmap(it) }
                     ?: avatarMapper.getDefaultAvatar(
-                        color = getMyAvatarColor(),
+                        color = getMyAvatarColorUseCase(),
                         text = userFullName,
                         isList = true
                     )
             } ?: avatarMapper.getDefaultAvatar(
-            color = getMyAvatarColor(),
+            color = getMyAvatarColorUseCase(),
             text = userFullName,
             isList = true
         )

@@ -20,7 +20,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
-import mega.privacy.android.domain.usecase.GetMyAvatarColor
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -49,7 +49,7 @@ internal class UserInfoViewModel @Inject constructor(
     private val getContactEmail: GetContactEmail,
     private val getMyAvatarFile: GetMyAvatarFile,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
-    private val getMyAvatarColor: GetMyAvatarColor,
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val avatarContentMapper: AvatarContentMapper,
     @ApplicationScope private val applicationScope: CoroutineScope,
     @ApplicationContext private val context: Context,
@@ -103,7 +103,7 @@ internal class UserInfoViewModel @Inject constructor(
         val avatarContent = avatarContentMapper(
             fullName = _state.value.fullName,
             localFile = avatarFile,
-            backgroundColor = { getMyAvatarColor() },
+            backgroundColor = { getMyAvatarColorUseCase() },
             showBorder = false,
             textSize = 36.sp
         )

@@ -42,7 +42,7 @@ import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetChatParticipants
 import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.GetVisibleContacts
+import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.InviteContact
 import mega.privacy.android.domain.usecase.InviteToChat
 import mega.privacy.android.domain.usecase.LeaveChat
@@ -71,7 +71,7 @@ import javax.inject.Inject
  * @property getChatParticipants            [GetChatParticipants]
  * @property getScheduledMeetingByChat      [GetScheduledMeetingByChat]
  * @property getChatCall                    [GetChatCall]
- * @property getVisibleContacts             [GetVisibleContacts]
+ * @property getVisibleContactsUseCase             [GetVisibleContactsUseCase]
  * @property queryChatLink                  [QueryChatLink]
  * @property removeChatLink                 [RemoveChatLink]
  * @property createChatLink                 [CreateChatLink]
@@ -103,7 +103,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getChatParticipants: GetChatParticipants,
     private val getScheduledMeetingByChat: GetScheduledMeetingByChat,
     private val getChatCall: GetChatCall,
-    private val getVisibleContacts: GetVisibleContacts,
+    private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val queryChatLink: QueryChatLink,
     private val removeChatLink: RemoveChatLink,
     private val createChatLink: CreateChatLink,
@@ -576,7 +576,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         if (isConnected) {
             Timber.d("Add participants to the chat room")
             viewModelScope.launch {
-                val contactList = getVisibleContacts()
+                val contactList = getVisibleContactsUseCase()
                 when {
                     contactList.isEmpty() -> {
                         _state.update {

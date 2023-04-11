@@ -11,7 +11,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
-import mega.privacy.android.domain.usecase.GetMyAvatarColor
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -32,7 +32,7 @@ import kotlin.test.assertEquals
 internal class EditProfileViewModelTest {
     private lateinit var underTest: EditProfileViewModel
 
-    private val getMyAvatarColor = mock<GetMyAvatarColor>()
+    private val getMyAvatarColorUseCase = mock<GetMyAvatarColorUseCase>()
     private val getMyAvatarFile = mock<GetMyAvatarFile>()
     private val monitorMyAvatarFile = mock<MonitorMyAvatarFile>()
     private val colorMyAvatar = Color.RED
@@ -45,12 +45,12 @@ internal class EditProfileViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
         whenever(monitorMyAvatarFile()).thenReturn(monitorMyAvatarFileFlow)
-        getMyAvatarColor.stub {
+        getMyAvatarColorUseCase.stub {
             onBlocking { invoke() }.doReturn(colorMyAvatar)
         }
         underTest = EditProfileViewModel(
             ioDispatcher = UnconfinedTestDispatcher(),
-            getMyAvatarColor = getMyAvatarColor,
+            getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFile = getMyAvatarFile,
             monitorMyAvatarFile = monitorMyAvatarFile,
             getCurrentUserFirstName = getCurrentUserFirstName,

@@ -24,7 +24,7 @@ import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactData
-import mega.privacy.android.domain.usecase.GetVisibleContacts
+import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -39,7 +39,7 @@ import javax.inject.Inject
 /**
  * StartConversationFragment view model.
  *
- * @property getVisibleContacts           [GetVisibleContacts]
+ * @property getVisibleContactsUseCase           [GetVisibleContactsUseCase]
  * @property getContactData               [GetContactData]
  * @property startConversation            [StartConversation]
  * @property monitorContactUpdates        [MonitorContactUpdates]
@@ -53,7 +53,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class StartConversationViewModel @Inject constructor(
-    private val getVisibleContacts: GetVisibleContacts,
+    private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val getContactData: GetContactData,
     private val startConversation: StartConversation,
     private val monitorContactUpdates: MonitorContactUpdates,
@@ -116,16 +116,21 @@ class StartConversationViewModel @Inject constructor(
             merge(
                 searchExpanded.map { widgetState ->
                     { state: StartConversationState ->
-                        state.copy(searchWidgetState = widgetState,
-                            buttonsVisible = widgetState != SearchWidgetState.EXPANDED)
+                        state.copy(
+                            searchWidgetState = widgetState,
+                            buttonsVisible = widgetState != SearchWidgetState.EXPANDED
+                        )
                     }
                 },
                 typedSearch.map { typed ->
                     { state: StartConversationState ->
-                        state.copy(typedSearch = typed,
+                        state.copy(
+                            typedSearch = typed,
                             filteredContactList = getFilteredContactList(
                                 contactList = state.contactItemList,
-                                typedSearch = typed))
+                                typedSearch = typed
+                            )
+                        )
                     }
                 },
                 fromChat.map { isFromChat ->
@@ -152,7 +157,7 @@ class StartConversationViewModel @Inject constructor(
 
     private fun getContacts() {
         viewModelScope.launch {
-            val contactList = getVisibleContacts()
+            val contactList = getVisibleContactsUseCase()
             _state.update {
                 it.copy(
                     contactItemList = contactList,

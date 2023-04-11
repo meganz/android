@@ -27,7 +27,7 @@ import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetRecentActions
-import mega.privacy.android.domain.usecase.GetVisibleContacts
+import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import nz.mega.sdk.MegaNode
@@ -47,7 +47,7 @@ class RecentActionsViewModelTest {
     private val getRecentActions = mock<GetRecentActions> {
         onBlocking { invoke() }.thenReturn(emptyList())
     }
-    private val getVisibleContacts = mock<GetVisibleContacts> {
+    private val getVisibleContactsUseCase = mock<GetVisibleContactsUseCase> {
         onBlocking { invoke() }.thenReturn(emptyList())
     }
     private val getNodeByHandle = mock<GetNodeByHandle> {
@@ -111,7 +111,7 @@ class RecentActionsViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher())
         underTest = RecentActionsViewModel(
             getRecentActions,
-            getVisibleContacts,
+            getVisibleContactsUseCase,
             setHideRecentActivity,
             getNodeByHandle,
             getAccountDetailsUseCase,
@@ -145,7 +145,8 @@ class RecentActionsViewModelTest {
                     val item = awaitItem()
                     assertThat(item.filterIsInstance<RecentActionItemType.Item>().size).isEqualTo(1)
                     assertThat(item.filterIsInstance<RecentActionItemType.Header>().size).isEqualTo(
-                        1)
+                        1
+                    )
                 }
         }
 
@@ -206,7 +207,7 @@ class RecentActionsViewModelTest {
                 on { contactData }.thenReturn(contact)
             }
             whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
-            whenever(getVisibleContacts()).thenReturn(listOf(contactItem))
+            whenever(getVisibleContactsUseCase()).thenReturn(listOf(contactItem))
 
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {
@@ -225,7 +226,7 @@ class RecentActionsViewModelTest {
                 on { contactData }.thenReturn(mock())
             }
             whenever(getRecentActions()).thenReturn(listOf(megaRecentActionBucket))
-            whenever(getVisibleContacts()).thenReturn(listOf(contactItem))
+            whenever(getVisibleContactsUseCase()).thenReturn(listOf(contactItem))
 
             underTest.state.map { it.recentActionItems }.distinctUntilChanged()
                 .test {

@@ -11,7 +11,6 @@ import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetContactData
-import mega.privacy.android.domain.usecase.GetVisibleContacts
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
@@ -72,10 +71,6 @@ internal abstract class ContactsModule {
         @Provides
         fun provideMonitorChatOnlineStatusUpdates(contactsRepository: ContactsRepository): MonitorOnlineStatusUpdates =
             MonitorOnlineStatusUpdates(contactsRepository::monitorChatOnlineStatusUpdates)
-
-        @Provides
-        fun provideGetVisibleContacts(contactsRepository: ContactsRepository): GetVisibleContacts =
-            GetVisibleContacts(contactsRepository::getVisibleContacts)
 
         @Provides
         fun provideGetContactData(contactsRepository: ContactsRepository): GetContactData =

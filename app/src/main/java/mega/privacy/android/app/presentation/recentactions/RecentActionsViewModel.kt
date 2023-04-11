@@ -21,7 +21,7 @@ import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.usecase.AreCredentialsVerified
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
 import mega.privacy.android.domain.usecase.GetRecentActions
-import mega.privacy.android.domain.usecase.GetVisibleContacts
+import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorHideRecentActivity
 import mega.privacy.android.domain.usecase.SetHideRecentActivity
 import nz.mega.sdk.MegaNode
@@ -32,8 +32,8 @@ import javax.inject.Inject
  * ViewModel associated to [RecentActionsFragment]
  *
  * @param getRecentActions
- * @param getVisibleContacts
- * @param getVisibleContacts
+ * @param getVisibleContactsUseCase
+ * @param getVisibleContactsUseCase
  * @param setHideRecentActivity
  * @param monitorNodeUpdates
  * @param areCredentialsVerified
@@ -41,7 +41,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RecentActionsViewModel @Inject constructor(
     private val getRecentActions: GetRecentActions,
-    private val getVisibleContacts: GetVisibleContacts,
+    private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val setHideRecentActivity: SetHideRecentActivity,
     private val getNodeByHandle: GetNodeByHandle,
     private val getAccountDetailsUseCase: GetAccountDetailsUseCase,
@@ -127,7 +127,7 @@ class RecentActionsViewModel @Inject constructor(
         val getRecentActions = async {
             getRecentActions().also { _buckets = it }
         }
-        val getVisibleContacts = async { getVisibleContacts() }
+        val getVisibleContacts = async { getVisibleContactsUseCase() }
 
         val formattedList =
             formatRecentActions(getRecentActions.await(), getVisibleContacts.await())
@@ -168,14 +168,16 @@ class RecentActionsViewModel @Inject constructor(
                 bucket.nodes[0].isNodeKeyDecrypted || areCredentialsVerified(bucket.userEmail)
             val parentNode = getNodeByHandle(bucket.parentHandle)
             val sharesType = getParentSharesType(parentNode)
-            recentItemList.add(RecentActionItemType.Item(
-                bucket,
-                userName,
-                parentNode?.name ?: "",
-                sharesType,
-                currentUserIsOwner,
-                isNodeKeyVerified,
-            ))
+            recentItemList.add(
+                RecentActionItemType.Item(
+                    bucket,
+                    userName,
+                    parentNode?.name ?: "",
+                    sharesType,
+                    currentUserIsOwner,
+                    isNodeKeyVerified,
+                )
+            )
         }
 
         return recentItemList

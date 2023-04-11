@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import mega.privacy.android.domain.usecase.GetMyAvatarColor
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
@@ -27,7 +27,7 @@ import javax.inject.Inject
 class EditProfileViewModel @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val getMyAvatarFile: GetMyAvatarFile,
-    private val getMyAvatarColor: GetMyAvatarColor,
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
     private val monitorMyAvatarFile: MonitorMyAvatarFile,
     private val getCurrentUserFirstName: GetCurrentUserFirstName,
     private val getCurrentUserLastName: GetCurrentUserLastName,
@@ -91,7 +91,7 @@ class EditProfileViewModel @Inject constructor(
      * @param avatarFile
      */
     private suspend fun updateMyAvatarFile(avatarFile: File?) {
-        _state.value = EditProfileState(avatarFile, getMyAvatarColor())
+        _state.value = EditProfileState(avatarFile, getMyAvatarColorUseCase())
     }
 
     /**

@@ -17,7 +17,7 @@ import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserId
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
-import mega.privacy.android.domain.usecase.GetMyAvatarColor
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
@@ -62,7 +62,7 @@ internal class UserInfoViewModelTest {
     private val getContactEmail: GetContactEmail = mock()
     private val applicationScope: CoroutineScope = CoroutineScope(UnconfinedTestDispatcher())
     private val avatarContentMapper: AvatarContentMapper = mock()
-    private val getMyAvatarColor: GetMyAvatarColor = mock()
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase = mock()
     private val getMyAvatarFile: GetMyAvatarFile = mock()
     private val monitorMyAvatarFile: MonitorMyAvatarFile = mock()
 
@@ -87,7 +87,7 @@ internal class UserInfoViewModelTest {
             getContactEmail = getContactEmail,
             applicationScope = applicationScope,
             avatarContentMapper = avatarContentMapper,
-            getMyAvatarColor = getMyAvatarColor,
+            getMyAvatarColorUseCase = getMyAvatarColorUseCase,
             getMyAvatarFile = getMyAvatarFile,
             monitorMyAvatarFile = monitorMyAvatarFile,
         )

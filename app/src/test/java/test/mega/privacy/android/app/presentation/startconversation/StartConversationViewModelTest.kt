@@ -25,7 +25,7 @@ import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactData
-import mega.privacy.android.domain.usecase.GetVisibleContacts
+import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
@@ -66,20 +66,22 @@ class StartConversationViewModelTest {
     )
     private val testContactList = mutableListOf<ContactItem>().apply {
         for (i in 0 until 10) {
-            add(ContactItem(
-                handle = Random.nextLong(),
-                email = "email$i@mega.nz",
-                contactData = emptyContactData,
-                defaultAvatarColor = "0asf80",
-                visibility = UserVisibility.Visible,
-                timestamp = Random.nextLong(),
-                areCredentialsVerified = false,
-                status = UserStatus.Online,
-            ))
+            add(
+                ContactItem(
+                    handle = Random.nextLong(),
+                    email = "email$i@mega.nz",
+                    contactData = emptyContactData,
+                    defaultAvatarColor = "0asf80",
+                    visibility = UserVisibility.Visible,
+                    timestamp = Random.nextLong(),
+                    areCredentialsVerified = false,
+                    status = UserStatus.Online,
+                )
+            )
         }
     }
 
-    private val getVisibleContacts = mock<GetVisibleContacts> {
+    private val getVisibleContactsUseCase = mock<GetVisibleContactsUseCase> {
         onBlocking { invoke() }.thenReturn(testContactList)
     }
 
@@ -128,7 +130,7 @@ class StartConversationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
         underTest = StartConversationViewModel(
-            getVisibleContacts = getVisibleContacts,
+            getVisibleContactsUseCase = getVisibleContactsUseCase,
             getContactData = getContactData,
             startConversation = startConversation,
             monitorContactUpdates = monitorContactUpdates,
@@ -298,8 +300,12 @@ class StartConversationViewModelTest {
     @Test
     fun `test that an invalid handle is returned if start conversation finish with an error`() =
         runTest {
-            whenever(startConversation(anyOrNull(),
-                anyOrNull())).thenAnswer { throw Throwable("Complete with error") }
+            whenever(
+                startConversation(
+                    anyOrNull(),
+                    anyOrNull()
+                )
+            ).thenAnswer { throw Throwable("Complete with error") }
             scheduler.advanceUntilIdle()
 
             underTest.state.map { it.result }.distinctUntilChanged()
@@ -313,8 +319,12 @@ class StartConversationViewModelTest {
     @Test
     fun `test that an error is returned if start conversation finish with an error`() =
         runTest {
-            whenever(startConversation(anyOrNull(),
-                anyOrNull())).thenAnswer { throw Throwable("Complete with error") }
+            whenever(
+                startConversation(
+                    anyOrNull(),
+                    anyOrNull()
+                )
+            ).thenAnswer { throw Throwable("Complete with error") }
             scheduler.advanceUntilIdle()
 
             underTest.state.map { it.error }.distinctUntilChanged()
