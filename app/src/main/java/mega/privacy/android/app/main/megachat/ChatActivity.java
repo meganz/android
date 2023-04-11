@@ -206,6 +206,7 @@ import static mega.privacy.android.app.utils.permission.PermissionUtils.requestC
 import static mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission;
 import static mega.privacy.android.data.facade.FileFacadeKt.INTENT_EXTRA_NODE_HANDLE;
 import static nz.mega.sdk.MegaApiJava.INVALID_HANDLE;
+import static nz.mega.sdk.MegaChatApi.INIT_ANONYMOUS;
 import static nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE;
 
 import android.Manifest;
@@ -267,6 +268,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.content.res.AppCompatResources;
@@ -619,7 +621,7 @@ public class ChatActivity extends PasscodeActivity
     public long selectedMessageId = -1;
     MegaChatRoom chatRoom;
 
-    public long idChat;
+    public long idChat = MEGACHAT_INVALID_HANDLE;
 
     boolean noMoreNoSentMessages = false;
 
@@ -1009,7 +1011,7 @@ public class ChatActivity extends PasscodeActivity
     }
 
     @Override
-    public void onPreviewLoaded(MegaChatRequest request, int errorCode) {
+    public void onPreviewLoaded(@NonNull MegaChatRequest request, int errorCode) {
         if (errorCode == MegaChatError.ERROR_OK || errorCode == MegaChatError.ERROR_EXIST) {
             if (idChat != MEGACHAT_INVALID_HANDLE && megaChatApi.getChatRoom(idChat) != null) {
                 Timber.d("Close previous chat");
@@ -1030,6 +1032,8 @@ public class ChatActivity extends PasscodeActivity
 
             MegaApplication.setOpenChatId(idChat);
 
+            initAndShowChat();
+
             if (errorCode == MegaChatError.ERROR_OK && openingAndJoining) {
                 if (!isAlreadyJoining(idChat)) {
                     megaChatApi.autojoinPublicChat(idChat, ChatActivity.this);
@@ -1041,32 +1045,12 @@ public class ChatActivity extends PasscodeActivity
                     //I'm already participant
                     joiningOrLeaving = false;
                     openingAndJoining = false;
-                } else {
-                    if (initChat()) {
-                        //Chat successfully initialized, now can rejoin
-                        setJoiningOrLeaving(getString(R.string.joining_label));
-                        titleToolbar.setText(getTitleChat(chatRoom));
-                        groupalSubtitleToolbar.setText(null);
-                        setGroupalSubtitleToolbarVisibility(false);
-                        if (adapter == null) {
-                            createAdapter();
-                        } else {
-                            adapter.updateChatRoom(chatRoom);
-                            adapter.notifyDataSetChanged();
-                        }
-                        if (!isAlreadyJoining(idChat)
-                                && !isAlreadyJoining(request.getUserHandle())) {
-                            megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
-                        }
-                    } else {
-                        Timber.w("Error opening chat before rejoin");
-                    }
-                    return;
+                }
+                if (!isAlreadyJoining(idChat) && !isAlreadyJoining(request.getUserHandle())) {
+                    megaChatApi.autorejoinPublicChat(idChat, request.getUserHandle(), this);
                 }
             }
 
-            Timber.d("Show new chat room UI");
-            initEmptyScreen(null);
             supportInvalidateOptionsMenu();
         } else {
             String text;
@@ -1506,7 +1490,7 @@ public class ChatActivity extends PasscodeActivity
             return;
         }
 
-        if (viewModel.isConnected()) {
+        if (viewModel.isConnected() && megaChatApi.getInitState() != INIT_ANONYMOUS) {
             shouldRefreshSessionDueToSDK();
         }
 
@@ -2083,7 +2067,7 @@ public class ChatActivity extends PasscodeActivity
 
             ScheduledMeetingStatus schedMeetStatus = chatState.getScheduledMeetingStatus();
 
-            if (chatRoom != null && chatRoom.isActive() && !chatRoom.isArchived() && schedMeetStatus != null && (schedMeetStatus instanceof ScheduledMeetingStatus.NotStarted ||
+            if (chatRoom != null && chatRoom.isActive() && !chatRoom.isArchived() && (schedMeetStatus instanceof ScheduledMeetingStatus.NotStarted ||
                     schedMeetStatus instanceof ScheduledMeetingStatus.NotJoined)) {
                 startOrJoinMeetingBanner.setText(schedMeetStatus instanceof ScheduledMeetingStatus.NotStarted ?
                         R.string.meetings_chat_room_start_scheduled_meeting_option :
@@ -2139,7 +2123,7 @@ public class ChatActivity extends PasscodeActivity
                     String link = newIntent.getDataString();
                     megaChatApi.openChatPreview(link, new LoadPreviewListener(ChatActivity.this, ChatActivity.this, ChatActivity.this, CHECK_LINK_TYPE_CHAT_LINK));
 
-                    if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK)) {
+                    if (intentAction.equals(ACTION_JOIN_OPEN_CHAT_LINK) && MegaApplication.getChatManagement().isAlreadyJoining(idChat)) {
                         openingAndJoining = true;
                         setJoiningOrLeaving(getString(R.string.joining_label));
                     }
@@ -2415,6 +2399,8 @@ public class ChatActivity extends PasscodeActivity
         if (!resultInit) {
             return;
         }
+
+        initEmptyScreen(null);
 
         initializeInputText();
         checkIfIsAlreadyJoiningOrLeaving();
@@ -8417,7 +8403,7 @@ public class ChatActivity extends PasscodeActivity
     @Override
     protected void onStart() {
         super.onStart();
-        if (!viewModel.isChatInitialised()) {
+        if (!viewModel.isChatInitialised() && megaChatApi.getInitState() != INIT_ANONYMOUS) {
             cleanBuffers();
 
             if (!initChat()) {
