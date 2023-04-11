@@ -24,9 +24,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
-import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodes
+import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
-import mega.privacy.android.domain.usecase.folderlink.LoginToFolder
+import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -45,7 +45,7 @@ class FolderLinkViewModelTest {
     private lateinit var underTest: FolderLinkViewModel
     private val monitorViewType = mock<MonitorViewType>()
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase>()
-    private val loginToFolder = mock<LoginToFolder>()
+    private val loginToFolderUseCase = mock<LoginToFolderUseCase>()
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase = mock()
     private val copyNodeUseCase: CopyNodeUseCase = mock()
     private val copyRequestMessageMapper: CopyRequestMessageMapper = mock()
@@ -54,7 +54,7 @@ class FolderLinkViewModelTest {
     private val setViewType: SetViewType = mock()
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase = mock()
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
-    private val getFolderLinkChildrenNodes: GetFolderLinkChildrenNodes = mock()
+    private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -74,7 +74,7 @@ class FolderLinkViewModelTest {
         underTest = FolderLinkViewModel(
             monitorConnectivityUseCase,
             monitorViewType,
-            loginToFolder,
+            loginToFolderUseCase,
             checkNameCollisionUseCase,
             copyNodeUseCase,
             copyRequestMessageMapper,
@@ -83,7 +83,7 @@ class FolderLinkViewModelTest {
             setViewType,
             fetchFolderNodesUseCase,
             getFolderParentNodeUseCase,
-            getFolderLinkChildrenNodes
+            getFolderLinkChildrenNodesUseCase
         )
     }
 
@@ -125,7 +125,7 @@ class FolderLinkViewModelTest {
     @Test
     fun `test that on login into folder and on result OK values are updated correctly`() = runTest {
         val folderLink = "abcd"
-        whenever(loginToFolder(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
+        whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.SUCCESS)
         underTest.state.test {
             underTest.folderLogin(folderLink)
             val newValue = expectMostRecentItem()
@@ -138,7 +138,7 @@ class FolderLinkViewModelTest {
     fun `test that on login into folder and on result API_INCOMPLETE values are updated correctly`() =
         runTest {
             val folderLink = "abcd"
-            whenever(loginToFolder(folderLink)).thenReturn(FolderLoginStatus.API_INCOMPLETE)
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.API_INCOMPLETE)
             underTest.state.test {
                 underTest.folderLogin(folderLink)
                 val newValue = expectMostRecentItem()
@@ -153,7 +153,7 @@ class FolderLinkViewModelTest {
         runTest {
             val folderLink = "abcd"
             val decryptionIntroduced = true
-            whenever(loginToFolder(folderLink)).thenReturn(FolderLoginStatus.INCORRECT_KEY)
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.INCORRECT_KEY)
             underTest.state.test {
                 underTest.folderLogin(folderLink, decryptionIntroduced)
                 val newValue = expectMostRecentItem()
@@ -167,7 +167,7 @@ class FolderLinkViewModelTest {
     fun `test that on login into folder and on result ERROR values are updated correctly`() =
         runTest {
             val folderLink = "abcd"
-            whenever(loginToFolder(folderLink)).thenReturn(FolderLoginStatus.ERROR)
+            whenever(loginToFolderUseCase(folderLink)).thenReturn(FolderLoginStatus.ERROR)
             underTest.state.test {
                 underTest.folderLogin(folderLink)
                 val newValue = expectMostRecentItem()
@@ -344,7 +344,7 @@ class FolderLinkViewModelTest {
         whenever(newChildNode.id.longValue).thenReturn(newChildHandle)
         whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
         whenever(getFolderParentNodeUseCase(oldParentNode.id)).thenReturn(newParentNode)
-        whenever(getFolderLinkChildrenNodes(newParentNode.id.longValue, null))
+        whenever(getFolderLinkChildrenNodesUseCase(newParentNode.id.longValue, null))
             .thenReturn(newChildrenNodes)
 
         underTest.state.test {

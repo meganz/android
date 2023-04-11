@@ -31,9 +31,9 @@ import mega.privacy.android.domain.exception.FetchFolderNodesException
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
-import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodes
+import mega.privacy.android.domain.usecase.folderlink.GetFolderLinkChildrenNodesUseCase
 import mega.privacy.android.domain.usecase.folderlink.GetFolderParentNodeUseCase
-import mega.privacy.android.domain.usecase.folderlink.LoginToFolder
+import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
@@ -48,7 +48,7 @@ import javax.inject.Inject
 class FolderLinkViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorViewType: MonitorViewType,
-    private val loginToFolder: LoginToFolder,
+    private val loginToFolderUseCase: LoginToFolderUseCase,
     private val checkNameCollisionUseCase: CheckNameCollisionUseCase,
     private val copyNodeUseCase: CopyNodeUseCase,
     private val copyRequestMessageMapper: CopyRequestMessageMapper,
@@ -57,7 +57,7 @@ class FolderLinkViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase,
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
-    private val getFolderLinkChildrenNodes: GetFolderLinkChildrenNodes,
+    private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
 ) : ViewModel() {
 
     /**
@@ -109,7 +109,7 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun folderLogin(folderLink: String, decryptionIntroduced: Boolean = false) {
         viewModelScope.launch {
-            when (val result = loginToFolder(folderLink)) {
+            when (val result = loginToFolderUseCase(folderLink)) {
                 FolderLoginStatus.SUCCESS -> {
                     _state.update { it.copy(isInitialState = false, isLoginComplete = true) }
                 }
@@ -392,7 +392,12 @@ class FolderLinkViewModel @Inject constructor(
             state.value.parentNode?.let { parentNode ->
                 runCatching { getFolderParentNodeUseCase(parentNode.id) }
                     .onSuccess { newParentNode ->
-                        runCatching { getFolderLinkChildrenNodes(newParentNode.id.longValue, null) }
+                        runCatching {
+                            getFolderLinkChildrenNodesUseCase(
+                                newParentNode.id.longValue,
+                                null
+                            )
+                        }
                             .onSuccess { children ->
                                 _state.update {
                                     it.copy(

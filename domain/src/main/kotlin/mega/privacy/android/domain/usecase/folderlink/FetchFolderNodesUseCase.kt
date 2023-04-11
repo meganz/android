@@ -11,9 +11,9 @@ import javax.inject.Inject
  * Use case implementation for fetching folder nodes
  */
 class FetchFolderNodesUseCase @Inject constructor(
-    private val repository: FolderLinkRepository,
+    private val folderLinkRepository: FolderLinkRepository,
     private val addNodeType: AddNodeType,
-    private val getChildrenNodes: GetFolderLinkChildrenNodes,
+    private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
 ) {
 
     /**
@@ -24,10 +24,10 @@ class FetchFolderNodesUseCase @Inject constructor(
      */
     suspend operator fun invoke(folderSubHandle: String?): FetchFolderNodesResult {
         val folderNodesResult = FetchFolderNodesResult()
-        runCatching { repository.fetchNodes() }
+        runCatching { folderLinkRepository.fetchNodes() }
             .onSuccess { result ->
-                repository.updateLastPublicHandle(result.nodeHandle)
-                val rootNode = repository.getRootNode()
+                folderLinkRepository.updateLastPublicHandle(result.nodeHandle)
+                val rootNode = folderLinkRepository.getRootNode()
                 if (rootNode != null) {
                     if (result.flag) {
                         throw FetchFolderNodesException.InvalidDecryptionKey()
@@ -38,7 +38,11 @@ class FetchFolderNodesUseCase @Inject constructor(
                                 var parentHandle = typedFolderNode.id.longValue
 
                                 if (folderSubHandle != null) {
-                                    runCatching { repository.getFolderLinkNode(folderSubHandle) }
+                                    runCatching {
+                                        folderLinkRepository.getFolderLinkNode(
+                                            folderSubHandle
+                                        )
+                                    }
                                         .onSuccess {
                                             runCatching { addNodeType(it) as TypedFolderNode }
                                                 .onSuccess {
@@ -49,7 +53,12 @@ class FetchFolderNodesUseCase @Inject constructor(
                                         .onFailure { throw FetchFolderNodesException.GenericError() }
                                 }
 
-                                runCatching { getChildrenNodes(parentHandle, null) }
+                                runCatching {
+                                    getFolderLinkChildrenNodesUseCase(
+                                        parentHandle,
+                                        null
+                                    )
+                                }
                                     .onSuccess { folderNodesResult.childrenNodes = it }
                                     .onFailure { throw FetchFolderNodesException.GenericError() }
                             }

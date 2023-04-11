@@ -25,7 +25,7 @@ class FetchFolderNodesUseCaseTest {
     private lateinit var underTest: FetchFolderNodesUseCase
     private val repository: FolderLinkRepository = mock()
     private val addNodeType: AddNodeType = mock()
-    private val getChildrenNodes: GetFolderLinkChildrenNodes = mock()
+    private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val unTypeNode = mock<UnTypedNode>()
     private val typedFolderNode = mock<TypedFolderNode>()
     private val typedNode = mock<TypedNode>()
@@ -33,7 +33,8 @@ class FetchFolderNodesUseCaseTest {
 
     @Before
     fun setUp() {
-        underTest = FetchFolderNodesUseCase(repository, addNodeType, getChildrenNodes)
+        underTest =
+            FetchFolderNodesUseCase(repository, addNodeType, getFolderLinkChildrenNodesUseCase)
     }
 
     @Test
@@ -45,12 +46,12 @@ class FetchFolderNodesUseCaseTest {
             whenever(repository.fetchNodes()).thenReturn(result)
             whenever(repository.getRootNode()).thenReturn(unTypeNode)
             whenever(addNodeType(unTypeNode)).thenReturn(typedFolderNode)
-            whenever(getChildrenNodes(any(), anyOrNull())).thenReturn(typedNodeList)
+            whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(typedNodeList)
 
             underTest(folderSubHandle)
             verify(repository).updateLastPublicHandle(nodeHandle)
             verify(addNodeType, times(1)).invoke(unTypeNode)
-            verify(getChildrenNodes, times(1)).invoke(any(), anyOrNull())
+            verify(getFolderLinkChildrenNodesUseCase, times(1)).invoke(any(), anyOrNull())
         }
 
     @Test
@@ -88,7 +89,7 @@ class FetchFolderNodesUseCaseTest {
         whenever(repository.fetchNodes()).thenReturn(result)
         whenever(repository.getRootNode()).thenReturn(unTypeNode)
         whenever(addNodeType(unTypeNode)).thenReturn(typedFolderNode)
-        whenever(getChildrenNodes(any(), anyOrNull())).thenReturn(typedNodeList)
+        whenever(getFolderLinkChildrenNodesUseCase(any(), anyOrNull())).thenReturn(typedNodeList)
 
         underTest(folderSubHandle)
         verify(repository).updateLastPublicHandle(nodeHandle)
