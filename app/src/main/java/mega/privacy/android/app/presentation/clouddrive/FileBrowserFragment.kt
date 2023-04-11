@@ -29,6 +29,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -601,13 +602,13 @@ class FileBrowserFragment : RotatableFragment() {
                 }
             }
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
-                    EventObserver { showSortByPanel() }
-                )
-            }
-        }
+        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
+            EventObserver { showSortByPanel() }
+        )
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            fileBrowserViewModel.refreshNodes()
+            hideMultipleSelect()
+        })
 
         LiveEventBus.get(EVENT_SHOW_MEDIA_DISCOVERY, Unit::class.java)
             .observe(this) { showMediaDiscovery(true) }

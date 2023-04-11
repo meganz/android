@@ -221,6 +221,9 @@ class LinksFragment : MegaNodeBaseFragment() {
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             showSortByPanel()
         })
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            viewModel.refreshLinksSharesNode()
+        })
     }
 
     /**

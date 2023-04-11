@@ -255,6 +255,9 @@ class OutgoingSharesFragment : MegaNodeBaseFragment() {
         sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner, EventObserver {
             showSortByPanel()
         })
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            viewModel.refreshOutgoingSharesNode()
+        })
 
         viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
             updateViewType(state.viewType)

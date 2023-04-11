@@ -147,13 +147,12 @@ class InboxFragment : RotatableFragment() {
     ): View? {
         Timber.d("onCreateView()")
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
-                    EventObserver { showSortByPanel() }
-                )
-            }
-        }
+        sortByHeaderViewModel.showDialogEvent.observe(viewLifecycleOwner,
+            EventObserver { showSortByPanel() }
+        )
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            viewModel.refreshInboxNodes()
+        })
 
         val display = requireActivity().windowManager.defaultDisplay
         val outMetrics = DisplayMetrics()
@@ -339,7 +338,11 @@ class InboxFragment : RotatableFragment() {
             when (item.itemId) {
                 R.id.cab_menu_download -> {
                     (requireActivity() as ManagerActivity).saveNodesToDevice(
-                        selectedNodes, false, false, false, false
+                        nodes = selectedNodes,
+                        highPriority = false,
+                        isFolderLink = false,
+                        fromMediaViewer = false,
+                        fromChat = false,
                     )
                     clearSelections()
                     hideMultipleSelect()

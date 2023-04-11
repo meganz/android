@@ -192,6 +192,11 @@ class SearchFragment : RotatableFragment() {
             viewLifecycleOwner,
             EventObserver { managerActivity.showNewSortByPanel(Constants.ORDER_CLOUD) })
 
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            hideMultipleSelect()
+            refresh()
+        })
+
         searchViewModel.updateNodes.observe(
             viewLifecycleOwner,
             EventObserver {
