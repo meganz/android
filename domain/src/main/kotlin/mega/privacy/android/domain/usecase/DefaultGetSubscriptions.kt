@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
 import javax.inject.Inject
 
 /**
@@ -17,10 +18,10 @@ class DefaultGetSubscriptions @Inject constructor(
     private val accountRepository: AccountRepository,
     private val getLocalPricing: GetLocalPricing,
     private val calculateCurrencyAmount: CalculateCurrencyAmount,
-    private val getAppSubscriptionOptions: GetAppSubscriptionOptions,
+    private val getAppSubscriptionOptionsUseCase: GetAppSubscriptionOptionsUseCase,
 ) : GetSubscriptions {
     override suspend fun invoke(): List<Subscription> {
-        return getAppSubscriptionOptions().map { plan ->
+        return getAppSubscriptionOptionsUseCase().map { plan ->
             val sku = getSku(plan.accountType)
             val localPricing = sku?.let { getLocalPricing(it) }
 

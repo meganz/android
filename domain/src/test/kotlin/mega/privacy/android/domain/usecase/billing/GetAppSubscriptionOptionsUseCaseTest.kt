@@ -1,4 +1,4 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.billing
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -7,15 +7,15 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.repository.AccountRepository
-import org.junit.Assert.*
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetAppSubscriptionOptionsTest {
-    private lateinit var underTest: GetAppSubscriptionOptions
+class GetAppSubscriptionOptionsUseCaseTest {
+    private lateinit var underTest: GetAppSubscriptionOptionsUseCase
     private val accountRepository = mock<AccountRepository>()
 
     private val subscriptionPlanProIMonthly = SubscriptionOption(
@@ -151,7 +151,7 @@ class DefaultGetAppSubscriptionOptionsTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAppSubscriptionOptions(
+        underTest = GetAppSubscriptionOptionsUseCase(
             accountRepository = accountRepository,
         )
     }
@@ -161,11 +161,12 @@ class DefaultGetAppSubscriptionOptionsTest {
         runTest {
 
             whenever(accountRepository.getSubscriptionOptions()).thenReturn(
-                fullListOfSubscriptionOptions)
+                fullListOfSubscriptionOptions
+            )
 
             val actual = underTest.invoke()
 
-            assertEquals(actual, expectedResult)
+            Assert.assertEquals(actual, expectedResult)
         }
     }
 }

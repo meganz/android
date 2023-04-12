@@ -12,6 +12,7 @@ import mega.privacy.android.domain.entity.account.CurrencyAmount
 import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_LITE_MONTH
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -25,7 +26,7 @@ class DefaultGetSubscriptionsTest {
     private val getLocalPricing = mock<GetLocalPricing>()
     private val calculateCurrencyAmount = mock<CalculateCurrencyAmount>()
     private val currencyMapper = ::Currency
-    private val getAppSubscriptionOptions = mock<GetAppSubscriptionOptions>()
+    private val getAppSubscriptionOptionsUseCase = mock<GetAppSubscriptionOptionsUseCase>()
 
     private val subscriptionOption = SubscriptionOption(
         accountType = AccountType.PRO_LITE,
@@ -59,19 +60,24 @@ class DefaultGetSubscriptionsTest {
             accountRepository = accountRepository,
             getLocalPricing = getLocalPricing,
             calculateCurrencyAmount = calculateCurrencyAmount,
-            getAppSubscriptionOptions = getAppSubscriptionOptions,
+            getAppSubscriptionOptionsUseCase = getAppSubscriptionOptionsUseCase,
         )
     }
 
     @Test
     fun `test the GetSubscriptions returns the list of Subscriptions successfully`() {
         runTest {
-            whenever(getAppSubscriptionOptions()).thenReturn(listOf(
-                subscriptionOption))
+            whenever(getAppSubscriptionOptionsUseCase()).thenReturn(
+                listOf(
+                    subscriptionOption
+                )
+            )
             whenever(getLocalPricing(SKU_PRO_LITE_MONTH)).thenReturn(localPricing)
-            whenever(calculateCurrencyAmount(
-                CurrencyPoint.LocalCurrencyPoint(9.99.toLong()),
-                Currency("EUR"))
+            whenever(
+                calculateCurrencyAmount(
+                    CurrencyPoint.LocalCurrencyPoint(9.99.toLong()),
+                    Currency("EUR")
+                )
             ).thenReturn(currencyAmount)
 
             val actual = underTest.invoke()

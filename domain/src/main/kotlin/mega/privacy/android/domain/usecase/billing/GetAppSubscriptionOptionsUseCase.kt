@@ -1,16 +1,16 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.billing
 
 import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.repository.AccountRepository
 import javax.inject.Inject
 
 /**
- * Default implementation of [GetAppSubscriptionOptions]
+ * Get subscription options filtered to subscription options available for purchase in the app, e.g. Pro I, Pro II or Pro III plans
  */
-class DefaultGetAppSubscriptionOptions @Inject constructor(
+class GetAppSubscriptionOptionsUseCase @Inject constructor(
     private val accountRepository: AccountRepository,
-) : GetAppSubscriptionOptions {
-    override suspend fun invoke() =
+) {
+    suspend operator fun invoke() =
         accountRepository.getSubscriptionOptions().filter { plan ->
             plan.accountType !== AccountType.BUSINESS &&
                     plan.accountType !== AccountType.PRO_FLEXI &&
