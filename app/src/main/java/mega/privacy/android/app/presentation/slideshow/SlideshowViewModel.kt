@@ -60,7 +60,7 @@ class SlideshowViewModel @Inject constructor(
 
     private fun playSlideshow(items: List<ImageItem>) {
         viewModelScope.launch {
-            val ids = items.map { it.id }
+            val ids = items.map { it.getNodeHandle() ?: it.id }
             _state.update {
                 it.copy(
                     items = getPhotosByIds(ids = ids.map { id -> NodeId(id) })
