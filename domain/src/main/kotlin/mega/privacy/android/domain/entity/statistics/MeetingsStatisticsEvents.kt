@@ -33,7 +33,7 @@ class StayOnCallEmptyCall :
  * User chooses "End call now" option when they are the only participant (empty meeting)
  */
 class EndCallEmptyCall :
-    MeetingsStatisticsEvents(99206, "Meeting Meeting End Call When Empty Call Scenario")
+    MeetingsStatisticsEvents(99206, "Meeting End Call When Empty Call Scenario")
 
 /**
  * Meeting End Call For All Tapped
