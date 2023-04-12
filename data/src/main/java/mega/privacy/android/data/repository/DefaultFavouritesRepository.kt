@@ -80,7 +80,9 @@ internal class DefaultFavouritesRepository @Inject constructor(
         nodes.map { megaNode ->
             nodeMapper(
                 megaNode,
-                ::getThumbnailCacheFilePath,
+                cacheFolder::getThumbnailCacheFilePath,
+                cacheFolder::getPreviewCacheFilePath,
+                cacheFolder::getFullSizeCacheFilePath,
                 megaApiGateway::hasVersion,
                 megaApiGateway::getNumChildFolders,
                 megaApiGateway::getNumChildFiles,
@@ -88,15 +90,5 @@ internal class DefaultFavouritesRepository @Inject constructor(
                 megaApiGateway::isPendingShare,
                 megaApiGateway::isInRubbish,
             )
-        }
-
-    /**
-     * Get the thumbnail cache file path
-     * @param megaNode MegaNode
-     * @return thumbnail cache file path
-     */
-    private fun getThumbnailCacheFilePath(megaNode: MegaNode) =
-        cacheFolder.getCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.let { thumbnail ->
-            "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
         }
 }

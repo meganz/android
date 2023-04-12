@@ -39,6 +39,8 @@ class NodeMapperTest {
             underTest(
                 megaNode = megaNode,
                 thumbnailPath = { null },
+                previewPath = { null },
+                fullSizePath = { null },
                 hasVersion = { false },
                 numberOfChildFolders = { 0 },
                 numberOfChildFiles = { 1 },
@@ -57,6 +59,8 @@ class NodeMapperTest {
             underTest(
                 megaNode = megaNode,
                 thumbnailPath = { null },
+                previewPath = { null },
+                fullSizePath = { null },
                 hasVersion = { false },
                 numberOfChildFolders = { 0 },
                 numberOfChildFiles = { 1 },
@@ -85,6 +89,8 @@ class NodeMapperTest {
         val actual = underTest(
             megaNode = node,
             thumbnailPath = { null },
+            previewPath = { null },
+            fullSizePath = { null },
             hasVersion = gateway::hasVersion,
             numberOfChildFolders = gateway::getNumChildFolders,
             numberOfChildFiles = gateway::getNumChildFiles,
@@ -144,6 +150,8 @@ class NodeMapperTest {
         private suspend fun mappedNode(megaNode: MegaNode) = underTest(
             megaNode = megaNode,
             thumbnailPath = { null },
+            previewPath = { null },
+            fullSizePath = { null },
             hasVersion = { false },
             numberOfChildFolders = { 0 },
             numberOfChildFiles = { 1 },

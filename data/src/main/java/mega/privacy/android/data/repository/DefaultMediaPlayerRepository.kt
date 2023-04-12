@@ -515,16 +515,6 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
             }
         }
 
-    /**
-     * Get the thumbnail cache file path
-     * @param megaNode MegaNode
-     * @return thumbnail cache file path
-     */
-    private fun getThumbnailCacheFilePath(megaNode: MegaNode) =
-        cacheFolder.getCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.let { thumbnail ->
-            "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
-        }
-
     private fun getMegaUserNameDB(user: MegaUser): String? =
         dbHandler.findContactByHandle(user.handle.toString())?.let { megaContactDB ->
             when {
@@ -550,7 +540,9 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(
             node,
-            ::getThumbnailCacheFilePath,
+            cacheFolder::getThumbnailCacheFilePath,
+            cacheFolder::getPreviewCacheFilePath,
+            cacheFolder::getFullSizeCacheFilePath,
             megaApi::hasVersion,
             megaApi::getNumChildFolders,
             megaApi::getNumChildFiles,

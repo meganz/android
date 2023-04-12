@@ -282,6 +282,8 @@ internal class NodeRepositoryImpl @Inject constructor(
         nodeMapper(
             node,
             cacheFolderGateway::getThumbnailCacheFilePath,
+            cacheFolderGateway::getPreviewCacheFilePath,
+            cacheFolderGateway::getFullSizeCacheFilePath,
             megaApiGateway::hasVersion,
             megaApiGateway::getNumChildFolders,
             megaApiGateway::getNumChildFiles,

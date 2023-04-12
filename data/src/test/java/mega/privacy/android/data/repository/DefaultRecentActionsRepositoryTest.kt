@@ -87,6 +87,8 @@ class DefaultRecentActionsRepositoryTest {
                 mock(),
                 mock(),
                 mock(),
+                mock(),
+                mock()
             )
         ).thenReturn(recentActionBucket)
 

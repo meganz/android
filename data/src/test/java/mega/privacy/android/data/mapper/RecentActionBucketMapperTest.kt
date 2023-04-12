@@ -52,6 +52,8 @@ class RecentActionBucketMapperTest {
         val actual = underTest.invoke(
             recentActionBucket,
             thumbnailPath = { null },
+            previewPath = { null },
+            fullSizePath = { null },
             hasVersion = { false },
             numberOfChildFolders = { 0 },
             numberOfChildFiles = { 1 },

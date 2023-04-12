@@ -37,6 +37,8 @@ internal class DefaultRecentActionsRepository @Inject constructor(
                 recentActionBucketMapper.invoke(
                     it,
                     cacheFolderGateway::getThumbnailCacheFilePath,
+                    cacheFolderGateway::getPreviewCacheFilePath,
+                    cacheFolderGateway::getFullSizeCacheFilePath,
                     megaApiGateway::hasVersion,
                     megaApiGateway::getNumChildFolders,
                     megaApiGateway::getNumChildFiles,

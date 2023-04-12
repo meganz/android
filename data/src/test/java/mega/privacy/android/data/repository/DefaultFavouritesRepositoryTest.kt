@@ -77,7 +77,20 @@ class DefaultFavouritesRepositoryTest {
             )
         }
 
-        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(
+            nodeMapper(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(
             favouriteInfo
         )
 
@@ -110,7 +123,20 @@ class DefaultFavouritesRepositoryTest {
             )
         }
 
-        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(
+            nodeMapper(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(
             favouriteInfo
         )
 

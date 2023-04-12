@@ -27,9 +27,24 @@ interface FileNode : UnTypedNode {
     val thumbnailPath: String?
 
     /**
+     * Preview path
+     */
+    val previewPath: String?
+
+    /**
+     * Full Size path
+     */
+    val fullSizePath: String?
+
+    /**
      * Fingerprint
      */
     val fingerprint: String?
+
+    /**
+     * Has thumbnail
+     */
+    val hasThumbnail: Boolean
 
     /**
      * Has preview

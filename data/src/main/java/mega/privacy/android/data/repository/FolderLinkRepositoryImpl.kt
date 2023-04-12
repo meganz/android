@@ -126,6 +126,8 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
         nodeMapper(
             node,
             cacheFolderGateway::getThumbnailCacheFilePath,
+            cacheFolderGateway::getPreviewCacheFilePath,
+            cacheFolderGateway::getFullSizeCacheFilePath,
             { false },
             megaApiFolderGateway::getNumChildFolders,
             megaApiFolderGateway::getNumChildFiles,

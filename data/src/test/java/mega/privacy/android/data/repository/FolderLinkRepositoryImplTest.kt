@@ -116,7 +116,7 @@ class FolderLinkRepositoryImplTest {
         val parentNode = mock<MegaNode>()
         whenever(megaApiFolderGateway.getMegaNodeByHandle(nodeId.longValue)).thenReturn(megaNode)
         whenever(megaApiFolderGateway.getParentNode(megaNode)).thenReturn(parentNode)
-        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
             untypedNode
         )
         assertThat(underTest.getParentNode(nodeId)).isEqualTo(untypedNode)
@@ -141,7 +141,7 @@ class FolderLinkRepositoryImplTest {
         val megaNode = mock<MegaNode>()
         whenever(megaApiGateway.base64ToHandle(base64Handle)).thenReturn(handle)
         whenever(megaApiFolderGateway.getMegaNodeByHandle(handle)).thenReturn(megaNode)
-        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
             untypedNode
         )
         assertThat(underTest.getFolderLinkNode(base64Handle)).isEqualTo(untypedNode)

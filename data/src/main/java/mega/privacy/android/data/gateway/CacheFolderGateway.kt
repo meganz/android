@@ -86,6 +86,11 @@ interface CacheFolderGateway {
     fun getPreviewCacheFilePath(megaNode: MegaNode): String?
 
     /**
+     * Return node full file path
+     */
+    fun getFullSizeCacheFilePath(megaNode: MegaNode): String?
+
+    /**
      * Removes old temp folders.
      */
     suspend fun removeOldTempFolders()

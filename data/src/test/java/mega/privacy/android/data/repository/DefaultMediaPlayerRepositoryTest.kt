@@ -72,6 +72,8 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedModificationTime = 2000L
     private val expectedCreationTime = 2000L
     private val expectedThumbnailPath: String? = null
+    private val expectedPreviewPath: String? = null
+    private val expectedFullSizePath: String? = null
     private val expectedFingerprint = "fingerprint"
     private val expectedType = StaticImageFileTypeInfo(mimeType = "", extension = "image")
     private val expectedFileMegaNode = createMegaNode(false)
@@ -81,6 +83,7 @@ class DefaultMediaPlayerRepositoryTest {
     private val expectedTotalDuration: Long = 200000
     private val expectedCurrentPosition: Long = 16000
     private val expectedHasPreview = false
+    private val expectedHasThumbnail = false
     private val nodeMapper = mock<NodeMapper>()
 
     @Before
@@ -106,7 +109,20 @@ class DefaultMediaPlayerRepositoryTest {
         initTestConditions(expectedFileMegaNode, expectedType)
 
         val expectedTypedNode = createTypedFileNode()
-        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(
+            nodeMapper(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(
             expectedTypedNode
         )
 
@@ -141,7 +157,20 @@ class DefaultMediaPlayerRepositoryTest {
         initTestConditions(expectedFolderMegaNode, expectedType)
 
         val expectedTypedNode = createTypedFolderNode()
-        whenever(nodeMapper(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(
+        whenever(
+            nodeMapper(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        ).thenReturn(
             expectedTypedNode
         )
         val actualTypedFolder = underTest.getUnTypedNodeByHandle(expectedHandle)
@@ -364,8 +393,11 @@ class DefaultMediaPlayerRepositoryTest {
         modificationTime = expectedModificationTime,
         fingerprint = expectedFingerprint,
         thumbnailPath = expectedThumbnailPath,
+        previewPath = expectedPreviewPath,
+        fullSizePath = expectedFullSizePath,
         type = expectedType,
         isNodeKeyDecrypted = isNodeKetDecrypted,
+        hasThumbnail = expectedHasThumbnail,
         hasPreview = expectedHasPreview,
     )
 

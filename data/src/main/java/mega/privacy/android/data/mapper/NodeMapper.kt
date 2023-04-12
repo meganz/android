@@ -14,6 +14,8 @@ internal class NodeMapper @Inject constructor() {
     suspend operator fun invoke(
         megaNode: MegaNode,
         thumbnailPath: suspend (MegaNode) -> String?,
+        previewPath: suspend (MegaNode) -> String?,
+        fullSizePath: suspend (MegaNode) -> String?,
         hasVersion: suspend (MegaNode) -> Boolean,
         numberOfChildFolders: suspend (MegaNode) -> Int,
         numberOfChildFiles: suspend (MegaNode) -> Int,
@@ -55,6 +57,8 @@ internal class NodeMapper @Inject constructor() {
             modificationTime = megaNode.modificationTime,
             hasVersion = hasVersion(megaNode),
             thumbnailPath = thumbnailPath(megaNode),
+            previewPath = previewPath(megaNode),
+            fullSizePath = fullSizePath(megaNode),
             type = fileTypeInfoMapper(megaNode),
             isFavourite = megaNode.isFavourite,
             exportedData = megaNode.takeIf { megaNode.isExported }?.let {
@@ -64,6 +68,7 @@ internal class NodeMapper @Inject constructor() {
             isIncomingShare = megaNode.isInShare,
             fingerprint = megaNode.fingerprint,
             isNodeKeyDecrypted = megaNode.isNodeKeyDecrypted,
+            hasThumbnail = megaNode.hasThumbnail(),
             hasPreview = megaNode.hasPreview(),
         )
     }

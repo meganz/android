@@ -15,6 +15,8 @@ internal class RecentActionBucketMapper @Inject constructor(private val nodeMapp
     suspend operator fun invoke(
         megaRecentActionBucket: MegaRecentActionBucket,
         thumbnailPath: suspend (MegaNode) -> String?,
+        previewPath: suspend (MegaNode) -> String?,
+        fullSizePath: suspend (MegaNode) -> String?,
         hasVersion: suspend (MegaNode) -> Boolean,
         numberOfChildFolders: suspend (MegaNode) -> Int,
         numberOfChildFiles: suspend (MegaNode) -> Int,
@@ -31,6 +33,8 @@ internal class RecentActionBucketMapper @Inject constructor(private val nodeMapp
             nodeMapper(
                 megaRecentActionBucket.nodes.get(it),
                 thumbnailPath,
+                previewPath,
+                fullSizePath,
                 hasVersion,
                 numberOfChildFolders,
                 numberOfChildFiles,

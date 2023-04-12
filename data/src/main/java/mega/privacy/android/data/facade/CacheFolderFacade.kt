@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.extensions.getFileName
 import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
@@ -144,6 +145,11 @@ internal class CacheFolderFacade @Inject constructor(
     override fun getPreviewCacheFilePath(megaNode: MegaNode): String? =
         getCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.let { thumbnail ->
             "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
+        }?.takeUnless { megaNode.isFolder }
+
+    override fun getFullSizeCacheFilePath(megaNode: MegaNode): String? =
+        getCacheFolder(CacheFolderConstant.TEMPORARY_FOLDER)?.let { tempFolder ->
+            "$tempFolder${File.separator}${megaNode.getFileName()}"
         }?.takeUnless { megaNode.isFolder }
 
     override suspend fun removeOldTempFolders() {
