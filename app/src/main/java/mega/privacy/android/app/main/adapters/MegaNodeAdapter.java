@@ -900,9 +900,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
                 holder.videoDuration.setVisibility(View.GONE);
 
                 String duration = getVideoDuration(node.getDuration());
-                if (duration != null && !duration.isEmpty()) {
+                if (!duration.isEmpty()) {
                     holder.videoDuration.setText(duration);
-                    holder.videoDuration.setVisibility(View.VISIBLE);
+                    holder.videoDuration.setVisibility(node.getDuration() <= 0 ? View.GONE : View.VISIBLE);
                 }
             }
 
