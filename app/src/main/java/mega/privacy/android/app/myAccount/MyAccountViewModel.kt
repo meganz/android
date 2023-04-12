@@ -55,7 +55,6 @@ import mega.privacy.android.app.utils.CacheFolderManager
 import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.app.utils.Constants.ACTION_OPEN_QR
 import mega.privacy.android.app.utils.Constants.ACTION_REFRESH
-import mega.privacy.android.app.utils.Constants.BUSINESS
 import mega.privacy.android.app.utils.Constants.CHANGE_MAIL_2FA
 import mega.privacy.android.app.utils.Constants.CHOOSE_PICTURE_PROFILE_CODE
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
@@ -75,14 +74,21 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.AccountType
+import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.user.UserChanges
+import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
+import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
+import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
+import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.ChangeEmail
@@ -91,6 +97,7 @@ import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
+import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
 import nz.mega.sdk.MegaAccountDetails
@@ -173,6 +180,11 @@ class MyAccountViewModel @Inject constructor(
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
+    private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
+    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
+    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
+    private val getInSharesUseCase: GetInSharesUseCase,
+    private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
@@ -213,6 +225,9 @@ class MyAccountViewModel @Inject constructor(
         refreshNumberOfSubscription(false)
         refreshUserName(false)
         refreshCurrentUserEmail()
+        getVisibleContacts()
+        getDefaultAvatarColor()
+
         viewModelScope.launch {
             monitorUserUpdates()
                 .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email }
@@ -275,6 +290,22 @@ class MyAccountViewModel @Inject constructor(
                     )
                 )
             }
+        }
+    }
+
+    private fun getDefaultAvatarColor() {
+        viewModelScope.launch {
+            _state.update { it.copy(avatarColor = getMyAvatarColorUseCase()) }
+        }
+    }
+
+    private fun getVisibleContacts() {
+        viewModelScope.launch {
+            val contactsSize = getVisibleContactsUseCase().filter { contact ->
+                contact.visibility == UserVisibility.Visible || getInSharesUseCase(contact.email).isNotEmpty()
+            }.size
+
+            _state.update { it.copy(visibleContacts = contactsSize) }
         }
     }
 
@@ -588,18 +619,11 @@ class MyAccountViewModel @Inject constructor(
     fun getRubbishStorage(): String = myAccountInfo.formattedUsedRubbish
 
     /**
-     * Is business account
-     *
-     * @return
-     */
-    fun isBusinessAccount(): Boolean = megaApi.isBusinessAccount && getAccountType() == BUSINESS
-
-    /**
      * Get master key
      *
      * @return
      */
-    fun getMasterKey(): String = megaApi.exportMasterKey()
+    suspend fun getMasterKey(): String? = getExportMasterKeyUseCase()
 
     /**
      * Check versions
@@ -765,13 +789,10 @@ class MyAccountViewModel @Inject constructor(
      *
      * @return True if business payment attention is needed, false otherwise.
      */
-    private fun isBusinessPaymentAttentionNeeded(): Boolean {
-        val status = megaApi.businessStatus
-
-        return isBusinessAccount() && megaApi.isMasterBusinessAccount
-                && (status == MegaApiJava.BUSINESS_STATUS_EXPIRED
-                || status == MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD)
-    }
+    private val isBusinessPaymentAttentionNeeded: Boolean
+        get() = state.value.isBusinessAccount &&
+                state.value.isMasterBusinessAccount &&
+                state.value.isBusinessStatusActive.not()
 
     /**
      * Should show payment info
@@ -785,8 +806,7 @@ class MyAccountViewModel @Inject constructor(
 
         val currentTime = System.currentTimeMillis() / 1000
 
-        return isBusinessPaymentAttentionNeeded()
-                || timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO
+        return isBusinessPaymentAttentionNeeded || timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO
     }
 
     /**
@@ -1249,7 +1269,7 @@ class MyAccountViewModel @Inject constructor(
     fun refreshAccountInfo() {
         viewModelScope.launch {
             runCatching {
-                getAccountDetailsUseCase(
+                val accountDetails = getAccountDetailsUseCase(
                     forceRefresh = myAccountInfo.usedFormatted.trim().isEmpty()
                 )
                 getExtendedAccountDetail(
@@ -1259,6 +1279,18 @@ class MyAccountViewModel @Inject constructor(
                     transactions = false
                 )
                 getPaymentMethod(false)
+
+                val isBusinessStatusActive = getBusinessStatusUseCase().let { status ->
+                    (status == BusinessAccountStatus.GracePeriod || status == BusinessAccountStatus.Expired).not()
+                }
+                _state.update {
+                    it.copy(
+                        isBusinessAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
+                        isMasterBusinessAccount = accountDetails.isMasterBusinessAccount,
+                        isAchievementsEnabled = accountDetails.isAchievementsEnabled,
+                        isBusinessStatusActive = isBusinessStatusActive
+                    )
+                }
             }.onFailure {
                 Timber.e(it)
             }

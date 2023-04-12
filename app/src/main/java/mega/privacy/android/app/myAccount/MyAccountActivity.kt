@@ -64,6 +64,7 @@ import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
+import mega.privacy.android.domain.entity.AccountType
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
@@ -84,6 +85,9 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
     }
 
     private val viewModel: MyAccountViewModel by viewModels()
+
+    private val isBusinessAccount
+        get() = viewModel.state.value.isBusinessAccount
 
     private lateinit var navController: NavController
     private lateinit var binding: ActivityMyAccountBinding
@@ -311,7 +315,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                     menu.findItem(R.id.action_cancel_subscriptions).isVisible = false
                 }
 
-                if (viewModel.isBusinessAccount() || viewModel.isProFlexiAccount()) {
+                if (isBusinessAccount || viewModel.isProFlexiAccount()) {
                     menu.findItem(R.id.action_upgrade_account).isVisible = false
                 }
 
@@ -755,12 +759,14 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             .setPositiveButton(
                 R.string.pin_lock_enter
             ) { _, _ ->
-                startActivity(
-                    Intent(this, ChangePasswordActivity::class.java)
-                        .setAction(ACTION_RESET_PASS_FROM_LINK)
-                        .setData(intent.data)
-                        .putExtra(EXTRA_MASTER_KEY, viewModel.getMasterKey())
-                )
+                lifecycleScope.launch {
+                    startActivity(
+                        Intent(this@MyAccountActivity, ChangePasswordActivity::class.java)
+                            .setAction(ACTION_RESET_PASS_FROM_LINK)
+                            .setData(intent.data)
+                            .putExtra(EXTRA_MASTER_KEY, viewModel.getMasterKey())
+                    )
+                }
             }
             .setNegativeButton(R.string.general_cancel, null)
             .show()

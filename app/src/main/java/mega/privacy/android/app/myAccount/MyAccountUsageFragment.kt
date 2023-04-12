@@ -39,6 +39,9 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
     private val viewModel: MyAccountViewModel by activityViewModels()
 
+    private val isBusinessAccount
+        get() = viewModel.state.value.isBusinessAccount
+
     private lateinit var binding: FragmentMyAccountUsageBinding
     private lateinit var usageBinding: MyAccountUsageContainerBinding
     private lateinit var paymentAlertBinding: MyAccountPaymentInfoContainerBinding
@@ -52,7 +55,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentMyAccountUsageBinding.inflate(layoutInflater)
         usageBinding = binding.usageViewLayout
@@ -120,7 +123,7 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
     }
 
     private fun setupAccountDetails() {
-        if (viewModel.isBusinessAccount()) {
+        if (isBusinessAccount) {
             usageBinding.updateBusinessOrProFlexi(viewModel)
             paymentAlertBinding.businessUpdate(
                 megaApi,

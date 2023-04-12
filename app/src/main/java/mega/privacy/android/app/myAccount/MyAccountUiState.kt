@@ -26,5 +26,11 @@ data class MyAccountUiState(
     val changeUserNameResult: Result<Unit>? = null,
     val verifiedPhoneNumber: String? = null,
     val canVerifyPhoneNumber: Boolean = false,
-    val avatar: File? = null
+    val avatar: File? = null,
+    val avatarColor: Int? = null,
+    val isBusinessAccount: Boolean = false,
+    val isMasterBusinessAccount: Boolean = false,
+    val isAchievementsEnabled: Boolean = false,
+    val isBusinessStatusActive: Boolean = false,
+    val visibleContacts: Int? = null,
 )

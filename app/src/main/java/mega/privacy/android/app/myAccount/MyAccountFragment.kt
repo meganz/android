@@ -50,8 +50,6 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
-import nz.mega.sdk.MegaApiJava
-import nz.mega.sdk.MegaUser
 import java.io.File
 import javax.inject.Inject
 
@@ -72,6 +70,15 @@ class MyAccountFragment : Fragment(), Scrollable {
     lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     private val viewModel: MyAccountViewModel by activityViewModels()
+
+    private val isBusinessAccount
+        get() = viewModel.state.value.isBusinessAccount
+    private val isAchievementsEnabled
+        get() = viewModel.state.value.isAchievementsEnabled
+    private val isMasterBusinessAccount
+        get() = viewModel.state.value.isMasterBusinessAccount
+    private val isBusinessStatusActive
+        get() = viewModel.state.value.isBusinessStatusActive
 
     private lateinit var binding: FragmentMyAccountBinding
     private lateinit var usageBinding: MyAccountUsageContainerBinding
@@ -136,10 +143,11 @@ class MyAccountFragment : Fragment(), Scrollable {
         binding.backupRecoveryKeyLayout.setOnClickListener {
             findNavController().navigate(R.id.action_my_account_to_export_recovery_key)
         }
-
+        binding.contactsLayout.setOnClickListener {
+            startActivity(ContactsActivity.getListIntent(requireContext()))
+        }
         setupAchievements()
         setupLastSession()
-        setupContactConnections()
     }
 
     override fun checkScroll() {
@@ -154,6 +162,15 @@ class MyAccountFragment : Fragment(), Scrollable {
         viewLifecycleOwner.collectFlow(viewModel.state) { state ->
             binding.nameText.text = state.name
             binding.emailText.text = state.email
+
+            state.visibleContacts?.let {
+                binding.contactsSubtitle.text = resources.getQuantityString(
+                    R.plurals.my_account_connections,
+                    it,
+                    it
+                )
+            }
+
             if (monitorPhoneFlagEnabled) {
                 setupPhoneNumber(
                     canVerifyPhoneNumber = state.canVerifyPhoneNumber,
@@ -161,7 +178,8 @@ class MyAccountFragment : Fragment(), Scrollable {
                     registeredPhoneNumber = state.verifiedPhoneNumber,
                 )
             }
-            setProfileAvatar(state.avatar)
+
+            setProfileAvatar(state.avatar, state.avatarColor)
         }
 
         if (!monitorPhoneFlagEnabled) {
@@ -183,20 +201,19 @@ class MyAccountFragment : Fragment(), Scrollable {
         changeApiServerDialog?.dismiss()
     }
 
-    private fun setProfileAvatar(avatar: File?) {
+    private fun setProfileAvatar(avatar: File?, avatarColor: Int?) {
         avatar?.takeIf { avatar.exists() && avatar.length() > 0 }
             ?.let { BitmapFactory.decodeFile(avatar.absolutePath, BitmapFactory.Options()) }
-            ?.let { bitmap ->
-                binding.myAccountThumbnail.setImageBitmap(bitmap)
-            } ?: run {
-            setDefaultAvatar()
-        }
+            ?.let { bitmap -> binding.myAccountThumbnail.setImageBitmap(bitmap) }
+            ?: run { setDefaultAvatar(avatarColor) }
     }
 
-    private fun setDefaultAvatar() {
+    private fun setDefaultAvatar(avatarColor: Int?) {
+        if (avatarColor == null) return
+
         binding.myAccountThumbnail.setImageBitmap(
             AvatarUtil.getDefaultAvatar(
-                AvatarUtil.getColorAvatar(megaApi.myUser),
+                avatarColor,
                 viewModel.getName(),
                 AVATAR_SIZE,
                 true
@@ -206,7 +223,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
     private fun setupAchievements() {
         binding.achievementsLayout.apply {
-            isVisible = megaApi.isAchievementsEnabled
+            isVisible = isAchievementsEnabled
 
             if (!isVisible) {
                 return@apply
@@ -237,29 +254,6 @@ class MyAccountFragment : Fragment(), Scrollable {
             ChangeApiServerUtil.showChangeApiServerDialog(requireActivity())
     }
 
-    private fun setupContactConnections() {
-        binding.contactsLayout.setOnClickListener {
-            startActivity(ContactsActivity.getListIntent(requireContext()))
-        }
-
-        val contacts = megaApi.contacts
-        val visibleContacts = ArrayList<MegaUser>()
-
-        for (contact in contacts.indices) {
-            if (contacts[contact].visibility == MegaUser.VISIBILITY_VISIBLE
-                || megaApi.getInShares(contacts[contact]).size > 0
-            ) {
-                visibleContacts.add(contacts[contact])
-            }
-        }
-
-        binding.contactsSubtitle.text = resources.getQuantityString(
-            R.plurals.my_account_connections,
-            visibleContacts.size,
-            visibleContacts.size
-        )
-    }
-
     private fun setupAccountDetails() {
         binding.lastSessionSubtitle.text =
             viewModel.getLastSession().ifEmpty { gettingInfo }
@@ -273,7 +267,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             )
         }
 
-        if (viewModel.isBusinessAccount()) {
+        if (isBusinessAccount) {
             setupBusinessAccount()
             return
         }
@@ -353,7 +347,7 @@ class MyAccountFragment : Fragment(), Scrollable {
         binding.upgradeButton.apply {
             isEnabled = false
             text = getString(
-                if (megaApi.isMasterBusinessAccount) R.string.admin_label
+                if (isMasterBusinessAccount) R.string.admin_label
                 else R.string.user_label
             )
         }
@@ -365,9 +359,10 @@ class MyAccountFragment : Fragment(), Scrollable {
             )
         )
 
-        if (megaApi.isMasterBusinessAccount) {
-            when (megaApi.businessStatus) {
-                MegaApiJava.BUSINESS_STATUS_EXPIRED, MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD -> {
+        if (isMasterBusinessAccount) {
+            when (isBusinessStatusActive) {
+                true -> setupPaymentDetails()
+                false -> {
                     paymentAlertBinding.businessUpdate(
                         megaApi,
                         viewModel,
@@ -376,7 +371,6 @@ class MyAccountFragment : Fragment(), Scrollable {
                     )
                     expandPaymentInfoIfNeeded()
                 }
-                else -> setupPaymentDetails() //BUSINESS_STATUS_ACTIVE
             }
 
             binding.businessAccountManagementText.isVisible = true
@@ -472,7 +466,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         if (addPhoneNumberVisible) {
             binding.addPhoneSubtitle.text =
-                if (megaApi.isAchievementsEnabled) getString(
+                if (isAchievementsEnabled) getString(
                     R.string.sms_add_phone_number_dialog_msg_achievement_user,
                     viewModel.getBonusStorageSMS()
                 ) else getString(
