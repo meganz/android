@@ -1710,6 +1710,10 @@ public class ChatActivity extends PasscodeActivity
         emptyTextView = findViewById(R.id.empty_text_chat_recent);
         emptyImageView = findViewById(R.id.empty_image_view_chat);
 
+        chatRelativeLayout = findViewById(R.id.relative_chat_layout);
+
+        initEmptyScreen(null);
+
         fragmentContainer = findViewById(R.id.fragment_container_chat);
         writingContainerLayout = findViewById(R.id.writing_container_layout_chat_layout);
 
@@ -1793,8 +1797,6 @@ public class ChatActivity extends PasscodeActivity
         enableButton(rLKeyboardTwemojiButton, keyboardTwemojiButton);
 
         unreadMsgsLayout.setOnClickListener(this);
-
-        chatRelativeLayout = findViewById(R.id.relative_chat_layout);
 
         sendIcon = findViewById(R.id.send_icon);
         sendIcon.setOnClickListener(this);
