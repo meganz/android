@@ -13,6 +13,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -30,9 +32,15 @@ import mega.privacy.android.app.utils.CallUtil
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges.OnHold
+import mega.privacy.android.domain.entity.meeting.ChatCallChanges.Status
+import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
+import mega.privacy.android.domain.entity.meeting.TermCodeType
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -47,6 +55,8 @@ import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
@@ -98,6 +108,8 @@ class ContactInfoViewModel @Inject constructor(
     private val setUserAliasUseCase: SetUserAliasUseCase,
     private val removeContactByEmailUseCase: RemoveContactByEmailUseCase,
     private val getInSharesUseCase: GetInSharesUseCase,
+    private val monitorChatCallUpdates: MonitorChatCallUpdates,
+    private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : BaseRxViewModel() {
@@ -138,6 +150,51 @@ class ContactInfoViewModel @Inject constructor(
 
     init {
         getContactUpdates()
+        monitorCallUpdates()
+        monitorChatSessionUpdates()
+    }
+
+    private fun monitorChatSessionUpdates() = viewModelScope.launch {
+        monitorChatSessionUpdatesUseCase().takeWhile {
+            it.changes in listOf(
+                ChatSessionChanges.Status,
+                ChatSessionChanges.RemoteAvFlags,
+                ChatSessionChanges.SessionSpeakRequested,
+                ChatSessionChanges.SessionOnHiRes,
+                ChatSessionChanges.SessionOnLowRes,
+                ChatSessionChanges.SessionOnHold,
+                ChatSessionChanges.AudioLevel,
+            )
+        }.collect {
+            _state.update { it.copy(callStatusChanged = true) }
+        }
+    }
+
+    private fun monitorCallUpdates() = viewModelScope.launch {
+        monitorChatCallUpdates()
+            .filter { it.changes in listOf(Status, OnHold) }
+            .collect { call ->
+                if (call.changes == Status) observeCallStatus(call)
+                else if (call.changes == OnHold) _state.update { it.copy(callStatusChanged = true) }
+            }
+    }
+
+    private fun observeCallStatus(call: ChatCall) {
+        if (call.status in listOf(
+                ChatCallStatus.Connecting,
+                ChatCallStatus.InProgress,
+                ChatCallStatus.Destroyed,
+                ChatCallStatus.TerminatingUserParticipation,
+                ChatCallStatus.UserNoPresent
+            )
+        ) {
+            _state.update { it.copy(callStatusChanged = true) }
+            if (call.status == ChatCallStatus.TerminatingUserParticipation &&
+                call.termCode == TermCodeType.TooManyParticipants
+            ) {
+                _state.update { it.copy(snackBarMessage = R.string.call_error_too_many_participants) }
+            }
+        }
     }
 
     /**
@@ -369,6 +426,15 @@ class ContactInfoViewModel @Inject constructor(
     fun onConsumeSnackBarMessageEvent() {
         viewModelScope.launch {
             _state.update { it.copy(snackBarMessage = null) }
+        }
+    }
+
+    /**
+     * on Consume Snack Bar Message event
+     */
+    fun onConsumeChatCallStatusChangeEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(callStatusChanged = false) }
         }
     }
 

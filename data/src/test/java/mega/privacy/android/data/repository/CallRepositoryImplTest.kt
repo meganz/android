@@ -1,6 +1,5 @@
 package mega.privacy.android.data.repository
 
-import mega.privacy.android.domain.entity.ChatRequest as ChatRequest
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -11,14 +10,19 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
-import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
-import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
+import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
+import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
+import mega.privacy.android.data.mapper.meeting.ChatSessionChangesMapper
+import mega.privacy.android.data.mapper.meeting.ChatSessionMapper
+import mega.privacy.android.data.mapper.meeting.ChatSessionStatusMapper
+import mega.privacy.android.data.mapper.meeting.ChatSessionTermCodeMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
+import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
@@ -56,6 +60,12 @@ class CallRepositoryImplTest {
     private val megaChatRequest = mock<MegaChatRequest>()
     private val chatRequestMapper = mock<ChatRequestMapper>()
     private val megaChatCallStatusMapper = MegaChatCallStatusMapper()
+    private val chatSessionChangesMapper = ChatSessionChangesMapper()
+    private val chatSessionStatusMapper = ChatSessionStatusMapper()
+    private val chatSessionTermCodeMapper = ChatSessionTermCodeMapper()
+    private val chatSessionMapper = ChatSessionMapper(
+        chatSessionChangesMapper, chatSessionStatusMapper, chatSessionTermCodeMapper,
+    )
     private val handleListMapper = HandleListMapper()
     private val chatScheduledMeetingMapper = mock<ChatScheduledMeetingMapper>()
     private val chatScheduledMeetingOccurrMapper = mock<ChatScheduledMeetingOccurrMapper>()
@@ -111,6 +121,7 @@ class CallRepositoryImplTest {
             dispatcher = testDispatcher,
             megaChatCallStatusMapper = megaChatCallStatusMapper,
             handleListMapper = handleListMapper,
+            chatSessionMapper = chatSessionMapper,
         )
 
         whenever(megaChatRoom.chatId).thenReturn(chatId)

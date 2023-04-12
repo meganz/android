@@ -15,6 +15,7 @@ import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
+import mega.privacy.android.data.mapper.meeting.ChatSessionMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.chat.ChatCall
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
+import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
@@ -43,6 +45,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * @property megaChatApiGateway                 [MegaChatApiGateway]
  * @property chatCallMapper                     [ChatCallMapper]
+ * @property chatSessionMapper                  [ChatSessionMapper]
  * @property chatRequestMapper                  [ChatRequestMapper]
  * @property chatScheduledMeetingMapper         [ChatScheduledMeetingMapper]
  * @property chatScheduledMeetingOccurrMapper   [ChatScheduledMeetingOccurrMapper]
@@ -51,6 +54,7 @@ import kotlin.coroutines.suspendCoroutine
 internal class CallRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     private val chatCallMapper: ChatCallMapper,
+    private val chatSessionMapper: ChatSessionMapper,
     private val chatRequestMapper: ChatRequestMapper,
     private val chatScheduledMeetingMapper: ChatScheduledMeetingMapper,
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
@@ -247,6 +251,12 @@ internal class CallRepositoryImpl @Inject constructor(
         .filterIsInstance<ChatCallUpdate.OnChatCallUpdate>()
         .mapNotNull { it.item }
         .map { chatCallMapper(it) }
+        .flowOn(dispatcher)
+
+    override fun monitorChatSessionUpdates(): Flow<ChatSession> = megaChatApiGateway.chatCallUpdates
+        .filterIsInstance<ChatCallUpdate.OnChatSessionUpdate>()
+        .mapNotNull { it.session }
+        .map { chatSessionMapper(it) }
         .flowOn(dispatcher)
 
     override fun monitorScheduledMeetingUpdates(): Flow<ChatScheduledMeeting> =

@@ -10,18 +10,19 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 /**
  * Contact info UI state
  *
- * @property error                  String resource id for showing an error.
- * @property isCallStarted          Handle when a call is started.
- * @property userStatus             user status
- * @property lastGreen              last seen time gap in minutes
- * @property isFromContacts         Checks if contact info launched from contacts screen
- * @property contactItem            Contact item contains all the info about the user
- * @property chatRoom               Chat room info
- * @property avatar                 Bitmap of user avatar
- * @property isOnline               Checks if connected to internet
- * @property snackBarMessage        One time snack bar message to be shown to the user
- * @property isUserRemoved          Checks if selected user is removed from contacts
- * @property inShares               In shares for the user
+ * @property error                      String resource id for showing an error.
+ * @property isCallStarted              Handle when a call is started.
+ * @property userStatus                 user status
+ * @property lastGreen                  last seen time gap in minutes
+ * @property isFromContacts             Checks if contact info launched from contacts screen
+ * @property contactItem                Contact item contains all the info about the user
+ * @property chatRoom                   Chat room info
+ * @property avatar                     Bitmap of user avatar
+ * @property isOnline                   Checks if connected to internet
+ * @property snackBarMessage            One time snack bar message to be shown to the user
+ * @property isUserRemoved              Checks if selected user is removed from contacts
+ * @property inShares                   In shares for the user
+ * @property callStatusChanged          when chat call status is changed
  */
 data class ContactInfoState(
     val error: Int? = null,
@@ -35,6 +36,7 @@ data class ContactInfoState(
     val isOnline: Boolean = false,
     val snackBarMessage: Int? = null,
     val isUserRemoved: Boolean = false,
+    val callStatusChanged: Boolean = false,
     val inShares: List<UnTypedNode> = emptyList(),
 ) {
 

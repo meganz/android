@@ -33,10 +33,8 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -58,9 +56,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETEN
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
 import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
-import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_CHANGE
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
@@ -113,7 +108,6 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaChatCall
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatPeerList
 import nz.mega.sdk.MegaChatRequest
@@ -216,26 +210,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
     }
 
-    private val callStatusObserver = Observer { call: MegaChatCall ->
-        when (call.status) {
-            MegaChatCall.CALL_STATUS_CONNECTING, MegaChatCall.CALL_STATUS_IN_PROGRESS, MegaChatCall.CALL_STATUS_DESTROYED, MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_USER_NO_PRESENT -> {
-                checkScreenRotationToShowCall()
-                if (call.status == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION &&
-                    call.termCode == MegaChatCall.TERM_CODE_TOO_MANY_PARTICIPANTS
-                ) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.call_error_too_many_participants),
-                        MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                    )
-                }
-            }
-        }
-    }
-
-    private val callOnHoldObserver = Observer<MegaChatCall> { checkScreenRotationToShowCall() }
-    private val sessionOnHoldObserver =
-        Observer<Pair<*, *>> { checkScreenRotationToShowCall() }
     private val chatRoomMuteUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (intent.action == ACTION_UPDATE_PUSH_NOTIFICATION_SETTING) {
@@ -519,7 +493,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
         collectFlows()
         registerBroadcastReceivers()
-        registerEventBusObservers()
         startActivity(Intent(this, AskForDisplayOverActivity::class.java))
     }
 
@@ -632,15 +605,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     )
                 }
             }
-    }
-
-    private fun registerEventBusObservers() {
-        LiveEventBus.get(EVENT_CALL_STATUS_CHANGE, MegaChatCall::class.java)
-            .observe(this, callStatusObserver)
-        LiveEventBus.get(EVENT_CALL_ON_HOLD_CHANGE, MegaChatCall::class.java)
-            .observe(this, callOnHoldObserver)
-        LiveEventBus.get(EVENT_SESSION_ON_HOLD_CHANGE, Pair::class.java)
-            .observe(this, sessionOnHoldObserver)
     }
 
     private fun registerBroadcastReceivers() {
@@ -1125,6 +1089,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     MegaChatApiJava.MEGACHAT_INVALID_HANDLE
                 )
                 viewModel.onConsumeSnackBarMessageEvent()
+            }
+            if (contactInfoState.callStatusChanged) {
+                checkScreenRotationToShowCall()
             }
             updateVerifyCredentialsLayout(contactInfoState)
             updateUserStatusChanges(contactInfoState)
@@ -1689,6 +1656,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         } else {
             this.invalidateOptionsMenu()
         }
+        viewModel.onConsumeChatCallStatusChangeEvent()
     }
 
     /**

@@ -36,6 +36,8 @@ import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
+import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
+import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
@@ -71,6 +73,8 @@ class ContactInfoViewModelTest {
     private lateinit var setUserAliasUseCase: SetUserAliasUseCase
     private lateinit var removeContactByEmailUseCase: RemoveContactByEmailUseCase
     private lateinit var getInSharesUseCase: GetInSharesUseCase
+    private lateinit var monitorChatCallUpdates: MonitorChatCallUpdates
+    private lateinit var monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -136,6 +140,8 @@ class ContactInfoViewModelTest {
             setUserAliasUseCase,
             removeContactByEmailUseCase,
             getInSharesUseCase,
+            monitorChatCallUpdates,
+            monitorChatSessionUpdatesUseCase,
             standardDispatcher,
             testScope,
         )
@@ -161,6 +167,8 @@ class ContactInfoViewModelTest {
         setUserAliasUseCase = mock()
         removeContactByEmailUseCase = mock()
         getInSharesUseCase = mock()
+        monitorChatCallUpdates = mock()
+        monitorChatSessionUpdatesUseCase = mock()
     }
 
     @After
