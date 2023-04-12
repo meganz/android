@@ -61,6 +61,12 @@ android {
             dimension "service"
         }
     }
+
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+    }
 }
 
 dependencies {
@@ -76,10 +82,12 @@ dependencies {
     implementation androidx.lifecycle.process
     implementation lib.fresco
     implementation androidx.work.ktx
+    implementation androidx.room
     implementation androidx.hilt.work
     implementation google.hilt.android
     kapt google.hilt.android.compiler
     kapt androidx.hilt.compiler
+    kapt androidx.room.compiler
 
     gmsImplementation lib.billing.client.ktx
 
