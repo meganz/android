@@ -7,10 +7,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.extensions.getRequestListener
-import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
@@ -35,7 +33,6 @@ import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
-import java.io.File
 import javax.inject.Inject
 
 /**
@@ -540,9 +537,9 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
     private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(
             node,
-            cacheFolder::getThumbnailCacheFilePath,
-            cacheFolder::getPreviewCacheFilePath,
-            cacheFolder::getFullSizeCacheFilePath,
+            cacheFolder::getThumbnailCacheFolder,
+            cacheFolder::getPreviewCacheFolder,
+            cacheFolder::getFullSizeCacheFolder,
             megaApi::hasVersion,
             megaApi::getNumChildFolders,
             megaApi::getNumChildFiles,

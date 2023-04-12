@@ -125,9 +125,9 @@ internal class FolderLinkRepositoryImpl @Inject constructor(
     private suspend fun convertToUntypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(
             node,
-            cacheFolderGateway::getThumbnailCacheFilePath,
-            cacheFolderGateway::getPreviewCacheFilePath,
-            cacheFolderGateway::getFullSizeCacheFilePath,
+            cacheFolderGateway::getThumbnailCacheFolder,
+            cacheFolderGateway::getPreviewCacheFolder,
+            cacheFolderGateway::getFullSizeCacheFolder,
             { false },
             megaApiFolderGateway::getNumChildFolders,
             megaApiFolderGateway::getNumChildFiles,

@@ -137,20 +137,14 @@ internal class CacheFolderFacade @Inject constructor(
 
     override suspend fun buildDefaultDownloadDir(): File = fileGateway.buildDefaultDownloadDir()
 
-    override fun getThumbnailCacheFilePath(megaNode: MegaNode): String? =
-        getCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)?.let { thumbnail ->
-            "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
-        }?.takeUnless { megaNode.isFolder }
+    override fun getThumbnailCacheFolder(): File? =
+        getCacheFolder(CacheFolderConstant.THUMBNAIL_FOLDER)
 
-    override fun getPreviewCacheFilePath(megaNode: MegaNode): String? =
-        getCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)?.let { thumbnail ->
-            "$thumbnail${File.separator}${megaNode.getThumbnailFileName()}"
-        }?.takeUnless { megaNode.isFolder }
+    override fun getPreviewCacheFolder(): File? =
+        getCacheFolder(CacheFolderConstant.PREVIEW_FOLDER)
 
-    override fun getFullSizeCacheFilePath(megaNode: MegaNode): String? =
-        getCacheFolder(CacheFolderConstant.TEMPORARY_FOLDER)?.let { tempFolder ->
-            "$tempFolder${File.separator}${megaNode.getFileName()}"
-        }?.takeUnless { megaNode.isFolder }
+    override fun getFullSizeCacheFolder(): File? =
+        getCacheFolder(CacheFolderConstant.TEMPORARY_FOLDER)
 
     override suspend fun removeOldTempFolders() {
         appScope.launch(ioDispatcher) {

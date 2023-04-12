@@ -2,9 +2,7 @@ package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import mega.privacy.android.data.constant.CacheFolderConstant
 import mega.privacy.android.data.extensions.failWithError
-import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
@@ -16,7 +14,6 @@ import mega.privacy.android.domain.repository.FavouritesRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaHandleList
 import nz.mega.sdk.MegaNode
-import java.io.File
 import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
@@ -80,9 +77,9 @@ internal class DefaultFavouritesRepository @Inject constructor(
         nodes.map { megaNode ->
             nodeMapper(
                 megaNode,
-                cacheFolder::getThumbnailCacheFilePath,
-                cacheFolder::getPreviewCacheFilePath,
-                cacheFolder::getFullSizeCacheFilePath,
+                cacheFolder::getThumbnailCacheFolder,
+                cacheFolder::getPreviewCacheFolder,
+                cacheFolder::getFullSizeCacheFolder,
                 megaApiGateway::hasVersion,
                 megaApiGateway::getNumChildFolders,
                 megaApiGateway::getNumChildFiles,

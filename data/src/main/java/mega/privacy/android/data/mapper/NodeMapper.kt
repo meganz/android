@@ -1,10 +1,15 @@
 package mega.privacy.android.data.mapper
 
+import mega.privacy.android.data.constant.CacheFolderConstant
+import mega.privacy.android.data.extensions.getFileName
+import mega.privacy.android.data.extensions.getPreviewFileName
+import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.model.node.DefaultFileNode
 import mega.privacy.android.data.model.node.DefaultFolderNode
 import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaNode
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -13,9 +18,9 @@ import javax.inject.Inject
 internal class NodeMapper @Inject constructor() {
     suspend operator fun invoke(
         megaNode: MegaNode,
-        thumbnailPath: suspend (MegaNode) -> String?,
-        previewPath: suspend (MegaNode) -> String?,
-        fullSizePath: suspend (MegaNode) -> String?,
+        thumbnailPath: suspend () -> File?,
+        previewPath: suspend () -> File?,
+        fullSizePath: suspend () -> File?,
         hasVersion: suspend (MegaNode) -> Boolean,
         numberOfChildFolders: suspend (MegaNode) -> Int,
         numberOfChildFiles: suspend (MegaNode) -> Int,
@@ -56,9 +61,9 @@ internal class NodeMapper @Inject constructor() {
             creationTime = megaNode.creationTime,
             modificationTime = megaNode.modificationTime,
             hasVersion = hasVersion(megaNode),
-            thumbnailPath = thumbnailPath(megaNode),
-            previewPath = previewPath(megaNode),
-            fullSizePath = fullSizePath(megaNode),
+            thumbnailPath = getThumbnailCacheFilePath(megaNode, thumbnailPath()),
+            previewPath = getPreviewCacheFilePath(megaNode, previewPath()),
+            fullSizePath = getFullSizeCacheFilePath(megaNode, fullSizePath()),
             type = fileTypeInfoMapper(megaNode),
             isFavourite = megaNode.isFavourite,
             exportedData = megaNode.takeIf { megaNode.isExported }?.let {
@@ -73,3 +78,18 @@ internal class NodeMapper @Inject constructor() {
         )
     }
 }
+
+private fun getThumbnailCacheFilePath(megaNode: MegaNode, thumbnailFolder: File?): String? =
+    thumbnailFolder?.let {
+        "$it${File.separator}${megaNode.getThumbnailFileName()}"
+    }?.takeUnless { megaNode.isFolder }
+
+private fun getPreviewCacheFilePath(megaNode: MegaNode, previewFolder: File?): String? =
+    previewFolder?.let {
+        "$it${File.separator}${megaNode.getPreviewFileName()}"
+    }?.takeUnless { megaNode.isFolder }
+
+private fun getFullSizeCacheFilePath(megaNode: MegaNode, tempFolder: File?): String? =
+    tempFolder?.let {
+        "$it${File.separator}${megaNode.getFileName()}"
+    }?.takeUnless { megaNode.isFolder }

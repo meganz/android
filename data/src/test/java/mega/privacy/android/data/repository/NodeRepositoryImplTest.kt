@@ -43,6 +43,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NodeRepositoryImplTest {
@@ -230,7 +231,7 @@ class NodeRepositoryImplTest {
             on { isNodeKeyDecrypted }.thenReturn(true)
             on { hasPreview() }.thenReturn(true)
         }
-        whenever(cacheFolderGateway.getThumbnailCacheFilePath(megaNode)).thenReturn("thumbnail_path")
+        whenever(cacheFolderGateway.getThumbnailCacheFolder()).thenReturn(File("thumbnail_path"))
         whenever(megaApiGateway.hasVersion(megaNode)).thenReturn(true)
         whenever(megaApiGateway.getNumChildFolders(megaNode)).thenReturn(2)
         whenever(megaApiGateway.getNumChildFiles(megaNode)).thenReturn(3)

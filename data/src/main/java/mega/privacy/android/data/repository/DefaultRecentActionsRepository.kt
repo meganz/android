@@ -36,9 +36,9 @@ internal class DefaultRecentActionsRepository @Inject constructor(
             val list = getMegaRecentAction().map {
                 recentActionBucketMapper.invoke(
                     it,
-                    cacheFolderGateway::getThumbnailCacheFilePath,
-                    cacheFolderGateway::getPreviewCacheFilePath,
-                    cacheFolderGateway::getFullSizeCacheFilePath,
+                    cacheFolderGateway::getThumbnailCacheFolder,
+                    cacheFolderGateway::getPreviewCacheFolder,
+                    cacheFolderGateway::getFullSizeCacheFolder,
                     megaApiGateway::hasVersion,
                     megaApiGateway::getNumChildFolders,
                     megaApiGateway::getNumChildFiles,

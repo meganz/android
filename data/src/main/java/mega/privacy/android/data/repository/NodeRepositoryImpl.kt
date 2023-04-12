@@ -281,9 +281,9 @@ internal class NodeRepositoryImpl @Inject constructor(
     private suspend fun convertToUnTypedNode(node: MegaNode): UnTypedNode =
         nodeMapper(
             node,
-            cacheFolderGateway::getThumbnailCacheFilePath,
-            cacheFolderGateway::getPreviewCacheFilePath,
-            cacheFolderGateway::getFullSizeCacheFilePath,
+            cacheFolderGateway::getThumbnailCacheFolder,
+            cacheFolderGateway::getPreviewCacheFolder,
+            cacheFolderGateway::getFullSizeCacheFolder,
             megaApiGateway::hasVersion,
             megaApiGateway::getNumChildFolders,
             megaApiGateway::getNumChildFiles,

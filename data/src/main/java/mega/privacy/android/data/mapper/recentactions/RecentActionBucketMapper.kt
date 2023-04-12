@@ -6,6 +6,7 @@ import mega.privacy.android.domain.entity.RecentActionBucket
 import mega.privacy.android.domain.entity.RecentActionBucketUnTyped
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRecentActionBucket
+import java.io.File
 import javax.inject.Inject
 
 /**
@@ -14,9 +15,9 @@ import javax.inject.Inject
 internal class RecentActionBucketMapper @Inject constructor(private val nodeMapper: NodeMapper) {
     suspend operator fun invoke(
         megaRecentActionBucket: MegaRecentActionBucket,
-        thumbnailPath: suspend (MegaNode) -> String?,
-        previewPath: suspend (MegaNode) -> String?,
-        fullSizePath: suspend (MegaNode) -> String?,
+        thumbnailPath: suspend () -> File?,
+        previewPath: suspend () -> File?,
+        fullSizePath: suspend () -> File?,
         hasVersion: suspend (MegaNode) -> Boolean,
         numberOfChildFolders: suspend (MegaNode) -> Int,
         numberOfChildFiles: suspend (MegaNode) -> Int,
