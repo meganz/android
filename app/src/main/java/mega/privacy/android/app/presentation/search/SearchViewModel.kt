@@ -19,9 +19,11 @@ import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.model.SearchState
+import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
+import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaNode
@@ -41,6 +43,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     monitorNodeUpdates: MonitorNodeUpdates,
+    monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
     private val rootNodeExistsUseCase: RootNodeExistsUseCase,
     private val getRootFolder: GetRootFolder,
     private val searchNodes: SearchNodes,
@@ -69,6 +72,16 @@ class SearchViewModel @Inject constructor(
      * Stack to maintain folder navigation clicks
      */
     private val lastPositionStack: Stack<Int> = Stack()
+
+    init {
+        viewModelScope.launch {
+            monitorTransferEventsUseCase().collect { event ->
+                if (event is TransferEvent.TransferFinishEvent && !event.transfer.isFolderTransfer) {
+                    setTextSubmitted(true)
+                }
+            }
+        }
+    }
 
     /**
      * Monitor global node updates

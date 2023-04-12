@@ -137,7 +137,6 @@ import mega.privacy.android.app.constants.EventConstants.EVENT_SESSION_ON_HOLD_C
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.contacts.ContactsActivity
 import mega.privacy.android.app.contacts.usecase.InviteContactUseCase
-import mega.privacy.android.app.data.extensions.isBackgroundTransfer
 import mega.privacy.android.app.databinding.FabMaskChatLayoutBinding
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.fragments.homepage.EventObserver
@@ -367,18 +366,15 @@ import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaTransfer
-import nz.mega.sdk.MegaTransferListenerInterface
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.io.File
-import java.util.Calendar
 import javax.inject.Inject
 
 @Suppress("KDocMissingDocumentation")
 @AndroidEntryPoint
 class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterface,
-    MegaChatRequestListenerInterface, NavigationView.OnNavigationItemSelectedListener,
-    MegaTransferListenerInterface, View.OnClickListener,
+    MegaChatRequestListenerInterface, NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,
     BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
     ChatManagementCallback, ActionNodeCallback, SnackbarShower,
     MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback,
@@ -466,7 +462,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     lateinit var moveRequestMessageMapper: MoveRequestMessageMapper
 
     private val subscriptions = CompositeDisposable()
-    private var transferCallback: Long = 0
 
     //GET PRO ACCOUNT PANEL
     private lateinit var getProLayout: LinearLayout
@@ -577,7 +572,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     var searchExpand = false
     private var isSearching = false
     var openLink = false
-    private var lastTimeOnTransferUpdate = Calendar.getInstance().timeInMillis
     private var requestNotificationsPermissionFirstLogin = false
     var askPermissions = false
         private set
@@ -1182,7 +1176,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         setupTransferPager()
         setupAudioPlayerController()
         megaApi.getAccountAchievements(this)
-        megaApi.addTransferListener(this)
         if (!viewModel.isConnected) {
             Timber.d("No network -> SHOW OFFLINE MODE")
             if (drawerItem == null) {
@@ -2487,6 +2480,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 finish()
             }
         }
+        collectFlow(transfersManagementViewModel.state) {
+            if (it.transfersInfo.numPendingTransfers <= 0) {
+                pauseTransfersMenuIcon?.isVisible = false
+                playTransfersMenuIcon?.isVisible = false
+                cancelAllTransfersMenuItem?.isVisible = false
+            }
+        }
     }
 
     /**
@@ -3304,7 +3304,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     override fun onDestroy() {
         Timber.d("onDestroy()")
         dbH.removeSentPendingMessages()
-        megaApi.removeTransferListener(this)
         megaApi.removeRequestListener(this)
         composite.clear()
         if (alertDialogSMSVerification != null) {
@@ -9247,53 +9246,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             confirmationTransfersDialog?.setCanceledOnTouchOutside(false)
             confirmationTransfersDialog?.show()
         }
-    }
-
-    override fun onTransferStart(api: MegaApiJava, transfer: MegaTransfer) {}
-
-    override fun onTransferFinish(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {
-        Timber.d(
-            "onTransferFinish: %d - %d- %d",
-            transfer.nodeHandle,
-            transfer.tag,
-            transfer.notificationNumber
-        )
-        if (transfer.isStreamingTransfer || transfer.isBackgroundTransfer()) {
-            return
-        }
-        if (transferCallback < transfer.notificationNumber) {
-            transferCallback = transfer.notificationNumber
-            val now = Calendar.getInstance().timeInMillis
-            lastTimeOnTransferUpdate = now
-            if (!transfer.isFolderTransfer) {
-                val pendingTransfers: Int =
-                    megaApi.numPendingDownloads + megaApi.numPendingUploads
-                if (pendingTransfers <= 0) {
-                    if (pauseTransfersMenuIcon != null) {
-                        pauseTransfersMenuIcon?.isVisible = false
-                        playTransfersMenuIcon?.isVisible = false
-                        cancelAllTransfersMenuItem?.isVisible = false
-                    }
-                }
-                onNodesSearchUpdate()
-                refreshSharesFragments()
-                sharesPageAdapter.notifyDataSetChanged()
-                LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE).post(false)
-            }
-        }
-    }
-
-    override fun onTransferUpdate(api: MegaApiJava, transfer: MegaTransfer) {}
-
-    override fun onTransferTemporaryError(api: MegaApiJava, transfer: MegaTransfer, e: MegaError) {}
-
-    override fun onTransferData(
-        api: MegaApiJava,
-        transfer: MegaTransfer,
-        buffer: ByteArray,
-    ): Boolean {
-        Timber.d("onTransferData")
-        return true
     }
 
     fun setFirstLogin(isFirst: Boolean) {
