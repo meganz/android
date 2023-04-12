@@ -4,12 +4,14 @@ import app.cash.turbine.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.repository.SlideshowRepository
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
@@ -19,12 +21,15 @@ import kotlin.test.fail
 class SlideshowRepositoryTest {
     private lateinit var underTest: SlideshowRepository
 
+    private val megaApiGateway = mock<MegaApiGateway>()
     private val slideshowPreferencesGateway = mock<SlideshowPreferencesGateway>()
 
     @Before
     fun setUp() {
+        whenever(megaApiGateway.myUserHandle).thenReturn(1234L)
         underTest = SlideshowRepositoryImpl(
             slideshowPreferencesGateway = slideshowPreferencesGateway,
+            megaApiGateway = megaApiGateway,
         )
     }
 
@@ -32,7 +37,7 @@ class SlideshowRepositoryTest {
     fun `test that monitor order setting receives correct item`() = runTest {
         // given
         val expectedSetting = SlideshowOrder.Shuffle
-        whenever(slideshowPreferencesGateway.monitorOrderSetting())
+        whenever(slideshowPreferencesGateway.monitorOrderSetting(any()))
             .thenReturn(flowOf(expectedSetting))
 
         // then
@@ -47,7 +52,7 @@ class SlideshowRepositoryTest {
     fun `test that monitor speed setting receives correct item`() = runTest {
         // given
         val expectedSetting = SlideshowSpeed.Normal
-        whenever(slideshowPreferencesGateway.monitorSpeedSetting())
+        whenever(slideshowPreferencesGateway.monitorSpeedSetting(any()))
             .thenReturn(flowOf(expectedSetting))
 
         // then
@@ -62,7 +67,7 @@ class SlideshowRepositoryTest {
     fun `test that monitor repeat setting receives correct item`() = runTest {
         // given
         val expectedSetting = true
-        whenever(slideshowPreferencesGateway.monitorRepeatSetting())
+        whenever(slideshowPreferencesGateway.monitorRepeatSetting(any()))
             .thenReturn(flowOf(expectedSetting))
 
         // then
