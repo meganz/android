@@ -193,12 +193,6 @@ android {
     configurations {
         implementation.exclude module: 'protolite-well-known-types'
         implementation.exclude module: 'protobuf-javalite'
-
-        all {
-            resolutionStrategy {
-                force 'androidx.test:monitor:1.4.0'
-            }
-        }
     }
     lint {
         checkReleaseBuilds false
@@ -403,6 +397,7 @@ dependencies {
     kaptTest google.hilt.android.compiler
     debugImplementation androidx.fragment.test
     debugImplementation testlib.compose.manifest
+    debugImplementation testlib.test.monitor
 
     // Live Data testing
     testImplementation testlib.jraska.livedata.test

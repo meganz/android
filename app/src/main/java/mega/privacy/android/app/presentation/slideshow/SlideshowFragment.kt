@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package mega.privacy.android.app.presentation.slideshow
 
 import android.os.Bundle
@@ -8,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +19,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -32,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
@@ -47,12 +54,9 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.yield
 import mega.privacy.android.app.R
@@ -71,6 +75,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.usecase.GetThemeMode
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -144,12 +149,13 @@ class SlideshowFragment : Fragment() {
         }
     }
 
-    @OptIn(ExperimentalPagerApi::class)
     @Composable
     private fun SlideshowBody() {
         val slideshowViewState by slideshowViewModel.state.collectAsStateWithLifecycle()
         val scrollState = rememberScaffoldState()
-        val pagerState = rememberPagerState()
+        val pagerState = rememberPagerState(
+            initialPage = 0
+        )
         val items = slideshowViewState.items
         val order = slideshowViewState.order ?: SlideshowOrder.Shuffle
         val speed = slideshowViewState.speed ?: SlideshowSpeed.Normal
@@ -158,57 +164,64 @@ class SlideshowFragment : Fragment() {
             mutableStateOf(true)
         }
 
-        val playItems = remember(items) {
+        var showBottomPanel by remember {
+            mutableStateOf(true)
+        }
+
+        val playItems = remember(items, order) {
             when (order) {
                 SlideshowOrder.Shuffle -> items.shuffled()
                 SlideshowOrder.Newest -> items.sortedByDescending { it.modificationTime }
                 SlideshowOrder.Oldest -> items.sortedBy { it.modificationTime }
             }
         }
+
         val photoState = rememberPhotoState()
-        LaunchedEffect(isPlaying) {
+        LaunchedEffect(repeat, isPlaying) {
             if (isPlaying) {
+                showBottomPanel = false
+                imageViewerViewModel.showToolbar(showBottomPanel)
                 while (true) {
                     yield()
                     delay(speed.duration * 1000L)
                     tween<Float>(600)
                     if (isPlaying) {
                         pagerState.animateScrollToPage(
-                            page = (pagerState.currentPage + 1) % (pagerState.pageCount)
+                            page = if (pagerState.canScrollForward) {
+                                pagerState.currentPage + 1
+                            } else {
+                                0
+                            },
                         )
                     }
                 }
+            } else {
+                showBottomPanel = true
+                imageViewerViewModel.showToolbar(showBottomPanel)
             }
         }
 
-        // When move to next, reset scale
-        LaunchedEffect(pagerState, repeat) {
-            snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect { page ->
-                photoState.resetScale()
-
-                imageViewerViewModel.images.value?.let { sourceImages ->
-                    // handle repeat playing
-                    if (page == sourceImages.size.minus(1) && repeat.not()) {
-                        isPlaying = false
-                        // Make sure the last picture completely showed
-                        pagerState.animateScrollToPage(
-                            page = pagerState.pageCount - 1
-                        )
-                    }
-
-                    if (page == pagerState.pageCount.minus(1)) {
-                        slideshowViewModel.playSlideshowItems(sourceImages)
-                    }
-                }
+        LaunchedEffect(Unit) {
+            // When order change, restart slideshow
+            snapshotFlow { order }.distinctUntilChanged().collect {
+                pagerState.animateScrollToPage(0)
             }
         }
 
-        // Observe if scaling, then pause slideshow
+        LaunchedEffect(pagerState.canScrollForward) {
+            // Not repeat and the last one.
+            isPlaying = !(repeat.not() && pagerState.canScrollForward.not())
+        }
+
+        LaunchedEffect(pagerState.currentPage) {
+            // When move to next, reset scale
+            photoState.resetScale()
+        }
+
         LaunchedEffect(photoState.isScaled) {
-            snapshotFlow { photoState.isScaled }.collect { isScaled ->
-                if (isScaled) {
-                    isPlaying = false
-                }
+            // Observe if scaling, then pause slideshow
+            if (photoState.isScaled) {
+                isPlaying = false
             }
         }
 
@@ -218,11 +231,16 @@ class SlideshowFragment : Fragment() {
             pagerState = pagerState,
             photoState = photoState,
             isPlaying = isPlaying,
-            onClick = { isPlaying = !isPlaying }
+            showBottomPanel = showBottomPanel,
+            onPlayIconClick = {
+                isPlaying = !isPlaying
+            },
+            onImageTap = {
+                isPlaying = false
+            }
         )
     }
 
-    @OptIn(ExperimentalPagerApi::class)
     @Composable
     private fun SlideshowCompose(
         scrollState: ScaffoldState = rememberScaffoldState(),
@@ -230,43 +248,41 @@ class SlideshowFragment : Fragment() {
         pagerState: PagerState,
         photoState: PhotoState,
         isPlaying: Boolean,
-        onClick: () -> Unit,
+        showBottomPanel: Boolean,
+        onPlayIconClick: () -> Unit,
+        onImageTap: ((Offset) -> Unit),
     ) {
-
-        var showBottomPanel by remember {
-            mutableStateOf(true)
-        }
-
         Scaffold(
             scaffoldState = scrollState,
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 HorizontalPager(
-                    modifier = Modifier.fillMaxSize(),
-                    count = playItems.size,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    pageCount = playItems.size,
                     state = pagerState,
+                    beyondBoundsPageCount = 5,
                     key = { playItems[it].id }
                 ) { index ->
 
                     val photo = playItems[index]
                     val imageState =
                         produceState<String?>(initialValue = null) {
-
-                            slideshowViewModel.downloadFullSizeImage(
-                                nodeHandle = photo.id
-                            ).collect { imageResult ->
-                                value = imageResult.getHighestResolutionAvailableUri()
+                            runCatching {
+                                slideshowViewModel.downloadFullSizeImage(
+                                    nodeHandle = photo.id
+                                ).collectLatest { imageResult ->
+                                    value = imageResult.getHighestResolutionAvailableUri()
+                                }
+                            }.onFailure { exception ->
+                                Timber.e(exception)
                             }
                         }
 
                     PhotoBox(
+                        modifier = Modifier.fillMaxSize(),
                         state = photoState,
-                        onTap = {
-                            if (showBottomPanel.not()) {
-                                showBottomPanel = true
-                                imageViewerViewModel.showToolbar(showBottomPanel)
-                            }
-                        }
+                        onTap = onImageTap
                     ) {
                         AsyncImage(
                             model = ImageRequest.Builder(LocalContext.current)
@@ -274,8 +290,6 @@ class SlideshowFragment : Fragment() {
                                 .crossfade(true)
                                 .build(),
                             contentDescription = null,
-                            placeholder = painterResource(id = R.drawable.ic_image_thumbnail),
-                            error = painterResource(id = R.drawable.ic_image_thumbnail),
                             contentScale = ContentScale.Fit,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -283,11 +297,6 @@ class SlideshowFragment : Fragment() {
                 }
 
                 if (showBottomPanel) {
-                    LaunchedEffect(true) {
-                        delay(5000L)
-                        showBottomPanel = false
-                        imageViewerViewModel.showToolbar(showBottomPanel)
-                    }
                     Row(
                         modifier = Modifier
                             .height(72.dp)
@@ -302,7 +311,7 @@ class SlideshowFragment : Fragment() {
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(onClick = onClick) {
+                        IconButton(onClick = onPlayIconClick) {
                             Icon(
                                 painter = if (isPlaying)
                                     painterResource(id = R.drawable.ic_pause)

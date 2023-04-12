@@ -1,5 +1,6 @@
 [versions]
 accompanist = "0.28.0"
+accompanist-pager = "0.30.1"
 accompanist-systemui = "0.23.1"
 autovalue = "1.9"
 exoplayer = "2.18.4"
@@ -18,7 +19,7 @@ services-maps = "18.1.0"
 zxing = "3.4.0"
 
 [libraries]
-accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
+accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist-pager" }
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
 accompanist-placeholder = { module = "com.google.accompanist:accompanist-placeholder", version.ref = "accompanist" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }

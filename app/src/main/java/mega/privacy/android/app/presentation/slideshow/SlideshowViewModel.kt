@@ -55,35 +55,20 @@ class SlideshowViewModel @Inject constructor(
     fun setData(
         items: List<ImageItem>,
     ) {
-        playSlideshowItems(items = items)
+        playSlideshow(items = items)
     }
 
-    /**
-     * Play slideshow from ImageViewer source images
-     */
-    fun playSlideshowItems(items: List<ImageItem>) {
+    private fun playSlideshow(items: List<ImageItem>) {
         viewModelScope.launch {
-            val chunkedSourceItems = items.chunked(slideshowPlayingUnit)
-            val nextPlayingChunkedIndex = chunkedItems(chunkedSourceItems = chunkedSourceItems)
-            val ids = chunkedSourceItems[_state.value.currentPlayingChunkedIndex].map { it.id }
+            val ids = items.map { it.id }
             _state.update {
                 it.copy(
                     items = getPhotosByIds(ids = ids.map { id -> NodeId(id) })
-                        .filterIsInstance<Photo.Image>(),
-                    currentPlayingChunkedIndex = nextPlayingChunkedIndex
+                        .filterIsInstance<Photo.Image>()
                 )
             }
         }
     }
-
-    private fun chunkedItems(chunkedSourceItems: List<List<ImageItem>>) =
-        _state.value.currentPlayingChunkedIndex.also { currentPlayingChunkedIndex ->
-            if (currentPlayingChunkedIndex > chunkedSourceItems.size.minus(1)) {
-                0
-            } else {
-                currentPlayingChunkedIndex.inc()
-            }
-        }
 
     suspend fun downloadFullSizeImage(
         nodeHandle: Long,
@@ -129,9 +114,5 @@ class SlideshowViewModel @Inject constructor(
 
     fun saveRepeatSetting(isRepeat: Boolean) = viewModelScope.launch {
         saveSlideshowRepeatSettingUseCase(isRepeat)
-    }
-
-    companion object {
-        private const val slideshowPlayingUnit = 200
     }
 }

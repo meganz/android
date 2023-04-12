@@ -1,6 +1,7 @@
 [versions]
-androidx-test = "1.5.0"
 androidx-arch = "2.2.0"
+androidx-test = "1.5.0"
+androidx-test-monitor = "1.6.1"
 coroutines-test = "1.6.0"
 espresso = "3.4.0"
 hamcrest = "1.3"
@@ -39,6 +40,7 @@ mockito = { module = "org.mockito:mockito-core", version.ref = "mockito" }
 mockito-android = { module = "org.mockito:mockito-android", version.ref = "mockito" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockito-inline" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }
+test-monitor = { module = "androidx.test:monitor", version.ref = "androidx-test-monitor" }
 test-core-ktx = { module = "androidx.test:core-ktx", version.ref = "androidx-test" }
 test-parameter-injector = { module = "com.google.testparameterinjector:test-parameter-injector", version.ref = "test-parameter-injector" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }

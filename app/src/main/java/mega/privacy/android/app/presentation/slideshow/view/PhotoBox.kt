@@ -2,8 +2,6 @@ package mega.privacy.android.app.presentation.slideshow.view
 
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.runtime.Composable
@@ -32,12 +30,6 @@ fun PhotoBox(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
-        if (enabled) {
-            state.currentScale *= zoomChange
-            state.currentOffset += panChange
-        }
-    }
     Box(
         modifier = modifier
             .onSizeChanged { state.layoutSize = it.toSize() }
@@ -74,7 +66,21 @@ fun PhotoBox(
                 translationX = state.currentOffset.x
                 translationY = state.currentOffset.y
             }
-            .transformable(state = transformableState),
+            .pointerInput(Unit) {
+                detectTransformGestures(
+                    onGestureStart = { },
+                    onGesture = { _, pan, zoom, _ ->
+                        if (zoom != state.currentScale) {
+                            state.currentScale *= zoom
+                            state.currentOffset += pan
+                            return@detectTransformGestures true
+                        }
+                        return@detectTransformGestures false
+                    },
+                    onGestureEnd = { },
+                    enableOneFingerZoom = false,
+                )
+            },
         contentAlignment = contentAlignment,
         propagateMinConstraints = propagateMinConstraints,
         content = content,
@@ -122,3 +128,4 @@ private fun Modifier.pointerTapInputs(
         )
     }
 }
+

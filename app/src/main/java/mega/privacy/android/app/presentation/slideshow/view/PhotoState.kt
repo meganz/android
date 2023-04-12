@@ -118,7 +118,9 @@ class PhotoState(
      * Is scaled
      */
     val isScaled: Boolean
-        get() = currentScale != 1f || currentOffset != Offset.Zero
+        get() = currentScale != 1f
+                || (currentOffset.x != Offset.Zero.x
+                && currentOffset.y != Offset.Zero.y)
 
 
     /**
