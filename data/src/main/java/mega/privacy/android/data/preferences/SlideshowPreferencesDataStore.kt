@@ -50,6 +50,7 @@ internal class SlideshowPreferencesDataStore @Inject constructor(
                     }
                 }
             } catch (e: JSONException) {
+                // Default value is normal
                 SlideshowSpeed.Normal
             }
 
@@ -80,6 +81,7 @@ internal class SlideshowPreferencesDataStore @Inject constructor(
                     }
                 }
             } catch (e: JSONException) {
+                // Default value is shuffle
                 SlideshowOrder.Shuffle
             }
         }.flowOn(ioDispatcher)
@@ -107,7 +109,8 @@ internal class SlideshowPreferencesDataStore @Inject constructor(
                     JSONObject(userPref)[repeatPreferenceKeyString] == true
                 }
             } catch (e: JSONException) {
-                true
+                // Default value is off
+                false
             }
         }.flowOn(ioDispatcher)
 
