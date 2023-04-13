@@ -767,7 +767,7 @@ class PhotosFragment : Fragment() {
             quantity = albumIds.size,
             albumIds.size.takeIf { it > 1 } ?: albums.find {
                 it.id is Album.UserAlbum && it.id.id == albumIds.firstOrNull()
-            }?.title,
+            }?.title?.getTitleString(requireContext()),
         ).orEmpty()
         albumsViewModel.updateAlbumDeletedMessage(message)
     }
