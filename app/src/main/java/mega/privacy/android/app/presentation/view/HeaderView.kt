@@ -34,28 +34,31 @@ fun HeaderViewItem(
     onChangeViewTypeClick: () -> Unit,
     sortOrder: String,
     isListView: Boolean,
+    showSortOrder: Boolean,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Row(
-            modifier = Modifier.clickable {
-                onSortOrderClick()
+        if (showSortOrder) {
+            Row(
+                modifier = Modifier.clickable {
+                    onSortOrderClick()
+                }
+            ) {
+                Text(
+                    style = MaterialTheme.typography.body2,
+                    color = MaterialTheme.textColorSecondary(),
+                    text = sortOrder
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.ic_down),
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.textColorSecondary()),
+                    contentDescription = "DropDown arrow",
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically),
+                )
             }
-        ) {
-            Text(
-                style = MaterialTheme.typography.body2,
-                color = MaterialTheme.textColorSecondary(),
-                text = sortOrder
-            )
-            Image(
-                painter = painterResource(id = R.drawable.ic_down),
-                colorFilter = ColorFilter.tint(color = MaterialTheme.textColorSecondary()),
-                contentDescription = "DropDown arrow",
-                modifier = Modifier
-                    .align(Alignment.CenterVertically),
-            )
         }
         Spacer(modifier = Modifier.weight(1f))
         Column(
@@ -87,7 +90,8 @@ fun PreviewHeaderView() {
             onChangeViewTypeClick = {},
             onSortOrderClick = {},
             isListView = true,
-            sortOrder = "Name"
+            sortOrder = "Name",
+            showSortOrder = true
         )
     }
 }

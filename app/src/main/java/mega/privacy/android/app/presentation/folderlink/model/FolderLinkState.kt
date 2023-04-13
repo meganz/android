@@ -10,6 +10,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * Data class defining the state of [mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel]
  *
  * @property isInitialState             Whether it is initial state
+ * @property url                        Url of the folder
+ * @property folderSubHandle            Handle of the folder link
  * @property isLoginComplete            Whether is login is successfully completed
  * @property isNodesFetched             Whether nodes are fetched
  * @property askForDecryptionKeyDialog  Whether to show AskForDecryptionDialog
@@ -31,6 +33,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  */
 data class FolderLinkState(
     val isInitialState: Boolean = true,
+    val url: String? = null,
+    val folderSubHandle: String? = null,
     val isLoginComplete: Boolean = false,
     val isNodesFetched: Boolean = false,
     val askForDecryptionKeyDialog: Boolean = false,

@@ -29,9 +29,9 @@ import androidx.constraintlayout.compose.Dimension
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
-import mega.privacy.android.core.ui.theme.white_alpha_005
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 
@@ -59,8 +59,8 @@ internal fun NodeGridViewItem(
                 .height(56.dp)
                 .alpha(if (nodeUIItem.isInvisible) 0f else 1f)
                 .border(
-                    width = 2.dp,
-                    color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else white_alpha_005,
+                    width = 1.dp,
+                    color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_012_white_012,
                     shape = RoundedCornerShape(5.dp)
                 )
                 .combinedClickable(
@@ -118,8 +118,8 @@ internal fun NodeGridViewItem(
             modifier = modifier
                 .fillMaxWidth()
                 .border(
-                    width = 2.dp,
-                    color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else white_alpha_005,
+                    width = 1.dp,
+                    color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_012_white_012,
                     shape = RoundedCornerShape(5.dp)
                 )
                 .combinedClickable(

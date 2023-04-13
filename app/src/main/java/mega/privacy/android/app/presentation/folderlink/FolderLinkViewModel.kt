@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.folderlink
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -430,6 +431,37 @@ class FolderLinkViewModel @Inject constructor(
                         _state.update { it.copy(finishActivity = true) }
                     }
             }
+        }
+    }
+
+    /**
+     * Handle intent
+     */
+    fun handleIntent(intent: Intent) {
+        if (intent.action == Constants.ACTION_OPEN_MEGA_FOLDER_LINK) {
+            val folderUrl = intent.dataString
+            var folderSubHandle: String? = null
+            folderUrl?.let { url ->
+                Timber.d("URL: $url")
+                val s =
+                    url.split("!".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                Timber.d("URL parts: ${s.size}")
+                for (i in s.indices) {
+                    when (i) {
+                        1 -> {
+                            Timber.d("URL_handle: ${s[1]}")
+                        }
+                        2 -> {
+                            Timber.d("URL_key: ${s[2]}")
+                        }
+                        3 -> {
+                            folderSubHandle = s[3]
+                            Timber.d("URL_subhandle: $folderSubHandle")
+                        }
+                    }
+                }
+                _state.update { it.copy(url = folderUrl, folderSubHandle = folderSubHandle) }
+            } ?: Timber.w("url NULL")
         }
     }
 }

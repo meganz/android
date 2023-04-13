@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.folderlink
 
+import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
@@ -16,6 +17,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -354,6 +356,22 @@ class FolderLinkViewModelTest {
             assertThat(newValue.parentNode).isEqualTo(newParentNode)
             assertThat(newValue.title).isEqualTo(newParentNodeName)
             assertThat(newValue.nodesList[0].id.longValue).isEqualTo(newChildHandle)
+        }
+    }
+
+    @Test
+    fun `test that handleIntent returns correct url and folderSubHandle`() = runTest {
+        val url = "https://mega.nz/#F!KDZkRKJK!1meD4csdaj7DWjEhJoHaFw!SDQadJqY"
+        val folderSubHandle = "SDQadJqY"
+        val intent = mock<Intent>()
+        whenever(intent.action).thenReturn(Constants.ACTION_OPEN_MEGA_FOLDER_LINK)
+        whenever(intent.dataString).thenReturn(url)
+
+        underTest.state.test {
+            underTest.handleIntent(intent)
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.url).isEqualTo(url)
+            assertThat(newValue.folderSubHandle).isEqualTo(folderSubHandle)
         }
     }
 

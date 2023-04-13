@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -104,8 +106,11 @@ private fun NodeGridView(
     sortOrder: String,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
+    showSortOrder: Boolean,
+    gridState: LazyGridState,
 ) {
     LazyVerticalGrid(
+        state = gridState,
         columns = GridCells.Fixed(spanCount),
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(4.dp),
@@ -122,7 +127,8 @@ private fun NodeGridView(
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 sortOrder = sortOrder,
-                isListView = false
+                isListView = false,
+                showSortOrder
             )
         }
         items(count = nodeUIItems.size,
@@ -167,8 +173,10 @@ private fun NodeListView(
     sortOrder: String,
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
+    showSortOrder: Boolean,
+    listState: LazyListState,
 ) {
-    LazyColumn {
+    LazyColumn(state = listState) {
         item(
             key = "header"
         ) {
@@ -177,7 +185,8 @@ private fun NodeListView(
                 onSortOrderClick = onSortOrderClick,
                 onChangeViewTypeClick = onChangeViewTypeClick,
                 sortOrder = sortOrder,
-                isListView = true
+                isListView = true,
+                showSortOrder = showSortOrder
             )
         }
         items(count = nodeUIItemList.size,
@@ -224,6 +233,9 @@ fun NodesView(
     onSortOrderClick: () -> Unit,
     onChangeViewTypeClick: () -> Unit,
     spanCount: Int = 2,
+    showSortOrder: Boolean = true,
+    listState: LazyListState = LazyListState(),
+    gridState: LazyGridState = LazyGridState(),
 ) {
     if (isListView) {
         NodeListView(
@@ -235,7 +247,9 @@ fun NodesView(
             onLongClick = onLongClick,
             sortOrder = sortOrder,
             onSortOrderClick = onSortOrderClick,
-            onChangeViewTypeClick = onChangeViewTypeClick
+            onChangeViewTypeClick = onChangeViewTypeClick,
+            showSortOrder = showSortOrder,
+            listState = listState
         )
     } else {
         val newList = rememberNodeListForGrid(nodeUIItems = nodeUIItems, spanCount = spanCount)
@@ -248,7 +262,9 @@ fun NodesView(
             spanCount = spanCount,
             sortOrder = sortOrder,
             onSortOrderClick = onSortOrderClick,
-            onChangeViewTypeClick = onChangeViewTypeClick
+            onChangeViewTypeClick = onChangeViewTypeClick,
+            showSortOrder = showSortOrder,
+            gridState = gridState
         )
     }
 }
