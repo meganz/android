@@ -7,8 +7,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.repository.BillingRepository
-import mega.privacy.android.domain.usecase.CalculateCurrencyAmount
-import mega.privacy.android.domain.usecase.DefaultCalculateCurrencyAmount
 import mega.privacy.android.domain.usecase.DefaultGetSubscriptions
 import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
 import mega.privacy.android.domain.usecase.GetSubscriptionOptions
@@ -34,9 +32,5 @@ abstract class UpgradeAccountUseCases {
             GetCurrentSubscriptionPlan {
                 repository::getUserAccount.invoke().accountTypeIdentifier
             }
-
-        @Provides
-        fun provideCalculateCurrencyAmount(): CalculateCurrencyAmount =
-            DefaultCalculateCurrencyAmount()
     }
 }

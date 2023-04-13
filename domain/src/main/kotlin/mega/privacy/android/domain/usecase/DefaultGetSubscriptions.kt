@@ -4,6 +4,7 @@ import mega.privacy.android.domain.entity.AccountType
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.Skus
 import mega.privacy.android.domain.repository.AccountRepository
+import mega.privacy.android.domain.usecase.billing.CalculateCurrencyAmountUseCase
 import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
 import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import javax.inject.Inject
@@ -13,12 +14,12 @@ import javax.inject.Inject
  *
  * @property accountRepository           [AccountRepository]
  * @property getLocalPricingUseCase             [GetLocalPricingUseCase]
- * @property calculateCurrencyAmount     [CalculateCurrencyAmount]
+ * @property calculateCurrencyAmountUseCase     [CalculateCurrencyAmountUseCase]
  */
 class DefaultGetSubscriptions @Inject constructor(
     private val accountRepository: AccountRepository,
+    private val calculateCurrencyAmountUseCase: CalculateCurrencyAmountUseCase,
     private val getLocalPricingUseCase: GetLocalPricingUseCase,
-    private val calculateCurrencyAmount: CalculateCurrencyAmount,
     private val getAppSubscriptionOptionsUseCase: GetAppSubscriptionOptionsUseCase,
 ) : GetSubscriptions {
     override suspend fun invoke(): List<Subscription> {
@@ -31,8 +32,13 @@ class DefaultGetSubscriptions @Inject constructor(
                 handle = plan.handle,
                 storage = plan.storage,
                 transfer = plan.transfer,
-                amount = localPricing?.let { calculateCurrencyAmount(it.amount, it.currency) }
-                    ?: calculateCurrencyAmount(plan.amount, plan.currency),
+                amount = localPricing?.let {
+                    calculateCurrencyAmountUseCase(
+                        it.amount,
+                        it.currency
+                    )
+                }
+                    ?: calculateCurrencyAmountUseCase(plan.amount, plan.currency),
             )
         }
     }
