@@ -518,18 +518,18 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
                 megaContactDB.nickname.isNullOrEmpty().not() -> {
                     megaContactDB.nickname
                 }
-                megaContactDB.name.isNullOrEmpty().not() -> {
+                megaContactDB.firstName.isNullOrEmpty().not() -> {
                     if (megaContactDB.lastName.isNullOrEmpty().not()) {
-                        "$megaContactDB.name $megaContactDB.lastName"
+                        "${megaContactDB.firstName} ${megaContactDB.lastName}"
                     } else {
-                        megaContactDB.name
+                        megaContactDB.firstName
                     }
                 }
                 megaContactDB.lastName.isNullOrEmpty().not() -> {
                     megaContactDB.lastName
                 }
                 else -> {
-                    megaContactDB.mail
+                    megaContactDB.email
                 }
             } ?: user.email
         }

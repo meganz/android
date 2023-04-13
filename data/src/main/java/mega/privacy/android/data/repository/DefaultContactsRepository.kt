@@ -39,8 +39,8 @@ import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
 import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.wrapper.ContactWrapper
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -708,7 +708,14 @@ internal class DefaultContactsRepository @Inject constructor(
         firstName: String,
         lastName: String,
     ) = withContext(ioDispatcher) {
-        databaseHandler.setContact(MegaContactDB(handle.toString(), email, firstName, lastName))
+        databaseHandler.setContact(
+            Contact(
+                userId = handle,
+                email = email,
+                lastName = lastName,
+                firstName = firstName
+            )
+        )
     }
 
     override suspend fun getContactDatabaseSize(): Int = withContext(ioDispatcher) {

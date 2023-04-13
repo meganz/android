@@ -2,7 +2,7 @@ package mega.privacy.android.data.gateway
 
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.data.model.MegaContactDB
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
@@ -434,7 +434,7 @@ interface MegaLocalStorageGateway {
      * @param email
      * @return local contact details if found
      */
-    suspend fun getContactByEmail(email: String?): MegaContactDB?
+    suspend fun getContactByEmail(email: String?): Contact?
 
     /**
      * Set first time

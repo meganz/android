@@ -183,8 +183,8 @@ public class MegaAddContactsAdapter extends RecyclerView.Adapter<MegaAddContacts
 
         if (contact.getMegaUser() != null && contact.getMegaUser().getEmail() != null) {
             mail = contact.getMegaUser().getEmail();
-        } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
-            mail = contact.getMegaContactDB().getMail();
+        } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getEmail() != null) {
+            mail = contact.getMegaContactDB().getEmail();
         } else {
             mail = contact.getFullName();
         }

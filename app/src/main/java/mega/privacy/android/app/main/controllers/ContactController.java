@@ -14,7 +14,7 @@ import java.util.List;
 
 import mega.privacy.android.data.database.DatabaseHandler;
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.Contact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.di.DbHandlerModuleKt;
 import mega.privacy.android.app.listeners.GetAttrUserListener;
@@ -251,8 +251,8 @@ public class ContactController {
         if (user == null) return;
         //Check the user is not previously in the DB
         if (dbH.findContactByHandle(String.valueOf(user.getHandle())) == null) {
-            MegaContactDB megaContactDB = new MegaContactDB(String.valueOf(user.getHandle()), user.getEmail(), "", "");
-            dbH.setContact(megaContactDB);
+            Contact contact = new Contact(user.getHandle(), user.getEmail(), "", "", "");
+            dbH.setContact(contact);
         }
         GetAttrUserListener listener = new GetAttrUserListener(context);
         megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, listener);

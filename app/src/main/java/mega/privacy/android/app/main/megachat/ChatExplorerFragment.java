@@ -46,7 +46,7 @@ import java.util.ListIterator;
 import dagger.hilt.android.AndroidEntryPoint;
 import mega.privacy.android.app.MegaApplication;
 import mega.privacy.android.app.MegaContactAdapter;
-import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.Contact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.PositionDividerItemDecoration;
 import mega.privacy.android.app.components.SimpleDividerItemDecoration;
@@ -284,7 +284,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             Timber.d("Chat ID %d with PeerHandle: %d is NULL", chat.getChatId(), handle);
             return null;
         }
-        MegaContactDB contactDB = getContactDB(handle);
+        Contact contactDB = getContactDB(handle);
         String fullName = getContactNameDB(contactDB);
         if (fullName == null) {
             fullName = user.getEmail();
@@ -343,7 +343,7 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
             Timber.d("Contact: %s_%d", contactsMEGA.get(i).getEmail(), contactsMEGA.get(i).getVisibility());
             if (contactsMEGA.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contactsMEGA.get(i).getHandle();
-                MegaContactDB contactDB = getContactDB(contactHandle);
+                Contact contactDB = getContactDB(contactHandle);
                 String fullName = getContactNameDB(contactDB);
                 if (fullName == null) {
                     fullName = contactsMEGA.get(i).getEmail();
@@ -493,8 +493,8 @@ public class ChatExplorerFragment extends Fragment implements CheckScrollInterfa
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
                 handle = contact.getMegaUser().getHandle();
-            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
-                handle = Long.parseLong(contact.getMegaContactDB().getHandle());
+            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getEmail() != null) {
+                handle = contact.getMegaContactDB().getUserId();
             }
         }
         return handle;

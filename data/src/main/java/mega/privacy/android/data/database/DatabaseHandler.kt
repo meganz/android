@@ -3,10 +3,10 @@ package mega.privacy.android.data.database
 import android.database.sqlite.SQLiteDatabase
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
@@ -308,9 +308,9 @@ interface DatabaseHandler {
     fun clearBackups()
 
     fun findNonContactByHandle(handle: String?): NonContactInfo?
-    fun setContact(contact: MegaContactDB)
-    fun findContactByHandle(handleParam: String?): MegaContactDB?
-    fun findContactByEmail(mail: String?): MegaContactDB?
+    fun setContact(contact: Contact)
+    fun findContactByHandle(handleParam: String?): Contact?
+    fun findContactByEmail(mail: String?): Contact?
 
     /**
      * Is completed transfers empty

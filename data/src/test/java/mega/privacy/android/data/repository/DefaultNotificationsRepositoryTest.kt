@@ -10,13 +10,13 @@ import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.mapper.EventMapper
 import mega.privacy.android.data.mapper.NodeProvider
-import mega.privacy.android.data.mapper.UserAlertScheduledMeetingProvider
 import mega.privacy.android.data.mapper.UserAlertContactProvider
 import mega.privacy.android.data.mapper.UserAlertMapper
 import mega.privacy.android.data.mapper.UserAlertScheduledMeetingOccurrProvider
+import mega.privacy.android.data.mapper.UserAlertScheduledMeetingProvider
 import mega.privacy.android.data.model.GlobalUpdate
-import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.chat.NonContactInfo
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeContactEstablishedAlert
 import mega.privacy.android.domain.entity.EventType
@@ -183,7 +183,7 @@ class DefaultNotificationsRepositoryTest {
         whenever(megaLocalStorageGateway.getNonContactByHandle(any())).thenReturn(contactInfo)
         whenever(megaApiGateway.getContact(any())).thenReturn(mock())
         val expectedNickname = "A nickname"
-        val contactDB = mock<MegaContactDB> { on { nickname }.thenReturn(expectedNickname) }
+        val contactDB = mock<Contact> { on { nickname }.thenReturn(expectedNickname) }
         whenever(megaLocalStorageGateway.getContactByEmail(any())).thenReturn(contactDB)
 
         underTest.monitorUserAlerts().test {

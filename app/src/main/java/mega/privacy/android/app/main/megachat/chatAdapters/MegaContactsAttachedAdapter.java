@@ -43,7 +43,7 @@ import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
 import mega.privacy.android.app.main.ManagerActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
-import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiAndroid;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiAndroid;
@@ -58,7 +58,7 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
 
     Context context;
     int positionClicked;
-    ArrayList<MegaContactDB> contacts;
+    ArrayList<Contact> contacts;
     RecyclerView listFragment;
     MegaApiAndroid megaApi;
     MegaChatApiAndroid megaChatApi;
@@ -125,7 +125,7 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
 
     }
 
-    public MegaContactsAttachedAdapter(Context _context, ArrayList<MegaContactDB> _contacts, RecyclerView _listView) {
+    public MegaContactsAttachedAdapter(Context _context, ArrayList<Contact> _contacts, RecyclerView _listView) {
         this.context = _context;
         this.positionClicked = -1;
         this.contacts = _contacts;
@@ -212,17 +212,17 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
     public void onBindViewHolderList(ViewHolderContactsList holder, int position) {
         holder.imageView.setImageBitmap(null);
 
-        MegaContactDB contact = (MegaContactDB) getItem(position);
+        Contact contact = (Contact) getItem(position);
 
-        MegaUser user = megaApi.getContact(contact.getMail());
+        MegaUser user = megaApi.getContact(contact.getEmail());
         boolean isNotChecked = !multipleSelect || !isItemChecked(position);
         holder.verifiedIcon.setVisibility(isNotChecked && user != null && megaApi.areCredentialsVerified(user) ? View.VISIBLE : View.GONE);
 
-        holder.contactMail = contact.getMail();
+        holder.contactMail = contact.getEmail();
 
         holder.contactStateIcon.setVisibility(View.VISIBLE);
 
-        setContactStatus(getUserStatus(MegaApiJava.base64ToUserHandle(contact.getHandle())), holder.contactStateIcon, StatusIconLocation.STANDARD);
+        setContactStatus(getUserStatus(contact.getUserId()), holder.contactStateIcon, StatusIconLocation.STANDARD);
         holder.textViewContactName.setText(getContactNameDB(contact));
 
         if (!multipleSelect) {
@@ -240,15 +240,15 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
                     bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                     if (bitmap == null) {
                         avatar.delete();
-                        megaApi.getUserAvatar(contact.getMail(), buildAvatarFile(context, contact.getMail() + ".jpg").getAbsolutePath(), listener);
+                        megaApi.getUserAvatar(contact.getEmail(), buildAvatarFile(context, contact.getEmail() + ".jpg").getAbsolutePath(), listener);
                     } else {
                         holder.imageView.setImageBitmap(bitmap);
                     }
                 } else {
-                    megaApi.getUserAvatar(contact.getMail(), buildAvatarFile(context, contact.getMail() + ".jpg").getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(contact.getEmail(), buildAvatarFile(context, contact.getEmail() + ".jpg").getAbsolutePath(), listener);
                 }
             } else {
-                megaApi.getUserAvatar(contact.getMail(), buildAvatarFile(context, contact.getMail() + ".jpg").getAbsolutePath(), listener);
+                megaApi.getUserAvatar(contact.getEmail(), buildAvatarFile(context, contact.getEmail() + ".jpg").getAbsolutePath(), listener);
             }
         } else {
 
@@ -269,33 +269,34 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
                         bitmap = BitmapFactory.decodeFile(avatar.getAbsolutePath(), bOpts);
                         if (bitmap == null) {
                             avatar.delete();
-                            megaApi.getUserAvatar(contact.getMail(), buildAvatarFile(context, contact.getMail() + ".jpg").getAbsolutePath(), listener);
+                            megaApi.getUserAvatar(contact.getEmail(), buildAvatarFile(context, contact.getEmail() + ".jpg").getAbsolutePath(), listener);
                         } else {
                             holder.imageView.setImageBitmap(bitmap);
                         }
                     } else {
-                        megaApi.getUserAvatar(contact.getMail(), buildAvatarFile(context, contact.getMail() + ".jpg").getAbsolutePath(), listener);
+                        megaApi.getUserAvatar(contact.getEmail(), buildAvatarFile(context, contact.getEmail() + ".jpg").getAbsolutePath(), listener);
                     }
                 } else {
-                    megaApi.getUserAvatar(contact.getMail(), buildAvatarFile(context, contact.getMail() + ".jpg").getAbsolutePath(), listener);
+                    megaApi.getUserAvatar(contact.getEmail(), buildAvatarFile(context, contact.getEmail() + ".jpg").getAbsolutePath(), listener);
                 }
             }
         }
 
-        holder.textViewContent.setText(contact.getMail());
+        holder.textViewContent.setText(contact.getEmail());
 
         holder.imageButtonThreeDots.setTag(holder);
         holder.imageButtonThreeDots.setOnClickListener(this);
     }
 
-    public void createDefaultAvatar(ViewHolderContacts holder, MegaContactDB contact) {
+    public void createDefaultAvatar(ViewHolderContacts holder, Contact contact) {
         int color;
-        if (contact.getHandle().equals(megaApi.getMyUserHandle())) {
-            color = getColorAvatar(megaApi.getMyUser());
+        MegaUser user = megaApi.getMyUser();
+        if (user != null && contact.getUserId() == user.getHandle()) {
+            color = getColorAvatar(user);
         } else {
-            color = getColorAvatar(MegaApiJava.base64ToUserHandle(contact.getHandle()));
+            color = getColorAvatar(contact.getUserId());
         }
-        String fullName = contact.getName();
+        String fullName = contact.getFirstName();
         if (holder instanceof ViewHolderContactsList) {
             Bitmap bitmap = getDefaultAvatar(color, fullName, AVATAR_SIZE, true);
             ((ViewHolderContactsList) holder).imageView.setImageBitmap(bitmap);
@@ -453,12 +454,12 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
     /*
      * Get list of all selected contacts
      */
-    public ArrayList<MegaContactDB> getSelectedUsers() {
-        ArrayList<MegaContactDB> users = new ArrayList<MegaContactDB>();
+    public ArrayList<Contact> getSelectedUsers() {
+        ArrayList<Contact> users = new ArrayList<Contact>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
             if (selectedItems.valueAt(i) == true) {
-                MegaContactDB u = getContactAt(selectedItems.keyAt(i));
+                Contact u = getContactAt(selectedItems.keyAt(i));
                 if (u != null) {
                     users.add(u);
                 }
@@ -470,12 +471,12 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
     /*
      * Get contact at specified position
      */
-    public MegaContactDB getContactAt(int position) {
-        MegaContactDB megaContactDB = null;
+    public Contact getContactAt(int position) {
+        Contact contact = null;
         try {
             if (contacts != null) {
-                megaContactDB = contacts.get(position);
-                return megaContactDB;
+                contact = contacts.get(position);
+                return contact;
             }
         } catch (IndexOutOfBoundsException e) {
         }
@@ -493,17 +494,17 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
 
         ViewHolderContacts holder = (ViewHolderContacts) v.getTag();
         int currentPosition = holder.getAdapterPosition();
-        MegaContactDB c = (MegaContactDB) getItem(currentPosition);
+        Contact c = (Contact) getItem(currentPosition);
 
         switch (v.getId()) {
             case R.id.contact_list_three_dots:
             case R.id.contact_grid_three_dots: {
                 Timber.d("Click contact three dots!");
                 if (!multipleSelect) {
-                    if ((c.getMail().equals(megaChatApi.getMyEmail()))) {
+                    if ((c.getEmail().equals(megaChatApi.getMyEmail()))) {
                         ((ContactAttachmentActivity) context).showSnackbar(context.getString(R.string.contact_is_me));
                     } else {
-                        ((ContactAttachmentActivity) context).showOptionsPanel(c.getMail());
+                        ((ContactAttachmentActivity) context).showOptionsPanel(c.getEmail());
                     }
                 }
                 break;
@@ -532,8 +533,8 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
         notifyDataSetChanged();
     }
 
-    public MegaContactDB getDocumentAt(int position) {
-        MegaContactDB megaContactAdapter = null;
+    public Contact getDocumentAt(int position) {
+        Contact megaContactAdapter = null;
         if (position < contacts.size()) {
             megaContactAdapter = contacts.get(position);
             return megaContactAdapter;
@@ -542,7 +543,7 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
         return null;
     }
 
-    public void setContacts(ArrayList<MegaContactDB> contacts) {
+    public void setContacts(ArrayList<Contact> contacts) {
         Timber.d("setContacts");
         this.contacts = contacts;
         positionClicked = -1;
@@ -557,7 +558,7 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
         this.listFragment = listFragment;
     }
 
-    public void updateContact(MegaContactDB contactDB, int position) {
+    public void updateContact(Contact contactDB, int position) {
         if (position >= 0 && position < getItemCount()) {
             contacts.set(position, contactDB);
             notifyItemChanged(position);

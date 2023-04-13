@@ -44,7 +44,7 @@ import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.megachat.chatAdapters.MegaContactsAttachedAdapter;
 import mega.privacy.android.app.modalbottomsheet.chatmodalbottomsheet.ContactAttachmentBottomSheetDialogFragment;
 import mega.privacy.android.app.utils.ContactUtil;
-import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApiJava;
 import nz.mega.sdk.MegaChatError;
@@ -82,7 +82,7 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
     public long chatId;
     public long messageId;
 
-    ArrayList<MegaContactDB> contacts;
+    ArrayList<Contact> contacts;
 
     MegaContactsAttachedAdapter adapter;
 
@@ -135,13 +135,16 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
 
             for (int i = 0; i < message.getMessage().getUsersCount(); i++) {
                 String email = message.getMessage().getUserEmail(i);
-                MegaContactDB contactDB = dbH.findContactByEmail(email);
+                Contact contactDB = dbH.findContactByEmail(email);
                 if (contactDB != null) {
                     contacts.add(contactDB);
                 } else {
                     long handle = message.getMessage().getUserHandle(i);
-                    String handleString = handle == megaApi.getMyUserHandleBinary() ? megaApi.getMyUserHandle() : MegaApiJava.userHandleToBase64(handle);
-                    MegaContactDB newContactDB = new MegaContactDB(handleString, email, message.getMessage().getUserName(i), "");
+                    Contact newContactDB = new Contact(handle,
+                            email,
+                            "",
+                            message.getMessage().getUserName(i),
+                            "");
                     contacts.add(newContactDB);
                 }
             }
@@ -170,10 +173,11 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
         actionButton = (Button) findViewById(R.id.contact_attachment_chat_option_button);
         actionButton.setOnClickListener(this);
 
-        for (MegaContactDB contactDB : contacts) {
-            MegaUser checkContact = megaApi.getContact(contactDB.getMail());
+        for (Contact contactDB : contacts) {
+            if (contactDB.getEmail() == null) continue;
+            MegaUser checkContact = megaApi.getContact(contactDB.getEmail());
 
-            if (!contactDB.getMail().equals(megaApi.getMyEmail()) &&
+            if (!contactDB.getEmail().equals(megaApi.getMyEmail()) &&
                     (checkContact == null || checkContact.getVisibility() != MegaUser.VISIBILITY_VISIBLE)) {
                 inviteAction = true;
                 break;
@@ -293,16 +297,16 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
     public void itemClick(int position) {
         Timber.d("Position: %s", position);
 
-        MegaContactDB c = contacts.get(position);
+        Contact c = contacts.get(position);
         if (c != null) {
-            MegaUser contact = megaApi.getContact(c.getMail());
+            MegaUser contact = megaApi.getContact(c.getEmail());
 
             if (contact != null) {
                 if (contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                     MegaChatRoom chat = megaChatApi.getChatRoom(chatId);
-                    long contactHandle = Long.parseLong(c.getHandle());
+                    long contactHandle = c.getUserId();
                     boolean isChatRoomOpen = chat != null && !chat.isGroup() && contactHandle == chat.getPeerHandle(0);
-                    ContactUtil.openContactInfoActivity(this, c.getMail(), isChatRoomOpen);
+                    ContactUtil.openContactInfoActivity(this, c.getEmail(), isChatRoomOpen);
                 } else {
                     Timber.d("The user is not contact");
                     showSnackbar(getString(R.string.alert_user_is_not_contact));
@@ -323,10 +327,10 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
                     ArrayList<String> contactEmails = new ArrayList<>();
                     ContactController contactControllerC = new ContactController(this);
                     for (int i = 0; i < contacts.size(); i++) {
-                        MegaContactDB contact = contacts.get(i);
-                        MegaUser checkContact = megaApi.getContact(contact.getMail());
-                        if (!contact.getMail().equals(megaApi.getMyEmail()) && (checkContact == null || checkContact.getVisibility() != MegaUser.VISIBILITY_VISIBLE)) {
-                            contactEmails.add(contact.getMail());
+                        Contact contact = contacts.get(i);
+                        MegaUser checkContact = megaApi.getContact(contact.getEmail());
+                        if (!contact.getEmail().equals(megaApi.getMyEmail()) && (checkContact == null || checkContact.getVisibility() != MegaUser.VISIBILITY_VISIBLE)) {
+                            contactEmails.add(contact.getEmail());
                         }
                     }
 
@@ -337,8 +341,7 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
                     ArrayList<Long> contactHandles = new ArrayList<>();
 
                     for (int i = 0; i < contacts.size(); i++) {
-                        String handle = contacts.get(i).getHandle();
-                        contactHandles.add(Long.parseLong(handle));
+                        contactHandles.add(contacts.get(i).getUserId());
                     }
 
                     startGroupConversation(contactHandles);
@@ -438,12 +441,18 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
         if (contacts == null || contacts.isEmpty()) return;
 
         for (int i = 0; i < contacts.size(); i++) {
-            String email = contacts.get(i).getMail();
+            String email = contacts.get(i).getEmail();
             MegaUser user = megaApi.getContact(email);
             long handleUser = user.getHandle();
             if (handleUser == handleReceived) {
-                contacts.get(i).setNickname(getNicknameContact(email));
-                adapter.updateContact(contacts.get(i), i);
+                Contact contact = contacts.get(i);
+                adapter.updateContact(new Contact(
+                        contact.getUserId(),
+                        email,
+                        getNicknameContact(email),
+                        contact.getFirstName(),
+                        contact.getLastName()
+                ), i);
                 break;
             }
         }

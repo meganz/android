@@ -12,7 +12,7 @@ import android.widget.RelativeLayout;
 import java.util.ArrayList;
 
 import mega.privacy.android.app.MegaApplication;
-import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.Contact;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
@@ -80,10 +80,10 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
             }
             userName = getContext().getString(R.string.chat_me_text_bracket, userName);
         } else {
-            MegaContactDB contactDB = getContactDB(userHandle);
-            if (contactDB != null) {
-                userName = getContactNameDB(contactDB);
-                email = contactDB.getMail();
+            Contact contact = getContactDB(userHandle);
+            if (contact != null) {
+                userName = getContactNameDB(contact);
+                email = contact.getEmail();
             } else {
                 chatC.setNonContactAttributesInDB(userHandle);
                 email = chatC.getParticipantEmail(userHandle);

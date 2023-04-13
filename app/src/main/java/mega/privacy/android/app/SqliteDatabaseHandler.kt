@@ -36,11 +36,11 @@ import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.data.model.MegaContactDB
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.BackupState
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncStatus
@@ -2279,13 +2279,13 @@ class SqliteDatabaseHandler(
         return null
     }
 
-    override fun setContact(contact: MegaContactDB) {
+    override fun setContact(contact: Contact) {
         val values = ContentValues().apply {
-            put(KEY_CONTACT_HANDLE, encrypt(contact.getHandle()))
-            put(KEY_CONTACT_MAIL, encrypt(contact.getMail()))
-            put(KEY_CONTACT_NAME, encrypt(contact.getName()))
-            put(KEY_CONTACT_LAST_NAME, encrypt(contact.getLastName()))
-            put(KEY_CONTACT_NICKNAME, encrypt(contact.getNickname()))
+            put(KEY_CONTACT_HANDLE, encrypt(contact.userId.toString()))
+            put(KEY_CONTACT_MAIL, encrypt(contact.email))
+            put(KEY_CONTACT_NAME, encrypt(contact.firstName))
+            put(KEY_CONTACT_LAST_NAME, encrypt(contact.lastName))
+            put(KEY_CONTACT_NICKNAME, encrypt(contact.nickname))
         }
         db.insert(TABLE_CONTACTS, null, values)
     }
@@ -2364,7 +2364,7 @@ class SqliteDatabaseHandler(
             null)
     }
 
-    override fun findContactByHandle(handleParam: String?): MegaContactDB? {
+    override fun findContactByHandle(handleParam: String?): Contact? {
         Timber.d("findContactByHandle: %s", handleParam)
         val selectQuery =
             "SELECT * FROM $TABLE_CONTACTS WHERE $KEY_CONTACT_HANDLE = '${encrypt(handleParam)}'"
@@ -2377,7 +2377,8 @@ class SqliteDatabaseHandler(
                     val name = decrypt(cursor.getString(3))
                     val lastName = decrypt(cursor.getString(4))
                     val nickname = decrypt(cursor.getString(5))
-                    return MegaContactDB(handle,
+                    return Contact(
+                        handle?.toLongOrNull() ?: 0L,
                         mail,
                         name,
                         lastName,
@@ -2390,7 +2391,7 @@ class SqliteDatabaseHandler(
         return null
     }
 
-    override fun findContactByEmail(mail: String?): MegaContactDB? {
+    override fun findContactByEmail(mail: String?): Contact? {
         Timber.d("findContactByEmail: %s", mail)
         val selectQuery =
             "SELECT * FROM $TABLE_CONTACTS WHERE $KEY_CONTACT_MAIL = '${encrypt(mail)}'"
@@ -2402,11 +2403,12 @@ class SqliteDatabaseHandler(
                     val name = decrypt(cursor.getString(3))
                     val lastName = decrypt(cursor.getString(4))
                     val nickname = decrypt(cursor.getString(5))
-                    return MegaContactDB(handle,
+                    return Contact(handle?.toLongOrNull() ?: 0L,
                         mail,
                         name,
                         lastName,
-                        nickname)
+                        nickname
+                    )
                 }
             }
         } catch (e: Exception) {

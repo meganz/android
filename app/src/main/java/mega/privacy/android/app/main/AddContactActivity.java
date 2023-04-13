@@ -114,7 +114,7 @@ import mega.privacy.android.app.presentation.qrcode.QRCodeActivity;
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase;
 import mega.privacy.android.app.utils.ColorUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
-import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaChatApi;
 import nz.mega.sdk.MegaChatRoom;
@@ -405,7 +405,10 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                         for (int j = 0; j < filteredContactMEGA.size(); j++) {
                             contact = filteredContactMEGA.get(j);
                             if ((contact.getMegaUser() != null && contact.getMegaUser().getEmail().equals(mail))
-                                    || (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail().equals(mail))) {
+                                    || (contact.getMegaContactDB() != null
+                                    && contact.getMegaContactDB().getEmail() != null
+                                    && contact.getMegaContactDB().getEmail().equals(mail))
+                            ) {
                                 addedContactsMEGA.add(contact);
                                 filteredContactMEGA.remove(contact);
                                 break;
@@ -2308,7 +2311,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
     }
 
     private MegaContactAdapter createMegaContact(MegaUser contact) {
-        MegaContactDB contactDB = getContactDB(contact.getHandle());
+        Contact contactDB = getContactDB(contact.getHandle());
         String fullName = getContactNameDB(contactDB);
         if (fullName == null) {
             fullName = contact.getEmail();
@@ -2794,8 +2797,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (contact.isMegaContact() && !contact.isHeader()) {
             if (contact.getMegaContactAdapter().getMegaUser() != null && contact.getMegaContactAdapter().getMegaUser().getEmail() != null) {
                 mail = contact.getMegaContactAdapter().getMegaUser().getEmail();
-            } else if (contact.getMegaContactAdapter().getMegaContactDB() != null && contact.getMegaContactAdapter().getMegaContactDB().getMail() != null) {
-                mail = contact.getMegaContactAdapter().getMegaContactDB().getMail();
+            } else if (contact.getMegaContactAdapter().getMegaContactDB() != null && contact.getMegaContactAdapter().getMegaContactDB().getEmail() != null) {
+                mail = contact.getMegaContactAdapter().getMegaContactDB().getEmail();
             }
         } else if (contact.isPhoneContact() && !contact.isHeader()) {
             mail = contact.getPhoneContactInfo().getEmail();
@@ -2811,8 +2814,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getEmail() != null) {
                 mail = contact.getMegaUser().getEmail();
-            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
-                mail = contact.getMegaContactDB().getMail();
+            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getEmail() != null) {
+                mail = contact.getMegaContactDB().getEmail();
             }
         }
         return mail;
@@ -2823,8 +2826,8 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         if (contact != null) {
             if (contact.getMegaUser() != null && contact.getMegaUser().getHandle() != -1) {
                 handle = contact.getMegaUser().getHandle();
-            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getMail() != null) {
-                handle = Long.parseLong(contact.getMegaContactDB().getHandle());
+            } else if (contact.getMegaContactDB() != null && contact.getMegaContactDB().getEmail() != null) {
+                handle = contact.getMegaContactDB().getUserId();
             }
         }
         return handle;
@@ -3000,7 +3003,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private void createMyContact() {
         if (myContact == null) {
-            MegaContactDB contactDB = dbH.findContactByHandle(String.valueOf(megaApi.getMyUserHandle() + ""));
+            Contact contactDB = dbH.findContactByHandle(String.valueOf(megaApi.getMyUserHandle() + ""));
             String myFullName = megaChatApi.getMyFullname();
 
             if (myFullName != null) {

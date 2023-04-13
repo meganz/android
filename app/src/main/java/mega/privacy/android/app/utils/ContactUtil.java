@@ -27,7 +27,7 @@ import mega.privacy.android.app.MegaContactAdapter;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.main.ContactInfoActivity;
 import mega.privacy.android.app.main.megachat.ContactAttachmentActivity;
-import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaApiJava;
 import nz.mega.sdk.MegaStringList;
 import nz.mega.sdk.MegaStringMap;
@@ -36,7 +36,7 @@ import timber.log.Timber;
 
 public class ContactUtil {
 
-    public static MegaContactDB getContactDB(long contactHandle) {
+    public static Contact getContactDB(long contactHandle) {
         return MegaApplication.getInstance().getDbH().findContactByHandle(String.valueOf(contactHandle));
     }
 
@@ -50,7 +50,7 @@ public class ContactUtil {
         return user.getEmail();
     }
 
-    public static String getContactNameDB(MegaContactDB contactDB) {
+    public static String getContactNameDB(Contact contactDB) {
         if (contactDB == null) {
             return null;
         }
@@ -60,15 +60,15 @@ public class ContactUtil {
             return nicknameText;
         }
 
-        String firstNameText = contactDB.getName();
+        String firstNameText = contactDB.getFirstName();
         String lastNameText = contactDB.getLastName();
-        String emailText = contactDB.getMail();
+        String emailText = contactDB.getEmail();
 
         return buildFullName(firstNameText, lastNameText, emailText);
     }
 
     public static String getContactNameDB(long contactHandle) {
-        MegaContactDB contactDB = getContactDB(contactHandle);
+        Contact contactDB = getContactDB(contactHandle);
         if (contactDB != null) {
             return getContactNameDB(contactDB);
         }
@@ -77,7 +77,7 @@ public class ContactUtil {
     }
 
     public static String getNicknameContact(long contactHandle) {
-        MegaContactDB contactDB = getContactDB(contactHandle);
+        Contact contactDB = getContactDB(contactHandle);
         if (contactDB == null)
             return null;
 
@@ -85,7 +85,7 @@ public class ContactUtil {
     }
 
     public static String getNicknameContact(String email) {
-        MegaContactDB contactDB = MegaApplication.getInstance().getDbH().findContactByEmail(email);
+        Contact contactDB = MegaApplication.getInstance().getDbH().findContactByEmail(email);
         if (contactDB != null) {
             return contactDB.getNickname();
         }
@@ -125,14 +125,14 @@ public class ContactUtil {
     }
 
     public static String getFirstNameDB(long contactHandle) {
-        MegaContactDB contactDB = getContactDB(contactHandle);
+        Contact contactDB = getContactDB(contactHandle);
         if (contactDB != null) {
             String nicknameText = contactDB.getNickname();
             if (nicknameText != null) {
                 return nicknameText;
             }
 
-            String firstNameText = contactDB.getName();
+            String firstNameText = contactDB.getFirstName();
             if (!isTextEmpty(firstNameText)) {
                 return firstNameText;
             }
@@ -142,7 +142,7 @@ public class ContactUtil {
                 return lastNameText;
             }
 
-            String emailText = contactDB.getMail();
+            String emailText = contactDB.getEmail();
             if (!isTextEmpty(emailText)) {
                 return emailText;
             }
@@ -228,7 +228,7 @@ public class ContactUtil {
         for (int i = 0; i < contacts.size(); i++) {
             if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                 long contactHandle = contacts.get(i).getHandle();
-                MegaContactDB contactDB = getContactDB(contactHandle);
+                Contact contactDB = getContactDB(contactHandle);
                 String fullName = getContactNameDB(contactDB);
                 MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
                 visibleContacts.add(megaContactAdapter);
@@ -281,7 +281,7 @@ public class ContactUtil {
      * @return The contact's email.
      */
     public static String getContactEmailDB(long contactHandle) {
-        MegaContactDB contactDB = getContactDB(contactHandle);
+        Contact contactDB = getContactDB(contactHandle);
         return contactDB != null ? getContactEmailDB(contactDB) : null;
     }
 
@@ -291,8 +291,8 @@ public class ContactUtil {
      * @param contactDB contact's MegaContactDB
      * @return The contact's email.
      */
-    public static String getContactEmailDB(MegaContactDB contactDB) {
-        return contactDB != null ? contactDB.getMail() : null;
+    public static String getContactEmailDB(Contact contactDB) {
+        return contactDB != null ? contactDB.getEmail() : null;
     }
 
     /**

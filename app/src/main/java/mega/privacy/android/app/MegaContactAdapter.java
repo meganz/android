@@ -1,31 +1,31 @@
 package mega.privacy.android.app;
 
 
-import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.Contact;
 import nz.mega.sdk.MegaUser;
 
 public class MegaContactAdapter {
 
-    MegaContactDB megaContactDB;
+    Contact contact;
     MegaUser megaUser;
     String fullName;
     String lastGreen;
     private boolean isSelected;
 
-    public MegaContactAdapter(MegaContactDB megaContactDB, MegaUser megaUser, String fullName) {
-        this.megaContactDB = megaContactDB;
+    public MegaContactAdapter(Contact contact, MegaUser megaUser, String fullName) {
+        this.contact = contact;
         this.megaUser = megaUser;
         this.fullName = fullName;
         this.lastGreen = "";
         this.isSelected = false;
     }
 
-    public MegaContactDB getMegaContactDB() {
-        return megaContactDB;
+    public Contact getMegaContactDB() {
+        return contact;
     }
 
-    public void setMegaContactDB(MegaContactDB megaContactDB) {
-        this.megaContactDB = megaContactDB;
+    public void setMegaContactDB(Contact contact) {
+        this.contact = contact;
     }
 
     public MegaUser getMegaUser() {

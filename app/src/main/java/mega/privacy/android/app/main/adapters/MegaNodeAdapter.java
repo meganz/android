@@ -100,7 +100,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil;
 import mega.privacy.android.app.utils.NodeTakenDownDialogListener;
 import mega.privacy.android.app.utils.ThumbnailUtils;
 import mega.privacy.android.data.database.DatabaseHandler;
-import mega.privacy.android.data.model.MegaContactDB;
+import mega.privacy.android.domain.entity.Contact;
 import mega.privacy.android.domain.entity.ShareData;
 import mega.privacy.android.domain.entity.SortOrder;
 import nz.mega.sdk.MegaApiAndroid;
@@ -1483,9 +1483,9 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
         if (sl.size() != 0) {
             if (sl.size() == 1 && sl.get(0).getUser() != null) {
                 subtitle = sl.get(0).getUser();
-                MegaContactDB contactDB = dbH.findContactByEmail(subtitle);
-                if (contactDB != null) {
-                    String fullName = getContactNameDB(contactDB);
+                Contact contact = dbH.findContactByEmail(subtitle);
+                if (contact != null) {
+                    String fullName = getContactNameDB(contact);
                     if (fullName != null) {
                         subtitle = fullName;
                     }
