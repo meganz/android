@@ -77,9 +77,7 @@ import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
-import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
-import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
@@ -140,12 +138,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideDeleteSyncRecordByFingerprint() = mock<DeleteSyncRecordByFingerprint>()
-
-    @Provides
-    fun provideSetSecondaryFolderPath() = mock<SetSecondaryFolderPath>()
-
-    @Provides
-    fun provideSetSyncLocalPath() = mock<SetSyncLocalPath>()
 
     @Provides
     fun provideFileNameExists() = mock<FileNameExists>()

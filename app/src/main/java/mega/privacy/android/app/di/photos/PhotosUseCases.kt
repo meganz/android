@@ -10,7 +10,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.SettingsRepository
-import mega.privacy.android.domain.usecase.DefaultEnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.DefaultFilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.DefaultFilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.DefaultGetDefaultAlbumPhotos
@@ -24,7 +23,6 @@ import mega.privacy.android.domain.usecase.DefaultUpdateAlbumPhotosAddingProgres
 import mega.privacy.android.domain.usecase.DefaultUpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
-import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
@@ -56,9 +54,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindFilterCloudDrivePhotos(useCase: DefaultFilterCloudDrivePhotos): FilterCloudDrivePhotos
-
-    @Binds
-    abstract fun bindEnableCameraUpload(useCase: DefaultEnablePhotosCameraUpload): EnablePhotosCameraUpload
 
     @Binds
     abstract fun bindSetInitialCUPreferences(useCase: DefaultSetInitialCUPreferences): SetInitialCUPreferences

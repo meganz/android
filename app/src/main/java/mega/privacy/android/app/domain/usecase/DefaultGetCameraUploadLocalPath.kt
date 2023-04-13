@@ -21,11 +21,11 @@ class DefaultGetCameraUploadLocalPath @Inject constructor(
 ) : GetCameraUploadLocalPath {
 
     override suspend fun invoke(): String? {
-        var localPath = if (cameraUploadRepository.isFolderExternalSd()) {
-            val sdUri = Uri.parse(cameraUploadRepository.getUriExternalSd())
+        var localPath = if (cameraUploadRepository.isPrimaryFolderInSDCard()) {
+            val sdUri = Uri.parse(cameraUploadRepository.getPrimaryFolderSDCardUriPath())
             getFullPathFileWrapper.getFullPathFromTreeUri(sdUri, context)
         } else {
-            cameraUploadRepository.getSyncLocalPath()
+            cameraUploadRepository.getPrimaryFolderLocalPath()
         }
 
         if (!localPath?.trim().isNullOrEmpty() && !localPath.isNullOrEmpty()

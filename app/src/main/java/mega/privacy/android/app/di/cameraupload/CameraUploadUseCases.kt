@@ -133,9 +133,7 @@ import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
-import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
-import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
@@ -285,20 +283,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideDeleteSyncRecordByFingerprint(cameraUploadRepository: CameraUploadRepository): DeleteSyncRecordByFingerprint =
             DeleteSyncRecordByFingerprint(cameraUploadRepository::deleteSyncRecordByFingerprint)
-
-        /**
-         * Provide the [SetSecondaryFolderPath] implementation
-         */
-        @Provides
-        fun provideSetSecondaryFolderPath(cameraUploadRepository: CameraUploadRepository): SetSecondaryFolderPath =
-            SetSecondaryFolderPath(cameraUploadRepository::setSecondaryFolderPath)
-
-        /**
-         * Provide the [SetSyncLocalPath] implementation
-         */
-        @Provides
-        fun provideSetSyncLocalPath(cameraUploadRepository: CameraUploadRepository): SetSyncLocalPath =
-            SetSyncLocalPath(cameraUploadRepository::setSyncLocalPath)
 
         /**
          * Provide the [FileNameExists] implementation

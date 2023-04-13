@@ -36,13 +36,13 @@ import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
-import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
 import timber.log.Timber
@@ -58,7 +58,7 @@ import javax.inject.Inject
  * @property getCameraUploadPhotos
  * @property getCloudDrivePhotos
  * @property setInitialCUPreferences
- * @property enablePhotosCameraUpload
+ * @property enableCameraUploadsInPhotosUseCase
  * @property getNodeListByIds
  * @property jobUtilWrapper
  * @property ioDispatcher
@@ -73,7 +73,7 @@ class TimelineViewModel @Inject constructor(
     val getCameraUploadPhotos: FilterCameraUploadPhotos,
     val getCloudDrivePhotos: FilterCloudDrivePhotos,
     val setInitialCUPreferences: SetInitialCUPreferences,
-    val enablePhotosCameraUpload: EnablePhotosCameraUpload,
+    private val enableCameraUploadsInPhotosUseCase: EnableCameraUploadsInPhotosUseCase,
     val getNodeListByIds: GetNodeListByIds,
     private val jobUtilWrapper: JobUtilWrapper,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
@@ -316,12 +316,12 @@ class TimelineViewModel @Inject constructor(
             val localFile = Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DCIM
             )
-            enablePhotosCameraUpload(
-                path = localFile?.absolutePath,
-                syncVideo = _state.value.cuUploadsVideos,
-                enableCellularSync = _state.value.cuUseCellularConnection,
-                videoQuality = VideoQuality.ORIGINAL,
-                conversionChargingOnSize = SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE
+            enableCameraUploadsInPhotosUseCase(
+                primaryFolderLocalPath = localFile.absolutePath,
+                shouldSyncVideos = _state.value.cuUploadsVideos,
+                shouldUseWiFiOnly = _state.value.cuUseCellularConnection.not(),
+                videoCompressionSizeLimit = SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE,
+                videoUploadQuality = VideoQuality.ORIGINAL,
             )
             Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
             jobUtilWrapper.fireCameraUploadJob(context)

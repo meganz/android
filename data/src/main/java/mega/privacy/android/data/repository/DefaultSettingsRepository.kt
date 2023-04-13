@@ -193,13 +193,6 @@ internal class DefaultSettingsRepository @Inject constructor(
         megaLocalStorageGateway.setCamSyncFileUpload(fileUpload)
     }
 
-    override suspend fun setCameraUploadLocalPath(path: String?) {
-        megaLocalStorageGateway.setCamSyncLocalPath(path)
-    }
-
-    override suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean) =
-        megaLocalStorageGateway.setCameraFolderExternalSDCard(cameraFolderExternalSDCard)
-
     override suspend fun getStorageDownloadAskAlways(): Boolean {
         return megaLocalStorageGateway.getStorageAskAlways()
     }

@@ -114,9 +114,7 @@ import mega.privacy.android.domain.usecase.MonitorChargingStoppedState
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetTotalUploads
 import mega.privacy.android.domain.usecase.SetPrimarySyncHandle
-import mega.privacy.android.domain.usecase.SetSecondaryFolderPath
 import mega.privacy.android.domain.usecase.SetSecondarySyncHandle
-import mega.privacy.android.domain.usecase.SetSyncLocalPath
 import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
@@ -127,6 +125,8 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -234,10 +234,10 @@ class CameraUploadsService : LifecycleService() {
     lateinit var deleteSyncRecordByFingerprint: DeleteSyncRecordByFingerprint
 
     /**
-     * SetSyncLocalPath
+     * SetPrimaryFolderLocalPathUseCase
      */
     @Inject
-    lateinit var setSyncLocalPath: SetSyncLocalPath
+    lateinit var setPrimaryFolderLocalPathUseCase: SetPrimaryFolderLocalPathUseCase
 
     /**
      * ShouldCompressVideo
@@ -246,10 +246,10 @@ class CameraUploadsService : LifecycleService() {
     lateinit var shouldCompressVideo: ShouldCompressVideo
 
     /**
-     * SetSecondaryFolderPath
+     * SetSecondaryFolderLocalPathUseCase
      */
     @Inject
-    lateinit var setSecondaryFolderPath: SetSecondaryFolderPath
+    lateinit var setSecondaryFolderLocalPathUseCase: SetSecondaryFolderLocalPathUseCase
 
     /**
      * ClearSyncRecords
@@ -1419,8 +1419,8 @@ class CameraUploadsService : LifecycleService() {
             LOCAL_FOLDER_REMINDER_PRIMARY
         )
         disableCameraUploadsInDatabase()
-        setSyncLocalPath(Constants.INVALID_NON_NULL_VALUE)
-        setSecondaryFolderPath(Constants.INVALID_NON_NULL_VALUE)
+        setPrimaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
+        setSecondaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
         // Refresh SettingsCameraUploadsFragment
         sendBroadcast(Intent(BroadcastConstants.ACTION_REFRESH_CAMERA_UPLOADS_SETTING))
     }
@@ -1436,7 +1436,7 @@ class CameraUploadsService : LifecycleService() {
         // Disable Media Uploads only
         resetMediaUploadTimeStamps()
         disableMediaUploadSettings()
-        setSecondaryFolderPath(SettingsConstants.INVALID_PATH)
+        setSecondaryFolderLocalPathUseCase(SettingsConstants.INVALID_PATH)
         sendBroadcast(Intent(BroadcastConstants.ACTION_DISABLE_MEDIA_UPLOADS_SETTING))
     }
 

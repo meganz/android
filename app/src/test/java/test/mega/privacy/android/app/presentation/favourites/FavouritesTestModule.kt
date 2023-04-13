@@ -18,7 +18,6 @@ import mega.privacy.android.app.presentation.favourites.model.mapper.FavouriteMa
 import mega.privacy.android.data.wrapper.DateUtilWrapper
 import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
-import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.GetPreview
@@ -79,9 +78,6 @@ object FavouritesTestModule {
 
     @Provides
     fun provideFilterCloudDrivePhotos(): FilterCloudDrivePhotos = mock()
-
-    @Provides
-    fun provideEnableCameraUpload(): EnablePhotosCameraUpload = mock()
 
     @Provides
     fun provideSetInitialCUPreferences(): SetInitialCUPreferences = mock()

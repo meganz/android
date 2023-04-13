@@ -255,19 +255,25 @@ interface MegaLocalStorageGateway {
     suspend fun isSyncEnabled(): Boolean
 
     /**
-     * Get camera upload sync local path
+     * Retrieves the Primary Folder local path
+     *
+     * @return A [String] that contains the Primary Folder local path, or null if it does not exist
      */
-    suspend fun getSyncLocalPath(): String?
+    suspend fun getPrimaryFolderLocalPath(): String?
 
     /**
-     * Set camera upload sync local path
+     * Sets the new Primary Folder local path
+     *
+     * @param localPath The new Primary Folder local path
      */
-    suspend fun setSyncLocalPath(localPath: String)
+    suspend fun setPrimaryFolderLocalPath(localPath: String)
 
     /**
-     * Set secondary folder path
+     * Sets the new Secondary Folder local path
+     *
+     * @param localPath The new Secondary Folder local path
      */
-    suspend fun setSecondaryFolderPath(secondaryFolderPath: String)
+    suspend fun setSecondaryFolderLocalPath(localPath: String)
 
     /**
      * Set secondary upload enabled
@@ -275,9 +281,11 @@ interface MegaLocalStorageGateway {
     suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean)
 
     /**
-     * Get secondary upload folder path
+     * Retrieves the Secondary Folder local path
+     *
+     * @return A [String] that contains the Primary Folder local path, or null if it does not exist
      */
-    suspend fun getSecondaryFolderPath(): String?
+    suspend fun getSecondaryFolderLocalPath(): String?
 
     /**
      * Checks the value in the Database, as to whether Location Tags should be added or not
@@ -317,14 +325,19 @@ interface MegaLocalStorageGateway {
     suspend fun setUploadFileNamesKept(keepFileNames: Boolean)
 
     /**
-     * Is folder path on external SD card
+     * Checks whether the Primary Folder is located in an external SD Card or not
+     *
+     * @return true if the Primary Folder is local in an external SD Card, and false if otherwise
      */
-    suspend fun isFolderExternalSd(): Boolean
+    suspend fun isPrimaryFolderInSDCard(): Boolean
 
     /**
-     * Get external SD card URI
+     * Retrieves the Primary Folder SD Card URI path
+     *
+     * @return A [String] that contains the Primary Folder SD Card URI path, or null if it does not
+     * exist
      */
-    suspend fun getUriExternalSd(): String?
+    suspend fun getPrimaryFolderSDCardUriPath(): String?
 
     /**
      * Is secondary media folder enabled
@@ -332,14 +345,19 @@ interface MegaLocalStorageGateway {
     suspend fun isSecondaryMediaFolderEnabled(): Boolean
 
     /**
-     * Is media upload folder path on external SD card
+     * Checks whether the Secondary Folder is located in an external SD Card or not
+     *
+     * @return true if the Secondary Folder is local in an external SD Card, and false if otherwise
      */
-    suspend fun isMediaFolderExternalSd(): Boolean
+    suspend fun isSecondaryFolderInSDCard(): Boolean
 
     /**
-     * Get media folder external SD card URI
+     * Retrieves the Secondary Folder SD Card URI path
+     *
+     * @return A [String] that contains the Secondary Folder SD Card URI path, or null if it does not
+     * exist
      */
-    suspend fun getUriMediaFolderExternalSd(): String?
+    suspend fun getSecondaryFolderSDCardUriPath(): String?
 
     /**
      * Should clear sync records
@@ -481,11 +499,11 @@ interface MegaLocalStorageGateway {
     suspend fun setCamSyncLocalPath(path: String?)
 
     /**
-     * Set if camera upload local path folder is on an external sd card
+     * Sets whether the Primary Folder is located in an external SD Card or not
      *
-     * @param cameraFolderExternalSDCard
+     * @param isInSDCard Whether the Primary Folder is located in an external SD Card or not
      */
-    suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean)
+    suspend fun setPrimaryFolderInSDCard(isInSDCard: Boolean)
 
     /**
      * Sets whether Camera Uploads should only run through Wi-Fi / Wi-Fi or Mobile Data

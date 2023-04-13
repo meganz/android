@@ -27,8 +27,8 @@ class DefaultIsLocalSecondaryFolderSet @Inject constructor(
 ) : IsLocalSecondaryFolderSet {
     override suspend fun invoke(): Boolean {
         return if (isSecondaryFolderEnabled()) {
-            if (cameraUploadRepository.isMediaFolderExternalSd()) {
-                val uri = Uri.parse(cameraUploadRepository.getUriMediaFolderExternalSd())
+            if (cameraUploadRepository.isSecondaryFolderInSDCard()) {
+                val uri = Uri.parse(cameraUploadRepository.getSecondaryFolderSDCardUriPath())
                 val file = getDocumentFileWrapper.getDocumentFileFromTreeUri(context, uri)
                 if (file == null) {
                     Timber.d("Local Media Folder on SD card is unavailable")

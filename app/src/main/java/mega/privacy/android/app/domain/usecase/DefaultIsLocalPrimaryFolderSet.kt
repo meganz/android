@@ -24,8 +24,8 @@ class DefaultIsLocalPrimaryFolderSet @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : IsLocalPrimaryFolderSet {
     override suspend fun invoke(): Boolean {
-        return if (cameraUploadRepository.isFolderExternalSd()) {
-            val uri = Uri.parse(cameraUploadRepository.getUriExternalSd())
+        return if (cameraUploadRepository.isPrimaryFolderInSDCard()) {
+            val uri = Uri.parse(cameraUploadRepository.getPrimaryFolderSDCardUriPath())
             val file = getDocumentFileWrapper.getDocumentFileFromTreeUri(context, uri)
             if (file == null) {
                 Timber.d("Local Folder on SD card is unavailable")

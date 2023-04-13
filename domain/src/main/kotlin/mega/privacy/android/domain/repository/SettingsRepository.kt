@@ -92,16 +92,6 @@ interface SettingsRepository {
     suspend fun setCameraUploadFileType(syncVideo: Boolean)
 
     /**
-     * Set the camera upload loca path
-     */
-    suspend fun setCameraUploadLocalPath(path: String?)
-
-    /**
-     * Set if camera folder is in external sd card
-     */
-    suspend fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean)
-
-    /**
      * Get always ask for storage value
      *
      * @return isStorageAskAlways as [Boolean]

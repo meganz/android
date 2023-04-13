@@ -28,13 +28,13 @@ import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
-import mega.privacy.android.domain.usecase.EnablePhotosCameraUpload
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
 import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -61,7 +61,7 @@ class TimelineViewModelTest {
 
     private val setInitialCUPreferences = mock<SetInitialCUPreferences>()
 
-    private val enablePhotosCameraUpload = mock<EnablePhotosCameraUpload>()
+    private val enableCameraUploadsInPhotosUseCase = mock<EnableCameraUploadsInPhotosUseCase>()
 
     private val getNodeListByIds = mock<GetNodeListByIds> {
         onBlocking { invoke(any()) }.thenReturn(
@@ -85,7 +85,7 @@ class TimelineViewModelTest {
             getCameraUploadPhotos = filterCameraUploadPhotos,
             getCloudDrivePhotos = filterCloudDrivePhotos,
             setInitialCUPreferences = setInitialCUPreferences,
-            enablePhotosCameraUpload = enablePhotosCameraUpload,
+            enableCameraUploadsInPhotosUseCase = enableCameraUploadsInPhotosUseCase,
             getNodeListByIds = getNodeListByIds,
             jobUtilWrapper = jobUtilWrapper,
             ioDispatcher = StandardTestDispatcher(),

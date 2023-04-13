@@ -319,15 +319,35 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload retrieves sync local path`() = runTest {
-        whenever(localStorageGateway.getSyncLocalPath()).thenReturn("")
-        assertThat(underTest.getSyncLocalPath()).isEqualTo("")
+    fun `test that the primary folder local path is retrieved`() = runTest {
+        val testPath = "test/primary/path"
+
+        whenever(localStorageGateway.getPrimaryFolderLocalPath()).thenReturn(testPath)
+        assertThat(underTest.getPrimaryFolderLocalPath()).isEqualTo(testPath)
     }
 
     @Test
-    fun `test camera upload retrieves secondary folder path`() = runTest {
-        whenever(localStorageGateway.getSecondaryFolderPath()).thenReturn("")
-        assertThat(underTest.getSecondaryFolderPath()).isEqualTo("")
+    fun `test that the new primary folder local path is set`() = runTest {
+        val testPath = "test/new/primary/path"
+
+        underTest.setPrimaryFolderLocalPath(testPath)
+        verify(localStorageGateway, times(1)).setPrimaryFolderLocalPath(testPath)
+    }
+
+    @Test
+    fun `test that the secondary folder local path is retrieved`() = runTest {
+        val testPath = "test/secondary/path"
+
+        whenever(localStorageGateway.getSecondaryFolderLocalPath()).thenReturn(testPath)
+        assertThat(underTest.getSecondaryFolderLocalPath()).isEqualTo(testPath)
+    }
+
+    @Test
+    fun `test that the new secondary folder local path is set`() = runTest {
+        val testPath = "test/new/secondary/path"
+
+        underTest.setSecondaryFolderLocalPath(testPath)
+        verify(localStorageGateway, times(1)).setSecondaryFolderLocalPath(testPath)
     }
 
     @Test
@@ -370,15 +390,38 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload folder is on external SD card`() = runTest {
-        whenever(localStorageGateway.isFolderExternalSd()).thenReturn(true)
-        assertThat(underTest.isFolderExternalSd()).isEqualTo(true)
+    fun `test that the primary folder is located in the SD card`() =
+        testIsPrimaryFolderInSDCard(true)
+
+    @Test
+    fun `test that the primary folder is not located in the SD card`() =
+        testIsPrimaryFolderInSDCard(false)
+
+    private fun testIsPrimaryFolderInSDCard(input: Boolean) = runTest {
+        whenever(localStorageGateway.isPrimaryFolderInSDCard()).thenReturn(input)
+        assertThat(underTest.isPrimaryFolderInSDCard()).isEqualTo(input)
     }
 
     @Test
-    fun `test camera upload retrieves external SD card URI`() = runTest {
-        whenever(localStorageGateway.getUriExternalSd()).thenReturn("")
-        assertThat(underTest.getUriExternalSd()).isEqualTo("")
+    fun `test that the primary folder is now located in the SD card`() =
+        testSetPrimaryFolderInSDCard(true)
+
+    @Test
+    fun `test that the primary folder is no longer located in the SD card`() =
+        testSetPrimaryFolderInSDCard(false)
+
+    private fun testSetPrimaryFolderInSDCard(isInSDCard: Boolean) = runTest {
+        underTest.setPrimaryFolderInSDCard(isInSDCard)
+
+        verify(localStorageGateway, times(1)).setPrimaryFolderInSDCard(isInSDCard)
+    }
+
+    @Test
+    fun `test that the primary folder SD card URI path is retrieved`() = runTest {
+        val testPath = "test/sd/primary/path"
+
+        whenever(localStorageGateway.getPrimaryFolderSDCardUriPath()).thenReturn(testPath)
+        assertThat(underTest.getPrimaryFolderSDCardUriPath()).isEqualTo(testPath)
     }
 
     @Test
@@ -388,15 +431,24 @@ class DefaultCameraUploadRepositoryTest {
     }
 
     @Test
-    fun `test camera upload if secondary media folder is on external SD card`() = runTest {
-        whenever(localStorageGateway.isMediaFolderExternalSd()).thenReturn(false)
-        assertThat(underTest.isMediaFolderExternalSd()).isEqualTo(false)
+    fun `test that the secondary folder is located in the SD card`() =
+        testIsSecondaryFolderInSDCard(true)
+
+    @Test
+    fun `test that the secondary folder is not located in the SD card`() =
+        testIsSecondaryFolderInSDCard(false)
+
+    private fun testIsSecondaryFolderInSDCard(input: Boolean) = runTest {
+        whenever(localStorageGateway.isSecondaryFolderInSDCard()).thenReturn(input)
+        assertThat(underTest.isSecondaryFolderInSDCard()).isEqualTo(input)
     }
 
     @Test
-    fun `test camera upload retrieves media folder external SD card URI`() = runTest {
-        whenever(localStorageGateway.getUriMediaFolderExternalSd()).thenReturn("")
-        assertThat(underTest.getUriMediaFolderExternalSd()).isEqualTo("")
+    fun `test that the secondary folder SD card URI path is retrieved`() = runTest {
+        val testPath = "test/sd/secondary/path"
+
+        whenever(localStorageGateway.getSecondaryFolderSDCardUriPath()).thenReturn(testPath)
+        assertThat(underTest.getSecondaryFolderSDCardUriPath()).isEqualTo(testPath)
     }
 
     @Test

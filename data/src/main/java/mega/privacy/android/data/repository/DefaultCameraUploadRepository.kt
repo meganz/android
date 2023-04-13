@@ -269,17 +269,17 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.isSyncEnabled()
     }
 
-    override suspend fun getSyncLocalPath(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getSyncLocalPath()
+    override suspend fun getPrimaryFolderLocalPath(): String? = withContext(ioDispatcher) {
+        localStorageGateway.getPrimaryFolderLocalPath()
     }
 
-    override suspend fun setSyncLocalPath(localPath: String) = withContext(ioDispatcher) {
-        localStorageGateway.setSyncLocalPath(localPath)
+    override suspend fun setPrimaryFolderLocalPath(localPath: String) = withContext(ioDispatcher) {
+        localStorageGateway.setPrimaryFolderLocalPath(localPath)
     }
 
-    override suspend fun setSecondaryFolderPath(secondaryFolderPath: String) =
+    override suspend fun setSecondaryFolderLocalPath(localPath: String) =
         withContext(ioDispatcher) {
-            localStorageGateway.setSecondaryFolderPath(secondaryFolderPath)
+            localStorageGateway.setSecondaryFolderLocalPath(localPath)
         }
 
     override suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =
@@ -287,8 +287,8 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.setSecondaryEnabled(secondaryCameraUpload)
         }
 
-    override suspend fun getSecondaryFolderPath(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getSecondaryFolderPath()
+    override suspend fun getSecondaryFolderLocalPath(): String? = withContext(ioDispatcher) {
+        localStorageGateway.getSecondaryFolderLocalPath()
     }
 
     override suspend fun areLocationTagsEnabled(): Boolean = withContext(ioDispatcher) {
@@ -322,24 +322,28 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.setUploadFileNamesKept(keepFileNames)
         }
 
-    override suspend fun isFolderExternalSd(): Boolean = withContext(ioDispatcher) {
-        localStorageGateway.isFolderExternalSd()
+    override suspend fun isPrimaryFolderInSDCard(): Boolean = withContext(ioDispatcher) {
+        localStorageGateway.isPrimaryFolderInSDCard()
     }
 
-    override suspend fun getUriExternalSd(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getUriExternalSd()
+    override suspend fun setPrimaryFolderInSDCard(isInSDCard: Boolean) = withContext(ioDispatcher) {
+        localStorageGateway.setPrimaryFolderInSDCard(isInSDCard)
+    }
+
+    override suspend fun getPrimaryFolderSDCardUriPath(): String? = withContext(ioDispatcher) {
+        localStorageGateway.getPrimaryFolderSDCardUriPath()
     }
 
     override suspend fun isSecondaryMediaFolderEnabled() = withContext(ioDispatcher) {
         localStorageGateway.isSecondaryMediaFolderEnabled()
     }
 
-    override suspend fun isMediaFolderExternalSd() = withContext(ioDispatcher) {
-        localStorageGateway.isMediaFolderExternalSd()
+    override suspend fun isSecondaryFolderInSDCard() = withContext(ioDispatcher) {
+        localStorageGateway.isSecondaryFolderInSDCard()
     }
 
-    override suspend fun getUriMediaFolderExternalSd(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getUriMediaFolderExternalSd()
+    override suspend fun getSecondaryFolderSDCardUriPath(): String? = withContext(ioDispatcher) {
+        localStorageGateway.getSecondaryFolderSDCardUriPath()
     }
 
     override suspend fun shouldClearSyncRecords() = withContext(ioDispatcher) {
