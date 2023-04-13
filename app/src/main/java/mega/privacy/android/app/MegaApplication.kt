@@ -10,6 +10,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.HiltAndroidApp
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -189,6 +191,8 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
             Thread.setDefaultUncaughtExceptionHandler { _: Thread?, e: Throwable? ->
                 handleUncaughtException(e)
             }
+        } else {
+            Firebase.crashlytics.setCrashlyticsCollectionEnabled(false)
         }
         RxJavaPlugins.setErrorHandler { throwable: Throwable? -> handleUncaughtException(throwable) }
 
