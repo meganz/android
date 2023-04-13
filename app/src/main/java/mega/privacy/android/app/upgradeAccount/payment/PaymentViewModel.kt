@@ -21,7 +21,7 @@ import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.account.Skus
-import mega.privacy.android.domain.usecase.GetLocalPricing
+import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
@@ -36,7 +36,7 @@ import javax.inject.Inject
 internal class PaymentViewModel @Inject constructor(
     private val getPaymentMethod: GetPaymentMethod,
     private val getPricing: GetPricing,
-    private val getLocalPricing: GetLocalPricing,
+    private val getLocalPricingUseCase: GetLocalPricingUseCase,
     private val isBillingAvailable: IsBillingAvailable,
     private val getActiveSubscription: GetActiveSubscription,
     @ApplicationContext private val context: Context,
@@ -110,7 +110,7 @@ internal class PaymentViewModel @Inject constructor(
         product: Product,
     ): String {
         // Try get the local pricing details from the store if available otherwise use "default" from Mega
-        val details = getLocalPricing(getSku(product))
+        val details = getLocalPricingUseCase(getSku(product))
         val (price, currency) = if (details != null) {
             details.amount.value / 1000000.00 to details.currency.currency
         } else {

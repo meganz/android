@@ -13,6 +13,7 @@ import mega.privacy.android.domain.entity.account.CurrencyPoint
 import mega.privacy.android.domain.entity.account.Skus.SKU_PRO_LITE_MONTH
 import mega.privacy.android.domain.repository.AccountRepository
 import mega.privacy.android.domain.usecase.billing.GetAppSubscriptionOptionsUseCase
+import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -23,7 +24,7 @@ import org.mockito.kotlin.whenever
 class DefaultGetSubscriptionsTest {
     private lateinit var underTest: GetSubscriptions
     private val accountRepository = mock<AccountRepository>()
-    private val getLocalPricing = mock<GetLocalPricing>()
+    private val getLocalPricingUseCase = mock<GetLocalPricingUseCase>()
     private val calculateCurrencyAmount = mock<CalculateCurrencyAmount>()
     private val currencyMapper = ::Currency
     private val getAppSubscriptionOptionsUseCase = mock<GetAppSubscriptionOptionsUseCase>()
@@ -58,7 +59,7 @@ class DefaultGetSubscriptionsTest {
     fun setUp() {
         underTest = DefaultGetSubscriptions(
             accountRepository = accountRepository,
-            getLocalPricing = getLocalPricing,
+            getLocalPricingUseCase = getLocalPricingUseCase,
             calculateCurrencyAmount = calculateCurrencyAmount,
             getAppSubscriptionOptionsUseCase = getAppSubscriptionOptionsUseCase,
         )
@@ -72,7 +73,7 @@ class DefaultGetSubscriptionsTest {
                     subscriptionOption
                 )
             )
-            whenever(getLocalPricing(SKU_PRO_LITE_MONTH)).thenReturn(localPricing)
+            whenever(getLocalPricingUseCase(SKU_PRO_LITE_MONTH)).thenReturn(localPricing)
             whenever(
                 calculateCurrencyAmount(
                     CurrencyPoint.LocalCurrencyPoint(9.99.toLong()),

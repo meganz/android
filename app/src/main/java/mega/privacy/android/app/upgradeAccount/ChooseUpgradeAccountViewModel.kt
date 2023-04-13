@@ -21,7 +21,7 @@ import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.app.utils.Util.getSizeStringGBBased
 import mega.privacy.android.app.utils.billing.PaymentUtils.getSku
 import mega.privacy.android.domain.entity.Product
-import mega.privacy.android.domain.usecase.GetLocalPricing
+import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.GetPricing
 import timber.log.Timber
 import java.text.NumberFormat
@@ -32,7 +32,7 @@ import javax.inject.Inject
 internal class ChooseUpgradeAccountViewModel @Inject constructor(
     private val myAccountInfo: MyAccountInfo,
     private val getPricing: GetPricing,
-    private val getLocalPricing: GetLocalPricing,
+    private val getLocalPricingUseCase: GetLocalPricingUseCase,
 ) : ViewModel() {
 
     companion object {
@@ -83,7 +83,7 @@ internal class ChooseUpgradeAccountViewModel @Inject constructor(
         var currency = product.currency
 
         // Try get the local pricing details from the store if available
-        val details = getLocalPricing(getSku(product))
+        val details = getLocalPricingUseCase(getSku(product))
 
         if (details != null) {
             price = details.amount.value / 1000000.00

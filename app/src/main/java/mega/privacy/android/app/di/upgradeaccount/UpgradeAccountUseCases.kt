@@ -11,7 +11,6 @@ import mega.privacy.android.domain.usecase.CalculateCurrencyAmount
 import mega.privacy.android.domain.usecase.DefaultCalculateCurrencyAmount
 import mega.privacy.android.domain.usecase.DefaultGetSubscriptions
 import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
-import mega.privacy.android.domain.usecase.GetLocalPricing
 import mega.privacy.android.domain.usecase.GetSubscriptionOptions
 import mega.privacy.android.domain.usecase.GetSubscriptions
 
@@ -35,10 +34,6 @@ abstract class UpgradeAccountUseCases {
             GetCurrentSubscriptionPlan {
                 repository::getUserAccount.invoke().accountTypeIdentifier
             }
-
-        @Provides
-        fun provideGetLocalPricing(repository: BillingRepository): GetLocalPricing =
-            GetLocalPricing(repository::getLocalPricing)
 
         @Provides
         fun provideCalculateCurrencyAmount(): CalculateCurrencyAmount =

@@ -16,7 +16,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.PRO_I
 import mega.privacy.android.app.utils.Constants.PRO_LITE
 import mega.privacy.android.domain.entity.billing.PaymentMethodFlags
-import mega.privacy.android.domain.usecase.GetLocalPricing
+import mega.privacy.android.domain.usecase.billing.GetLocalPricingUseCase
 import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.billing.GetActiveSubscription
@@ -34,7 +34,7 @@ import kotlin.test.assertTrue
 internal class PaymentViewModelTest {
     private val getPaymentMethod: GetPaymentMethod = mock()
     private val getPricing: GetPricing = mock()
-    private val getLocalPricing: GetLocalPricing = mock()
+    private val getLocalPricingUseCase: GetLocalPricingUseCase = mock()
     private val isBillingAvailable: IsBillingAvailable = mock()
     private val getActiveSubscription: GetActiveSubscription = mock()
     private val context: Context = mock()
@@ -52,7 +52,7 @@ internal class PaymentViewModelTest {
         underTest = PaymentViewModel(
             getPaymentMethod = getPaymentMethod,
             getPricing = getPricing,
-            getLocalPricing = getLocalPricing,
+            getLocalPricingUseCase = getLocalPricingUseCase,
             isBillingAvailable = isBillingAvailable,
             getActiveSubscription = getActiveSubscription,
             context = context,
