@@ -10,8 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
-import dagger.hilt.android.EntryPointAccessors.fromApplication
-import mega.privacy.android.app.di.LegacyLoggingEntryPoint
+import dagger.hilt.android.qualifiers.ApplicationContext
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
@@ -30,7 +29,6 @@ import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.contacts.MegaContactGetter.MegaContact
-import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
@@ -54,17 +52,17 @@ import timber.log.Timber
 import java.io.File
 import java.util.Collections
 import java.util.Locale
+import javax.inject.Inject
 
 /**
  * Sqlite implementation of database handler
  */
-class SqliteDatabaseHandler(
-    context: Context?,
+class SqliteDatabaseHandler @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val legacyLoggingSettings: LegacyLoggingSettings,
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
-) :
-    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), LegacyDatabaseHandler {
+) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), LegacyDatabaseHandler {
     private var db: SQLiteDatabase
     override fun onCreate(db: SQLiteDatabase) {
         Timber.d("onCreate")
@@ -4905,33 +4903,6 @@ class SqliteDatabaseHandler(
         private const val OLD_VIDEO_QUALITY_ORIGINAL = 0
         private const val SYNC_RECORD_TYPE_VIDEO = 2
         private const val SYNC_RECORD_TYPE_ANY = -1
-        private var instance: DatabaseHandler? = null
-
-        @JvmStatic
-        @Synchronized
-        fun getDbHandler(
-            context: Context,
-            storageStateMapper: StorageStateMapper,
-            storageStateIntMapper: StorageStateIntMapper,
-        ): LegacyDatabaseHandler {
-            Timber.d("getDbHandler")
-
-            if (instance == null) {
-                Timber.d("INSTANCE IS NULL")
-                val legacyLoggingSettings = fromApplication(
-                    context,
-                    LegacyLoggingEntryPoint::class.java
-                ).legacyLoggingSettings
-
-                instance = SqliteDatabaseHandler(
-                    context = context,
-                    legacyLoggingSettings = legacyLoggingSettings,
-                    storageStateMapper = storageStateMapper,
-                    storageStateIntMapper = storageStateIntMapper
-                )
-            }
-            return instance as LegacyDatabaseHandler
-        }
 
         private fun encrypt(original: String?): String? =
             original?.let {
