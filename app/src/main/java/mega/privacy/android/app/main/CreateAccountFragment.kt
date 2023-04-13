@@ -307,79 +307,83 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
         startActivity(viewIntent)
     }
 
-    private fun checkPasswordStrength(s: String) = with(binding) {
-        if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length < 4) {
-            shapePasswdFirst.background = veryWeakDrawable
-            shapePasswdSecond.background = shapeDrawable
-            shapePasswdThird.background = shapeDrawable
-            shapePasswdFourth.background = shapeDrawable
-            shapePasswdFifth.background = shapeDrawable
-            passwordType.apply {
-                text = getString(R.string.pass_very_weak)
-                setTextColor(veryWeakColor)
+    private fun checkPasswordStrength(s: String) {
+        if (!isAdded) return
+
+        with(binding) {
+            if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_VERYWEAK || s.length < 4) {
+                shapePasswdFirst.background = veryWeakDrawable
+                shapePasswdSecond.background = shapeDrawable
+                shapePasswdThird.background = shapeDrawable
+                shapePasswdFourth.background = shapeDrawable
+                shapePasswdFifth.background = shapeDrawable
+                passwordType.apply {
+                    text = getString(R.string.pass_very_weak)
+                    setTextColor(veryWeakColor)
+                }
+                passwordAdviceText.text = getString(R.string.passwd_weak)
+                passwdValid = false
+                createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
+                setEditTextUnderlineColor(createAccountPasswordText, R.color.red_600_red_300)
+            } else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_WEAK) {
+                shapePasswdFirst.background = weakDrawable
+                shapePasswdSecond.background = weakDrawable
+                shapePasswdThird.background = shapeDrawable
+                shapePasswdFourth.background = shapeDrawable
+                shapePasswdFifth.background = shapeDrawable
+                passwordType.apply {
+                    text = getString(R.string.pass_weak)
+                    setTextColor(weakColor)
+                }
+                passwordAdviceText.text = getString(R.string.passwd_weak)
+                passwdValid = true
+                createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak)
+                setEditTextUnderlineColor(createAccountPasswordText, R.color.yellow_600_yellow_300)
+            } else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM) {
+                shapePasswdFirst.background = mediumDrawable
+                shapePasswdSecond.background = mediumDrawable
+                shapePasswdThird.background = mediumDrawable
+                shapePasswdFourth.background = shapeDrawable
+                shapePasswdFifth.background = shapeDrawable
+                passwordType.apply {
+                    text = getString(R.string.pass_medium)
+                    setTextColor(mediumColor)
+                }
+                passwordAdviceText.text = getString(R.string.passwd_medium)
+                passwdValid = true
+                createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
+                setEditTextUnderlineColor(createAccountPasswordText, R.color.green_500_green_400)
+            } else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_GOOD) {
+                shapePasswdFirst.background = goodDrawable
+                shapePasswdSecond.background = goodDrawable
+                shapePasswdThird.background = goodDrawable
+                shapePasswdFourth.background = goodDrawable
+                shapePasswdFifth.background = shapeDrawable
+                passwordType.apply {
+                    text = getString(R.string.pass_good)
+                    setTextColor(goodColor)
+                }
+                passwordAdviceText.text = getString(R.string.passwd_good)
+                passwdValid = true
+                createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good)
+                setEditTextUnderlineColor(createAccountPasswordText, R.color.lime_green_500_200)
+            } else {
+                shapePasswdFirst.background = strongDrawable
+                shapePasswdSecond.background = strongDrawable
+                shapePasswdThird.background = strongDrawable
+                shapePasswdFourth.background = strongDrawable
+                shapePasswdFifth.background = strongDrawable
+                passwordType.apply {
+                    text = getString(R.string.pass_strong)
+                    setTextColor(strongColor)
+                }
+                passwordAdviceText.text = getString(R.string.passwd_strong)
+                passwdValid = true
+                createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Strong)
+                setEditTextUnderlineColor(createAccountPasswordText, R.color.dark_blue_500_200)
             }
-            passwordAdviceText.text = getString(R.string.passwd_weak)
-            passwdValid = false
-            createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_VeryWeak)
-            setEditTextUnderlineColor(createAccountPasswordText, R.color.red_600_red_300)
-        } else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_WEAK) {
-            shapePasswdFirst.background = weakDrawable
-            shapePasswdSecond.background = weakDrawable
-            shapePasswdThird.background = shapeDrawable
-            shapePasswdFourth.background = shapeDrawable
-            shapePasswdFifth.background = shapeDrawable
-            passwordType.apply {
-                text = getString(R.string.pass_weak)
-                setTextColor(weakColor)
-            }
-            passwordAdviceText.text = getString(R.string.passwd_weak)
-            passwdValid = true
-            createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Weak)
-            setEditTextUnderlineColor(createAccountPasswordText, R.color.yellow_600_yellow_300)
-        } else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_MEDIUM) {
-            shapePasswdFirst.background = mediumDrawable
-            shapePasswdSecond.background = mediumDrawable
-            shapePasswdThird.background = mediumDrawable
-            shapePasswdFourth.background = shapeDrawable
-            shapePasswdFifth.background = shapeDrawable
-            passwordType.apply {
-                text = getString(R.string.pass_medium)
-                setTextColor(mediumColor)
-            }
-            passwordAdviceText.text = getString(R.string.passwd_medium)
-            passwdValid = true
-            createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Medium)
-            setEditTextUnderlineColor(createAccountPasswordText, R.color.green_500_green_400)
-        } else if (megaApi.getPasswordStrength(s) == MegaApiJava.PASSWORD_STRENGTH_GOOD) {
-            shapePasswdFirst.background = goodDrawable
-            shapePasswdSecond.background = goodDrawable
-            shapePasswdThird.background = goodDrawable
-            shapePasswdFourth.background = goodDrawable
-            shapePasswdFifth.background = shapeDrawable
-            passwordType.apply {
-                text = getString(R.string.pass_good)
-                setTextColor(goodColor)
-            }
-            passwordAdviceText.text = getString(R.string.passwd_good)
-            passwdValid = true
-            createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Good)
-            setEditTextUnderlineColor(createAccountPasswordText, R.color.lime_green_500_200)
-        } else {
-            shapePasswdFirst.background = strongDrawable
-            shapePasswdSecond.background = strongDrawable
-            shapePasswdThird.background = strongDrawable
-            shapePasswdFourth.background = strongDrawable
-            shapePasswdFifth.background = strongDrawable
-            passwordType.apply {
-                text = getString(R.string.pass_strong)
-                setTextColor(strongColor)
-            }
-            passwordAdviceText.text = getString(R.string.passwd_strong)
-            passwdValid = true
-            createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_InputHint_Strong)
-            setEditTextUnderlineColor(createAccountPasswordText, R.color.dark_blue_500_200)
+            createAccountPasswordTextErrorIcon.isVisible = false
         }
-        createAccountPasswordTextErrorIcon.isVisible = false
     }
 
     private fun submitForm() {
@@ -558,7 +562,9 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
         icon.isVisible = true
     }
 
-    private fun quitError(layout: TextInputLayout, icon: ImageView) = with(binding) {
+    private fun quitError(layout: TextInputLayout, icon: ImageView) {
+        if (!isAdded) return
+
         layout.apply {
             error = null
             setHintTextAppearance(R.style.TextAppearance_Design_Hint)
@@ -567,11 +573,11 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
     }
 
     override fun onVisibilityChanged(visible: Boolean) {
-        if (isAdded) {
-            with(binding) {
-                createAccountAndAcceptLayout.isVisible =
-                    !visible && createAccountCreateLayout.isVisible
-            }
+        if (!isAdded) return
+
+        with(binding) {
+            createAccountAndAcceptLayout.isVisible =
+                !visible && createAccountCreateLayout.isVisible
         }
     }
 
