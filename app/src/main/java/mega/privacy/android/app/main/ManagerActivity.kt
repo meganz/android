@@ -338,6 +338,7 @@ import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeId
@@ -2482,7 +2483,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
         collectFlow(transfersManagementViewModel.state) {
-            if (it.transfersInfo.numPendingTransfers <= 0) {
+            if (it.transfersInfo.status == TransfersStatus.NotTransferring) {
                 pauseTransfersMenuIcon?.isVisible = false
                 playTransfersMenuIcon?.isVisible = false
                 cancelAllTransfersMenuItem?.isVisible = false
@@ -4520,6 +4521,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             return completedTransfersFragment?.isAdded ?: false
         }
 
+    override val isOnFileManagementManagerSection: Boolean
+        get() = drawerItem !== DrawerItem.TRANSFERS
+                && drawerItem !== DrawerItem.NOTIFICATIONS
+                && drawerItem !== DrawerItem.CHAT
+                && drawerItem !== DrawerItem.RUBBISH_BIN
+                && drawerItem !== DrawerItem.PHOTOS
+                && !isInImagesPage
+
     fun checkScrollElevation() {
         if (drawerItem == null) {
             return
@@ -5514,7 +5523,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun adjustTransferWidgetPositionInHomepage() {
         if (isInMainHomePage) {
-            val transfersWidgetLayout: RelativeLayout =
+            val transfersWidgetLayout: View =
                 findViewById(R.id.transfers_widget_layout)
                     ?: return
             val params = transfersWidgetLayout.layoutParams as LinearLayout.LayoutParams
@@ -9949,7 +9958,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
      * @param bNVHidden true if the bottom navigation view is hidden, false otherwise
      */
     private fun updateTransfersWidgetPosition(bNVHidden: Boolean) {
-        val transfersWidgetLayout: RelativeLayout =
+        val transfersWidgetLayout: View =
             findViewById(R.id.transfers_widget_layout)
                 ?: return
         val params = transfersWidgetLayout.layoutParams as LinearLayout.LayoutParams

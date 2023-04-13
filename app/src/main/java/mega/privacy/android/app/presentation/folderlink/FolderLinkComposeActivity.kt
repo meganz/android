@@ -32,7 +32,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.usecase.GetThemeMode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -44,9 +43,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     DecryptAlertDialog.DecryptDialogListener {
 
     private lateinit var binding: ActivityFolderLinkComposeBinding
-
-    @Inject
-    lateinit var getThemeMode: GetThemeMode
 
     /**
      * String formatter for file desc

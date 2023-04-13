@@ -4,6 +4,8 @@ import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import mega.privacy.android.core.ui.theme.amber_300
+import mega.privacy.android.core.ui.theme.amber_700
 import mega.privacy.android.core.ui.theme.blue_200
 import mega.privacy.android.core.ui.theme.blue_400
 import mega.privacy.android.core.ui.theme.dark_blue_200
@@ -163,3 +165,9 @@ val Colors.red_600_red_300: Color
  */
 val Colors.grey_alpha_087_yellow_700: Color
     get() = if (isLight) grey_alpha_087 else yellow_700
+
+/**
+ * Color for amber 700 when light [amber_700] and amber 300 when dark [amber_300]
+ */
+val Colors.amber_700_amber_300: Color
+    get() = if (isLight) amber_700 else amber_300

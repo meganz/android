@@ -15,9 +15,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.AreAllTransfersPaused
+import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.presentation.transfers.model.mapper.TransfersInfoMapper
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
-import mega.privacy.android.domain.entity.TransfersInfo
 import mega.privacy.android.domain.entity.TransfersSizeInfo
+import mega.privacy.android.domain.entity.TransfersStatus
 import mega.privacy.android.domain.entity.transfer.TransferType
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.GetNumPendingDownloadsNonBackground
@@ -48,6 +50,8 @@ class TransfersManagementViewModel @Inject constructor(
     private val isCompletedTransfersEmpty: IsCompletedTransfersEmpty,
     private val areAllTransfersPaused: AreAllTransfersPaused,
     private val broadcastPausedTransfers: BroadcastPausedTransfers,
+    private val transfersInfoMapper: TransfersInfoMapper,
+    private val transfersManagement: TransfersManagement,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     monitorConnectivityUseCase: MonitorConnectivityUseCase,
     monitorTransfersSize: MonitorTransfersSize,
@@ -74,6 +78,7 @@ class TransfersManagementViewModel @Inject constructor(
                     getPendingDownloadAndUpload(transfersInfo)
                 }
         }
+        checkTransfersState()
     }
 
     /**
@@ -84,34 +89,41 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * Checks transfers info.
      */
-    fun checkTransfersInfo(transferType: TransferType) {
-        val transfersInfo = state.value.transfersInfo
+    fun checkTransfersInfo(transferType: TransferType, unHideWidget: Boolean) {
+        val transfersInfo = _state.value.transfersInfo
         getPendingDownloadAndUpload(
             TransfersSizeInfo(
                 transferType = transferType,
                 totalSizeTransferred = transfersInfo.totalSizeTransferred,
                 totalSizePendingTransfer = transfersInfo.totalSizePendingTransfer,
-            )
+            ), unHideWidget
         )
     }
 
     /**
      * get pending download and upload
      */
-    private fun getPendingDownloadAndUpload(transfersSizeInfo: TransfersSizeInfo) {
+    private fun getPendingDownloadAndUpload(
+        transfersSizeInfo: TransfersSizeInfo,
+        unHideWidget: Boolean = false,
+    ) {
         viewModelScope.launch {
             val numPendingDownloadsNonBackground = getNumPendingDownloadsNonBackground()
             val numPendingUploads = getNumPendingUploads()
-
+            val areTransfersPaused = areAllTransfersPaused()
             _state.update {
                 it.copy(
-                    transfersInfo = TransfersInfo(
+                    hideTransfersWidget = if (unHideWidget) false else it.hideTransfersWidget,
+                    transfersInfo = transfersInfoMapper(
                         transferType = transfersSizeInfo.transferType,
                         numPendingDownloadsNonBackground = numPendingDownloadsNonBackground,
                         numPendingUploads = numPendingUploads,
-                        areTransfersPaused = areAllTransfersPaused(),
+                        isTransferError = transfersManagement.shouldShowNetworkWarning || transfersManagement.getAreFailedTransfers(),
+                        isTransferOverQuota = false,
+                        isStorageOverQuota = false,
+                        areTransfersPaused = areTransfersPaused,
                         totalSizeTransferred = transfersSizeInfo.totalSizeTransferred,
-                        totalSizePendingTransfer = transfersSizeInfo.totalSizePendingTransfer
+                        totalSizePendingTransfer = transfersSizeInfo.totalSizePendingTransfer,
                     )
                 )
             }
@@ -133,10 +145,21 @@ class TransfersManagementViewModel @Inject constructor(
      */
     fun checkTransfersState() = viewModelScope.launch {
         areAllTransfersPaused().let { paused ->
-            _state.update { it.copy(transfersInfo = it.transfersInfo.copy(areTransfersPaused = paused)) }
             if (paused) {
+                _state.update { it.copy(transfersInfo = it.transfersInfo.copy(status = TransfersStatus.Paused)) }
                 broadcastPausedTransfers()
+            } else {
+                checkTransfersInfo(TransferType.NONE, false)
             }
+        }
+    }
+
+    /**
+     * updates UI state to hide the transfers widget
+     */
+    fun hideTransfersWidget() {
+        _state.update {
+            it.copy(hideTransfersWidget = true)
         }
     }
 
@@ -144,5 +167,5 @@ class TransfersManagementViewModel @Inject constructor(
      * Are transfers paused
      */
     val areTransfersPaused: Boolean
-        get() = state.value.transfersInfo.areTransfersPaused
+        get() = _state.value.transfersInfo.status == TransfersStatus.Paused
 }
