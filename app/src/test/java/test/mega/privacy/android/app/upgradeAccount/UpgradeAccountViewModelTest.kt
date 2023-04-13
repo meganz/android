@@ -18,7 +18,7 @@ import mega.privacy.android.domain.entity.Currency
 import mega.privacy.android.domain.entity.PaymentMethod
 import mega.privacy.android.domain.entity.Subscription
 import mega.privacy.android.domain.entity.account.CurrencyAmount
-import mega.privacy.android.domain.usecase.GetCurrentPayment
+import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
 import mega.privacy.android.domain.usecase.GetSubscriptions
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
@@ -36,7 +36,7 @@ class UpgradeAccountViewModelTest {
 
     private val getSubscriptions = mock<GetSubscriptions>()
     private val getCurrentSubscriptionPlan = mock<GetCurrentSubscriptionPlan>()
-    private val getCurrentPayment = mock<GetCurrentPayment>()
+    private val getCurrentPaymentUseCase = mock<GetCurrentPaymentUseCase>()
     private val isBillingAvailable = mock<IsBillingAvailable>()
 
 
@@ -94,7 +94,7 @@ class UpgradeAccountViewModelTest {
         underTest = UpgradeAccountViewModel(
             getSubscriptions = getSubscriptions,
             getCurrentSubscriptionPlan = getCurrentSubscriptionPlan,
-            getCurrentPayment = getCurrentPayment,
+            getCurrentPaymentUseCase = getCurrentPaymentUseCase,
             isBillingAvailable = isBillingAvailable,
         )
     }
@@ -127,7 +127,7 @@ class UpgradeAccountViewModelTest {
     @Test
     fun `test that initial state has current payment listed if current payment is available`() =
         runTest {
-            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
             underTest.state.map { it.currentPayment }.distinctUntilChanged().test {
                 assertThat(awaitItem()).isEqualTo(expectedInitialCurrentPayment)
                 assertThat(awaitItem()).isEqualTo(expectedCurrentPayment)
@@ -139,7 +139,7 @@ class UpgradeAccountViewModelTest {
         runTest {
             whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlan()).thenReturn(expectedCurrentPlan)
-            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
             underTest.currentPaymentCheck(Constants.PRO_II)
 
@@ -158,7 +158,7 @@ class UpgradeAccountViewModelTest {
         runTest {
             whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlan()).thenReturn(expectedCurrentPlan)
-            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
             underTest.setBillingWarningVisibility(true)
 
@@ -173,7 +173,7 @@ class UpgradeAccountViewModelTest {
         runTest {
             whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlan()).thenReturn(expectedCurrentPlan)
-            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
             underTest.setBillingWarningVisibility(false)
 
@@ -188,14 +188,15 @@ class UpgradeAccountViewModelTest {
         runTest {
             whenever(getSubscriptions()).thenReturn(expectedSubscriptionsList)
             whenever(getCurrentSubscriptionPlan()).thenReturn(expectedCurrentPlan)
-            whenever(getCurrentPayment()).thenReturn(expectedCurrentPayment.currentPayment)
+            whenever(getCurrentPaymentUseCase()).thenReturn(expectedCurrentPayment.currentPayment)
 
             underTest.setShowBuyNewSubscriptionDialog(expectedShowBuyNewSubscriptionDialog)
 
             underTest.state.test {
                 val showBuyNewSubscriptionDialog = awaitItem().showBuyNewSubscriptionDialog
                 assertThat(showBuyNewSubscriptionDialog).isEqualTo(
-                    expectedShowBuyNewSubscriptionDialog)
+                    expectedShowBuyNewSubscriptionDialog
+                )
             }
         }
 }

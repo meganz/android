@@ -13,7 +13,7 @@ import mega.privacy.android.app.upgradeAccount.model.UpgradePayment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.usecase.GetCurrentPayment
+import mega.privacy.android.domain.usecase.billing.GetCurrentPaymentUseCase
 import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
 import mega.privacy.android.domain.usecase.GetSubscriptions
 import mega.privacy.android.domain.usecase.billing.IsBillingAvailable
@@ -31,7 +31,7 @@ import javax.inject.Inject
 class UpgradeAccountViewModel @Inject constructor(
     private val getSubscriptions: GetSubscriptions,
     private val getCurrentSubscriptionPlan: GetCurrentSubscriptionPlan,
-    private val getCurrentPayment: GetCurrentPayment,
+    private val getCurrentPaymentUseCase: GetCurrentPaymentUseCase,
     private val isBillingAvailable: IsBillingAvailable,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
@@ -58,7 +58,7 @@ class UpgradeAccountViewModel @Inject constructor(
             _state.update { it.copy(currentSubscriptionPlan = currentSubscriptionPlan) }
         }
         viewModelScope.launch {
-            val currentPayment = getCurrentPayment()
+            val currentPayment = getCurrentPaymentUseCase()
             currentPayment?.let {
                 _state.update {
                     it.copy(
@@ -79,7 +79,7 @@ class UpgradeAccountViewModel @Inject constructor(
      */
     fun currentPaymentCheck(upgradeType: Int) {
         viewModelScope.launch {
-            val currentPayment = getCurrentPayment()
+            val currentPayment = getCurrentPaymentUseCase()
             currentPayment?.let {
                 _state.update {
                     it.copy(

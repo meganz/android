@@ -10,7 +10,6 @@ import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.usecase.CalculateCurrencyAmount
 import mega.privacy.android.domain.usecase.DefaultCalculateCurrencyAmount
 import mega.privacy.android.domain.usecase.DefaultGetSubscriptions
-import mega.privacy.android.domain.usecase.GetCurrentPayment
 import mega.privacy.android.domain.usecase.GetCurrentSubscriptionPlan
 import mega.privacy.android.domain.usecase.GetLocalPricing
 import mega.privacy.android.domain.usecase.GetSubscriptionOptions
@@ -44,9 +43,5 @@ abstract class UpgradeAccountUseCases {
         @Provides
         fun provideCalculateCurrencyAmount(): CalculateCurrencyAmount =
             DefaultCalculateCurrencyAmount()
-
-        @Provides
-        fun provideGetCurrentPaymentMethod(repository: BillingRepository): GetCurrentPayment =
-            GetCurrentPayment(repository::getCurrentPaymentMethod)
     }
 }
