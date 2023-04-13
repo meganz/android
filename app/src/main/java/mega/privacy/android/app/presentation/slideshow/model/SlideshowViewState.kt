@@ -18,6 +18,6 @@ data class SlideshowViewState(
     val currentPlayingChunkedIndex: Int = 0,
     val order: SlideshowOrder? = null,
     val speed: SlideshowSpeed? = null,
-    val repeat: Boolean = true,
+    val repeat: Boolean = false,
 )
 

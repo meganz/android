@@ -100,7 +100,7 @@ class SlideshowViewModel @Inject constructor(
     private fun monitorRepeatSetting() = monitorSlideshowRepeatSettingUseCase()
         .onEach { isRepeat ->
             _state.update {
-                it.copy(repeat = isRepeat ?: true)
+                it.copy(repeat = isRepeat ?: false)
             }
         }.launchIn(viewModelScope)
 

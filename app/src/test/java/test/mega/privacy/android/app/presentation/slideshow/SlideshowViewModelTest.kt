@@ -102,7 +102,7 @@ class SlideshowViewModelTest {
     @Test
     fun `test that monitor repeat setting receives correct result`() = runTest {
         // given
-        val expectedSetting = false
+        val expectedSetting = true
         whenever(monitorSlideshowRepeatSettingUseCase.invoke())
             .thenReturn(flowOf(expectedSetting))
 
