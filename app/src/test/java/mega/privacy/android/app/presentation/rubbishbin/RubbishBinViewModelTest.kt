@@ -8,11 +8,13 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -25,6 +27,7 @@ import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
 import nz.mega.sdk.MegaNode
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -46,6 +49,7 @@ class RubbishBinViewModelTest {
     private val setViewType = mock<SetViewType>()
     private val monitorViewType = mock<MonitorViewType>()
     private val getCloudSortOrder = mock<GetCloudSortOrder>()
+    private val getIntentToOpenFileMapper = mock<GetIntentToOpenFileMapper>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -64,7 +68,8 @@ class RubbishBinViewModelTest {
             getRubbishBinChildren = getRubbishBinChildren,
             setViewType = setViewType,
             monitorViewType = monitorViewType,
-            getCloudSortOrder = getCloudSortOrder
+            getCloudSortOrder = getCloudSortOrder,
+            getIntentToOpenFileMapper = getIntentToOpenFileMapper
         )
     }
 
@@ -371,7 +376,7 @@ class RubbishBinViewModelTest {
         }
 
     @Test
-    fun `test that when any file item is clicked and no other item is selected then it updates meganode in state`() =
+    fun `test that when any file item is clicked and no other item is selected then it updates FileNode in state`() =
         runTest {
             val nodesListItem1 = mock<FolderNode>()
             val nodesListItem2 = mock<FileNode>()
@@ -392,12 +397,17 @@ class RubbishBinViewModelTest {
             underTest.refreshNodes()
             underTest.onItemClicked(
                 NodeUIItem(
-                    node = nodesListItem1,
+                    node = nodesListItem2,
                     isSelected = false,
                     isInvisible = false
                 )
             )
-            Truth.assertThat(underTest.state.value.megaNode).isNotNull()
+            Truth.assertThat(underTest.state.value.currFileNode).isNotNull()
             Truth.assertThat(underTest.state.value.itemIndex).isNotEqualTo(-1)
         }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
 }

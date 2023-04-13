@@ -6,6 +6,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
 import androidx.compose.foundation.layout.padding
@@ -17,7 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
@@ -27,8 +30,10 @@ import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
@@ -105,6 +110,54 @@ class RubbishBinComposeFragment : Fragment() {
                     folderCount = uiState.selectedFolderNodes
                 )
                 restoreMegaNode(uiState.selectedMegaNodes)
+                itemClickedEvenReceived(uiState.currFileNode)
+            }
+        }
+    }
+
+    /**
+     * On Item click event received from [RubbishBinViewModel]
+     *
+     * @param fileNode [FileNode]
+     */
+    private fun itemClickedEvenReceived(fileNode: FileNode?) {
+        fileNode?.let {
+            openFile(fileNode = it)
+            viewModel.onItemPerformedClicked()
+        } ?: run {
+            (requireActivity() as ManagerActivity).setToolbarTitle()
+            (requireActivity() as ManagerActivity).invalidateOptionsMenu()
+        }
+    }
+
+    /**
+     * Open File
+     * @param fileNode [FileNode]
+     */
+    private fun openFile(fileNode: FileNode) {
+        lifecycleScope.launch {
+            runCatching {
+                viewModel.getIntent(
+                    activity = requireActivity(),
+                    fileNode = fileNode
+                )?.let {
+                    if (MegaApiUtils.isIntentAvailable(context, it)) {
+                        startActivity(it)
+                    } else {
+                        Toast.makeText(
+                            context,
+                            getString(R.string.intent_not_available),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }.onFailure {
+                Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+                (requireActivity() as? ManagerActivity)?.showSnackbar(
+                    type = Constants.SNACKBAR_TYPE,
+                    content = getString(R.string.general_text_error),
+                    chatId = -1,
+                )
             }
         }
     }
@@ -173,8 +226,23 @@ class RubbishBinComposeFragment : Fragment() {
     /**
      * On back pressed from ManagerActivity
      */
-    fun onBackPressed() {
-
+    fun onBackPressed(): Int {
+        return with(requireActivity() as ManagerActivity) {
+            if (comesFromNotifications && comesFromNotificationHandle == rubbishBinViewModel.state.value.rubbishBinHandle) {
+                restoreRubbishAfterComingFromNotification()
+                2
+            } else {
+                rubbishBinViewModel.state.value.parentHandle?.let {
+                    rubbishBinViewModel.onBackPressed()
+                    invalidateOptionsMenu()
+                    setToolbarTitle()
+                    rubbishBinViewModel.popLastPositionStack()
+                    2
+                } ?: run {
+                    0
+                }
+            }
+        }
     }
 
     /**
@@ -205,7 +273,7 @@ class RubbishBinComposeFragment : Fragment() {
 
             runCatching {
                 actionMode?.invalidate()
-            }.getOrElse {
+            }.onFailure {
                 Timber.e(it, "Invalidate error")
             }
         } ?: run {

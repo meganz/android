@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
+import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +13,7 @@ import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
@@ -35,6 +37,7 @@ import javax.inject.Inject
  * @param getRubbishBinChildren [GetRubbishBinChildren] Fetch Rubbish Bin [Node]
  * @param setViewType [SetViewType] to set view type
  * @param monitorViewType [MonitorViewType] check view type
+ * @param getIntentToOpenFileMapper [GetIntentToOpenFileMapper]
  */
 @HiltViewModel
 class RubbishBinViewModel @Inject constructor(
@@ -45,6 +48,7 @@ class RubbishBinViewModel @Inject constructor(
     private val setViewType: SetViewType,
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
+    private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
 ) : ViewModel() {
 
     /**
@@ -125,8 +129,13 @@ class RubbishBinViewModel @Inject constructor(
      * This will map list of [Node] to [NodeUIItem]
      */
     private fun getNodeUiItems(nodeList: List<Node>): List<NodeUIItem> {
-        return nodeList.map {
-            NodeUIItem(node = it, isSelected = false, isInvisible = false)
+        val existingNodeList = _state.value.nodeList
+        return nodeList.mapIndexed { index, it ->
+            NodeUIItem(
+                node = it,
+                isSelected = if (existingNodeList.size > index) existingNodeList[index].isSelected else false,
+                isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false
+            )
         }
     }
 
@@ -171,7 +180,7 @@ class RubbishBinViewModel @Inject constructor(
     fun onItemPerformedClicked() {
         _state.update {
             it.copy(
-                megaNode = null,
+                currFileNode = null,
                 itemIndex = -1
             )
         }
@@ -209,14 +218,17 @@ class RubbishBinViewModel @Inject constructor(
         if (_state.value.isInSelection) {
             updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
         } else {
-            val megaNode = _state.value.nodes.find { it.handle == nodeUIItem.id.longValue }
-            viewModelScope.launch {
-                _state.update {
-                    it.copy(
-                        megaNode = megaNode,
-                        itemIndex = index
-                    )
+            if (nodeUIItem.node is FileNode) {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            itemIndex = index,
+                            currFileNode = nodeUIItem.node
+                        )
+                    }
                 }
+            } else {
+                onFolderItemClicked(0, nodeUIItem.id.longValue)
             }
         }
     }
@@ -391,4 +403,15 @@ class RubbishBinViewModel @Inject constructor(
     fun markHandledPendingRefresh() {
         _state.update { it.copy(isPendingRefresh = false) }
     }
+
+    /**
+     * Get intent to open [FileNode]
+     * @param activity [Activity]
+     * @param fileNode [FileNode]
+     */
+    suspend fun getIntent(activity: Activity, fileNode: FileNode) =
+        getIntentToOpenFileMapper(
+            activity = activity,
+            fileNode = fileNode,
+        )
 }

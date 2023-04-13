@@ -5395,8 +5395,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             backToDrawerItem(bottomNavigationCurrentItem)
         } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
             rubbishBinFragment = getRubbishBinFragment()
-            if (rubbishBinFragment == null || rubbishBinFragment?.onBackPressed() == 0) {
-                backToDrawerItem(bottomNavigationCurrentItem)
+            rubbishBinComposeFragment = getRubbishBinComposeFragment()
+            if (isRubbishBinComposeEnabled()) {
+                if (rubbishBinComposeFragment == null || rubbishBinComposeFragment?.onBackPressed() == 0) {
+                    backToDrawerItem(bottomNavigationCurrentItem)
+                }
+            } else {
+                if (rubbishBinFragment == null || rubbishBinFragment?.onBackPressed() == 0) {
+                    backToDrawerItem(bottomNavigationCurrentItem)
+                }
             }
         } else if (drawerItem === DrawerItem.TRANSFERS) {
             backToDrawerItem(bottomNavigationCurrentItem)
