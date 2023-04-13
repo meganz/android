@@ -220,6 +220,7 @@ import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.app.presentation.manager.model.UserInfoUiState
 import mega.privacy.android.app.presentation.manager.outgoingSharesState
 import mega.privacy.android.app.presentation.manager.rubbishBinState
+import mega.privacy.android.app.presentation.meeting.ScheduleMeetingActivity
 import mega.privacy.android.app.presentation.movenode.MoveRequestResult
 import mega.privacy.android.app.presentation.movenode.mapper.MoveRequestMessageMapper
 import mega.privacy.android.app.presentation.notification.NotificationsFragment
@@ -6520,6 +6521,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (requestBluetoothPermission()) return
             CallUtil.openMeetingToCreate(this)
         }
+    }
+
+    override fun onScheduleMeeting() {
+        val scheduleMeetingIntent = Intent(this, ScheduleMeetingActivity::class.java)
+        startActivity(scheduleMeetingIntent)
     }
 
     /**

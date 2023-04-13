@@ -86,7 +86,7 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
                 dismiss()
             }
             R.id.btn_schedule_meeting -> {
-                // Start schedule meeting screen
+                listener?.onScheduleMeeting()
                 dismiss()
             }
         }

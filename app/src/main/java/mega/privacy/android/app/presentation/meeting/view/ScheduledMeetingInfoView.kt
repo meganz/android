@@ -75,6 +75,7 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.controls.CustomDivider
 import mega.privacy.android.core.ui.controls.MarqueeText
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
@@ -837,22 +838,6 @@ private fun ScheduledMeetingDescriptionView(state: ScheduledMeetingInfoState) {
             }
         }
     }
-}
-
-/**
- * Divider options view
- *
- * @param withStartPadding True, if has start padding. False, if not
- */
-@Composable
-fun CustomDivider(withStartPadding: Boolean) {
-    Divider(
-        modifier = if (withStartPadding) Modifier.padding(
-            start = 72.dp,
-            end = 0.dp
-        ) else Modifier.padding(start = 0.dp, end = 0.dp),
-        color = grey_alpha_012.takeIf { isLight() } ?: white_alpha_012,
-        thickness = 1.dp)
 }
 
 /**
