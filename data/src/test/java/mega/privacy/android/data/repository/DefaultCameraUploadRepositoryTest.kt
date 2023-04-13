@@ -38,19 +38,34 @@ import mega.privacy.android.domain.exception.MegaException
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.DynamicTest.dynamicTest
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.LinkedList
 import kotlin.contracts.ExperimentalContracts
+import kotlin.test.assertFailsWith
 
+/**
+ * Test class for [DefaultCameraUploadRepository]
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExperimentalContracts
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DefaultCameraUploadRepositoryTest {
     private lateinit var underTest: CameraUploadRepository
 
@@ -81,10 +96,10 @@ class DefaultCameraUploadRepositoryTest {
         type = -1,
         nodeHandle = null,
         isCopyOnly = false,
-        isSecondary = false
+        isSecondary = false,
     )
 
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = DefaultCameraUploadRepository(
             localStorageGateway = localStorageGateway,
@@ -106,682 +121,769 @@ class DefaultCameraUploadRepositoryTest {
             videoAttachmentMapper = ::toVideoAttachment,
             uploadOptionMapper = uploadOptionMapper,
             uploadOptionIntMapper = uploadOptionIntMapper,
-            context = mock()
+            context = mock(),
         )
     }
 
-    @Test
-    fun `test that camera uploads can only run when connected to wifi`() = runTest {
-        whenever(localStorageGateway.isCameraUploadsByWifi()).thenReturn(true)
-
-        assertThat(underTest.isCameraUploadsByWifi()).isTrue()
-    }
-
-    @Test
-    fun `test that camera uploads can run when connected to either wifi or mobile data`() =
-        runTest {
-            whenever(localStorageGateway.isCameraUploadsByWifi()).thenReturn(false)
-
-            assertThat(underTest.isCameraUploadsByWifi()).isFalse()
-        }
-
-    @Test
-    fun `test that camera uploads can now only run when connected to wifi`() = runTest {
-        underTest.setCameraUploadsByWifi(true)
-
-        verify(localStorageGateway).setCameraUploadsByWifi(true)
-    }
-
-    @Test
-    fun `test that camera uploads can now run when connected to either wifi or mobile data`() =
-        runTest {
-            underTest.setCameraUploadsByWifi(false)
-
-            verify(localStorageGateway).setCameraUploadsByWifi(false)
-        }
-
-    @Test
-    fun `test camera upload retrieves sync records`() = runTest {
-        whenever(localStorageGateway.getPendingSyncRecords()).thenReturn(listOf(fakeRecord))
-        assertThat(underTest.getPendingSyncRecords()).isEqualTo(listOf(fakeRecord))
-    }
-
-    @Test
-    fun `test that the current upload option is only photos`() =
-        testGetUploadOption(input = "0", expectedUploadOption = UploadOption.PHOTOS)
-
-    @Test
-    fun `test that the current upload option is only videos`() =
-        testGetUploadOption(input = "1", expectedUploadOption = UploadOption.VIDEOS)
-
-    @Test
-    fun `test that the current upload option is both photos and videos`() =
-        testGetUploadOption(input = "2", expectedUploadOption = UploadOption.PHOTOS_AND_VIDEOS)
-
-    private fun testGetUploadOption(input: String, expectedUploadOption: UploadOption) = runTest {
-        whenever(localStorageGateway.getCameraSyncFileUpload()).thenReturn(input)
-        whenever(uploadOptionMapper(input)).thenReturn(expectedUploadOption)
-
-        assertThat(underTest.getUploadOption()).isEqualTo(expectedUploadOption)
-    }
-
-    @Test
-    fun `test that the new upload option is only photos`() =
-        testSetUploadOption(UploadOption.PHOTOS)
-
-    @Test
-    fun `test that the new upload option is only videos`() =
-        testSetUploadOption(UploadOption.VIDEOS)
-
-    @Test
-    fun `test that the new upload option is both photos and videos`() =
-        testSetUploadOption(UploadOption.PHOTOS_AND_VIDEOS)
-
-    private fun testSetUploadOption(input: UploadOption) = runTest {
-        underTest.setUploadOption(input)
-
-        verify(localStorageGateway).setCameraSyncFileUpload(uploadOptionIntMapper(input))
-    }
-
-    @Test
-    fun `test that the current upload video quality in camera uploads is original quality`() =
-        testGetUploadVideoQuality(input = "3", expectedVideoQuality = VideoQuality.ORIGINAL)
-
-    @Test
-    fun `test that the current upload video quality in camera uploads is high quality`() =
-        testGetUploadVideoQuality(input = "2", expectedVideoQuality = VideoQuality.HIGH)
-
-    @Test
-    fun `test that the current upload video quality in camera uploads is medium quality`() =
-        testGetUploadVideoQuality(input = "1", expectedVideoQuality = VideoQuality.MEDIUM)
-
-    @Test
-    fun `test that the current upload video quality in camera uploads is low quality`() =
-        testGetUploadVideoQuality(input = "0", expectedVideoQuality = VideoQuality.LOW)
-
-    @Test
-    fun `test that the current upload video quality will return null`() =
-        testGetUploadVideoQuality(input = "5", expectedVideoQuality = null)
-
-    private fun testGetUploadVideoQuality(input: String, expectedVideoQuality: VideoQuality?) =
-        runTest {
-            whenever(localStorageGateway.getUploadVideoQuality()).thenReturn(input)
-            assertThat(underTest.getUploadVideoQuality()).isEqualTo(expectedVideoQuality)
-        }
-
-    @Test
-    fun `test that the videos uploaded through camera uploads will now retain their original resolutions`() =
-        testSetUploadVideoQuality(VideoQuality.ORIGINAL)
-
-    @Test
-    fun `test that the videos uploaded through camera uploads are now compressed in high quality`() =
-        testSetUploadVideoQuality(VideoQuality.HIGH)
-
-    @Test
-    fun `test that the videos uploaded through camera uploads are now compressed in medium quality`() =
-        testSetUploadVideoQuality(VideoQuality.MEDIUM)
-
-    @Test
-    fun `test that the videos uploaded through camera uploads are now compressed in low quality`() =
-        testSetUploadVideoQuality(VideoQuality.LOW)
-
-    private fun testSetUploadVideoQuality(videoQuality: VideoQuality) = runTest {
-        underTest.setUploadVideoQuality(videoQuality)
-
-        verify(localStorageGateway, times(1)).setUploadVideoQuality(videoQuality.value)
-    }
-
-    @Test
-    fun `test that the videos to be uploaded by camera uploads are now subject for compression`() =
-        testSetUploadVideoSyncStatus(SyncStatus.STATUS_TO_COMPRESS)
-
-    @Test
-    fun `test that the videos to be uploaded by camera uploads are now queued for upload`() =
-        testSetUploadVideoSyncStatus(SyncStatus.STATUS_PENDING)
-
-    private fun testSetUploadVideoSyncStatus(syncStatus: SyncStatus) = runTest {
-        underTest.setUploadVideoSyncStatus(syncStatus)
-
-        verify(
+    @BeforeEach
+    fun resetMocks() {
+        reset(
             localStorageGateway,
-            times(1)
-        ).setUploadVideoSyncStatus(syncStatus.value)
-    }
-
-    @Test
-    fun `test camera upload gets sync record by fingerprint`() = runTest {
-        whenever(
-            localStorageGateway.getSyncRecordByFingerprint(
-                fingerprint = null,
-                isSecondary = false,
-                isCopy = false
-            )
-        ).thenReturn(null)
-        assertThat(
-            underTest.getSyncRecordByFingerprint(
-                fingerprint = null,
-                isSecondary = false,
-                isCopy = false
-            )
-        ).isEqualTo(null)
-    }
-
-    @Test
-    fun `test camera upload gets sync record by new path`() = runTest {
-        whenever(localStorageGateway.getSyncRecordByNewPath("")).thenReturn(null)
-        assertThat(underTest.getSyncRecordByNewPath("")).isEqualTo(null)
-    }
-
-    @Test
-    fun `test camera upload gets sync record by local path`() = runTest {
-        whenever(localStorageGateway.getSyncRecordByLocalPath("", false)).thenReturn(null)
-        assertThat(underTest.getSyncRecordByLocalPath("", false)).isEqualTo(null)
-    }
-
-    @Test
-    fun `test camera upload retrieves file name exists`() = runTest {
-        whenever(localStorageGateway.doesFileNameExist("", false, -1)).thenReturn(true)
-        whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
-        assertThat(underTest.doesFileNameExist("", false, SyncRecordType.TYPE_ANY)).isEqualTo(true)
-    }
-
-    @Test
-    fun `test camera upload retrieves local path exists`() = runTest {
-        whenever(localStorageGateway.doesLocalPathExist("", false, -1)).thenReturn(true)
-        whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
-        assertThat(underTest.doesLocalPathExist("", false, SyncRecordType.TYPE_ANY)).isEqualTo(true)
-    }
-
-    @Test
-    fun `test camera upload retrieves the correct sync time stamp`() = runTest {
-        whenever(localStorageGateway.getPhotoTimeStamp()).thenReturn("150")
-        assertThat(underTest.getSyncTimeStamp(SyncTimeStamp.PRIMARY_PHOTO)).isEqualTo(
-            150
+            megaApiGateway,
+            fileAttributeGateway,
+            cameraUploadMediaGateway,
+            workerGateway,
+            syncRecordTypeIntMapper,
+            mediaStoreFileTypeUriWrapper,
+            cameraUploadsHandlesMapper,
+            appEventGateway,
+            videoCompressorGateway,
+            uploadOptionMapper,
+            uploadOptionIntMapper,
         )
     }
 
-    @Test
-    fun `test camera upload retrieves if credentials exist`() = runTest {
-        whenever(localStorageGateway.doCredentialsExist()).thenReturn(true)
-        assertThat(underTest.doCredentialsExist()).isEqualTo(true)
-    }
-
-    @Test
-    fun `test camera upload retrieves if preferences are set`() = runTest {
-        whenever(localStorageGateway.doPreferencesExist()).thenReturn(true)
-        assertThat(underTest.doPreferencesExist()).isEqualTo(true)
-    }
-
-    @Test
-    fun `test camera upload retrieves if camera upload sync is enabled`() = runTest {
-        whenever(localStorageGateway.isSyncEnabled()).thenReturn(true)
-        assertThat(underTest.isSyncEnabled()).isEqualTo(true)
-    }
-
-    @Test
-    fun `test that the primary folder local path is retrieved`() = runTest {
-        val testPath = "test/primary/path"
-
-        whenever(localStorageGateway.getPrimaryFolderLocalPath()).thenReturn(testPath)
-        assertThat(underTest.getPrimaryFolderLocalPath()).isEqualTo(testPath)
-    }
-
-    @Test
-    fun `test that the new primary folder local path is set`() = runTest {
-        val testPath = "test/new/primary/path"
-
-        underTest.setPrimaryFolderLocalPath(testPath)
-        verify(localStorageGateway, times(1)).setPrimaryFolderLocalPath(testPath)
-    }
-
-    @Test
-    fun `test that the secondary folder local path is retrieved`() = runTest {
-        val testPath = "test/secondary/path"
-
-        whenever(localStorageGateway.getSecondaryFolderLocalPath()).thenReturn(testPath)
-        assertThat(underTest.getSecondaryFolderLocalPath()).isEqualTo(testPath)
-    }
-
-    @Test
-    fun `test that the new secondary folder local path is set`() = runTest {
-        val testPath = "test/new/secondary/path"
-
-        underTest.setSecondaryFolderLocalPath(testPath)
-        verify(localStorageGateway, times(1)).setSecondaryFolderLocalPath(testPath)
-    }
-
-    @Test
-    fun `test that calling areLocationTagsEnabled retrieves the value`() = runTest {
-        whenever(localStorageGateway.areLocationTagsEnabled()).thenReturn(false)
-        assertThat(underTest.areLocationTagsEnabled()).isEqualTo(false)
-    }
-
-    @Test
-    fun `test that setLocationTagsEnabled is invoked`() = runTest {
-        underTest.setLocationTagsEnabled(true)
-        verify(localStorageGateway).setLocationTagsEnabled(true)
-    }
-
-    @Test
-    fun `test that the file names are kept as is when uploading content`() =
-        testAreUploadFileNamesKept(true)
-
-    @Test
-    fun `test that the file names should be different when uploading content`() =
-        testAreUploadFileNamesKept(false)
-
-    private fun testAreUploadFileNamesKept(input: Boolean) = runTest {
-        whenever(localStorageGateway.areUploadFileNamesKept()).thenReturn(input)
-        assertThat(underTest.areUploadFileNamesKept()).isEqualTo(input)
-    }
-
-    @Test
-    fun `test that the file names should now be kept when uploading content`() =
-        testSetUploadFileNamesKept(true)
-
-    @Test
-    fun `test that the file names should no longer be kept when uploading content`() =
-        testSetUploadFileNamesKept(false)
-
-    private fun testSetUploadFileNamesKept(keepFileNames: Boolean) = runTest {
-        underTest.setUploadFileNamesKept(keepFileNames)
-
-        verify(localStorageGateway, times(1)).setUploadFileNamesKept(keepFileNames)
-    }
-
-    @Test
-    fun `test that the primary folder is located in the SD card`() =
-        testIsPrimaryFolderInSDCard(true)
-
-    @Test
-    fun `test that the primary folder is not located in the SD card`() =
-        testIsPrimaryFolderInSDCard(false)
-
-    private fun testIsPrimaryFolderInSDCard(input: Boolean) = runTest {
-        whenever(localStorageGateway.isPrimaryFolderInSDCard()).thenReturn(input)
-        assertThat(underTest.isPrimaryFolderInSDCard()).isEqualTo(input)
-    }
-
-    @Test
-    fun `test that the primary folder is now located in the SD card`() =
-        testSetPrimaryFolderInSDCard(true)
-
-    @Test
-    fun `test that the primary folder is no longer located in the SD card`() =
-        testSetPrimaryFolderInSDCard(false)
-
-    private fun testSetPrimaryFolderInSDCard(isInSDCard: Boolean) = runTest {
-        underTest.setPrimaryFolderInSDCard(isInSDCard)
-
-        verify(localStorageGateway, times(1)).setPrimaryFolderInSDCard(isInSDCard)
-    }
-
-    @Test
-    fun `test that the primary folder SD card URI path is retrieved`() = runTest {
-        val testPath = "test/sd/primary/path"
-
-        whenever(localStorageGateway.getPrimaryFolderSDCardUriPath()).thenReturn(testPath)
-        assertThat(underTest.getPrimaryFolderSDCardUriPath()).isEqualTo(testPath)
-    }
-
-    @Test
-    fun `test camera upload retrieves secondary folder enabled preference`() = runTest {
-        whenever(localStorageGateway.isSecondaryMediaFolderEnabled()).thenReturn(false)
-        assertThat(underTest.isSecondaryMediaFolderEnabled()).isEqualTo(false)
-    }
-
-    @Test
-    fun `test that the secondary folder is located in the SD card`() =
-        testIsSecondaryFolderInSDCard(true)
-
-    @Test
-    fun `test that the secondary folder is not located in the SD card`() =
-        testIsSecondaryFolderInSDCard(false)
-
-    private fun testIsSecondaryFolderInSDCard(input: Boolean) = runTest {
-        whenever(localStorageGateway.isSecondaryFolderInSDCard()).thenReturn(input)
-        assertThat(underTest.isSecondaryFolderInSDCard()).isEqualTo(input)
-    }
-
-    @Test
-    fun `test that the secondary folder SD card URI path is retrieved`() = runTest {
-        val testPath = "test/sd/secondary/path"
-
-        whenever(localStorageGateway.getSecondaryFolderSDCardUriPath()).thenReturn(testPath)
-        assertThat(underTest.getSecondaryFolderSDCardUriPath()).isEqualTo(testPath)
-    }
-
-    @Test
-    fun `test camera upload should clear all sync records`() = runTest {
-        whenever(localStorageGateway.shouldClearSyncRecords()).thenReturn(true)
-        assertThat(underTest.shouldClearSyncRecords()).isEqualTo(true)
-    }
-
-    @Test
-    fun `test camera upload retrieves maximal time stamp`() = runTest {
-        whenever(localStorageGateway.getMaxTimestamp(false, -1)).thenReturn(1000L)
-        whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
-        assertThat(underTest.getMaxTimestamp(false, SyncRecordType.TYPE_ANY)).isEqualTo(1000L)
-    }
-
-    @Test
-    fun `test camera upload retrieves video sync records by status`() = runTest {
-        whenever(localStorageGateway.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING.value)).thenReturn(
-            listOf(fakeRecord)
-        )
-        assertThat(underTest.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)).isEqualTo(
-            listOf(fakeRecord)
-        )
-    }
-
-    @Test
-    fun `test that the device needs to be charged when compressing videos`() =
-        testIsChargingRequiredForVideoCompression(true)
-
-    @Test
-    fun `test that the device does not need to be charged when compressing videos`() =
-        testIsChargingRequiredForVideoCompression(false)
-
-    private fun testIsChargingRequiredForVideoCompression(expectedResult: Boolean) = runTest {
-        whenever(localStorageGateway.isChargingRequiredForVideoCompression()).thenReturn(
-            expectedResult
-        )
-        assertThat(underTest.isChargingRequiredForVideoCompression()).isEqualTo(expectedResult)
-    }
-
-    @Test
-    fun `test that the device will now have to be charged when compressing videos`() =
-        testSetChargingRequiredForVideoCompression(true)
-
-    @Test
-    fun `test that the device will no longer have to be charged when compressing videos`() =
-        testSetChargingRequiredForVideoCompression(false)
-
-    private fun testSetChargingRequiredForVideoCompression(requireCharging: Boolean) = runTest {
-        underTest.setChargingRequiredForVideoCompression(requireCharging)
-
-        verify(
-            localStorageGateway,
-            times(1)
-        ).setChargingRequiredForVideoCompression(requireCharging)
-    }
-
-    @Test
-    fun `test that the video compression size limit is retrieved`() = runTest {
-        whenever(localStorageGateway.getVideoCompressionSizeLimit()).thenReturn(300)
-        assertThat(underTest.getVideoCompressionSizeLimit()).isEqualTo(300)
-    }
-
-    @Test
-    fun `test that the new video compression size limit is set`() = runTest {
-        underTest.setVideoCompressionSizeLimit(300)
-        verify(localStorageGateway).setVideoCompressionSizeLimit(300)
-    }
-
-    @Test
-    fun `test that setup primary folder returns success when api set camera upload folders returns API_OK`() =
-        runTest {
-            val result = 69L
-            val megaError = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-            }
-            val megaRequest = mock<MegaRequest> {
-                on { nodeHandle }.thenReturn(result)
-            }
-            whenever(
-                megaApiGateway.setCameraUploadsFolders(
-                    any(),
-                    any(),
-                    listener = any()
-                )
-            ).thenAnswer {
-                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    megaRequest,
-                    megaError
-                )
+    @Nested
+    @DisplayName("Connection Type")
+    inner class ConnectionTypeTest {
+        @ParameterizedTest(name = "wi-fi only: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that camera uploads can only run on specific connection types`(wifiOnly: Boolean) =
+            runTest {
+                whenever(localStorageGateway.isCameraUploadsByWifi()).thenReturn(wifiOnly)
+                assertThat(underTest.isCameraUploadsByWifi()).isEqualTo(wifiOnly)
             }
 
-            assertThat(underTest.setupPrimaryFolder(1L)).isEqualTo(result)
-        }
-
-    @Test(expected = MegaException::class)
-    fun `test that setup primary folder returns an exception when api set camera upload folders does not return API_OK`() =
-        runTest {
-            val megaError = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_ENOENT)
+        @ParameterizedTest(name = "wi-fi only: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that camera uploads can now be run on specific connection types`(wifiOnly: Boolean) =
+            runTest {
+                underTest.setCameraUploadsByWifi(wifiOnly)
+                verify(localStorageGateway).setCameraUploadsByWifi(wifiOnly)
             }
-            val megaRequest = mock<MegaRequest> {}
-            whenever(
-                megaApiGateway.setCameraUploadsFolders(
-                    any(),
-                    any(),
-                    listener = any()
-                )
-            ).thenAnswer {
-                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    megaRequest,
-                    megaError
-                )
-            }
-
-            underTest.setupPrimaryFolder(1L)
-        }
-
-    @Test
-    fun `test that setup secondary folder returns success when api set camera upload folders returns API_OK`() =
-        runTest {
-            val result = 69L
-            val megaError = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_OK)
-            }
-            val megaRequest = mock<MegaRequest> {
-                on { parentHandle }.thenReturn(result)
-            }
-            whenever(
-                megaApiGateway.setCameraUploadsFolders(
-                    any(),
-                    any(),
-                    listener = any()
-                )
-            ).thenAnswer {
-                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    megaRequest,
-                    megaError
-                )
-            }
-
-            assertThat(underTest.setupSecondaryFolder(1L)).isEqualTo(result)
-        }
-
-    @Test(expected = MegaException::class)
-    fun `test that setup secondary folder returns an exception when api set camera upload folders does not return API_OK`() =
-        runTest {
-            val megaError = mock<MegaError> {
-                on { errorCode }.thenReturn(MegaError.API_ENOENT)
-            }
-            val megaRequest = mock<MegaRequest> {}
-            whenever(
-                megaApiGateway.setCameraUploadsFolders(
-                    any(),
-                    any(),
-                    listener = any()
-                )
-            ).thenAnswer {
-                (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
-                    mock(),
-                    megaRequest,
-                    megaError
-                )
-            }
-
-            underTest.setupSecondaryFolder(1L)
-        }
-
-    @Test
-    fun `test camera upload get the correct media queues by media store file type`() = runTest {
-        val result = LinkedList(listOf(CameraUploadMedia("", 1)))
-        whenever(
-            cameraUploadMediaGateway.getMediaQueue(
-                anyOrNull(),
-                any(),
-                any(),
-                any()
-            )
-        ).thenReturn(
-            result
-        )
-        whenever(mediaStoreFileTypeUriWrapper(any())).thenReturn(Uri.EMPTY)
-        val actual = underTest.getMediaQueue(
-            MediaStoreFileType.IMAGES_INTERNAL,
-            "",
-            false,
-            ""
-        )
-        assertThat(actual).isEqualTo(result)
     }
 
-    @Test
-    fun `test that primary folder handle is returned successfully`() {
-        runTest {
-            val result = 1L
-            whenever(localStorageGateway.getCamSyncHandle()).thenReturn(result)
-            val actual = underTest.getPrimarySyncHandle()
-            assertThat(actual).isEqualTo(result)
-        }
-    }
 
-    @Test
-    fun `test that secondary folder handle is returned successfully`() {
-        runTest {
-            val result = 2L
-            whenever(localStorageGateway.getMegaHandleSecondaryFolder()).thenReturn(result)
-            val actual = underTest.getSecondarySyncHandle()
-            assertThat(actual).isEqualTo(result)
-        }
-    }
+    @Nested
+    @DisplayName("Content to Upload")
+    inner class ContentToUpload {
+        @TestFactory
+        fun `test that camera uploads will upload specific content`() =
+            listOf(
+                "0" to UploadOption.PHOTOS,
+                "1" to UploadOption.VIDEOS,
+                "2" to UploadOption.PHOTOS_AND_VIDEOS,
+            ).map { (input, expectedUploadOption) ->
+                dynamicTest("test that the value $input will return $expectedUploadOption") {
+                    runTest {
+                        whenever(localStorageGateway.getCameraSyncFileUpload()).thenReturn(input)
+                        whenever(uploadOptionMapper(input)).thenReturn(expectedUploadOption)
 
-    @Test
-    @Suppress("DEPRECATION")
-    fun `test that reset total uploads is invoked`() = runTest {
-        underTest.resetTotalUploads()
-        verify(megaApiGateway).resetTotalUploads()
-    }
-
-    @Test
-    fun `test that correct GPS coordinates are retrieved by file type video`() {
-        val result = Pair(6F, 9F)
-        runTest {
-            whenever(fileAttributeGateway.getVideoGPSCoordinates("")).thenReturn(result)
-            val actual = underTest.getVideoGPSCoordinates("")
-            assertThat(actual).isEqualTo(result)
-        }
-    }
-
-    @Test
-    fun `test that correct GPS coordinates are retrieved by file type photo`() {
-        val result = Pair(6F, 9F)
-        runTest {
-            whenever(fileAttributeGateway.getPhotoGPSCoordinates("")).thenReturn(result)
-            val actual = underTest.getPhotoGPSCoordinates("")
-            assertThat(actual).isEqualTo(result)
-        }
-    }
-
-    @Test
-    fun `test camera upload job is fired if sync is enabled`() = runTest {
-        underTest.fireCameraUploadJob()
-        verify(workerGateway, times(1)).fireCameraUploadJob()
-    }
-
-    @Test
-    fun `test stop camera upload job is fired if sync is enabled`() = runTest {
-        underTest.fireStopCameraUploadJob()
-        verify(workerGateway, times(1)).fireStopCameraUploadJob()
-    }
-
-    @Test
-    fun `test schedule camera upload job is fired if sync is enabled`() = runTest {
-        underTest.scheduleCameraUploadJob()
-        verify(workerGateway, times(1)).scheduleCameraUploadJob()
-    }
-
-    @Test
-    fun `test restart camera upload job is fired`() = runTest {
-        underTest.fireRestartCameraUploadJob()
-        verify(workerGateway, times(1)).fireRestartCameraUploadJob()
-    }
-
-    @Test
-    fun `test reschedule camera upload job is fired`() = runTest {
-        underTest.rescheduleCameraUpload()
-        verify(workerGateway, times(1)).rescheduleCameraUpload()
-    }
-
-    @Test
-    fun `test stop camera upload and heart beat sync workers is fired`() = runTest {
-        underTest.stopCameraUploadSyncHeartbeatWorkers()
-        verify(workerGateway, times(1)).stopCameraUploadSyncHeartbeatWorkers()
-    }
-
-    @Test
-    fun `test that starting video compression emit events in order`() {
-        val list = listOf(25, 50, 57, 100)
-        val flow = flow {
-            list.forEach {
-                emit(VideoCompressionState.Progress(it, 1, 2, ""))
-            }
-            emit(
-                VideoCompressionState.FinishedCompression(
-                    "",
-                    true,
-                    1
-                )
-            )
-            emit(VideoCompressionState.Finished)
-        }
-        runTest {
-            whenever(videoCompressorGateway.start()).thenReturn(flow)
-            underTest.compressVideos("", VideoQuality.ORIGINAL, emptyList()).test {
-                list.forEach {
-                    val item = awaitItem()
-                    assertThat(item.javaClass).isEqualTo(VideoCompressionState.Progress::class.java)
-                    assertThat((item as VideoCompressionState.Progress).progress).isEqualTo(it)
+                        assertThat(underTest.getUploadOption()).isEqualTo(expectedUploadOption)
+                    }
                 }
-                val finishedCompressionItem = awaitItem()
-                assertThat(finishedCompressionItem.javaClass).isEqualTo(VideoCompressionState.FinishedCompression::class.java)
-                val finished = awaitItem()
-                assertThat(finished.javaClass).isEqualTo(VideoCompressionState.Finished::class.java)
-                cancelAndConsumeRemainingEvents()
+            }
+
+        @ParameterizedTest(name = "upload option: {0}")
+        @EnumSource(UploadOption::class)
+        fun `test that a new upload option for camera uploads is set`(uploadOption: UploadOption) =
+            runTest {
+                underTest.setUploadOption(uploadOption)
+                verify(localStorageGateway).setCameraSyncFileUpload(
+                    uploadOptionIntMapper(
+                        uploadOption
+                    )
+                )
+            }
+
+        @Test
+        fun `test that the correct media queues are retrieved by media store file type`() =
+            runTest {
+                val result = LinkedList(listOf(CameraUploadMedia("", 1)))
+
+                whenever(
+                    cameraUploadMediaGateway.getMediaQueue(
+                        uri = anyOrNull(),
+                        parentPath = any(),
+                        isVideo = any(),
+                        selectionQuery = any(),
+                    )
+                ).thenReturn(
+                    result
+                )
+                whenever(mediaStoreFileTypeUriWrapper(any())).thenReturn(Uri.EMPTY)
+
+                val actual = underTest.getMediaQueue(
+                    mediaStoreFileType = MediaStoreFileType.IMAGES_INTERNAL,
+                    parentPath = "",
+                    isVideo = false,
+                    selectionQuery = "",
+                )
+                assertThat(actual).isEqualTo(result)
+            }
+
+        @Test
+        @Suppress("DEPRECATION")
+        fun `test that reset total uploads is invoked`() = runTest {
+            underTest.resetTotalUploads()
+            verify(megaApiGateway).resetTotalUploads()
+        }
+    }
+
+    @Nested
+    @DisplayName("Video Upload Quality")
+    inner class VideoUploadQuality {
+        @TestFactory
+        fun `test that camera uploads will upload videos on a specific video quality`() =
+            listOf(
+                "0" to VideoQuality.LOW,
+                "1" to VideoQuality.MEDIUM,
+                "2" to VideoQuality.HIGH,
+                "3" to VideoQuality.ORIGINAL,
+                "4" to null,
+            ).map { (input, expectedVideoQuality) ->
+                dynamicTest("test that the value $input will return $expectedVideoQuality") {
+                    runTest {
+                        whenever(localStorageGateway.getUploadVideoQuality()).thenReturn(input)
+                        assertThat(underTest.getUploadVideoQuality()).isEqualTo(expectedVideoQuality)
+                    }
+                }
+            }
+
+        @ParameterizedTest(name = "video quality: {0}")
+        @EnumSource(VideoQuality::class)
+        fun `test that a new video quality is set when uploading videos`(videoQuality: VideoQuality) =
+            runTest {
+                underTest.setUploadVideoQuality(videoQuality)
+                verify(localStorageGateway, times(1)).setUploadVideoQuality(videoQuality.value)
+            }
+    }
+
+    @Nested
+    @DisplayName("Video Sync Status")
+    inner class VideoSyncStatus {
+        @ParameterizedTest(name = "video sync status: {0}")
+        @EnumSource(SyncStatus::class)
+        fun `test that the upload video sync status is updated`(syncStatus: SyncStatus) = runTest {
+            underTest.setUploadVideoSyncStatus(syncStatus)
+            verify(localStorageGateway, times(1)).setUploadVideoSyncStatus(syncStatus.value)
+        }
+    }
+
+    @Nested
+    @DisplayName("Sync")
+    inner class SyncTest {
+        @Test
+        fun `test that the camera uploads sync records are retrieved`() = runTest {
+            whenever(localStorageGateway.getPendingSyncRecords()).thenReturn(listOf(fakeRecord))
+            assertThat(underTest.getPendingSyncRecords()).isEqualTo(listOf(fakeRecord))
+        }
+
+        @Test
+        fun `test that camera uploads retrieves the sync record by fingerprint`() = runTest {
+            whenever(
+                localStorageGateway.getSyncRecordByFingerprint(
+                    fingerprint = anyOrNull(),
+                    isSecondary = any(),
+                    isCopy = any(),
+                )
+            ).thenReturn(null)
+            assertThat(
+                underTest.getSyncRecordByFingerprint(
+                    fingerprint = null,
+                    isSecondary = false,
+                    isCopy = false,
+                )
+            ).isEqualTo(null)
+        }
+
+        @Test
+        fun `test that camera uploads retrieves the sync record by new path`() = runTest {
+            whenever(localStorageGateway.getSyncRecordByNewPath(any())).thenReturn(null)
+            assertThat(underTest.getSyncRecordByNewPath("")).isEqualTo(null)
+        }
+
+        @Test
+        fun `test that camera uploads retrieves the sync record by local path`() = runTest {
+            whenever(
+                localStorageGateway.getSyncRecordByLocalPath(
+                    path = any(),
+                    isSecondary = any(),
+                )
+            ).thenReturn(null)
+            assertThat(
+                underTest.getSyncRecordByLocalPath(
+                    path = "",
+                    isSecondary = false,
+                )
+            ).isEqualTo(null)
+        }
+
+        @ParameterizedTest(name = "file name exists: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the file name exists or not`(fileNameExists: Boolean) = runTest {
+            whenever(
+                localStorageGateway.doesFileNameExist(
+                    fileName = any(),
+                    isSecondary = any(),
+                    type = any(),
+                )
+            ).thenReturn(
+                fileNameExists
+            )
+            whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
+
+            assertThat(
+                underTest.doesFileNameExist(
+                    fileName = "",
+                    isSecondary = false,
+                    type = SyncRecordType.TYPE_ANY,
+                )
+            ).isEqualTo(fileNameExists)
+        }
+
+        @ParameterizedTest(name = "local path exists: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the local path exists or not`(localPathExists: Boolean) = runTest {
+            whenever(
+                localStorageGateway.doesLocalPathExist(
+                    fileName = any(),
+                    isSecondary = any(),
+                    type = any(),
+                )
+            ).thenReturn(
+                localPathExists
+            )
+            whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
+
+            assertThat(
+                underTest.doesLocalPathExist(
+                    fileName = "",
+                    isSecondary = false,
+                    type = SyncRecordType.TYPE_ANY,
+                )
+            ).isEqualTo(localPathExists)
+        }
+
+        @Test
+        fun `test that the sync time stamp is retrieved`() = runTest {
+            val testTimeStamp = "150"
+
+            whenever(localStorageGateway.getPhotoTimeStamp()).thenReturn(testTimeStamp)
+            assertThat(underTest.getSyncTimeStamp(SyncTimeStamp.PRIMARY_PHOTO)).isEqualTo(
+                testTimeStamp.toInt()
+            )
+        }
+
+        @ParameterizedTest(name = "sync enabled: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that camera uploads is enabled or not`(syncEnabled: Boolean) = runTest {
+            whenever(localStorageGateway.isSyncEnabled()).thenReturn(syncEnabled)
+            assertThat(underTest.isSyncEnabled()).isEqualTo(syncEnabled)
+        }
+
+        @ParameterizedTest(name = "clear all sync records: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the sync records should be cleared or not`(clearAllSyncRecords: Boolean) =
+            runTest {
+                whenever(localStorageGateway.shouldClearSyncRecords()).thenReturn(
+                    clearAllSyncRecords
+                )
+                assertThat(underTest.shouldClearSyncRecords()).isEqualTo(clearAllSyncRecords)
+            }
+
+        @Test
+        fun `test that the maximal time stamp is retrieved`() = runTest {
+            val testTimeStamp = 1000L
+
+            whenever(
+                localStorageGateway.getMaxTimestamp(
+                    isSecondary = any(),
+                    syncRecordType = any(),
+                )
+            ).thenReturn(testTimeStamp)
+            whenever(syncRecordTypeIntMapper(any())).thenReturn(-1)
+
+            assertThat(
+                underTest.getMaxTimestamp(
+                    isSecondary = false,
+                    syncRecordType = SyncRecordType.TYPE_ANY,
+                )
+            ).isEqualTo(
+                testTimeStamp
+            )
+        }
+
+        @Test
+        fun `test that the video sync records are retrieved by status`() = runTest {
+            whenever(localStorageGateway.getVideoSyncRecordsByStatus(any())).thenReturn(
+                listOf(fakeRecord)
+            )
+            assertThat(underTest.getVideoSyncRecordsByStatus(SyncStatus.STATUS_PENDING)).isEqualTo(
+                listOf(fakeRecord)
+            )
+        }
+    }
+
+    @Nested
+    @DisplayName("Credentials")
+    inner class CredentialsTest {
+        @ParameterizedTest(name = "credentials exist: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the credentials exist or not`(credentialsExist: Boolean) = runTest {
+            whenever(localStorageGateway.doCredentialsExist()).thenReturn(credentialsExist)
+            assertThat(underTest.doCredentialsExist()).isEqualTo(credentialsExist)
+        }
+    }
+
+    @Nested
+    @DisplayName("Preferences")
+    inner class PreferencesTest {
+        @ParameterizedTest(name = "preferences exist: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the preferences exist or not`(preferencesExist: Boolean) = runTest {
+            whenever(localStorageGateway.doPreferencesExist()).thenReturn(preferencesExist)
+            assertThat(underTest.doPreferencesExist()).isEqualTo(preferencesExist)
+        }
+    }
+
+    @Nested
+    @DisplayName("Primary Folder")
+    inner class PrimaryFolderTest {
+        @Test
+        fun `test that the primary folder local path is retrieved`() = runTest {
+            val testPath = "test/primary/path"
+
+            whenever(localStorageGateway.getPrimaryFolderLocalPath()).thenReturn(testPath)
+            assertThat(underTest.getPrimaryFolderLocalPath()).isEqualTo(testPath)
+        }
+
+        @Test
+        fun `test that the new primary folder local path is set`() = runTest {
+            val testPath = "test/new/primary/path"
+
+            underTest.setPrimaryFolderLocalPath(testPath)
+            verify(localStorageGateway, times(1)).setPrimaryFolderLocalPath(testPath)
+        }
+
+        @ParameterizedTest(name = "is in SD card: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the primary folder could be located in the SD card`(isInSDCard: Boolean) =
+            runTest {
+                whenever(localStorageGateway.isPrimaryFolderInSDCard()).thenReturn(isInSDCard)
+                assertThat(underTest.isPrimaryFolderInSDCard()).isEqualTo(isInSDCard)
+            }
+
+        @ParameterizedTest(name = "is in SD card: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the primary folder in the SD card is handled`(isInSDCard: Boolean) =
+            runTest {
+                underTest.setPrimaryFolderInSDCard(isInSDCard)
+                verify(localStorageGateway, times(1)).setPrimaryFolderInSDCard(isInSDCard)
+            }
+
+        @Test
+        fun `test that the primary folder SD card URI path is retrieved`() = runTest {
+            val testPath = "test/sd/primary/path"
+
+            whenever(localStorageGateway.getPrimaryFolderSDCardUriPath()).thenReturn(testPath)
+            assertThat(underTest.getPrimaryFolderSDCardUriPath()).isEqualTo(testPath)
+        }
+
+        @Test
+        fun `test that setup primary folder returns success when api set camera upload folders returns API_OK`() =
+            runTest {
+                val result = 69L
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest> {
+                    on { nodeHandle }.thenReturn(result)
+                }
+
+                whenever(
+                    megaApiGateway.setCameraUploadsFolders(
+                        primaryFolder = any(),
+                        secondaryFolder = any(),
+                        listener = any(),
+                    )
+                ).thenAnswer {
+                    (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        api = mock(),
+                        request = megaRequest,
+                        error = megaError,
+                    )
+                }
+                assertThat(underTest.setupPrimaryFolder(1L)).isEqualTo(result)
+            }
+
+        @Test
+        fun `test that setup primary folder returns an exception when api set camera upload folders does not return API_OK`() =
+            runTest {
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_ENOENT)
+                }
+                val megaRequest = mock<MegaRequest> {}
+
+                whenever(
+                    megaApiGateway.setCameraUploadsFolders(
+                        primaryFolder = any(),
+                        secondaryFolder = any(),
+                        listener = any(),
+                    )
+                ).thenAnswer {
+                    (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        api = mock(),
+                        request = megaRequest,
+                        error = megaError,
+                    )
+                }
+
+                assertFailsWith(
+                    exceptionClass = MegaException::class,
+                    block = { underTest.setupPrimaryFolder(1L) },
+                )
+            }
+
+        @Test
+        fun `test that the primary folder handle is retrieved`() = runTest {
+            val testHandle = 1L
+
+            whenever(localStorageGateway.getCamSyncHandle()).thenReturn(testHandle)
+            assertThat(underTest.getPrimarySyncHandle()).isEqualTo(testHandle)
+        }
+    }
+
+    @Nested
+    @DisplayName("Secondary Folder")
+    inner class SecondaryFolderTest {
+        @Test
+        fun `test that the secondary folder local path is retrieved`() = runTest {
+            val testPath = "test/secondary/path"
+
+            whenever(localStorageGateway.getSecondaryFolderLocalPath()).thenReturn(testPath)
+            assertThat(underTest.getSecondaryFolderLocalPath()).isEqualTo(testPath)
+        }
+
+        @Test
+        fun `test that the new secondary folder local path is set`() = runTest {
+            val testPath = "test/new/secondary/path"
+
+            underTest.setSecondaryFolderLocalPath(testPath)
+            verify(localStorageGateway, times(1)).setSecondaryFolderLocalPath(testPath)
+        }
+
+        @ParameterizedTest(name = "secondary folder enabled: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the secondary folder is enabled or not`(enabled: Boolean) =
+            runTest {
+                whenever(localStorageGateway.isSecondaryMediaFolderEnabled()).thenReturn(enabled)
+                assertThat(underTest.isSecondaryMediaFolderEnabled()).isEqualTo(enabled)
+            }
+
+        @ParameterizedTest(name = "is in SD card: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the secondary folder could be located in the SD card`(isInSDCard: Boolean) =
+            runTest {
+                whenever(localStorageGateway.isSecondaryFolderInSDCard()).thenReturn(isInSDCard)
+                assertThat(underTest.isSecondaryFolderInSDCard()).isEqualTo(isInSDCard)
+            }
+
+        @Test
+        fun `test that the secondary folder SD card URI path is retrieved`() = runTest {
+            val testPath = "test/sd/secondary/path"
+
+            whenever(localStorageGateway.getSecondaryFolderSDCardUriPath()).thenReturn(testPath)
+            assertThat(underTest.getSecondaryFolderSDCardUriPath()).isEqualTo(testPath)
+        }
+
+        @Test
+        fun `test that setup secondary folder returns success when api set camera upload folders returns API_OK`() =
+            runTest {
+                val result = 69L
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_OK)
+                }
+                val megaRequest = mock<MegaRequest> {
+                    on { parentHandle }.thenReturn(result)
+                }
+
+                whenever(
+                    megaApiGateway.setCameraUploadsFolders(
+                        primaryFolder = any(),
+                        secondaryFolder = any(),
+                        listener = any(),
+                    )
+                ).thenAnswer {
+                    (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        api = mock(),
+                        request = megaRequest,
+                        error = megaError,
+                    )
+                }
+                assertThat(underTest.setupSecondaryFolder(1L)).isEqualTo(result)
+            }
+
+        @Test
+        fun `test that setup secondary folder returns an exception when api set camera upload folders does not return API_OK`() =
+            runTest {
+                val megaError = mock<MegaError> {
+                    on { errorCode }.thenReturn(MegaError.API_ENOENT)
+                }
+                val megaRequest = mock<MegaRequest> {}
+                whenever(
+                    megaApiGateway.setCameraUploadsFolders(
+                        primaryFolder = any(),
+                        secondaryFolder = any(),
+                        listener = any(),
+                    )
+                ).thenAnswer {
+                    (it.arguments[2] as OptionalMegaRequestListenerInterface).onRequestFinish(
+                        api = mock(),
+                        request = megaRequest,
+                        error = megaError,
+                    )
+                }
+
+                assertFailsWith(
+                    exceptionClass = MegaException::class,
+                    block = { underTest.setupSecondaryFolder(1L) },
+                )
+            }
+
+        @Test
+        fun `test that the secondary folder handle is retrieved`() {
+            runTest {
+                val testHandle = 2L
+
+                whenever(localStorageGateway.getMegaHandleSecondaryFolder()).thenReturn(testHandle)
+                assertThat(underTest.getSecondarySyncHandle()).isEqualTo(testHandle)
             }
         }
     }
 
-    @Test
-    fun `test that broadcasting camera upload progress call event gateway camera upload progress with appropriate value`() {
-        runTest {
-            val expected = Pair(50, 25)
-            underTest.broadcastCameraUploadProgress(
-                progress = expected.first,
-                pending = expected.second
-            )
-            verify(appEventGateway).broadcastCameraUploadProgress(
-                progress = expected.first,
-                pending = expected.second
-            )
+    @Nested
+    @DisplayName("Location Tags")
+    inner class LocationTagsTest {
+        @ParameterizedTest(name = "location tags enabled: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the location tags are added or not when uploading photos`(includeLocationTags: Boolean) =
+            runTest {
+                whenever(localStorageGateway.areLocationTagsEnabled()).thenReturn(
+                    includeLocationTags
+                )
+                assertThat(underTest.areLocationTagsEnabled()).isEqualTo(includeLocationTags)
+            }
+
+        @ParameterizedTest(name = "location tags enabled: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the location tags are now handled when uploading photos`(includeLocationTags: Boolean) =
+            runTest {
+                underTest.setLocationTagsEnabled(includeLocationTags)
+                verify(localStorageGateway).setLocationTagsEnabled(includeLocationTags)
+            }
+    }
+
+    @Nested
+    @DisplayName("File Names")
+    inner class FileNamesTest {
+        @ParameterizedTest(name = "file names kept: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the file names are kept or not when uploading content`(keepFileNames: Boolean) =
+            runTest {
+                whenever(localStorageGateway.areUploadFileNamesKept()).thenReturn(keepFileNames)
+                assertThat(underTest.areUploadFileNamesKept()).isEqualTo(keepFileNames)
+            }
+
+        @ParameterizedTest(name = "file names kept: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that the file names for uploads are handled`(keepFileNames: Boolean) =
+            runTest {
+                underTest.setUploadFileNamesKept(keepFileNames)
+                verify(localStorageGateway, times(1)).setUploadFileNamesKept(keepFileNames)
+            }
+    }
+
+    @Nested
+    @DisplayName("Video Compression")
+    inner class VideoCompressionTest {
+        @ParameterizedTest(name = "charging required: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that charging could be required to compress videos`(chargingRequired: Boolean) =
+            runTest {
+                whenever(localStorageGateway.isChargingRequiredForVideoCompression()).thenReturn(
+                    chargingRequired
+                )
+                assertThat(underTest.isChargingRequiredForVideoCompression()).isEqualTo(
+                    chargingRequired
+                )
+            }
+
+        @ParameterizedTest(name = "charging required: {0}")
+        @ValueSource(booleans = [true, false])
+        fun `test that compressing videos will depend on the device charging status`(
+            chargingRequired: Boolean,
+        ) =
+            runTest {
+                underTest.setChargingRequiredForVideoCompression(chargingRequired)
+                verify(
+                    localStorageGateway,
+                    times(1)
+                ).setChargingRequiredForVideoCompression(chargingRequired)
+            }
+
+        @Test
+        fun `test that the video compression size limit is retrieved`() = runTest {
+            val testSizeLimit = 300
+
+            whenever(localStorageGateway.getVideoCompressionSizeLimit()).thenReturn(testSizeLimit)
+            assertThat(underTest.getVideoCompressionSizeLimit()).isEqualTo(testSizeLimit)
+        }
+
+        @Test
+        fun `test that the new video compression size limit is set`() = runTest {
+            val testSizeLimit = 300
+
+            underTest.setVideoCompressionSizeLimit(testSizeLimit)
+            verify(localStorageGateway).setVideoCompressionSizeLimit(testSizeLimit)
+        }
+
+        @Test
+        fun `test that starting video compression emits events in order`() {
+            runTest {
+                val list = listOf(25, 50, 57, 100)
+                val flow = flow {
+                    list.forEach {
+                        emit(
+                            VideoCompressionState.Progress(
+                                progress = it,
+                                currentIndex = 1,
+                                totalCount = 2,
+                                path = "",
+                            )
+                        )
+                    }
+                    emit(
+                        VideoCompressionState.FinishedCompression(
+                            returnedFile = "",
+                            isSuccess = true,
+                            messageId = 1,
+                        )
+                    )
+                    emit(VideoCompressionState.Finished)
+                }
+
+                whenever(videoCompressorGateway.start()).thenReturn(flow)
+                underTest.compressVideos(
+                    root = "",
+                    quality = VideoQuality.ORIGINAL,
+                    records = emptyList(),
+                ).test {
+                    list.forEach {
+                        val item = awaitItem()
+                        assertThat(item.javaClass).isEqualTo(VideoCompressionState.Progress::class.java)
+                        assertThat((item as VideoCompressionState.Progress).progress).isEqualTo(it)
+                    }
+                    val finishedCompressionItem = awaitItem()
+                    assertThat(finishedCompressionItem.javaClass).isEqualTo(VideoCompressionState.FinishedCompression::class.java)
+                    val finished = awaitItem()
+                    assertThat(finished.javaClass).isEqualTo(VideoCompressionState.Finished::class.java)
+
+                    cancelAndConsumeRemainingEvents()
+                }
+            }
         }
     }
 
-    @Test
-    fun `test that monitor camera upload progress returns the result of event gateway monitor camera upload progress`() {
-        runTest {
-            val progress1 = Pair(50, 25)
-            val progress2 = Pair(51, 24)
-            val expected = flowOf(progress1, progress2)
-            whenever(appEventGateway.monitorCameraUploadProgress).thenReturn(expected)
-            assertThat(underTest.monitorCameraUploadProgress()).isEqualTo(expected)
+    @Nested
+    @DisplayName("GPS Coordinates")
+    inner class GPSCoordinatesTest {
+        @Test
+        fun `test that the video GPS coordinates are retrieved`() = runTest {
+            val testCoordinates = Pair(6F, 9F)
+
+            whenever(fileAttributeGateway.getVideoGPSCoordinates(any())).thenReturn(testCoordinates)
+            assertThat(underTest.getVideoGPSCoordinates("")).isEqualTo(testCoordinates)
+        }
+
+        @Test
+        fun `test that the photo GPS coordinates are retrieved`() {
+            runTest {
+                val testCoordinates = Pair(6F, 9F)
+
+                whenever(fileAttributeGateway.getPhotoGPSCoordinates(any())).thenReturn(
+                    testCoordinates
+                )
+                assertThat(underTest.getPhotoGPSCoordinates("")).isEqualTo(testCoordinates)
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("Camera Uploads Operation")
+    inner class CameraUploadsOperationTest {
+        @Test
+        fun `test that the worker is called to start camera uploads`() = runTest {
+            underTest.fireCameraUploadJob()
+            verify(workerGateway, times(1)).fireCameraUploadJob()
+        }
+
+        @Test
+        fun `test that the worker is called to stop camera uploads`() = runTest {
+            underTest.fireStopCameraUploadJob()
+            verify(workerGateway, times(1)).fireStopCameraUploadJob()
+        }
+
+        @Test
+        fun `test that the worker is called to schedule camera uploads`() = runTest {
+            underTest.scheduleCameraUploadJob()
+            verify(workerGateway, times(1)).scheduleCameraUploadJob()
+        }
+
+        @Test
+        fun `test that the worker is called to restart camera uploads`() = runTest {
+            underTest.fireRestartCameraUploadJob()
+            verify(workerGateway, times(1)).fireRestartCameraUploadJob()
+        }
+
+        @Test
+        fun `test that the worker is called to reschedule camera uploads`() = runTest {
+            underTest.rescheduleCameraUpload()
+            verify(workerGateway, times(1)).rescheduleCameraUpload()
+        }
+
+        @Test
+        fun `test that the worker is called to stop camera uploads heartbeat workers`() = runTest {
+            underTest.stopCameraUploadSyncHeartbeatWorkers()
+            verify(workerGateway, times(1)).stopCameraUploadSyncHeartbeatWorkers()
+        }
+
+        @Test
+        fun `test that the app event gateway is notified of the camera uploads progress`() {
+            runTest {
+                val expected = Pair(50, 25)
+
+                underTest.broadcastCameraUploadProgress(
+                    progress = expected.first,
+                    pending = expected.second,
+                )
+                verify(appEventGateway).broadcastCameraUploadProgress(
+                    progress = expected.first,
+                    pending = expected.second,
+                )
+            }
+        }
+
+        @Test
+        fun `test that the camera uploads progress is being observed`() {
+            runTest {
+                val progress1 = Pair(50, 25)
+                val progress2 = Pair(51, 24)
+                val expected = flowOf(progress1, progress2)
+
+                whenever(appEventGateway.monitorCameraUploadProgress).thenReturn(expected)
+                assertThat(underTest.monitorCameraUploadProgress()).isEqualTo(expected)
+            }
         }
     }
 }
