@@ -47,6 +47,15 @@ class ScheduleMeetingViewModel @Inject constructor(
     }
 
     /**
+     * Enable or disable allow non-hosts to add participants option
+     */
+    fun onAllowNonHostAddParticipantsTap() {
+        _state.update { state ->
+            state.copy(enabledAllowAddParticipantsOption = !state.enabledAllowAddParticipantsOption)
+        }
+    }
+
+    /**
      * Show snackBar with a text
      *
      * @param stringId String id.

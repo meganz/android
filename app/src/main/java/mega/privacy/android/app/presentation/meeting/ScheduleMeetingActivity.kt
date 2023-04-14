@@ -89,7 +89,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             ScheduleMeetingAction.MeetingLink -> viewModel.onMeetingLinkTap()
             ScheduleMeetingAction.AddParticipants -> Timber.d("Add participants option")
             ScheduleMeetingAction.SendCalendarInvite -> Timber.d("Send calendar invite option")
-            ScheduleMeetingAction.AllowNonHostAddParticipants -> Timber.d("Allow non-host add participants option")
+            ScheduleMeetingAction.AllowNonHostAddParticipants -> viewModel.onAllowNonHostAddParticipantsTap()
             ScheduleMeetingAction.AddDescription -> Timber.d("Add description option")
         }
     }

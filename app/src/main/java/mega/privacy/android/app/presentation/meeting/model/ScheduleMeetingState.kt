@@ -8,16 +8,17 @@ import java.util.TimeZone
 /**
  * Data class defining the state of [ScheduleMeetingViewModel]
  *
- * @property meetingName                   Meeting name
- * @property freq                          [OccurrenceFrequencyType].
- * @property startDate                     Start Date.
- * @property endDate                       End Date.
- * @property participantItemList           List of participants
- * @property finish                        True, if the activity is to be terminated.
- * @property buttons                       List of available action buttons.
- * @property snackBar                      String resource id for showing an snackBar.
- * @property enabledMeetingLinkOption      True if is enabled the meeting link option, false otherwise.
- * @property discardMeetingDialog          True if show discard meeting alert dialog, false if not.
+ * @property meetingName                            Meeting name
+ * @property freq                                   [OccurrenceFrequencyType].
+ * @property startDate                              Start Date.
+ * @property endDate                                End Date.
+ * @property participantItemList                    List of participants
+ * @property finish                                 True, if the activity is to be terminated.
+ * @property buttons                                List of available action buttons.
+ * @property snackBar                               String resource id for showing an snackBar.
+ * @property enabledMeetingLinkOption               True if is enabled the meeting link option, false otherwise.
+ * @property discardMeetingDialog                   True if show discard meeting alert dialog, false if not.
+ * @property enabledAllowAddParticipantsOption      True if is enabled the allow non-hosts to add participants option, false otherwise.
  */
 data class ScheduleMeetingState(
     val meetingName: String? = null,
@@ -30,6 +31,7 @@ data class ScheduleMeetingState(
     val snackBar: Int? = null,
     val enabledMeetingLinkOption: Boolean = true,
     val discardMeetingDialog: Boolean = false,
+    val enabledAllowAddParticipantsOption: Boolean = true,
 ) {
     /**
      * Get start meeting time

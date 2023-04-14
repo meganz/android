@@ -222,6 +222,8 @@ private fun ActionButton(
             action = action,
             isChecked = when (action) {
                 ScheduleMeetingAction.MeetingLink -> state.enabledMeetingLinkOption
+                ScheduleMeetingAction.AllowNonHostAddParticipants -> state.enabledAllowAddParticipantsOption
+                ScheduleMeetingAction.SendCalendarInvite -> false
                 else -> true
             },
             hasSwitch = when (action) {
@@ -435,7 +437,7 @@ private fun ActionOption(
             ) {
                 MegaSwitch(
                     checked = isChecked,
-                    enabled = true,
+                    enabled = action != ScheduleMeetingAction.SendCalendarInvite,
                     onCheckedChange = null,
                     modifier = Modifier.align(Alignment.Center)
                 )
