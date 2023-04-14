@@ -87,7 +87,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new RubbishBin Compose UI
      */
-    RubbishBinCompose("Enable compose for RubbishBin", false);
+    RubbishBinCompose("Enable compose for RubbishBin", false),
+
+    /**
+     * To switch into new Plans page UI
+     */
+    PlansPageUpdate("Enable new design for Upgrade account view", false);
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
