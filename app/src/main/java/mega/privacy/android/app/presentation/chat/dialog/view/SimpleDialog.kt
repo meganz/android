@@ -36,7 +36,7 @@ import mega.privacy.android.core.ui.theme.white_alpha_060
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SimpleDialog(
-    title: Int,
+    title: Int?,
     description: Int,
     confirmButton: Int,
     dismissButton: Int,
@@ -56,7 +56,7 @@ fun SimpleDialog(
         ),
         onDismissRequest = { onDismiss() },
 
-        titleString = stringResource(id = title),
+        titleString = if (title != null) stringResource(id = title) else null,
         titleAlign = TextAlign.Start,
         body = {
             Text(
@@ -69,7 +69,8 @@ fun SimpleDialog(
                 color = if (MaterialTheme.colors.isLight)
                     grey_alpha_060
                 else
-                    white_alpha_060)
+                    white_alpha_060
+            )
         },
         confirmButton = {
             Button(

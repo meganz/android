@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.update
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import javax.inject.Inject
@@ -36,4 +37,21 @@ class ScheduleMeetingViewModel @Inject constructor(
     val isConnected: Boolean
         get() = monitorConnectivityUseCase().value
 
+    /**
+     * Discard meeting button clicked
+     */
+    fun onDiscardMeetingTap() =
+        _state.update { state ->
+            state.copy(discardMeetingDialog = !state.discardMeetingDialog)
+        }
+
+    /**
+     * Dismiss alert dialogs
+     */
+    fun dismissDialog() =
+        _state.update { state ->
+            state.copy(
+                discardMeetingDialog = false,
+            )
+        }
 }

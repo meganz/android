@@ -54,6 +54,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
+import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.title
@@ -90,6 +91,7 @@ internal fun ScheduleMeetingView(
     onScrollChange: (Boolean) -> Unit,
     onDismiss: () -> Unit,
     onSnackbarShown: () -> Unit,
+    onDiscardMeetingDialog: () -> Unit,
 ) {
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
@@ -113,6 +115,11 @@ internal fun ScheduleMeetingView(
             )
         }
     ) { paddingValues ->
+        DiscardMeetingAlertDialog(
+            state = state,
+            onKeepEditing = { onDismiss() },
+            onDiscard = { onDiscardMeetingDialog() })
+
         LazyColumn(
             state = listState,
             modifier = Modifier.padding(paddingValues)
@@ -432,6 +439,57 @@ private fun ActionOption(
 }
 
 /**
+ * Dialogue to discard the meeting
+ *
+ * @param state                     [ScheduledMeetingInfoState]
+ * @param onKeepEditing             When continue editing the meeting.
+ * @param onDiscard                 When discard the meeting.
+ */
+@Composable
+private fun DiscardMeetingAlertDialog(
+    state: ScheduleMeetingState,
+    onKeepEditing: () -> Unit,
+    onDiscard: () -> Unit,
+) {
+    if (state.discardMeetingDialog) {
+        SimpleDialog(
+            title = null,
+            description = R.string.meetings_schedule_meeting_discard_meeting_dialog_title,
+            confirmButton = R.string.meetings_schedule_meeting_discard_meeting_dialog_discard_option,
+            dismissButton = R.string.meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option,
+            shouldDismissOnBackPress = true,
+            shouldDismissOnClickOutside = true,
+            onDismiss = onKeepEditing,
+            onConfirmButton = onDiscard
+        )
+    }
+}
+
+/**
+ * Discard Meeting Alert Dialog Preview
+ */
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewDiscardMeetingAlertDialog")
+@Composable
+fun PreviewDiscardMeetingAlertDialog() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        DiscardMeetingAlertDialog(state = ScheduleMeetingState(
+            meetingName = "Title meeting",
+            freq = OccurrenceFrequencyType.Invalid,
+            startDate = null,
+            endDate = null,
+            participantItemList = emptyList(),
+            finish = false,
+            buttons = ScheduleMeetingAction.values().asList(),
+            snackBar = null,
+            discardMeetingDialog = true,
+        ),
+            onKeepEditing = { },
+            onDiscard = {})
+    }
+}
+
+/**
  * Schedule meeting View Preview
  */
 @Preview
@@ -448,7 +506,7 @@ private fun PreviewScheduleMeetingView() {
                 participantItemList = emptyList(),
                 finish = false,
                 buttons = ScheduleMeetingAction.values().asList(),
-                snackBar = null,
+                snackBar = null
             ),
             onButtonClicked = {},
             onDiscardClicked = {},
@@ -459,7 +517,8 @@ private fun PreviewScheduleMeetingView() {
             onEndDateClicked = {},
             onScrollChange = {},
             onDismiss = {},
-            onSnackbarShown = {}
+            onSnackbarShown = {},
+            onDiscardMeetingDialog = {}
         )
     }
 }

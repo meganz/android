@@ -66,15 +66,16 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             ScheduleMeetingView(
                 state = uiState,
                 onButtonClicked = ::onActionTap,
-                onDiscardClicked = { finish() },
+                onDiscardClicked = { viewModel.onDiscardMeetingTap() },
                 onAcceptClicked = { },
                 onStartTimeClicked = { },
                 onStartDateClicked = { },
                 onEndTimeClicked = { },
                 onEndDateClicked = { },
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
-                onDismiss = { },
-                onSnackbarShown = {}
+                onDismiss = { viewModel.dismissDialog() },
+                onSnackbarShown = {},
+                onDiscardMeetingDialog = { finish() },
             )
         }
     }
