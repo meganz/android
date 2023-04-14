@@ -220,6 +220,10 @@ private fun ActionButton(
         ActionOption(
             state = state,
             action = action,
+            isChecked = when (action) {
+                ScheduleMeetingAction.MeetingLink -> state.enabledMeetingLinkOption
+                else -> true
+            },
             hasSwitch = when (action) {
                 ScheduleMeetingAction.Recurrence,
                 ScheduleMeetingAction.AddParticipants,
@@ -346,12 +350,14 @@ private fun ScheduleMeetingAppBar(
  *
  * @param state         [ScheduleMeetingState]
  * @param action        [ScheduleMeetingAction]
+ * @param isChecked     True, if the option must be checked. False if not
  * @param hasSwitch     True, if the option has a switch. False if not
  */
 @Composable
 private fun ActionOption(
     state: ScheduleMeetingState,
     action: ScheduleMeetingAction,
+    isChecked: Boolean,
     hasSwitch: Boolean,
 ) {
     Row(
@@ -428,7 +434,7 @@ private fun ActionOption(
                     .wrapContentSize(if (action == ScheduleMeetingAction.MeetingLink) Alignment.TopEnd else Alignment.Center)
             ) {
                 MegaSwitch(
-                    checked = true,
+                    checked = isChecked,
                     enabled = true,
                     onCheckedChange = null,
                     modifier = Modifier.align(Alignment.Center)

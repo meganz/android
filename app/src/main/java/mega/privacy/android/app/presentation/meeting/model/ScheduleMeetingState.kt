@@ -16,6 +16,7 @@ import java.util.TimeZone
  * @property finish                        True, if the activity is to be terminated.
  * @property buttons                       List of available action buttons.
  * @property snackBar                      String resource id for showing an snackBar.
+ * @property enabledMeetingLinkOption      True if is enabled the meeting link option, false otherwise.
  * @property discardMeetingDialog          True if show discard meeting alert dialog, false if not.
  */
 data class ScheduleMeetingState(
@@ -27,6 +28,7 @@ data class ScheduleMeetingState(
     val finish: Boolean = false,
     val buttons: List<ScheduleMeetingAction> = ScheduleMeetingAction.values().asList(),
     val snackBar: Int? = null,
+    val enabledMeetingLinkOption: Boolean = true,
     val discardMeetingDialog: Boolean = false,
 ) {
     /**

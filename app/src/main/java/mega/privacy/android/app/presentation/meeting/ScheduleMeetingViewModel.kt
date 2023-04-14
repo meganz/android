@@ -38,6 +38,23 @@ class ScheduleMeetingViewModel @Inject constructor(
         get() = monitorConnectivityUseCase().value
 
     /**
+     * Enable or disable meeting link option
+     */
+    fun onMeetingLinkTap() {
+        _state.update { state ->
+            state.copy(enabledMeetingLinkOption = !state.enabledMeetingLinkOption)
+        }
+    }
+
+    /**
+     * Show snackBar with a text
+     *
+     * @param stringId String id.
+     */
+    private fun showSnackBar(stringId: Int) =
+        _state.update { it.copy(snackBar = stringId) }
+
+    /**
      * Discard meeting button clicked
      */
     fun onDiscardMeetingTap() =
