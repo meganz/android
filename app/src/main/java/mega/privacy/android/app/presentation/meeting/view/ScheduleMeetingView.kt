@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
@@ -147,7 +148,12 @@ internal fun ScheduleMeetingView(
         }
 
         if (state.snackBar != null) {
-            val msg = stringResource(id = state.snackBar)
+            val msg = if (state.snackBar == R.string.number_of_participants) pluralStringResource(
+                R.plurals.meetings_schedule_meeting_snackbar_adding_participants_success,
+                state.participantItemList.size,
+                state.participantItemList.size
+            ) else
+                stringResource(id = state.snackBar)
 
             LaunchedEffect(scaffoldState.snackbarHostState) {
                 val s = scaffoldState.snackbarHostState.showSnackbar(
@@ -403,7 +409,7 @@ private fun ActionOption(
                     ScheduleMeetingAction.AddParticipants -> if (state.participantItemList.isNotEmpty()) subtitle =
                         stringResource(
                             id = R.string.number_of_participants,
-                            state.participantItemList.size
+                            state.numOfParticipants
                         )
                     ScheduleMeetingAction.Recurrence -> subtitle = when (state.freq) {
                         OccurrenceFrequencyType.Invalid -> stringResource(id = R.string.meetings_schedule_meeting_recurrence_never_label)
@@ -492,7 +498,7 @@ fun PreviewDiscardMeetingAlertDialog() {
             snackBar = null,
             discardMeetingDialog = true,
         ),
-            onKeepEditing = { },
+            onKeepEditing = {},
             onDiscard = {})
     }
 }

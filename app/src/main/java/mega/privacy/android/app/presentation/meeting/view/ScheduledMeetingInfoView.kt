@@ -43,7 +43,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -63,8 +62,6 @@ import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.contact.view.ContactStatus
-import mega.privacy.android.app.presentation.contact.view.DefaultContactAvatar
-import mega.privacy.android.app.presentation.contact.view.UriAvatar
 import mega.privacy.android.app.presentation.contact.view.getLastSeenString
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
@@ -416,7 +413,6 @@ private fun isLight(): Boolean = MaterialTheme.colors.isLight
  *
  * @param state [ScheduledMeetingInfoState]
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun ScheduledMeetingSubtitle(state: ScheduledMeetingInfoState) {
     state.scheduledMeeting?.let { schedMeet ->
@@ -1132,7 +1128,6 @@ private fun ChatNotificationSubtitle(seconds: Long) {
  * @param seconds  The retention time in seconds
  * @return         The formatted text
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun formatRetentionTimeInSecondsToString(seconds: Long): String {
     if (seconds == Constants.DISABLED_RETENTION_TIME)
@@ -1191,7 +1186,6 @@ fun formatRetentionTimeInSecondsToString(seconds: Long): String {
  * @param seconds       The seconds which have been set for do not disturb mode
  * @return              The right string
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun getStringForDndTime(seconds: Long): String {
     val cal = Calendar.getInstance()
@@ -1218,30 +1212,6 @@ fun getStringForDndTime(seconds: Long): String {
         R.plurals.chat_notifications_muted_until_specific_time,
         cal[Calendar.HOUR_OF_DAY], df.format(cal.time)
     )
-}
-
-/**
- * Participant avatar
- *
- * @param participant [ChatParticipant]
- */
-@Composable
-private fun ParticipantAvatar(
-    modifier: Modifier = Modifier,
-    participant: ChatParticipant,
-) {
-    if (participant.data.avatarUri != null) {
-        UriAvatar(
-            modifier = modifier,
-            uri = participant.data.avatarUri.toString(),
-        )
-    } else {
-        DefaultContactAvatar(
-            modifier = modifier,
-            color = Color(participant.defaultAvatarColor),
-            content = participant.getAvatarFirstLetter(),
-        )
-    }
 }
 
 /**

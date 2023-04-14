@@ -1,7 +1,10 @@
 package mega.privacy.android.app.presentation.meeting
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -11,8 +14,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
+import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
@@ -23,6 +28,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import timber.log.Timber
 import javax.inject.Inject
 import mega.privacy.android.app.presentation.meeting.view.ScheduleMeetingView
+import mega.privacy.android.app.utils.Constants
 
 /**
  * Activity which shows scheduled meeting info screen.
@@ -41,6 +47,8 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
 
     private val viewModel by viewModels<ScheduleMeetingViewModel>()
 
+    private lateinit var addContactLauncher: ActivityResultLauncher<Intent?>
+
     /**
      * Perform Activity initialization
      */
@@ -49,12 +57,45 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect {
+                viewModel.state.collect { (_, _, _, _, _, _, _, _, _, _, _, _, openAddContact) ->
+                    openAddContact?.let { shouldOpen ->
+                        if (shouldOpen) {
+                            viewModel.removeAddContact()
+                            Timber.d("Open Invite participants screen")
+                            addContactLauncher.launch(
+                                Intent(
+                                    this@ScheduleMeetingActivity,
+                                    AddContactActivity::class.java
+                                )
+                                    .putExtra(
+                                        Constants.INTENT_EXTRA_KEY_CONTACT_TYPE,
+                                        Constants.CONTACT_TYPE_MEGA
+                                    )
+                                    .putExtra(Constants.INTENT_EXTRA_KEY_CHAT, true)
+                                    .putExtra(
+                                        Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE,
+                                        getString(R.string.add_participants_menu_item)
+                                    )
+                            )
+                        }
+                    }
                 }
             }
         }
 
         setContent { ScheduleMeetingComposeView() }
+
+        addContactLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.getStringArrayListExtra(AddContactActivity.EXTRA_CONTACTS)
+                        ?.let { contactsData ->
+                            viewModel.addContactsSelected(contactsData)
+                        }
+                } else {
+                    Timber.e("Error adding participants")
+                }
+            }
     }
 
     @Composable
@@ -74,7 +115,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                 onEndDateClicked = { },
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
                 onDismiss = { viewModel.dismissDialog() },
-                onSnackbarShown = {},
+                onSnackbarShown = viewModel::snackbarShown,
                 onDiscardMeetingDialog = { finish() },
             )
         }
@@ -87,7 +128,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
         when (action) {
             ScheduleMeetingAction.Recurrence -> Timber.d("Recurrence option")
             ScheduleMeetingAction.MeetingLink -> viewModel.onMeetingLinkTap()
-            ScheduleMeetingAction.AddParticipants -> Timber.d("Add participants option")
+            ScheduleMeetingAction.AddParticipants -> viewModel.onAddParticipantsTap()
             ScheduleMeetingAction.SendCalendarInvite -> Timber.d("Send calendar invite option")
             ScheduleMeetingAction.AllowNonHostAddParticipants -> viewModel.onAllowNonHostAddParticipantsTap()
             ScheduleMeetingAction.AddDescription -> Timber.d("Add description option")
