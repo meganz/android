@@ -13,6 +13,13 @@ import mega.privacy.android.domain.featuretoggle.FeatureFlagValueProvider
  */
 enum class AppFeatures(override val description: String, private val defaultValue: Boolean) :
     Feature {
+    /**
+     * Enable album sharing feature.
+     */
+    AlbumSharing(
+        "Enable album sharing feature",
+        false
+    ),
 
     /**
      * To switch into new compose slideshow or not toggle.
