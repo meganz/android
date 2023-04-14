@@ -1409,7 +1409,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             val isImportingToCloud =
                 importFileF && importFragmentSelected == CLOUD_FRAGMENT && binding.explorerTabsPager.currentItem == CLOUD_TAB
             return (cDriveExplorer != null && cDriveExplorer?.isVisible == true
-                    && (tabShown == CLOUD_TAB && !importFileF || isImportingToCloud))
+                    && (tabShown == CLOUD_TAB && !importFileF || tabShown == NO_TABS || isImportingToCloud))
         }
 
     private val isIncomingVisible: Boolean

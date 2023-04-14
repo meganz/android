@@ -518,7 +518,7 @@ class CloudDriveExplorerFragment : RotatableFragment(), CheckScrollInterface, Se
         updateNodesByAdapter(originalData)
         recyclerView.scrollToPosition(0)
 
-        if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY)
+        if (modeCloud == FileExplorerActivity.MOVE || modeCloud == FileExplorerActivity.COPY || modeCloud == FileExplorerActivity.SELECT)
             activateButton(true)
     }
 
