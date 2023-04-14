@@ -111,5 +111,6 @@ dependencies {
     androidTestImplementation testlib.bundles.unit.test
     androidTestImplementation lib.bundles.unit.test
     androidTestImplementation testlib.junit.test.ktx
+    androidTestImplementation testlib.runner
 }
 
