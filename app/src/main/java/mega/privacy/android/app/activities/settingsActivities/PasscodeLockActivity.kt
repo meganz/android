@@ -267,189 +267,191 @@ class PasscodeLockActivity : BaseActivity() {
      */
     private fun initPasscodeScreen() {
         setTitleText()
-        binding.passcodeOptionsButton.isVisible = !secondRound
 
-        if (mode == UNLOCK_MODE) {
-            attempts = dbH.attributes?.attempts ?: 0
-            binding.passcodeOptionsButton.isVisible = false
-        }
-
-        binding.doNotMatchWarning.isVisible = false
-
-        if (forgetPasscode) {
-            hidePins()
-            hideErrorElements()
-            binding.passwordInput.isVisible = false
-
-            binding.passwordLayout.apply {
-                isVisible = true
-                requestFocus()
-            }
-
-            binding.passwordField.setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == IME_ACTION_DONE) {
-                    checkPassword()
-                    true
-                } else false
-            }
-
-            if (passwordAlreadyTyped) {
-                showAttemptsError()
-            }
-
-            return
-        }
-
-        binding.passwordLayout.isVisible = false
-
-        if (attempts > 0) {
-            showAttemptsError()
-        } else {
-            hideErrorElements()
-        }
-
-        if (passcodeType == PIN_ALPHANUMERIC) {
-            hidePins()
-
-            binding.passwordInput.apply {
-                isVisible = true
-                requestFocus()
-
-                setOnEditorActionListener { _, actionId, _ ->
-                    if (actionId == IME_ACTION_DONE) {
-                        checkPasscode()
-                        true
-                    } else false
-
-                }
-            }
-        } else {
-            binding.passFirstInput.apply {
-                isVisible = true
-                requestFocus()
-
-                doAfterTextChanged {
-                    isEnabled = if (this.text.toString().isNotEmpty()) {
-                        binding.passSecondInput.requestFocus()
-                        false
-                    } else {
-                        true
-                    }
-                }
-            }
-
-            binding.passSecondInput.apply {
-                isVisible = true
-
-                doAfterTextChanged {
-                    isEnabled = if (this.text.toString().isNotEmpty()) {
-                        binding.passThirdInput.requestFocus()
-                        false
-                    } else {
-                        true
-                    }
-                }
-
-                previousDigitEditText = binding.passFirstInput
-            }
-
-
-            binding.passThirdInput.apply {
-                isVisible = true
-
-                doAfterTextChanged {
-                    isEnabled = if (this.text.toString().isNotEmpty()) {
-                        binding.passFourthInput.requestFocus()
-                        false
-                    } else {
-                        true
-                    }
-                }
-
-                previousDigitEditText = binding.passSecondInput
-            }
-
-            binding.passFourthInput.apply {
-                isVisible = true
-
-                doAfterTextChanged {
-                    if (passcodeType == PIN_4) {
-                        if (this.text.toString().isNotEmpty()) {
-                            binding.passFirstInput.apply {
-                                isCursorVisible = false
-                                requestFocus()
-                            }
-
-                            checkPasscode()
-                        }
-                    } else {
-                        isEnabled = if (this.text.toString().isNotEmpty()) {
-                            binding.passFifthInput.requestFocus()
-                            false
-                        } else {
-                            true
-                        }
-                    }
-                }
-
-                previousDigitEditText = binding.passThirdInput
-            }
-
-            val params = binding.passFourthInput.layoutParams as ConstraintLayout.LayoutParams
-
-            if (passcodeType == PIN_4) {
-                binding.passFourthInput.imeOptions = IME_ACTION_DONE or IME_FLAG_NO_FULLSCREEN
-
-                params.marginEnd = 0
-
-                binding.passFifthInput.isVisible = false
-                binding.passSixthInput.isVisible = false
-            } else {
-                binding.passFourthInput.imeOptions = IME_ACTION_NEXT or IME_FLAG_NO_FULLSCREEN
-
-                params.marginEnd = dp2px(16F, resources.displayMetrics)
-
-                binding.passFifthInput.apply {
-                    isVisible = true
-
-                    doAfterTextChanged {
-                        isEnabled = if (this.text.toString().isNotEmpty()) {
-                            binding.passSixthInput.requestFocus()
-                            false
-                        } else {
-                            true
-                        }
-                    }
-
-                    previousDigitEditText = binding.passFourthInput
-                }
-
-                binding.passSixthInput.apply {
-                    isVisible = true
-
-                    doAfterTextChanged {
-                        if (this.text.toString().isNotEmpty()) {
-                            binding.passFirstInput.apply {
-                                isCursorVisible = false
-                                requestFocus()
-                            }
-
-                            checkPasscode()
-                        }
-                    }
-
-                    previousDigitEditText = binding.passFifthInput
-                }
-            }
-
-            binding.passFourthInput.layoutParams = params
-
-            binding.passwordInput.isVisible = false
-        }
-
-        if (shouldShowFingerprintLock()) {
+        if (shouldShowFingerprintLock() && !fingerprintSkipped) {
             binding.passcodeScrollView.isVisible = false
             showFingerprintUnlock()
+        } else {
+            binding.passcodeScrollView.isVisible = true
+            binding.passcodeOptionsButton.isVisible = !secondRound
+
+            if (mode == UNLOCK_MODE) {
+                attempts = dbH.attributes?.attempts ?: 0
+                binding.passcodeOptionsButton.isVisible = false
+            }
+
+            binding.doNotMatchWarning.isVisible = false
+
+            if (forgetPasscode) {
+                hidePins()
+                hideErrorElements()
+                binding.passwordInput.isVisible = false
+
+                binding.passwordLayout.apply {
+                    isVisible = true
+                    requestFocus()
+                }
+
+                binding.passwordField.setOnEditorActionListener { _, actionId, _ ->
+                    if (actionId == IME_ACTION_DONE) {
+                        checkPassword()
+                        true
+                    } else false
+                }
+
+                if (passwordAlreadyTyped) {
+                    showAttemptsError()
+                }
+
+                return
+            }
+
+            binding.passwordLayout.isVisible = false
+
+            if (attempts > 0) {
+                showAttemptsError()
+            } else {
+                hideErrorElements()
+            }
+
+            if (passcodeType == PIN_ALPHANUMERIC) {
+                hidePins()
+
+                binding.passwordInput.apply {
+                    isVisible = true
+                    requestFocus()
+
+                    setOnEditorActionListener { _, actionId, _ ->
+                        if (actionId == IME_ACTION_DONE) {
+                            checkPasscode()
+                            true
+                        } else false
+
+                    }
+                }
+            } else {
+                binding.passFirstInput.apply {
+                    isVisible = true
+                    requestFocus()
+
+                    doAfterTextChanged {
+                        isEnabled = if (this.text.toString().isNotEmpty()) {
+                            binding.passSecondInput.requestFocus()
+                            false
+                        } else {
+                            true
+                        }
+                    }
+                }
+
+                binding.passSecondInput.apply {
+                    isVisible = true
+
+                    doAfterTextChanged {
+                        isEnabled = if (this.text.toString().isNotEmpty()) {
+                            binding.passThirdInput.requestFocus()
+                            false
+                        } else {
+                            true
+                        }
+                    }
+
+                    previousDigitEditText = binding.passFirstInput
+                }
+
+
+                binding.passThirdInput.apply {
+                    isVisible = true
+
+                    doAfterTextChanged {
+                        isEnabled = if (this.text.toString().isNotEmpty()) {
+                            binding.passFourthInput.requestFocus()
+                            false
+                        } else {
+                            true
+                        }
+                    }
+
+                    previousDigitEditText = binding.passSecondInput
+                }
+
+                binding.passFourthInput.apply {
+                    isVisible = true
+
+                    doAfterTextChanged {
+                        if (passcodeType == PIN_4) {
+                            if (this.text.toString().isNotEmpty()) {
+                                binding.passFirstInput.apply {
+                                    isCursorVisible = false
+                                    requestFocus()
+                                }
+
+                                checkPasscode()
+                            }
+                        } else {
+                            isEnabled = if (this.text.toString().isNotEmpty()) {
+                                binding.passFifthInput.requestFocus()
+                                false
+                            } else {
+                                true
+                            }
+                        }
+                    }
+
+                    previousDigitEditText = binding.passThirdInput
+                }
+
+                val params = binding.passFourthInput.layoutParams as ConstraintLayout.LayoutParams
+
+                if (passcodeType == PIN_4) {
+                    binding.passFourthInput.imeOptions = IME_ACTION_DONE or IME_FLAG_NO_FULLSCREEN
+
+                    params.marginEnd = 0
+
+                    binding.passFifthInput.isVisible = false
+                    binding.passSixthInput.isVisible = false
+                } else {
+                    binding.passFourthInput.imeOptions = IME_ACTION_NEXT or IME_FLAG_NO_FULLSCREEN
+
+                    params.marginEnd = dp2px(16F, resources.displayMetrics)
+
+                    binding.passFifthInput.apply {
+                        isVisible = true
+
+                        doAfterTextChanged {
+                            isEnabled = if (this.text.toString().isNotEmpty()) {
+                                binding.passSixthInput.requestFocus()
+                                false
+                            } else {
+                                true
+                            }
+                        }
+
+                        previousDigitEditText = binding.passFourthInput
+                    }
+
+                    binding.passSixthInput.apply {
+                        isVisible = true
+
+                        doAfterTextChanged {
+                            if (this.text.toString().isNotEmpty()) {
+                                binding.passFirstInput.apply {
+                                    isCursorVisible = false
+                                    requestFocus()
+                                }
+
+                                checkPasscode()
+                            }
+                        }
+
+                        previousDigitEditText = binding.passFifthInput
+                    }
+                }
+
+                binding.passFourthInput.layoutParams = params
+
+                binding.passwordInput.isVisible = false
+            }
         }
     }
 
@@ -808,7 +810,7 @@ class PasscodeLockActivity : BaseActivity() {
                         }
                         else -> {
                             fingerprintSkipped = true
-                            binding.passcodeScrollView.isVisible = true
+                            initPasscodeScreen()
                         }
                     }
                 }
