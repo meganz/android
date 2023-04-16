@@ -122,7 +122,8 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApi.getMegaNodeByHandle(nodeHandle)?.let { node ->
                 suspendCancellableCoroutine { continuation ->
-                    val listener = continuation.getRequestListener("getThumbnailFromMegaApi") { it.nodeHandle }
+                    val listener =
+                        continuation.getRequestListener("getThumbnailFromMegaApi") { it.nodeHandle }
                     megaApi.getThumbnail(node = node, thumbnailFilePath = path, listener = listener)
                     continuation.invokeOnCancellation {
                         megaApi.removeRequestListener(listener)
@@ -135,7 +136,8 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         withContext(ioDispatcher) {
             megaApi.getMegaNodeByHandle(nodeHandle)?.let { node ->
                 suspendCancellableCoroutine { continuation ->
-                    val listener = continuation.getRequestListener("getThumbnailFromMegaApiFolder") { it.nodeHandle }
+                    val listener =
+                        continuation.getRequestListener("getThumbnailFromMegaApiFolder") { it.nodeHandle }
                     megaApiFolder.getThumbnail(
                         node = node,
                         thumbnailFilePath = path,

@@ -756,10 +756,12 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
         val launchIntent = playerServiceViewModelGateway?.getCurrentIntent() ?: return false
         val playingHandle = playerServiceViewModelGateway?.getCurrentPlayingHandle() ?: return false
         val adapterType = launchIntent.getIntExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
-        val isFolderLink = adapterType == FOLDER_LINK_ADAPTER
 
         when (item.itemId) {
             R.id.save_to_device -> {
+                if (!isAudioPlayer()) {
+                    viewModel.sendSaveToDeviceButtonClickedEvent()
+                }
                 when (adapterType) {
                     OFFLINE_ADAPTER -> nodeSaver.saveOfflineNode(playingHandle, true)
                     ZIP_ADAPTER -> {
@@ -784,7 +786,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                                 Timber.d("currentDocument NOT NULL")
                                 nodeSaver.saveNode(
                                     currentDocument,
-                                    isFolderLink = isFolderLink,
+                                    isFolderLink = false,
                                     fromMediaViewer = true,
                                     needSerialize = true
                                 )
@@ -796,7 +798,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                     else -> {
                         nodeSaver.saveHandle(
                             playingHandle,
-                            isFolderLink = isFolderLink,
+                            isFolderLink = adapterType == FOLDER_LINK_ADAPTER,
                             fromMediaViewer = true
                         )
                     }
@@ -818,6 +820,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                         )
                     )
                 } else {
+                    if (!isAudioPlayer()) {
+                        viewModel.sendInfoButtonClickedEvent()
+                    }
                     val intent: Intent
 
                     if (adapterType == OFFLINE_ADAPTER) {
@@ -867,6 +872,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 return true
             }
             R.id.share -> {
+                if (!isAudioPlayer()) {
+                    viewModel.sendShareButtonClickedEvent()
+                }
                 when (adapterType) {
                     OFFLINE_ADAPTER, ZIP_ADAPTER -> {
                         val mediaItem = serviceGateway?.getCurrentMediaItem()
@@ -892,10 +900,16 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 return true
             }
             R.id.send_to_chat -> {
+                if (!isAudioPlayer()) {
+                    viewModel.sendSendToChatButtonClickedEvent()
+                }
                 nodeAttacher.attachNode(playingHandle)
                 return true
             }
             R.id.get_link -> {
+                if (!isAudioPlayer()) {
+                    viewModel.sendGetLinkButtonClickedEvent()
+                }
                 if (showTakenDownNodeActionNotAvailableDialog(
                         megaApi.getNodeByHandle(playingHandle), this
                     )
@@ -906,6 +920,9 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
                 return true
             }
             R.id.remove_link -> {
+                if (!isAudioPlayer()) {
+                    viewModel.sendRemoveLinkButtonClickedEvent()
+                }
                 val node = megaApi.getNodeByHandle(playingHandle) ?: return true
                 if (showTakenDownNodeActionNotAvailableDialog(node, this)) {
                     return true
@@ -1152,7 +1169,7 @@ abstract class MediaPlayerActivity : PasscodeActivity(), SnackbarShower, Activit
      *
      * @param isHide true is hidden, otherwise is shown
      */
-    fun updateToolbar(isHide: Boolean) {
+    private fun updateToolbar(isHide: Boolean) {
         binding.toolbar.animate().cancel()
         binding.toolbar.translationY = if (isHide) {
             -binding.toolbar.measuredHeight.toFloat()

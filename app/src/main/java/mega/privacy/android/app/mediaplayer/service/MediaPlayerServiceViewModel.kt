@@ -95,6 +95,7 @@ import mega.privacy.android.domain.entity.mediaplayer.PlaybackInformation
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedNode
+import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreCredentialsNull
@@ -139,6 +140,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseC
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SavePlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -208,6 +210,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getFingerprint: GetFingerprint,
     private val fileDurationMapper: FileDurationMapper,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
+    private val sendStatisticsMediaPlayerUseCase: SendStatisticsMediaPlayerUseCase,
 ) : PlayerServiceViewModelGateway, ExposedShuffleOrder.ShuffleChangeListener, SearchCallback.Data {
     private val compositeDisposable = CompositeDisposable()
 
@@ -1487,6 +1490,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
             }
             subtitleName == mediaItemName
         }
+
+    override fun sendVideoPlayerActivatedEvent() {
+        sharingScope.launch {
+            sendStatisticsMediaPlayerUseCase(MediaPlayerStatisticsEvents.VideoPlayerActivatedEvent())
+        }
+    }
 
     private fun initPlayerSourceChanged() {
         if (playSourceChanged.isEmpty()) {

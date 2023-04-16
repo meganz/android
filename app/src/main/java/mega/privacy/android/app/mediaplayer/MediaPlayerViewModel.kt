@@ -41,7 +41,9 @@ import mega.privacy.android.app.usecase.MoveNodeUseCase
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.livedata.SingleLiveEvent
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
@@ -54,9 +56,11 @@ import javax.inject.Inject
 /**
  * ViewModel for main audio player UI logic.
  *
- * @property checkNameCollisionUseCase  Required for checking name collisions.
- * @property copyNodeUseCase            Required for copying nodes.
- * @property moveNodeUseCase            Required for moving nodes.
+ * @property checkNameCollisionUseCase Required for checking name collisions.
+ * @property copyNodeUseCase Required for copying nodes.
+ * @property moveNodeUseCase Required for moving nodes.
+ * @property ioDispatcher CoroutineDispatcher
+ * @property sendStatisticsMediaPlayerUseCase SendStatisticsMediaPlayerUseCase
  */
 @HiltViewModel
 class MediaPlayerViewModel @Inject constructor(
@@ -64,6 +68,7 @@ class MediaPlayerViewModel @Inject constructor(
     private val copyNodeUseCase: CopyNodeUseCase,
     private val moveNodeUseCase: MoveNodeUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val sendStatisticsMediaPlayerUseCase: SendStatisticsMediaPlayerUseCase,
     savedStateHandle: SavedStateHandle,
 ) : BaseRxViewModel() {
 
@@ -496,6 +501,101 @@ class MediaPlayerViewModel @Inject constructor(
             String.format("%2d:%02d:%02d", hour, minutes, resultSeconds)
         } else {
             String.format("%02d:%02d", minutes, resultSeconds)
+        }
+    }
+
+    /**
+     * Send SubtitleDialogShownEvent
+     */
+    fun sendSubtitleDialogShownEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SubtitleDialogShownEvent())
+
+    /**
+     * Send HideSubtitleEvent
+     */
+    fun sendHideSubtitleEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.HideSubtitleEvent())
+
+    /**
+     * Send AutoMatchSubtitleClickedEvent
+     */
+    fun sendAutoMatchSubtitleClickedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.AutoMatchSubtitleClickedEvent())
+
+    /**
+     * Send OpenSelectSubtitlePageEvent
+     */
+    fun sendOpenSelectSubtitlePageEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.OpenSelectSubtitlePageEvent())
+
+    /**
+     * Send LoopButtonEnabledEvent
+     */
+    fun sendLoopButtonEnabledEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.LoopButtonEnabledEvent())
+
+    /**
+     * Send ScreenLockedEvent
+     */
+    fun sendScreenLockedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.ScreenLockedEvent())
+
+    /**
+     * Send ScreenUnlockedEvent
+     */
+    fun sendScreenUnlockedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.ScreenUnlockedEvent())
+
+    /**
+     * Send SnapshotButtonClickedEvent
+     */
+    fun sendSnapshotButtonClickedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SnapshotButtonClickedEvent())
+
+    /**
+     * Send InfoButtonClickedEvent
+     */
+    fun sendInfoButtonClickedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.InfoButtonClickedEvent())
+
+    /**
+     * Send SaveToDeviceButtonClickedEvent
+     */
+    fun sendSaveToDeviceButtonClickedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SaveToDeviceButtonClickedEvent())
+
+    /**
+     * Send SendToChatButtonClickedEvent
+     */
+    fun sendSendToChatButtonClickedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SendToChatButtonClickedEvent())
+
+    /**
+     * Send ShareButtonClickedEvent
+     */
+    fun sendShareButtonClickedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.ShareButtonClickedEvent())
+
+    /**
+     * Send GetLinkButtonClickedEvent
+     */
+    fun sendGetLinkButtonClickedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.GetLinkButtonClickedEvent())
+
+    /**
+     * Send RemoveLinkButtonClickedEvent
+     */
+    fun sendRemoveLinkButtonClickedEvent() =
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.RemoveLinkButtonClickedEvent())
+
+    /**
+     * Send MediaPlayerStatisticsEvent
+     *
+     * @param event MediaPlayerStatisticsEvents
+     */
+    private fun sendMediaPlayerStatisticsEvent(event: MediaPlayerStatisticsEvents) {
+        viewModelScope.launch {
+            sendStatisticsMediaPlayerUseCase(event)
         }
     }
 

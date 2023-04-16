@@ -396,6 +396,9 @@ class MediaPlayerFragment : Fragment() {
                         viewModel.updateLockStatus(isLock)
                         if (isLock) {
                             delayHideWhenLocked()
+                            viewModel.sendScreenLockedEvent()
+                        } else {
+                            viewModel.sendScreenUnlockedEvent()
                         }
                     }
                     initAddSubtitleDialog(viewHolder.binding.addSubtitleDialog)
@@ -409,9 +412,11 @@ class MediaPlayerFragment : Fragment() {
                                 serviceGateway?.hideSubtitle()
                                 viewModel.showSubtitle(false)
                                 viewModel.showSubtitleDialog(false)
+                                viewModel.sendHideSubtitleEvent()
                             } else {
                                 viewModel.showSubtitle(true)
                                 viewModel.showSubtitleDialog(true)
+                                viewModel.sendSubtitleDialogShownEvent()
                             }
                         }
                     }
@@ -427,6 +432,7 @@ class MediaPlayerFragment : Fragment() {
                                 screenshotsFolderPath,
                                 view
                             ) { bitmap ->
+                                viewModel.sendSnapshotButtonClickedEvent()
                                 requireActivity().runOnUiThread {
                                     showCaptureScreenshotAnimation(
                                         view = binding.screenshotScaleAnimationView,
@@ -526,6 +532,7 @@ class MediaPlayerFragment : Fragment() {
                 if (repeatToggleMode == RepeatToggleMode.REPEAT_NONE) {
                     setRepeatModeForVideo(RepeatToggleMode.REPEAT_ONE)
                     repeatToggleButton.setColorFilter(requireContext().getColor(R.color.teal_300))
+                    viewModel.sendLoopButtonEnabledEvent()
                 } else {
                     setRepeatModeForVideo(RepeatToggleMode.REPEAT_NONE)
                     repeatToggleButton.setColorFilter(requireContext().getColor(R.color.white))
@@ -689,9 +696,11 @@ class MediaPlayerFragment : Fragment() {
                                 viewModel.showSubtitle(true)
                                 viewModel.showSubtitleDialog(false)
                                 viewModel.updateSubtitleInfoByAddSubtitles(null)
+                                viewModel.sendAutoMatchSubtitleClickedEvent()
                             }
                         },
                         onToSelectSubtitle = {
+                            viewModel.sendOpenSelectSubtitlePageEvent()
                             selectSubtitleFileActivityLauncher.launch(
                                 Intent(
                                     requireActivity(),

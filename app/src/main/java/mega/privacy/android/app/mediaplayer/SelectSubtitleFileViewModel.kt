@@ -16,7 +16,9 @@ import mega.privacy.android.app.mediaplayer.mapper.SubtitleFileInfoItemMapper
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.core.ui.controls.SearchWidgetState
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
+import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import javax.inject.Inject
 
 /**
@@ -26,6 +28,7 @@ import javax.inject.Inject
 class SelectSubtitleFileViewModel @Inject constructor(
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
     private val subtitleFileInfoItemMapper: SubtitleFileInfoItemMapper,
+    private val sendStatisticsMediaPlayerUseCase: SendStatisticsMediaPlayerUseCase,
 ) : ViewModel() {
     /**
      * The state for updating the subtitle file info item list
@@ -121,6 +124,7 @@ class SelectSubtitleFileViewModel @Inject constructor(
      */
     fun searchWidgetStateUpdate() {
         searchState = if (searchState == SearchWidgetState.COLLAPSED) {
+            sendSearchModeEnabledEvent()
             SearchWidgetState.EXPANDED
         } else {
             SearchWidgetState.COLLAPSED
@@ -133,5 +137,37 @@ class SelectSubtitleFileViewModel @Inject constructor(
     fun closeSearch() {
         query.update { null }
         searchState = SearchWidgetState.COLLAPSED
+    }
+
+    /**
+     * Send SearchModeEnabledEvent
+     */
+    private fun sendSearchModeEnabledEvent() {
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SearchModeEnabledEvent())
+    }
+
+    /**
+     * Send AddSubtitleClickedEvent
+     */
+    fun sendAddSubtitleClickedEvent() {
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.AddSubtitleClickedEvent())
+    }
+
+    /**
+     * Send SelectSubtitleCancelledEvent
+     */
+    fun sendSelectSubtitleCancelledEvent() {
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SelectSubtitleCancelledEvent())
+    }
+
+    /**
+     * Send MediaPlayerStatisticsEvent
+     *
+     * @param event MediaPlayerStatisticsEvents
+     */
+    private fun sendMediaPlayerStatisticsEvent(event: MediaPlayerStatisticsEvents) {
+        viewModelScope.launch {
+            sendStatisticsMediaPlayerUseCase(event)
+        }
     }
 }

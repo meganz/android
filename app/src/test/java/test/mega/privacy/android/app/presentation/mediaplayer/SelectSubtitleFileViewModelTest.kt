@@ -32,7 +32,8 @@ internal class SelectSubtitleFileViewModelTest {
         Dispatchers.setMain(StandardTestDispatcher(scheduler))
         underTest = SelectSubtitleFileViewModel(
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
-            subtitleFileInfoItemMapper = subtitleFileInfoItemMapper
+            subtitleFileInfoItemMapper = subtitleFileInfoItemMapper,
+            sendStatisticsMediaPlayerUseCase = mock()
         )
     }
 

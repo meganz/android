@@ -371,4 +371,9 @@ interface PlayerServiceViewModelGateway {
      * @return SubtitleFileInfo
      */
     suspend fun getMatchedSubtitleFileInfoForPlayingItem(): SubtitleFileInfo?
+
+    /**
+     * Send VideoPlayerActivatedEvent
+     */
+    fun sendVideoPlayerActivatedEvent()
 }

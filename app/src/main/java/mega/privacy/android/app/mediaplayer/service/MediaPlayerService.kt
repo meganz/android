@@ -252,6 +252,10 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
                         state == MEDIA_PLAYER_STATE_READY && isPaused()
                                 && mediaPlayerGateway.getPlayWhenReady() -> {
                             setPaused(false)
+                            if (!isAudioPlayer()) {
+                                Timber.d("video is playing")
+                                viewModelGateway.sendVideoPlayerActivatedEvent()
+                            }
                         }
                     }
                 }

@@ -53,6 +53,7 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
                 SelectSubtitleFileView(
                     onAddSubtitleCallback = { info ->
                         info?.let {
+                            viewModel.sendAddSubtitleClickedEvent()
                             setResult(
                                 RESULT_OK,
                                 Intent().putExtra(
@@ -64,6 +65,7 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
                         }
                     },
                     onBackPressedCallback = {
+                        viewModel.sendSelectSubtitleCancelledEvent()
                         setResult(RESULT_OK)
                         this.finish()
                     })
