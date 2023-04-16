@@ -17,7 +17,8 @@ class SDCardFacade @Inject constructor(
     private val documentFileWrapper: DocumentFileWrapper,
 ) : SDCardGateway {
 
-    override suspend fun getDirectoryName(uri: Uri): String {
+    override suspend fun getDirectoryName(localPath: String): String {
+        val uri = Uri.parse(localPath)
         val documentFile = documentFileWrapper.fromTreeUri(uri)
         return documentFile?.let {
             if (it.canWrite()) it.name else ""

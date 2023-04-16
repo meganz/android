@@ -180,8 +180,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun isSyncEnabled(): Boolean =
         dbHandler.preferences?.camSyncEnabled.toBoolean()
 
-    override suspend fun getPrimaryFolderLocalPath(): String? =
-        dbHandler.preferences?.camSyncLocalPath
+    override suspend fun getPrimaryFolderLocalPath(): String =
+        dbHandler.preferences?.camSyncLocalPath ?: ""
 
     override suspend fun setPrimaryFolderLocalPath(localPath: String) =
         dbHandler.setCamSyncLocalPath(localPath)
@@ -213,16 +213,16 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun isPrimaryFolderInSDCard(): Boolean =
         dbHandler.preferences?.cameraFolderExternalSDCard.toBoolean()
 
-    override suspend fun getPrimaryFolderSDCardUriPath(): String? =
-        dbHandler.preferences?.uriExternalSDCard
+    override suspend fun getPrimaryFolderSDCardUriPath(): String =
+        dbHandler.preferences?.uriExternalSDCard ?: ""
 
     override suspend fun isSecondaryMediaFolderEnabled(): Boolean =
         dbHandler.preferences?.secondaryMediaFolderEnabled.toBoolean()
 
     override suspend fun isSecondaryFolderInSDCard(): Boolean = dbHandler.mediaFolderExternalSdCard
 
-    override suspend fun getSecondaryFolderSDCardUriPath(): String? =
-        dbHandler.uriMediaExternalSdCard
+    override suspend fun getSecondaryFolderSDCardUriPath(): String =
+        dbHandler.uriMediaExternalSdCard ?: ""
 
     override suspend fun shouldClearSyncRecords(): Boolean = dbHandler.shouldClearCamsyncRecords()
 

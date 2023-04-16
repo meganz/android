@@ -1,6 +1,7 @@
 package mega.privacy.android.data.facade
 
 import android.content.Context
+import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.reset
@@ -50,23 +52,28 @@ class SDCardFacadeTest {
     @ParameterizedTest(name = "can write document file: {0}")
     @ValueSource(booleans = [true, false])
     fun `test that the directory name is retrieved`(canWrite: Boolean) = runTest {
-        val expectedName = "Test Name"
-        val documentFile = mock<DocumentFile> {
-            on { name }.thenReturn(expectedName)
-            on { canWrite() }.thenReturn(canWrite)
+        mockStatic(Uri::class.java).use { mockedUri ->
+            mockedUri.`when`<Uri> { Uri.parse(any()) }.thenReturn(mock())
+
+            val expectedName = "Test Name"
+            val documentFile = mock<DocumentFile> {
+                on { name }.thenReturn(expectedName)
+                on { canWrite() }.thenReturn(canWrite)
+            }
+            val directoryName = if (documentFile.canWrite()) expectedName else ""
+
+            whenever(documentFileWrapper.fromTreeUri(any())).thenReturn(documentFile)
+            assertThat(underTest.getDirectoryName("test/local/path")).isEqualTo(directoryName)
         }
-        val directoryName = if (documentFile.canWrite()) expectedName else ""
-
-        whenever(documentFileWrapper.fromTreeUri(any())).thenReturn(documentFile)
-
-        assertThat(underTest.getDirectoryName(mock())).isEqualTo(directoryName)
     }
 
     @Test
     fun `test that the directory name is empty if the document file does not exist`() = runTest {
-        whenever(documentFileWrapper.fromTreeUri(any())).thenReturn(null)
-
-        assertThat(underTest.getDirectoryName(mock())).isEmpty()
+        mockStatic(Uri::class.java).use { mockedUri ->
+            mockedUri.`when`<Uri> { Uri.parse(any()) }.thenReturn(mock())
+            whenever(documentFileWrapper.fromTreeUri(any())).thenReturn(null)
+            assertThat(underTest.getDirectoryName("test/local/path")).isEmpty()
+        }
     }
 
     @ParameterizedTest(name = "{index}: {0}")
@@ -77,7 +84,6 @@ class SDCardFacadeTest {
         folderExists: Boolean,
     ) = runTest {
         whenever(context.getExternalFilesDirs(null)).thenReturn(externalDir)
-
         assertThat(underTest.doesFolderExists(localPath)).isEqualTo(folderExists)
     }
 
@@ -105,7 +111,6 @@ class SDCardFacadeTest {
     @MethodSource("provideRootSDCardPathTestParameters")
     fun `test that the root SD card path is retrieved`(path: String, maxIndex: Int) = runTest {
         val expectedRootSDCardPath = path.substring(0, maxIndex)
-
         val rootSDCardPath = underTest.getRootSDCardPath(path)
 
         assertThat(expectedRootSDCardPath).isEqualTo(rootSDCardPath)

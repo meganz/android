@@ -1,7 +1,5 @@
 package mega.privacy.android.data.gateway
 
-import android.net.Uri
-
 /**
  * Gateway class that provides SD Card-related implementations
  */
@@ -11,11 +9,11 @@ interface SDCardGateway {
      * Retrieves the Folder Directory name in the SD Card
      *
      * @see mega.privacy.android.app.utils.SDCardUtils.getSDCardDirName
-     * @param uri The [Uri] to get the name of the folder
+     * @param localPath The Folder local path
      *
      * @return The Folder Directory name
      */
-    suspend fun getDirectoryName(uri: Uri): String
+    suspend fun getDirectoryName(localPath: String): String
 
     /**
      * Checks whether a given Folder is inside the SD Card

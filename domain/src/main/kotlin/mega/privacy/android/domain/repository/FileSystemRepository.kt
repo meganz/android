@@ -12,6 +12,12 @@ import java.io.IOException
  *
  */
 interface FileSystemRepository {
+
+    /**
+     * The local DCIM Folder path
+     */
+    val localDCIMFolderPath: String
+
     /**
      * Get offline path
      *
@@ -126,4 +132,20 @@ interface FileSystemRepository {
      * @return fingerprint
      */
     suspend fun getFingerprint(filePath: String): String?
+
+    /**
+     * Checks whether the Folder exists
+     *
+     * @param folderPath The Folder path
+     *
+     * @return true if the Folder exists, and false if otherwise
+     */
+    suspend fun doesFolderExists(folderPath: String): Boolean
+
+    /**
+     * Checks whether the External Storage Directory exists
+     *
+     * @return true if it exists, and false if otherwise
+     */
+    suspend fun doesExternalStorageDirectoryExists(): Boolean
 }

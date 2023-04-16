@@ -235,9 +235,9 @@ interface CameraUploadRepository {
     /**
      * Retrieves the Primary Folder local path
      *
-     * @return A [String] that contains the Primary Folder local path, or null if it does not exist
+     * @return A [String] that contains the Primary Folder local path
      */
-    suspend fun getPrimaryFolderLocalPath(): String?
+    suspend fun getPrimaryFolderLocalPath(): String
 
     /**
      * Sets the new Primary Folder local path
@@ -335,10 +335,9 @@ interface CameraUploadRepository {
     /**
      * Retrieves the Primary Folder SD Card URI path
      *
-     * @return A [String] that contains the Primary Folder SD Card URI path, or null if it does not
-     * exist
+     * @return A [String] that contains the Primary Folder SD Card URI path
      */
-    suspend fun getPrimaryFolderSDCardUriPath(): String?
+    suspend fun getPrimaryFolderSDCardUriPath(): String
 
     /**
      * Is secondary media folder enabled
@@ -357,10 +356,9 @@ interface CameraUploadRepository {
     /**
      * Retrieves the Secondary Folder SD Card URI path
      *
-     * @return A [String] that contains the Secondary Folder SD Card URI path, or null if it does not
-     * exist
+     * @return A [String] that contains the Secondary Folder SD Card URI path
      */
-    suspend fun getSecondaryFolderSDCardUriPath(): String?
+    suspend fun getSecondaryFolderSDCardUriPath(): String
 
     /**
      * Get maximum timestamp or null

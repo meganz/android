@@ -42,6 +42,12 @@ const val INTENT_EXTRA_NODE_HANDLE = "NODE_HANDLE"
 class FileFacade @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : FileGateway {
+
+    override val localDCIMFolderPath: String
+        get() = Environment.getExternalStoragePublicDirectory(
+            Environment.DIRECTORY_DCIM
+        )?.absolutePath ?: ""
+
     override suspend fun getDirSize(dir: File?): Long {
         dir ?: return -1L
         var size = 0L
@@ -98,6 +104,9 @@ class FileFacade @Inject constructor(
 
     @Deprecated("File already exposes exists() function", ReplaceWith("file?.exists() == true"))
     override suspend fun isFileAvailable(file: File?): Boolean = file?.exists() == true
+    override suspend fun isFileAvailable(fileString: String): Boolean = File(fileString).exists()
+    override suspend fun doesExternalStorageDirectoryExists(): Boolean =
+        Environment.getExternalStorageDirectory() != null
 
     override suspend fun buildDefaultDownloadDir(): File =
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)

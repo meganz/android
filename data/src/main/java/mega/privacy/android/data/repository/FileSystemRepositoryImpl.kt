@@ -85,6 +85,9 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val deviceGateway: DeviceGateway,
 ) : FileSystemRepository {
 
+    override val localDCIMFolderPath: String
+        get() = fileGateway.localDCIMFolderPath
+
     override suspend fun downloadBackgroundFile(viewerNode: ViewerNode): String =
         withContext(ioDispatcher) {
             getMegaNode(viewerNode)?.let { node ->
@@ -122,7 +125,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             } ?: throw NullPointerException()
         }
 
-    suspend fun getMegaNode(viewerNode: ViewerNode): MegaNode? = withContext(ioDispatcher) {
+    private suspend fun getMegaNode(viewerNode: ViewerNode): MegaNode? = withContext(ioDispatcher) {
         when (viewerNode) {
             is ViewerNode.ChatNode -> getMegaNodeFromChat(viewerNode)
             is ViewerNode.FileLinkNode -> MegaNode.unserialize(viewerNode.serializedNode)
@@ -265,5 +268,13 @@ internal class FileSystemRepositoryImpl @Inject constructor(
 
     override suspend fun getFingerprint(filePath: String) = withContext(ioDispatcher) {
         megaApiGateway.getFingerprint(filePath)
+    }
+
+    override suspend fun doesFolderExists(folderPath: String) = withContext(ioDispatcher) {
+        fileGateway.isFileAvailable(folderPath)
+    }
+
+    override suspend fun doesExternalStorageDirectoryExists() = withContext(ioDispatcher) {
+        fileGateway.doesExternalStorageDirectoryExists()
     }
 }

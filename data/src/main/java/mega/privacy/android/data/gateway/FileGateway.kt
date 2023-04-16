@@ -9,6 +9,12 @@ import java.io.IOException
  * @constructor Create empty File gateway
  */
 interface FileGateway {
+
+    /**
+     * The local DCIM Folder path
+     */
+    val localDCIMFolderPath: String
+
     /**
      * Get dir size
      *
@@ -30,6 +36,22 @@ interface FileGateway {
      * @return
      */
     suspend fun isFileAvailable(file: File?): Boolean
+
+    /**
+     * Checks whether the External Storage Directory exists
+     *
+     * @return true if it exists, and false if otherwise
+     */
+    suspend fun doesExternalStorageDirectoryExists(): Boolean
+
+    /**
+     * Checks whether the [File] is available or not from the given [String] path
+     *
+     * @param fileString The [String] containing the file location
+     *
+     * @return true if the file exists, and false if otherwise
+     */
+    suspend fun isFileAvailable(fileString: String): Boolean
 
     /**
      * Build default download dir

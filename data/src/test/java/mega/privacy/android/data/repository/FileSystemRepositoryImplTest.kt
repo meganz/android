@@ -31,16 +31,25 @@ import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.reset
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
+/**
+ * Test class for [FileSystemRepositoryImpl]
+ */
 @ExperimentalCoroutinesApi
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 internal class FileSystemRepositoryImplTest {
     private lateinit var underTest: FileSystemRepository
 
@@ -63,8 +72,7 @@ internal class FileSystemRepositoryImplTest {
     private val streamingGateway = mock<StreamingGateway>()
     private val deviceGateway = mock<DeviceGateway>()
 
-
-    @Before
+    @BeforeAll
     fun setUp() {
         underTest = FileSystemRepositoryImpl(
             context = context,
@@ -88,6 +96,37 @@ internal class FileSystemRepositoryImplTest {
         )
     }
 
+    @BeforeEach
+    fun resetMocks() {
+        reset(
+            context,
+            megaApiGateway,
+            megaApiFolderGateway,
+            megaChatApiGateway,
+            megaLocalStorageGateway,
+            megaShareMapper,
+            megaExceptionMapper,
+            sortOrderIntMapper,
+            cacheFolderGateway,
+            nodeMapper,
+            fileTypeInfoMapper,
+            offlineNodeInformationMapper,
+            fileGateway,
+            chatFilesFolderUserAttributeMapper,
+            fileVersionsOptionCache,
+            streamingGateway,
+            deviceGateway,
+        )
+    }
+
+    @Test
+    fun `test that the local DCIM folder path is retrieved`() = runTest {
+        val testPath = "test/local/dcim/path"
+
+        whenever(fileGateway.localDCIMFolderPath).thenReturn(testPath)
+        assertThat(underTest.localDCIMFolderPath).isEqualTo(testPath)
+    }
+
     @Test
     fun `test that data return from cache when fileVersionsOptionCache is not null and call getFileVersionsOption with forceRefresh false`() =
         runTest {
@@ -96,7 +135,7 @@ internal class FileSystemRepositoryImplTest {
             val actual = underTest.getFileVersionsOption(false)
             verify(fileVersionsOptionCache, times(0)).set(any())
             verify(megaApiGateway, times(0)).getFileVersionsOption(any())
-            assertEquals(expectedFileVersionsOption, actual)
+            assertThat(expectedFileVersionsOption).isEqualTo(actual)
         }
 
     @Test
@@ -121,7 +160,7 @@ internal class FileSystemRepositoryImplTest {
             val actual = underTest.getFileVersionsOption(true)
             verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
             verify(megaApiGateway, times(1)).getFileVersionsOption(any())
-            assertEquals(expectedFileVersionsOption, actual)
+            assertThat(expectedFileVersionsOption).isEqualTo(actual)
         }
 
     @Test
@@ -146,7 +185,7 @@ internal class FileSystemRepositoryImplTest {
             val actual = underTest.getFileVersionsOption(false)
             verify(fileVersionsOptionCache, times(1)).set(expectedFileVersionsOption)
             verify(megaApiGateway, times(1)).getFileVersionsOption(any())
-            assertEquals(expectedFileVersionsOption, actual)
+            assertThat(expectedFileVersionsOption).isEqualTo(actual)
         }
 
     @Test
@@ -186,7 +225,7 @@ internal class FileSystemRepositoryImplTest {
         assertThat(actual).isEqualTo(newPath)
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `test that file not found exception is thrown when local path is null`() = runTest {
         val localPath = "/path/to/local"
         val newPath = "/path/to/new"
@@ -208,10 +247,13 @@ internal class FileSystemRepositoryImplTest {
             isSecondary = false,
         )
         whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenReturn(Unit)
-        underTest.createTempFile(rootPath, syncRecord)
+        assertFailsWith(
+            exceptionClass = IllegalArgumentException::class,
+            block = { underTest.createTempFile(rootPath, syncRecord) }
+        )
     }
 
-    @Test(expected = NotEnoughStorageException::class)
+    @Test
     fun `test that not enough storage exception is thrown when there is not enough storage`() =
         runTest {
             val localPath = "/path/to/local"
@@ -236,10 +278,13 @@ internal class FileSystemRepositoryImplTest {
             whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenThrow(
                 NotEnoughStorageException()
             )
-            underTest.createTempFile(rootPath, syncRecord)
+            assertFailsWith(
+                exceptionClass = NotEnoughStorageException::class,
+                block = { underTest.createTempFile(rootPath, syncRecord) }
+            )
         }
 
-    @Test(expected = FileNotCreatedException::class)
+    @Test
     fun `test that file not created exception is thrown when file creation is not successful`() =
         runTest {
             val localPath = "/path/to/local"
@@ -264,6 +309,24 @@ internal class FileSystemRepositoryImplTest {
             whenever(fileGateway.createTempFile(rootPath, localPath, newPath)).thenThrow(
                 FileNotCreatedException()
             )
-            underTest.createTempFile(rootPath, syncRecord)
+            assertFailsWith(
+                exceptionClass = FileNotCreatedException::class,
+                block = { underTest.createTempFile(rootPath, syncRecord) }
+            )
+        }
+
+    @ParameterizedTest(name = "folder exists: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that the folder could exist`(folderExists: Boolean) = runTest {
+        whenever(fileGateway.isFileAvailable(fileString = any())).thenReturn(folderExists)
+        assertThat(underTest.doesFolderExists("test/folder")).isEqualTo(folderExists)
+    }
+
+    @ParameterizedTest(name = "external directory exists: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that the external storage directory could exist`(externalDirExists: Boolean) =
+        runTest {
+            whenever(fileGateway.doesExternalStorageDirectoryExists()).thenReturn(externalDirExists)
+            assertThat(underTest.doesExternalStorageDirectoryExists()).isEqualTo(externalDirExists)
         }
 }

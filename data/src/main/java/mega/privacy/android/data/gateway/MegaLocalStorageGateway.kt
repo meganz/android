@@ -257,9 +257,10 @@ interface MegaLocalStorageGateway {
     /**
      * Retrieves the Primary Folder local path
      *
-     * @return A [String] that contains the Primary Folder local path, or null if it does not exist
+     * @return A [String] that contains the Primary Folder local path, or an empty [String]
+     * if it does not exist
      */
-    suspend fun getPrimaryFolderLocalPath(): String?
+    suspend fun getPrimaryFolderLocalPath(): String
 
     /**
      * Sets the new Primary Folder local path
@@ -334,10 +335,10 @@ interface MegaLocalStorageGateway {
     /**
      * Retrieves the Primary Folder SD Card URI path
      *
-     * @return A [String] that contains the Primary Folder SD Card URI path, or null if it does not
-     * exist
+     * @return A [String] that contains the Primary Folder SD Card URI path, or an empty [String]
+     * if it does not exist
      */
-    suspend fun getPrimaryFolderSDCardUriPath(): String?
+    suspend fun getPrimaryFolderSDCardUriPath(): String
 
     /**
      * Is secondary media folder enabled
@@ -354,10 +355,10 @@ interface MegaLocalStorageGateway {
     /**
      * Retrieves the Secondary Folder SD Card URI path
      *
-     * @return A [String] that contains the Secondary Folder SD Card URI path, or null if it does not
-     * exist
+     * @return A [String] that contains the Secondary Folder SD Card URI path, or an empty [String]
+     * if it does not exist
      */
-    suspend fun getSecondaryFolderSDCardUriPath(): String?
+    suspend fun getSecondaryFolderSDCardUriPath(): String
 
     /**
      * Should clear sync records

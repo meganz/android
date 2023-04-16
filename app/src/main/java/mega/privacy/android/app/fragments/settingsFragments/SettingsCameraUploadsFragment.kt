@@ -271,9 +271,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             cameraUpload = false
         } else {
             cameraUpload = prefs.camSyncEnabled.toBoolean()
-            if (prefs.cameraFolderExternalSDCard != null) {
-                isExternalSDCardCU = prefs.cameraFolderExternalSDCard.toBoolean()
-            }
             val tempHandle = prefs.camSyncHandle
             if (tempHandle != null) {
                 camSyncHandle = tempHandle.toLongOrNull()
@@ -291,6 +288,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 nodeForCameraSyncDoesNotExist()
             }
 
+            // Setting up the Primary Folder path
+            if (prefs.cameraFolderExternalSDCard != null) {
+                isExternalSDCardCU = prefs.cameraFolderExternalSDCard.toBoolean()
+            }
             camSyncLocalPath = prefs.camSyncLocalPath
             if (camSyncLocalPath.isNullOrBlank() || !isExternalSDCardCU
                 && !FileUtil.isFileAvailable(camSyncLocalPath?.let { File(it) })
@@ -314,6 +315,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     Timber.w("The Directory Name is Null")
                 }
             }
+
+            // Setting up the Secondary Folder path
             if (prefs.secondaryMediaFolderEnabled == null) {
                 dbH.setSecondaryUploadEnabled(false)
                 secondaryUpload = false

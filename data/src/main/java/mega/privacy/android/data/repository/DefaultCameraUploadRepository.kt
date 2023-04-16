@@ -14,7 +14,9 @@ import mega.privacy.android.data.gateway.CacheGateway
 import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
+import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
+import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -58,6 +60,7 @@ import kotlin.coroutines.Continuation
  * @property localStorageGateway [MegaLocalStorageGateway]
  * @property megaApiGateway [MegaApiGateway]
  * @property fileAttributeGateway [FileAttributeGateway]
+ * @property fileGateway [FileGateway]
  * @property cameraUploadMediaGateway [CameraUploadMediaGateway]
  * @property cacheGateway [CacheGateway]
  * @property syncRecordTypeIntMapper [SyncRecordTypeIntMapper]
@@ -67,6 +70,7 @@ import kotlin.coroutines.Continuation
  * @property deviceEventGateway [DeviceEventGateway]
  * @property workerGateway [WorkerGateway]
  * @property videoQualityMapper [VideoQualityMapper]
+ * @property sdCardGateway [SDCardGateway]
  * @property syncStatusIntMapper [SyncStatusIntMapper]
  * @property cameraUploadsHandlesMapper [CameraUploadsHandlesMapper]
  * @property uploadOptionMapper [UploadOptionMapper]
@@ -76,6 +80,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val megaApiGateway: MegaApiGateway,
     private val fileAttributeGateway: FileAttributeGateway,
+    private val fileGateway: FileGateway,
     private val cameraUploadMediaGateway: CameraUploadMediaGateway,
     private val cacheGateway: CacheGateway,
     private val syncRecordTypeIntMapper: SyncRecordTypeIntMapper,
@@ -86,6 +91,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
+    private val sdCardGateway: SDCardGateway,
     private val syncStatusIntMapper: SyncStatusIntMapper,
     private val cameraUploadsHandlesMapper: CameraUploadsHandlesMapper,
     private val videoCompressorGateway: VideoCompressorGateway,
@@ -269,7 +275,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.isSyncEnabled()
     }
 
-    override suspend fun getPrimaryFolderLocalPath(): String? = withContext(ioDispatcher) {
+    override suspend fun getPrimaryFolderLocalPath(): String = withContext(ioDispatcher) {
         localStorageGateway.getPrimaryFolderLocalPath()
     }
 
@@ -330,8 +336,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.setPrimaryFolderInSDCard(isInSDCard)
     }
 
-    override suspend fun getPrimaryFolderSDCardUriPath(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getPrimaryFolderSDCardUriPath()
+    override suspend fun getPrimaryFolderSDCardUriPath(): String = withContext(ioDispatcher) {
+        val uriString = localStorageGateway.getPrimaryFolderSDCardUriPath()
+        sdCardGateway.getDirectoryName(uriString)
     }
 
     override suspend fun isSecondaryMediaFolderEnabled() = withContext(ioDispatcher) {
@@ -342,8 +349,9 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.isSecondaryFolderInSDCard()
     }
 
-    override suspend fun getSecondaryFolderSDCardUriPath(): String? = withContext(ioDispatcher) {
-        localStorageGateway.getSecondaryFolderSDCardUriPath()
+    override suspend fun getSecondaryFolderSDCardUriPath(): String = withContext(ioDispatcher) {
+        val uriString = localStorageGateway.getSecondaryFolderSDCardUriPath()
+        sdCardGateway.getDirectoryName(uriString)
     }
 
     override suspend fun shouldClearSyncRecords() = withContext(ioDispatcher) {
