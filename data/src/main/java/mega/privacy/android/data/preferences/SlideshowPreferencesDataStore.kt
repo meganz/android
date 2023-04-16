@@ -33,6 +33,10 @@ internal class SlideshowPreferencesDataStore @Inject constructor(
         name = "SLIDESHOW_PREFERENCES",
     )
 
+    private lateinit var speedPreferenceKey: Preferences.Key<Int>
+    private lateinit var orderPreferenceKey: Preferences.Key<Int>
+    private lateinit var repeatPreferenceKey: Preferences.Key<Boolean>
+
     companion object {
         private const val speedPreferenceKeyString = "SLIDESHOW_SPEED"
         private const val orderPreferenceKeyString = "SLIDESHOW_ORDER"
@@ -41,89 +45,51 @@ internal class SlideshowPreferencesDataStore @Inject constructor(
 
     override fun monitorSpeedSetting(userHandle: Long): Flow<SlideshowSpeed?> =
         context.dataStore.data.map { prefs ->
-            try {
-                val userKey = stringPreferencesKey("$userHandle")
-                val userPref = prefs[userKey]
-                userPref?.let {
-                    SlideshowSpeed.values().find {
-                        it.id == JSONObject(userPref)[speedPreferenceKeyString]
-                    }
-                }
-            } catch (e: JSONException) {
-                // Default value is normal
-                SlideshowSpeed.Normal
+            speedPreferenceKey = intPreferencesKey(userHandle.toString() + speedPreferenceKeyString)
+            prefs[speedPreferenceKey]?.let { id ->
+                SlideshowSpeed.values().find { it.id == id }
             }
-
         }.flowOn(ioDispatcher)
 
     override suspend fun saveSpeedSetting(userHandle: Long, speed: SlideshowSpeed) {
         withContext(ioDispatcher) {
-            context.dataStore.edit { prefs ->
-                val userKey = stringPreferencesKey("$userHandle")
-                val userPref = prefs[userKey]
-
-                val json = JSONObject(userPref ?: "{}")
-                json.put(speedPreferenceKeyString, speed.id)
-
-                prefs[userKey] = json.toString()
+            speedPreferenceKey = intPreferencesKey(userHandle.toString() + speedPreferenceKeyString)
+            context.dataStore.edit {
+                it[speedPreferenceKey] = speed.id
             }
         }
     }
 
     override fun monitorOrderSetting(userHandle: Long): Flow<SlideshowOrder?> =
         context.dataStore.data.map { prefs ->
-            try {
-                val userKey = stringPreferencesKey("$userHandle")
-                val userPref = prefs[userKey]
-                userPref?.let {
-                    SlideshowOrder.values().find {
-                        it.id == JSONObject(userPref)[orderPreferenceKeyString]
-                    }
-                }
-            } catch (e: JSONException) {
-                // Default value is shuffle
-                SlideshowOrder.Shuffle
+            orderPreferenceKey = intPreferencesKey(userHandle.toString() + orderPreferenceKeyString)
+            prefs[orderPreferenceKey]?.let { id ->
+                SlideshowOrder.values().find { it.id == id }
             }
         }.flowOn(ioDispatcher)
 
     override suspend fun saveOrderSetting(userHandle: Long, order: SlideshowOrder) {
         withContext(ioDispatcher) {
-            context.dataStore.edit { prefs ->
-                val userKey = stringPreferencesKey("$userHandle")
-                val userPref = prefs[userKey]
-
-                val json = JSONObject(userPref ?: "{}")
-                json.put(orderPreferenceKeyString, order.id)
-
-                prefs[userKey] = json.toString()
+            orderPreferenceKey = intPreferencesKey(userHandle.toString() + orderPreferenceKeyString)
+            context.dataStore.edit {
+                it[orderPreferenceKey] = order.id
             }
         }
     }
 
     override fun monitorRepeatSetting(userHandle: Long): Flow<Boolean?> =
         context.dataStore.data.map { prefs ->
-            try {
-                val userKey = stringPreferencesKey("$userHandle")
-                val userPref = prefs[userKey]
-                userPref?.let {
-                    JSONObject(userPref)[repeatPreferenceKeyString] == true
-                }
-            } catch (e: JSONException) {
-                // Default value is off
-                false
-            }
+            repeatPreferenceKey =
+                booleanPreferencesKey(userHandle.toString() + repeatPreferenceKeyString)
+            prefs[repeatPreferenceKey]
         }.flowOn(ioDispatcher)
 
     override suspend fun saveRepeatSetting(userHandle: Long, isRepeat: Boolean) {
         withContext(ioDispatcher) {
-            context.dataStore.edit { prefs ->
-                val userKey = stringPreferencesKey("$userHandle")
-                val userPref = prefs[userKey]
-
-                val json = JSONObject(userPref ?: "{}")
-                json.put(repeatPreferenceKeyString, isRepeat)
-
-                prefs[userKey] = json.toString()
+            repeatPreferenceKey =
+                booleanPreferencesKey(userHandle.toString() + repeatPreferenceKeyString)
+            context.dataStore.edit {
+                it[repeatPreferenceKey] = isRepeat
             }
         }
     }
