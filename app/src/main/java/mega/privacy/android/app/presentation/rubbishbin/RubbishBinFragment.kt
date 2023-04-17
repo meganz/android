@@ -33,9 +33,12 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
@@ -156,7 +159,6 @@ class RubbishBinFragment : Fragment() {
         }
 
         (requireActivity() as ManagerActivity).setToolbarTitle()
-        (requireActivity() as ManagerActivity).invalidateOptionsMenu()
 
         adapter = MegaNodeAdapter(requireActivity(),
             this@RubbishBinFragment,
@@ -251,6 +253,14 @@ class RubbishBinFragment : Fragment() {
         DragToExitSupport.observeDragSupportEvents(viewLifecycleOwner,
             recyclerView,
             Constants.VIEWER_FROM_RUBBISH_BIN)
+        setupObserver()
+    }
+
+    private fun setupObserver() {
+        viewLifecycleOwner.collectFlow(rubbishBinViewModel.state.map { it.nodes.isEmpty() }
+            .distinctUntilChanged()) {
+            requireActivity().invalidateOptionsMenu()
+        }
     }
 
     /**
