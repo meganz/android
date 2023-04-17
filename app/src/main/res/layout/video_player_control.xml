@@ -129,26 +129,13 @@
                 tools:text="04:30" />
 
             <ImageButton
-                android:id="@+id/playlist"
-                style="@style/VideoPlayerButton"
-                android:enabled="false"
-                android:src="@drawable/ic_player_queue"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.9"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white"
-                tools:visibility="visible" />
-
-            <ImageButton
                 android:id="@+id/image_button_lock"
                 style="@style/VideoPlayerButton"
                 android:enabled="false"
                 android:src="@drawable/ic_lock"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.35"
+                app:layout_constraintHorizontal_bias="0.05"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tint="@color/white" />
 
@@ -159,17 +146,7 @@
                 android:src="@drawable/ic_screenshot"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.65"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/repeat_toggle"
-                style="@style/VideoPlayerButton"
-                android:src="@drawable/ic_repeat"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintHorizontal_bias="0.275"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tint="@color/white" />
 
@@ -182,6 +159,29 @@
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toStartOf="parent"
                 app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/repeat_toggle"
+                style="@style/VideoPlayerButton"
+                android:src="@drawable/ic_repeat"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.725"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/playlist"
+                style="@style/VideoPlayerButton"
+                android:enabled="false"
+                android:src="@drawable/ic_player_queue"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.95"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/white"
+                tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

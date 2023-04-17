@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.mediaplayer.mapper.SubtitleFileInfoItemMapper
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
+import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.core.ui.controls.SearchWidgetState
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
@@ -33,7 +34,7 @@ class SelectSubtitleFileViewModel @Inject constructor(
     /**
      * The state for updating the subtitle file info item list
      */
-    var state by mutableStateOf<List<SubtitleFileInfoItem>>(emptyList())
+    var state by mutableStateOf<SubtitleLoadState>(SubtitleLoadState.Loading)
         private set
 
     private val query = MutableStateFlow<String?>(null)
@@ -54,7 +55,11 @@ class SelectSubtitleFileViewModel @Inject constructor(
                 getSubtitleFileInfoList(),
                 ::mapToSubtitleFileInfoItem
             ).collectLatest {
-                state = it
+                state = if (it.isEmpty()) {
+                    SubtitleLoadState.Empty
+                } else {
+                    SubtitleLoadState.Success(it)
+                }
             }
         }
     }

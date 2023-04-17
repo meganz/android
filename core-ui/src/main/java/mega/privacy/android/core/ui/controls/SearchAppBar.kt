@@ -23,11 +23,13 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +37,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+/**
+ * The compose view for search app bar
+ */
 @Composable
 fun SearchAppBar(
     searchWidgetState: SearchWidgetState,
@@ -46,12 +51,15 @@ fun SearchAppBar(
     elevation: Boolean,
     titleId: Int,
     hintId: Int,
+    isHideAfterSearch: Boolean = false,
 ) {
     when (searchWidgetState) {
         SearchWidgetState.COLLAPSED -> {
-            CollapsedSearchAppBar(onBackPressed = onBackPressed,
+            CollapsedSearchAppBar(
+                onBackPressed = onBackPressed,
                 onSearchClicked = onSearchClicked,
-                elevation = elevation, titleId = titleId)
+                elevation = elevation, titleId = titleId
+            )
         }
         SearchWidgetState.EXPANDED -> {
             ExpandedSearchAppBar(
@@ -59,12 +67,16 @@ fun SearchAppBar(
                 hintId = hintId,
                 onSearchTextChange = onSearchTextChange,
                 onCloseClicked = onCloseClicked,
-                elevation = elevation
+                elevation = elevation,
+                isHideAfterSearch = isHideAfterSearch
             )
         }
     }
 }
 
+/**
+ * The collapsed search app bar
+ */
 @Composable
 fun CollapsedSearchAppBar(
     onBackPressed: () -> Unit,
@@ -76,15 +88,19 @@ fun CollapsedSearchAppBar(
 
     TopAppBar(
         title = {
-            Text(text = stringResource(id = titleId),
+            Text(
+                text = stringResource(id = titleId),
                 style = MaterialTheme.typography.subtitle1,
-                fontWeight = FontWeight.Medium)
+                fontWeight = FontWeight.Medium
+            )
         },
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
-                Icon(imageVector = Icons.Filled.ArrowBack,
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back button",
-                    tint = iconColor)
+                    tint = iconColor
+                )
             }
         },
         actions = {
@@ -101,6 +117,10 @@ fun CollapsedSearchAppBar(
     )
 }
 
+/**
+ * The expanded search app bar
+ */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ExpandedSearchAppBar(
     text: String,
@@ -108,6 +128,7 @@ fun ExpandedSearchAppBar(
     onSearchTextChange: (String) -> Unit,
     onCloseClicked: () -> Unit,
     elevation: Boolean,
+    isHideAfterSearch: Boolean = false,
 ) {
     Surface(
         modifier = Modifier
@@ -118,11 +139,12 @@ fun ExpandedSearchAppBar(
     ) {
         val focusRequester = remember { FocusRequester() }
         val iconColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
-
-        TextField(modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 5.dp, end = 5.dp)
-            .focusRequester(focusRequester),
+        val keyboardController = LocalSoftwareKeyboardController.current
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 5.dp, end = 5.dp)
+                .focusRequester(focusRequester),
             value = text,
             onValueChange = { onSearchTextChange(it) },
             placeholder = {
@@ -157,14 +179,20 @@ fun ExpandedSearchAppBar(
                 }
             },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-            keyboardActions = KeyboardActions(onSearch = { onSearchTextChange(text) }),
+            keyboardActions = KeyboardActions(onSearch = {
+                onSearchTextChange(text)
+                if (isHideAfterSearch) {
+                    keyboardController?.hide()
+                }
+            }),
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color.Transparent,
                 cursorColor = MaterialTheme.colors.secondary,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent
-            ))
+            )
+        )
 
         DisposableEffect(Unit) {
             focusRequester.requestFocus()
@@ -173,16 +201,24 @@ fun ExpandedSearchAppBar(
     }
 }
 
+/**
+ * App bar preview
+ */
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkAppBarPreview")
 @Composable
 fun AppBarPreview() {
-    CollapsedSearchAppBar(onBackPressed = {},
+    CollapsedSearchAppBar(
+        onBackPressed = {},
         onSearchClicked = {},
         elevation = false,
-        0)
+        0
+    )
 }
 
+/**
+ * Search app bar preview
+ */
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSearchAppBarPreview")
 @Composable

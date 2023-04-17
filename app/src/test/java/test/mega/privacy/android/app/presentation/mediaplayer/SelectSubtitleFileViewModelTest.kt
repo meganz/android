@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.mediaplayer.SelectSubtitleFileViewModel
 import mega.privacy.android.app.mediaplayer.mapper.SubtitleFileInfoItemMapper
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
+import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
 import org.junit.After
@@ -50,8 +51,8 @@ internal class SelectSubtitleFileViewModelTest {
         underTest.getSubtitleFileInfoList()
         scheduler.advanceUntilIdle()
         assertThat(
-            underTest.state
-        ).isEmpty()
+            underTest.state is SubtitleLoadState.Empty
+        ).isTrue()
     }
 
     @Test
@@ -108,7 +109,7 @@ internal class SelectSubtitleFileViewModelTest {
         underTest.getSubtitleFileInfoList()
         scheduler.advanceUntilIdle()
         assertThat(
-            underTest.state
+            (underTest.state as SubtitleLoadState.Success).items
         ).isEqualTo(
             expectedSubtitleFileInfoItemList
         )

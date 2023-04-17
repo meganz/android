@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -31,7 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -46,12 +47,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
+import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.core.ui.controls.SearchAppBar
+import mega.privacy.android.core.ui.controls.SearchWidgetState
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import timber.log.Timber
 
@@ -67,21 +72,34 @@ internal fun SelectSubtitleFileView(
     onBackPressedCallback: () -> Unit,
 ) {
     val viewModel: SelectSubtitleFileViewModel = viewModel()
-
+    val isEmpty = viewModel.state is SubtitleLoadState.Empty
+    val isLoading = viewModel.state is SubtitleLoadState.Loading
+    val items = if (viewModel.state is SubtitleLoadState.Success) {
+        (viewModel.state as SubtitleLoadState.Success).items
+    } else {
+        emptyList()
+    }
+    val selectedSubtitleFileInfo by viewModel.getSelectedSubtitleFileInfoFlow()
+        .collectAsStateWithLifecycle()
+    val query by viewModel.getQueryStateFlow().collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         viewModel.getSubtitleFileInfoList()
     }
 
     Scaffold(
         topBar = {
-            if (viewModel.getSelectedSubtitleFileInfoFlow().collectAsState().value != null) {
-                SelectedTopBar {
-                    onBackPressedCallback()
-                }
-            } else {
-                SearchAppBar(
+            when {
+                isEmpty && isLoading && viewModel.searchState != SearchWidgetState.EXPANDED ->
+                    EmptyTopBar {
+                        onBackPressedCallback()
+                    }
+                selectedSubtitleFileInfo != null ->
+                    SelectedTopBar {
+                        onBackPressedCallback()
+                    }
+                else -> SearchAppBar(
                     searchWidgetState = viewModel.searchState,
-                    typedSearch = viewModel.getQueryStateFlow().collectAsState().value ?: "",
+                    typedSearch = query ?: "",
                     onSearchTextChange = { search ->
                         viewModel.searchQuery(search)
                     },
@@ -94,7 +112,8 @@ internal fun SelectSubtitleFileView(
                     },
                     elevation = false,
                     titleId = R.string.media_player_video_select_subtitle_file_title,
-                    hintId = R.string.hint_action_search
+                    hintId = R.string.hint_action_search,
+                    isHideAfterSearch = true
                 )
             }
         }) { innerPadding ->
@@ -110,11 +129,23 @@ internal fun SelectSubtitleFileView(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    if (viewModel.state.isEmpty()) {
-                        SubtitleEmptyView(modifier = Modifier.fillMaxSize())
-                    } else {
-                        SubtitleFileInfoListView(
-                            subtitleInfoList = viewModel.state,
+                    when {
+                        isLoading -> Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                            content = {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(44.dp),
+                                    color = teal_300,
+                                )
+                            },
+                        )
+                        isEmpty || items.isEmpty() -> SubtitleEmptyView(
+                            modifier = Modifier.fillMaxSize(),
+                            isSearchMode = viewModel.searchState == SearchWidgetState.EXPANDED
+                        )
+                        else -> SubtitleFileInfoListView(
+                            subtitleInfoList = items,
                         ) { index ->
                             viewModel.itemClickedUpdate(index)
                         }
@@ -140,15 +171,18 @@ internal fun SelectSubtitleFileView(
 
                 Button(
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 24.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = colorResource(id = R.color.teal_300)),
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = colorResource(id = R.color.teal_300),
+                        disabledBackgroundColor = colorResource(id = R.color.teal_100)
+                    ),
                     onClick = {
                         onAddSubtitleCallback(viewModel.getSelectedSubtitleFileInfoFlow().value)
                     },
-                    enabled = viewModel.state.firstOrNull { it.selected } != null
+                    enabled = items.firstOrNull { it.selected } != null
                 ) {
                     Text(
                         text = stringResource(id = R.string.media_player_video_select_subtitle_file_button_add_subtitles),
-                        color = Color.White
+                        color = colorResource(id = R.color.white_dark_grey)
                     )
                 }
             }
@@ -234,18 +268,31 @@ internal fun SubtitleFileInfoListItem(
  * The empty view of subtitle
  */
 @Composable
-internal fun SubtitleEmptyView(modifier: Modifier) {
+internal fun SubtitleEmptyView(
+    modifier: Modifier,
+    isSearchMode: Boolean,
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.ic_subtitles_empty),
+            painter = if (isSearchMode) {
+                painterResource(id = R.drawable.ic_no_search_results)
+            } else {
+                painterResource(id = R.drawable.ic_subtitles_empty)
+            },
             contentDescription = null,
         )
         Text(
-            text = stringResource(id = R.string.media_player_video_select_subtitle_file_empty_message),
+            text = stringResource(
+                id = if (isSearchMode) {
+                    R.string.no_results_found
+                } else {
+                    R.string.media_player_video_select_subtitle_file_empty_message
+                }
+            ).uppercase(),
             color = colorResource(id = R.color.grey_300)
         )
     }
@@ -279,7 +326,9 @@ internal fun SubtitleFileInfoListView(
 }
 
 @Composable
-internal fun SelectedTopBar(onBackPressedCallback: () -> Unit) {
+internal fun SelectedTopBar(
+    onBackPressedCallback: () -> Unit,
+) {
     TopAppBar(
         title = {
             Text(
@@ -295,6 +344,31 @@ internal fun SelectedTopBar(onBackPressedCallback: () -> Unit) {
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back button",
                     tint = colorResource(id = R.color.teal_300)
+                )
+            }
+        },
+        backgroundColor = MaterialTheme.colors.surface,
+        elevation = 0.dp
+    )
+}
+
+@Composable
+internal fun EmptyTopBar(
+    onBackPressedCallback: () -> Unit,
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = R.string.media_player_video_select_subtitle_file_title),
+                style = MaterialTheme.typography.subtitle1,
+                fontWeight = FontWeight.Medium
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackPressedCallback) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    contentDescription = "Back button"
                 )
             }
         },
@@ -323,7 +397,21 @@ private fun PreviewSelectSubtitleFileView() {
 @Composable
 private fun PreviewSubtitleEmptyView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        SubtitleEmptyView(Modifier.fillMaxSize())
+        SubtitleEmptyView(
+            Modifier.fillMaxSize(),
+            false
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewSubtitleEmptyViewWhenSearchMode() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        SubtitleEmptyView(
+            Modifier.fillMaxSize(),
+            true
+        )
     }
 }
 

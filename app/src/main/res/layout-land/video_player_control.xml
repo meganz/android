@@ -130,6 +130,48 @@
                 tools:text="04:30" />
 
             <ImageButton
+                android:id="@+id/image_button_lock"
+                style="@style/VideoPlayerButton"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:enabled="false"
+                android:src="@drawable/ic_lock"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/image_screenshot"
+                style="@style/VideoPlayerButton"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:enabled="false"
+                android:src="@drawable/ic_screenshot"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/subtitle"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/subtitle"
+                style="@style/VideoPlayerButton"
+                android:src="@drawable/ic_subtitles_disable"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/repeat_toggle"
+                app:tint="@color/white" />
+
+            <ImageButton
+                android:id="@+id/repeat_toggle"
+                style="@style/VideoPlayerButton"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/ic_repeat"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/playlist"
+                app:tint="@color/white" />
+
+            <ImageButton
                 android:id="@+id/playlist"
                 style="@style/VideoPlayerButton"
                 android:layout_marginEnd="5dp"
@@ -141,49 +183,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:tint="@color/white"
                 tools:visibility="visible" />
-
-            <ImageButton
-                android:id="@+id/image_button_lock"
-                style="@style/VideoPlayerButton"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:enabled="false"
-                android:src="@drawable/ic_lock"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/image_screenshot"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/image_screenshot"
-                style="@style/VideoPlayerButton"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:enabled="false"
-                android:src="@drawable/ic_screenshot"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/playlist"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/repeat_toggle"
-                style="@style/VideoPlayerButton"
-                android:layout_marginStart="5dp"
-                android:layout_marginBottom="5dp"
-                android:src="@drawable/ic_repeat"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:tint="@color/white" />
-
-            <ImageButton
-                android:id="@+id/subtitle"
-                style="@style/VideoPlayerButton"
-                android:src="@drawable/ic_subtitles_disable"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:tint="@color/white" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
