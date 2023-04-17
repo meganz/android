@@ -23,7 +23,7 @@ import mega.privacy.android.core.ui.theme.teal_300_alpha_038
 import mega.privacy.android.core.ui.theme.white
 
 @Composable
-fun TextMegaButton(
+fun RaisedDefaultMegaButton(
     modifier: Modifier = Modifier,
     textId: Int,
     onClick: () -> Unit,
