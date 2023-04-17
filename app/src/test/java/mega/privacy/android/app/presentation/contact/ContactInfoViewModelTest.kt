@@ -40,6 +40,7 @@ import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import org.junit.After
 import org.junit.Before
@@ -75,6 +76,7 @@ class ContactInfoViewModelTest {
     private lateinit var getInSharesUseCase: GetInSharesUseCase
     private lateinit var monitorChatCallUpdates: MonitorChatCallUpdates
     private lateinit var monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase
+    private lateinit var monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -142,6 +144,7 @@ class ContactInfoViewModelTest {
             getInSharesUseCase,
             monitorChatCallUpdates,
             monitorChatSessionUpdatesUseCase,
+            monitorUpdatePushNotificationSettingsUseCase,
             standardDispatcher,
             testScope,
         )
@@ -169,6 +172,7 @@ class ContactInfoViewModelTest {
         getInSharesUseCase = mock()
         monitorChatCallUpdates = mock()
         monitorChatSessionUpdatesUseCase = mock()
+        monitorUpdatePushNotificationSettingsUseCase = mock()
     }
 
     @After

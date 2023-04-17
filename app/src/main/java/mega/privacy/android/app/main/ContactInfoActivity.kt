@@ -51,7 +51,6 @@ import mega.privacy.android.app.components.AppBarStateChangeListener
 import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.components.twemoji.EmojiEditText
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_DESTROY_ACTION_MODE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_MANAGE_SHARE
@@ -206,19 +205,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             sharedFoldersFragment?.clearSelections()
             sharedFoldersFragment?.hideMultipleSelect()
             statusDialog?.dismiss()
-        }
-    }
-
-    private val chatRoomMuteUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == ACTION_UPDATE_PUSH_NOTIFICATION_SETTING) {
-                ChatUtil.checkSpecificChatNotifications(
-                    chatHandle,
-                    contentContactProperties.notificationSwitch,
-                    contentContactProperties.notificationsMutedText,
-                    this@ContactInfoActivity
-                )
-            }
         }
     }
 
@@ -612,10 +598,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             IntentFilter(BROADCAST_ACTION_INTENT_MANAGE_SHARE)
         )
         registerReceiver(
-            chatRoomMuteUpdateReceiver,
-            IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
-        )
-        registerReceiver(
             retentionTimeReceiver,
             IntentFilter(ACTION_UPDATE_RETENTION_TIME)
         )
@@ -995,6 +977,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 }
                 sendFileToChat()
             }
+
             R.id.action_return_call -> {
                 CallUtil.returnActiveCall(this, passcodeManagement)
                 return true
@@ -1072,6 +1055,15 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             if (contactInfoState.isUserRemoved) {
                 finish()
             }
+            if (contactInfoState.isPushNotificationSettingsUpdatedEvent) {
+                ChatUtil.checkSpecificChatNotifications(
+                    chatHandle,
+                    contentContactProperties.notificationSwitch,
+                    contentContactProperties.notificationsMutedText,
+                    this@ContactInfoActivity
+                )
+                viewModel.onConsumePushNotificationSettingsUpdateEvent()
+            }
             if (contactInfoState.error != null) {
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
@@ -1145,6 +1137,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             Constants.REQUEST_RECORD_AUDIO -> if (CallUtil.checkCameraPermission(this)) {
                 startCall()
             }
+
             Constants.REQUEST_CAMERA -> startCall()
         }
         nodeSaver.handleRequestPermissionsResult(requestCode)
@@ -1327,7 +1320,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         megaApi.removeGlobalListener(megaGlobalListenerInterface)
         megaApi.removeRequestListener(this)
         megaChatApi.removeChatRequestListener(megaChatRequestListenerInterface)
-        unregisterReceiver(chatRoomMuteUpdateReceiver)
         unregisterReceiver(retentionTimeReceiver)
         unregisterReceiver(manageShareReceiver)
         unregisterReceiver(destroyActionModeReceiver)

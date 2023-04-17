@@ -90,7 +90,7 @@ class GlobalListener @Inject constructor(
                 LiveEventBus.get(EVENT_USER_VISIBILITY_CHANGE, Long::class.java)
                     .post(user.handle)
             }
-            if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && isMyChange) {
+            if (user.hasChanged(MegaUser.CHANGE_TYPE_PUSH_SETTINGS) && user.isOwnChange == 0) {
                 pushNotificationSettingManagement.updateMegaPushNotificationSetting()
             }
             if (user.hasChanged(MegaUser.CHANGE_TYPE_MY_CHAT_FILES_FOLDER) && isMyChange) {
@@ -210,12 +210,9 @@ class GlobalListener @Inject constructor(
                 val state = storageStateMapper(event.number.toInt())
                 Timber.d("EVENT_STORAGE: $state")
                 when (state) {
-                    StorageState.Change -> {
-                        refreshAccountDetail()
-                    }
-                    StorageState.PayWall -> {
-                        showOverDiskQuotaPaywallWarning()
-                    }
+                    StorageState.Change -> refreshAccountDetail()
+                    StorageState.PayWall -> showOverDiskQuotaPaywallWarning()
+
                     else -> {
                         val intent =
                             Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS).apply {
@@ -226,6 +223,7 @@ class GlobalListener @Inject constructor(
                     }
                 }
             }
+
             MegaEvent.EVENT_ACCOUNT_BLOCKED -> {
                 Timber.d("EVENT_ACCOUNT_BLOCKED: %s", event.number)
                 appContext.sendBroadcast(
@@ -234,6 +232,7 @@ class GlobalListener @Inject constructor(
                         .putExtra(BroadcastConstants.EVENT_TEXT, event.text)
                 )
             }
+
             MegaEvent.EVENT_BUSINESS_STATUS -> sendBroadcastUpdateAccountDetails()
             MegaEvent.EVENT_MISC_FLAGS_READY -> checkEnabledCookies()
             MegaEvent.EVENT_RELOADING -> showLoginFetchingNodes()

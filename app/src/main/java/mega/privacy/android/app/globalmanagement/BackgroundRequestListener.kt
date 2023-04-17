@@ -18,6 +18,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
+import mega.privacy.android.domain.usecase.setting.BroadcastPushNotificationSettingsUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -54,19 +55,20 @@ class BackgroundRequestListener @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
     private val getFullAccountInfo: GetFullAccountInfo,
     private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
+    private val broadcastPushNotificationSettingsUseCase: BroadcastPushNotificationSettingsUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
      */
     override fun onRequestStart(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("BackgroundRequestListener:onRequestStart: %s", request.requestString)
+        Timber.d("BackgroundRequestListener:onRequestStart: ${request.requestString}")
     }
 
     /**
      * On request update
      */
     override fun onRequestUpdate(api: MegaApiJava, request: MegaRequest) {
-        Timber.d("BackgroundRequestListener:onRequestUpdate: %s", request.requestString)
+        Timber.d("BackgroundRequestListener:onRequestUpdate: ${request.requestString}")
     }
 
     /**
@@ -77,12 +79,7 @@ class BackgroundRequestListener @Inject constructor(
         request: MegaRequest,
         e: MegaError,
     ) {
-        Timber.d(
-            "BackgroundRequestListener:onRequestFinish: %s____%d___%d",
-            request.requestString,
-            e.errorCode,
-            request.paramType
-        )
+        Timber.d("BackgroundRequestListener:onRequestFinish: ${request.requestString}____${e.errorCode}___${request.paramType}")
         if (e.errorCode == MegaError.API_EPAYWALL) {
             showOverDiskQuotaPaywallWarning()
             return
@@ -104,6 +101,7 @@ class BackgroundRequestListener @Inject constructor(
         if (request.paramType == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
             if (e.errorCode == MegaError.API_OK) {
                 pushNotificationSettingManagement.sendPushNotificationSettings(request.megaPushNotificationSettings)
+                applicationScope.launch { broadcastPushNotificationSettingsUseCase() }
             } else {
                 Timber.e("Chat notification settings cannot be updated")
             }
@@ -114,27 +112,35 @@ class BackgroundRequestListener @Inject constructor(
         if (request.paramType == MegaApiJava.USER_ATTR_PUSH_SETTINGS) {
             if (e.errorCode == MegaError.API_OK || e.errorCode == MegaError.API_ENOENT) {
                 pushNotificationSettingManagement.sendPushNotificationSettings(request.megaPushNotificationSettings)
+                applicationScope.launch { broadcastPushNotificationSettingsUseCase() }
             }
         } else if (e.errorCode == MegaError.API_OK) {
             if (request.paramType == MegaApiJava.USER_ATTR_FIRSTNAME || request.paramType == MegaApiJava.USER_ATTR_LASTNAME) {
                 request.email?.let { email ->
                     megaApi.getContact(email)?.let { user ->
-                        Timber.d("User handle: %s", user.handle)
-                        Timber.d("Visibility: %s",
-                            user.visibility) //If user visibility == MegaUser.VISIBILITY_UNKNOWN then, non contact
+                        Timber.d("User handle: ${user.handle}")
+                        Timber.d("Visibility: ${user.visibility}") //If user visibility == MegaUser.VISIBILITY_UNKNOWN then, non contact
                         if (user.visibility != MegaUser.VISIBILITY_VISIBLE) {
                             Timber.d("Non-contact")
                             when (request.paramType) {
                                 MegaApiJava.USER_ATTR_FIRSTNAME -> {
-                                    dbH.setNonContactEmail(request.email,
-                                        user.handle.toString() + "")
-                                    dbH.setNonContactFirstName(request.text,
-                                        user.handle.toString() + "")
+                                    dbH.setNonContactEmail(
+                                        request.email,
+                                        user.handle.toString() + ""
+                                    )
+                                    dbH.setNonContactFirstName(
+                                        request.text,
+                                        user.handle.toString() + ""
+                                    )
                                 }
+
                                 MegaApiJava.USER_ATTR_LASTNAME -> {
-                                    dbH.setNonContactLastName(request.text,
-                                        user.handle.toString() + "")
+                                    dbH.setNonContactLastName(
+                                        request.text,
+                                        user.handle.toString() + ""
+                                    )
                                 }
+
                                 else -> {}
                             }
                         } else {
@@ -184,8 +190,11 @@ class BackgroundRequestListener @Inject constructor(
         } else if (e.errorCode == MegaError.API_EINCOMPLETE) {
             if (request.paramType == MegaError.API_ESSL) {
                 Timber.w("SSL verification failed")
-                application.sendBroadcast(Intent(
-                    BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED))
+                application.sendBroadcast(
+                    Intent(
+                        BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
+                    )
+                )
             }
         } else if (e.errorCode == MegaError.API_ESID) {
             Timber.w("TYPE_LOGOUT:API_ESID")
@@ -205,8 +214,7 @@ class BackgroundRequestListener @Inject constructor(
         api: MegaApiJava,
         request: MegaRequest, e: MegaError,
     ) {
-        Timber.d("BackgroundRequestListener: onRequestTemporaryError: %s",
-            request.requestString)
+        Timber.d("BackgroundRequestListener: onRequestTemporaryError: ${request.requestString}")
     }
 
     private fun askForFullAccountInfo() {

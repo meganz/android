@@ -5,6 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
@@ -30,6 +31,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property ioDispatcher      Required for launching coroutines.
  * @property megaChatApi       Required for notifying about pushes.
  * @property chatRequestMapper [ChatRequestMapper]
+ * @property appEventGateway    Required for getting app events
  */
 internal class DefaultPushesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -37,6 +39,7 @@ internal class DefaultPushesRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaChatApi: MegaChatApiGateway,
     private val chatRequestMapper: ChatRequestMapper,
+    private val appEventGateway: AppEventGateway,
 ) : PushesRepository {
 
     override fun getPushToken(): String =
@@ -100,6 +103,13 @@ internal class DefaultPushesRepository @Inject constructor(
                 continuation.failWithError(error, "onRequestPushReceivedCompleted")
             }
         }
+
+    override suspend fun broadcastPushNotificationSettings() = withContext(ioDispatcher) {
+        appEventGateway.broadcastPushNotificationSettings()
+    }
+
+    override fun monitorPushNotificationSettings() =
+        appEventGateway.monitorPushNotificationSettings()
 
     companion object {
         private const val PUSH_TOKEN = "PUSH_TOKEN"

@@ -126,4 +126,14 @@ internal interface AppEventGateway {
      * Broadcast paused transfers.
      */
     suspend fun broadcastPausedTransfers()
+
+    /**
+     * Broadcast push notification settings
+     */
+    suspend fun broadcastPushNotificationSettings()
+
+    /**
+     * Monitor push notification settings
+     */
+    fun monitorPushNotificationSettings(): Flow<Boolean>
 }

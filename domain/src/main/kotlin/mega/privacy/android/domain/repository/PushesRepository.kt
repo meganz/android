@@ -1,5 +1,6 @@
 package mega.privacy.android.domain.repository
 
+import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
 
 /**
@@ -43,4 +44,14 @@ interface PushesRepository {
      *
      */
     suspend fun clearPushToken()
+
+    /**
+     * Broadcast push notification settings update
+     */
+    suspend fun broadcastPushNotificationSettings()
+
+    /**
+     * Monitor push notification settings update
+     */
+    fun monitorPushNotificationSettings(): Flow<Boolean>
 }

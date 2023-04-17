@@ -16,8 +16,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
-import com.jeremyliao.liveeventbus.LiveEventBus;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -75,7 +73,6 @@ public class PushNotificationSettingManagement {
     public void sendPushNotificationSettings(MegaPushNotificationSettings receivedPush) {
         push = receivedPush != null ? MegaPushNotificationSettingsAndroid.copy(receivedPush) : MegaPushNotificationSettings.createInstance();
         application.sendBroadcast(new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
-        LiveEventBus.get(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING).post(null);
     }
 
     /**

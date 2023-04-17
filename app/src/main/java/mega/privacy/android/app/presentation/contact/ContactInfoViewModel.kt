@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
@@ -110,6 +111,7 @@ class ContactInfoViewModel @Inject constructor(
     private val getInSharesUseCase: GetInSharesUseCase,
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
+    private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : BaseRxViewModel() {
@@ -152,6 +154,13 @@ class ContactInfoViewModel @Inject constructor(
         getContactUpdates()
         monitorCallUpdates()
         monitorChatSessionUpdates()
+        chatMuteUpdates()
+    }
+
+    private fun chatMuteUpdates() = viewModelScope.launch {
+        monitorUpdatePushNotificationSettingsUseCase().collect {
+            _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
+        }
     }
 
     private fun monitorChatSessionUpdates() = viewModelScope.launch {
@@ -435,6 +444,15 @@ class ContactInfoViewModel @Inject constructor(
     fun onConsumeChatCallStatusChangeEvent() {
         viewModelScope.launch {
             _state.update { it.copy(callStatusChanged = false) }
+        }
+    }
+
+    /**
+     * on Consume Push notification settings updated event
+     */
+    fun onConsumePushNotificationSettingsUpdateEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = false) }
         }
     }
 

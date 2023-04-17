@@ -27,6 +27,7 @@ internal class AppEventFacade @Inject constructor(
     private val accountUpdate = MutableSharedFlow<Boolean>()
     private val pausedTransfers = MutableSharedFlow<Boolean>()
     private val _transferFailed = MutableSharedFlow<Boolean>()
+    private val pushNotificationSettingsUpdate = MutableSharedFlow<Boolean>()
 
     private val _isSMSVerificationShownState = MutableStateFlow(false)
     private val _finishActivity = MutableSharedFlow<Boolean>()
@@ -90,6 +91,12 @@ internal class AppEventFacade @Inject constructor(
     override fun monitorPausedTransfers() = pausedTransfers.asSharedFlow()
 
     override suspend fun broadcastPausedTransfers() = pausedTransfers.emit(true)
+
+    override suspend fun broadcastPushNotificationSettings() =
+        pushNotificationSettingsUpdate.emit(true)
+
+    override fun monitorPushNotificationSettings() =
+        pushNotificationSettingsUpdate.toSharedFlow(appScope)
 }
 
 private fun <T> Flow<T>.toSharedFlow(
