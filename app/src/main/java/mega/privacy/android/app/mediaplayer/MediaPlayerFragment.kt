@@ -19,6 +19,7 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.collectAsState
@@ -144,7 +145,7 @@ class MediaPlayerFragment : Fragment() {
                 )?.let { info ->
                     info.url?.let {
                         viewModel.updateSubtitleInfoByAddSubtitles(info)
-                    }
+                    } ?: Timber.d("The subtitle file url is null")
                     viewModel.showSubtitle(true)
                 } ?: viewModel.showSubtitle(false)
                 viewModel.showSubtitleDialog(false)
@@ -694,10 +695,10 @@ class MediaPlayerFragment : Fragment() {
                             info.url?.let {
                                 viewModel.updateCurrentSubtitleFileInfo(info)
                                 viewModel.showSubtitle(true)
-                                viewModel.showSubtitleDialog(false)
                                 viewModel.updateSubtitleInfoByAddSubtitles(null)
                                 viewModel.sendAutoMatchSubtitleClickedEvent()
-                            }
+                            } ?: Timber.d("The subtitle file url is null")
+                            viewModel.showSubtitleDialog(false)
                         },
                         onToSelectSubtitle = {
                             viewModel.sendOpenSelectSubtitlePageEvent()

@@ -336,6 +336,7 @@ class MediaPlayerFacade @Inject constructor(
             player.setMediaItem(mediaItem, oldPosition)
             player.prepare()
             player.play()
+            showSubtitle()
         }
     }
 

@@ -117,14 +117,13 @@ internal fun SelectSubtitleFileView(
                 )
             }
         }) { innerPadding ->
-        Box(
+        Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .background(color = colorResource(id = R.color.white_dark_grey)),
-            contentAlignment = Alignment.BottomEnd
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -153,7 +152,9 @@ internal fun SelectSubtitleFileView(
                 }
             }
             Row(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
