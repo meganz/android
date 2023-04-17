@@ -15,6 +15,8 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 /**
@@ -105,6 +107,43 @@ class ScheduleMeetingViewModel @Inject constructor(
                     snackBar = R.string.number_of_participants
                 )
             }
+        }
+    }
+
+    /**
+     * Set start date
+     *
+     * @param newDate   Start Date
+     */
+    fun setStartDate(newDate: Instant) {
+        if (newDate.isBefore(Instant.now())) return
+
+        _state.update { state ->
+            if (state.endDate.isAfter(newDate)) {
+                state.copy(
+                    startDate = newDate,
+                )
+            } else {
+                state.copy(
+                    startDate = newDate,
+                    endDate = newDate.plus(1, ChronoUnit.HOURS)
+                )
+            }
+        }
+    }
+
+    /**
+     * Set end date
+     *
+     * @param newDate   End Date
+     */
+    fun setEndDate(newDate: Instant) {
+        if (newDate.isBefore(state.value.startDate)) return
+
+        _state.update {
+            it.copy(
+                endDate = newDate
+            )
         }
     }
 

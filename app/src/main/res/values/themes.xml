@@ -124,6 +124,9 @@
         <item name="textAppearanceButton">@style/TextAppearance.Mega.Button</item>
         <!-- In material design, TextInputLayout hint,error,helper text, BNV item text, etc. -->
         <item name="textAppearanceCaption">@style/TextAppearance.Mega.Caption</item>
+
+        <item name="materialCalendarTheme">@style/ThemeOverlay.Mega.DatePicker</item>
+        <item name="materialTimePickerTheme">@style/ThemeOverlay.Mega.TimePicker</item>
     </style>
 
     <style name="Theme.Mega.FullScreen" parent="Theme.Mega">

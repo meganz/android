@@ -2,7 +2,8 @@ package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.app.presentation.meeting.ScheduleMeetingViewModel
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
-import java.util.TimeZone
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 /**
  * Data class defining the state of [ScheduleMeetingViewModel]
@@ -22,11 +23,11 @@ import java.util.TimeZone
  * @property openAddContact                         True, if should open Add contact screen. False, if not.
  * @property numOfParticipants                      Number of participants.
  */
-data class ScheduleMeetingState(
+data class ScheduleMeetingState constructor(
     val meetingName: String? = null,
     val freq: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
-    val startDate: TimeZone? = null,
-    val endDate: TimeZone? = null,
+    val startDate: Instant = Instant.now(),
+    val endDate: Instant = Instant.now().plus(1, ChronoUnit.HOURS),
     val participantItemList: List<Long> = emptyList(),
     val finish: Boolean = false,
     val buttons: List<ScheduleMeetingAction> = ScheduleMeetingAction.values().asList(),
@@ -37,40 +38,4 @@ data class ScheduleMeetingState(
     val addParticipantsNoContactsDialog: Boolean = false,
     val openAddContact: Boolean? = null,
     val numOfParticipants: Int = 1,
-) {
-    /**
-     * Get start meeting time
-     *
-     * @return  start time
-     */
-    fun getStartTime(): String {
-        return "10:00"
-    }
-
-    /**
-     * Get start meeting date
-     *
-     * @return  start date
-     */
-    fun getStartDate(): String {
-        return "Fri, 5 Aug, 2022"
-    }
-
-    /**
-     * Get end meeting time
-     *
-     * @return  end time
-     */
-    fun getEndTime(): String {
-        return "11:00"
-    }
-
-    /**
-     * Get end meeting date
-     *
-     * @return  end date
-     */
-    fun getEndDate(): String {
-        return "Fri, 5 Aug, 2022"
-    }
-}
+)

@@ -774,4 +774,14 @@
         <item name="android:popupBackground">@color/grey_800</item>
         <item name="actionModeBackground">@color/grey_800</item>
     </style>
+
+    <style name="ThemeOverlay.Mega.DatePicker" parent="@style/ThemeOverlay.MaterialComponents.MaterialCalendar">
+        <item name="colorPrimary">?colorSecondary</item>
+        <item name="colorOnPrimary">?colorOnSecondary</item>
+    </style>
+
+    <style name="ThemeOverlay.Mega.TimePicker" parent="@style/ThemeOverlay.MaterialComponents.TimePicker">
+        <item name="colorPrimary">?colorSecondary</item>
+        <item name="colorOnPrimary">?colorOnSecondary</item>
+    </style>
 </resources>

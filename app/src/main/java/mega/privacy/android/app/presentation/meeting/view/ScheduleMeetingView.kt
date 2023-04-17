@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.view
 
 import android.content.res.Configuration
+import android.text.format.DateFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -47,6 +48,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -59,22 +61,36 @@ import mega.privacy.android.app.presentation.chat.dialog.view.SimpleDialog
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.extensions.icon
 import mega.privacy.android.app.presentation.extensions.title
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.grey_alpha_054
-import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.core.ui.controls.CustomDivider
 import mega.privacy.android.core.ui.controls.MegaSwitch
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_038
+import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.secondary_dark
 import mega.privacy.android.core.ui.theme.secondary_light
+import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_038
+import mega.privacy.android.core.ui.theme.white_alpha_054
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+private var is24hourFormat: Boolean = false
+private val timeFormatter by lazy {
+    DateTimeFormatter
+        .ofPattern(if (is24hourFormat) "HH:mm" else "hh:mma")
+        .withZone(ZoneId.systemDefault())
+}
+private val dateFormatter by lazy {
+    DateTimeFormatter
+        .ofPattern("E',' d MMM',' yyyy")
+        .withZone(ZoneId.systemDefault())
+}
 
 /**
  * Schedule meeting View
@@ -94,6 +110,7 @@ internal fun ScheduleMeetingView(
     onSnackbarShown: () -> Unit,
     onDiscardMeetingDialog: () -> Unit,
 ) {
+    is24hourFormat = DateFormat.is24HourFormat(LocalContext.current)
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val snackbarHostState = remember { SnackbarHostState() }
@@ -195,7 +212,7 @@ private fun ScheduledMeetingDateAndTime(
             .height(56.dp)
     ) {
         Text(
-            text = if (isStart) state.getStartDate() else state.getEndDate(),
+            text = dateFormatter.format(if (isStart) state.startDate else state.endDate),
             modifier = Modifier
                 .align(Alignment.CenterStart)
                 .clickable { onDateClicked() },
@@ -203,7 +220,7 @@ private fun ScheduledMeetingDateAndTime(
             color = grey_alpha_087.takeIf { isLight() } ?: white)
 
         Text(
-            text = if (isStart) state.getStartTime() else state.getEndTime(),
+            text = timeFormatter.format(if (isStart) state.startDate else state.endDate),
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .clickable { onTimeClicked() },
@@ -490,8 +507,6 @@ fun PreviewDiscardMeetingAlertDialog() {
         DiscardMeetingAlertDialog(state = ScheduleMeetingState(
             meetingName = "Title meeting",
             freq = OccurrenceFrequencyType.Invalid,
-            startDate = null,
-            endDate = null,
             participantItemList = emptyList(),
             finish = false,
             buttons = ScheduleMeetingAction.values().asList(),
@@ -515,8 +530,6 @@ private fun PreviewScheduleMeetingView() {
             state = ScheduleMeetingState(
                 meetingName = "Title meeting",
                 freq = OccurrenceFrequencyType.Invalid,
-                startDate = null,
-                endDate = null,
                 participantItemList = emptyList(),
                 finish = false,
                 buttons = ScheduleMeetingAction.values().asList(),

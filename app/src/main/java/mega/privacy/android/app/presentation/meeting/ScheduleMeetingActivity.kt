@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.meeting
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.format.DateFormat
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,6 +13,11 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
@@ -21,14 +27,16 @@ import mega.privacy.android.app.main.AddContactActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
+import mega.privacy.android.app.presentation.meeting.view.ScheduleMeetingView
 import mega.privacy.android.app.presentation.security.PasscodeCheck
+import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
-import mega.privacy.android.core.ui.theme.AndroidTheme
 import timber.log.Timber
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
-import mega.privacy.android.app.presentation.meeting.view.ScheduleMeetingView
-import mega.privacy.android.app.utils.Constants
 
 /**
  * Activity which shows scheduled meeting info screen.
@@ -109,16 +117,74 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                 onButtonClicked = ::onActionTap,
                 onDiscardClicked = { viewModel.onDiscardMeetingTap() },
                 onAcceptClicked = { },
-                onStartTimeClicked = { },
-                onStartDateClicked = { },
-                onEndTimeClicked = { },
-                onEndDateClicked = { },
+                onStartTimeClicked = { showTimePicker(true) },
+                onStartDateClicked = { showDatePicker(true) },
+                onEndTimeClicked = { showTimePicker(false) },
+                onEndDateClicked = { showDatePicker(false) },
                 onScrollChange = { scrolled -> this.changeStatusBarColor(scrolled, isDark) },
                 onDismiss = { viewModel.dismissDialog() },
                 onSnackbarShown = viewModel::snackbarShown,
                 onDiscardMeetingDialog = { finish() },
             )
         }
+    }
+
+    private fun showDatePicker(isStart: Boolean) {
+        val currentState = viewModel.state.value
+        val currentDate = if (isStart) currentState.startDate else currentState.endDate
+        val dateValidator = if (isStart) {
+            DateValidatorPointForward.now()
+        } else {
+            DateValidatorPointForward.from(currentState.startDate.toEpochMilli())
+        }
+
+        MaterialDatePicker.Builder.datePicker()
+            .setInputMode(MaterialDatePicker.INPUT_MODE_CALENDAR)
+            .setSelection(currentDate.toEpochMilli())
+            .setCalendarConstraints(
+                CalendarConstraints.Builder().setValidator(dateValidator).build()
+            )
+            .build()
+            .apply {
+                addOnPositiveButtonClickListener { selection ->
+                    val updatedDate = Instant.ofEpochMilli(selection)
+                    if (isStart) {
+                        viewModel.setStartDate(updatedDate)
+                    } else {
+                        viewModel.setEndDate(updatedDate)
+                    }
+                }
+                show(supportFragmentManager, "DatePicker")
+            }
+    }
+
+    private fun showTimePicker(isStart: Boolean) {
+        val currentState = viewModel.state.value
+        val currentDate = (if (isStart) currentState.startDate else currentState.endDate)
+            .atZone(ZoneId.systemDefault())
+
+        MaterialTimePicker.Builder()
+            .setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
+            .setTimeFormat(
+                if (DateFormat.is24HourFormat(this))
+                    TimeFormat.CLOCK_24H
+                else
+                    TimeFormat.CLOCK_12H
+            )
+            .setHour(currentDate.hour)
+            .setMinute(currentDate.minute)
+            .build()
+            .apply {
+                addOnPositiveButtonClickListener {
+                    val updatedDate = currentDate.withHour(hour).withMinute(minute).toInstant()
+                    if (isStart) {
+                        viewModel.setStartDate(updatedDate)
+                    } else {
+                        viewModel.setEndDate(updatedDate)
+                    }
+                }
+                show(supportFragmentManager, "TimePicker")
+            }
     }
 
     /**
