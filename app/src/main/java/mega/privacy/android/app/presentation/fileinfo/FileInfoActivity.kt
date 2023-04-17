@@ -165,7 +165,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                         updateActionModeTitle()
                     } else {
                         val megaUser =
-                            viewModel.uiState.value.outShares.getOrNull(currentPosition)?.user
+                            viewModel.uiState.value.outSharesDeprecated.getOrNull(currentPosition)?.user
                         val contact = megaUser?.let { megaApi.getContact(it) }
                         if (contact != null && contact.visibility == MegaUser.VISIBILITY_VISIBLE) {
                             ContactUtil.openContactInfoActivity(this@FileInfoActivity, megaUser)
@@ -569,7 +569,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         bindingContent.filePropertiesSharedLayout.isVisible = visibleOutShares.isNotEmpty()
         bindingContent.dividerSharedLayout.isVisible = visibleOutShares.isNotEmpty()
         bindingContent.sharedContactListContainer.isVisible =
-            visibleOutShares.isNotEmpty() && viewState.isShareContactExpanded
+            visibleOutShares.isNotEmpty() && viewState.isShareContactExpandedDeprecated
         if (visibleOutShares.isNotEmpty()) {
             if (adapter.isMultipleSelect) {
                 adapter.clearSelections()
@@ -587,10 +587,10 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
                 }
             }
             //shared with expanded or not
-            if (viewState.isShareContactExpanded) {
+            if (viewState.isShareContactExpandedDeprecated) {
                 bindingContent.filePropertiesSharedInfoButton.setText(R.string.general_close)
             } else {
-                viewModel.uiState.value.outShares.let { sl ->
+                viewModel.uiState.value.outSharesDeprecated.let { sl ->
                     bindingContent.filePropertiesSharedInfoButton.text =
                         resources.getQuantityString(
                             R.plurals.general_selection_num_contacts,

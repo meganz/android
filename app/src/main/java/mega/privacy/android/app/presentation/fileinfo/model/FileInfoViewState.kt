@@ -25,8 +25,9 @@ import nz.mega.sdk.MegaShare
  * @param previewUriString the uri of the file containing the preview
  * @param thumbnailUriString the uri of the file containing the thumbnail, just as a fallback in case there's no [previewUriString]
  * @param folderTreeInfo the folder info if the node is a folder
- * @param isShareContactExpanded outShares are shown if is set to true
- * @param outShares shares in case of a node shared with others as outShare
+ * @param isShareContactExpandedDeprecated outShares are shown if is set to true
+ * @param outSharesDeprecated shares in case of a node shared with others as outgoing share (To be removed when the compose view is used)
+ * @param outShares shares in case of a node shared with others as outgoing share (To be used when the compose view is used)
  * @param nodeLocationInfo the location info of the node
  * @param isAvailableOffline true if the file is available offline
  * @param isAvailableOfflineEnabled true if offline availability can be changed, false if not
@@ -58,8 +59,11 @@ data class FileInfoViewState(
     val previewUriString: String? = null,
     val thumbnailUriString: String? = null,
     val folderTreeInfo: FolderTreeInfo? = null,
-    val isShareContactExpanded: Boolean = false,
-    val outShares: List<MegaShare> = emptyList(),
+    @Deprecated("to be removed once migrated to compose")
+    val isShareContactExpandedDeprecated: Boolean = false,
+    @Deprecated("to be removed once migrated to compose")
+    val outSharesDeprecated: List<MegaShare> = emptyList(),
+    val outShares: List<ContactPermission> = emptyList(),
     val nodeLocationInfo: LocationInfo? = null,
     val isAvailableOffline: Boolean = false,
     val isAvailableOfflineEnabled: Boolean = false,
@@ -151,19 +155,20 @@ data class FileInfoViewState(
      * the limited amount of outshares to be shown
      */
     val outSharesCoerceMax by lazy(LazyThreadSafetyMode.NONE) {
-        outShares.takeIf { it.size <= MAX_NUMBER_OF_CONTACTS_IN_LIST }
-            ?: (outShares.take(MAX_NUMBER_OF_CONTACTS_IN_LIST))
+        outSharesDeprecated.takeIf { it.size <= MAX_NUMBER_OF_CONTACTS_IN_LIST }
+            ?: (outSharesDeprecated.take(MAX_NUMBER_OF_CONTACTS_IN_LIST))
     }
 
     /**
      * true in case [outSharesCoerceMax] are not representing all the outShares
      */
-    val thereAreMoreOutShares = outShares.size > MAX_NUMBER_OF_CONTACTS_IN_LIST
+    val thereAreMoreOutShares = outSharesDeprecated.size > MAX_NUMBER_OF_CONTACTS_IN_LIST
 
     /**
      * the amount of outShares that are not represented by [outSharesCoerceMax]
      */
-    val extraOutShares = (outShares.size - MAX_NUMBER_OF_CONTACTS_IN_LIST).coerceAtLeast(0)
+    val extraOutShares =
+        (outSharesDeprecated.size - MAX_NUMBER_OF_CONTACTS_IN_LIST).coerceAtLeast(0)
 
     /**
      * true if this node is an incoming shared root node

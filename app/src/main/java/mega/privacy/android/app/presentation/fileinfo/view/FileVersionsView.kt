@@ -1,7 +1,7 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -49,22 +48,19 @@ internal fun FileVersionsView(
         alignment = Alignment.CenterStart,
         contentDescription = "versions icon"
     )
-    TextButton(
+    Text(
         modifier = Modifier
-            .widthIn(min = 100.dp)
+            .clickable(onClick = onClick)
+            .padding(8.dp)
+            .widthIn(min = 80.dp)
             .testTag(TEST_TAG_VERSIONS_BUTTON),
-        onClick = onClick,
-        border = BorderStroke(1.dp, MaterialTheme.colors.secondary)
-    ) {
-        Text(
-            text = pluralStringResource(
-                id = R.plurals.number_of_versions,
-                count = versions,
-                versions
-            ),
-            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.secondary),
-        )
-    }
+        text = pluralStringResource(
+            id = R.plurals.number_of_versions,
+            count = versions,
+            versions
+        ),
+        style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.secondary),
+    )
 }
 
 /**

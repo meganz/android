@@ -1,8 +1,15 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,21 +18,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.fileinfo.model.ContactPermission
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
-import mega.privacy.android.app.utils.LocationInfo
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.shares.AccessPermission
-import java.time.Instant.now
-import kotlin.time.Duration.Companion.days
+import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_012
 
 /**
  * Content for FileInfo screen, all except toolbar, bottom sheets, dialogs
@@ -37,214 +38,174 @@ internal fun FileInfoContent(
     onLocationClick: () -> Unit,
     availableOfflineChanged: (checked: Boolean) -> Unit,
     onVersionsClick: () -> Unit,
-    onSharedWithHeaderClick: () -> Unit,
     onSharedWithContactClick: (ContactPermission) -> Unit,
     onSharedWithContactLongClick: (ContactPermission) -> Unit,
     onSharedWithContactMoreOptionsClick: (ContactPermission) -> Unit,
     onShowMoreSharedWithContactsClick: () -> Unit,
     onPublicLinkCopyClick: () -> Unit,
     modifier: Modifier = Modifier,
-) = Column(modifier = modifier) {
-    val paddingEnd = Modifier.padding(end = 16.dp)
-    val paddingHorizontal = Modifier.padding(start = 72.dp, end = 16.dp)
-    with(viewState) {
-        //take down alert
-        var showTakeDownWarning by remember { mutableStateOf(isTakenDown) }
-        if (showTakeDownWarning) {
-            TakeDownWarningView(
-                isFile = isFile,
-                onLinkClick = onLinkClick,
-                onCloseClick = { showTakeDownWarning = false }
-            )
-        }
+) {
+    var isShareContactExpanded by remember { mutableStateOf(false) }
+    Column(
+        modifier = modifier
+    ) {
+        val paddingEnd = Modifier.padding(end = 16.dp)
+        val paddingHorizontal = Modifier.padding(start = 72.dp, end = 16.dp)
+        with(viewState) {
+            //take down alert
+            var showTakeDownWarning by remember { mutableStateOf(isTakenDown) }
+            if (showTakeDownWarning) {
+                TakeDownWarningView(
+                    isFile = isFile,
+                    onLinkClick = onLinkClick,
+                    onCloseClick = { showTakeDownWarning = false }
+                )
+            }
 
-        //owner (incoming share)
-        inShareOwnerContactItem?.let { contactItem ->
-            OwnerInfoView(
-                contactItem,
-                modifier = paddingEnd
-            )
-        }
+            //owner (incoming share)
+            inShareOwnerContactItem?.let { contactItem ->
+                OwnerInfoView(
+                    contactItem,
+                    modifier = paddingEnd
+                )
+                FileInfoContentDivider(16.dp)
+            }
 
-        //available offline
-        if (isAvailableOfflineAvailable) {
-            AvailableOfflineView(
-                enabled = isAvailableOfflineEnabled,
-                available = isAvailableOffline,
-                onCheckChanged = availableOfflineChanged,
-                modifier = paddingHorizontal,
-            )
-        }
+            //available offline
+            if (isAvailableOfflineAvailable) {
+                AvailableOfflineView(
+                    enabled = isAvailableOfflineEnabled,
+                    available = isAvailableOffline,
+                    onCheckChanged = availableOfflineChanged,
+                    modifier = paddingHorizontal,
+                )
+                FileInfoContentDivider()
+            }
 
-        //file versions
-        if (isFile) {
-            FileVersionsView(
-                versions = historyVersions,
-                onClick = onVersionsClick,
-                modifier = paddingEnd,
-            )
-        }
+            //file versions
+            if (showHistoryVersions) {
+                FileVersionsView(
+                    versions = historyVersions,
+                    onClick = onVersionsClick,
+                    modifier = paddingEnd,
+                )
+                FileInfoContentDivider()
+            }
 
-        //shared info (outgoing share)
-        if (outShares.isNotEmpty()) {
-            SharedInfoView(
-                contacts = emptyList(),
-                expanded = isShareContactExpanded,
-                onHeaderClick = onSharedWithHeaderClick,
-                onContactClick = onSharedWithContactClick,
-                onContactLongClick = onSharedWithContactLongClick,
-                onMoreOptionsClick = onSharedWithContactMoreOptionsClick,
-                onShowMoreContactsClick = onShowMoreSharedWithContactsClick,
-            )
-        }
+            //shared info (outgoing share)
+            if (outShares.isNotEmpty()) {
+                SharedInfoView(
+                    contacts = outShares,
+                    expanded = isShareContactExpanded,
+                    onHeaderClick = { isShareContactExpanded = !isShareContactExpanded },
+                    onContactClick = onSharedWithContactClick,
+                    onContactLongClick = onSharedWithContactLongClick,
+                    onMoreOptionsClick = onSharedWithContactMoreOptionsClick,
+                    onShowMoreContactsClick = onShowMoreSharedWithContactsClick,
+                )
+                FileInfoContentDivider()
+            }
 
-        //file size layout
-        NodeSizeView(
-            forFolder = !isFile,
-            sizeString = Util.getSizeString(sizeInBytes, LocalContext.current),
-            modifier = paddingHorizontal
-        )
-
-        //folder content
-        folderTreeInfo?.let {
-            FolderContentView(
-                numberOfFolders = it.numberOfFolders,
-                numberOfFiles = it.numberOfFiles,
-                modifier = paddingHorizontal,
+            //file size layout
+            Spacer(modifier = Modifier.height(8.dp))
+            NodeSizeView(
+                forFolder = !isFile,
+                sizeString = Util.getSizeString(sizeInBytes, LocalContext.current),
+                modifier = paddingHorizontal
             )
-        }
 
-        //folder versions
-        if (showFolderHistoryVersions) {
-            FolderVersionsView(
-                numberOfVersions = folderTreeInfo?.numberOfVersions ?: 0,
-                currentVersionsSizeInBytes = folderTreeInfo?.totalCurrentSizeInBytes ?: 0,
-                previousVersionsSizeInBytes = folderTreeInfo?.sizeOfPreviousVersionsInBytes ?: 0,
-                modifier = paddingHorizontal,
-            )
-        }
+            //folder content
+            folderTreeInfo?.let {
+                FolderContentView(
+                    numberOfFolders = it.numberOfFolders,
+                    numberOfFiles = it.numberOfFiles,
+                    modifier = paddingHorizontal,
+                )
+            }
 
-        //location
-        nodeLocationInfo?.location?.let {
-            LocationInfoView(
-                location = it,
-                modifier = paddingHorizontal,
-                onClick = onLocationClick,
-            )
-        }
+            //folder versions
+            if (showFolderHistoryVersions) {
+                FolderVersionsView(
+                    numberOfVersions = folderTreeInfo?.numberOfVersions ?: 0,
+                    currentVersionsSizeInBytes = folderTreeInfo?.totalCurrentSizeInBytes ?: 0,
+                    previousVersionsSizeInBytes = folderTreeInfo?.sizeOfPreviousVersionsInBytes
+                        ?: 0,
+                    modifier = paddingHorizontal,
+                )
+            }
 
-        //creation and modification times
-        creationTime?.let {
-            CreationModificationTimesView(
-                creationTimeInSeconds = it,
-                modificationTimeInSeconds = modificationTime,
-                modifier = paddingHorizontal,
-            )
-        }
+            //location
+            nodeLocationInfo?.location?.let {
+                LocationInfoView(
+                    location = it,
+                    modifier = paddingHorizontal,
+                    onClick = onLocationClick,
+                )
+            }
 
-        //link
-        if (showLink && publicLink != null) {
-            ShareLinkView(
-                link = publicLink,
-                date = publicLinkCreationTime ?: 0,
-                onCopyLinkClick = onPublicLinkCopyClick,
-                modifier = paddingHorizontal,
-            )
+            //creation and modification times
+            creationTime?.let {
+                CreationModificationTimesView(
+                    creationTimeInSeconds = it,
+                    modificationTimeInSeconds = modificationTime,
+                    modifier = paddingHorizontal,
+                )
+            }
+
+            //link
+            if (showLink && publicLink != null) {
+                FileInfoContentDivider(paddingBottom = 8.dp)
+                ShareLinkView(
+                    link = publicLink,
+                    date = publicLinkCreationTime ?: 0,
+                    onCopyLinkClick = onPublicLinkCopyClick,
+                    modifier = paddingHorizontal,
+                )
+            }
         }
     }
+}
+
+@Composable
+private fun FileInfoContentDivider(
+    paddingStart: Dp = paddingStartDefault.dp,
+    paddingTop: Dp = 0.dp,
+    paddingBottom: Dp = 0.dp,
+) {
+    Divider(
+        modifier = Modifier.padding(start = paddingStart, top = paddingTop, bottom = paddingBottom),
+        color = MaterialTheme.colors.grey_white_alpha_012,
+        thickness = 1.dp
+    )
 }
 
 /**
  * Preview for [FileInfoContent] for a file
  */
+@SuppressLint("UnrememberedMutableState")
 @CombinedThemePreviews
 @Composable
-private fun FileInfoContentFilePreview(
-    @PreviewParameter(FileInfoViewStateProvider::class) viewState: FileInfoViewState,
+private fun FileInfoContentPreview(
+    @PreviewParameter(FileInfoViewStatePreviewsProvider::class) viewState: FileInfoViewState,
 ) {
+    val scrollState = rememberScrollState()
+    var state by mutableStateOf(viewState) //not remembered to allow multiple states in device, don't do that in real code, just in previews
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FileInfoContent(
-            viewState = viewState,
+            viewState = state,
             onLinkClick = {},
-            availableOfflineChanged = {},
+            availableOfflineChanged = {
+                state = state.copy(isAvailableOffline = !state.isAvailableOffline)
+            },
             onVersionsClick = {},
             onSharedWithContactClick = {},
             onSharedWithContactLongClick = {},
             onSharedWithContactMoreOptionsClick = {},
-            onSharedWithHeaderClick = {},
             onShowMoreSharedWithContactsClick = {},
             onPublicLinkCopyClick = {},
-            onLocationClick = {}
+            onLocationClick = {},
+            modifier = Modifier.verticalScroll(scrollState)
         )
     }
 }
 
-private class FileInfoViewStateProvider : PreviewParameterProvider<FileInfoViewState> {
-    override val values = listOf(viewStateFile, viewStateFolder).asSequence()
-}
-
-private val viewStateFile = FileInfoViewState(
-    title = "Node",
-    isFile = true,
-    oneOffViewEvent = null,
-    jobInProgressState = null,
-    historyVersions = 5,
-    isNodeInInbox = false,
-    isNodeInRubbish = false,
-    previewUriString = null,
-    thumbnailUriString = null,
-    folderTreeInfo = null,
-    isShareContactExpanded = false,
-    outShares = emptyList(),
-    nodeLocationInfo = LocationInfo("Cloud drive"),
-    isAvailableOffline = false,
-    isAvailableOfflineEnabled = true,
-    isAvailableOfflineAvailable = true,
-    inShareOwnerContactItem = contactItemForPreviews,
-    accessPermission = AccessPermission.FULL,
-    outShareContactShowOptions = null,
-    outShareContactsSelected = emptyList(),
-    iconResource = R.drawable.ic_text_thumbnail,
-    sizeInBytes = 1024,
-    isExported = true,
-    isTakenDown = false,
-    publicLink = "https://mega.co.nz/whatever",
-    publicLinkCreationTime = now().epochSecond - 10.days.inWholeSeconds,
-    showLink = true,
-    creationTime = now().epochSecond - 10.days.inWholeSeconds,
-    modificationTime = now().epochSecond,
-    hasPreview = false,
-)
-
-private val viewStateFolder = FileInfoViewState(
-    title = "Node",
-    isFile = false,
-    oneOffViewEvent = null,
-    jobInProgressState = null,
-    historyVersions = 5,
-    isNodeInInbox = false,
-    isNodeInRubbish = false,
-    previewUriString = null,
-    thumbnailUriString = null,
-    folderTreeInfo = FolderTreeInfo(5, 6, 1024 * 15, 23, 1024 * 2),
-    isShareContactExpanded = false,
-    outShares = emptyList(),
-    nodeLocationInfo = LocationInfo("Cloud drive"),
-    isAvailableOffline = false,
-    isAvailableOfflineEnabled = true,
-    isAvailableOfflineAvailable = true,
-    inShareOwnerContactItem = contactItemForPreviews,
-    accessPermission = AccessPermission.FULL,
-    outShareContactShowOptions = null,
-    outShareContactsSelected = emptyList(),
-    iconResource = R.drawable.ic_folder_incoming,
-    sizeInBytes = 1024,
-    isExported = true,
-    isTakenDown = false,
-    publicLink = "https://mega.co.nz/whatever",
-    publicLinkCreationTime = now().epochSecond - 10.days.inWholeSeconds,
-    showLink = true,
-    creationTime = now().epochSecond - 10.days.inWholeSeconds,
-    modificationTime = now().epochSecond,
-    hasPreview = false,
-)

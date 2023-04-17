@@ -678,7 +678,7 @@ internal class FileInfoViewModelTest {
         val expected = mock<List<MegaShare>>()
         whenever(getOutShares.invoke(nodeId)).thenReturn(expected)
         underTest.setNode(node.handle)
-        Truth.assertThat(underTest.uiState.value.outShares).isEqualTo(expected)
+        Truth.assertThat(underTest.uiState.value.outSharesDeprecated).isEqualTo(expected)
     }
 
     @Test

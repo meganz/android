@@ -19,7 +19,7 @@ class FileInfoViewStateTest {
     @Test
     fun `test outSharesCoerceMax is returning all outShares if maximum is not surpassed`() {
         val outShares = List<MegaShare>(MAX_NUMBER_OF_CONTACTS_IN_LIST) { mock() }
-        underTest = FileInfoViewState(outShares = outShares)
+        underTest = FileInfoViewState(outSharesDeprecated = outShares)
         Truth.assertThat(underTest.outSharesCoerceMax.size)
             .isEqualTo(MAX_NUMBER_OF_CONTACTS_IN_LIST)
     }
@@ -27,7 +27,7 @@ class FileInfoViewStateTest {
     @Test
     fun `test outSharesCoerceMax is returning no more than maximum out shares`() {
         val outShares = List<MegaShare>(MAX_NUMBER_OF_CONTACTS_IN_LIST + 1) { mock() }
-        underTest = FileInfoViewState(outShares = outShares)
+        underTest = FileInfoViewState(outSharesDeprecated = outShares)
         Truth.assertThat(underTest.outSharesCoerceMax.size)
             .isEqualTo(MAX_NUMBER_OF_CONTACTS_IN_LIST)
     }

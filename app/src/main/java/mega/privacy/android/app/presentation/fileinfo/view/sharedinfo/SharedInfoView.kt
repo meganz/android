@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.fileinfo.view.sharedinfo
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -53,14 +54,16 @@ internal fun SharedInfoView(
         modifier = modifier.fillMaxWidth()
     ) {
         Header(contacts, expanded, onHeaderClick)
-        if (expanded) {
-            ContactsList(
-                contacts,
-                onContactClick,
-                onContactLongClick,
-                onMoreOptionsClick,
-                onShowMoreContactsClick
-            )
+        Column(modifier = modifier.animateContentSize()) {
+            if (expanded) {
+                ContactsList(
+                    contacts,
+                    onContactClick,
+                    onContactLongClick,
+                    onMoreOptionsClick,
+                    onShowMoreContactsClick
+                )
+            }
         }
     }
 }
@@ -78,7 +81,7 @@ private fun Header(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .clickable(onClick = onHeaderClick)
-            .height(72.dp)
+            .height(56.dp)
             .padding(start = 72.dp)
             .fillMaxWidth()
             .testTag(TEST_TAG_SHARES_HEADER),
@@ -98,7 +101,7 @@ private fun Header(
                     contacts.size
                 )
             },
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(end = 24.dp, start = 8.dp),
             style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.secondary),
         )
     }
@@ -112,7 +115,6 @@ private fun ColumnScope.ContactsList(
     onMoreOptionsClick: (ContactPermission) -> Unit,
     onShowMoreContactsClick: () -> Unit,
 ) {
-
     //maximum 5, so no LazyColumn needed
     contacts.take(MAX_CONTACTS_TO_SHOW).forEachIndexed { i, contactItem ->
         SharedInfoContactItemView(
@@ -133,8 +135,9 @@ private fun ColumnScope.ContactsList(
         Text(
             text = "$extra ${stringResource(id = R.string.label_more)}",
             modifier = Modifier
+                .padding(2.dp)
                 .clickable(onClick = onShowMoreContactsClick)
-                .padding(24.dp)
+                .padding(horizontal = 24.dp, vertical = 12.dp)
                 .align(Alignment.End)
                 .testTag(TEST_TAG_SHOW_MORE),
             style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.secondary),

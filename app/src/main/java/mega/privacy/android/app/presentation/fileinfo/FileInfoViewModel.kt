@@ -276,7 +276,7 @@ class FileInfoViewModel @Inject constructor(
      * change the state of isShareContactExpanded
      */
     fun expandOutSharesClick() {
-        updateState { it.copy(isShareContactExpanded = !it.isShareContactExpanded) }
+        updateState { it.copy(isShareContactExpandedDeprecated = !it.isShareContactExpandedDeprecated) }
     }
 
     /**
@@ -608,7 +608,7 @@ class FileInfoViewModel @Inject constructor(
     }
 
     private fun updateOutShares() = updateState {
-        it.copy(outShares = getOutShares(typedNode.id) ?: emptyList())
+        it.copy(outSharesDeprecated = getOutShares(typedNode.id) ?: emptyList())
     }
 
     /**
