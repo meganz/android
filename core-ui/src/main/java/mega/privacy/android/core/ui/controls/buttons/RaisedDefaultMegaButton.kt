@@ -64,7 +64,7 @@ private fun PreviewTextMegaButton(
     @PreviewParameter(BooleanProvider::class) enabled: Boolean,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        TextMegaButton(
+        RaisedDefaultMegaButton(
             textId = R.string.search_label,
             onClick = {},
             enabled = enabled
