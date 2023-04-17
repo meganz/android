@@ -140,7 +140,7 @@ internal fun FileInfoScreen(
 private fun FileInfoScreenPreview(
     @PreviewParameter(FileInfoViewStatePreviewsProvider::class) viewState: FileInfoViewState,
 ) {
-    var state by mutableStateOf(FileInfoViewStatePreviewsProvider.viewStateFolder2) //not remembered to allow multiple states in device, don't do that in real code, just in previews
+    var state by mutableStateOf(viewState) //not remembered to allow multiple states in device, don't do that in real code, just in previews
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FileInfoScreen(
             viewState = state,
