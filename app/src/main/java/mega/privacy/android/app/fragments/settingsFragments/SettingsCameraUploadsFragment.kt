@@ -536,10 +536,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             REQUEST_CAMERA_FOLDER -> {
                 val cameraPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
                 if (!isNewSettingValid(
-                        cameraPath,
-                        prefs.localPathSecondaryFolder,
-                        prefs.camSyncHandle,
-                        prefs.megaHandleSecondaryFolder
+                        primaryPath = cameraPath,
+                        secondaryPath = prefs.localPathSecondaryFolder,
+                        primaryHandle = prefs.camSyncHandle,
+                        secondaryHandle = prefs.megaHandleSecondaryFolder,
                     )
                 ) {
                     Toast.makeText(
@@ -571,10 +571,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 // Primary Folder to Sync
                 val handle = intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
                 if (!isNewSettingValid(
-                        prefs.camSyncLocalPath,
-                        prefs.localPathSecondaryFolder,
-                        handle.toString(),
-                        prefs.megaHandleSecondaryFolder
+                        primaryPath = prefs.camSyncLocalPath,
+                        secondaryPath = prefs.localPathSecondaryFolder,
+                        primaryHandle = handle.toString(),
+                        secondaryHandle = prefs.megaHandleSecondaryFolder,
                     )
                 ) {
                     Toast.makeText(
@@ -596,10 +596,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 // Secondary Folder to Sync
                 val secondaryPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
                 if (!isNewSettingValid(
-                        prefs.camSyncLocalPath,
-                        secondaryPath,
-                        prefs.camSyncHandle,
-                        prefs.megaHandleSecondaryFolder
+                        primaryPath = prefs.camSyncLocalPath,
+                        secondaryPath = secondaryPath,
+                        primaryHandle = prefs.camSyncHandle,
+                        secondaryHandle = prefs.megaHandleSecondaryFolder,
                     )
                 ) {
                     Toast.makeText(
@@ -631,10 +631,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 val secondaryHandle =
                     intent.getLongExtra(SELECTED_MEGA_FOLDER, MegaApiJava.INVALID_HANDLE)
                 if (!isNewSettingValid(
-                        prefs.camSyncLocalPath,
-                        prefs.localPathSecondaryFolder,
-                        prefs.camSyncHandle,
-                        secondaryHandle.toString()
+                        primaryPath = prefs.camSyncLocalPath,
+                        secondaryPath = prefs.localPathSecondaryFolder,
+                        primaryHandle = prefs.camSyncHandle,
+                        secondaryHandle = secondaryHandle.toString(),
                     )
                 ) {
                     Toast.makeText(
