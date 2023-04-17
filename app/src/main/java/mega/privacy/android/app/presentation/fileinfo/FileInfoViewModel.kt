@@ -22,6 +22,7 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEv
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOrigin
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
+import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -60,6 +61,7 @@ import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
@@ -104,6 +106,8 @@ class FileInfoViewModel @Inject constructor(
     private val getNodeAccessPermission: GetNodeAccessPermission,
     private val setOutgoingPermissions: SetOutgoingPermissions,
     private val stopSharingNode: StopSharingNode,
+    private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase,
+    private val nodeActionMapper: NodeActionMapper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -111,7 +115,7 @@ class FileInfoViewModel @Inject constructor(
     /**
      * the state of the view
      */
-    val uiState = _uiState.asStateFlow()
+    internal val uiState = _uiState.asStateFlow()
 
     /**
      * the node whose information are displayed
@@ -712,7 +716,9 @@ class FileInfoViewModel @Inject constructor(
     private fun updateState(update: suspend (FileInfoViewState) -> FileInfoViewState) =
         viewModelScope.launch {
             _uiState.update {
-                update(it)
+                update(it).copy(actions = getAvailableNodeActionsUseCase(typedNode).map { nodeAction ->
+                    nodeActionMapper(nodeAction)
+                })
             }
         }
 

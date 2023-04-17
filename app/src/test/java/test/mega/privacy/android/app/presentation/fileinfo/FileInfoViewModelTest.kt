@@ -26,6 +26,7 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.fileinfo.FileInfoViewModel
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
+import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.usecase.exception.MegaNodeException
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
 import mega.privacy.android.data.repository.MegaNodeRepository
@@ -59,6 +60,7 @@ import mega.privacy.android.domain.usecase.filenode.GetNodeVersionsByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.MoveNodeToRubbishByHandle
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
@@ -117,6 +119,8 @@ internal class FileInfoViewModelTest {
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
     private val setOutgoingPermissions: SetOutgoingPermissions = mock()
     private val stopSharingNode: StopSharingNode = mock()
+    private val nodeActionMapper: NodeActionMapper = mock()
+    private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase = mock()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -166,6 +170,8 @@ internal class FileInfoViewModelTest {
             getNodeAccessPermission = getNodeAccessPermission,
             setOutgoingPermissions = setOutgoingPermissions,
             stopSharingNode = stopSharingNode,
+            getAvailableNodeActionsUseCase = getAvailableNodeActionsUseCase,
+            nodeActionMapper = nodeActionMapper,
         )
     }
 
@@ -193,6 +199,7 @@ internal class FileInfoViewModelTest {
         whenever(typedFileNode.thumbnailPath).thenReturn(null)
         whenever(typedFileNode.hasPreview).thenReturn(false)
         whenever(isAvailableOffline.invoke(any())).thenReturn(true)
+        whenever(getAvailableNodeActionsUseCase(any())).thenReturn(emptyList())
     }
 
     @After

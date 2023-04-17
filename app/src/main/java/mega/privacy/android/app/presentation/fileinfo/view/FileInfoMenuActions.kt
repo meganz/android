@@ -19,11 +19,11 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 
 @Composable
 internal fun RowScope.FileInfoMenuActions(
-    viewState: FileInfoViewState,
+    actions: List<FileInfoMenuAction>,
     tint: Color,
     onActionClick: (FileInfoMenuAction) -> Unit,
 ) = MenuActions(
-    actions = getActions(viewState),
+    actions = actions,
     maxActionsToShow = 3,
     dropDownIcon = painterResource(id = R.drawable.ic_dots_vertical_white),
     tint = tint,
@@ -88,7 +88,7 @@ private fun MenuActionsPreview(
             title = {},
             actions = {
                 FileInfoMenuActions(
-                    viewState = viewState,
+                    actions = viewState.actions,
                     tint = MaterialTheme.colors.onSurface,
                     onActionClick = {}
                 )

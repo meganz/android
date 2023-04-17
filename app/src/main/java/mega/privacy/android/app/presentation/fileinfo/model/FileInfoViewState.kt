@@ -46,8 +46,9 @@ import nz.mega.sdk.MegaShare
  * @param creationTime creation time of the node
  * @param modificationTime modification time of the node in case of file node
  * @param hasPreview this node has a preview (Images, pdf, videos, etc.)
+ * @param actions a list of [FileInfoMenuAction] representing available actions for this node
  */
-data class FileInfoViewState(
+internal data class FileInfoViewState(
     val title: String = "",
     val isFile: Boolean = true,
     val origin: FileInfoOrigin = FileInfoOrigin.Other,
@@ -82,6 +83,7 @@ data class FileInfoViewState(
     val creationTime: Long? = null,
     val modificationTime: Long? = null,
     val hasPreview: Boolean = false,
+    val actions: List<FileInfoMenuAction> = emptyList(),
 ) {
 
     /**

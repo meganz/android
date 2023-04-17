@@ -51,7 +51,7 @@ internal fun FileInfoTopBar(
         },
         actions = {
             FileInfoMenuActions(
-                viewState = viewState,
+                actions = viewState.actions,
                 tint = tintColor,
                 onActionClick = onActionClick
             )
