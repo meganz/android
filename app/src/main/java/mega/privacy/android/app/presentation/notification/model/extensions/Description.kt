@@ -3,7 +3,6 @@ package mega.privacy.android.app.presentation.notification.model.extensions
 import android.content.Context
 import androidx.annotation.StringRes
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
 import mega.privacy.android.app.presentation.extensions.spanABTextFontColour
 import mega.privacy.android.domain.entity.ContactAlert
 import mega.privacy.android.domain.entity.ContactChangeAccountDeletedAlert
@@ -67,8 +66,8 @@ private fun ContactAlert.getDescriptionId(): Int? = when (this) {
 private fun ContactAlert.getDescriptionFunction(): (Context) -> CharSequence? =
     { context ->
         this.getDescriptionId()?.let {
-            context.getFormattedStringOrDefault(it,
-                this.contact.getNicknameStringOrEmail(context)).spanABTextFontColour(context)
+            context.getString(it, this.contact.getNicknameStringOrEmail(context))
+                .spanABTextFontColour(context)
         }
     }
 
@@ -78,6 +77,7 @@ private fun ContactAlert.getDescriptionFunction(): (Context) -> CharSequence? =
  */
 private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSequence? =
     { context ->
+        val user = email ?: context.getString(R.string.unknown_name_label)
         when (this) {
             is NewScheduledMeetingAlert -> {
                 val stringRes = if (isRecurring) {
@@ -85,8 +85,7 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                 } else {
                     R.string.notification_subtitle_scheduled_meeting_new
                 }
-                context.getFormattedStringOrDefault(stringRes, email)
-                    .spanABTextFontColour(context)
+                context.getString(stringRes, user).spanABTextFontColour(context)
             }
             is UpdatedScheduledMeetingCancelAlert, is DeletedScheduledMeetingAlert -> {
                 val stringRes = when {
@@ -94,13 +93,12 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                     isRecurring -> R.string.notification_subtitle_scheduled_recurring_meeting_canceled
                     else -> R.string.notification_subtitle_scheduled_meeting_canceled
                 }
-                context.getFormattedStringOrDefault(stringRes, email)
-                    .spanABTextFontColour(context)
+                context.getString(stringRes, user).spanABTextFontColour(context)
             }
             is UpdatedScheduledMeetingTitleAlert -> {
-                context.getFormattedStringOrDefault(
+                context.getString(
                     R.string.notification_subtitle_scheduled_meeting_updated_title,
-                    email,
+                    user,
                     oldTitle,
                     title
                 ).spanABTextFontColour(context)
@@ -111,8 +109,7 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                 } else {
                     R.string.notification_subtitle_scheduled_meeting_updated_description
                 }
-                context.getFormattedStringOrDefault(stringRes, email)
-                    .spanABTextFontColour(context)
+                context.getString(stringRes, user).spanABTextFontColour(context)
             }
             is UpdatedScheduledMeetingDateTimeAlert -> {
                 val stringRes = when {
@@ -124,8 +121,7 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                         R.string.notification_subtitle_scheduled_meeting_updated_time
                     }
                 }
-                context.getFormattedStringOrDefault(stringRes, email)
-                    .spanABTextFontColour(context)
+                context.getString(stringRes, user).spanABTextFontColour(context)
             }
             is UpdatedScheduledMeetingFieldsAlert -> {
                 val stringRes = if (isRecurring) {
@@ -133,8 +129,7 @@ private fun ScheduledMeetingAlert.getDescriptionFunction(): (Context) -> CharSeq
                 } else {
                     R.string.notification_subtitle_scheduled_meeting_updated_multiple
                 }
-                context.getFormattedStringOrDefault(stringRes, email)
-                    .spanABTextFontColour(context)
+                context.getString(stringRes, user).spanABTextFontColour(context)
             }
             else -> {
                 null
