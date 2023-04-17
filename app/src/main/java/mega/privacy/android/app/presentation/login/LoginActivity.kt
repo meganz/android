@@ -23,10 +23,10 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.ActivityLoginBinding
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.interfaces.OnKeyboardVisibilityListener
-import mega.privacy.android.app.main.ConfirmEmailFragment
 import mega.privacy.android.app.main.CreateAccountFragment
 import mega.privacy.android.app.main.TourFragment
 import mega.privacy.android.app.presentation.extensions.toConstant
+import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.Util

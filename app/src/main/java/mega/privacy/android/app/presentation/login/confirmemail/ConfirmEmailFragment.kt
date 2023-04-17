@@ -1,4 +1,4 @@
-package mega.privacy.android.app.main
+package mega.privacy.android.app.presentation.login.confirmemail
 
 import android.content.Context
 import android.os.Bundle
@@ -10,10 +10,13 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.FragmentConfirmEmailBinding
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.Constants.EMAIL_ADDRESS
 import mega.privacy.android.app.utils.Util
@@ -40,6 +43,8 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
     @Inject
     lateinit var megaApi: MegaApiAndroid
 
+    private val viewModel: ConfirmEmailViewModel by viewModels()
+
     private var _binding: FragmentConfirmEmailBinding? = null
 
     private val binding get() = _binding!!
@@ -59,7 +64,19 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupObservers()
         setupView()
+    }
+
+    private fun setupObservers() {
+        viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
+            with(uiState) {
+                if (isPendingToShowFragment != null) {
+                    (requireActivity() as LoginActivity).showFragment(isPendingToShowFragment.toConstant())
+                    viewModel.markHandledPendingToShowFragment()
+                }
+            }
+        }
     }
 
     private fun setupView() = with(binding) {
@@ -175,7 +192,8 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
                         requireContext().getFormattedStringOrDefault(R.string.confirm_email_misspelled_email_sent)
                     } else {
                         e.errorString
-                    })
+                    }
+                )
             }
         } else {
             Timber.d("isAdded false")

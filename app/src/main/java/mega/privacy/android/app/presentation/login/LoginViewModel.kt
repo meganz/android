@@ -46,7 +46,6 @@ import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.login.LocalLogoutUseCase
 import mega.privacy.android.domain.usecase.login.LoginUseCase
 import mega.privacy.android.domain.usecase.login.LoginWith2FAUseCase
-import mega.privacy.android.domain.usecase.login.MonitorAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
 import mega.privacy.android.domain.usecase.login.SaveAccountCredentialsUseCase
@@ -85,7 +84,6 @@ class LoginViewModel @Inject constructor(
     private val fetchNodesUseCase: FetchNodesUseCase,
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
-    private val monitorAccountUpdateUseCase: MonitorAccountUpdateUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -150,13 +148,6 @@ class LoginViewModel @Inject constructor(
                                 { state: LoginState -> state }
                             }
                         }
-                    }
-                },
-                monitorAccountUpdateUseCase().map {
-                    if (state.value.isPendingToShowFragment == LoginFragmentType.ConfirmEmail) {
-                        { state: LoginState -> state.copy(isPendingToShowFragment = LoginFragmentType.Login) }
-                    } else {
-                        { state: LoginState -> state }
                     }
                 },
             ).collect {
