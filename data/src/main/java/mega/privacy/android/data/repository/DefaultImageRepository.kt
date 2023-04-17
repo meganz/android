@@ -289,24 +289,13 @@ internal class DefaultImageRepository @Inject constructor(
         val fileName =
             "${offlineNodeInformation.handle.encodeBase64()}${FileConstant.JPG_EXTENSION}"
         val thumbnailFile = getThumbnailFile(fileName)
-        var previewFile = getPreviewFile(fileName)
 
-        if (previewFile?.exists() != true) {
-            previewFile = if (isVideo) {
-                getVideoThumbnail(fileName = fileName, videoUri = file.toUri())?.toUri()?.toFile()
-            } else {
-                getImagePreview(
-                    fileName = fileName,
-                    imageUri = file.toUri(),
-                    highPriority = highPriority
-                )?.toUri()?.toFile()
-            }
-        }
+        val previewUri = getOrGeneratePreview(fileName, isVideo, file, highPriority)
 
         return@withContext ImageResult(
             isVideo = isVideo,
-            thumbnailUri = thumbnailFile?.takeIf { it.exists() }?.toUri().toString(),
-            previewUri = previewFile?.takeIf { it.exists() }?.toUri().toString(),
+            thumbnailUri = thumbnailFile?.takeIf { it.exists() }?.toUri()?.toString(),
+            previewUri = previewUri,
             fullSizeUri = file.toUri().toString(),
             isFullyLoaded = true
         )
@@ -315,18 +304,10 @@ internal class DefaultImageRepository @Inject constructor(
     override suspend fun getImageFromFile(file: File, highPriority: Boolean): ImageResult =
         withContext(ioDispatcher) {
             val isVideo = MimeTypeList.typeForName(file.name).isVideo
-            val previewName =
+            val fileName =
                 "${(file.name + file.length()).encodeBase64()}${FileConstant.JPG_EXTENSION}"
 
-            val previewUri = if (isVideo) {
-                getVideoThumbnail(fileName = previewName, videoUri = file.toUri())
-            } else {
-                getImagePreview(
-                    fileName = previewName,
-                    imageUri = file.toUri(),
-                    highPriority = highPriority
-                )
-            }
+            val previewUri = getOrGeneratePreview(fileName, isVideo, file, highPriority)
 
             return@withContext ImageResult(
                 previewUri = previewUri,
@@ -336,63 +317,89 @@ internal class DefaultImageRepository @Inject constructor(
             )
         }
 
+    private suspend fun getOrGeneratePreview(
+        previewFileName: String,
+        isVideo: Boolean,
+        file: File,
+        highPriority: Boolean,
+    ): String? {
+        val previewFile = getPreviewFile(previewFileName)
+        val previewUri = if (previewFile?.exists() == true) {
+            previewFile.toUri().toString()
+        } else {
+            if (isVideo) {
+                getVideoThumbnail(previewFilePath = previewFile?.absolutePath, file = file)
+            } else {
+                getImagePreview(
+                    previewFilePath = previewFile?.absolutePath,
+                    file = file,
+                    highPriority = highPriority
+                )
+            }
+        }
+        return previewUri
+    }
+
     private suspend fun getImagePreview(
-        fileName: String,
-        imageUri: Uri,
+        previewFilePath: String?,
+        file: File,
         highPriority: Boolean,
     ): String? =
         withContext(ioDispatcher) {
-            val imageFile = imageUri.toFile().takeIf { it.exists() && it.length() > SIZE_1_MB }
-            imageFile?.let { getPreviewFile(fileName) }?.let { previewFile ->
-                if (previewFile.exists()) return@withContext previewFile.toUri().toString()
+            val imageFile = file.takeIf { it.exists() && it.length() > SIZE_1_MB }
+            imageFile?.let {
+                previewFilePath?.let {
+                    val previewFile = File(previewFilePath)
+                    if (previewFile.exists()) return@withContext previewFile.toUri().toString()
 
-                val screenSize = context.getScreenSize()
-                val imageRequest = ImageRequestBuilder.newBuilderWithSource(imageUri)
-                    .setRotationOptions(RotationOptions.autoRotate())
-                    .setRequestPriority(if (highPriority) Priority.HIGH else Priority.LOW)
-                    .setResizeOptions(
-                        ResizeOptions.forDimensions(
-                            screenSize.width,
-                            screenSize.height
+                    val screenSize = context.getScreenSize()
+                    val imageRequest = ImageRequestBuilder.newBuilderWithSource(file.toUri())
+                        .setRotationOptions(RotationOptions.autoRotate())
+                        .setRequestPriority(if (highPriority) Priority.HIGH else Priority.LOW)
+                        .setResizeOptions(
+                            ResizeOptions.forDimensions(
+                                screenSize.width,
+                                screenSize.height
+                            )
                         )
-                    )
-                    .build()
+                        .build()
 
-                return@withContext suspendCancellableCoroutine { continuation ->
-                    val dataSource =
-                        Fresco.getImagePipeline().fetchDecodedImage(imageRequest, imageUri)
-                    dataSource.subscribe(object : BaseBitmapDataSubscriber() {
-                        override fun onNewResultImpl(bitmap: Bitmap?) {
-                            bitmap?.let {
-                                BufferedOutputStream(FileOutputStream(previewFile)).apply {
-                                    this.use {
-                                        bitmap.compress(
-                                            Bitmap.CompressFormat.JPEG,
-                                            BITMAP_COMPRESS_QUALITY,
-                                            it
-                                        )
+                    return@withContext suspendCancellableCoroutine { continuation ->
+                        val dataSource =
+                            Fresco.getImagePipeline().fetchDecodedImage(imageRequest, file.toUri())
+                        dataSource.subscribe(object : BaseBitmapDataSubscriber() {
+                            override fun onNewResultImpl(bitmap: Bitmap?) {
+                                bitmap?.let {
+                                    BufferedOutputStream(FileOutputStream(previewFile)).apply {
+                                        this.use {
+                                            bitmap.compress(
+                                                Bitmap.CompressFormat.JPEG,
+                                                BITMAP_COMPRESS_QUALITY,
+                                                it
+                                            )
+                                        }
                                     }
-                                }
-                                bitmap.recycle()
-                                continuation.resumeWith(
-                                    Result.success(
-                                        previewFile.toUri().toString()
+                                    bitmap.recycle()
+                                    continuation.resumeWith(
+                                        Result.success(
+                                            previewFile.toUri().toString()
+                                        )
                                     )
-                                )
-                                dataSource.close()
-                            } ?: run {
-                                continuation.resumeWithException(NullPointerException())
+                                    dataSource.close()
+                                } ?: run {
+                                    continuation.resumeWithException(NullPointerException())
+                                    dataSource.close()
+                                }
+                            }
+
+                            override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
+                                continuation.resumeWithException(dataSource.failureCause ?: return)
                                 dataSource.close()
                             }
-                        }
-
-                        override fun onFailureImpl(dataSource: DataSource<CloseableReference<CloseableImage>>) {
-                            continuation.resumeWithException(dataSource.failureCause ?: return)
+                        }, CallerThreadExecutor.getInstance())
+                        continuation.invokeOnCancellation {
                             dataSource.close()
                         }
-                    }, CallerThreadExecutor.getInstance())
-                    continuation.invokeOnCancellation {
-                        dataSource.close()
                     }
                 }
             }
@@ -639,6 +646,46 @@ internal class DefaultImageRepository @Inject constructor(
 
     private suspend fun getPreviewFile(fileName: String): File? =
         cacheGateway.getCacheFile(CacheFolderConstant.PREVIEW_FOLDER, fileName)
+
+    @Suppress("DEPRECATION")
+    suspend fun getVideoThumbnail(previewFilePath: String?, file: File): String? =
+        withContext(ioDispatcher) {
+            previewFilePath?.let {
+                val previewFile = File(previewFilePath)
+                if (previewFile.exists()) return@withContext previewFile.toUri()
+                    .toString()
+                val videoFile = file.takeIf { it.exists() }
+                videoFile?.let {
+                    val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ThumbnailUtils.createVideoThumbnail(
+                            videoFile,
+                            context.getScreenSize(),
+                            null
+                        )
+                    } else {
+                        ThumbnailUtils.createVideoThumbnail(
+                            videoFile.path,
+                            MediaStore.Images.Thumbnails.FULL_SCREEN_KIND
+                        )
+                    }
+
+                    bitmap?.let {
+                        BufferedOutputStream(FileOutputStream(previewFile)).apply {
+                            this.use {
+                                bitmap.compress(
+                                    Bitmap.CompressFormat.JPEG,
+                                    BITMAP_COMPRESS_QUALITY,
+                                    it,
+                                )
+                            }
+                        }
+                        bitmap.recycle()
+                        return@withContext previewFile.toUri()
+                            .toString()
+                    }
+                }
+            }
+        }
 
     @Suppress("deprecation")
     suspend fun getVideoThumbnail(fileName: String, videoUri: Uri): String? =

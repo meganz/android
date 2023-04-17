@@ -15,15 +15,15 @@ import java.io.File
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetImageFromFileTest {
-    private lateinit var underTest: GetImageFromFile
+class GetImageFromFileUseCaseTest {
+    private lateinit var underTest: GetImageFromFileUseCase
 
     private val imageRepository = mock<ImageRepository>()
 
     @Before
     fun setUp() {
         underTest =
-            DefaultGetImageFromFile(imageRepository)
+            GetImageFromFileUseCase(imageRepository)
     }
 
 

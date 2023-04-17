@@ -3,14 +3,23 @@ package mega.privacy.android.domain.usecase.imageviewer
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.repository.ImageRepository
 import java.io.File
+import javax.inject.Inject
 
 /**
- * Default Implementation of [GetImageFromFile]
+ * The use case to get Image Result given an Image file
  */
-class DefaultGetImageFromFile(
+class GetImageFromFileUseCase @Inject constructor(
     private val imageRepository: ImageRepository,
-) : GetImageFromFile {
-    override suspend fun invoke(
+) {
+    /**
+     * Invoke
+     *
+     * @param file              Image file
+     * @param highPriority      Flag to request image with high priority
+     *
+     * @return ImageResult
+     */
+    suspend operator fun invoke(
         file: File,
         highPriority: Boolean,
     ): ImageResult {

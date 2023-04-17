@@ -4,16 +4,25 @@ import mega.privacy.android.domain.entity.imageviewer.ImageResult
 import mega.privacy.android.domain.repository.ImageRepository
 import mega.privacy.android.domain.repository.NodeRepository
 import mega.privacy.android.domain.usecase.favourites.GetOfflineFileUseCase
+import javax.inject.Inject
 
 /**
- * Default Implementation of [GetImageByOfflineNodeHandle]
+ * The use case to get Image Result given Offline Node Handle
  */
-class DefaultGetImageByOfflineNodeHandle(
+class GetImageByOfflineNodeHandleUseCase @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val getOfflineFileUseCase: GetOfflineFileUseCase,
     private val imageRepository: ImageRepository,
-) : GetImageByOfflineNodeHandle {
-    override suspend fun invoke(
+) {
+    /**
+     * Invoke
+     *
+     * @param nodeHandle                Image Offline File node handle
+     * @param highPriority              Flag to request image with high priority
+     *
+     * @return ImageResult
+     */
+    suspend operator fun invoke(
         nodeHandle: Long,
         highPriority: Boolean,
     ): ImageResult {

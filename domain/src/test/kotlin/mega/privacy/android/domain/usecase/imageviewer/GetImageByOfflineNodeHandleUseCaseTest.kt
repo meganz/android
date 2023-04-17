@@ -16,8 +16,8 @@ import java.io.File
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetImageByOfflineNodeHandleTest {
-    private lateinit var underTest: GetImageByOfflineNodeHandle
+class GetImageByOfflineNodeHandleUseCaseTest {
+    private lateinit var underTest: GetImageByOfflineNodeHandleUseCase
 
     private val nodeRepository = mock<NodeRepository>()
     private val imageRepository = mock<ImageRepository>()
@@ -30,7 +30,7 @@ class DefaultGetImageByOfflineNodeHandleTest {
     @Before
     fun setUp() {
         underTest =
-            DefaultGetImageByOfflineNodeHandle(
+            GetImageByOfflineNodeHandleUseCase(
                 nodeRepository,
                 getOfflineFileUseCase,
                 imageRepository
