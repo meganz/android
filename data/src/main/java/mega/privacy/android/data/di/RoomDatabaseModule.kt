@@ -1,6 +1,7 @@
 package mega.privacy.android.data.di
 
 import android.content.Context
+import android.provider.Settings
 import androidx.room.Room
 import dagger.Module
 import dagger.Provides
@@ -10,6 +11,7 @@ import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.data.database.MegaDatabase
 import mega.privacy.android.data.database.MegaDatabaseConstant
 import mega.privacy.android.data.database.dao.ContactDao
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -27,4 +29,12 @@ internal object RoomDatabaseModule {
     @Provides
     @Singleton
     internal fun provideContactDao(database: MegaDatabase): ContactDao = database.contactDao()
+
+    @Provides
+    @Singleton
+    @Named("aes_key")
+    internal fun provideAesKey(): ByteArray {
+        val key = Settings.Secure.ANDROID_ID + "fkvn8 w4y*(NC\$G*(G($*GR*(#)*huio4h389\$G"
+        return key.toByteArray().copyOfRange(0, 32)
+    }
 }

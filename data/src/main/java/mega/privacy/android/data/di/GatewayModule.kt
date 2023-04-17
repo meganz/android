@@ -149,6 +149,7 @@ internal abstract class GatewayModule {
     abstract fun bindMegaChatApiGateway(implementation: MegaChatApiFacade): MegaChatApiGateway
 
     @Binds
+    @Singleton
     abstract fun bindMegaDBHandlerWrapper(implementation: MegaLocalStorageFacade): MegaLocalStorageGateway
 
     @Binds
