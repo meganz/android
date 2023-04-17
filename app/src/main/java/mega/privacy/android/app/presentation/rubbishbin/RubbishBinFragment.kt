@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
@@ -161,7 +162,6 @@ class RubbishBinFragment : Fragment() {
         }
 
         (requireActivity() as ManagerActivity).setToolbarTitle()
-        (requireActivity() as ManagerActivity).invalidateOptionsMenu()
 
         adapter = MegaNodeAdapter(requireActivity(),
             this@RubbishBinFragment,
@@ -268,6 +268,10 @@ class RubbishBinFragment : Fragment() {
                     markHandledPendingRefresh()
                 }
             }
+        }
+        viewLifecycleOwner.collectFlow(rubbishBinViewModel.state.map { it.nodes.isEmpty() }
+            .distinctUntilChanged()) {
+            requireActivity().invalidateOptionsMenu()
         }
     }
 
