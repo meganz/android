@@ -63,7 +63,6 @@ import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
-import mega.privacy.android.app.main.listeners.MultipleRequestListener
 import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
@@ -1526,68 +1525,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             longArray[i] = handleList[i]
         }
         selectFolderToCopyLauncher.launch(longArray)
-    }
-
-    /**
-     * Confirmation alert before moving a file to rubbish bin
-     */
-    fun askConfirmationMoveToRubbish(handleList: ArrayList<Long>?) {
-        Timber.d("askConfirmationMoveToRubbish")
-        if (!handleList.isNullOrEmpty()) {
-            val message = if (handleList.size > 1) {
-                getString(R.string.confirmation_move_to_rubbish_plural)
-            } else {
-                getString(R.string.confirmation_move_to_rubbish)
-            }
-            MaterialAlertDialogBuilder(this)
-                .setMessage(message)
-                .setPositiveButton(R.string.general_move) { _, _ ->
-                    moveToTrash(handleList)
-                }
-                .setNegativeButton(R.string.general_cancel) { _, _ -> }
-                .show()
-        } else {
-            Timber.w("handleList NULL")
-        }
-    }
-
-    private fun moveToTrash(handleList: ArrayList<Long>?) {
-        Timber.d("moveToTrash: ")
-        moveToRubbish = true
-        if (!viewModel.isOnline()) {
-            showSnackbar(
-                Constants.SNACKBAR_TYPE,
-                getString(R.string.error_server_connection_problem),
-                -1
-            )
-            return
-        }
-        val moveMultipleListener: MultipleRequestListener?
-        //Check if the node is not yet in the rubbish bin (if so, remove it)
-        if (handleList != null) {
-            if (handleList.size > 1) {
-                Timber.d("MOVE multiple: ${handleList.size}")
-                moveMultipleListener =
-                    MultipleRequestListener(Constants.MULTIPLE_SEND_RUBBISH, this)
-                for (i in handleList.indices) {
-                    megaApi.moveNode(
-                        megaApi.getNodeByHandle(handleList[i]),
-                        megaApi.rubbishNode,
-                        moveMultipleListener
-                    )
-                }
-            } else {
-                Timber.d("MOVE single")
-                megaApi.moveNode(
-                    megaApi.getNodeByHandle(handleList[0]),
-                    megaApi.rubbishNode,
-                    this
-                )
-            }
-        } else {
-            Timber.w("handleList NULL")
-            return
-        }
     }
 
     private fun setFoldersButtonText(nodes: List<UnTypedNode>) {

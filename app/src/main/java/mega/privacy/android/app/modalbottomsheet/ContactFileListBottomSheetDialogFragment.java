@@ -257,8 +257,6 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
             case R.id.rubbish_bin_option:
                 if (requireActivity() instanceof ContactFileListActivity) {
                     contactFileListActivity.askConfirmationMoveToRubbish(handleList);
-                } else if (requireActivity() instanceof ContactInfoActivity) {
-                    contactInfoActivity.askConfirmationMoveToRubbish(handleList);
                 }
                 break;
 

@@ -33,7 +33,6 @@ import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import timber.log.Timber
-import java.util.Stack
 
 /**
  * Fragment for Contact shared Folder
@@ -47,7 +46,6 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     private var _binding: FragmentContactSharedFolderListBinding? = null
     private val binding: FragmentContactSharedFolderListBinding
         get() = _binding!!
-    private val parentHandleStack = Stack<Long>()
     private lateinit var moreButton: Button
     private lateinit var listView: RecyclerView
 
@@ -156,9 +154,7 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
     fun hideMultipleSelect() {
         Timber.d("hideMultipleSelect")
         adapter.isMultipleSelect = false
-        actionMode?.let {
-            it.finish()
-        }
+        actionMode?.finish()
     }
 
     /**
@@ -276,7 +272,6 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
 
                 var showRename = false
                 var showMove = false
-                var showTrash = false
                 // Rename
                 if (selected.size == 1) {
                     if ((megaApi.checkAccessErrorExtended(
@@ -336,20 +331,6 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                         }
                     }
 
-                    if (!isEmptyParentHandleStack()) {
-                        showTrash = true
-                    }
-                    selected.forEach {
-                        if ((megaApi.checkAccessErrorExtended(
-                                it,
-                                MegaShare.ACCESS_FULL
-                            ).errorCode != MegaError.API_OK)
-                        ) {
-                            showTrash = false
-                            return@forEach
-                        }
-                    }
-
                     if (selected.size == adapter?.itemCount) {
                         findItem(R.id.cab_menu_select_all).isVisible = false
                         findItem(R.id.cab_menu_unselect_all).isVisible = true
@@ -373,7 +354,6 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
 
                 findItem(R.id.cab_menu_move).isVisible = showMove
                 findItem(R.id.cab_menu_share_link).isVisible = false
-                findItem(R.id.cab_menu_trash).isVisible = showTrash
             }
 
             return false
@@ -408,13 +388,6 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                         (requireActivity() as SnackbarShower), handleList
                     )
                 }
-                R.id.cab_menu_trash -> {
-                    val handleList = arrayListOf<Long>()
-                    documents.forEach {
-                        handleList.add(it.handle)
-                    }
-                    contactInfoActivity.askConfirmationMoveToRubbish(handleList)
-                }
                 R.id.cab_menu_rename -> {
                     if (documents.isNotEmpty()) {
                         val node = documents[0]
@@ -444,11 +417,6 @@ class ContactSharedFolderFragment : ContactFileBaseFragment() {
                 (requireActivity() as AppCompatActivity).startSupportActionMode(ActionBarCallBack())
         }
     }
-
-    /**
-     * @return if stack is empty or not
-     */
-    fun isEmptyParentHandleStack() = parentHandleStack.isEmpty()
 
     override fun onDestroyView() {
         super.onDestroyView()
