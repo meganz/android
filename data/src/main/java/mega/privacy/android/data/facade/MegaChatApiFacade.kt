@@ -26,8 +26,10 @@ import nz.mega.sdk.MegaChatPresenceConfig
 import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaChatRoomListenerInterface
+import nz.mega.sdk.MegaChatScheduledFlags
 import nz.mega.sdk.MegaChatScheduledMeeting
 import nz.mega.sdk.MegaChatScheduledMeetingListenerInterface
+import nz.mega.sdk.MegaChatScheduledRules
 import nz.mega.sdk.MegaChatSession
 import nz.mega.sdk.MegaHandleList
 import javax.inject.Inject
@@ -405,4 +407,39 @@ internal class MegaChatApiFacade @Inject constructor(
     override suspend fun refreshUrl() = chatApi.refreshUrl()
 
     override fun getChatCalls(state: Int): MegaHandleList? = chatApi.getChatCalls(state)
+
+    override fun createChatroomAndSchedMeeting(
+        peerList: MegaChatPeerList,
+        isMeeting: Boolean,
+        publicChat: Boolean,
+        title: String,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+        timezone: String,
+        startDate: Long,
+        endDate: Long,
+        description: String,
+        flags: MegaChatScheduledFlags?,
+        rules: MegaChatScheduledRules?,
+        attributes: String,
+        listener: MegaChatRequestListenerInterface,
+    ) {
+        chatApi.createChatroomAndSchedMeeting(
+            peerList, isMeeting,
+            publicChat,
+            title,
+            speakRequest,
+            waitingRoom,
+            openInvite,
+            timezone,
+            startDate,
+            endDate,
+            description,
+            flags,
+            rules,
+            attributes,
+            listener
+        )
+    }
 }

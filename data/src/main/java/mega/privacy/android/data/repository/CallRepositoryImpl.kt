@@ -12,17 +12,22 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
+import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
 import mega.privacy.android.data.mapper.meeting.ChatSessionMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
+import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingFlagsMapper
+import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingRulesMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.chat.ChatCall
+import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeeting
 import mega.privacy.android.domain.entity.chat.ChatScheduledMeetingOccurr
+import mega.privacy.android.domain.entity.chat.ChatScheduledRules
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSession
 import mega.privacy.android.domain.entity.meeting.ResultOccurrenceUpdate
@@ -43,13 +48,18 @@ import kotlin.coroutines.suspendCoroutine
 /**
  * Default implementation of [CallRepository]
  *
- * @property megaChatApiGateway                 [MegaChatApiGateway]
- * @property chatCallMapper                     [ChatCallMapper]
- * @property chatSessionMapper                  [ChatSessionMapper]
- * @property chatRequestMapper                  [ChatRequestMapper]
- * @property chatScheduledMeetingMapper         [ChatScheduledMeetingMapper]
- * @property chatScheduledMeetingOccurrMapper   [ChatScheduledMeetingOccurrMapper]
- * @property dispatcher                         [CoroutineDispatcher]
+ * @property megaChatApiGateway                     [MegaChatApiGateway]
+ * @property chatCallMapper                         [ChatCallMapper]
+ * @property chatSessionMapper                      [ChatSessionMapper]
+ * @property chatRequestMapper                      [ChatRequestMapper]
+ * @property chatScheduledMeetingMapper             [ChatScheduledMeetingMapper]
+ * @property chatScheduledMeetingOccurrMapper       [ChatScheduledMeetingOccurrMapper]
+ * @property megaChatCallStatusMapper               [MegaChatCallStatusMapper]
+ * @property handleListMapper                       [HandleListMapper]
+ * @property megaChatScheduledMeetingFlagsMapper    [MegaChatScheduledMeetingFlagsMapper]
+ * @property megaChatScheduledMeetingRulesMapper    [MegaChatScheduledMeetingRulesMapper]
+ * @property megaChatPeerListMapper                 [MegaChatPeerListMapper]
+ * @property dispatcher                             [CoroutineDispatcher]
  */
 internal class CallRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
@@ -60,6 +70,9 @@ internal class CallRepositoryImpl @Inject constructor(
     private val chatScheduledMeetingOccurrMapper: ChatScheduledMeetingOccurrMapper,
     private val megaChatCallStatusMapper: MegaChatCallStatusMapper,
     private val handleListMapper: HandleListMapper,
+    private val megaChatScheduledMeetingFlagsMapper: MegaChatScheduledMeetingFlagsMapper,
+    private val megaChatScheduledMeetingRulesMapper: MegaChatScheduledMeetingRulesMapper,
+    private val megaChatPeerListMapper: MegaChatPeerListMapper,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : CallRepository {
 
@@ -246,6 +259,47 @@ internal class CallRepositoryImpl @Inject constructor(
                         || occurr.endDateTime?.toZonedDateTime()?.isAfter(now) == true)
             }
         }
+
+    override suspend fun createChatroomAndSchedMeeting(
+        peerList: List<Long>,
+        isMeeting: Boolean,
+        publicChat: Boolean,
+        title: String,
+        speakRequest: Boolean,
+        waitingRoom: Boolean,
+        openInvite: Boolean,
+        timezone: String,
+        startDate: Long,
+        endDate: Long,
+        description: String,
+        flags: ChatScheduledFlags,
+        rules: ChatScheduledRules,
+        attributes: String,
+    ): ChatRequest = withContext(dispatcher) {
+        suspendCoroutine { continuation ->
+            val callback = OptionalMegaChatRequestListenerInterface(
+                onRequestFinish = onRequestCompleted(continuation)
+            )
+
+            megaChatApiGateway.createChatroomAndSchedMeeting(
+                megaChatPeerListMapper(peerList),
+                isMeeting,
+                publicChat,
+                title,
+                speakRequest,
+                waitingRoom,
+                openInvite,
+                timezone,
+                startDate,
+                endDate,
+                description,
+                megaChatScheduledMeetingFlagsMapper(flags),
+                megaChatScheduledMeetingRulesMapper(rules),
+                attributes,
+                callback
+            )
+        }
+    }
 
     override fun monitorChatCallUpdates(): Flow<ChatCall> = megaChatApiGateway.chatCallUpdates
         .filterIsInstance<ChatCallUpdate.OnChatCallUpdate>()

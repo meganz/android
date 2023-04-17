@@ -12,6 +12,7 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.mapper.HandleListMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
+import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.meeting.ChatCallMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingMapper
 import mega.privacy.android.data.mapper.meeting.ChatScheduledMeetingOccurrMapper
@@ -20,6 +21,8 @@ import mega.privacy.android.data.mapper.meeting.ChatSessionMapper
 import mega.privacy.android.data.mapper.meeting.ChatSessionStatusMapper
 import mega.privacy.android.data.mapper.meeting.ChatSessionTermCodeMapper
 import mega.privacy.android.data.mapper.meeting.MegaChatCallStatusMapper
+import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingFlagsMapper
+import mega.privacy.android.data.mapper.meeting.MegaChatScheduledMeetingRulesMapper
 import mega.privacy.android.data.model.ChatCallUpdate
 import mega.privacy.android.data.model.ScheduledMeetingUpdate
 import mega.privacy.android.domain.entity.ChatRequest
@@ -69,6 +72,9 @@ class CallRepositoryImplTest {
     private val handleListMapper = HandleListMapper()
     private val chatScheduledMeetingMapper = mock<ChatScheduledMeetingMapper>()
     private val chatScheduledMeetingOccurrMapper = mock<ChatScheduledMeetingOccurrMapper>()
+    private val megaChatScheduledMeetingRulesMapper = mock<MegaChatScheduledMeetingRulesMapper>()
+    private val megaChatScheduledMeetingFlagsMapper = mock<MegaChatScheduledMeetingFlagsMapper>()
+    private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val megaChatScheduledMeeting = mock<MegaChatScheduledMeeting>()
     private val chatScheduledMeeting = mock<ChatScheduledMeeting>()
@@ -122,6 +128,9 @@ class CallRepositoryImplTest {
             megaChatCallStatusMapper = megaChatCallStatusMapper,
             handleListMapper = handleListMapper,
             chatSessionMapper = chatSessionMapper,
+            megaChatScheduledMeetingFlagsMapper = megaChatScheduledMeetingFlagsMapper,
+            megaChatScheduledMeetingRulesMapper = megaChatScheduledMeetingRulesMapper,
+            megaChatPeerListMapper = megaChatPeerListMapper
         )
 
         whenever(megaChatRoom.chatId).thenReturn(chatId)
