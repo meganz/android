@@ -104,39 +104,24 @@ public class AndroidMegaRichLinkMessage {
         return isFile;
     }
 
-    public static String[] extractMegaLinks(String text) {
-        List<String> links = new ArrayList<String>();
-        Matcher m = Patterns.WEB_URL.matcher(text);
-        while (m.find()) {
-            String url = m.group();
-            Timber.d("URL extracted: %s", url);
-            if (isFileLink(url)) {
-                return links.toArray(new String[links.size()]);
-            }
-            if (isFolderLink(url)) {
-                links.add(url);
-                return links.toArray(new String[links.size()]);
-            }
-        }
-
-        return links.toArray(new String[links.size()]);
-    }
-
     public static String extractMegaLink(String urlIn) {
-        Matcher m = Patterns.WEB_URL.matcher(urlIn);
+        try {
+            Matcher m = Patterns.WEB_URL.matcher(urlIn);
+            while (m.find()) {
+                String url = decodeURL(m.group());
 
-        while (m.find()) {
-            String url = decodeURL(m.group());
-
-            if (isFileLink(url)) {
-                return url;
+                if (isFileLink(url)) {
+                    return url;
+                }
+                if (isFolderLink(url)) {
+                    return url;
+                }
+                if (isChatLink(url)) {
+                    return url;
+                }
             }
-            if (isFolderLink(url)) {
-                return url;
-            }
-            if (isChatLink(url)) {
-                return url;
-            }
+        } catch (Exception e) {
+            Timber.e(e);
         }
 
         return null;
@@ -165,16 +150,20 @@ public class AndroidMegaRichLinkMessage {
      * @return The contact link if exists.
      */
     public static String extractContactLink(String content) {
-        if (!TextUtil.isTextEmpty(content)) {
-            Matcher m = Patterns.WEB_URL.matcher(content);
+        try {
+            if (!TextUtil.isTextEmpty(content)) {
+                Matcher m = Patterns.WEB_URL.matcher(content);
 
-            while (m.find()) {
-                String url = decodeURL(m.group());
+                while (m.find()) {
+                    String url = decodeURL(m.group());
 
-                if (isContactLink(url)) {
-                    return url;
+                    if (isContactLink(url)) {
+                        return url;
+                    }
                 }
             }
+        } catch (Exception e) {
+            Timber.e(e);
         }
 
         return null;

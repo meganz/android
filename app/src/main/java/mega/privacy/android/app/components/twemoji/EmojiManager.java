@@ -184,15 +184,18 @@ public final class EmojiManager {
      * returns true when the string contains only emojis. Note that whitespace will be filtered out.
      */
     public boolean isOnlyEmojis(@Nullable final String text) {
-        if (!TextUtils.isEmpty(text)) {
-            final String inputWithoutSpaces = SPACE_REMOVAL.matcher(text).replaceAll(Matcher.quoteReplacement(""));
-            return EmojiManager.getInstance()
-                    .getEmojiRepetitivePattern()
-                    .matcher(inputWithoutSpaces)
-                    .matches();
-//      return EmojiManager.getInstance().getEmojiRepetitivePattern().matcher(text).matches();
-        } else {
+        try {
+            if (!TextUtils.isEmpty(text)) {
+                final String inputWithoutSpaces = SPACE_REMOVAL.matcher(text).replaceAll(Matcher.quoteReplacement(""));
+                return EmojiManager.getInstance()
+                        .getEmojiRepetitivePattern()
+                        .matcher(inputWithoutSpaces)
+                        .matches();
+            }
+        } catch (Exception e) {
+            Timber.e(e);
         }
+
         return false;
     }
 

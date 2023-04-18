@@ -231,13 +231,17 @@ public class Util {
     }
 
     public static int countMatches(Pattern pattern, String string) {
-        Matcher matcher = pattern.matcher(string);
-
         int count = 0;
         int pos = 0;
-        while (matcher.find(pos)) {
-            count++;
-            pos = matcher.start() + 1;
+        try {
+            Matcher matcher = pattern.matcher(string);
+
+            while (matcher.find(pos)) {
+                count++;
+                pos = matcher.start() + 1;
+            }
+        } catch (Exception e) {
+            Timber.e(e);
         }
 
         return count;
@@ -751,30 +755,6 @@ public class Util {
 
     }
 
-    /*
-     * Validate email
-     */
-    public static String getEmailError(String value, Context context) {
-        Timber.d("getEmailError");
-        if (value.length() == 0) {
-            return context.getString(R.string.error_enter_email);
-        }
-        if (!Constants.EMAIL_ADDRESS.matcher(value).matches()) {
-            return context.getString(R.string.error_invalid_email);
-        }
-        return null;
-    }
-
-    /*
-     * compare the current mail to newly changed email
-     */
-    public static String comparedToCurrentEmail(String value, Context context) {
-        DatabaseHandler dbH = MegaApplication.getInstance().getDbH();
-        if (value.equals(dbH.getCredentials().getEmail())) {
-            return context.getString(R.string.mail_same_as_old);
-        }
-        return null;
-    }
 
     public static AlertDialog showAlert(Context context, String message, String title) {
         Timber.d("showAlert");
@@ -804,19 +784,6 @@ public class Util {
         return builder.show();
     }
 
-    public static long calculateTimestampMinDifference(String timeStamp) {
-        Timber.d("calculateTimestampDifference");
-
-        Long actualTimestamp = System.currentTimeMillis() / 1000;
-
-        Long oldTimestamp = Long.parseLong(timeStamp);
-
-        Long difference = actualTimestamp - oldTimestamp;
-
-        difference = difference / 60;
-
-        return difference;
-    }
 
     public static int getVersion(Context context) {
         try {
@@ -947,17 +914,6 @@ public class Util {
     @Deprecated
     public static boolean existOngoingTransfers(MegaApiAndroid megaApi) {
         return megaApi.getNumPendingDownloads() > 0 || megaApi.getNumPendingUploads() > 0;
-    }
-
-    public static Bitmap createAvatarBackground(int color) {
-        Bitmap circle = Bitmap.createBitmap(Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Constants.DEFAULT_AVATAR_WIDTH_HEIGHT, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(circle);
-        Paint paintCircle = new Paint();
-        paintCircle.setAntiAlias(true);
-        paintCircle.setColor(color);
-        int radius = circle.getWidth() / 2;
-        c.drawCircle(radius, radius, radius, paintCircle);
-        return circle;
     }
 
     /**
