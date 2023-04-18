@@ -173,19 +173,15 @@ public class CloudDriveProviderFragment extends Fragment implements CheckScrollI
             Timber.d("onActionItemClicked");
             List<MegaNode> documents = adapter.getSelectedNodes();
 
-            switch (item.getItemId()) {
-                case R.id.action_mode_close_button: {
-                    Timber.d("Close button");
-                }
-                case R.id.cab_menu_select_all: {
-                    selectAll();
-                    break;
-                }
-                case R.id.cab_menu_unselect_all: {
-                    clearSelections();
-                    hideMultipleSelect();
-                    break;
-                }
+            int itemId = item.getItemId();
+            if (itemId == R.id.action_mode_close_button) {
+                Timber.d("Close button");
+                selectAll();
+            } else if (itemId == R.id.cab_menu_select_all) {
+                selectAll();
+            } else if (itemId == R.id.cab_menu_unselect_all) {
+                clearSelections();
+                hideMultipleSelect();
             }
             return false;
         }

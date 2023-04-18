@@ -499,21 +499,14 @@ public class MapsActivity extends PasscodeActivity implements ActivityCompat.OnR
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.send_current_location_layout_landscape:
-            case R.id.send_current_location_layout: {
-                setActivityResult(currentAddress);
-                break;
-            }
-            case R.id.my_location_fab: {
-                setMyLocation(true);
-                break;
-            }
-            case R.id.set_fullscreen_fab: {
-                isFullScreenEnabled = !isFullScreenEnabled;
-                setFullScreen();
-                break;
-            }
+        int id = v.getId();
+        if (id == R.id.send_current_location_layout_landscape || id == R.id.send_current_location_layout) {
+            setActivityResult(currentAddress);
+        } else if (id == R.id.my_location_fab) {
+            setMyLocation(true);
+        } else if (id == R.id.set_fullscreen_fab) {
+            isFullScreenEnabled = !isFullScreenEnabled;
+            setFullScreen();
         }
     }
 

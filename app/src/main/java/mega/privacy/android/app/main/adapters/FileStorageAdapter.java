@@ -186,12 +186,9 @@ public class FileStorageAdapter extends RecyclerView.Adapter<FileStorageAdapter.
 
         int currentPosition = holder.getAdapterPosition();
 
-        switch (v.getId()) {
-            case R.id.file_explorer_filename:
-            case R.id.file_explorer_item_layout: {
-                ((FileStorageActivity) context).itemClick(currentPosition);
-                break;
-            }
+        int id = v.getId();
+        if (id == R.id.file_explorer_filename || id == R.id.file_explorer_item_layout) {
+            ((FileStorageActivity) context).itemClick(currentPosition);
         }
     }
 }

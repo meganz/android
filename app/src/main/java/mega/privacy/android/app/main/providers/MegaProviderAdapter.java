@@ -260,15 +260,12 @@ public class MegaProviderAdapter extends RecyclerView.Adapter<MegaProviderAdapte
 
         int currentPosition = holder.currentPosition;
 
-        switch (v.getId()) {
-            case R.id.file_explorer_filename:
-            case R.id.file_explorer_item_layout: {
-                if (fragment instanceof CloudDriveProviderFragment) {
-                    ((CloudDriveProviderFragment) fragment).itemClick(currentPosition);
-                } else if (fragment instanceof IncomingSharesProviderFragment) {
-                    ((IncomingSharesProviderFragment) fragment).itemClick(currentPosition);
-                }
-                break;
+        int id = v.getId();
+        if (id == R.id.file_explorer_filename || id == R.id.file_explorer_item_layout) {
+            if (fragment instanceof CloudDriveProviderFragment) {
+                ((CloudDriveProviderFragment) fragment).itemClick(currentPosition);
+            } else if (fragment instanceof IncomingSharesProviderFragment) {
+                ((IncomingSharesProviderFragment) fragment).itemClick(currentPosition);
             }
         }
     }

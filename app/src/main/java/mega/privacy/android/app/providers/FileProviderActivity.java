@@ -750,42 +750,30 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        switch (v.getId()) {
-            case R.id.pin_first_login: {
-                if (hasFocus) {
-                    firstPin.setText("");
-                }
-                break;
+        int id = v.getId();
+        if (id == R.id.pin_first_login) {
+            if (hasFocus) {
+                firstPin.setText("");
             }
-            case R.id.pin_second_login: {
-                if (hasFocus) {
-                    secondPin.setText("");
-                }
-                break;
+        } else if (id == R.id.pin_second_login) {
+            if (hasFocus) {
+                secondPin.setText("");
             }
-            case R.id.pin_third_login: {
-                if (hasFocus) {
-                    thirdPin.setText("");
-                }
-                break;
+        } else if (id == R.id.pin_third_login) {
+            if (hasFocus) {
+                thirdPin.setText("");
             }
-            case R.id.pin_fourth_login: {
-                if (hasFocus) {
-                    fourthPin.setText("");
-                }
-                break;
+        } else if (id == R.id.pin_fourth_login) {
+            if (hasFocus) {
+                fourthPin.setText("");
             }
-            case R.id.pin_fifth_login: {
-                if (hasFocus) {
-                    fifthPin.setText("");
-                }
-                break;
+        } else if (id == R.id.pin_fifth_login) {
+            if (hasFocus) {
+                fifthPin.setText("");
             }
-            case R.id.pin_sixth_login: {
-                if (hasFocus) {
-                    sixthPin.setText("");
-                }
-                break;
+        } else if (id == R.id.pin_sixth_login) {
+            if (hasFocus) {
+                sixthPin.setText("");
             }
         }
     }
@@ -838,16 +826,10 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
     @Override
     public boolean onLongClick(View v) {
-        switch (v.getId()) {
-            case R.id.pin_first_login:
-            case R.id.pin_second_login:
-            case R.id.pin_third_login:
-            case R.id.pin_fourth_login:
-            case R.id.pin_fifth_login:
-            case R.id.pin_sixth_login: {
-                pinLongClick = true;
-                v.requestFocus();
-            }
+        int id = v.getId();
+        if (id == R.id.pin_first_login || id == R.id.pin_second_login || id == R.id.pin_third_login || id == R.id.pin_fourth_login || id == R.id.pin_fifth_login || id == R.id.pin_sixth_login) {
+            pinLongClick = true;
+            v.requestFocus();
         }
         return false;
     }
@@ -1082,54 +1064,46 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.button_login: {
-                onLoginClick(v);
-                break;
+        int id = v.getId();
+        if (id == R.id.button_login) {
+            onLoginClick(v);
+        } else if (id == R.id.cancel_button) {
+            finish();
+        } else if (id == R.id.attach_button) {
+            AlertDialog temp;
+            try {
+                temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
+                temp.show();
+            } catch (Exception e) {
+                return;
             }
-            case R.id.cancel_button: {
-                finish();
-                break;
+            statusDialog = temp;
+
+            progressTransfersFinish = 0;
+            clipDataTransfers = null;
+            long[] hashes = new long[selectedNodes.size()];
+            ArrayList<Long> totalHashes = new ArrayList<>();
+
+            for (int i = 0; i < selectedNodes.size(); i++) {
+                hashes[i] = selectedNodes.get(i).getHandle();
+                getTotalTransfers(selectedNodes.get(i), totalHashes);
             }
-            case R.id.attach_button: {
-                AlertDialog temp;
-                try {
-                    temp = MegaProgressDialogUtil.createProgressDialog(this, getString(R.string.context_preparing_provider));
-                    temp.show();
-                } catch (Exception e) {
-                    return;
-                }
-                statusDialog = temp;
 
-                progressTransfersFinish = 0;
-                clipDataTransfers = null;
-                long[] hashes = new long[selectedNodes.size()];
-                ArrayList<Long> totalHashes = new ArrayList<>();
-
-                for (int i = 0; i < selectedNodes.size(); i++) {
-                    hashes[i] = selectedNodes.get(i).getHandle();
-                    getTotalTransfers(selectedNodes.get(i), totalHashes);
-                }
-
-                hashes = new long[totalTransfers];
-                for (int i = 0; i < totalHashes.size(); i++) {
-                    hashes[i] = totalHashes.get(i);
-                }
-                downloadAndAttach(hashes);
-                break;
+            hashes = new long[totalTransfers];
+            for (int i = 0; i < totalHashes.size(); i++) {
+                hashes[i] = totalHashes.get(i);
             }
-            case R.id.lost_authentication_device: {
-                try {
-                    Intent openTermsIntent = new Intent(this, WebViewActivity.class);
-                    openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    openTermsIntent.setData(Uri.parse(RECOVERY_URL));
-                    startActivity(openTermsIntent);
-                } catch (Exception e) {
-                    Intent viewIntent = new Intent(Intent.ACTION_VIEW);
-                    viewIntent.setData(Uri.parse(RECOVERY_URL));
-                    startActivity(viewIntent);
-                }
-                break;
+            downloadAndAttach(hashes);
+        } else if (id == R.id.lost_authentication_device) {
+            try {
+                Intent openTermsIntent = new Intent(this, WebViewActivity.class);
+                openTermsIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                openTermsIntent.setData(Uri.parse(RECOVERY_URL));
+                startActivity(openTermsIntent);
+            } catch (Exception e) {
+                Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                viewIntent.setData(Uri.parse(RECOVERY_URL));
+                startActivity(viewIntent);
             }
         }
     }
