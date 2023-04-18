@@ -573,10 +573,16 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
                         }
                     }
                     if (numMega == 0 && queryContactsShare.size() > 0) {
-                        queryContactsShare.remove(0);
+                        ShareContactInfo first = queryContactsShare.get(0);
+                        if (first.isHeader() && first.isMegaContact()) {
+                            queryContactsShare.remove(0);
+                        }
                     }
                     if (numPhone == 0 && (queryContactsShare.size() - 1 >= 0)) {
-                        queryContactsShare.remove(queryContactsShare.size() - 1);
+                        ShareContactInfo last = queryContactsShare.get(queryContactsShare.size() - 1);
+                        if (last.isHeader() && last.isPhoneContact()) {
+                            queryContactsShare.remove(queryContactsShare.size() - 1);
+                        }
                     }
                 }
             }
