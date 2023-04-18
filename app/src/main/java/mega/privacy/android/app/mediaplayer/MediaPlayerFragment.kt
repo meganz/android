@@ -207,6 +207,7 @@ class MediaPlayerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
+        viewModel.updateAddSubtitleState()
         if (isVideoPlayer() && serviceGateway?.playing() == true) {
             serviceGateway?.setPlayWhenReady(false)
             viewModel.updateVideoPlayerPausedForPlaylist(true)

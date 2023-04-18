@@ -238,6 +238,13 @@ class MediaPlayerViewModel @Inject constructor(
     }
 
     /**
+     * Update isAddSubtitle state
+     */
+    fun updateAddSubtitleState() {
+        _isAddSubtitle.update { state.value.isAddSubtitle && state.value.subtitleFileInfo == null }
+    }
+
+    /**
      * Update current subtitle file info
      *
      * @param subtitleFileInfo [SubtitleFileInfo]
