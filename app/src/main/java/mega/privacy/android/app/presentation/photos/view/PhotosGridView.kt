@@ -3,6 +3,7 @@
 package mega.privacy.android.app.presentation.photos.view
 
 import android.content.res.Configuration
+import android.text.format.DateFormat.getBestDateTimePattern
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -104,8 +105,10 @@ internal fun PhotosGridView(
 
             when (item) {
                 is UIPhoto.Separator -> {
-                    Separator(currentZoomLevel = currentZoomLevel,
-                        modificationTime = item.modificationTime)
+                    Separator(
+                        currentZoomLevel = currentZoomLevel,
+                        modificationTime = item.modificationTime,
+                    )
                 }
                 is UIPhoto.PhotoItem -> {
                     val isSelected = item.photo.id in selectedPhotoIds
@@ -183,11 +186,10 @@ internal fun PhotoViewContainer(
             )
         }
         if (photo is Photo.Video) {
-            Spacer(modifier = Modifier
-                .matchParentSize()
-                .background(
-                    color = grey_alpha_032
-                )
+            Spacer(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(color = grey_alpha_032)
             )
 
             Text(
@@ -256,7 +258,11 @@ internal fun Separator(
     modificationTime: LocalDateTime,
 ) {
     Text(
-        text = dateText(currentZoomLevel = currentZoomLevel, modificationTime = modificationTime),
+        text = dateText(
+            currentZoomLevel = currentZoomLevel,
+            modificationTime = modificationTime,
+            locale = LocalContext.current.resources.configuration.locales[0],
+        ),
         textAlign = TextAlign.Start,
         color = colorResource(id = R.color.grey_087_white_087),
         modifier = Modifier
@@ -268,23 +274,27 @@ internal fun Separator(
 private fun dateText(
     currentZoomLevel: ZoomLevel,
     modificationTime: LocalDateTime,
+    locale: Locale,
 ): String {
     val datePattern = if (currentZoomLevel == ZoomLevel.Grid_1) {
         if (modificationTime.year == LocalDateTime.now().year) {
-            "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH_WITH_DAY"
+            getBestDateTimePattern(locale, "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH_WITH_DAY")
         } else {
-            "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH_WITH_DAY $DATE_FORMAT_YEAR_WITH_MONTH"
+            getBestDateTimePattern(
+                locale,
+                "$DATE_FORMAT_DAY $DATE_FORMAT_MONTH_WITH_DAY $DATE_FORMAT_YEAR_WITH_MONTH"
+            )
         }
     } else {
         if (modificationTime.year == LocalDateTime.now().year) {
-            DATE_FORMAT_MONTH
+            getBestDateTimePattern(locale, DATE_FORMAT_MONTH)
         } else {
-            "$DATE_FORMAT_MONTH $DATE_FORMAT_YEAR_WITH_MONTH"
+            getBestDateTimePattern(locale, "$DATE_FORMAT_MONTH $DATE_FORMAT_YEAR_WITH_MONTH")
         }
     }
     return SimpleDateFormat(
         datePattern,
-        Locale.getDefault()
+        locale
     ).format(
         Date.from(
             modificationTime
