@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
@@ -163,6 +164,11 @@ class ManagerViewModelTest {
             canRequestOptInVerification = false,
         )
     )
+
+    private val monitorPushNotificationSettingsUpdate =
+        mock<MonitorUpdatePushNotificationSettingsUseCase> {
+            onBlocking { invoke() }.thenReturn(flowOf(true))
+        }
     private val requireTwoFactorAuthenticationUseCase =
         mock<RequireTwoFactorAuthenticationUseCase>()
     private val setLatestTargetPath = mock<SetLatestTargetPath>()
@@ -209,6 +215,7 @@ class ManagerViewModelTest {
             listenToNewMediaUseCase = mock(),
             monitorUserUpdates = monitorUserUpdates,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
+            monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate
         )
     }
 
@@ -493,5 +500,16 @@ class ManagerViewModelTest {
             testScheduler.advanceUntilIdle()
 
             verify(establishCameraUploadsSyncHandlesUseCase).invoke()
+        }
+
+    @Test
+    fun `test that when push notification settings is updated state is also updated`() =
+        runTest {
+            testScheduler.advanceUntilIdle()
+            verify(monitorPushNotificationSettingsUpdate).invoke()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isPushNotificationSettingsUpdatedEvent).isTrue()
+            }
         }
 }

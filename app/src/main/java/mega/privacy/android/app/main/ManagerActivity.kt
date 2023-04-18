@@ -123,7 +123,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISAB
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_FILTER_CONTACT_UPDATE
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
 import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
@@ -818,7 +817,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
     }
     private val callStatusObserver: Observer<MegaChatCall> =
-        Observer<MegaChatCall> { call: MegaChatCall ->
+        Observer { call: MegaChatCall ->
             when (call.status) {
                 MegaChatCall.CALL_STATUS_CONNECTING, MegaChatCall.CALL_STATUS_IN_PROGRESS, MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION, MegaChatCall.CALL_STATUS_DESTROYED, MegaChatCall.CALL_STATUS_USER_NO_PRESENT -> {
                     updateVisibleCallElements(call.chatid)
@@ -835,22 +834,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
     private val callOnHoldObserver: Observer<MegaChatCall> =
-        Observer<MegaChatCall> { call: MegaChatCall -> updateVisibleCallElements(call.chatid) }
+        Observer { call: MegaChatCall -> updateVisibleCallElements(call.chatid) }
     private val sessionOnHoldObserver =
         Observer { sessionAndCall: android.util.Pair<*, *> ->
             val call: MegaChatCall = megaChatApi.getChatCallByCallId(sessionAndCall.first as Long)
             updateVisibleCallElements(call.chatid)
         }
-    private val chatRoomMuteUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == null) return
-            if (intent.action == ACTION_UPDATE_PUSH_NOTIFICATION_SETTING) {
-                if (recentChatsFragment != null && recentChatsFragment?.isVisible == true) {
-                    recentChatsFragment?.notifyPushChanged()
-                }
-            }
-        }
-    }
     private val refreshObserver = Observer { refreshed: Boolean? ->
         if (refreshed == true) {
             if (drawerItem === DrawerItem.CLOUD_DRIVE) {
@@ -2220,14 +2209,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         registerOrderUpdatedReceiver()
         registerChatArchivedReceiver()
         registerTransferFinishedReceiver()
-        registerChatRoomMuteUpdateReceiver()
-    }
-
-    private fun registerChatRoomMuteUpdateReceiver() {
-        registerReceiver(
-            chatRoomMuteUpdateReceiver,
-            IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
-        )
     }
 
     private fun registerTransferFinishedReceiver() {
@@ -2391,7 +2372,13 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             if (managerState.shouldAlertUserAboutSecurityUpgrade) {
                 SecurityUpgradeDialogFragment.newInstance()
                     .show(supportFragmentManager, SecurityUpgradeDialogFragment.TAG)
-                viewModel.setShouldAlertUserAboutSecurityUpgrade(false);
+                viewModel.setShouldAlertUserAboutSecurityUpgrade(false)
+            }
+            if (managerState.isPushNotificationSettingsUpdatedEvent) {
+                if (recentChatsFragment?.isVisible == true) {
+                    recentChatsFragment?.notifyPushChanged()
+                }
+                viewModel.onConsumePushNotificationSettingsUpdateEvent()
             }
             enabledFeatures = managerState.enabledFlags
             canVerifyPhoneNumber = managerState.canVerifyPhoneNumber
@@ -3301,7 +3288,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             alertDialogSMSVerification?.dismiss()
         }
         isStorageStatusDialogShown = false
-        unregisterReceiver(chatRoomMuteUpdateReceiver)
         unregisterReceiver(contactUpdateReceiver)
         unregisterReceiver(updateMyAccountReceiver)
         unregisterReceiver(receiverUpdateOrder)

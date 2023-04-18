@@ -47,12 +47,15 @@ import mega.privacy.android.domain.usecase.BroadcastUploadPauseState
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.HasInboxChildren
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
@@ -64,9 +67,7 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
-import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
@@ -142,6 +143,7 @@ class ManagerViewModel @Inject constructor(
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
+    monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
 ) : ViewModel() {
 
     /**
@@ -246,6 +248,11 @@ class ManagerViewModel @Inject constructor(
                     )
                     establishCameraUploadsSyncHandlesUseCase()
                 }
+        }
+        viewModelScope.launch {
+            monitorUpdatePushNotificationSettingsUseCase().collect {
+                _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
+            }
         }
     }
 
@@ -530,6 +537,15 @@ class ManagerViewModel @Inject constructor(
     fun setShouldAlertUserAboutSecurityUpgrade(shouldShow: Boolean) {
         _state.update {
             it.copy(shouldAlertUserAboutSecurityUpgrade = shouldShow)
+        }
+    }
+
+    /**
+     * on Consume Push notification settings updated event
+     */
+    fun onConsumePushNotificationSettingsUpdateEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = false) }
         }
     }
 
