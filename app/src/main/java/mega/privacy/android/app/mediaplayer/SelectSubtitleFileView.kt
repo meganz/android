@@ -89,7 +89,7 @@ internal fun SelectSubtitleFileView(
     Scaffold(
         topBar = {
             when {
-                isEmpty && isLoading && viewModel.searchState != SearchWidgetState.EXPANDED ->
+                (isEmpty || isLoading) && viewModel.searchState != SearchWidgetState.EXPANDED ->
                     EmptyTopBar {
                         onBackPressedCallback()
                     }
