@@ -24,7 +24,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.R
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
@@ -40,6 +42,7 @@ import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
 
 /**
@@ -61,6 +64,9 @@ class AlbumDynamicContentFragment : Fragment() {
     // Action mode
     private var actionMode: ActionMode? = null
     private lateinit var actionModeCallback: AlbumContentActionModeCallback
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     companion object {
         @JvmStatic
@@ -216,6 +222,14 @@ class AlbumDynamicContentFragment : Fragment() {
             menu.findItem(R.id.action_menu_sort_by)?.isVisible = photos.isNotEmpty()
             photos.setFilterMenuItemVisibility()
             if (album is Album.UserAlbum) {
+                val isAlbumSharingEnabled = runBlocking {
+                    getFeatureFlagValueUseCase(AppFeatures.AlbumSharing)
+                }
+                menu.findItem(R.id.action_menu_get_link)?.let { menu ->
+                    menu.title = context?.resources?.getQuantityString(R.plurals.get_links, 1)
+                    menu.isVisible = isAlbumSharingEnabled
+                }
+
                 menu.findItem(R.id.action_menu_rename)?.isVisible = true
                 menu.findItem(R.id.action_menu_delete)?.isVisible = true
 
@@ -226,6 +240,9 @@ class AlbumDynamicContentFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.action_menu_get_link -> {
+                openAlbumGetLinkScreen()
+            }
             R.id.action_menu_sort_by -> {
                 albumsViewModel.showSortByDialog(showSortByDialog = true)
             }
@@ -296,5 +313,15 @@ class AlbumDynamicContentFragment : Fragment() {
 
         if (!isProgressCompleted) return
         albumContentViewModel.updatePhotosRemovingProgressCompleted(albumId = album.id)
+    }
+
+    private fun openAlbumGetLinkScreen() {
+        val album = albumsViewModel.state.value.currentUserAlbum ?: return
+        val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
+            context = requireContext(),
+            albumId = album.id,
+        )
+        startActivity(intent)
+        activity?.overridePendingTransition(0, 0)
     }
 }
