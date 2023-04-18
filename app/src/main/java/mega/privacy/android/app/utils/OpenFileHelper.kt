@@ -8,6 +8,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.PdfViewerActivity
 import mega.privacy.android.app.presentation.favourites.facade.OpenFileWrapper
+import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
@@ -121,7 +122,7 @@ class OpenFileHelper @Inject constructor(
         } else {
             Intent(Intent.ACTION_VIEW)
         }.apply {
-            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, Constants.FILE_BROWSER_ADAPTER)
+            putExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, FAVOURITES_ADAPTER)
             putExtra(Constants.INTENT_EXTRA_KEY_FILE_NAME, node.name)
             if (availablePlaylist) {
                 putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, node.parentHandle)

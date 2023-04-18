@@ -19,7 +19,6 @@ import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.collectAsState
@@ -55,8 +54,15 @@ import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
 import mega.privacy.android.app.mediaplayer.service.MediaPlayerServiceBinder
 import mega.privacy.android.app.mediaplayer.service.VideoPlayerService
 import mega.privacy.android.app.presentation.extensions.serializable
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.Constants.AUDIO_PLAYER_TOOLBAR_INIT_HIDE_DELAY_MS
+import mega.privacy.android.app.utils.Constants.FAVOURITES_ADAPTER
+import mega.privacy.android.app.utils.Constants.FILE_LINK_ADAPTER
+import mega.privacy.android.app.utils.Constants.FROM_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_REBUILD_PLAYLIST
+import mega.privacy.android.app.utils.Constants.INVALID_VALUE
+import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
+import mega.privacy.android.app.utils.Constants.RECENTS_ADAPTER
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.isVisible
@@ -405,9 +411,11 @@ class MediaPlayerFragment : Fragment() {
                     }
                     initAddSubtitleDialog(viewHolder.binding.addSubtitleDialog)
                     viewLifecycleOwner.lifecycleScope.launch {
+                        val isShow = getFeatureFlagValueUseCase(feature = AppFeatures.AddSubtitle)
+                                && !hideShowSubtitleIcon()
                         setupSubtitleButton(
                             // Add feature flag, and will be removed after the feature is finished.
-                            isShow = getFeatureFlagValueUseCase(feature = AppFeatures.AddSubtitle),
+                            isShow = isShow,
                             isSubtitleShown = viewModel.state.value.isSubtitleShown
                         ) {
                             if (viewModel.state.value.isSubtitleShown) {
@@ -718,6 +726,18 @@ class MediaPlayerFragment : Fragment() {
             }
         }
     }
+
+    /**
+     * Hide the subtitle icon when the adapterType is OFFLINE_ADAPTER,
+     * FILE_LINK_ADAPTER, RECENTS_ADAPTER, or FAVOURITES_ADAPTER
+     */
+    private fun hideShowSubtitleIcon() =
+        requireActivity().intent.getIntExtra(Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE, INVALID_VALUE)
+            .let { adapterType ->
+                adapterType == OFFLINE_ADAPTER || adapterType == FILE_LINK_ADAPTER
+                        || adapterType == RECENTS_ADAPTER || adapterType == FAVOURITES_ADAPTER
+                        || adapterType == FROM_CHAT
+            }
 
     companion object {
         private const val MEGA_SCREENSHOTS_FOLDER_NAME = "MEGA Screenshots"
