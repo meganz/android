@@ -194,13 +194,6 @@ interface ChatRepository {
     suspend fun isChatLastMessageGeolocation(chatId: Long): Boolean
 
     /**
-     * Monitor muted chats
-     *
-     * @return  A flow of Booleans indicating some changes has been made
-     */
-    fun monitorMutedChats(): Flow<Boolean>
-
-    /**
      * Get my email updated
      */
     fun monitorMyEmail(): Flow<String?>

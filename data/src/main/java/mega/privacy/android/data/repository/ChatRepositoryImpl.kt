@@ -342,9 +342,6 @@ internal class ChatRepositoryImpl @Inject constructor(
                     && lastMessage?.containsMeta?.type == MegaChatContainsMeta.CONTAINS_META_GEOLOCATION
         }
 
-    override fun monitorMutedChats(): Flow<Boolean> =
-        deviceEventGateway.monitorMutedChats
-
     override fun monitorMyEmail(): Flow<String?> = megaApiGateway.globalUpdates
         .filterIsInstance<GlobalUpdate.OnUsersUpdate>()
         .mapNotNull {

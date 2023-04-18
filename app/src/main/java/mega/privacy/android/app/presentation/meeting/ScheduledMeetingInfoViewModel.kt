@@ -55,11 +55,11 @@ import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
-import mega.privacy.android.domain.usecase.chat.MonitorMutedChatsUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaApiJava
 import timber.log.Timber
 import javax.inject.Inject
@@ -67,34 +67,34 @@ import javax.inject.Inject
 /**
  * ScheduledMeetingInfoActivity view model.
  *
- * @property getChatRoom                    [GetChatRoom]
- * @property getChatParticipants            [GetChatParticipants]
- * @property getScheduledMeetingByChat      [GetScheduledMeetingByChat]
- * @property getChatCall                    [GetChatCall]
- * @property getVisibleContactsUseCase             [GetVisibleContactsUseCase]
- * @property queryChatLink                  [QueryChatLink]
- * @property removeChatLink                 [RemoveChatLink]
- * @property createChatLink                 [CreateChatLink]
- * @property inviteToChat                   [InviteToChat]
- * @property leaveChat                      [LeaveChat]
- * @property removeFromChat                 [RemoveFromChat]
- * @property inviteContact                  [InviteContact]
- * @property setOpenInvite                  [SetOpenInvite]
- * @property updateChatPermissions          [UpdateChatPermissions]
- * @property getPublicChatToPrivate         [SetPublicChatToPrivate]
- * @property getChatRoomUseCase             [GetChatRoomUseCase]
- * @property passcodeManagement             [PasscodeManagement]
- * @property chatManagement                 [ChatManagement]
- * @property startConversation              [StartConversation]
- * @property openOrStartCall                [OpenOrStartCall]
- * @property monitorChatListItemUpdates     [MonitorChatListItemUpdates]
- * @property monitorScheduledMeetingUpdates [MonitorScheduledMeetingUpdates]
- * @property monitorConnectivityUseCase     [MonitorConnectivityUseCase]
- * @property monitorChatRoomUpdates         [MonitorChatRoomUpdates]
- * @property monitorMutedChats              [MonitorMutedChatsUseCase]
- * @property cameraGateway                  [CameraGateway]
- * @property deviceGateway                  [DeviceGateway]
- * @property state                          Current view state as [ScheduledMeetingInfoState]
+ * @property getChatRoom                                    [GetChatRoom]
+ * @property getChatParticipants                            [GetChatParticipants]
+ * @property getScheduledMeetingByChat                      [GetScheduledMeetingByChat]
+ * @property getChatCall                                    [GetChatCall]
+ * @property getVisibleContactsUseCase                      [GetVisibleContactsUseCase]
+ * @property queryChatLink                                  [QueryChatLink]
+ * @property removeChatLink                                 [RemoveChatLink]
+ * @property createChatLink                                 [CreateChatLink]
+ * @property inviteToChat                                   [InviteToChat]
+ * @property leaveChat                                      [LeaveChat]
+ * @property removeFromChat                                 [RemoveFromChat]
+ * @property inviteContact                                  [InviteContact]
+ * @property setOpenInvite                                  [SetOpenInvite]
+ * @property updateChatPermissions                          [UpdateChatPermissions]
+ * @property getPublicChatToPrivate                         [SetPublicChatToPrivate]
+ * @property getChatRoomUseCase                             [GetChatRoomUseCase]
+ * @property passcodeManagement                             [PasscodeManagement]
+ * @property chatManagement                                 [ChatManagement]
+ * @property startConversation                              [StartConversation]
+ * @property openOrStartCall                                [OpenOrStartCall]
+ * @property monitorChatListItemUpdates                     [MonitorChatListItemUpdates]
+ * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdates]
+ * @property monitorConnectivityUseCase                     [MonitorConnectivityUseCase]
+ * @property monitorChatRoomUpdates                         [MonitorChatRoomUpdates]
+ * @property monitorUpdatePushNotificationSettingsUseCase   [MonitorUpdatePushNotificationSettingsUseCase]
+ * @property cameraGateway                                  [CameraGateway]
+ * @property deviceGateway                                  [DeviceGateway]
+ * @property state                    Current view state as [ScheduledMeetingInfoState]
 
  */
 @HiltViewModel
@@ -123,7 +123,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val monitorChatRoomUpdates: MonitorChatRoomUpdates,
     private val monitorChatListItemUpdates: MonitorChatListItemUpdates,
-    private val monitorMutedChats: MonitorMutedChatsUseCase,
+    private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val cameraGateway: CameraGateway,
     private val deviceGateway: DeviceGateway,
     private val megaChatApiGateway: MegaChatApiGateway,
@@ -219,7 +219,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
      * Monitor muted chats updates
      */
     private fun monitorMutedChatsUpdates() = viewModelScope.launch {
-        monitorMutedChats().collectLatest {
+        monitorUpdatePushNotificationSettingsUseCase().collectLatest {
             updateDndSeconds(state.value.chatId)
         }
     }

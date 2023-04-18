@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingResult
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
+import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import org.junit.After
@@ -38,6 +39,7 @@ class GetMeetingsImplTest {
     private val meetingRoomMapper = DefaultMeetingRoomMapper()
     private val getMeetingsRepository = mock<GetMeetingsRepository>()
     private val chatRepository = mock<ChatRepository>()
+    private val pushesRepository = mock<PushesRepository>()
     private val monitorChatCallUpdates = mock<MonitorChatCallUpdates>()
     private val monitorScheduledMeetingUpdates = mock<MonitorScheduledMeetingUpdates>()
 
@@ -52,6 +54,7 @@ class GetMeetingsImplTest {
         underTest = GetMeetingsImpl(
             chatRepository = chatRepository,
             getMeetingsRepository = getMeetingsRepository,
+            pushesRepository = pushesRepository,
             meetingRoomMapper = meetingRoomMapper,
             monitorChatCallUpdates = monitorChatCallUpdates,
             monitorScheduledMeetingUpdates = monitorScheduledMeetingUpdates,
@@ -61,13 +64,17 @@ class GetMeetingsImplTest {
         runBlocking {
             whenever(chatRepository.isChatNotifiable(any())).thenReturn(Random.nextBoolean())
             whenever(chatRepository.isChatLastMessageGeolocation(any())).thenReturn(Random.nextBoolean())
-            whenever(chatRepository.monitorMutedChats()).thenReturn(emptyFlow())
+            whenever(pushesRepository.monitorPushNotificationSettings()).thenReturn(emptyFlow())
             whenever(chatRepository.monitorChatListItemUpdates()).thenReturn(emptyFlow())
             whenever(chatRepository.getMeetingChatRooms()).thenReturn(chatRooms)
             whenever(monitorChatCallUpdates()).thenReturn(emptyFlow())
             whenever(monitorScheduledMeetingUpdates()).thenReturn(emptyFlow())
-            whenever(getMeetingsRepository.getMeetingParticipants(any())).thenReturn(MeetingParticipantsResult())
-            whenever(getMeetingsRepository.getScheduledMeetingStatus(any())).thenReturn(ScheduledMeetingStatus.NotStarted)
+            whenever(getMeetingsRepository.getMeetingParticipants(any())).thenReturn(
+                MeetingParticipantsResult()
+            )
+            whenever(getMeetingsRepository.getScheduledMeetingStatus(any())).thenReturn(
+                ScheduledMeetingStatus.NotStarted
+            )
             whenever(getMeetingsRepository.getMeetingScheduleData(any())).thenAnswer {
                 schedMeetingRooms.firstOrNull { item -> item.schedId == it.arguments[0] as Long }
             }

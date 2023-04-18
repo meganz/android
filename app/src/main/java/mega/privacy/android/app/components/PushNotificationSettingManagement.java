@@ -1,6 +1,5 @@
 package mega.privacy.android.app.components;
 
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
 import static mega.privacy.android.app.utils.ChatUtil.muteChat;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_1_HOUR;
 import static mega.privacy.android.app.utils.Constants.NOTIFICATIONS_24_HOURS;
@@ -14,7 +13,6 @@ import static mega.privacy.android.app.utils.TimeUtils.getCalendarSpecificTime;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.Intent;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -72,7 +70,6 @@ public class PushNotificationSettingManagement {
      */
     public void sendPushNotificationSettings(MegaPushNotificationSettings receivedPush) {
         push = receivedPush != null ? MegaPushNotificationSettingsAndroid.copy(receivedPush) : MegaPushNotificationSettings.createInstance();
-        application.sendBroadcast(new Intent(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
     }
 
     /**

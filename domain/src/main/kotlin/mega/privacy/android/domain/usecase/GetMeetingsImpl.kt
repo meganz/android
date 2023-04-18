@@ -24,6 +24,7 @@ import mega.privacy.android.domain.entity.meeting.ScheduledMeetingResult
 import mega.privacy.android.domain.qualifier.DefaultDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
 import mega.privacy.android.domain.repository.GetMeetingsRepository
+import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import javax.inject.Inject
@@ -34,6 +35,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class GetMeetingsImpl @Inject constructor(
     private val chatRepository: ChatRepository,
+    private val pushesRepository: PushesRepository,
     private val getMeetingsRepository: GetMeetingsRepository,
     private val meetingRoomMapper: MeetingRoomMapper,
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
@@ -130,7 +132,7 @@ class GetMeetingsImpl @Inject constructor(
         }
 
     private fun MutableMap<Long, MeetingRoomItem>.monitorMutedChats(mutex: Mutex): Flow<List<MeetingRoomItem>> =
-        chatRepository.monitorMutedChats()
+        pushesRepository.monitorPushNotificationSettings()
             .map {
                 values.toList().forEach { item ->
                     if (item.isMuted != !chatRepository.isChatNotifiable(item.chatId)) {
