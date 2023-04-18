@@ -59,7 +59,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * User albums toggle
      */
-    UserAlbums("Enable user albums feature", false),
+    UserAlbums("Enable user albums feature", true),
 
     /**
      * Permanent logging toggle
