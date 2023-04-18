@@ -41,6 +41,7 @@ import mega.privacy.android.app.MegaApplication.Companion.getInstance
 import mega.privacy.android.app.MegaApplication.Companion.userWaitingForCall
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.twemoji.EmojiEditText
@@ -194,18 +195,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         }
     }
 
-    private val chatRoomMuteUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent?) {
-            intent?.let {
-                it.action?.let { action ->
-                    if (action == BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING) {
-                        adapter?.checkNotifications(chatHandle)
-                    }
-                }
-            }
-        }
-    }
-
     private val retentionTimeReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) {
             intent?.let {
@@ -233,7 +222,7 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         if (shouldRefreshSessionDueToKarere()) return
 
         checkChatChanges()
-
+        collectFlows()
 
         intent.extras?.let { extras ->
             chatHandle = extras.getLong(Constants.HANDLE, MEGACHAT_INVALID_HANDLE)
@@ -320,10 +309,6 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
             }
 
             registerReceiver(
-                chatRoomMuteUpdateReceiver,
-                IntentFilter(BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
-            )
-            registerReceiver(
                 retentionTimeReceiver,
                 IntentFilter(BroadcastConstants.ACTION_UPDATE_RETENTION_TIME)
             )
@@ -372,10 +357,17 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         }
     }
 
+    private fun collectFlows() {
+        collectFlow(viewModel.state) { groupInfoState ->
+            if (groupInfoState.isPushNotificationSettingsUpdatedEvent) {
+                adapter?.checkNotifications(chatHandle)
+                viewModel.onConsumePushNotificationSettingsUpdateEvent()
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
-
-        unregisterReceiver(chatRoomMuteUpdateReceiver)
         unregisterReceiver(retentionTimeReceiver)
         unregisterReceiver(contactUpdateReceiver)
         composite.clear()

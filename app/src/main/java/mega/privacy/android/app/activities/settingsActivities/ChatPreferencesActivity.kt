@@ -12,27 +12,27 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Lifecycle
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE
 import mega.privacy.android.app.presentation.settings.chat.SettingsChatFragment
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
-import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE
 import timber.log.Timber
 
+/**
+ * ChatPreferencesActivity
+ */
 @AndroidEntryPoint
 class ChatPreferencesActivity : PreferencesBaseActivity() {
     private var sttChat: SettingsChatFragment? = null
     private var newFolderDialog: AlertDialog? = null
-    private val chatRoomMuteUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (sttChat != null && intent.action == ACTION_UPDATE_PUSH_NOTIFICATION_SETTING) {
-                sttChat?.updateNotifChat()
-            }
-        }
-    }
+    private val viewModel by viewModels<ChatPreferencesViewModel>()
+
     private val richLinksUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (sttChat != null && intent.action == BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE) {
@@ -48,18 +48,18 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
         }
     }
 
+    /**
+     * onCreate
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding.toolbarSettings.title = getString(R.string.section_chat)
         sttChat = SettingsChatFragment()
         sttChat?.let { replaceFragment(it) }
+        collectFlows()
         registerReceiver(
             richLinksUpdateReceiver,
             IntentFilter(BROADCAST_ACTION_INTENT_RICH_LINK_SETTING_UPDATE)
-        )
-        registerReceiver(
-            chatRoomMuteUpdateReceiver,
-            IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
         )
         registerReceiver(
             signalPresenceReceiver,
@@ -67,10 +67,21 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
         )
     }
 
+    private fun collectFlows() {
+        collectFlow(viewModel.state) { chatPreferencesState ->
+            if (chatPreferencesState.isPushNotificationSettingsUpdatedEvent) {
+                sttChat?.updateNotifChat()
+                viewModel.onConsumePushNotificationSettingsUpdateEvent()
+            }
+        }
+    }
+
+    /**
+     * onDestroy
+     */
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(richLinksUpdateReceiver)
-        unregisterReceiver(chatRoomMuteUpdateReceiver)
         unregisterReceiver(signalPresenceReceiver)
     }
 
@@ -131,7 +142,7 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
             }
             timeout.toString()
         } catch (e: Exception) {
-            Timber.w("Unable to parse user input, user entered: '%s'", value)
+            Timber.w("Unable to parse user input, user entered: $value")
             null
         }
     }
@@ -143,7 +154,7 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
      * @param cancelled If it is cancelled.
      */
     private fun setAutoAwayValue(value: String, cancelled: Boolean) {
-        Timber.d("Value: %s", value)
+        Timber.d("Value: $value")
         if (cancelled) {
             sttChat?.updatePresenceConfigChat(true)
         } else {
@@ -158,7 +169,7 @@ class ChatPreferencesActivity : PreferencesBaseActivity() {
      * @param enable True to enable. False to disable.
      */
     fun enableLastGreen(enable: Boolean) {
-        Timber.d("Enable Last Green: %s", enable)
+        Timber.d("Enable Last Green: $enable")
         megaChatApi.setLastGreenVisible(enable, null)
     }
 }

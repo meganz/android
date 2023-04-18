@@ -10,7 +10,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,6 +33,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import nz.mega.sdk.MegaChatRoom
 import timber.log.Timber
 import javax.inject.Inject
@@ -63,6 +64,7 @@ class GroupChatInfoViewModel @Inject constructor(
     private val chatManagement: ChatManagement,
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
+    private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
 ) : BaseRxViewModel() {
 
     /**
@@ -71,9 +73,10 @@ class GroupChatInfoViewModel @Inject constructor(
     private val _state = MutableStateFlow(GroupInfoState())
 
     /**
-     * public UI State
+     * UI State GroupChatInfo
+     * Flow of [GroupInfoState]
      */
-    val state: StateFlow<GroupInfoState> = _state
+    val state = _state.asStateFlow()
 
     private val isConnected =
         monitorConnectivityUseCase().stateIn(viewModelScope, SharingStarted.Eagerly, false)
@@ -88,6 +91,11 @@ class GroupChatInfoViewModel @Inject constructor(
     init {
         LiveEventBus.get(EventConstants.EVENT_CHAT_OPEN_INVITE, MegaChatRoom::class.java)
             .observeForever(openInviteChangeObserver)
+        viewModelScope.launch {
+            monitorUpdatePushNotificationSettingsUseCase().collect {
+                _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
+            }
+        }
     }
 
     override fun onCleared() {
@@ -224,6 +232,15 @@ class GroupChatInfoViewModel @Inject constructor(
             kotlin.runCatching {
                 sendStatisticsMeetingsUseCase(EndCallForAll())
             }
+        }
+    }
+
+    /**
+     * on Consume Push notification settings updated event
+     */
+    fun onConsumePushNotificationSettingsUpdateEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = false) }
         }
     }
 }

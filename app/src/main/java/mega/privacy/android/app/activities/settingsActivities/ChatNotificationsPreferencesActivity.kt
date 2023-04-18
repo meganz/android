@@ -1,17 +1,16 @@
 package mega.privacy.android.app.activities.settingsActivities
 
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
 import mega.privacy.android.app.R
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.settingsFragments.SettingsChatNotificationsFragment
 import timber.log.Timber
 
@@ -21,14 +20,7 @@ import timber.log.Timber
 class ChatNotificationsPreferencesActivity : PreferencesBaseActivity() {
     private var sttChatNotifications: SettingsChatNotificationsFragment? = null
     private lateinit var ringTonePickerResultLauncher: ActivityResultLauncher<Intent>
-
-    private val chatRoomMuteUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == ACTION_UPDATE_PUSH_NOTIFICATION_SETTING) {
-                sttChatNotifications?.updateSwitch()
-            }
-        }
-    }
+    private val viewModel by viewModels<ChatNotificationPreferencesViewModel>()
 
     /**
      * onCreate lifecycle callback
@@ -39,11 +31,17 @@ class ChatNotificationsPreferencesActivity : PreferencesBaseActivity() {
         sttChatNotifications = SettingsChatNotificationsFragment().apply {
             replaceFragment(this)
         }
-        registerReceiver(
-            chatRoomMuteUpdateReceiver,
-            IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)
-        )
+        collectFlows()
         registerForActivityResultLauncher()
+    }
+
+    private fun collectFlows() {
+        collectFlow(viewModel.state) { chatPreferencesState ->
+            if (chatPreferencesState.isPushNotificationSettingsUpdatedEvent) {
+                sttChatNotifications?.updateSwitch()
+                viewModel.onConsumePushNotificationSettingsUpdateEvent()
+            }
+        }
     }
 
     private fun registerForActivityResultLauncher() {
@@ -86,14 +84,5 @@ class ChatNotificationsPreferencesActivity : PreferencesBaseActivity() {
             putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, uri)
         }
         ringTonePickerResultLauncher.launch(intent)
-    }
-
-
-    /**
-     * onDestroy life cycle callback
-     */
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(chatRoomMuteUpdateReceiver)
     }
 }

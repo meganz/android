@@ -8,7 +8,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.shareIn
@@ -35,7 +35,6 @@ import mega.privacy.android.domain.entity.statistics.EndCallEmptyCall
 import mega.privacy.android.domain.entity.statistics.EndCallForAll
 import mega.privacy.android.domain.entity.statistics.StayOnCallEmptyCall
 import mega.privacy.android.domain.usecase.GetScheduledMeetingByChat
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.meeting.AnswerChatCall
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
@@ -44,6 +43,8 @@ import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
 import mega.privacy.android.domain.usecase.meeting.SendStatisticsMeetingsUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.meeting.StartChatCallNoRinging
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -66,6 +67,7 @@ import javax.inject.Inject
  * @property endCallUseCase                     [EndCallUseCase]
  * @property sendStatisticsMeetingsUseCase      [SendStatisticsMeetingsUseCase]
  * @property isConnected True if the app has some network connection, false otherwise.
+ * @property monitorUpdatePushNotificationSettingsUseCase monitors push notification settings update
  */
 @HiltViewModel
 class ChatViewModel @Inject constructor(
@@ -86,17 +88,16 @@ class ChatViewModel @Inject constructor(
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
     private val endCallUseCase: EndCallUseCase,
     private val sendStatisticsMeetingsUseCase: SendStatisticsMeetingsUseCase,
+    private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
 ) : ViewModel() {
 
-    /**
-     * private UI state
-     */
     private val _state = MutableStateFlow(ChatState())
 
     /**
-     * public UI State
+     * UI State Chat
+     * Flow of [ChatState]
      */
-    val state: StateFlow<ChatState> = _state
+    val state = _state.asStateFlow()
 
     /**
      * Get latest [StorageState] from [MonitorStorageStateEventUseCase] use case.
@@ -112,6 +113,14 @@ class ChatViewModel @Inject constructor(
 
     val isConnected: Boolean
         get() = monitorConnectivityUseCase().value
+
+    init {
+        viewModelScope.launch {
+            monitorUpdatePushNotificationSettingsUseCase().collect {
+                _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
+            }
+        }
+    }
 
     /**
      * Call button clicked
@@ -434,6 +443,15 @@ class ChatViewModel @Inject constructor(
             kotlin.runCatching {
                 sendStatisticsMeetingsUseCase(EndCallForAll())
             }
+        }
+    }
+
+    /**
+     * on Consume Push notification settings updated event
+     */
+    fun onConsumePushNotificationSettingsUpdateEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = false) }
         }
     }
 }

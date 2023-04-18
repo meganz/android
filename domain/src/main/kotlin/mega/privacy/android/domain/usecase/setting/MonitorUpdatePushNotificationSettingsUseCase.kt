@@ -6,7 +6,9 @@ import javax.inject.Inject
 /**
  * MonitorPushNotificationsSettingsUseCase
  */
-class MonitorUpdatePushNotificationSettingsUseCase @Inject constructor(private val pushesRepository: PushesRepository) {
+class MonitorUpdatePushNotificationSettingsUseCase @Inject constructor(
+    private val pushesRepository: PushesRepository,
+) {
 
     /**
      * Invoke

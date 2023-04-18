@@ -9,7 +9,6 @@ import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_LEFT_
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_FIRST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_LAST_NAME;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_NICKNAME;
-import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_PUSH_NOTIFICATION_SETTING;
 import static mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_RETENTION_TIME;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_CHAT_TRANSFER_START;
 import static mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_ERROR_COPYING_NODES;
@@ -1306,23 +1305,6 @@ public class ChatActivity extends PasscodeActivity
         }
     };
 
-    private BroadcastReceiver chatRoomMuteUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent == null || intent.getAction() == null)
-                return;
-
-            if (intent.getAction().equals(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING)) {
-                if (chatRoom == null) {
-                    chatRoom = megaChatApi.getChatRoom(idChat);
-                }
-                if (chatRoom != null) {
-                    muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
-                }
-            }
-        }
-    };
-
     private final BroadcastReceiver leftChatReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1549,8 +1531,6 @@ public class ChatActivity extends PasscodeActivity
                         showSnackbar(SNACKBAR_TYPE, getString(R.string.calls_chat_screen_unable_to_reconnect_the_call), MEGACHAT_INVALID_HANDLE);
                     }
                 });
-
-        registerReceiver(chatRoomMuteUpdateReceiver, new IntentFilter(ACTION_UPDATE_PUSH_NOTIFICATION_SETTING));
 
         IntentFilter leftChatFilter = new IntentFilter(BROADCAST_ACTION_INTENT_LEFT_CHAT);
         leftChatFilter.addAction(ACTION_LEFT_CHAT);
@@ -2020,7 +2000,7 @@ public class ChatActivity extends PasscodeActivity
                 }
 
                 if (stateHistory != MegaChatApi.SOURCE_NONE) {
-                    scrollingUp = dy > 0 ? true : false;
+                    scrollingUp = dy > 0;
 
                     if (!scrollingUp && mLayoutManager.findFirstVisibleItemPosition() <= NUMBER_MESSAGES_BEFORE_LOAD && getMoreHistory) {
                         askForMoreMessages();
@@ -2044,8 +2024,7 @@ public class ChatActivity extends PasscodeActivity
     private boolean isAllowedToRecord() {
         Timber.d("isAllowedToRecord ");
         if (participatingInACall()) return false;
-        if (!checkPermissionsVoiceClip()) return false;
-        return true;
+        return checkPermissionsVoiceClip();
     }
 
     private void showLetterKB() {
@@ -2065,6 +2044,16 @@ public class ChatActivity extends PasscodeActivity
                 showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error), MEGACHAT_INVALID_HANDLE);
             } else if (chatState.isCallAnswered()) {
                 callInProgressLayout.setEnabled(true);
+            }
+
+            if (chatState.isPushNotificationSettingsUpdatedEvent()) {
+                if (chatRoom == null) {
+                    chatRoom = megaChatApi.getChatRoom(idChat);
+                }
+                if (chatRoom != null) {
+                    muteIconToolbar.setVisibility(isEnableChatNotifications(chatRoom.getChatId()) ? View.GONE : View.VISIBLE);
+                }
+                viewModel.onConsumePushNotificationSettingsUpdateEvent();
             }
 
             ScheduledMeetingStatus schedMeetStatus = chatState.getScheduledMeetingStatus();
@@ -7243,10 +7232,7 @@ public class ChatActivity extends PasscodeActivity
         int indexToChange = -1;
         ListIterator<AndroidMegaChatMessage> itr = messages.listIterator(messages.size());
 
-        boolean editedMsgHasTempId = false;
-        if (editedMsg.getMessage().getTempId() != -1) {
-            editedMsgHasTempId = true;
-        }
+        boolean editedMsgHasTempId = editedMsg.getMessage().getTempId() != -1;
 
         // Iterate in reverse.
         while (itr.hasPrevious()) {
@@ -8454,7 +8440,6 @@ public class ChatActivity extends PasscodeActivity
         }
 
         unregisterReceiver(historyTruncatedByRetentionTimeReceiver);
-        unregisterReceiver(chatRoomMuteUpdateReceiver);
         unregisterReceiver(voiceclipDownloadedReceiver);
         unregisterReceiver(userNameReceiver);
         unregisterReceiver(chatArchivedReceiver);
