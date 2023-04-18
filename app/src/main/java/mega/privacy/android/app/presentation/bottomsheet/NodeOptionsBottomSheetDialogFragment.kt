@@ -931,6 +931,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun onRenameClicked(node: MegaNode) {
         (requireActivity() as ManagerActivity).showRenameDialog(node)
+        setStateBottomSheetBehaviorHidden()
     }
 
     private fun onSendChatClicked(node: MegaNode?) {
