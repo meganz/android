@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.media.AudioManager
-import androidx.core.content.ContextCompat
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.interfaces.OnProximitySensorListener
 import mega.privacy.android.app.main.megachat.AppRTCAudioManager
@@ -68,9 +67,9 @@ class RTCAudioManagerFacade @Inject constructor(
             if (rtcAudioManagerRingInCall != null) {
                 removeRTCAudioManagerRingIn()
             }
-            ContextCompat.registerReceiver(
-                application, volumeReceiver,
-                IntentFilter(Constants.VOLUME_CHANGED_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED
+            application.registerReceiver(
+                volumeReceiver,
+                IntentFilter(Constants.VOLUME_CHANGED_ACTION)
             )
             application.registerReceiver(
                 becomingNoisyReceiver,

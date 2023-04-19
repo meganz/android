@@ -1265,10 +1265,13 @@ open class BaseActivity : AppCompatActivity(), ActivityLauncher, PermissionReque
     @SuppressLint("WrongConstant")
     override fun registerReceiver(receiver: BroadcastReceiver?, filter: IntentFilter): Intent? {
         return try {
-            ContextCompat.registerReceiver(
-                this, receiver, filter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.registerReceiver(
+                    this, receiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED
+                )
+            } else {
+                super.registerReceiver(receiver, filter)
+            }
         } catch (e: IllegalStateException) {
             Timber.e(e, "IllegalStateException registering receiver")
             null

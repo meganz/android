@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.ServiceConnection
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.view.LayoutInflater
@@ -67,7 +68,6 @@ import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_DOWNLOAD
 import mega.privacy.android.app.constants.SettingsConstants.KEY_STORAGE_FILE_MANAGEMENT
 import mega.privacy.android.app.constants.SettingsConstants.REPORT_ISSUE
 import mega.privacy.android.app.featuretoggle.AppFeatures
-import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.main.VerifyTwoFactorActivity
 import mega.privacy.android.app.mediaplayer.gateway.PlayerServiceViewModelGateway
 import mega.privacy.android.app.mediaplayer.service.AudioPlayerService
@@ -78,6 +78,7 @@ import mega.privacy.android.app.presentation.settings.calls.SettingsCallsActivit
 import mega.privacy.android.app.presentation.settings.exportrecoverykey.ExportRecoveryKeyActivity
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.app.presentation.settings.model.PreferenceResource
+import mega.privacy.android.app.presentation.twofactorauthentication.TwoFactorAuthenticationActivity
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
@@ -224,12 +225,16 @@ class SettingsFragment :
     @SuppressLint("WrongConstant")
     private fun registerAccountChangeReceiver() {
         val filter = IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-        ContextCompat.registerReceiver(
-            requireContext(),
-            updateMyAccountReceiver,
-            filter,
-            ContextCompat.RECEIVER_NOT_EXPORTED
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.registerReceiver(
+                requireContext(),
+                updateMyAccountReceiver,
+                filter,
+                ContextCompat.RECEIVER_NOT_EXPORTED
+            )
+        } else {
+            requireContext().registerReceiver(updateMyAccountReceiver, filter)
+        }
     }
 
     private fun refreshSummaries() {
