@@ -1,6 +1,7 @@
 package mega.privacy.android.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.gateway.CacheFolderGateway
@@ -17,7 +18,6 @@ import nz.mega.sdk.MegaRecentActionBucket
 import nz.mega.sdk.MegaRequest
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * Default implementation of [RecentActionsRepository]
@@ -56,22 +56,22 @@ internal class DefaultRecentActionsRepository @Inject constructor(
 
     private suspend fun getMegaRecentAction(): List<MegaRecentActionBucket> =
         withContext(ioDispatcher) {
-            val result = suspendCoroutine { continuation ->
-                megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES,
-                    OptionalMegaRequestListenerInterface(
-                        onRequestFinish = { request: MegaRequest, error: MegaError ->
-                            if (error.errorCode == MegaError.API_OK) {
-                                continuation.resumeWith(Result.success(request.recentActions))
-                            } else {
-                                continuation.failWithError(error, "getMegaRecentAction")
-                            }
+            suspendCancellableCoroutine { continuation ->
+                val listener = OptionalMegaRequestListenerInterface(
+                    onRequestFinish = { request: MegaRequest, error: MegaError ->
+                        if (error.errorCode == MegaError.API_OK) {
+                            val result = recentActionsMapper(
+                                request.recentActions,
+                                this@DefaultRecentActionsRepository::copyRecentActionBucket
+                            )
+                            continuation.resumeWith(Result.success(result))
+                        } else {
+                            continuation.failWithError(error, "getMegaRecentAction")
                         }
-                    ))
+                    })
+                continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
+                megaApiGateway.getRecentActionsAsync(DAYS, MAX_NODES, listener)
             }
-            return@withContext recentActionsMapper(
-                result,
-                this@DefaultRecentActionsRepository::copyRecentActionBucket
-            )
         }
 
 

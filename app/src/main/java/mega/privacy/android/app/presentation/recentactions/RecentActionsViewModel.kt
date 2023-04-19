@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
@@ -71,13 +73,17 @@ class RecentActionsViewModel @Inject constructor(
     var snapshotActionList: List<RecentActionBucket>? = null
 
     init {
-        updateRecentActions()
+        viewModelScope.launch {
+            updateRecentActions()
+        }
 
         // monitor node updates
         viewModelScope.launch {
-            monitorNodeUpdates().collectLatest {
-                updateRecentActions()
-            }
+            monitorNodeUpdates()
+                .conflate()
+                .collect {
+                    updateRecentActions()
+                }
         }
         // monitor hide recent activity preference
         viewModelScope.launch {
@@ -123,11 +129,11 @@ class RecentActionsViewModel @Inject constructor(
     /**
      * Update the recent actions list by combination
      */
-    private fun updateRecentActions() = viewModelScope.launch {
-        val getRecentActions = async {
+    private suspend fun updateRecentActions() = coroutineScope {
+        val getRecentActions = async(coroutineContext) {
             getRecentActions().also { _buckets = it }
         }
-        val getVisibleContacts = async { getVisibleContactsUseCase() }
+        val getVisibleContacts = async(coroutineContext) { getVisibleContactsUseCase() }
 
         val formattedList =
             formatRecentActions(getRecentActions.await(), getVisibleContacts.await())
