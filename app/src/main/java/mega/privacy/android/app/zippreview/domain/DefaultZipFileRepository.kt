@@ -3,6 +3,7 @@ package mega.privacy.android.app.zippreview.domain
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import mega.privacy.android.domain.qualifier.IoDispatcher
+import timber.log.Timber
 import java.io.*
 import java.lang.Exception
 import java.util.zip.ZipFile
@@ -32,16 +33,16 @@ class DefaultZipFileRepository @Inject constructor(@IoDispatcher private val ioD
      * @return true is unzip succeed.
      */
     private fun unzip(zipFullPath: String, unzipRootPath: String): Boolean {
-        val zipFile = ZipFile(zipFullPath)
-        val zipEntries = zipFile.entries()
-        zipEntries.toList().forEach {
-            val zipDestination = File(unzipRootPath + it.name)
-            if (it.isDirectory) {
-                if (!zipDestination.exists()) {
-                    zipDestination.mkdirs()
-                }
-            } else {
-                try {
+        try {
+            val zipFile = ZipFile(zipFullPath)
+            val zipEntries = zipFile.entries()
+            zipEntries.toList().forEach {
+                val zipDestination = File(unzipRootPath + it.name)
+                if (it.isDirectory) {
+                    if (!zipDestination.exists()) {
+                        zipDestination.mkdirs()
+                    }
+                } else {
                     val inputStream = zipFile.getInputStream(it)
                     //Get the parent file. If it is null or
                     // doesn't exist, created the parent folder.
@@ -66,12 +67,11 @@ class DefaultZipFileRepository @Inject constructor(@IoDispatcher private val ioD
                         }
                         inputStream.close()
                     }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    return false
                 }
             }
-
+        } catch (e: Exception) {
+            Timber.e(e)
+            return false
         }
         return true
     }

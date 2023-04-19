@@ -151,11 +151,15 @@ class ZipBrowserViewModel @Inject constructor(
         this.unzipRootPath = "${unzipRootPath}${File.separator}"
         // Log the zip file path
         crashReporter.log("Path of ZipFile(viewModelInit) is $zipFullPath")
-        zipFile = ZipFile(zipFullPath)
-        rootFolderPath = unzipRootPath.split("/").last()
-        viewModelScope.launch {
-            zipFileRepository.initZipTreeNode(zipFile)
-            updateZipInfoList(context)
+        try {
+            zipFile = ZipFile(zipFullPath)
+            rootFolderPath = unzipRootPath.split("/").last()
+            viewModelScope.launch {
+                zipFileRepository.initZipTreeNode(zipFile)
+                updateZipInfoList(context)
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
         }
     }
 
