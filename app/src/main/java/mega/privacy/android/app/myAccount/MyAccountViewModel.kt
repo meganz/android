@@ -73,20 +73,15 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.app.utils.permission.PermissionUtils.requestPermission
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.entity.AccountType
-import mega.privacy.android.domain.entity.account.business.BusinessAccountStatus
 import mega.privacy.android.domain.entity.user.UserChanges
-import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
-import mega.privacy.android.domain.usecase.GetBusinessStatusUseCase
 import mega.privacy.android.domain.usecase.GetCurrentUserFullName
 import mega.privacy.android.domain.usecase.GetExportMasterKeyUseCase
 import mega.privacy.android.domain.usecase.GetExtendedAccountDetail
-import mega.privacy.android.domain.usecase.GetMyAvatarColorUseCase
 import mega.privacy.android.domain.usecase.GetMyAvatarFile
 import mega.privacy.android.domain.usecase.GetNumberOfSubscription
 import mega.privacy.android.domain.usecase.GetPaymentMethod
-import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.MonitorMyAvatarFile
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.account.ChangeEmail
@@ -95,7 +90,6 @@ import mega.privacy.android.domain.usecase.avatar.SetAvatarUseCase
 import mega.privacy.android.domain.usecase.contact.GetCurrentUserEmail
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.file.GetFileVersionsOption
-import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.verification.ResetSMSVerifiedPhoneNumber
 import nz.mega.sdk.MegaAccountDetails
@@ -124,7 +118,6 @@ import javax.inject.Inject
  * @property cancelSubscriptionsUseCase
  * @property getMyAvatarFile
  * @property checkPasswordReminderUseCase
- * @property resetPhoneNumberUseCase
  * @property resetSMSVerifiedPhoneNumber
  * @property getUserDataUseCase
  * @property getFileVersionsOption
@@ -177,16 +170,10 @@ class MyAccountViewModel @Inject constructor(
     private val getCurrentUserEmail: GetCurrentUserEmail,
     private val monitorVerificationStatus: MonitorVerificationStatus,
     private val getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase,
-    private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
-    private val getBusinessStatusUseCase: GetBusinessStatusUseCase,
-    private val getMyAvatarColorUseCase: GetMyAvatarColorUseCase,
-    private val getInSharesUseCase: GetInSharesUseCase,
     private val getExportMasterKeyUseCase: GetExportMasterKeyUseCase,
 ) : BaseRxViewModel() {
 
     companion object {
-        private const val CLICKS_TO_CHANGE_API_SERVER = 5
-        private const val TIME_TO_SHOW_PAYMENT_INFO = 604800 //1 week in seconds
         const val CHECKING_2FA = "CHECKING_2FA"
     }
 
@@ -222,21 +209,17 @@ class MyAccountViewModel @Inject constructor(
         refreshNumberOfSubscription(false)
         refreshUserName(false)
         refreshCurrentUserEmail()
-        getVisibleContacts()
-        getDefaultAvatarColor()
 
         viewModelScope.launch {
-            monitorUserUpdates()
-                .filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email }
-                .collect {
-                    when (it) {
-                        UserChanges.Email -> refreshCurrentUserEmail()
-                        UserChanges.Firstname,
-                        UserChanges.Lastname,
-                        -> refreshUserName(true)
-                        else -> Unit
-                    }
+            flow {
+                emitAll(monitorUserUpdates().filter { it == UserChanges.Firstname || it == UserChanges.Lastname || it == UserChanges.Email })
+            }.collect {
+                when (it) {
+                    UserChanges.Email -> refreshCurrentUserEmail()
+                    UserChanges.Firstname, UserChanges.Lastname -> refreshUserName(true)
+                    else -> Unit
                 }
+            }
         }
         viewModelScope.launch {
             monitorVerificationStatus().collect { status ->
@@ -249,29 +232,11 @@ class MyAccountViewModel @Inject constructor(
                 }
             }
         }
-        viewModelScope.launch {
-            flow {
-                emit(getMyAvatarFile(isForceRefresh = false))
-                emitAll(monitorMyAvatarFile())
-            }.collect { file ->
-                _state.update {
-                    it.copy(avatar = file)
-                }
-            }
-        }
     }
 
     override fun onCleared() {
         super.onCleared()
         resetJob?.cancel()
-    }
-
-    private fun refreshCurrentUserEmail() {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(email = getCurrentUserEmail().orEmpty())
-            }
-        }
     }
 
     private fun refreshUserName(forceRefresh: Boolean) {
@@ -288,19 +253,11 @@ class MyAccountViewModel @Inject constructor(
         }
     }
 
-    private fun getDefaultAvatarColor() {
+    private fun refreshCurrentUserEmail() {
         viewModelScope.launch {
-            _state.update { it.copy(avatarColor = getMyAvatarColorUseCase()) }
-        }
-    }
-
-    private fun getVisibleContacts() {
-        viewModelScope.launch {
-            val contactsSize = getVisibleContactsUseCase().filter { contact ->
-                contact.visibility == UserVisibility.Visible || getInSharesUseCase(contact.email).isNotEmpty()
-            }.size
-
-            _state.update { it.copy(visibleContacts = contactsSize) }
+            _state.update {
+                it.copy(email = getCurrentUserEmail().orEmpty())
+            }
         }
     }
 
@@ -331,6 +288,7 @@ class MyAccountViewModel @Inject constructor(
                         SubscriptionCheckResult(typeID = TYPE_ANDROID_PLATFORM, platformInfo = this)
                     )
                 }
+
                 subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_GOOGLE_WALLET ||
                         subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_HUAWEI_WALLET -> {
                     _subscriptionDialogState.value = SubscriptionDialogState.Visible(
@@ -340,11 +298,13 @@ class MyAccountViewModel @Inject constructor(
                         )
                     )
                 }
+
                 subscriptionMethodId == MegaApiJava.PAYMENT_METHOD_ITUNES -> {
                     _subscriptionDialogState.value = SubscriptionDialogState.Visible(
                         SubscriptionCheckResult(typeID = TYPE_ITUNES, platformInfo = this)
                     )
                 }
+
                 else -> {
                     _cancelAccountDialogState.value =
                         CancelAccountDialogState.VisibleWithSubscription
@@ -436,18 +396,9 @@ class MyAccountViewModel @Inject constructor(
 
     private var is2FaEnabled = false
 
-    private var numOfClicksLastSession = 0
-
     private lateinit var snackbarShower: SnackbarShower
 
     private var confirmationLink: String? = null
-
-    /**
-     * Get name
-     *
-     * @return
-     */
-    fun getName(): String = state.value.name
 
     /**
      * Get email
@@ -710,6 +661,7 @@ class MyAccountViewModel @Inject constructor(
                     LiveEventBus.get<Boolean>(EVENT_REFRESH).post(true)
                 }
             }
+
             TAKE_PICTURE_PROFILE_CODE -> addProfileAvatar(null)
             CHOOSE_PICTURE_PROFILE_CODE -> {
                 if (data == null) {
@@ -762,46 +714,6 @@ class MyAccountViewModel @Inject constructor(
                 onError = Timber::w
             )
             .addTo(composite)
-    }
-
-    /**
-     * Increment last session click
-     *
-     * @return
-     */
-    fun incrementLastSessionClick(): Boolean {
-        numOfClicksLastSession++
-
-        if (numOfClicksLastSession < CLICKS_TO_CHANGE_API_SERVER)
-            return false
-
-        numOfClicksLastSession = 0
-        return true
-    }
-
-    /**
-     * Checks if business payment attention is needed.
-     *
-     * @return True if business payment attention is needed, false otherwise.
-     */
-    private val isBusinessPaymentAttentionNeeded: Boolean
-        get() = state.value.isBusinessAccount &&
-                state.value.isMasterBusinessAccount &&
-                state.value.isBusinessStatusActive.not()
-
-    /**
-     * Should show payment info
-     *
-     * @return
-     */
-    fun shouldShowPaymentInfo(): Boolean {
-        val timeToCheck =
-            if (hasRenewableSubscription()) myAccountInfo.subscriptionRenewTime
-            else myAccountInfo.proExpirationTime
-
-        val currentTime = System.currentTimeMillis() / 1000
-
-        return isBusinessPaymentAttentionNeeded || timeToCheck.minus(currentTime) <= TIME_TO_SHOW_PAYMENT_INFO
     }
 
     /**
@@ -1042,6 +954,7 @@ class MyAccountViewModel @Inject constructor(
             newEmail == getEmail() -> context.getString(R.string.mail_same_as_old)
             !EMAIL_ADDRESS.matcher(newEmail)
                 .matches() -> context.getString(R.string.error_invalid_email)
+
             is2FaEnabled -> {
                 context.startActivity(
                     Intent(context, VerifyTwoFactorActivity::class.java)
@@ -1051,6 +964,7 @@ class MyAccountViewModel @Inject constructor(
 
                 CHECKING_2FA
             }
+
             else -> {
                 viewModelScope.launch {
                     val changeEmailResult = runCatching { changeEmail(newEmail) }
@@ -1264,15 +1178,10 @@ class MyAccountViewModel @Inject constructor(
                 )
                 getPaymentMethod(false)
 
-                val isBusinessStatusActive = getBusinessStatusUseCase().let { status ->
-                    (status == BusinessAccountStatus.GracePeriod || status == BusinessAccountStatus.Expired).not()
-                }
                 _state.update {
                     it.copy(
-                        isBusinessAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
-                        isMasterBusinessAccount = accountDetails.isMasterBusinessAccount,
-                        isAchievementsEnabled = accountDetails.isAchievementsEnabled,
-                        isBusinessStatusActive = isBusinessStatusActive
+                        isBusinessAccount = accountDetails.isBusinessAccount &&
+                                accountDetails.accountTypeIdentifier == AccountType.BUSINESS
                     )
                 }
             }.onFailure {

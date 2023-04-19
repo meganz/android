@@ -31,25 +31,33 @@ object MyAccountViewUtil {
      *
      * @param viewModel MyAccountViewModel to check the data.
      */
-    fun MyAccountUsageContainerBinding.update(viewModel: MyAccountViewModel) {
+    fun MyAccountUsageContainerBinding.update(
+        context: Context,
+        isFreeAccount: Boolean,
+        totalStorage: String,
+        totalTransfer: String,
+        usedStorage: String,
+        usedStoragePercentage: Int,
+        usedTransfer: String,
+        usedTransferPercentage: Int,
+    ) {
         storageProgressBar.isVisible = true
         noPercentageStorageImage.isVisible = false
         transferProgressBar.isVisible = true
         noPercentageTransferImage.isVisible = false
 
-        if (viewModel.getUsedStorage().isEmpty()) {
+        if (usedStorage.isEmpty()) {
             storageProgressPercentage.isVisible = false
             storageProgressBar.progress = 0
-            storageProgress.text = getGettingInfo(viewModel.context)
+            storageProgress.text = getGettingInfo(context)
         } else {
-            val usedStorage = viewModel.getUsedStoragePercentage()
-            val isStorageOverQuota = usedStorage >= 100
+            val isStorageOverQuota = usedStoragePercentage >= 100
 
             storageProgressPercentage.apply {
                 isVisible = true
-                text = viewModel.context.getString(
+                text = context.getString(
                     R.string.used_storage_transfer_percentage,
-                    usedStorage
+                    usedStoragePercentage.toString()
                 )
 
                 setTextStyle(
@@ -63,7 +71,7 @@ object MyAccountViewUtil {
             }
 
             storageProgressBar.apply {
-                progress = usedStorage
+                progress = usedStoragePercentage
                 progressDrawable =
                     ContextCompat.getDrawable(
                         context,
@@ -75,10 +83,10 @@ object MyAccountViewUtil {
                     )
             }
 
-            storageProgress.text = viewModel.context.getString(
+            storageProgress.text = context.getString(
                 R.string.used_storage_transfer,
-                viewModel.getUsedStorage(),
-                viewModel.getTotalStorage()
+                usedStorage,
+                totalStorage
             ).let { text ->
                 if (isStorageOverQuota) {
                     text.formatColorTag(storageProgress.context, 'A', R.color.red_600_red_300)
@@ -90,33 +98,32 @@ object MyAccountViewUtil {
             }
         }
 
-        transferLayout.isVisible = !viewModel.isFreeAccount()
+        transferLayout.isVisible = !isFreeAccount
 
-        if (viewModel.getUsedTransfer().isEmpty()) {
+        if (usedTransfer.isEmpty()) {
             transferProgressPercentage.isVisible = false
             transferProgressBar.progress = 0
-            transferProgress.text = getGettingInfo(viewModel.context)
+            transferProgress.text = getGettingInfo(context)
         } else {
             transferProgressPercentage.apply {
                 isVisible = true
-                text = viewModel.context.getString(
+                text = context.getString(
                     R.string.used_storage_transfer_percentage,
-                    viewModel.getUsedTransferPercentage()
+                    usedTransferPercentage.toString()
                 )
             }
 
-            transferProgressBar.progress =
-                viewModel.getUsedTransferPercentage()
+            transferProgressBar.progress = usedTransferPercentage
 
-            transferProgress.text = viewModel.context.getString(
+            transferProgress.text = context.getString(
                 R.string.used_storage_transfer,
-                viewModel.getUsedTransfer(),
-                viewModel.getTotalTransfer()
+                usedTransfer,
+                totalTransfer
             ).replace("[A]", "")
                 .replace("[/A]", "")
         }
 
-        root.post { checkImagesOrProgressBarVisibility(viewModel.isFreeAccount()) }
+        root.post { checkImagesOrProgressBarVisibility(isFreeAccount) }
     }
 
     /**
@@ -125,20 +132,25 @@ object MyAccountViewUtil {
      *
      * @param viewModel MyAccountViewModel to check the data.
      */
-    fun MyAccountUsageContainerBinding.updateBusinessOrProFlexi(viewModel: MyAccountViewModel) {
+    fun MyAccountUsageContainerBinding.updateBusinessOrProFlexi(
+        context: Context,
+        usedStorage: String,
+        usedTransFer: String,
+    ) {
         storageProgressPercentage.isVisible = false
         storageProgressBar.isVisible = false
         noPercentageStorageImage.isVisible = true
 
-        storageProgress.text =
-            viewModel.getUsedStorage().ifEmpty { getGettingInfo(viewModel.context) }
+        storageProgress.text = usedStorage.ifEmpty { getGettingInfo(context) }
 
         transferProgressPercentage.isVisible = false
         transferProgressBar.isVisible = false
         noPercentageTransferImage.isVisible = true
 
-        transferProgress.text =
-            viewModel.getUsedTransfer().ifEmpty { getGettingInfo(viewModel.context) }
+        transferLayout.isVisible = true
+        transferProgress.isVisible = true
+        transferLabel.isVisible = true
+        transferProgress.text = usedTransFer.ifEmpty { getGettingInfo(context) }
 
         root.post { checkImagesOrProgressBarVisibility(false) }
     }
@@ -150,14 +162,16 @@ object MyAccountViewUtil {
      * @param fragment Value from `ActiveFragment` enum indicating what is the active fragment.
      */
     fun MyAccountPaymentInfoContainerBinding.update(
-        viewModel: MyAccountViewModel,
+        renewTime: Long,
+        expirationTime: Long,
+        hasRenewableSubscription: Boolean = false,
+        hasExpirableSubscription: Boolean = false,
         fragment: ActiveFragment,
     ): Boolean {
         businessStatusText.isVisible = false
-        val renewable = viewModel.hasRenewableSubscription()
 
-        return if (renewable || viewModel.hasExpirableSubscription()) {
-            setRenewOrExpiryDate(viewModel, renewable, fragment)
+        return if (hasRenewableSubscription || hasExpirableSubscription) {
+            setRenewOrExpiryDate(renewTime, expirationTime, hasRenewableSubscription, fragment)
             true
         } else false
     }
@@ -171,8 +185,12 @@ object MyAccountViewUtil {
      * @param fragment      Value from `ActiveFragment` enum indicating what is the active fragment.
      */
     fun MyAccountPaymentInfoContainerBinding.businessUpdate(
+        context: Context,
+        renewTime: Long,
+        expirationTime: Long,
+        hasRenewableSubscription: Boolean = false,
+        hasExpirableSubscription: Boolean = false,
         megaApi: MegaApiAndroid,
-        viewModel: MyAccountViewModel,
         expandedView: Boolean,
         fragment: ActiveFragment,
     ) {
@@ -181,18 +199,18 @@ object MyAccountViewUtil {
         }
 
         val businessStatus = megaApi.businessStatus
-        val renewable = viewModel.hasRenewableSubscription()
-        val expirable = viewModel.hasExpirableSubscription()
 
         when {
             businessStatus == MegaApiJava.BUSINESS_STATUS_EXPIRED -> {
-                setBusinessAlert(true, expandedView, viewModel.context)
+                setBusinessAlert(true, expandedView, context)
             }
+
             businessStatus == MegaApiJava.BUSINESS_STATUS_GRACE_PERIOD -> {
-                setBusinessAlert(false, expandedView, viewModel.context)
+                setBusinessAlert(false, expandedView, context)
             }
-            renewable || expirable -> {
-                setRenewOrExpiryDate(viewModel, renewable, fragment)
+
+            hasRenewableSubscription || hasExpirableSubscription -> {
+                setRenewOrExpiryDate(renewTime, expirationTime, hasRenewableSubscription, fragment)
             }
         }
     }
@@ -229,7 +247,8 @@ object MyAccountViewUtil {
      * @param fragment  Value from `ActiveFragment` enum indicating what is the active fragment.
      */
     private fun MyAccountPaymentInfoContainerBinding.setRenewOrExpiryDate(
-        viewModel: MyAccountViewModel,
+        renewTime: Long,
+        expirationTime: Long,
         renewable: Boolean,
         fragment: ActiveFragment,
     ) {
@@ -237,10 +256,10 @@ object MyAccountViewUtil {
 
         renewExpiryText.apply {
             isVisible = true
-            text = viewModel.context.getString(
+            text = context.getString(
                 if (renewable) R.string.account_info_renews_on else R.string.account_info_expires_on,
                 TimeUtils.formatDate(
-                    if (renewable) viewModel.getRenewTime() else viewModel.getExpirationTime(),
+                    if (renewable) renewTime else expirationTime,
                     TimeUtils.DATE_MM_DD_YYYY_FORMAT,
                     context
                 )
@@ -255,6 +274,7 @@ object MyAccountViewUtil {
                         .replace("[/B]", "</font></big>")
                         .toSpannedHtmlText()
                 }
+
                 ActiveFragment.MY_ACCOUNT_USAGE -> {
                     text.toString()
                         .replace("[A]", "")
@@ -315,6 +335,4 @@ object MyAccountViewUtil {
         storageProgressLayout.isVisible = visible
         transferProgressLayout.isVisible = visible
     }
-
-
 }

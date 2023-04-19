@@ -5,7 +5,21 @@ import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.user.UserId
 import javax.inject.Inject
 
+/**
+ * User Account Info Mapper
+ */
 class UserAccountMapper @Inject constructor() {
+    /**
+     * Invoke
+     * @return [UserAccount]
+     * @param userId
+     * @param email
+     * @param fullName
+     * @param isBusinessAccount
+     * @param isMasterBusinessAccount
+     * @param accountTypeIdentifier
+     * @param accountTypeString
+     */
     operator fun invoke(
         userId: UserId?,
         email: String,
@@ -14,7 +28,6 @@ class UserAccountMapper @Inject constructor() {
         isMasterBusinessAccount: Boolean,
         accountTypeIdentifier: AccountType?,
         accountTypeString: String,
-        isAchievementsEnabled: Boolean
     ): UserAccount {
         return UserAccount(
             userId = userId,
@@ -24,7 +37,6 @@ class UserAccountMapper @Inject constructor() {
             isMasterBusinessAccount = isMasterBusinessAccount,
             accountTypeIdentifier = accountTypeIdentifier,
             accountTypeString = accountTypeString,
-            isAchievementsEnabled = isAchievementsEnabled
         )
     }
 }

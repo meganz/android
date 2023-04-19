@@ -14,5 +14,5 @@ data class AccountTransferDetail(
      * Used transfer percentage
      */
     val usedTransferPercentage: Int
-        get() = (100 * usedTransfer / totalTransfer).toInt()
+        get() = if (totalTransfer > 0) (100 * usedTransfer / totalTransfer).toInt() else 0
 }

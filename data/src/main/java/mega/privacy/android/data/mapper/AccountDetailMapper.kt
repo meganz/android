@@ -38,10 +38,12 @@ internal fun toAccountDetail(
     transferDetail = details.takeIf { numDetails and HAS_TRANSFER_DETAILS != 0 }
         ?.let { accountTransferDetailMapper(it.transferMax, it.transferUsed) },
     levelDetail = details.takeIf { numDetails and HAS_PRO_DETAILS != 0 }?.let {
-        accountLevelDetailMapper(it.subscriptionRenewTime,
+        accountLevelDetailMapper(
+            it.subscriptionRenewTime,
             it.proExpiration,
             accountTypeMapper(it.proLevel),
-            subscriptionStatusMapper(it.subscriptionStatus))
+            subscriptionStatusMapper(it.subscriptionStatus)
+        )
     },
     storageDetail = details.takeIf { numDetails and HAS_STORAGE_DETAILS != 0 }?.let {
         accountStorageDetailMapper(
@@ -51,7 +53,7 @@ internal fun toAccountDetail(
             inShares,
             details.storageMax,
             details.storageUsed,
-            details.subscriptionMethodId
+            details.subscriptionMethodId,
         )
     },
 )

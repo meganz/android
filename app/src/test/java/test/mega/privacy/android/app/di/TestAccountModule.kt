@@ -14,6 +14,7 @@ import mega.privacy.android.domain.usecase.GetMyCredentials
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.IsBusinessAccountActive
 import mega.privacy.android.domain.usecase.IsUserLoggedIn
+import mega.privacy.android.domain.usecase.MonitorAccountDetail
 import mega.privacy.android.domain.usecase.login.LocalLogoutAppUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.login.QuerySignupLinkUseCase
@@ -124,4 +125,7 @@ object TestAccountModule {
 
     @Provides
     fun provideMonitorSecurityUpgradeInApp() = mock<MonitorSecurityUpgradeInApp>()
+
+    @Provides
+    fun providesMonitorAccountDetail() = mock<MonitorAccountDetail>()
 }

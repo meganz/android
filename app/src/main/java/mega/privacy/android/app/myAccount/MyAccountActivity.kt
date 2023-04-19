@@ -40,6 +40,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.middlelayer.iab.BillingConstant
 import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivity
 import mega.privacy.android.app.presentation.extensions.getFormattedStringOrDefault
+import mega.privacy.android.app.presentation.myaccount.MyAccountFragment
 import mega.privacy.android.app.upgradeAccount.UpgradeAccountActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.isAlertDialogShown
 import mega.privacy.android.app.utils.AlertDialogUtil.quitEditTextError
@@ -64,7 +65,6 @@ import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.app.utils.Util.showAlert
 import mega.privacy.android.app.utils.Util.showKeyboardDelayed
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
-import mega.privacy.android.domain.entity.AccountType
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError.API_OK
 import timber.log.Timber
@@ -141,16 +141,20 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 savedInstanceState.getBoolean(KILL_SESSIONS_SHOWN, false) -> {
                     showConfirmationKillSessions()
                 }
+
                 savedInstanceState.getBoolean(CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
                     cancelSubscriptionsFeedback = savedInstanceState.getString(TYPED_FEEDBACK)
                     showCancelSubscriptions()
                 }
+
                 savedInstanceState.getBoolean(CONFIRM_CANCEL_SUBSCRIPTIONS_SHOWN, false) -> {
                     showConfirmationCancelSubscriptions()
                 }
+
                 savedInstanceState.getBoolean(CONFIRM_CHANGE_EMAIL_SHOWN, false) -> {
                     showConfirmChangeEmailDialog()
                 }
+
                 savedInstanceState.getBoolean(CONFIRM_RESET_PASSWORD_SHOWN, false) -> {
                     showConfirmResetPasswordDialog()
                 }
@@ -176,6 +180,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 navController.navigate(R.id.action_my_account_to_achievements)
                 intent.action = null
             }
+
             ACTION_CANCEL_ACCOUNT -> {
                 intent.dataString?.let { link ->
                     viewModel.confirmCancelAccount(link) { result ->
@@ -185,6 +190,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
                 intent.action = null
             }
+
             ACTION_CHANGE_MAIL -> {
                 intent.dataString?.let { link ->
                     viewModel.confirmChangeEmail(link) { result ->
@@ -194,10 +200,12 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
                 intent.action = null
             }
+
             ACTION_RESET_PASS -> {
                 showConfirmResetPasswordDialog()
                 intent.action = null
             }
+
             ACTION_PASS_CHANGED -> {
                 viewModel.finishPasswordChange(
                     intent.getIntExtra(RESULT, API_OK),
@@ -280,6 +288,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                 navController.navigate(R.id.action_my_account_to_upgrade)
                 viewModel.setOpenUpgradeFrom()
             }
+
             R.id.action_cancel_subscriptions -> showCancelSubscriptions()
             R.id.action_logout -> viewModel.logout(this)
         }
@@ -321,6 +330,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
 
                 updateActionBar(ContextCompat.getColor(this, R.color.grey_020_grey_087))
             }
+
             else -> {
                 menu.toggleAllMenuItemsVisibility(false)
                 updateActionBar(ContextCompat.getColor(this, R.color.white))
@@ -569,8 +579,10 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                     platformInfo.platformName,
                     platformInfo.platformStoreName
                 )
+
             TYPE_ITUNES ->
                 getString(R.string.message_itunes_platform_subscription)
+
             else ->
                 getString(R.string.message_other_platform_subscription)
         }
@@ -649,6 +661,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
             matchRegexs(result, VERIFY_CHANGE_MAIL_LINK_REGEXS) -> {
                 showConfirmChangeEmailDialog()
             }
+
             result == getFormattedStringOrDefault(R.string.account_change_email_error_not_logged_with_correct_account_message) -> {
                 showAlert(
                     this,
@@ -656,6 +669,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                     getFormattedStringOrDefault(R.string.account_change_email_error_not_logged_with_correct_account_title)
                 )
             }
+
             else -> {
                 showErrorAlert(getString(R.string.general_error_word))
             }
@@ -729,6 +743,7 @@ class MyAccountActivity : PasscodeActivity(), MyAccountFragment.MessageResultCal
                                     showErrorAlert(message)
                                 }
                             }
+
                             TYPE_CHANGE_EMAIL -> {
                                 viewModel.finishConfirmChangeEmail(
                                     password,

@@ -32,8 +32,7 @@ class DefaultMonitorUserUpdatesTest {
                 isBusinessAccount = false,
                 isMasterBusinessAccount = false,
                 accountTypeIdentifier = null,
-                accountTypeString = "",
-                isAchievementsEnabled = false
+                accountTypeString = ""
             )
         )
     }

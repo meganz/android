@@ -66,8 +66,7 @@ class DefaultCreateSupportTicketTest {
                     isBusinessAccount = true,
                     isMasterBusinessAccount = true,
                     accountTypeIdentifier = AccountType.FREE,
-                    accountTypeString = accountTypeString,
-                    isAchievementsEnabled = false
+                    accountTypeString = accountTypeString
                 )
             )
         }

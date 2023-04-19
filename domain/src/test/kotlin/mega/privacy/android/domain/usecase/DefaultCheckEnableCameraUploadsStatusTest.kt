@@ -31,8 +31,7 @@ class DefaultCheckEnableCameraUploadsStatusTest {
         isBusinessAccount = false,
         isMasterBusinessAccount = false,
         accountTypeIdentifier = AccountType.PRO_I,
-        accountTypeString = "",
-        isAchievementsEnabled = false
+        accountTypeString = ""
     )
 
     @Before
@@ -56,11 +55,13 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     @Test
     fun `test that CAN_ENABLE_CAMERA_UPLOADS is returned when the user is under an active master business account`() =
         runTest {
-            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
-                isBusinessAccount = true,
-                isMasterBusinessAccount = true,
-                accountTypeIdentifier = AccountType.BUSINESS
-            ))
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(
+                testUserAccount.copy(
+                    isBusinessAccount = true,
+                    isMasterBusinessAccount = true,
+                    accountTypeIdentifier = AccountType.BUSINESS
+                )
+            )
             whenever(isBusinessAccountActive()).thenReturn(true)
 
             assertEquals(underTest.invoke(), EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
@@ -69,54 +70,70 @@ class DefaultCheckEnableCameraUploadsStatusTest {
     @Test
     fun `test that SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT is returned when the user is under an active regular business account`() =
         runTest {
-            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
-                isBusinessAccount = true,
-                accountTypeIdentifier = AccountType.BUSINESS
-            ))
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(
+                testUserAccount.copy(
+                    isBusinessAccount = true,
+                    accountTypeIdentifier = AccountType.BUSINESS
+                )
+            )
             whenever(isBusinessAccountActive()).thenReturn(true)
 
-            assertEquals(underTest.invoke(),
-                EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT)
+            assertEquals(
+                underTest.invoke(),
+                EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
+            )
         }
 
     @Test
     fun `test that SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT is returned when the user is under an inactive regular business account`() =
         runTest {
-            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
-                isBusinessAccount = true,
-                accountTypeIdentifier = AccountType.BUSINESS
-            ))
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(
+                testUserAccount.copy(
+                    isBusinessAccount = true,
+                    accountTypeIdentifier = AccountType.BUSINESS
+                )
+            )
             whenever(isBusinessAccountActive()).thenReturn(false)
 
-            assertEquals(underTest.invoke(),
-                EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT)
+            assertEquals(
+                underTest.invoke(),
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
+            )
         }
 
     @Test
     fun `test that SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT is returned when the user is under an inactive master business account`() =
         runTest {
-            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
-                isBusinessAccount = true,
-                isMasterBusinessAccount = true,
-                accountTypeIdentifier = AccountType.BUSINESS
-            ))
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(
+                testUserAccount.copy(
+                    isBusinessAccount = true,
+                    isMasterBusinessAccount = true,
+                    accountTypeIdentifier = AccountType.BUSINESS
+                )
+            )
             whenever(isBusinessAccountActive()).thenReturn(false)
 
-            assertEquals(underTest.invoke(),
-                EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT)
+            assertEquals(
+                underTest.invoke(),
+                EnableCameraUploadsStatus.SHOW_SUSPENDED_BUSINESS_ACCOUNT_PROMPT
+            )
         }
 
     @Test
     fun `test that CAN_ENABLE_CAMERA_UPLOADS is returned when the user is Pro Flexi account`() =
         runTest {
-            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(testUserAccount.copy(
-                isBusinessAccount = true,
-                accountTypeIdentifier = AccountType.PRO_FLEXI
-            ))
+            whenever(getAccountDetailsUseCase(forceRefresh = true)).thenReturn(
+                testUserAccount.copy(
+                    isBusinessAccount = true,
+                    accountTypeIdentifier = AccountType.PRO_FLEXI
+                )
+            )
             whenever(isBusinessAccountActive()).thenReturn(true)
 
-            assertEquals(underTest.invoke(),
-                EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS)
+            assertEquals(
+                underTest.invoke(),
+                EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
+            )
         }
 
 }

@@ -124,21 +124,45 @@ class MyAccountUsageFragment : Fragment(), Scrollable {
 
     private fun setupAccountDetails() {
         if (isBusinessAccount) {
-            usageBinding.updateBusinessOrProFlexi(viewModel)
+            usageBinding.updateBusinessOrProFlexi(
+                requireContext(),
+                viewModel.getUsedStorage(),
+                viewModel.getUsedTransfer()
+            )
             paymentAlertBinding.businessUpdate(
+                requireContext(),
+                viewModel.getRenewTime(),
+                viewModel.getExpirationTime(),
+                viewModel.hasRenewableSubscription(),
+                viewModel.hasExpirableSubscription(),
                 megaApi,
-                viewModel,
                 true,
                 ActiveFragment.MY_ACCOUNT_USAGE
             )
             paymentAlertBinding.root.isVisible = true
         } else if (viewModel.isProFlexiAccount()) {
-            usageBinding.updateBusinessOrProFlexi(viewModel)
+            usageBinding.updateBusinessOrProFlexi(
+                requireContext(),
+                viewModel.getUsedStorage(),
+                viewModel.getUsedTransfer()
+            )
             paymentAlertBinding.setRenewalDateForProFlexi(viewModel)
         } else {
-            usageBinding.update(viewModel)
+            usageBinding.update(
+                requireContext(),
+                viewModel.isFreeAccount(),
+                viewModel.getTotalStorage(),
+                viewModel.getTotalTransfer(),
+                viewModel.getUsedStorage(),
+                viewModel.getUsedStoragePercentage(),
+                viewModel.getUsedTransfer(),
+                viewModel.getUsedTransferPercentage()
+            )
             paymentAlertBinding.root.isVisible = paymentAlertBinding.update(
-                viewModel,
+                viewModel.getRenewTime(),
+                viewModel.getExpirationTime(),
+                viewModel.hasRenewableSubscription(),
+                viewModel.hasExpirableSubscription(),
                 ActiveFragment.MY_ACCOUNT_USAGE
             )
         }

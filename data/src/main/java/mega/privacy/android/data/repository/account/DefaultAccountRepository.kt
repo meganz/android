@@ -138,7 +138,6 @@ internal class DefaultAccountRepository @Inject constructor(
             megaApiGateway.isMasterBusinessAccount(),
             accountTypeMapper(myAccountInfoFacade.accountTypeId),
             myAccountInfoFacade.accountTypeString,
-            megaApiGateway.isAchievementsEnabled
         )
     }
 
