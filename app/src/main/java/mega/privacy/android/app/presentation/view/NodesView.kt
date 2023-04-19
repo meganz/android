@@ -58,6 +58,11 @@ const val EXPORTED_TEST_TAG = "exported Tag"
 const val TAKEN_TEST_TAG = "taken Tag"
 
 /**
+ * Test tag for nodesView visibility
+ */
+const val NODES_EMPTY_VIEW_VISIBLE = "Nodes empty view not visible"
+
+/**
  * This method will return different type of folder icons based on their type
  * @param nodeUIItem [FolderNode]
  */

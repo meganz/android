@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildren
 import mega.privacy.android.app.domain.usecase.GetRubbishBinChildrenNode
+import mega.privacy.android.app.domain.usecase.GetRubbishBinFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -24,6 +25,7 @@ import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaNode
 import java.util.Stack
 import javax.inject.Inject
@@ -38,6 +40,7 @@ import javax.inject.Inject
  * @param setViewType [SetViewType] to set view type
  * @param monitorViewType [MonitorViewType] check view type
  * @param getIntentToOpenFileMapper [GetIntentToOpenFileMapper]
+ * @param getRubbishBinFolder [GetRubbishBinFolder]
  */
 @HiltViewModel
 class RubbishBinViewModel @Inject constructor(
@@ -49,6 +52,7 @@ class RubbishBinViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
+    private val getRubbishBinFolder: GetRubbishBinFolder
 ) : ViewModel() {
 
     /**
@@ -119,7 +123,9 @@ class RubbishBinViewModel @Inject constructor(
                     nodes = getRubbishBinChildrenNode(_state.value.rubbishBinHandle) ?: emptyList(),
                     parentHandle = getRubbishBinParentNodeHandle(_state.value.rubbishBinHandle),
                     nodeList = nodeList,
-                    sortOrder = getCloudSortOrder()
+                    sortOrder = getCloudSortOrder(),
+                    isRubbishBinEmpty = INVALID_HANDLE == _state.value.rubbishBinHandle ||
+                            getRubbishBinFolder()?.handle == _state.value.rubbishBinHandle
                 )
             }
         }

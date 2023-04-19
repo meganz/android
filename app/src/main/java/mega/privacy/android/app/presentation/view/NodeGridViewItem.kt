@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +28,7 @@ import androidx.constraintlayout.compose.Dimension
 import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
+import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -95,7 +95,7 @@ internal fun NodeGridViewItem(
                         bottom.linkTo(parent.bottom)
                     }
             )
-            Text(
+            MiddleEllipsisText(
                 text = nodeUIItem.name,
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
@@ -108,7 +108,6 @@ internal fun NodeGridViewItem(
                     },
                 style = MaterialTheme.typography.subtitle1,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
                 color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary
             )
 
@@ -147,6 +146,7 @@ internal fun NodeGridViewItem(
             }
             ConstraintLayout(
                 modifier = Modifier.padding(start = 16.dp, end = 8.dp, bottom = 16.dp, top = 16.dp)
+                    .fillMaxWidth()
             ) {
                 val (menuImage, txtTitle) = createRefs()
                 Image(
@@ -158,7 +158,7 @@ internal fun NodeGridViewItem(
                             end.linkTo(parent.end)
                         }
                 )
-                Text(
+                MiddleEllipsisText(
                     text = nodeUIItem.name,
                     modifier = Modifier
                         .padding(horizontal = 8.dp)

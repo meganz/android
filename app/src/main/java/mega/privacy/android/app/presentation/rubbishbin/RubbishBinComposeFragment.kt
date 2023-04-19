@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.rubbishbin
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -9,32 +10,31 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.ActionMode
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
-import mega.privacy.android.app.presentation.view.NodesView
+import mega.privacy.android.app.presentation.rubbishbin.view.RubbishBinComposeView
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaApiUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.entity.node.FileNode
-import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.usecase.GetThemeMode
 import nz.mega.sdk.MegaChatApiJava
 import nz.mega.sdk.MegaNode
@@ -83,9 +83,8 @@ class RubbishBinComposeFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 val uiState by viewModel.state.collectAsStateWithLifecycle()
                 AndroidTheme(isDark = themeMode.isDarkMode()) {
-                    NodesView(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        nodeUIItems = uiState.nodeList,
+                    RubbishBinComposeView(
+                        uiState = uiState,
                         stringUtilWrapper = stringUtilWrapper,
                         onMenuClick = ::showOptionsMenuForItem,
                         onItemClicked = viewModel::onItemClicked,
@@ -100,9 +99,9 @@ class RubbishBinComposeFragment : Fragment() {
                             SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
                                 ?: R.string.sortby_name
                         ),
-                        isListView = uiState.currentViewType == ViewType.LIST,
                         onSortOrderClick = { showSortByPanel() },
                         onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
+                        emptyState = getEmptyFolderDrawable(uiState.isRubbishBinEmpty),
                     )
                 }
                 updateActionModeTitle(
@@ -113,6 +112,31 @@ class RubbishBinComposeFragment : Fragment() {
                 itemClickedEvenReceived(uiState.currFileNode)
             }
         }
+    }
+
+    private fun getEmptyFolderDrawable(isRubbishBinEmpty: Boolean): Pair<Int, Int> {
+        return if (isRubbishBinEmpty) {
+            Pair(
+                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    R.drawable.rubbish_bin_empty_landscape
+                } else {
+                    R.drawable.rubbish_bin_empty
+                }, R.string.context_empty_rubbish_bin
+            )
+        } else {
+            Pair(
+                if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    R.drawable.ic_zero_landscape_empty_folder
+                } else {
+                    R.drawable.ic_zero_portrait_empty_folder
+                }, R.string.file_browser_empty_folder_new
+            )
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupObserver()
     }
 
     /**
@@ -278,6 +302,18 @@ class RubbishBinComposeFragment : Fragment() {
             }
         } ?: run {
             return
+        }
+    }
+
+    private fun setupObserver() {
+        viewLifecycleOwner.collectFlow(viewModel.state.map { it.isPendingRefresh }
+            .sample(500L)) { isPendingRefresh ->
+            if (isPendingRefresh) {
+                viewModel.apply {
+                    refreshNodes()
+                    markHandledPendingRefresh()
+                }
+            }
         }
     }
 }

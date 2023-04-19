@@ -33,6 +33,7 @@ import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
 import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -105,7 +106,7 @@ internal fun NodeListViewItem(
             }
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Row {
-                    Text(
+                    MiddleEllipsisText(
                         text = nodeUIItem.name,
                         style = MaterialTheme.typography.subtitle1,
                         color = if (nodeUIItem.isTakenDown) MaterialTheme.colors.red_800_red_400 else MaterialTheme.colors.textColorPrimary,

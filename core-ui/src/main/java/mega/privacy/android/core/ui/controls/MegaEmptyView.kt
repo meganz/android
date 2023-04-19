@@ -17,8 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import mega.privacy.android.core.ui.model.SpanIndicator
+import mega.privacy.android.core.ui.theme.extensions.grey_300_grey_600
+import mega.privacy.android.core.ui.theme.extensions.grey_900_grey_100
 
 /**
  * Reusable EmptyView with Icon & Text
@@ -119,4 +124,48 @@ private fun getIconTint(): Color {
     }
 }
 
+/**
+ * Reusable EmptyView with Icon & Text
+ * Pass imageVector using ImageVector.vectorResource(id = R.drawable.ic_xyz)
+ * @param modifier
+ * @param imagePainter
+ * @param text with string
+ */
+@Composable
+fun MegaEmptyView(
+    modifier: Modifier = Modifier,
+    text: String,
+    imagePainter: Painter
+) {
+    MegaEmptyView(modifier, text) {
+        Icon(
+            painter = imagePainter,
+            contentDescription = "Empty Icon",
+            modifier = Modifier.padding(bottom = 30.dp),
+            tint = getIconTint()
+        )
+    }
+}
+
+@Composable
+private fun MegaEmptyView(modifier: Modifier, text: String, Icon: @Composable () -> Unit) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Icon()
+        MegaSpannedText(
+            value = text, baseStyle = MaterialTheme.typography.subtitle1.copy(
+                fontSize = 16.sp,
+            ),
+            styles = mapOf(
+                SpanIndicator('A') to SpanStyle(color = MaterialTheme.colors.grey_900_grey_100),
+                SpanIndicator('B') to SpanStyle(color = MaterialTheme.colors.grey_300_grey_600)
+            )
+        )
+    }
+}
 
