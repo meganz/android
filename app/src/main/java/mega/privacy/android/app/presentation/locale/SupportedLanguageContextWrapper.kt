@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.locale
 import android.content.Context
 import android.content.ContextWrapper
 import android.os.LocaleList
+import java.util.Locale
 
 /**
  * Supported language context wrapper
@@ -49,15 +50,20 @@ class SupportedLanguageContextWrapper private constructor(base: Context?) : Cont
              * default language. I don't know what causes that to happen, but this code removes
              * unsupported locales from the configuration as a measure to prevent the strange behaviour.
              **/
-
-
             context?.resources?.configuration?.let { configuration ->
                 val locales = configuration.locales
                 LocaleList(*getSupportedLocales(locales))
                     .takeUnless { it.isEmpty }
                     ?.let {
+                        Locale.setDefault(it.get(0))
                         configuration.setLocales(it)
-                    }
+                    } ?: run {
+                    // If only unsupported locale is set in phone setting and app-specific setting
+                    // set default locale to English.
+                    val defaultLocale = Locale("en")
+                    Locale.setDefault(defaultLocale)
+                    configuration.setLocales(LocaleList(defaultLocale))
+                }
             }
             return SupportedLanguageContextWrapper(context)
         }
