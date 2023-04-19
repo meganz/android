@@ -66,14 +66,11 @@ public class QRCodeSaveBottomSheetDialogFragment extends BaseBottomSheetDialogFr
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.qr_code_saveTo_cloud_layout:
-                saveToCloudDrive();
-                break;
-
-            case R.id.qr_code_saveTo_fileSystem_layout:
-                saveToFileSystem();
-                break;
+        int id = v.getId();
+        if (id == R.id.qr_code_saveTo_cloud_layout) {
+            saveToCloudDrive();
+        } else if (id == R.id.qr_code_saveTo_fileSystem_layout) {
+            saveToFileSystem();
         }
 
         setStateBottomSheetBehaviorHidden();

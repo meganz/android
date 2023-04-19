@@ -155,11 +155,8 @@ public class ShareContactsAdapter extends RecyclerView.Adapter<ShareContactsAdap
                 Timber.e("Current position error - not valid value");
                 return;
             }
-            switch (view.getId()) {
-                case R.id.item_layout_chip: {
-                    ((AddContactActivity) context).deleteContact(currentPosition);
-                    break;
-                }
+            if (view.getId() == R.id.item_layout_chip) {
+                ((AddContactActivity) context).deleteContact(currentPosition);
             }
         } else {
             Timber.e("Error. Holder is Null");

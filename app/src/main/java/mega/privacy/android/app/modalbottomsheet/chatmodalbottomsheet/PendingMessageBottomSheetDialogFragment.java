@@ -95,19 +95,16 @@ public class PendingMessageBottomSheetDialogFragment extends BaseBottomSheetDial
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.msg_not_sent_retry_layout:
-                if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD) && isUploadingMessage) {
-                    megaApi.pauseTransfers(false);
-                    ((ChatActivity) requireActivity()).updatePausedUploadingMessages();
-                } else {
-                    ((ChatActivity) requireActivity()).retryPendingMessage(messageId);
-                }
-                break;
-
-            case R.id.msg_not_sent_delete_layout:
-                ((ChatActivity) requireActivity()).removePendingMsg(messageId);
-                break;
+        int id = v.getId();
+        if (id == R.id.msg_not_sent_retry_layout) {
+            if (megaApi.areTransfersPaused(MegaTransfer.TYPE_UPLOAD) && isUploadingMessage) {
+                megaApi.pauseTransfers(false);
+                ((ChatActivity) requireActivity()).updatePausedUploadingMessages();
+            } else {
+                ((ChatActivity) requireActivity()).retryPendingMessage(messageId);
+            }
+        } else if (id == R.id.msg_not_sent_delete_layout) {
+            ((ChatActivity) requireActivity()).removePendingMsg(messageId);
         }
 
         setStateBottomSheetBehaviorHidden();

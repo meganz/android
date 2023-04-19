@@ -251,29 +251,26 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
     public boolean onOptionsItemSelected(MenuItem item) {
         Timber.d("onOptionsItemSelected");
 
-        switch (item.getItemId()) {
-            case android.R.id.home: {
-                finish();
-                break;
-            }
-            case R.id.cab_menu_new_chat: {
-                if (megaApi != null && megaApi.getRootNode() != null) {
-                    ArrayList<MegaUser> contacts = megaApi.getContacts();
-                    if (contacts == null) {
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            finish();
+        } else if (itemId == R.id.cab_menu_new_chat) {
+            if (megaApi != null && megaApi.getRootNode() != null) {
+                ArrayList<MegaUser> contacts = megaApi.getContacts();
+                if (contacts == null) {
+                    showSnackbar(getString(R.string.no_contacts_invite));
+                } else {
+                    if (contacts.isEmpty()) {
                         showSnackbar(getString(R.string.no_contacts_invite));
                     } else {
-                        if (contacts.isEmpty()) {
-                            showSnackbar(getString(R.string.no_contacts_invite));
-                        } else {
-                            Intent in = new Intent(this, AddContactActivity.class);
-                            in.putExtra("contactType", CONTACT_TYPE_MEGA);
-                            startActivityForResult(in, REQUEST_CREATE_CHAT);
-                        }
+                        Intent in = new Intent(this, AddContactActivity.class);
+                        in.putExtra("contactType", CONTACT_TYPE_MEGA);
+                        startActivityForResult(in, REQUEST_CREATE_CHAT);
                     }
-                } else {
-                    Timber.w("Online but not megaApi");
-                    showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
                 }
+            } else {
+                Timber.w("Online but not megaApi");
+                showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
             }
         }
         return super.onOptionsItemSelected(item);
@@ -425,32 +422,28 @@ public class ChatExplorerActivity extends PasscodeActivity implements View.OnCli
     public void onClick(View v) {
         Timber.d("onClick");
 
-        switch (v.getId()) {
-            case R.id.fab_chat_explorer: {
-                if (chatExplorerFragment != null) {
-                    if (chatExplorerFragment.getAddedChats() != null) {
-                        chooseChats(chatExplorerFragment.getAddedChats());
-                    }
+        int id = v.getId();
+        if (id == R.id.fab_chat_explorer) {
+            if (chatExplorerFragment != null) {
+                if (chatExplorerFragment.getAddedChats() != null) {
+                    chooseChats(chatExplorerFragment.getAddedChats());
                 }
-                break;
             }
-            case R.id.new_group_button: {
-                if (megaApi != null && megaApi.getRootNode() != null) {
-                    ArrayList<MegaUser> contacts = megaApi.getContacts();
-                    if (contacts == null || contacts.isEmpty()) {
-                        showSnackbar(getString(R.string.no_contacts_invite));
-                        break;
-                    }
-
-                    Intent intent = new Intent(this, AddContactActivity.class);
-                    intent.putExtra("contactType", CONTACT_TYPE_MEGA);
-                    intent.putExtra("onlyCreateGroup", true);
-                    startActivityForResult(intent, REQUEST_CREATE_CHAT);
-                } else {
-                    Timber.w("Online but not megaApi");
-                    showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
+        } else if (id == R.id.new_group_button) {
+            if (megaApi != null && megaApi.getRootNode() != null) {
+                ArrayList<MegaUser> contacts = megaApi.getContacts();
+                if (contacts == null || contacts.isEmpty()) {
+                    showSnackbar(getString(R.string.no_contacts_invite));
+                    return;
                 }
-                break;
+
+                Intent intent = new Intent(this, AddContactActivity.class);
+                intent.putExtra("contactType", CONTACT_TYPE_MEGA);
+                intent.putExtra("onlyCreateGroup", true);
+                startActivityForResult(intent, REQUEST_CREATE_CHAT);
+            } else {
+                Timber.w("Online but not megaApi");
+                showErrorAlertDialog(getString(R.string.error_server_connection_problem), false, this);
             }
         }
     }

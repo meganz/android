@@ -118,19 +118,14 @@ public class VersionBottomSheetDialogFragment extends BaseBottomSheetDialogFragm
             return;
         }
 
-        switch (v.getId()) {
-            case R.id.option_download_layout:
-                ((VersionsFileActivity) requireActivity()).downloadNodes(Collections.singletonList(node));
-                break;
-
-            case R.id.option_revert_layout:
-                ((VersionsFileActivity) requireActivity()).checkRevertVersion();
-                dismissAllowingStateLoss();
-                break;
-
-            case R.id.option_delete_layout:
-                ((VersionsFileActivity) requireActivity()).showConfirmationRemoveVersion();
-                break;
+        int id = v.getId();
+        if (id == R.id.option_download_layout) {
+            ((VersionsFileActivity) requireActivity()).downloadNodes(Collections.singletonList(node));
+        } else if (id == R.id.option_revert_layout) {
+            ((VersionsFileActivity) requireActivity()).checkRevertVersion();
+            dismissAllowingStateLoss();
+        } else if (id == R.id.option_delete_layout) {
+            ((VersionsFileActivity) requireActivity()).showConfirmationRemoveVersion();
         }
 
         setStateBottomSheetBehaviorHidden();

@@ -47,14 +47,11 @@ public class ContactNicknameBottomSheetDialogFragment extends BaseBottomSheetDia
     @Override
     public void onClick(View v) {
         if (contactInfoActivity == null) return;
-        switch (v.getId()) {
-            case R.id.edit_nickname_layout:
-                contactInfoActivity.showConfirmationSetNickname(nickname);
-                break;
-
-            case R.id.remove_nickname_layout:
-                viewModel.updateNickName(null);
-                break;
+        int id = v.getId();
+        if (id == R.id.edit_nickname_layout) {
+            contactInfoActivity.showConfirmationSetNickname(nickname);
+        } else if (id == R.id.remove_nickname_layout) {
+            viewModel.updateNickName(null);
         }
 
         setStateBottomSheetBehaviorHidden();

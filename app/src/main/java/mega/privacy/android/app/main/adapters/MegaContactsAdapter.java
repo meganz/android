@@ -632,13 +632,10 @@ public class MegaContactsAdapter extends RecyclerView.Adapter<MegaContactsAdapte
         int currentPosition = holder.getAdapterPosition();
         try {
             MegaContactAdapter c = (MegaContactAdapter) getItem(currentPosition);
-            switch (v.getId()) {
-                case R.id.contact_list_decline:
-                case R.id.contact_list_item_layout: {
-                    Timber.d("contact_list_item_layout");
-                    ((AddContactActivity) context).itemClick(c.getMegaUser().getEmail(), adapterType);
-                    break;
-                }
+            int id = v.getId();
+            if (id == R.id.contact_list_decline || id == R.id.contact_list_item_layout) {
+                Timber.d("contact_list_item_layout");
+                ((AddContactActivity) context).itemClick(c.getMegaUser().getEmail(), adapterType);
             }
         } catch (IndexOutOfBoundsException e) {
             Timber.e(e);

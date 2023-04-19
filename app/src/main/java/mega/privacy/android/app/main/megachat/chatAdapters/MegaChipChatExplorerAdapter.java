@@ -166,11 +166,8 @@ public class MegaChipChatExplorerAdapter extends RecyclerView.Adapter<MegaChipCh
                 Timber.w("Current position error - not valid value");
                 return;
             }
-            switch (view.getId()) {
-                case R.id.delete_icon_chip: {
-                    ((ChatExplorerFragment) fragment).deleteItemPosition(currentPosition);
-                    break;
-                }
+            if (view.getId() == R.id.delete_icon_chip) {
+                ((ChatExplorerFragment) fragment).deleteItemPosition(currentPosition);
             }
         } else {
             Timber.w("Error. Holder is Null");

@@ -1363,24 +1363,17 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
         Timber.d("onOptionsItemSelected");
 
         int id = item.getItemId();
-        switch (id) {
-            case android.R.id.home: {
-                onBackPressed();
-                break;
+        if (id == android.R.id.home) {
+            onBackPressed();
+        } else if (id == R.id.action_scan_qr) {
+            initScanQR();
+        } else if (id == R.id.action_send_invitation) {
+            if (contactType == CONTACT_TYPE_MEGA) {
+                setResultContacts(addedContactsMEGA, true);
+            } else {
+                shareWith(addedContactsShare);
             }
-            case R.id.action_scan_qr: {
-                initScanQR();
-                break;
-            }
-            case R.id.action_send_invitation: {
-                if (contactType == CONTACT_TYPE_MEGA) {
-                    setResultContacts(addedContactsMEGA, true);
-                } else {
-                    shareWith(addedContactsShare);
-                }
-                hideKeyboard(addContactActivity, 0);
-                break;
-            }
+            hideKeyboard(addContactActivity, 0);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -2847,44 +2840,35 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.layout_scan_qr: {
-                Timber.d("Scan QR code pressed");
-                if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
-                    showConfirmationOpenCamera(this, ACTION_OPEN_QR, true);
-                    break;
+        int id = v.getId();
+        if (id == R.id.layout_scan_qr) {
+            Timber.d("Scan QR code pressed");
+            if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
+                showConfirmationOpenCamera(this, ACTION_OPEN_QR, true);
+                return;
+            }
+            initScanQR();
+        } else if (id == R.id.add_contact_list_empty_invite_button) {
+            toInviteContact();
+        } else if (id == R.id.ekr_switch) {
+            isEKREnabled = ekrSwitch.isChecked();
+            setGetChatLinkVisibility();
+        } else if (id == R.id.allow_add_participants_switch) {
+            isAllowAddParticipantsEnabled = allowAddParticipantsSwitch.isChecked();
+        } else if (id == R.id.fab_button_next) {
+            if (contactType == CONTACT_TYPE_DEVICE) {
+                inviteContacts(addedContactsPhone);
+            } else if (contactType == CONTACT_TYPE_MEGA) {
+                if (onlyCreateGroup && !isStartConversation && addedContactsMEGA.isEmpty()) {
+                    showSnackbar(getString(R.string.error_creating_group_and_attaching_file));
+                    return;
                 }
-                initScanQR();
-                break;
-            }
-            case R.id.add_contact_list_empty_invite_button:
-                toInviteContact();
-                break;
 
-            case R.id.ekr_switch: {
-                isEKREnabled = ekrSwitch.isChecked();
-                setGetChatLinkVisibility();
-                break;
+                setResultContacts(addedContactsMEGA, true);
+            } else {
+                shareWith(addedContactsShare);
             }
-            case R.id.allow_add_participants_switch:
-                isAllowAddParticipantsEnabled = allowAddParticipantsSwitch.isChecked();
-                break;
-            case R.id.fab_button_next: {
-                if (contactType == CONTACT_TYPE_DEVICE) {
-                    inviteContacts(addedContactsPhone);
-                } else if (contactType == CONTACT_TYPE_MEGA) {
-                    if (onlyCreateGroup && !isStartConversation && addedContactsMEGA.isEmpty()) {
-                        showSnackbar(getString(R.string.error_creating_group_and_attaching_file));
-                        break;
-                    }
-
-                    setResultContacts(addedContactsMEGA, true);
-                } else {
-                    shareWith(addedContactsShare);
-                }
-                hideKeyboard(this, 0);
-                break;
-            }
+            hideKeyboard(this, 0);
         }
     }
 

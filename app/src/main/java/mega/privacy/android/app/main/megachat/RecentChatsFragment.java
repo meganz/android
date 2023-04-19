@@ -666,71 +666,58 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
     public void onClick(View v) {
         Timber.d("onClick");
 
-        switch (v.getId()) {
-            case R.id.btn_new_chat: {
-                if (recentChatsViewModel.isConnected()) {
-                    if (context instanceof ManagerActivity) {
-                        Intent in = new Intent(context, AddContactActivity.class);
-                        in.putExtra("contactType", CONTACT_TYPE_MEGA);
-                        ((ManagerActivity) context).startActivityForResult(in, REQUEST_CREATE_CHAT);
-                    }
-                    if (megaChatApi.isSignalActivityRequired()) {
-                        megaChatApi.signalPresenceActivity();
-                    }
-                } else {
-                    ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
+        int id = v.getId();
+        if (id == R.id.btn_new_chat) {
+            if (recentChatsViewModel.isConnected()) {
+                if (context instanceof ManagerActivity) {
+                    Intent in = new Intent(context, AddContactActivity.class);
+                    in.putExtra("contactType", CONTACT_TYPE_MEGA);
+                    ((ManagerActivity) context).startActivityForResult(in, REQUEST_CREATE_CHAT);
                 }
-                break;
+                if (megaChatApi.isSignalActivityRequired()) {
+                    megaChatApi.signalPresenceActivity();
+                }
+            } else {
+                ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), -1);
             }
-            case R.id.empty_image_view_chat: {
-                numberOfClicks++;
-                Timber.d("Number of clicks: %s", numberOfClicks);
-                if (numberOfClicks >= 5) {
-                    numberOfClicks = 0;
-                    showStateInfo();
-                }
-
-                break;
+        } else if (id == R.id.empty_image_view_chat) {
+            numberOfClicks++;
+            Timber.d("Number of clicks: %s", numberOfClicks);
+            if (numberOfClicks >= 5) {
+                numberOfClicks = 0;
+                showStateInfo();
             }
-            case R.id.call_in_progress_layout: {
-                Timber.d("call_in_progress_layout");
-                if (checkPermissionsCall()) {
-                    returnActiveCall(context, passcodeManagement);
-                }
-                break;
+        } else if (id == R.id.call_in_progress_layout) {
+            Timber.d("call_in_progress_layout");
+            if (checkPermissionsCall()) {
+                returnActiveCall(context, passcodeManagement);
             }
-            case R.id.invite_title:
-            case R.id.dismiss_button:
-            case R.id.collapse_btn:
-                if (v.getId() == R.id.dismiss_button) {
-                    recentChatsViewModel.setLastDismissedRequestContactTime();
-                }
-                if (moreContactsTitle.getVisibility() == View.VISIBLE) {
-                    startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
-                } else {
-                    if (invitationContainer.getVisibility() == View.VISIBLE) {
-                        invitationContainer.setVisibility(View.GONE);
-                        collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
-                        isExpand = false;
-                    } else {
-                        invitationContainer.setVisibility(View.VISIBLE);
-                        collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
-                        isExpand = true;
-                    }
-                }
-                break;
-            case R.id.close_btn:
-                dbH.setShowInviteBanner("false");
-                bannerContainer.setVisibility(View.GONE);
-                break;
-            case R.id.allow_button:
-                Timber.d("request contact permission!");
-                requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                break;
-            case R.id.more_contacts_title:
-                Timber.d("to InviteContactActivity");
+        } else if (id == R.id.invite_title || id == R.id.dismiss_button || id == R.id.collapse_btn) {
+            if (v.getId() == R.id.dismiss_button) {
+                recentChatsViewModel.setLastDismissedRequestContactTime();
+            }
+            if (moreContactsTitle.getVisibility() == View.VISIBLE) {
                 startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
-                break;
+            } else {
+                if (invitationContainer.getVisibility() == View.VISIBLE) {
+                    invitationContainer.setVisibility(View.GONE);
+                    collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_collapse_acc));
+                    isExpand = false;
+                } else {
+                    invitationContainer.setVisibility(View.VISIBLE);
+                    collapseBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_expand));
+                    isExpand = true;
+                }
+            }
+        } else if (id == R.id.close_btn) {
+            dbH.setShowInviteBanner("false");
+            bannerContainer.setVisibility(View.GONE);
+        } else if (id == R.id.allow_button) {
+            Timber.d("request contact permission!");
+            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, REQUEST_READ_CONTACTS);
+        } else if (id == R.id.more_contacts_title) {
+            Timber.d("to InviteContactActivity");
+            startActivityForResult(new Intent(context, InviteContactActivity.class), REQUEST_INVITE_CONTACT_FROM_DEVICE);
         }
     }
 
@@ -1543,52 +1530,36 @@ public class RecentChatsFragment extends RotatableFragment implements View.OnCli
                 megaChatApi.signalPresenceActivity();
             }
 
-            switch (item.getItemId()) {
-                case R.id.cab_menu_select_all: {
-                    selectAll();
-                    break;
-                }
-                case R.id.cab_menu_unselect_all: {
+            int itemId = item.getItemId();
+            if (itemId == R.id.cab_menu_select_all) {
+                selectAll();
+            } else if (itemId == R.id.cab_menu_unselect_all) {
+                clearSelections();
+                hideMultipleSelect();
+            } else if (itemId == R.id.cab_menu_mute) {
+                if (context instanceof ManagerActivity && chats != null && !chats.isEmpty()) {
+                    createMuteNotificationsChatAlertDialog((Activity) context, chats);
                     clearSelections();
                     hideMultipleSelect();
-                    break;
                 }
-                case R.id.cab_menu_mute:
-                    if (context instanceof ManagerActivity && chats != null && !chats.isEmpty()) {
-                        createMuteNotificationsChatAlertDialog((Activity) context, chats);
-                        clearSelections();
-                        hideMultipleSelect();
-                    }
-                    break;
-
-                case R.id.cab_menu_unmute:
-                    if (context instanceof ManagerActivity && chats != null && !chats.isEmpty()) {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chats);
-                        clearSelections();
-                        hideMultipleSelect();
-                    }
-                    break;
-
-                case R.id.cab_menu_archive:
-                case R.id.cab_menu_unarchive: {
+            } else if (itemId == R.id.cab_menu_unmute) {
+                if (context instanceof ManagerActivity && chats != null && !chats.isEmpty()) {
+                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotifications(context, NOTIFICATIONS_ENABLED, chats);
                     clearSelections();
                     hideMultipleSelect();
-                    ChatController chatC = new ChatController(context);
-                    chatC.archiveChats(chats);
-                    break;
                 }
-                case R.id.cab_menu_delete: {
-                    clearSelections();
-                    hideMultipleSelect();
-                    //Delete
-                    Toast.makeText(context, "Not yet implemented! Delete: " + chats.size() + " chats", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case R.id.chat_list_leave_chat_layout: {
-                    //Leave group chat
-                    showConfirmationLeaveChats(context, chats, ((ManagerActivity) context));
-                    break;
-                }
+            } else if (itemId == R.id.cab_menu_archive || itemId == R.id.cab_menu_unarchive) {
+                clearSelections();
+                hideMultipleSelect();
+                ChatController chatC = new ChatController(context);
+                chatC.archiveChats(chats);
+            } else if (itemId == R.id.cab_menu_delete) {
+                clearSelections();
+                hideMultipleSelect();
+                //Delete
+                Toast.makeText(context, "Not yet implemented! Delete: " + chats.size() + " chats", Toast.LENGTH_SHORT).show();
+            } else if (itemId == R.id.chat_list_leave_chat_layout) {//Leave group chat
+                showConfirmationLeaveChats(context, chats, ((ManagerActivity) context));
             }
             return false;
         }

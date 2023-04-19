@@ -137,35 +137,19 @@ public class ChatReactionsView extends RelativeLayout implements View.OnClickLis
             return;
         }
 
-        switch (view.getId()) {
-            case R.id.first_emoji_layout:
-            case R.id.first_emoji_image:
-                addReaction(firstEmoji.getEmoji());
-                break;
-
-            case R.id.second_emoji_layout:
-            case R.id.second_emoji_image:
-                addReaction(secondEmoji.getEmoji());
-                break;
-
-            case R.id.third_emoji_layout:
-            case R.id.third_emoji_image:
-                addReaction(thirdEmoji.getEmoji());
-                break;
-
-            case R.id.fourth_emoji_layout:
-            case R.id.fourth_emoji_image:
-                addReaction(fourthEmoji.getEmoji());
-                break;
-
-            case R.id.fifth_emoji_layout:
-            case R.id.fifth_emoji_image:
-                addReaction(fifthEmoji.getEmoji());
-                break;
-
-            case R.id.icon_more_reactions:
-                ((ChatActivity) context).showReactionBottomSheet(messagesSelected.get(0), positionMessage, null);
-                break;
+        int id = view.getId();
+        if (id == R.id.first_emoji_layout || id == R.id.first_emoji_image) {
+            addReaction(firstEmoji.getEmoji());
+        } else if (id == R.id.second_emoji_layout || id == R.id.second_emoji_image) {
+            addReaction(secondEmoji.getEmoji());
+        } else if (id == R.id.third_emoji_layout || id == R.id.third_emoji_image) {
+            addReaction(thirdEmoji.getEmoji());
+        } else if (id == R.id.fourth_emoji_layout || id == R.id.fourth_emoji_image) {
+            addReaction(fourthEmoji.getEmoji());
+        } else if (id == R.id.fifth_emoji_layout || id == R.id.fifth_emoji_image) {
+            addReaction(fifthEmoji.getEmoji());
+        } else if (id == R.id.icon_more_reactions) {
+            ((ChatActivity) context).showReactionBottomSheet(messagesSelected.get(0), positionMessage, null);
         }
     }
 

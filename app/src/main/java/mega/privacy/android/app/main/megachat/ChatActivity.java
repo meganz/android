@@ -3186,98 +3186,72 @@ public class ChatActivity extends PasscodeActivity
             return false;
         }
 
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home: {
-                if (emojiKeyboard != null) {
-                    emojiKeyboard.hideBothKeyboard(this);
-                }
-
-                if (handlerEmojiKeyboard != null) {
-                    handlerEmojiKeyboard.removeCallbacksAndMessages(null);
-                }
-                if (handlerKeyboard != null) {
-                    handlerKeyboard.removeCallbacksAndMessages(null);
-                }
-                ifAnonymousModeLogin(false);
-                break;
-            }
-            case R.id.cab_menu_call_chat:
-                if (recordView.isRecordingNow()) break;
-
-                if (participatingInACall()) {
-                    showConfirmationInACall(this, getString(R.string.ongoing_call_content), passcodeManagement);
-                    break;
-                }
-
-                startVideo = false;
-                checkCallInThisChat();
-                break;
-
-            case R.id.cab_menu_video_chat:
-                if (recordView.isRecordingNow()) break;
-
-                if (CallUtil.participatingInACall()) {
-                    showConfirmationInACall(this, getString(R.string.ongoing_call_content), passcodeManagement);
-                    break;
-                }
-                startVideo = true;
-                checkCallInThisChat();
-                break;
-
-            case R.id.cab_menu_select_messages:
-                activateActionMode();
-                break;
-
-            case R.id.cab_menu_invite_chat:
-                if (recordView.isRecordingNow())
-                    break;
-
-                chooseAddParticipantDialog();
-                break;
-
-            case R.id.cab_menu_contact_info_chat: {
-                if (recordView.isRecordingNow()) break;
-                showGroupOrContactInfoActivity();
-                break;
-            }
-            case R.id.cab_menu_clear_history_chat: {
-                if (recordView.isRecordingNow()) break;
-
-                Timber.d("Clear history selected!");
-                stopReproductions();
-                showConfirmationClearChat(this, chatRoom);
-                break;
-            }
-            case R.id.cab_menu_leave_chat: {
-                if (recordView.isRecordingNow()) break;
-
-                Timber.d("Leave selected!");
-                showConfirmationLeaveChat(chatActivity, chatRoom.getChatId(), chatActivity);
-                break;
+        int itemId = item.getItemId();// Respond to the action bar's Up/Home button
+        if (itemId == android.R.id.home) {
+            if (emojiKeyboard != null) {
+                emojiKeyboard.hideBothKeyboard(this);
             }
 
-            case R.id.cab_menu_end_call_for_all:
-                Timber.d("End call for all selected");
-                showEndCallForAllDialog();
-                break;
+            if (handlerEmojiKeyboard != null) {
+                handlerEmojiKeyboard.removeCallbacksAndMessages(null);
+            }
+            if (handlerKeyboard != null) {
+                handlerKeyboard.removeCallbacksAndMessages(null);
+            }
+            ifAnonymousModeLogin(false);
+        } else if (itemId == R.id.cab_menu_call_chat) {
+            if (recordView.isRecordingNow()) return super.onOptionsItemSelected(item);
 
-            case R.id.cab_menu_archive_chat: {
-                if (recordView.isRecordingNow()) break;
-
-                Timber.d("Archive/unarchive selected!");
-                ChatController chatC = new ChatController(chatActivity);
-                chatC.archiveChat(chatRoom);
-                break;
+            if (participatingInACall()) {
+                showConfirmationInACall(this, getString(R.string.ongoing_call_content), passcodeManagement);
+                return super.onOptionsItemSelected(item);
             }
 
-            case R.id.cab_menu_mute_chat:
-                createMuteNotificationsAlertDialogOfAChat(this, chatRoom.getChatId());
-                break;
+            startVideo = false;
+            checkCallInThisChat();
+        } else if (itemId == R.id.cab_menu_video_chat) {
+            if (recordView.isRecordingNow()) return super.onOptionsItemSelected(item);
 
-            case R.id.cab_menu_unmute_chat:
-                MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(this, NOTIFICATIONS_ENABLED, chatRoom.getChatId());
-                break;
+            if (participatingInACall()) {
+                showConfirmationInACall(this, getString(R.string.ongoing_call_content), passcodeManagement);
+                return super.onOptionsItemSelected(item);
+            }
+            startVideo = true;
+            checkCallInThisChat();
+        } else if (itemId == R.id.cab_menu_select_messages) {
+            activateActionMode();
+        } else if (itemId == R.id.cab_menu_invite_chat) {
+            if (recordView.isRecordingNow())
+                return super.onOptionsItemSelected(item);
+
+            chooseAddParticipantDialog();
+        } else if (itemId == R.id.cab_menu_contact_info_chat) {
+            if (recordView.isRecordingNow()) return super.onOptionsItemSelected(item);
+            showGroupOrContactInfoActivity();
+        } else if (itemId == R.id.cab_menu_clear_history_chat) {
+            if (recordView.isRecordingNow()) return super.onOptionsItemSelected(item);
+
+            Timber.d("Clear history selected!");
+            stopReproductions();
+            showConfirmationClearChat(this, chatRoom);
+        } else if (itemId == R.id.cab_menu_leave_chat) {
+            if (recordView.isRecordingNow()) return super.onOptionsItemSelected(item);
+
+            Timber.d("Leave selected!");
+            showConfirmationLeaveChat(chatActivity, chatRoom.getChatId(), chatActivity);
+        } else if (itemId == R.id.cab_menu_end_call_for_all) {
+            Timber.d("End call for all selected");
+            showEndCallForAllDialog();
+        } else if (itemId == R.id.cab_menu_archive_chat) {
+            if (recordView.isRecordingNow()) return super.onOptionsItemSelected(item);
+
+            Timber.d("Archive/unarchive selected!");
+            ChatController chatC = new ChatController(chatActivity);
+            chatC.archiveChat(chatRoom);
+        } else if (itemId == R.id.cab_menu_mute_chat) {
+            createMuteNotificationsAlertDialogOfAChat(this, chatRoom.getChatId());
+        } else if (itemId == R.id.cab_menu_unmute_chat) {
+            MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(this, NOTIFICATIONS_ENABLED, chatRoom.getChatId());
         }
         return super.onOptionsItemSelected(item);
     }
@@ -4361,26 +4335,20 @@ public class ChatActivity extends PasscodeActivity
         dialogCall.show();
 
         View.OnClickListener clickListener = v -> {
-            switch (v.getId()) {
-                case R.id.first_button:
-                    if (anotherCall.isOnHold()) {
-                        MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
-                        if (callInChat != null && (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
-                                callInChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION)) {
-                            answerCall(callInThisChat, false, true, false);
-                        }
-                    } else {
-                        megaChatApi.setCallOnHold(anotherCall.getChatid(), true, new SetCallOnHoldListener(this, this, this));
+            int id = v.getId();
+            if (id == R.id.first_button) {
+                if (anotherCall.isOnHold()) {
+                    MegaChatCall callInChat = megaChatApi.getChatCall(callInThisChat);
+                    if (callInChat != null && (callInChat.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                            callInChat.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION)) {
+                        answerCall(callInThisChat, false, true, false);
                     }
-                    break;
-
-                case R.id.second_button:
-                    endCall(anotherCall.getCallId());
-                    break;
-
-                case R.id.cancel_button:
-                    break;
-
+                } else {
+                    megaChatApi.setCallOnHold(anotherCall.getChatid(), true, new SetCallOnHoldListener(this, this, this));
+                }
+            } else if (id == R.id.second_button) {
+                endCall(anotherCall.getCallId());
+            } else if (id == R.id.cancel_button) {
             }
             if (dialogCall != null) {
                 dialogCall.dismiss();
@@ -4425,134 +4393,107 @@ public class ChatActivity extends PasscodeActivity
         if (joiningOrLeaving && v.getId() != R.id.home)
             return;
         MegaChatCall callInThisChat;
-        switch (v.getId()) {
-            case R.id.home:
-                onBackPressed();
-                break;
+        int id = v.getId();
+        if (id == R.id.home) {
+            onBackPressed();
+        } else if (id == R.id.call_on_hold_layout) {
+            callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
+            if (callInThisChat == null)
+                return;
 
-            case R.id.call_on_hold_layout:
-                callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
-                if (callInThisChat == null)
-                    break;
+            if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
+                if (callInThisChat.isOnHold()) {
+                    returnCall(this, chatRoom.getChatId(), passcodeManagement);
+                }
 
-                if (callInThisChat.getStatus() == MegaChatCall.CALL_STATUS_IN_PROGRESS) {
-                    if (callInThisChat.isOnHold()) {
-                        returnCall(this, chatRoom.getChatId(), passcodeManagement);
+            } else {
+                ArrayList<Long> numCallsParticipating = getCallsParticipating();
+                if (numCallsParticipating == null || numCallsParticipating.isEmpty())
+                    return;
+
+                if (numCallsParticipating.size() == 1) {
+                    MegaChatCall anotherCall = getAnotherActiveCall(chatRoom.getChatId());
+                    if (anotherCall == null) {
+                        anotherCall = getAnotherOnHoldCall(chatRoom.getChatId());
                     }
-
+                    if (anotherCall != null) {
+                        showJoinCallDialog(callInThisChat.getChatid(), anotherCall, false);
+                    }
                 } else {
-                    ArrayList<Long> numCallsParticipating = getCallsParticipating();
-                    if (numCallsParticipating == null || numCallsParticipating.isEmpty())
-                        break;
-
-                    if (numCallsParticipating.size() == 1) {
-                        MegaChatCall anotherCall = getAnotherActiveCall(chatRoom.getChatId());
-                        if (anotherCall == null) {
-                            anotherCall = getAnotherOnHoldCall(chatRoom.getChatId());
-                        }
-                        if (anotherCall != null) {
-                            showJoinCallDialog(callInThisChat.getChatid(), anotherCall, false);
-                        }
-                    } else {
-                        for (int i = 0; i < numCallsParticipating.size(); i++) {
-                            MegaChatCall call = megaChatApi.getChatCall(numCallsParticipating.get(i));
-                            if (call != null && !call.isOnHold()) {
-                                showJoinCallDialog(callInThisChat.getChatid(), call, true);
-                            }
+                    for (int i = 0; i < numCallsParticipating.size(); i++) {
+                        MegaChatCall call = megaChatApi.getChatCall(numCallsParticipating.get(i));
+                        if (call != null && !call.isOnHold()) {
+                            showJoinCallDialog(callInThisChat.getChatid(), call, true);
                         }
                     }
                 }
-                break;
+            }
+        } else if (id == R.id.call_in_progress_layout) {
+            if (chatIdBanner == MEGACHAT_INVALID_HANDLE)
+                return;
 
-            case R.id.call_in_progress_layout:
-                if (chatIdBanner == MEGACHAT_INVALID_HANDLE)
-                    break;
+            MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
+            if (!checkIfCanJoinOneToOneCall(chatIdBanner)) {
+                showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
+                return;
+            }
 
-                MegaChatCall callBanner = megaChatApi.getChatCall(chatIdBanner);
-                if (!checkIfCanJoinOneToOneCall(chatIdBanner)) {
-                    showSnackbar(SNACKBAR_TYPE, getString(R.string.call_error_too_many_participants), MEGACHAT_INVALID_HANDLE);
-                    break;
-                }
-
-                if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
-                        callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
-                    startVideo = false;
-                    checkCallInThisChat();
-                } else {
-                    returnCall(this, chatIdBanner, passcodeManagement);
-                }
-                break;
-
-            case R.id.expand_input_text_rl:
-            case R.id.expand_input_text_icon:
-                isInputTextExpanded = !isInputTextExpanded;
-                checkExpandOrCollapseInputText();
-                break;
-
-            case R.id.send_icon:
-                String text = textChat.getText().toString();
-                if (text.trim().isEmpty()) break;
-                if (editingMessage) {
-                    editMessage(text);
-                    finishMultiselectionMode();
-                    checkActionMode();
-                    hideEditMsgLayout();
-                } else {
-                    sendMessage(text);
-                }
-                textChat.setText("", TextView.BufferType.EDITABLE);
-                controlExpandableInputText(1);
-                break;
-
-            case R.id.more_options_rl:
-                showChatRoomToolbarByPanel();
-                break;
-
-            case R.id.cancel_edit:
-                editingMessage = false;
-                messageToEdit = null;
-                hideEditMsgLayout();
-                textChat.setText(null);
-                textChat.post(() -> {
-                    controlExpandableInputText(textChat.getLineCount());
-                });
-                showSendIcon();
-                refreshTextInput();
-                break;
-
-            case R.id.emoji_rl:
-            case R.id.emoji_icon:
-                Timber.d("Emoji icon clicked");
-                if (emojiKeyboard == null) break;
-                changeKeyboard();
-                break;
-
-            case R.id.toolbar_chat:
-                Timber.d("toolbar_chat");
-                if (recordView.isRecordingNow()) break;
-
-                showGroupOrContactInfoActivity();
-                break;
-
-            case R.id.new_messages_icon:
-                goToEnd();
-                break;
-
-            case R.id.join_button:
-                if (chatC.isInAnonymousMode()) {
-                    ifAnonymousModeLogin(true);
-                } else if (!isAlreadyJoining(idChat)) {
-                    setJoiningOrLeaving(getString(R.string.joining_label));
-                    megaChatApi.autojoinPublicChat(idChat, this);
-                }
-
-                break;
-
-            case R.id.start_or_join_meeting_banner:
+            if (callBanner == null || callBanner.getStatus() == MegaChatCall.CALL_STATUS_USER_NO_PRESENT ||
+                    callBanner.getStatus() == MegaChatCall.CALL_STATUS_TERMINATING_USER_PARTICIPATION) {
                 startVideo = false;
-                startCall();
-                break;
+                checkCallInThisChat();
+            } else {
+                returnCall(this, chatIdBanner, passcodeManagement);
+            }
+        } else if (id == R.id.expand_input_text_rl || id == R.id.expand_input_text_icon) {
+            isInputTextExpanded = !isInputTextExpanded;
+            checkExpandOrCollapseInputText();
+        } else if (id == R.id.send_icon) {
+            String text = textChat.getText().toString();
+            if (text.trim().isEmpty()) return;
+            if (editingMessage) {
+                editMessage(text);
+                finishMultiselectionMode();
+                checkActionMode();
+                hideEditMsgLayout();
+            } else {
+                sendMessage(text);
+            }
+            textChat.setText("", TextView.BufferType.EDITABLE);
+            controlExpandableInputText(1);
+        } else if (id == R.id.more_options_rl) {
+            showChatRoomToolbarByPanel();
+        } else if (id == R.id.cancel_edit) {
+            editingMessage = false;
+            messageToEdit = null;
+            hideEditMsgLayout();
+            textChat.setText(null);
+            textChat.post(() -> {
+                controlExpandableInputText(textChat.getLineCount());
+            });
+            showSendIcon();
+            refreshTextInput();
+        } else if (id == R.id.emoji_rl || id == R.id.emoji_icon) {
+            Timber.d("Emoji icon clicked");
+            if (emojiKeyboard == null) return;
+            changeKeyboard();
+        } else if (id == R.id.toolbar_chat) {
+            Timber.d("toolbar_chat");
+            if (recordView.isRecordingNow()) return;
 
+            showGroupOrContactInfoActivity();
+        } else if (id == R.id.new_messages_icon) {
+            goToEnd();
+        } else if (id == R.id.join_button) {
+            if (chatC.isInAnonymousMode()) {
+                ifAnonymousModeLogin(true);
+            } else if (!isAlreadyJoining(idChat)) {
+                setJoiningOrLeaving(getString(R.string.joining_label));
+                megaChatApi.autojoinPublicChat(idChat, this);
+            }
+        } else if (id == R.id.start_or_join_meeting_banner) {
+            startVideo = false;
+            startCall();
         }
     }
 
@@ -4963,90 +4904,70 @@ public class ChatActivity extends PasscodeActivity
             }
             finishMultiselectionMode();
 
-            switch (item.getItemId()) {
-                case R.id.chat_cab_menu_edit:
-                    editMessage(messagesSelected);
-                    break;
-
-                case R.id.chat_cab_menu_share:
-                    Timber.d("Share option");
-                    if (!messagesSelected.isEmpty()) {
-                        if (messagesSelected.size() == 1) {
-                            shareMsgFromChat(chatActivity, messagesSelected.get(0), idChat);
-                        } else {
-                            shareNodesFromChat(chatActivity, messagesSelected, idChat);
-                        }
-                    }
-                    break;
-
-                case R.id.chat_cab_menu_invite:
-                    ContactController cC = new ContactController(chatActivity);
+            int itemId = item.getItemId();
+            if (itemId == R.id.chat_cab_menu_edit) {
+                editMessage(messagesSelected);
+            } else if (itemId == R.id.chat_cab_menu_share) {
+                Timber.d("Share option");
+                if (!messagesSelected.isEmpty()) {
                     if (messagesSelected.size() == 1) {
-                        cC.inviteContact(messagesSelected.get(0).getMessage().getUserEmail(0));
+                        shareMsgFromChat(chatActivity, messagesSelected.get(0), idChat);
                     } else {
-                        ArrayList<String> contactEmails = new ArrayList<>();
-                        for (AndroidMegaChatMessage message : messagesSelected) {
-                            contactEmails.add(message.getMessage().getUserEmail(0));
-                        }
-                        cC.inviteMultipleContacts(contactEmails);
+                        shareNodesFromChat(chatActivity, messagesSelected, idChat);
                     }
-                    break;
-
-                case R.id.chat_cab_menu_start_conversation:
-                    if (messagesSelected.size() == 1) {
-                        startConversation(messagesSelected.get(0).getMessage().getUserHandle(0));
-                    } else {
-                        ArrayList<Long> contactHandles = new ArrayList<>();
-                        for (AndroidMegaChatMessage message : messagesSelected) {
-                            contactHandles.add(message.getMessage().getUserHandle(0));
-                        }
-                        startGroupConversation(contactHandles);
+                }
+            } else if (itemId == R.id.chat_cab_menu_invite) {
+                ContactController cC = new ContactController(chatActivity);
+                if (messagesSelected.size() == 1) {
+                    cC.inviteContact(messagesSelected.get(0).getMessage().getUserEmail(0));
+                } else {
+                    ArrayList<String> contactEmails = new ArrayList<>();
+                    for (AndroidMegaChatMessage message : messagesSelected) {
+                        contactEmails.add(message.getMessage().getUserEmail(0));
                     }
-                    break;
-
-                case R.id.chat_cab_menu_forward:
-                    Timber.d("Forward message");
-                    forwardMessages(messagesSelected);
-                    break;
-
-                case R.id.chat_cab_menu_copy:
-                    String text;
-                    if (messagesSelected.size() == 1) {
-                        MegaChatMessage msg = messagesSelected.get(0).getMessage();
-                        text = isGeolocation(msg) ? msg.getContainsMeta().getTextMessage() : copyMessage(messagesSelected.get(0));
-                    } else {
-                        text = copyMessages(messagesSelected);
+                    cC.inviteMultipleContacts(contactEmails);
+                }
+            } else if (itemId == R.id.chat_cab_menu_start_conversation) {
+                if (messagesSelected.size() == 1) {
+                    startConversation(messagesSelected.get(0).getMessage().getUserHandle(0));
+                } else {
+                    ArrayList<Long> contactHandles = new ArrayList<>();
+                    for (AndroidMegaChatMessage message : messagesSelected) {
+                        contactHandles.add(message.getMessage().getUserHandle(0));
                     }
-                    copyToClipboard(text);
-                    break;
-
-                case R.id.chat_cab_menu_delete:
-                    //Delete
-                    showConfirmationDeleteMessages(messagesSelected, chatRoom);
-                    break;
-
-                case R.id.chat_cab_menu_download:
-                    Timber.d("chat_cab_menu_download ");
-                    ArrayList<MegaNodeList> list = new ArrayList<>();
-                    for (int i = 0; i < messagesSelected.size(); i++) {
-                        MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
-                        list.add(megaNodeList);
-                    }
-                    PermissionUtils.checkNotificationsPermission(chatActivity);
-                    nodeSaver.saveNodeLists(list, false, false, false, true);
-                    break;
-
-                case R.id.chat_cab_menu_import:
-                    finishMultiselectionMode();
-                    chatC.importNodesFromAndroidMessages(messagesSelected, IMPORT_ONLY_OPTION);
-                    break;
-
-                case R.id.chat_cab_menu_offline:
-                    PermissionUtils.checkNotificationsPermission(chatActivity);
-                    finishMultiselectionMode();
-                    chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom,
-                            ChatActivity.this);
-                    break;
+                    startGroupConversation(contactHandles);
+                }
+            } else if (itemId == R.id.chat_cab_menu_forward) {
+                Timber.d("Forward message");
+                forwardMessages(messagesSelected);
+            } else if (itemId == R.id.chat_cab_menu_copy) {
+                String text;
+                if (messagesSelected.size() == 1) {
+                    MegaChatMessage msg = messagesSelected.get(0).getMessage();
+                    text = isGeolocation(msg) ? msg.getContainsMeta().getTextMessage() : copyMessage(messagesSelected.get(0));
+                } else {
+                    text = copyMessages(messagesSelected);
+                }
+                copyToClipboard(text);
+            } else if (itemId == R.id.chat_cab_menu_delete) {//Delete
+                showConfirmationDeleteMessages(messagesSelected, chatRoom);
+            } else if (itemId == R.id.chat_cab_menu_download) {
+                Timber.d("chat_cab_menu_download ");
+                ArrayList<MegaNodeList> list = new ArrayList<>();
+                for (int i = 0; i < messagesSelected.size(); i++) {
+                    MegaNodeList megaNodeList = messagesSelected.get(i).getMessage().getMegaNodeList();
+                    list.add(megaNodeList);
+                }
+                PermissionUtils.checkNotificationsPermission(chatActivity);
+                nodeSaver.saveNodeLists(list, false, false, false, true);
+            } else if (itemId == R.id.chat_cab_menu_import) {
+                finishMultiselectionMode();
+                chatC.importNodesFromAndroidMessages(messagesSelected, IMPORT_ONLY_OPTION);
+            } else if (itemId == R.id.chat_cab_menu_offline) {
+                PermissionUtils.checkNotificationsPermission(chatActivity);
+                finishMultiselectionMode();
+                chatC.saveForOfflineWithAndroidMessages(messagesSelected, chatRoom,
+                        ChatActivity.this);
             }
             return false;
         }

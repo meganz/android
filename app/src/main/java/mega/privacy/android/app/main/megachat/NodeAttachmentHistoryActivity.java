@@ -421,22 +421,17 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
-        switch (item.getItemId()) {
-            case android.R.id.home: {
-                onBackPressed();
-                return true;
-            }
-            case R.id.action_select: {
-                selectAll();
-                return true;
-            }
-            case R.id.action_grid: {
-                return true;
-            }
-            default: {
-                return super.onOptionsItemSelected(item);
-            }
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (itemId == R.id.action_select) {
+            selectAll();
+            return true;
+        } else if (itemId == R.id.action_grid) {
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     public void activateActionMode() {
@@ -759,14 +754,11 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.file_contact_list_layout: {
-                Intent i = new Intent(this, ManagerActivity.class);
-                i.setAction(ACTION_REFRESH_PARENTHANDLE_BROWSER);
-                startActivity(i);
-                finish();
-                break;
-            }
+        if (v.getId() == R.id.file_contact_list_layout) {
+            Intent i = new Intent(this, ManagerActivity.class);
+            i.setAction(ACTION_REFRESH_PARENTHANDLE_BROWSER);
+            startActivity(i);
+            finish();
         }
     }
 
@@ -823,57 +815,43 @@ public class NodeAttachmentHistoryActivity extends PasscodeActivity implements
                 return false;
             }
 
-            switch (item.getItemId()) {
-                case R.id.cab_menu_select_all: {
-                    selectAll();
-                    break;
-                }
-                case R.id.cab_menu_unselect_all: {
-                    clearSelections();
-                    break;
-                }
-                case R.id.chat_cab_menu_forward: {
-                    Timber.d("Forward message");
-                    clearSelections();
-                    hideMultipleSelect();
-                    forwardMessages(messagesSelected);
-                    break;
-                }
-                case R.id.chat_cab_menu_delete: {
-                    clearSelections();
-                    hideMultipleSelect();
-                    //Delete
-                    showConfirmationDeleteMessages(messagesSelected, chatRoom);
-                    break;
-                }
-                case R.id.chat_cab_menu_download: {
-                    clearSelections();
-                    hideMultipleSelect();
+            int itemId = item.getItemId();
+            if (itemId == R.id.cab_menu_select_all) {
+                selectAll();
+            } else if (itemId == R.id.cab_menu_unselect_all) {
+                clearSelections();
+            } else if (itemId == R.id.chat_cab_menu_forward) {
+                Timber.d("Forward message");
+                clearSelections();
+                hideMultipleSelect();
+                forwardMessages(messagesSelected);
+            } else if (itemId == R.id.chat_cab_menu_delete) {
+                clearSelections();
+                hideMultipleSelect();
+                //Delete
+                showConfirmationDeleteMessages(messagesSelected, chatRoom);
+            } else if (itemId == R.id.chat_cab_menu_download) {
+                clearSelections();
+                hideMultipleSelect();
 
-                    ArrayList<MegaNodeList> list = new ArrayList<>();
-                    for (int i = 0; i < messagesSelected.size(); i++) {
+                ArrayList<MegaNodeList> list = new ArrayList<>();
+                for (int i = 0; i < messagesSelected.size(); i++) {
 
-                        MegaNodeList megaNodeList = messagesSelected.get(i).getMegaNodeList();
-                        list.add(megaNodeList);
-                    }
-                    PermissionUtils.checkNotificationsPermission(nodeAttachmentHistoryActivity);
-                    nodeSaver.saveNodeLists(list, false, false, false, true);
-                    break;
+                    MegaNodeList megaNodeList = messagesSelected.get(i).getMegaNodeList();
+                    list.add(megaNodeList);
                 }
-                case R.id.chat_cab_menu_import: {
-                    clearSelections();
-                    hideMultipleSelect();
-                    chatC.importNodesFromMessages(messagesSelected);
-                    break;
-                }
-                case R.id.chat_cab_menu_offline: {
-                    PermissionUtils.checkNotificationsPermission(nodeAttachmentHistoryActivity);
-                    clearSelections();
-                    hideMultipleSelect();
-                    chatC.saveForOfflineWithMessages(messagesSelected,
-                            megaChatApi.getChatRoom(chatId), NodeAttachmentHistoryActivity.this);
-                    break;
-                }
+                PermissionUtils.checkNotificationsPermission(nodeAttachmentHistoryActivity);
+                nodeSaver.saveNodeLists(list, false, false, false, true);
+            } else if (itemId == R.id.chat_cab_menu_import) {
+                clearSelections();
+                hideMultipleSelect();
+                chatC.importNodesFromMessages(messagesSelected);
+            } else if (itemId == R.id.chat_cab_menu_offline) {
+                PermissionUtils.checkNotificationsPermission(nodeAttachmentHistoryActivity);
+                clearSelections();
+                hideMultipleSelect();
+                chatC.saveForOfflineWithMessages(messagesSelected,
+                        megaChatApi.getChatRoom(chatId), NodeAttachmentHistoryActivity.this);
             }
             return false;
         }

@@ -686,36 +686,28 @@ public class NodeAttachmentHistoryAdapter extends RecyclerView.Adapter<NodeAttac
         if (m == null) {
             return;
         }
-        switch (v.getId()) {
-            case R.id.file_list_three_dots_layout:
-            case R.id.file_grid_three_dots: {
-                threeDotsClicked(currentPosition, m);
-                break;
+        int id = v.getId();
+        if (id == R.id.file_list_three_dots_layout || id == R.id.file_grid_three_dots) {
+            threeDotsClicked(currentPosition, m);
+        } else if (id == R.id.file_grid_three_dots_for_file) {
+            threeDotsClicked(currentPosition, m);
+        } else if (id == R.id.file_list_item_layout || id == R.id.file_grid_item_layout) {
+            int[] screenPosition = new int[2];
+            ImageView imageView;
+            if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
+                imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
+            } else {
+                imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
             }
-            case R.id.file_grid_three_dots_for_file: {
-                threeDotsClicked(currentPosition, m);
-                break;
-            }
-            case R.id.file_list_item_layout:
-            case R.id.file_grid_item_layout: {
-                int[] screenPosition = new int[2];
-                ImageView imageView;
-                if (adapterType == NodeAttachmentHistoryAdapter.ITEM_VIEW_TYPE_LIST) {
-                    imageView = (ImageView) v.findViewById(R.id.file_list_thumbnail);
-                } else {
-                    imageView = (ImageView) v.findViewById(R.id.file_grid_thumbnail);
-                }
-                imageView.getLocationOnScreen(screenPosition);
+            imageView.getLocationOnScreen(screenPosition);
 
-                int[] dimens = new int[4];
-                dimens[0] = screenPosition[0];
-                dimens[1] = screenPosition[1];
-                dimens[2] = imageView.getWidth();
-                dimens[3] = imageView.getHeight();
+            int[] dimens = new int[4];
+            dimens[0] = screenPosition[0];
+            dimens[1] = screenPosition[1];
+            dimens[2] = imageView.getWidth();
+            dimens[3] = imageView.getHeight();
 
-                ((NodeAttachmentHistoryActivity) context).itemClick(currentPosition);
-                break;
-            }
+            ((NodeAttachmentHistoryActivity) context).itemClick(currentPosition);
         }
     }
 

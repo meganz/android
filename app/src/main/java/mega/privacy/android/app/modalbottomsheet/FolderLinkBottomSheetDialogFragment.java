@@ -88,16 +88,11 @@ public class FolderLinkBottomSheetDialogFragment extends BaseBottomSheetDialogFr
             return;
         }
 
-        switch (v.getId()) {
-
-            case R.id.option_download_layout:
-                ((FolderLinkActivity) requireActivity()).downloadNode();
-                break;
-
-            case R.id.option_import_layout:
-                ((FolderLinkActivity) requireActivity()).importNode();
-                break;
-
+        int id = v.getId();
+        if (id == R.id.option_download_layout) {
+            ((FolderLinkActivity) requireActivity()).downloadNode();
+        } else if (id == R.id.option_import_layout) {
+            ((FolderLinkActivity) requireActivity()).importNode();
         }
 
         setStateBottomSheetBehaviorHidden();

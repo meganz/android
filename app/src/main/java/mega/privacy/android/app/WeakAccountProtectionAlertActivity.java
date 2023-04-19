@@ -122,27 +122,20 @@ public class WeakAccountProtectionAlertActivity extends PasscodeActivity impleme
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.why_am_i_seeing_this_layout:
-                showInfoDialog();
-                break;
-
-            case R.id.resend_email_button:
-                megaApi.resendVerificationEmail(new ResendVerificationEmailListener(this));
-                break;
-
-            case R.id.ok_button:
-                isInfoDialogShown = false;
-                try {
-                    infoDialog.dismiss();
-                } catch (Exception e) {
-                    Timber.w("Exception dismissing infoDialog");
-                }
-                break;
-
-            case R.id.logout_button:
-                AccountController.logout(this, megaApi, sharingScope);
-                break;
+        int id = v.getId();
+        if (id == R.id.why_am_i_seeing_this_layout) {
+            showInfoDialog();
+        } else if (id == R.id.resend_email_button) {
+            megaApi.resendVerificationEmail(new ResendVerificationEmailListener(this));
+        } else if (id == R.id.ok_button) {
+            isInfoDialogShown = false;
+            try {
+                infoDialog.dismiss();
+            } catch (Exception e) {
+                Timber.w("Exception dismissing infoDialog");
+            }
+        } else if (id == R.id.logout_button) {
+            AccountController.logout(this, megaApi, sharingScope);
         }
     }
 

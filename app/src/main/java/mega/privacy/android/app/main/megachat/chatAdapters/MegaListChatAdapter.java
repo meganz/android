@@ -816,57 +816,49 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
     public void onClick(View v) {
         ViewHolderChatList holder = (ViewHolderChatList) v.getTag();
 
-        switch (v.getId()) {
-            case R.id.recent_chat_list_three_dots: {
-                int currentPosition = holder.getBindingAdapterPosition();
-                Timber.d("Current position: %s", currentPosition);
-                if (isInvalidPosition(currentPosition)) {
-                    break;
-                }
-
-                MegaChatListItem c = (MegaChatListItem) getItem(currentPosition);
-                if (context instanceof ManagerActivity) {
-
-                    if (multipleSelect) {
-                        ((RecentChatsFragment) fragment).itemClick(currentPosition);
-                    } else {
-                        ((ManagerActivity) context).showChatPanel(c);
-                    }
-                } else if (context instanceof ArchivedChatsActivity) {
-                    if (multipleSelect) {
-                        ((RecentChatsFragment) fragment).itemClick(currentPosition);
-                    } else {
-                        ((ArchivedChatsActivity) context).showChatPanel(c);
-                    }
-                }
-
-                break;
+        int id = v.getId();
+        if (id == R.id.recent_chat_list_three_dots) {
+            int currentPosition = holder.getBindingAdapterPosition();
+            Timber.d("Current position: %s", currentPosition);
+            if (isInvalidPosition(currentPosition)) {
+                return;
             }
-            case R.id.recent_chat_list_item_layout: {
-                Timber.d("Click layout!");
-                int currentPosition = holder.getBindingAdapterPosition();
-                Timber.d("Current position: %s", currentPosition);
-                if (isInvalidPosition(currentPosition)) {
-                    break;
-                }
 
-                if (context instanceof ManagerActivity) {
+            MegaChatListItem c = (MegaChatListItem) getItem(currentPosition);
+            if (context instanceof ManagerActivity) {
+
+                if (multipleSelect) {
                     ((RecentChatsFragment) fragment).itemClick(currentPosition);
-                } else if (context instanceof ChatExplorerActivity || context instanceof FileExplorerActivity) {
-                    ((ChatExplorerFragment) fragment).itemClick(currentPosition);
-                } else if (context instanceof ArchivedChatsActivity) {
-                    ((RecentChatsFragment) fragment).itemClick(currentPosition);
+                } else {
+                    ((ManagerActivity) context).showChatPanel(c);
                 }
-
-                break;
+            } else if (context instanceof ArchivedChatsActivity) {
+                if (multipleSelect) {
+                    ((RecentChatsFragment) fragment).itemClick(currentPosition);
+                } else {
+                    ((ArchivedChatsActivity) context).showChatPanel(c);
+                }
             }
-            case R.id.archived_chat_option_text: {
-                Timber.d("Show archived chats");
-
-                Intent archivedChatsIntent = new Intent(context, ArchivedChatsActivity.class);
-                context.startActivity(archivedChatsIntent);
-                break;
+        } else if (id == R.id.recent_chat_list_item_layout) {
+            Timber.d("Click layout!");
+            int currentPosition = holder.getBindingAdapterPosition();
+            Timber.d("Current position: %s", currentPosition);
+            if (isInvalidPosition(currentPosition)) {
+                return;
             }
+
+            if (context instanceof ManagerActivity) {
+                ((RecentChatsFragment) fragment).itemClick(currentPosition);
+            } else if (context instanceof ChatExplorerActivity || context instanceof FileExplorerActivity) {
+                ((ChatExplorerFragment) fragment).itemClick(currentPosition);
+            } else if (context instanceof ArchivedChatsActivity) {
+                ((RecentChatsFragment) fragment).itemClick(currentPosition);
+            }
+        } else if (id == R.id.archived_chat_option_text) {
+            Timber.d("Show archived chats");
+
+            Intent archivedChatsIntent = new Intent(context, ArchivedChatsActivity.class);
+            context.startActivity(archivedChatsIntent);
         }
     }
 

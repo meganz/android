@@ -157,37 +157,27 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.option_view_layout:
-                if (transfer.getType() == TYPE_UPLOAD && !isOnline(requireContext())) {
-                    managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
-                    break;
-                }
-
+        int id = v.getId();
+        if (id == R.id.option_view_layout) {
+            if (transfer.getType() == TYPE_UPLOAD && !isOnline(requireContext())) {
+                managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+            } else {
                 managerActivity.openTransferLocation(transfer);
-                break;
-
-            case R.id.option_get_link_layout:
-                if (!isOnline(requireContext())) {
-                    managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
-                    break;
-                }
-
+            }
+        } else if (id == R.id.option_get_link_layout) {
+            if (!isOnline(requireContext())) {
+                managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+            } else {
                 managerActivity.showGetLinkActivity(handle);
-                break;
-
-            case R.id.option_clear_layout:
-                managerActivity.removeCompletedTransfer(transfer, true);
-                break;
-
-            case R.id.option_retry_layout:
-                if (!isOnline(requireContext())) {
-                    managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
-                    break;
-                }
-
+            }
+        } else if (id == R.id.option_clear_layout) {
+            managerActivity.removeCompletedTransfer(transfer, true);
+        } else if (id == R.id.option_retry_layout) {
+            if (!isOnline(requireContext())) {
+                managerActivity.showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), MEGACHAT_INVALID_HANDLE);
+            } else {
                 managerActivity.retrySingleTransfer(transfer);
-                break;
+            }
         }
 
         setStateBottomSheetBehaviorHidden();
