@@ -220,44 +220,38 @@ public class NodeAttachmentBottomSheetDialogFragment extends BaseBottomSheetDial
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
 
-        switch (v.getId()) {
-            case R.id.option_download_layout:
-                Timber.d("Download option");
-                if (node == null) {
-                    Timber.w("The selected node is NULL");
-                    return;
-                }
-                ((NodeAttachmentHistoryActivity) requireActivity()).downloadNodeList(nodeList);
-                break;
+        int id = v.getId();
+        if (id == R.id.option_download_layout) {
+            Timber.d("Download option");
+            if (node == null) {
+                Timber.w("The selected node is NULL");
+                return;
+            }
+            ((NodeAttachmentHistoryActivity) requireActivity()).downloadNodeList(nodeList);
+        } else if (id == R.id.option_import_layout) {
+            if (node == null) {
+                Timber.w("The selected node is NULL");
+                return;
+            }
+            chatC.importNode(messageId, chatId, IMPORT_ONLY_OPTION);
+        } else if (id == R.id.option_save_offline_switch || id == R.id.option_save_offline_layout) {
+            if (message == null) {
+                Timber.w("Message is NULL");
+                return;
+            }
 
-            case R.id.option_import_layout:
-                if (node == null) {
-                    Timber.w("The selected node is NULL");
-                    return;
-                }
-                chatC.importNode(messageId, chatId, IMPORT_ONLY_OPTION);
-                break;
-
-            case R.id.option_save_offline_switch:
-            case R.id.option_save_offline_layout:
-                if (message == null) {
-                    Timber.w("Message is NULL");
-                    return;
-                }
-
-                if (availableOffline(requireContext(), node)) {
-                    MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
-                    removeOffline(mOffDelete, dbH, requireContext());
-                    Util.showSnackbar(
-                            getActivity(), getResources().getString(R.string.file_removed_offline));
-                } else if (requireActivity() instanceof SnackbarShower) {
-                    PermissionUtils.checkNotificationsPermission(requireActivity());
-                    ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-                    messages.add(message);
-                    chatC.saveForOfflineWithAndroidMessages(messages,
-                            megaChatApi.getChatRoom(chatId), (SnackbarShower) requireActivity());
-                }
-                break;
+            if (availableOffline(requireContext(), node)) {
+                MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
+                removeOffline(mOffDelete, dbH, requireContext());
+                Util.showSnackbar(
+                        getActivity(), getResources().getString(R.string.file_removed_offline));
+            } else if (requireActivity() instanceof SnackbarShower) {
+                PermissionUtils.checkNotificationsPermission(requireActivity());
+                ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+                messages.add(message);
+                chatC.saveForOfflineWithAndroidMessages(messages,
+                        megaChatApi.getChatRoom(chatId), (SnackbarShower) requireActivity());
+            }
         }
 
         setStateBottomSheetBehaviorHidden();

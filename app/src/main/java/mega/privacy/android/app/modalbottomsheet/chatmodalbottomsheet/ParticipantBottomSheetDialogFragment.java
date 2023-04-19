@@ -259,78 +259,63 @@ public class ParticipantBottomSheetDialogFragment extends BaseBottomSheetDialogF
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.contact_info_group_participants_chat_layout:
-                ContactUtil.openContactInfoActivity(requireActivity(), chatC.getParticipantEmail(participantHandle));
-                break;
-
-            case R.id.start_chat_group_participants_chat_layout:
+        int id = v.getId();
+        if (id == R.id.contact_info_group_participants_chat_layout) {
+            ContactUtil.openContactInfoActivity(requireActivity(), chatC.getParticipantEmail(participantHandle));
+        } else if (id == R.id.start_chat_group_participants_chat_layout) {
+            if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                if (viewModel != null) {
+                    viewModel.onSendMsgTap();
+                }
+            } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                ((GroupChatInfoActivity) requireActivity()).startConversation(participantHandle);
+            }
+        } else if (id == R.id.contact_list_option_call_layout) {
+            MegaApplication.setUserWaitingForCall(participantHandle);
+            if (canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
                 if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
                     if (viewModel != null) {
-                        viewModel.onSendMsgTap();
+                        viewModel.onStartCallTap();
                     }
                 } else if (requireActivity() instanceof GroupChatInfoActivity) {
-                    ((GroupChatInfoActivity) requireActivity()).startConversation(participantHandle);
+                    ((GroupChatInfoActivity) requireActivity()).startCall();
                 }
-                break;
-
-            case R.id.contact_list_option_call_layout:
-                MegaApplication.setUserWaitingForCall(participantHandle);
-                if (canCallBeStartedFromContactOption(requireActivity(), passcodeManagement)) {
-                    if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
-                        if (viewModel != null) {
-                            viewModel.onStartCallTap();
-                        }
-                    } else if (requireActivity() instanceof GroupChatInfoActivity) {
-                        ((GroupChatInfoActivity) requireActivity()).startCall();
-                    }
+            }
+        } else if (id == R.id.change_permissions_group_participants_chat_layout) {
+            if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                if (viewModel != null) {
+                    viewModel.onChangePermissionsTap();
                 }
-                break;
-
-            case R.id.change_permissions_group_participants_chat_layout:
-                if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
-                    if (viewModel != null) {
-                        viewModel.onChangePermissionsTap();
-                    }
-                } else if (requireActivity() instanceof GroupChatInfoActivity) {
-                    ((GroupChatInfoActivity) requireActivity()).showChangePermissionsDialog(participantHandle, selectedChat);
+            } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                ((GroupChatInfoActivity) requireActivity()).showChangePermissionsDialog(participantHandle, selectedChat);
+            }
+        } else if (id == R.id.remove_group_participants_chat_layout) {
+            if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                if (viewModel != null) {
+                    viewModel.onRemoveParticipantTap(true);
                 }
-                break;
-
-            case R.id.remove_group_participants_chat_layout:
-                if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
-                    if (viewModel != null) {
-                        viewModel.onRemoveParticipantTap(true);
-                    }
-                } else if (requireActivity() instanceof GroupChatInfoActivity) {
-                    ((GroupChatInfoActivity) requireActivity()).showRemoveParticipantConfirmation(participantHandle);
+            } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                ((GroupChatInfoActivity) requireActivity()).showRemoveParticipantConfirmation(participantHandle);
+            }
+        } else if (id == R.id.edit_profile_group_participants_chat_layout) {
+            Intent editProfile = new Intent(requireActivity(), MyAccountActivity.class);
+            startActivity(editProfile);
+        } else if (id == R.id.leave_group_participants_chat_layout) {
+            if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                if (viewModel != null) {
+                    viewModel.onLeaveGroupTap();
                 }
-                break;
-
-            case R.id.edit_profile_group_participants_chat_layout:
-                Intent editProfile = new Intent(requireActivity(), MyAccountActivity.class);
-                startActivity(editProfile);
-                break;
-
-            case R.id.leave_group_participants_chat_layout:
-                if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
-                    if (viewModel != null) {
-                        viewModel.onLeaveGroupTap();
-                    }
-                } else if (requireActivity() instanceof GroupChatInfoActivity) {
-                    ((GroupChatInfoActivity) requireActivity()).showConfirmationLeaveChat();
+            } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                ((GroupChatInfoActivity) requireActivity()).showConfirmationLeaveChat();
+            }
+        } else if (id == R.id.invite_group_participants_chat_layout) {
+            if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
+                if (viewModel != null) {
+                    viewModel.onInviteContactTap();
                 }
-                break;
-
-            case R.id.invite_group_participants_chat_layout:
-                if (requireActivity() instanceof ScheduledMeetingInfoActivity) {
-                    if (viewModel != null) {
-                        viewModel.onInviteContactTap();
-                    }
-                } else if (requireActivity() instanceof GroupChatInfoActivity) {
-                    ((GroupChatInfoActivity) requireActivity()).inviteContact(chatC.getParticipantEmail(participantHandle));
-                }
-                break;
+            } else if (requireActivity() instanceof GroupChatInfoActivity) {
+                ((GroupChatInfoActivity) requireActivity()).inviteContact(chatC.getParticipantEmail(participantHandle));
+            }
         }
 
         dismissAllowingStateLoss();

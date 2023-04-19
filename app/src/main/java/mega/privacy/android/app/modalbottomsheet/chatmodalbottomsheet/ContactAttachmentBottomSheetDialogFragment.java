@@ -276,86 +276,79 @@ public class ContactAttachmentBottomSheetDialogFragment extends BaseBottomSheetD
         messagesSelected.add(message);
         long numUsers = message.getMessage().getUsersCount();
 
-        switch (v.getId()) {
-            case R.id.option_info_layout:
-                if (!isOnline(requireContext())) {
-                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
-                    return;
-                }
+        int id = v.getId();
+        if (id == R.id.option_info_layout) {
+            if (!isOnline(requireContext())) {
+                ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                return;
+            }
 
-                long contactHandle = MEGACHAT_INVALID_HANDLE;
-                String contactEmail = null;
-                if (requireActivity() instanceof ChatActivity) {
-                    contactEmail = message.getMessage().getUserEmail(0);
-                    contactHandle = message.getMessage().getUserHandle(0);
-                } else if (position != -1) {
-                    contactEmail = message.getMessage().getUserEmail(position);
-                    contactHandle = message.getMessage().getUserHandle(position);
+            long contactHandle = MEGACHAT_INVALID_HANDLE;
+            String contactEmail = null;
+            if (requireActivity() instanceof ChatActivity) {
+                contactEmail = message.getMessage().getUserEmail(0);
+                contactHandle = message.getMessage().getUserHandle(0);
+            } else if (position != -1) {
+                contactEmail = message.getMessage().getUserEmail(position);
+                contactHandle = message.getMessage().getUserHandle(position);
+            } else {
+                Timber.w("Error - position -1");
+            }
+
+            if (contactHandle != MEGACHAT_INVALID_HANDLE) {
+                MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
+                boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0);
+                ContactUtil.openContactInfoActivity(requireActivity(), contactEmail, isChatRoomOpen);
+            }
+        } else if (id == R.id.option_view_layout) {
+            Timber.d("View option");
+            ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
+        } else if (id == R.id.option_invite_layout) {
+            if (!isOnline(requireContext())) {
+                ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                return;
+            }
+
+            ContactController cC = new ContactController(requireActivity());
+            ArrayList<String> contactEmails;
+
+            if (requireActivity() instanceof ChatActivity) {
+                if (numUsers == 1) {
+                    cC.inviteContact(message.getMessage().getUserEmail(0));
                 } else {
-                    Timber.w("Error - position -1");
-                }
+                    Timber.d("Num users to invite: %s", numUsers);
+                    contactEmails = new ArrayList<>();
 
-                if (contactHandle != MEGACHAT_INVALID_HANDLE) {
-                    MegaChatRoom chatRoom = megaChatApi.getChatRoom(chatId);
-                    boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() && contactHandle == chatRoom.getPeerHandle(0);
-                    ContactUtil.openContactInfoActivity(requireActivity(), contactEmail, isChatRoomOpen);
-                }
-                break;
-
-            case R.id.option_view_layout:
-                Timber.d("View option");
-                ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
-                break;
-
-            case R.id.option_invite_layout:
-                if (!isOnline(requireContext())) {
-                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
-                    return;
-                }
-
-                ContactController cC = new ContactController(requireActivity());
-                ArrayList<String> contactEmails;
-
-                if (requireActivity() instanceof ChatActivity) {
-                    if (numUsers == 1) {
-                        cC.inviteContact(message.getMessage().getUserEmail(0));
-                    } else {
-                        Timber.d("Num users to invite: %s", numUsers);
-                        contactEmails = new ArrayList<>();
-
-                        for (int j = 0; j < numUsers; j++) {
-                            String userMail = message.getMessage().getUserEmail(j);
-                            contactEmails.add(userMail);
-                        }
-                        cC.inviteMultipleContacts(contactEmails);
+                    for (int j = 0; j < numUsers; j++) {
+                        String userMail = message.getMessage().getUserEmail(j);
+                        contactEmails.add(userMail);
                     }
-                } else if (email != null) {
-                    cC.inviteContact(email);
+                    cC.inviteMultipleContacts(contactEmails);
                 }
-                break;
-
-            case R.id.option_start_conversation_layout:
-                if (requireActivity() instanceof ChatActivity) {
-                    if (numUsers == 1) {
-                        ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
-                        dismissAllowingStateLoss();
-                    } else {
-                        Timber.d("Num users to invite: %s", numUsers);
-                        ArrayList<Long> contactHandles = new ArrayList<>();
-
-                        for (int j = 0; j < numUsers; j++) {
-                            long userHandle = message.getMessage().getUserHandle(j);
-                            contactHandles.add(userHandle);
-                        }
-                        ((ChatActivity) requireActivity()).startGroupConversation(contactHandles);
-                    }
+            } else if (email != null) {
+                cC.inviteContact(email);
+            }
+        } else if (id == R.id.option_start_conversation_layout) {
+            if (requireActivity() instanceof ChatActivity) {
+                if (numUsers == 1) {
+                    ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
+                    dismissAllowingStateLoss();
                 } else {
-                    Timber.d("Instance of ContactAttachmentActivity");
-                    Timber.d("position: %s", position);
-                    long userHandle = message.getMessage().getUserHandle(position);
-                    ((ContactAttachmentActivity) requireActivity()).startConversation(userHandle);
+                    Timber.d("Num users to invite: %s", numUsers);
+                    ArrayList<Long> contactHandles = new ArrayList<>();
+
+                    for (int j = 0; j < numUsers; j++) {
+                        long userHandle = message.getMessage().getUserHandle(j);
+                        contactHandles.add(userHandle);
+                    }
+                    ((ChatActivity) requireActivity()).startGroupConversation(contactHandles);
                 }
-                break;
+            } else {
+                Timber.d("Instance of ContactAttachmentActivity");
+                Timber.d("position: %s", position);
+                long userHandle = message.getMessage().getUserHandle(position);
+                ((ContactAttachmentActivity) requireActivity()).startConversation(userHandle);
+            }
         }
 
         setStateBottomSheetBehaviorHidden();

@@ -90,31 +90,22 @@ public class NodeLabelBottomSheetDialogFragment extends BaseBottomSheetDialogFra
     }
 
     private void updateNodeLabel(int checkedId) {
-        switch (checkedId) {
-            case R.id.radio_label_red:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_RED);
-                break;
-            case R.id.radio_label_orange:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_ORANGE);
-                break;
-            case R.id.radio_label_yellow:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_YELLOW);
-                break;
-            case R.id.radio_label_green:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREEN);
-                break;
-            case R.id.radio_label_blue:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_BLUE);
-                break;
-            case R.id.radio_label_purple:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_PURPLE);
-                break;
-            case R.id.radio_label_grey:
-                megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREY);
-                break;
-            case R.id.radio_remove:
-                megaApi.resetNodeLabel(node);
-                break;
+        if (checkedId == R.id.radio_label_red) {
+            megaApi.setNodeLabel(node, MegaNode.NODE_LBL_RED);
+        } else if (checkedId == R.id.radio_label_orange) {
+            megaApi.setNodeLabel(node, MegaNode.NODE_LBL_ORANGE);
+        } else if (checkedId == R.id.radio_label_yellow) {
+            megaApi.setNodeLabel(node, MegaNode.NODE_LBL_YELLOW);
+        } else if (checkedId == R.id.radio_label_green) {
+            megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREEN);
+        } else if (checkedId == R.id.radio_label_blue) {
+            megaApi.setNodeLabel(node, MegaNode.NODE_LBL_BLUE);
+        } else if (checkedId == R.id.radio_label_purple) {
+            megaApi.setNodeLabel(node, MegaNode.NODE_LBL_PURPLE);
+        } else if (checkedId == R.id.radio_label_grey) {
+            megaApi.setNodeLabel(node, MegaNode.NODE_LBL_GREY);
+        } else if (checkedId == R.id.radio_remove) {
+            megaApi.resetNodeLabel(node);
         }
 
         dismiss();

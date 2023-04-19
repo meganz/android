@@ -138,26 +138,21 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.file_contact_list_option_permissions_layout:
-                if (requireActivity() instanceof FileContactListActivity) {
-                    ((FileContactListActivity) requireActivity()).changePermissions();
-                } else if (requireActivity() instanceof FileInfoActivity) {
-                    ((FileInfoActivity) requireActivity()).changePermissions();
-                }
-                break;
-
-            case R.id.file_contact_list_option_delete_layout:
-                if (requireActivity() instanceof FileContactListActivity) {
-                    ((FileContactListActivity) requireActivity()).removeFileContactShare();
-                } else if (requireActivity() instanceof FileInfoActivity) {
-                    ((FileInfoActivity) requireActivity()).removeFileContactShare();
-                }
-                break;
-
-            case R.id.file_contact_list_option_info_layout:
-                ContactUtil.openContactInfoActivity(requireActivity(), share.getUser());
-                break;
+        int id = v.getId();
+        if (id == R.id.file_contact_list_option_permissions_layout) {
+            if (requireActivity() instanceof FileContactListActivity) {
+                ((FileContactListActivity) requireActivity()).changePermissions();
+            } else if (requireActivity() instanceof FileInfoActivity) {
+                ((FileInfoActivity) requireActivity()).changePermissions();
+            }
+        } else if (id == R.id.file_contact_list_option_delete_layout) {
+            if (requireActivity() instanceof FileContactListActivity) {
+                ((FileContactListActivity) requireActivity()).removeFileContactShare();
+            } else if (requireActivity() instanceof FileInfoActivity) {
+                ((FileInfoActivity) requireActivity()).removeFileContactShare();
+            }
+        } else if (id == R.id.file_contact_list_option_info_layout) {
+            ContactUtil.openContactInfoActivity(requireActivity(), share.getUser());
         }
 
         setStateBottomSheetBehaviorHidden();

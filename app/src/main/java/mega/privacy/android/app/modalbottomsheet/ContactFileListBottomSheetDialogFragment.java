@@ -210,59 +210,44 @@ public class ContactFileListBottomSheetDialogFragment extends BaseBottomSheetDia
         ArrayList<Long> handleList = new ArrayList<>();
         handleList.add(node.getHandle());
 
-        switch (v.getId()) {
-            case R.id.download_option:
-                if (requireActivity() instanceof ContactFileListActivity) {
-                    contactFileListActivity.downloadFile(Collections.singletonList(node));
-                } else if (requireActivity() instanceof ContactInfoActivity) {
-                    contactInfoActivity.downloadFile(Collections.singletonList(node));
-                }
-                break;
-
-            case R.id.properties_option:
-                Intent i = new Intent(requireContext(), FileInfoActivity.class);
-                i.putExtra(HANDLE, node.getHandle());
-                i.putExtra("from", FROM_INCOMING_SHARES);
-                i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, node.isInShare());
-                i.putExtra(NAME, node.getName());
-                startActivity(i);
-                break;
-
-            case R.id.leave_option:
-                showConfirmationLeaveIncomingShare(requireActivity(),
-                        (SnackbarShower) requireActivity(), node);
-                break;
-
-            case R.id.rename_option:
-                showRenameNodeDialog(requireActivity(), node, (SnackbarShower) getActivity(),
-                        (ActionNodeCallback) getActivity());
-                break;
-
-            case R.id.move_option:
-                if (requireActivity() instanceof ContactFileListActivity) {
-                    contactFileListActivity.showMove(handleList);
-                } else if (requireActivity() instanceof ContactInfoActivity) {
-                    contactInfoActivity.showMove(handleList);
-                }
-                break;
-
-            case R.id.copy_option:
-                if (requireActivity() instanceof ContactFileListActivity) {
-                    contactFileListActivity.showCopy(handleList);
-                } else if (requireActivity() instanceof ContactInfoActivity) {
-                    contactInfoActivity.showCopy(handleList);
-                }
-                break;
-
-            case R.id.rubbish_bin_option:
-                if (requireActivity() instanceof ContactFileListActivity) {
-                    contactFileListActivity.askConfirmationMoveToRubbish(handleList);
-                }
-                break;
-
-            case R.id.edit_file_option:
-                manageEditTextFileIntent(requireContext(), node, CONTACT_FILE_ADAPTER);
-                break;
+        int id = v.getId();
+        if (id == R.id.download_option) {
+            if (requireActivity() instanceof ContactFileListActivity) {
+                contactFileListActivity.downloadFile(Collections.singletonList(node));
+            } else if (requireActivity() instanceof ContactInfoActivity) {
+                contactInfoActivity.downloadFile(Collections.singletonList(node));
+            }
+        } else if (id == R.id.properties_option) {
+            Intent i = new Intent(requireContext(), FileInfoActivity.class);
+            i.putExtra(HANDLE, node.getHandle());
+            i.putExtra("from", FROM_INCOMING_SHARES);
+            i.putExtra(INTENT_EXTRA_KEY_FIRST_LEVEL, node.isInShare());
+            i.putExtra(NAME, node.getName());
+            startActivity(i);
+        } else if (id == R.id.leave_option) {
+            showConfirmationLeaveIncomingShare(requireActivity(),
+                    (SnackbarShower) requireActivity(), node);
+        } else if (id == R.id.rename_option) {
+            showRenameNodeDialog(requireActivity(), node, (SnackbarShower) getActivity(),
+                    (ActionNodeCallback) getActivity());
+        } else if (id == R.id.move_option) {
+            if (requireActivity() instanceof ContactFileListActivity) {
+                contactFileListActivity.showMove(handleList);
+            } else if (requireActivity() instanceof ContactInfoActivity) {
+                contactInfoActivity.showMove(handleList);
+            }
+        } else if (id == R.id.copy_option) {
+            if (requireActivity() instanceof ContactFileListActivity) {
+                contactFileListActivity.showCopy(handleList);
+            } else if (requireActivity() instanceof ContactInfoActivity) {
+                contactInfoActivity.showCopy(handleList);
+            }
+        } else if (id == R.id.rubbish_bin_option) {
+            if (requireActivity() instanceof ContactFileListActivity) {
+                contactFileListActivity.askConfirmationMoveToRubbish(handleList);
+            }
+        } else if (id == R.id.edit_file_option) {
+            manageEditTextFileIntent(requireContext(), node, CONTACT_FILE_ADAPTER);
         }
 
         setStateBottomSheetBehaviorHidden();

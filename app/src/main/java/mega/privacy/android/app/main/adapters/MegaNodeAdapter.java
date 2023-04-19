@@ -1274,28 +1274,18 @@ public class MegaNodeAdapter extends RecyclerView.Adapter<MegaNodeAdapter.ViewHo
             return;
         }
 
-        switch (v.getId()) {
-            case R.id.grid_bottom_container:
-            case R.id.file_list_three_dots_layout:
-            case R.id.file_grid_three_dots:
-            case R.id.file_grid_three_dots_for_file: {
-                threeDotsClicked(currentPosition, n, sd);
-                break;
-            }
-            case R.id.file_list_item_layout:
-            case R.id.file_grid_item_layout: {
-                if (n.isTakenDown() && !isMultipleSelect()) {
-                    takenDownDialog = showTakenDownDialog(n.isFolder(), currentPosition, this, context);
-                    unHandledItem = currentPosition;
-                } else if (n.isFile() && !isOnline(context) && getLocalFile(n) == null) {
-                    if (isOffline(context)) {
-                        break;
-                    }
-                } else {
-                    fileClicked(currentPosition);
+        int id = v.getId();
+        if (id == R.id.grid_bottom_container || id == R.id.file_list_three_dots_layout || id == R.id.file_grid_three_dots || id == R.id.file_grid_three_dots_for_file) {
+            threeDotsClicked(currentPosition, n, sd);
+        } else if (id == R.id.file_list_item_layout || id == R.id.file_grid_item_layout) {
+            if (n.isTakenDown() && !isMultipleSelect()) {
+                takenDownDialog = showTakenDownDialog(n.isFolder(), currentPosition, this, context);
+                unHandledItem = currentPosition;
+            } else if (n.isFile() && !isOnline(context) && getLocalFile(n) == null) {
+                if (isOffline(context)) {
                 }
-
-                break;
+            } else {
+                fileClicked(currentPosition);
             }
         }
     }

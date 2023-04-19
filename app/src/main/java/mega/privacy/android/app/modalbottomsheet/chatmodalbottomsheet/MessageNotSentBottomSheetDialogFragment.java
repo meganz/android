@@ -100,55 +100,51 @@ public class MessageNotSentBottomSheetDialogFragment extends BaseBottomSheetDial
             return;
         }
 
-        switch (v.getId()) {
-            case R.id.msg_not_sent_retry_layout:
-                if (selectedMessage.getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
-                    MegaNodeList nodeList = selectedMessage.getMessage().getMegaNodeList();
-                    if (nodeList != null) {
-                        long nodeHandle = nodeList.get(0).getHandle();
-
-                        ((ChatActivity) requireActivity()).removeMsgNotSent();
-                        megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
-
-                        ((ChatActivity) requireActivity()).retryNodeAttachment(nodeHandle);
-                    } else {
-                        Timber.w("Error the nodeList cannot be recovered");
-                    }
-                } else if (selectedMessage.getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
-                    long userCount = selectedMessage.getMessage().getUsersCount();
-
-                    MegaHandleList handleList = MegaHandleList.createInstance();
-
-                    for (int i = 0; i < userCount; i++) {
-                        long handle = selectedMessage.getMessage().getUserHandle(i);
-                        handleList.addMegaHandle(handle);
-                    }
+        int id = v.getId();
+        if (id == R.id.msg_not_sent_retry_layout) {
+            if (selectedMessage.getMessage().getType() == MegaChatMessage.TYPE_NODE_ATTACHMENT) {
+                MegaNodeList nodeList = selectedMessage.getMessage().getMegaNodeList();
+                if (nodeList != null) {
+                    long nodeHandle = nodeList.get(0).getHandle();
 
                     ((ChatActivity) requireActivity()).removeMsgNotSent();
                     megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
 
-                    ((ChatActivity) requireActivity()).retryContactAttachment(handleList);
+                    ((ChatActivity) requireActivity()).retryNodeAttachment(nodeHandle);
                 } else {
-                    ((ChatActivity) requireActivity()).removeMsgNotSent();
-                    megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
+                    Timber.w("Error the nodeList cannot be recovered");
+                }
+            } else if (selectedMessage.getMessage().getType() == MegaChatMessage.TYPE_CONTACT_ATTACHMENT) {
+                long userCount = selectedMessage.getMessage().getUsersCount();
 
-                    if (selectedMessage.getMessage().isEdited()) {
-                        Timber.d("Message is edited --> edit");
-                        if (originalMsg != null) {
-                            ((ChatActivity) requireActivity()).editMessageMS(selectedMessage.getMessage().getContent(), originalMsg);
-                        }
-                    } else {
-                        Timber.d("Message NOT edited --> send");
-                        ((ChatActivity) requireActivity()).sendMessage(selectedMessage.getMessage().getContent());
-                    }
+                MegaHandleList handleList = MegaHandleList.createInstance();
+
+                for (int i = 0; i < userCount; i++) {
+                    long handle = selectedMessage.getMessage().getUserHandle(i);
+                    handleList.addMegaHandle(handle);
                 }
 
-                break;
-
-            case R.id.msg_not_sent_delete_layout:
                 ((ChatActivity) requireActivity()).removeMsgNotSent();
                 megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
-                break;
+
+                ((ChatActivity) requireActivity()).retryContactAttachment(handleList);
+            } else {
+                ((ChatActivity) requireActivity()).removeMsgNotSent();
+                megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
+
+                if (selectedMessage.getMessage().isEdited()) {
+                    Timber.d("Message is edited --> edit");
+                    if (originalMsg != null) {
+                        ((ChatActivity) requireActivity()).editMessageMS(selectedMessage.getMessage().getContent(), originalMsg);
+                    }
+                } else {
+                    Timber.d("Message NOT edited --> send");
+                    ((ChatActivity) requireActivity()).sendMessage(selectedMessage.getMessage().getContent());
+                }
+            }
+        } else if (id == R.id.msg_not_sent_delete_layout) {
+            ((ChatActivity) requireActivity()).removeMsgNotSent();
+            megaChatApi.removeUnsentMessage(selectedChat.getChatId(), selectedMessage.getMessage().getRowId());
         }
 
         setStateBottomSheetBehaviorHidden();

@@ -352,145 +352,118 @@ public class GeneralChatMessageBottomSheet extends BaseBottomSheetDialogFragment
 
         ArrayList<AndroidMegaChatMessage> messagesSelected = new ArrayList<>();
         messagesSelected.add(message);
-        switch (view.getId()) {
-            case R.id.open_with_layout:
-                if (node == null) {
-                    Timber.w("The selected node is NULL");
-                    return;
-                }
-                cannotOpenFileDialog = openWith(this, requireActivity(), node, ((ChatActivity) requireActivity())::saveNodeByTap);
+        int id = view.getId();
+        if (id == R.id.open_with_layout) {
+            if (node == null) {
+                Timber.w("The selected node is NULL");
                 return;
+            }
+            cannotOpenFileDialog = openWith(this, requireActivity(), node, ((ChatActivity) requireActivity())::saveNodeByTap);
+            return;
+        } else if (id == R.id.forward_layout) {
+            ((ChatActivity) requireActivity()).forwardMessages(messagesSelected);
+        } else if (id == R.id.edit_layout) {
+            ((ChatActivity) requireActivity()).editMessage(messagesSelected);
+        } else if (id == R.id.copy_layout) {
+            MegaChatMessage msg = message.getMessage();
+            String text = isGeolocation(msg) ? msg.getContainsMeta().getTextMessage() :
+                    ((ChatActivity) requireActivity()).copyMessage(message);
+            ((ChatActivity) requireActivity()).copyToClipboard(text);
+        } else if (id == R.id.share_layout) {
+            if (node == null) {
+                Timber.w("The selected node is NULL");
+                return;
+            }
 
-            case R.id.forward_layout:
-                ((ChatActivity) requireActivity()).forwardMessages(messagesSelected);
-                break;
+            shareMsgFromChat(requireActivity(), message, chatId);
+        } else if (id == R.id.select_layout) {
+            ((ChatActivity) requireActivity()).activateActionModeWithItem(positionMessage);
+        } else if (id == R.id.option_view_layout) {
+            Timber.d("View option");
+            ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
+        } else if (id == R.id.option_info_layout) {
+            if (!isOnline(requireContext())) {
+                ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                return;
+            }
 
-            case R.id.edit_layout:
-                ((ChatActivity) requireActivity()).editMessage(messagesSelected);
-                break;
+            boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() &&
+                    message.getMessage().getUserHandle(0) == chatRoom.getPeerHandle(0);
+            ContactUtil.openContactInfoActivity(requireActivity(), message.getMessage().getUserEmail(0), isChatRoomOpen);
+        } else if (id == R.id.option_invite_layout) {
+            if (!isOnline(requireContext())) {
+                ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
+                return;
+            }
 
-            case R.id.copy_layout:
-                MegaChatMessage msg = message.getMessage();
-                String text = isGeolocation(msg) ? msg.getContainsMeta().getTextMessage() :
-                        ((ChatActivity) requireActivity()).copyMessage(message);
-                ((ChatActivity) requireActivity()).copyToClipboard(text);
-                break;
+            ContactController cC = new ContactController(requireActivity());
+            ArrayList<String> contactEmails;
+            long usersCount = message.getMessage().getUsersCount();
 
-            case R.id.share_layout:
-                if (node == null) {
-                    Timber.w("The selected node is NULL");
-                    return;
+            if (usersCount == 1) {
+                cC.inviteContact(message.getMessage().getUserEmail(0));
+            } else {
+                Timber.d("Num users to invite: %s", usersCount);
+                contactEmails = new ArrayList<>();
+
+                for (int j = 0; j < usersCount; j++) {
+                    String userMail = message.getMessage().getUserEmail(j);
+                    contactEmails.add(userMail);
                 }
+                cC.inviteMultipleContacts(contactEmails);
+            }
+        } else if (id == R.id.option_start_conversation_layout) {
+            long numUsers = message.getMessage().getUsersCount();
 
-                shareMsgFromChat(requireActivity(), message, chatId);
-                break;
+            if (numUsers == 1) {
+                ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
+            } else {
+                Timber.d("Num users to invite: %s", numUsers);
+                ArrayList<Long> contactHandles = new ArrayList<>();
 
-            case R.id.select_layout:
-                ((ChatActivity) requireActivity()).activateActionModeWithItem(positionMessage);
-                break;
-
-            case R.id.option_view_layout:
-                Timber.d("View option");
-                ContactUtil.openContactAttachmentActivity(requireActivity(), chatId, messageId);
-                break;
-
-            case R.id.option_info_layout:
-                if (!isOnline(requireContext())) {
-                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
-                    return;
+                for (int j = 0; j < numUsers; j++) {
+                    long userHandle = message.getMessage().getUserHandle(j);
+                    contactHandles.add(userHandle);
                 }
+                ((ChatActivity) requireActivity()).startGroupConversation(contactHandles);
+            }
+        } else if (id == R.id.option_download_layout) {
+            if (node == null) {
+                Timber.w("The selected node is NULL");
+                return;
+            }
 
-                boolean isChatRoomOpen = chatRoom != null && !chatRoom.isGroup() &&
-                        message.getMessage().getUserHandle(0) == chatRoom.getPeerHandle(0);
-                ContactUtil.openContactInfoActivity(requireActivity(), message.getMessage().getUserEmail(0), isChatRoomOpen);
-                break;
+            MegaNodeList nodeList = message.getMessage().getMegaNodeList();
+            if (nodeList != null && nodeList.size() > 0) {
+                ((ChatActivity) requireActivity()).downloadNodeList(nodeList);
+            }
+        } else if (id == R.id.option_import_layout) {
+            if (node == null) {
+                Timber.w("The selected node is NULL");
+                return;
+            }
 
-            case R.id.option_invite_layout:
-                if (!isOnline(requireContext())) {
-                    ((ChatActivity) requireActivity()).showSnackbar(SNACKBAR_TYPE, getString(R.string.error_server_connection_problem), INVALID_HANDLE);
-                    return;
-                }
+            chatC.importNode(messageId, chatId, IMPORT_ONLY_OPTION);
+        } else if (id == R.id.file_properties_switch || id == R.id.option_save_offline_layout) {
+            if (message == null || node == null) {
+                Timber.w("Message or node is NULL");
+                return;
+            }
 
-                ContactController cC = new ContactController(requireActivity());
-                ArrayList<String> contactEmails;
-                long usersCount = message.getMessage().getUsersCount();
-
-                if (usersCount == 1) {
-                    cC.inviteContact(message.getMessage().getUserEmail(0));
-                } else {
-                    Timber.d("Num users to invite: %s", usersCount);
-                    contactEmails = new ArrayList<>();
-
-                    for (int j = 0; j < usersCount; j++) {
-                        String userMail = message.getMessage().getUserEmail(j);
-                        contactEmails.add(userMail);
-                    }
-                    cC.inviteMultipleContacts(contactEmails);
-                }
-                break;
-
-            case R.id.option_start_conversation_layout:
-                long numUsers = message.getMessage().getUsersCount();
-
-                if (numUsers == 1) {
-                    ((ChatActivity) requireActivity()).startConversation(message.getMessage().getUserHandle(0));
-                } else {
-                    Timber.d("Num users to invite: %s", numUsers);
-                    ArrayList<Long> contactHandles = new ArrayList<>();
-
-                    for (int j = 0; j < numUsers; j++) {
-                        long userHandle = message.getMessage().getUserHandle(j);
-                        contactHandles.add(userHandle);
-                    }
-                    ((ChatActivity) requireActivity()).startGroupConversation(contactHandles);
-                }
-                break;
-
-            case R.id.option_download_layout:
-                if (node == null) {
-                    Timber.w("The selected node is NULL");
-                    return;
-                }
-
-                MegaNodeList nodeList = message.getMessage().getMegaNodeList();
-                if (nodeList != null && nodeList.size() > 0) {
-                    ((ChatActivity) requireActivity()).downloadNodeList(nodeList);
-                }
-                break;
-
-            case R.id.option_import_layout:
-                if (node == null) {
-                    Timber.w("The selected node is NULL");
-                    return;
-                }
-
-                chatC.importNode(messageId, chatId, IMPORT_ONLY_OPTION);
-                break;
-
-            case R.id.file_properties_switch:
-            case R.id.option_save_offline_layout:
-                if (message == null || node == null) {
-                    Timber.w("Message or node is NULL");
-                    return;
-                }
-
-                if (availableOffline(requireContext(), node)) {
-                    MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
-                    removeOffline(mOffDelete, dbH, requireContext());
-                    Util.showSnackbar(
-                            getActivity(), getResources().getString(R.string.file_removed_offline));
-                } else {
-                    PermissionUtils.checkNotificationsPermission(requireActivity());
-                    ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
-                    messages.add(message);
-                    chatC.saveForOfflineWithAndroidMessages(messages,
-                            megaChatApi.getChatRoom(chatId), (ChatActivity) requireActivity());
-                }
-                break;
-
-            case R.id.delete_layout:
-                ((ChatActivity) requireActivity()).showConfirmationDeleteMessages(messagesSelected, chatRoom);
-                break;
+            if (availableOffline(requireContext(), node)) {
+                MegaOffline mOffDelete = dbH.findByHandle(node.getHandle());
+                removeOffline(mOffDelete, dbH, requireContext());
+                Util.showSnackbar(
+                        getActivity(), getResources().getString(R.string.file_removed_offline));
+            } else {
+                PermissionUtils.checkNotificationsPermission(requireActivity());
+                ArrayList<AndroidMegaChatMessage> messages = new ArrayList<>();
+                messages.add(message);
+                chatC.saveForOfflineWithAndroidMessages(messages,
+                        megaChatApi.getChatRoom(chatId), (ChatActivity) requireActivity());
+            }
+        } else if (id == R.id.delete_layout) {
+            ((ChatActivity) requireActivity()).showConfirmationDeleteMessages(messagesSelected, chatRoom);
         }
         closeDialog();
     }

@@ -132,29 +132,22 @@ public class OfflineOptionsBottomSheetDialogFragment extends BaseBottomSheetDial
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.option_delete_offline_layout:
-                if (requireActivity() instanceof ManagerActivity) {
-                    ((ManagerActivity) requireActivity())
-                            .showConfirmationRemoveFromOffline(nodeOffline,
-                                    this::setStateBottomSheetBehaviorHidden);
-                }
-                break;
-            case R.id.option_open_with_layout:
-                OfflineUtils.openWithOffline(requireContext(), Long.valueOf(nodeOffline.getHandle()));
-                break;
-            case R.id.option_share_layout:
-                OfflineUtils.shareOfflineNode(requireContext(), Long.valueOf(nodeOffline.getHandle()));
-                break;
-            case R.id.option_download_layout:
-                ((ManagerActivity) requireActivity()).saveOfflineNodesToDevice(
-                        Collections.singletonList(nodeOffline));
-                break;
-            case R.id.option_properties_layout:
-                ((ManagerActivity) requireActivity()).showOfflineFileInfo(nodeOffline);
-                break;
-            default:
-                break;
+        int id = v.getId();
+        if (id == R.id.option_delete_offline_layout) {
+            if (requireActivity() instanceof ManagerActivity) {
+                ((ManagerActivity) requireActivity())
+                        .showConfirmationRemoveFromOffline(nodeOffline,
+                                this::setStateBottomSheetBehaviorHidden);
+            }
+        } else if (id == R.id.option_open_with_layout) {
+            OfflineUtils.openWithOffline(requireContext(), Long.valueOf(nodeOffline.getHandle()));
+        } else if (id == R.id.option_share_layout) {
+            OfflineUtils.shareOfflineNode(requireContext(), Long.valueOf(nodeOffline.getHandle()));
+        } else if (id == R.id.option_download_layout) {
+            ((ManagerActivity) requireActivity()).saveOfflineNodesToDevice(
+                    Collections.singletonList(nodeOffline));
+        } else if (id == R.id.option_properties_layout) {
+            ((ManagerActivity) requireActivity()).showOfflineFileInfo(nodeOffline);
         }
 
         setStateBottomSheetBehaviorHidden();

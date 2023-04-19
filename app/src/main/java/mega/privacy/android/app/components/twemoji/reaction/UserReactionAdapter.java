@@ -120,26 +120,24 @@ public class UserReactionAdapter extends ArrayAdapter<Long> implements View.OnCl
     public void onClick(View view) {
         long handle = (long) view.getTag();
 
-        switch (view.getId()) {
-            case R.id.layout:
-                if (handle == MEGACHAT_INVALID_HANDLE) {
-                    break;
-                }
+        if (view.getId() == R.id.layout) {
+            if (handle == MEGACHAT_INVALID_HANDLE) {
+                return;
+            }
 
-                if (context instanceof ChatActivity) {
-                    if (!isMyUserHandle(handle)) {
-                        String email = chatC.getParticipantEmail(handle);
-                        MegaUser contact = megaApi.getContact(email);
-                        if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                            ((ChatActivity) context).hideBottomSheet();
-                            ContactUtil.openContactInfoActivity(context, email);
-                        }
-                    } else {
+            if (context instanceof ChatActivity) {
+                if (!isMyUserHandle(handle)) {
+                    String email = chatC.getParticipantEmail(handle);
+                    MegaUser contact = megaApi.getContact(email);
+                    if (contact != null && contact.getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
                         ((ChatActivity) context).hideBottomSheet();
-                        ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.contact_is_me), MEGACHAT_INVALID_HANDLE);
+                        openContactInfoActivity(context, email);
                     }
+                } else {
+                    ((ChatActivity) context).hideBottomSheet();
+                    ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.contact_is_me), MEGACHAT_INVALID_HANDLE);
                 }
-                break;
+            }
         }
     }
 

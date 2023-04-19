@@ -30,14 +30,11 @@ public class SendAttachmentChatBottomSheetDialogFragment extends BaseBottomSheet
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.send_attachment_chat_from_cloud_layout:
-                ((ChatActivity) requireActivity()).sendFromCloud();
-                break;
-
-            case R.id.send_attachment_chat_from_filesystem_layout:
-                ((ChatActivity) requireActivity()).sendFromFileSystem();
-                break;
+        int id = v.getId();
+        if (id == R.id.send_attachment_chat_from_cloud_layout) {
+            ((ChatActivity) requireActivity()).sendFromCloud();
+        } else if (id == R.id.send_attachment_chat_from_filesystem_layout) {
+            ((ChatActivity) requireActivity()).sendFromFileSystem();
         }
 
         setStateBottomSheetBehaviorHidden();

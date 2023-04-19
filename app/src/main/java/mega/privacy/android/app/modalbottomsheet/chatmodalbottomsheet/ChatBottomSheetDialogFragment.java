@@ -277,46 +277,36 @@ public class ChatBottomSheetDialogFragment extends BaseBottomSheetDialogFragment
             return;
         }
 
-        switch (v.getId()) {
-            case R.id.chat_list_info_chat_layout:
-                if (chat.isGroup()) {
-                    Intent i = new Intent(requireContext(), GroupChatInfoActivity.class);
-                    i.putExtra(HANDLE, chat.getChatId());
-                    startActivity(i);
+        int id = v.getId();
+        if (id == R.id.chat_list_info_chat_layout) {
+            if (chat.isGroup()) {
+                Intent i = new Intent(requireContext(), GroupChatInfoActivity.class);
+                i.putExtra(HANDLE, chat.getChatId());
+                startActivity(i);
+            } else {
+                Intent i = new Intent(requireContext(), ContactInfoActivity.class);
+                i.putExtra(HANDLE, chat.getChatId());
+                startActivity(i);
+            }
+        } else if (id == R.id.chat_list_leave_chat_layout) {
+            Timber.d("Leave chat - Chat ID: %s", chat.getChatId());
+
+            if (requireActivity() instanceof ManagerActivity) {
+                showConfirmationLeaveChat(requireActivity(), chat.getChatId(), ((ManagerActivity) requireActivity()));
+            }
+        } else if (id == R.id.chat_list_clear_history_chat_layout) {
+            Timber.d("Clear chat - Chat ID: %s", chat.getChatId());
+            showConfirmationClearChat(((ManagerActivity) requireActivity()), megaChatApi.getChatRoom(chat.getChatId()));
+        } else if (id == R.id.chat_list_mute_chat_layout) {
+            if (requireActivity() instanceof ManagerActivity) {
+                if (optionMuteChatText.getText().equals(getString(R.string.general_mute))) {
+                    createMuteNotificationsAlertDialogOfAChat(requireActivity(), chat.getChatId());
                 } else {
-                    Intent i = new Intent(requireContext(), ContactInfoActivity.class);
-                    i.putExtra(HANDLE, chat.getChatId());
-                    startActivity(i);
+                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(requireActivity(), NOTIFICATIONS_ENABLED, chat.getChatId());
                 }
-
-                break;
-
-            case R.id.chat_list_leave_chat_layout:
-                Timber.d("Leave chat - Chat ID: %s", chat.getChatId());
-
-                if (requireActivity() instanceof ManagerActivity) {
-                    showConfirmationLeaveChat(requireActivity(), chat.getChatId(), ((ManagerActivity) requireActivity()));
-                }
-                break;
-
-            case R.id.chat_list_clear_history_chat_layout:
-                Timber.d("Clear chat - Chat ID: %s", chat.getChatId());
-                showConfirmationClearChat(((ManagerActivity) requireActivity()), megaChatApi.getChatRoom(chat.getChatId()));
-                break;
-
-            case R.id.chat_list_mute_chat_layout:
-                if (requireActivity() instanceof ManagerActivity) {
-                    if (optionMuteChatText.getText().equals(getString(R.string.general_mute))) {
-                        createMuteNotificationsAlertDialogOfAChat(requireActivity(), chat.getChatId());
-                    } else {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(requireActivity(), NOTIFICATIONS_ENABLED, chat.getChatId());
-                    }
-                }
-                break;
-
-            case R.id.chat_list_archive_chat_layout:
-                chatC.archiveChat(chat);
-                break;
+            }
+        } else if (id == R.id.chat_list_archive_chat_layout) {
+            chatC.archiveChat(chat);
         }
 
         setStateBottomSheetBehaviorHidden();
