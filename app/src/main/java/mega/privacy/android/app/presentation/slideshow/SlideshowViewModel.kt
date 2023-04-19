@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -19,10 +20,8 @@ import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
-import mega.privacy.android.domain.usecase.SaveSlideshowOrderSettingUseCase
-import mega.privacy.android.domain.usecase.SaveSlideshowRepeatSettingUseCase
-import mega.privacy.android.domain.usecase.SaveSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -35,11 +34,12 @@ class SlideshowViewModel @Inject constructor(
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase,
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase,
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase,
-    private val saveSlideshowOrderSettingUseCase: SaveSlideshowOrderSettingUseCase,
-    private val saveSlideshowSpeedSettingUseCase: SaveSlideshowSpeedSettingUseCase,
-    private val saveSlideshowRepeatSettingUseCase: SaveSlideshowRepeatSettingUseCase,
     private val getImageByNodeHandle: GetImageByNodeHandle,
 ) : ViewModel() {
+
+    /**
+     * Slideshow ViewState
+     */
     private val _state = MutableStateFlow(SlideshowViewState())
     val state = _state.asStateFlow()
 
@@ -59,12 +59,15 @@ class SlideshowViewModel @Inject constructor(
     }
 
     private fun playSlideshow(items: List<ImageItem>) {
+        if (_state.value.items.isNotEmpty())
+            return
         viewModelScope.launch {
             val ids = items.map { it.getNodeHandle() ?: it.id }
             _state.update {
                 it.copy(
                     items = getPhotosByIds(ids = ids.map { id -> NodeId(id) })
-                        .filterIsInstance<Photo.Image>()
+                        .filterIsInstance<Photo.Image>(),
+                    isPlaying = true
                 )
             }
         }
@@ -82,37 +85,52 @@ class SlideshowViewModel @Inject constructor(
         resetDownloads = resetDownloads,
     )
 
+    /**
+     * Update Playing status
+     */
+    fun updateIsPlaying(isPlaying: Boolean) {
+        _state.update {
+            it.copy(isPlaying = isPlaying)
+        }
+    }
 
-    private fun monitorOrderSetting() = monitorSlideshowOrderSettingUseCase()
-        .onEach { order ->
-            _state.update {
-                it.copy(order = order ?: SlideshowOrder.Shuffle)
-            }
-        }.launchIn(viewModelScope)
+    /**
+     * Should play slideshow from the first item
+     */
+    fun shouldPlayFromFirst(shouldPlayFromFirst: Boolean) {
+        _state.update {
+            it.copy(shouldPlayFromFirst = shouldPlayFromFirst)
+        }
+    }
+
+    private fun monitorOrderSetting() =
+        monitorSlideshowOrderSettingUseCase()
+            .distinctUntilChanged().onEach { order ->
+                Timber.d("Slideshow monitorOrderSetting order+$order")
+                val isFirstInSlideshow = _state.value.isFirstInSlideshow
+                Timber.d("Slideshow monitorOrderSetting shouldPlayFromFirst+${!isFirstInSlideshow}")
+                _state.update {
+                    it.copy(
+                        order = order ?: SlideshowOrder.Shuffle,
+                        shouldPlayFromFirst = !isFirstInSlideshow,
+                        isFirstInSlideshow = false
+                    )
+                }
+            }.launchIn(viewModelScope)
 
     private fun monitorSpeedSetting() = monitorSlideshowSpeedSettingUseCase()
-        .onEach { speed ->
+        .distinctUntilChanged().onEach { speed ->
+            Timber.d("Slideshow monitorSpeedSetting speed+$speed")
             _state.update {
                 it.copy(speed = speed ?: SlideshowSpeed.Normal)
             }
         }.launchIn(viewModelScope)
 
     private fun monitorRepeatSetting() = monitorSlideshowRepeatSettingUseCase()
-        .onEach { isRepeat ->
+        .distinctUntilChanged().onEach { isRepeat ->
+            Timber.d("Slideshow monitorRepeatSetting isRepeat+$isRepeat")
             _state.update {
                 it.copy(repeat = isRepeat ?: false)
             }
         }.launchIn(viewModelScope)
-
-    fun saveOrderSetting(order: SlideshowOrder) = viewModelScope.launch {
-        saveSlideshowOrderSettingUseCase(order)
-    }
-
-    fun saveSpeedSetting(speed: SlideshowSpeed) = viewModelScope.launch {
-        saveSlideshowSpeedSettingUseCase(speed)
-    }
-
-    fun saveRepeatSetting(isRepeat: Boolean) = viewModelScope.launch {
-        saveSlideshowRepeatSettingUseCase(isRepeat)
-    }
 }

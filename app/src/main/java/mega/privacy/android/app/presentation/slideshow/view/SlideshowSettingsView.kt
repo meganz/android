@@ -16,7 +16,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
@@ -35,7 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.slideshow.SlideshowViewModel
+import mega.privacy.android.app.presentation.slideshow.SlideshowSettingViewModel
 import mega.privacy.android.core.ui.controls.LabelledSwitch
 import mega.privacy.android.core.ui.controls.MegaDialog
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -56,9 +55,9 @@ import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SlideshowSettingsView(
-    slideshowViewModel: SlideshowViewModel,
+    slideshowSettingViewModel: SlideshowSettingViewModel,
 ) {
-    val state by slideshowViewModel.state.collectAsStateWithLifecycle()
+    val state by slideshowSettingViewModel.state.collectAsStateWithLifecycle()
     val isLight = MaterialTheme.colors.isLight
     val settingsTitleFontSize = 16.sp
     val settingsSubtitleFontSize = 14.sp
@@ -126,7 +125,7 @@ fun SlideshowSettingsView(
             LabelledSwitch(
                 label = stringResource(R.string.slideshow_setting_repeat),
                 checked = state.repeat,
-                onCheckChanged = { slideshowViewModel.saveRepeatSetting(!state.repeat) },
+                onCheckChanged = { slideshowSettingViewModel.saveRepeatSetting(!state.repeat) },
                 modifier = Modifier
                     .fillMaxWidth(),
             )
@@ -140,7 +139,7 @@ fun SlideshowSettingsView(
                 options = SlideshowSpeed.values(),
                 selectedOption = state.speed ?: SlideshowSpeed.Normal,
             ) {
-                slideshowViewModel.saveSpeedSetting(it)
+                slideshowSettingViewModel.saveSpeedSetting(it)
             }
         }
 
@@ -150,7 +149,7 @@ fun SlideshowSettingsView(
                 options = SlideshowOrder.values(),
                 selectedOption = state.order ?: SlideshowOrder.Shuffle,
             ) {
-                slideshowViewModel.saveOrderSetting(it)
+                slideshowSettingViewModel.saveOrderSetting(it)
             }
         }
     }

@@ -23,7 +23,7 @@ class SlideshowSettingsFragment : Fragment() {
 
     private lateinit var imageViewerActivity: ImageViewerActivity
 
-    private val slideshowViewModel: SlideshowViewModel by viewModels()
+    private val slideshowSettingViewModel: SlideshowSettingViewModel by viewModels()
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
@@ -45,7 +45,7 @@ class SlideshowSettingsFragment : Fragment() {
                 )
                 AndroidTheme(isDark = mode.isDarkMode()) {
                     SlideshowSettingsView(
-                        slideshowViewModel = slideshowViewModel,
+                        slideshowSettingViewModel = slideshowSettingViewModel,
                     )
                 }
             }

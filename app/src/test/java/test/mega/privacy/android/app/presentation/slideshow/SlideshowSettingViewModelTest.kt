@@ -8,29 +8,33 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import mega.privacy.android.app.presentation.slideshow.SlideshowViewModel
+import mega.privacy.android.app.presentation.slideshow.SlideshowSettingViewModel
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
-import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
+import mega.privacy.android.domain.usecase.SaveSlideshowOrderSettingUseCase
+import mega.privacy.android.domain.usecase.SaveSlideshowRepeatSettingUseCase
+import mega.privacy.android.domain.usecase.SaveSlideshowSpeedSettingUseCase
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import kotlin.test.assertEquals
+import kotlin.test.fail
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SlideshowViewModelTest {
-    private lateinit var underTest: SlideshowViewModel
+class SlideshowSettingViewModelTest {
+    private lateinit var underTest: SlideshowSettingViewModel
 
-    private val getPhotosByIds: GetPhotosByIds = mock()
     private val monitorSlideshowOrderSettingUseCase: MonitorSlideshowOrderSettingUseCase = mock()
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase = mock()
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase = mock()
-    private val getImageByNodeHandle: GetImageByNodeHandle = mock()
+    private val saveSlideshowOrderSettingUseCase: SaveSlideshowOrderSettingUseCase = mock()
+    private val saveSlideshowSpeedSettingUseCase: SaveSlideshowSpeedSettingUseCase = mock()
+    private val saveSlideshowRepeatSettingUseCase: SaveSlideshowRepeatSettingUseCase = mock()
 
     @Before
     fun setUp() {
@@ -46,12 +50,13 @@ class SlideshowViewModelTest {
             .thenReturn(flowOf())
     }
 
-    private fun createSUT() = SlideshowViewModel(
-        getPhotosByIds = getPhotosByIds,
+    private fun createSUT() = SlideshowSettingViewModel(
         monitorSlideshowOrderSettingUseCase = monitorSlideshowOrderSettingUseCase,
         monitorSlideshowSpeedSettingUseCase = monitorSlideshowSpeedSettingUseCase,
         monitorSlideshowRepeatSettingUseCase = monitorSlideshowRepeatSettingUseCase,
-        getImageByNodeHandle = getImageByNodeHandle
+        saveSlideshowOrderSettingUseCase = saveSlideshowOrderSettingUseCase,
+        saveSlideshowSpeedSettingUseCase = saveSlideshowSpeedSettingUseCase,
+        saveSlideshowRepeatSettingUseCase = saveSlideshowRepeatSettingUseCase,
     )
 
     @Test
@@ -102,6 +107,57 @@ class SlideshowViewModelTest {
         underTest.state.drop(1).test {
             val actualSetting = awaitItem().repeat
             assertEquals(expectedSetting, actualSetting)
+        }
+    }
+
+    @Test
+    fun `test that save order setting works properly`() = runTest {
+        // given
+        whenever(saveSlideshowOrderSettingUseCase.invoke(any()))
+            .thenReturn(Unit)
+
+        // when
+        underTest = createSUT()
+
+        // then
+        try {
+            underTest.saveOrderSetting(order = SlideshowOrder.Shuffle)
+        } catch (e: Exception) {
+            fail(message = "${e.message}")
+        }
+    }
+
+    @Test
+    fun `test that save speed setting works properly`() = runTest {
+        // given
+        whenever(saveSlideshowSpeedSettingUseCase.invoke(any()))
+            .thenReturn(Unit)
+
+        // when
+        underTest = createSUT()
+
+        // then
+        try {
+            underTest.saveSpeedSetting(speed = SlideshowSpeed.Normal)
+        } catch (e: Exception) {
+            fail(message = "${e.message}")
+        }
+    }
+
+    @Test
+    fun `test that save repeat setting works properly`() = runTest {
+        // given
+        whenever(saveSlideshowRepeatSettingUseCase.invoke(any()))
+            .thenReturn(Unit)
+
+        // when
+        underTest = createSUT()
+
+        // then
+        try {
+            underTest.saveRepeatSetting(isRepeat = false)
+        } catch (e: Exception) {
+            fail(message = "${e.message}")
         }
     }
 }

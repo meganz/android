@@ -8,16 +8,20 @@ import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
  * Slideshow ViewState
  *
  * @property items Slideshow items
- * @property currentPlayingChunkedIndex Indicate handle chunked playing slideshow in case avoiding OOM
  * @property order Slideshow play order
  * @property speed Slideshow speed
  * @property repeat Loop play
+ * @property isPlaying play or pause
+ * @property shouldPlayFromFirst Should play slideshow from the first item
+ * @property isFirstInSlideshow Is first time in slideshow
  */
 data class SlideshowViewState(
     val items: List<Photo> = emptyList(),
-    val currentPlayingChunkedIndex: Int = 0,
     val order: SlideshowOrder? = null,
     val speed: SlideshowSpeed? = null,
     val repeat: Boolean = false,
+    val isPlaying: Boolean = false,
+    val shouldPlayFromFirst: Boolean = false,
+    val isFirstInSlideshow: Boolean = true,
 )
 

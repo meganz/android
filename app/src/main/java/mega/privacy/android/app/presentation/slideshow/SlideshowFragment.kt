@@ -31,10 +31,8 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -152,21 +150,14 @@ class SlideshowFragment : Fragment() {
     @Composable
     private fun SlideshowBody() {
         val slideshowViewState by slideshowViewModel.state.collectAsStateWithLifecycle()
-        val scrollState = rememberScaffoldState()
-        val pagerState = rememberPagerState(
-            initialPage = 0
-        )
+        val scaffoldState = rememberScaffoldState()
+        val pagerState = rememberPagerState()
+        val photoState = rememberPhotoState()
         val items = slideshowViewState.items
         val order = slideshowViewState.order ?: SlideshowOrder.Shuffle
         val speed = slideshowViewState.speed ?: SlideshowSpeed.Normal
         val repeat = slideshowViewState.repeat
-        var isPlaying by remember {
-            mutableStateOf(true)
-        }
-
-        var showBottomPanel by remember {
-            mutableStateOf(true)
-        }
+        val isPlaying = slideshowViewState.isPlaying
 
         val playItems = remember(items, order) {
             when (order) {
@@ -176,84 +167,87 @@ class SlideshowFragment : Fragment() {
             }
         }
 
-        val photoState = rememberPhotoState()
-        LaunchedEffect(repeat, isPlaying) {
+        LaunchedEffect(isPlaying) {
             if (isPlaying) {
-                showBottomPanel = false
-                imageViewerViewModel.showToolbar(showBottomPanel)
+                imageViewerViewModel.showToolbar(false)
                 while (true) {
                     yield()
                     delay(speed.duration * 1000L)
                     tween<Float>(600)
-                    if (isPlaying) {
-                        pagerState.animateScrollToPage(
-                            page = if (pagerState.canScrollForward) {
-                                pagerState.currentPage + 1
-                            } else {
-                                0
-                            },
-                        )
-                    }
+                    pagerState.animateScrollToPage(
+                        page = if (pagerState.canScrollForward) {
+                            pagerState.currentPage + 1
+                        } else {
+                            0
+                        },
+                    )
                 }
             } else {
-                showBottomPanel = true
-                imageViewerViewModel.showToolbar(showBottomPanel)
+                imageViewerViewModel.showToolbar(true)
             }
         }
 
         LaunchedEffect(Unit) {
             // When order change, restart slideshow
             snapshotFlow { order }.distinctUntilChanged().collect {
-                pagerState.animateScrollToPage(0)
+                if (slideshowViewState.shouldPlayFromFirst) {
+                    Timber.d("Slideshow shouldPlayFromFirst")
+                    pagerState.animateScrollToPage(0)
+                    slideshowViewModel.shouldPlayFromFirst(shouldPlayFromFirst = false)
+                }
             }
         }
 
         LaunchedEffect(pagerState.canScrollForward) {
             // Not repeat and the last one.
-            isPlaying = !(repeat.not() && pagerState.canScrollForward.not())
+            if (!pagerState.canScrollForward && !repeat && isPlaying) {
+                slideshowViewModel.updateIsPlaying(false)
+            }
         }
 
         LaunchedEffect(pagerState.currentPage) {
             // When move to next, reset scale
-            photoState.resetScale()
+            if (photoState.isScaled) {
+                Timber.d("Slideshow reset scaled")
+                photoState.resetScale()
+            }
         }
 
         LaunchedEffect(photoState.isScaled) {
             // Observe if scaling, then pause slideshow
             if (photoState.isScaled) {
-                isPlaying = false
+                Timber.d("Slideshow is scaling")
+                slideshowViewModel.updateIsPlaying(false)
             }
         }
 
         SlideshowCompose(
-            scrollState = scrollState,
+            scaffoldState = scaffoldState,
             playItems = playItems,
             pagerState = pagerState,
             photoState = photoState,
             isPlaying = isPlaying,
-            showBottomPanel = showBottomPanel,
             onPlayIconClick = {
-                isPlaying = !isPlaying
+                slideshowViewModel.updateIsPlaying(!isPlaying)
             },
             onImageTap = {
-                isPlaying = false
+                slideshowViewModel.updateIsPlaying(false)
             }
         )
     }
 
     @Composable
     private fun SlideshowCompose(
-        scrollState: ScaffoldState = rememberScaffoldState(),
+        scaffoldState: ScaffoldState = rememberScaffoldState(),
         playItems: List<Photo>,
         pagerState: PagerState,
         photoState: PhotoState,
         isPlaying: Boolean,
-        showBottomPanel: Boolean,
         onPlayIconClick: () -> Unit,
         onImageTap: ((Offset) -> Unit),
     ) {
         Scaffold(
-            scaffoldState = scrollState,
+            scaffoldState = scaffoldState,
         ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 HorizontalPager(
@@ -275,7 +269,7 @@ class SlideshowFragment : Fragment() {
                                     value = imageResult.getHighestResolutionAvailableUri()
                                 }
                             }.onFailure { exception ->
-                                Timber.e(exception)
+                                Timber.d(exception)
                             }
                         }
 
@@ -296,7 +290,7 @@ class SlideshowFragment : Fragment() {
                     }
                 }
 
-                if (showBottomPanel) {
+                if (!isPlaying) {
                     Row(
                         modifier = Modifier
                             .height(72.dp)
