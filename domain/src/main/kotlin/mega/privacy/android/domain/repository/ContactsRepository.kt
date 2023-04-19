@@ -2,6 +2,7 @@ package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.contacts.AccountCredentials
+import mega.privacy.android.domain.entity.chat.ChatConnectionState
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -60,6 +61,13 @@ interface ContactsRepository {
      * @return A flow of [OnlineStatus].
      */
     fun monitorChatOnlineStatusUpdates(): Flow<OnlineStatus>
+
+    /**
+     * Monitor updates on chat connection state.
+     *
+     * @return A flow of [ChatConnectionState].
+     */
+    fun monitorChatConnectionStateUpdates(): Flow<ChatConnectionState>
 
     /**
      * Gets visible contacts with the cached data, not the updated one.

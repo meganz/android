@@ -30,6 +30,7 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.chat.ChatConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
@@ -94,6 +95,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val userUpdateMapper: UserUpdateMapper,
     private val megaChatPeerListMapper: MegaChatPeerListMapper,
     private val onlineStatusMapper: OnlineStatusMapper,
+    private val chatConnectionStateMapper: ChatConnectionStateMapper,
     private val contactItemMapper: ContactItemMapper,
     private val contactDataMapper: ContactDataMapper,
     private val contactCredentialsMapper: ContactCredentialsMapper,
@@ -113,6 +115,16 @@ internal class DefaultContactsRepository @Inject constructor(
     override fun monitorChatPresenceLastGreenUpdates() = megaChatApiGateway.chatUpdates
         .filterIsInstance<ChatUpdate.OnChatPresenceLastGreen>()
         .map { userLastGreenMapper(it.userHandle, it.lastGreen) }
+        .flowOn(ioDispatcher)
+
+    override fun monitorChatOnlineStatusUpdates() = megaChatApiGateway.chatUpdates
+        .filterIsInstance<ChatUpdate.OnChatOnlineStatusUpdate>()
+        .map { onlineStatusMapper(it.userHandle, it.status, it.inProgress) }
+        .flowOn(ioDispatcher)
+
+    override fun monitorChatConnectionStateUpdates() = megaChatApiGateway.chatUpdates
+        .filterIsInstance<ChatUpdate.OnChatConnectionStateUpdate>()
+        .map { chatConnectionStateMapper(it.chatId, it.newState) }
         .flowOn(ioDispatcher)
 
     override suspend fun requestLastGreen(userHandle: Long) {
@@ -165,11 +177,6 @@ internal class DefaultContactsRepository @Inject constructor(
                 continuation.failWithError(error, "onRequestCreateChatCompleted")
             }
         }
-
-    override fun monitorChatOnlineStatusUpdates() = megaChatApiGateway.chatUpdates
-        .filterIsInstance<ChatUpdate.OnChatOnlineStatusUpdate>()
-        .map { onlineStatusMapper(it.userHandle, it.status, it.inProgress) }
-        .flowOn(ioDispatcher)
 
     override suspend fun getVisibleContacts(): List<ContactItem> = withContext(ioDispatcher) {
         megaApiGateway.getContacts()

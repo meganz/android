@@ -1,9 +1,11 @@
 package mega.privacy.android.data.repository
 
 import android.content.Context
+import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -16,13 +18,17 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
+import mega.privacy.android.data.mapper.chat.ChatConnectionStateMapper
+import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper
 import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
 import mega.privacy.android.data.mapper.contact.ContactDataMapper
 import mega.privacy.android.data.mapper.contact.ContactItemMapper
+import mega.privacy.android.data.model.ChatUpdate
 import mega.privacy.android.data.wrapper.ContactWrapper
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.user.UserCredentials
@@ -70,6 +76,8 @@ class DefaultContactsRepositoryTest {
     private val contactDataMapper = mock<ContactDataMapper>()
     private val contactCredentialsMapper = mock<ContactCredentialsMapper>()
     private val inviteContactRequestMapper = mock<InviteContactRequestMapper>()
+    private val chatConnectionStateMapper =
+        ChatConnectionStateMapper(chatConnectionStatusMapper = ChatConnectionStatusMapper())
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val contactWrapper: ContactWrapper = mock()
     private val databaseHandler: DatabaseHandler = mock()
@@ -114,6 +122,7 @@ class DefaultContactsRepositoryTest {
             localStorageGateway = localStorageGateway,
             contactWrapper = contactWrapper,
             databaseHandler = databaseHandler,
+            chatConnectionStateMapper = chatConnectionStateMapper,
             context = context,
         )
 
@@ -984,5 +993,25 @@ class DefaultContactsRepositoryTest {
 
         val contact = underTest.getContactItemFromUserEmail(userEmail, skipCache = true)
         assertEquals(contact, expectedContact)
+    }
+
+    @Test
+    fun `test that monitorChatConnectionStateUpdates returns flow of chatConnectionState`() {
+        val chatId = 123456L
+        whenever(megaChatApiGateway.chatUpdates).thenReturn(
+            flowOf(
+                ChatUpdate.OnChatConnectionStateUpdate(
+                    chatId = chatId,
+                    newState = MegaChatApi.CHAT_CONNECTION_ONLINE
+                )
+            )
+        )
+        runTest {
+            underTest.monitorChatConnectionStateUpdates().test {
+                val actual = awaitItem()
+                awaitComplete()
+                assertThat(actual.chatConnectionStatus).isEqualTo(ChatConnectionStatus.Online)
+            }
+        }
     }
 }
