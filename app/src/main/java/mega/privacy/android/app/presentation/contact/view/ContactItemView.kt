@@ -1,11 +1,11 @@
 package mega.privacy.android.app.presentation.contact.view
 
 
+import android.text.format.DateFormat
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,7 +35,6 @@ import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.core.ui.controls.MarqueeText
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.conditional
 import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_054
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
@@ -150,7 +149,11 @@ internal fun getLastSeenString(lastGreen: Int?): String? {
                 timeZone = lastGreenCalendar.timeZone
             }
             val time = dateFormat.format(lastGreenCalendar.time)
-            dateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+
+            dateFormat = SimpleDateFormat(
+                DateFormat.getBestDateTimePattern(Locale.getDefault(), "dd MMM"),
+                Locale.getDefault()
+            )
             val day = dateFormat.format(lastGreenCalendar.time)
             stringResource(R.string.last_seen_general, day, time)
         }
