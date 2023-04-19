@@ -66,6 +66,7 @@ import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
 import mega.privacy.android.core.ui.controls.CustomDivider
 import mega.privacy.android.core.ui.controls.MegaSwitch
+import mega.privacy.android.core.ui.controls.textFields.TextFieldGenericDescription
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.grey_alpha_038
@@ -109,6 +110,7 @@ internal fun ScheduleMeetingView(
     onDismiss: () -> Unit,
     onSnackbarShown: () -> Unit,
     onDiscardMeetingDialog: () -> Unit,
+    onDescriptionValueChange: (String?) -> Unit,
 ) {
     is24hourFormat = DateFormat.is24HourFormat(LocalContext.current)
     val listState = rememberLazyListState()
@@ -133,6 +135,7 @@ internal fun ScheduleMeetingView(
             )
         }
     ) { paddingValues ->
+
         DiscardMeetingAlertDialog(
             state = state,
             onKeepEditing = { onDismiss() },
@@ -160,7 +163,17 @@ internal fun ScheduleMeetingView(
             }
 
             items(state.buttons) { button ->
-                ActionButton(state = state, action = button, onButtonClicked = onButtonClicked)
+                ActionButton(
+                    state = state,
+                    action = button,
+                    onButtonClicked = onButtonClicked
+                )
+            }
+
+            item(key = "Schedule meeting add description") {
+                if (state.isEditingDescription) {
+                    AddDescriptionButton(state = state, onValueChange = onDescriptionValueChange)
+                }
             }
         }
 
@@ -229,6 +242,63 @@ private fun ScheduledMeetingDateAndTime(
     }
 }
 
+/**
+ * Add description to the scheduled meeting.
+ *
+ * @param state [ScheduleMeetingState]
+ * @param onValueChange
+ */
+@Composable
+private fun AddDescriptionButton(
+    state: ScheduleMeetingState,
+    onValueChange: (String?) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(start = 18.dp, end = 0.dp, top = 1.dp, bottom = 0.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(top = 17.dp, end = 36.dp)
+                        .clip(RectangleShape)
+                        .wrapContentSize(Alignment.TopCenter)
+                ) {
+                    Icon(painter = painterResource(id = R.drawable.ic_sched_meeting_description),
+                        contentDescription = "${stringResource(id = R.string.meetings_schedule_meeting_add_description_label)} icon",
+                        tint = grey_alpha_054.takeIf { isLight() }
+                            ?: white_alpha_054)
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    TextFieldGenericDescription(
+                        value = if (state.descriptionText.isNullOrEmpty()) "" else state.descriptionText,
+                        placeholderText = stringResource(id = R.string.meetings_schedule_meeting_add_description_label),
+                        onValueChange = { text ->
+                            onValueChange(text)
+                        },
+                        errorText = stringResource(id = R.string.meetings_schedule_meeting_meeting_description_too_long_error),
+                        charLimit = 4000
+                    )
+                }
+            }
+        }
+
+        CustomDivider(withStartPadding = false)
+    }
+}
+
 @Composable
 private fun ActionButton(
     state: ScheduleMeetingState,
@@ -240,33 +310,36 @@ private fun ActionButton(
         .clickable {
             onButtonClicked(action)
         }) {
-        ActionOption(
-            state = state,
-            action = action,
-            isChecked = when (action) {
-                ScheduleMeetingAction.MeetingLink -> state.enabledMeetingLinkOption
-                ScheduleMeetingAction.AllowNonHostAddParticipants -> state.enabledAllowAddParticipantsOption
-                ScheduleMeetingAction.SendCalendarInvite -> false
-                else -> true
-            },
-            hasSwitch = when (action) {
-                ScheduleMeetingAction.Recurrence,
-                ScheduleMeetingAction.AddParticipants,
-                ScheduleMeetingAction.AddDescription,
-                -> false
-                else -> true
-            }
-        )
+        if (action != ScheduleMeetingAction.AddDescription || !state.isEditingDescription) {
+            ActionOption(
+                state = state,
+                action = action,
+                isChecked = when (action) {
+                    ScheduleMeetingAction.MeetingLink -> state.enabledMeetingLinkOption
+                    ScheduleMeetingAction.AllowNonHostAddParticipants -> state.enabledAllowAddParticipantsOption
+                    ScheduleMeetingAction.SendCalendarInvite -> false
+                    else -> true
+                },
+                hasSwitch = when (action) {
+                    ScheduleMeetingAction.Recurrence,
+                    ScheduleMeetingAction.AddParticipants,
+                    ScheduleMeetingAction.SendCalendarInvite,
+                    ScheduleMeetingAction.AddDescription,
+                    -> false
+                    else -> true
+                }
+            )
 
-        CustomDivider(
-            withStartPadding = when (action) {
-                ScheduleMeetingAction.Recurrence,
-                ScheduleMeetingAction.AddParticipants,
-                ScheduleMeetingAction.SendCalendarInvite,
-                -> true
-                else -> false
-            }
-        )
+            CustomDivider(
+                withStartPadding = when (action) {
+                    ScheduleMeetingAction.Recurrence,
+                    ScheduleMeetingAction.AddParticipants,
+                    ScheduleMeetingAction.SendCalendarInvite,
+                    -> true
+                    else -> false
+                }
+            )
+        }
     }
 }
 
@@ -399,7 +472,6 @@ private fun ActionOption(
                     .padding(top = 4.dp)
                     .clip(RectangleShape)
                     .wrapContentSize(Alignment.TopCenter)
-
             ) {
                 Icon(painter = painterResource(id = action.icon),
                     contentDescription = "${action.name} icon",
@@ -545,7 +617,8 @@ private fun PreviewScheduleMeetingView() {
             onScrollChange = {},
             onDismiss = {},
             onSnackbarShown = {},
-            onDiscardMeetingDialog = {}
+            onDiscardMeetingDialog = {},
+            onDescriptionValueChange = { },
         )
     }
 }

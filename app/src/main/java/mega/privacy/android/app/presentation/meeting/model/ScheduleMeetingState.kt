@@ -22,6 +22,8 @@ import java.time.temporal.ChronoUnit
  * @property addParticipantsNoContactsDialog        True if show add participants no contacts dialog, false if not.
  * @property openAddContact                         True, if should open Add contact screen. False, if not.
  * @property numOfParticipants                      Number of participants.
+ * @property isEditingDescription                   True, if is editing description. False, if not.
+ * @property descriptionText                        Description text
  */
 data class ScheduleMeetingState constructor(
     val meetingName: String? = null,
@@ -38,4 +40,6 @@ data class ScheduleMeetingState constructor(
     val addParticipantsNoContactsDialog: Boolean = false,
     val openAddContact: Boolean? = null,
     val numOfParticipants: Int = 1,
+    val isEditingDescription: Boolean = false,
+    val descriptionText: String? = "",
 )

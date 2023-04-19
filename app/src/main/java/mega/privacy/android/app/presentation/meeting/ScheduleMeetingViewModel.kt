@@ -159,11 +159,26 @@ class ScheduleMeetingViewModel @Inject constructor(
     /**
      * Enable or disable allow non-hosts to add participants option
      */
-    fun onAllowNonHostAddParticipantsTap() {
+    fun onAllowNonHostAddParticipantsTap() =
         _state.update { state ->
             state.copy(enabledAllowAddParticipantsOption = !state.enabledAllowAddParticipantsOption)
         }
-    }
+
+    /**
+     * Start adding description
+     */
+    fun onAddDescriptionTap() =
+        _state.update { state ->
+            state.copy(isEditingDescription = true)
+        }
+
+    /**
+     * Description text
+     */
+    fun onDescriptionChange(text: String?) =
+        _state.update { state ->
+            state.copy(descriptionText = text)
+        }
 
     /**
      * Updates state after shown snackBar.
@@ -177,6 +192,12 @@ class ScheduleMeetingViewModel @Inject constructor(
         _state.update { state ->
             state.copy(discardMeetingDialog = !state.discardMeetingDialog)
         }
+
+    /**
+     * Schedule meeting
+     */
+    fun onScheduleMeetingTap() {
+    }
 
     /**
      * Dismiss alert dialogs

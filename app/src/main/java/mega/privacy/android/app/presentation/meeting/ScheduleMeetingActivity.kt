@@ -116,7 +116,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                 state = uiState,
                 onButtonClicked = ::onActionTap,
                 onDiscardClicked = { viewModel.onDiscardMeetingTap() },
-                onAcceptClicked = { },
+                onAcceptClicked = { viewModel.onScheduleMeetingTap() },
                 onStartTimeClicked = { showTimePicker(true) },
                 onStartDateClicked = { showDatePicker(true) },
                 onEndTimeClicked = { showTimePicker(false) },
@@ -125,6 +125,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                 onDismiss = { viewModel.dismissDialog() },
                 onSnackbarShown = viewModel::snackbarShown,
                 onDiscardMeetingDialog = { finish() },
+                onDescriptionValueChange = { text -> viewModel.onDescriptionChange(text) }
             )
         }
     }
@@ -197,7 +198,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             ScheduleMeetingAction.AddParticipants -> viewModel.onAddParticipantsTap()
             ScheduleMeetingAction.SendCalendarInvite -> Timber.d("Send calendar invite option")
             ScheduleMeetingAction.AllowNonHostAddParticipants -> viewModel.onAllowNonHostAddParticipantsTap()
-            ScheduleMeetingAction.AddDescription -> Timber.d("Add description option")
+            ScheduleMeetingAction.AddDescription -> viewModel.onAddDescriptionTap()
         }
     }
 }
