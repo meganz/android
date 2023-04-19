@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import mega.privacy.android.app.R
-import mega.privacy.android.app.presentation.photos.PhotosViewModel
+import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumContentViewModel
 import mega.privacy.android.app.presentation.photos.albums.AlbumsViewModel
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
@@ -66,7 +66,7 @@ import mega.privacy.android.domain.entity.photos.Photo
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun AlbumContentScreen(
-    photosViewModel: PhotosViewModel,
+    photoDownloaderViewModel: PhotoDownloaderViewModel,
     timelineViewModel: TimelineViewModel,
     albumsViewModel: AlbumsViewModel,
     albumContentViewModel: AlbumContentViewModel,
@@ -144,7 +144,7 @@ fun AlbumContentScreen(
                 lazyListState = lazyListState,
                 photos = photos,
                 smallWidth = smallWidth,
-                photoDownload = photosViewModel::downloadPhoto,
+                photoDownload = photoDownloaderViewModel::downloadPhoto,
                 onClick = { photo ->
                     if (albumsState.selectedPhotos.isEmpty()) {
                         onNavigatePhotoPreview(photo, photos)

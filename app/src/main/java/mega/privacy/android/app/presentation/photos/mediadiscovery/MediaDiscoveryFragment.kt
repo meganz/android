@@ -56,7 +56,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.photos.PhotosViewModel
+import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.mediadiscovery.actionMode.MediaDiscoveryActionModeCallback
 import mega.privacy.android.app.presentation.photos.mediadiscovery.model.MediaDiscoveryViewState
 import mega.privacy.android.app.presentation.photos.model.DateCard
@@ -86,7 +86,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MediaDiscoveryFragment : Fragment() {
 
-    private val photosViewModel: PhotosViewModel by viewModels()
+    private val photoDownloaderViewModel: PhotoDownloaderViewModel by viewModels()
     internal val mediaDiscoveryViewModel: MediaDiscoveryViewModel by viewModels()
     private val mediaDiscoveryZoomViewModel: MediaDiscoveryZoomViewModel by activityViewModels()
 
@@ -260,7 +260,7 @@ class MediaDiscoveryFragment : Fragment() {
         lazyGridState: LazyGridState,
     ) = CardListView(
         dateCards = dateCards,
-        photoDownload = photosViewModel::downloadPhoto,
+        photoDownload = photoDownloaderViewModel::downloadPhoto,
         onCardClick = mediaDiscoveryViewModel::onCardClick,
         state = lazyGridState,
     )
@@ -269,7 +269,7 @@ class MediaDiscoveryFragment : Fragment() {
     fun PhotosGridView(uiState: MediaDiscoveryViewState, lazyGridState: LazyGridState) =
         PhotosGridView(
             currentZoomLevel = uiState.currentZoomLevel,
-            photoDownland = photosViewModel::downloadPhoto,
+            photoDownland = photoDownloaderViewModel::downloadPhoto,
             lazyGridState = lazyGridState,
             onClick = this::onClick,
             onLongPress = this::onLongPress,

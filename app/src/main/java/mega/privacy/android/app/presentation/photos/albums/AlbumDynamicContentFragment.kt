@@ -28,7 +28,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
-import mega.privacy.android.app.presentation.photos.PhotosViewModel
+import mega.privacy.android.app.presentation.photos.PhotoDownloaderViewModel
 import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumContentActionModeCallback
 import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
@@ -50,7 +50,7 @@ class AlbumDynamicContentFragment : Fragment() {
     internal val timelineViewModel: TimelineViewModel by activityViewModels()
     internal val albumsViewModel: AlbumsViewModel by activityViewModels()
 
-    private val photosViewModel: PhotosViewModel by activityViewModels()
+    private val photoDownloaderViewModel: PhotoDownloaderViewModel by viewModels()
     private val albumContentViewModel: AlbumContentViewModel by viewModels()
 
     @Inject
@@ -98,7 +98,7 @@ class AlbumDynamicContentFragment : Fragment() {
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
                 AndroidTheme(isDark = mode.isDarkMode()) {
                     AlbumContentScreen(
-                        photosViewModel = photosViewModel,
+                        photoDownloaderViewModel = photoDownloaderViewModel,
                         timelineViewModel = timelineViewModel,
                         albumsViewModel = albumsViewModel,
                         albumContentViewModel = albumContentViewModel,

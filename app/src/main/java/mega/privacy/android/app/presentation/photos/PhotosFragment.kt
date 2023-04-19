@@ -26,13 +26,8 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
@@ -44,9 +39,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
@@ -55,8 +47,6 @@ import mega.privacy.android.app.extensions.navigateToAppSettings
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
-import mega.privacy.android.app.presentation.account.CameraUploadsBusinessAlertDialog
-import mega.privacy.android.app.presentation.extensions.getQuantityStringOrDefault
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.AlbumDynamicContentFragment
 import mega.privacy.android.app.presentation.photos.albums.AlbumScreenWrapperActivity
@@ -65,7 +55,7 @@ import mega.privacy.android.app.presentation.photos.albums.actionMode.AlbumsActi
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.model.UIAlbum
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
-import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
+import mega.privacy.android.app.presentation.photos.compose.main.PhotosScreen
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosNavGraph
 import mega.privacy.android.app.presentation.photos.compose.navigation.photosRoute
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
@@ -75,14 +65,8 @@ import mega.privacy.android.app.presentation.photos.model.TimeBarTab
 import mega.privacy.android.app.presentation.photos.timeline.actionMode.TimelineActionModeCallback
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelineViewState
 import mega.privacy.android.app.presentation.photos.timeline.photosfilter.PhotosFilterFragment
-import mega.privacy.android.app.presentation.photos.timeline.view.EmptyState
-import mega.privacy.android.app.presentation.photos.timeline.view.EnableCU
-import mega.privacy.android.app.presentation.photos.timeline.view.PhotosGridView
-import mega.privacy.android.app.presentation.photos.timeline.view.TimelineView
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.getCurrentSort
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUploadVideos
-import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCUUseCellularConnection
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.setCurrentSort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.shouldEnableCUPage
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingFilterPage
@@ -90,7 +74,6 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.showingSo
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.updateFilterState
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomIn
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomOut
-import mega.privacy.android.app.presentation.photos.view.PhotosBodyView
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers
@@ -101,21 +84,26 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.getNotification
 import mega.privacy.android.app.utils.permission.PermissionUtils.getVideoPermissionByVersion
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.photos.Album
 import mega.privacy.android.domain.entity.photos.AlbumId
 import mega.privacy.android.domain.entity.photos.Photo
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetThemeMode
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
+
+/** A temporary bridge to support compatibility between view and compose architecture. */
+class PhotosViewComposeCoordinator {
+    var lazyGridState: LazyGridState? = null
+}
 
 /**
  * PhotosFragment
  */
-@OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @AndroidEntryPoint
 class PhotosFragment : Fragment() {
 
-    private val photosViewModel: PhotosViewModel by viewModels()
+    private val photosViewModel: PhotosViewModel by activityViewModels()
+    private val photoDownloaderViewModel: PhotoDownloaderViewModel by viewModels()
     internal val timelineViewModel: TimelineViewModel by activityViewModels()
     internal val albumsViewModel: AlbumsViewModel by activityViewModels()
 
@@ -141,9 +129,7 @@ class PhotosFragment : Fragment() {
 
     @Inject
     lateinit var getThemeMode: GetThemeMode
-    lateinit var pagerState: PagerState
-    lateinit var timelineLazyGridState: LazyGridState
-    lateinit var albumsLazyGridState: LazyGridState
+    private val viewComposeCoordinator = PhotosViewComposeCoordinator()
 
     @Inject
     lateinit var getFeatureFlagUseCase: GetFeatureFlagValueUseCase
@@ -182,7 +168,19 @@ class PhotosFragment : Fragment() {
                             photosNavGraph(animatedNavController)
                         }
                     } else {
-                        PhotosBody()
+                        PhotosScreen(
+                            viewComposeCoordinator = viewComposeCoordinator,
+                            getFeatureFlagUseCase = getFeatureFlagUseCase,
+                            photosViewModel = photosViewModel,
+                            timelineViewModel = timelineViewModel,
+                            albumsViewModel = albumsViewModel,
+                            photoDownloaderViewModel = photoDownloaderViewModel,
+                            onCameraUploadsClicked = ::onCameraUploadsButtonClicked,
+                            onEnableCameraUploads = ::enableCameraUploads,
+                            onNavigatePhotosFilter = ::openFilterFragment,
+                            onNavigateAlbumContent = ::openAlbum,
+                            onNavigateAlbumPhotosSelection = ::openAlbumPhotosSelection,
+                        )
                     }
                 }
             }
@@ -370,138 +368,6 @@ class PhotosFragment : Fragment() {
         }
     }
 
-    @Composable
-    private fun PhotosBody() {
-        val photosViewState by photosViewModel.state.collectAsStateWithLifecycle()
-        val timelineViewState by timelineViewModel.state.collectAsStateWithLifecycle()
-        val albumsViewState by albumsViewModel.state.collectAsStateWithLifecycle()
-
-        if (!this::pagerState.isInitialized) {
-            pagerState =
-                if (managerActivity.fromAlbumContent)
-                    rememberPagerState(initialPage = PhotosTab.Albums.ordinal)
-                else
-                    rememberPagerState(initialPage = photosViewState.selectedTab.ordinal)
-        }
-        timelineLazyGridState = rememberLazyGridState()
-
-        albumsLazyGridState = rememberLazyGridState()
-
-        if (managerActivity.fromAlbumContent) {
-            managerActivity.fromAlbumContent = false
-            photosViewModel.onTabSelected(PhotosTab.Albums)
-        }
-
-        LaunchedEffect(pagerState.currentPage) {
-            snapshotFlow { pagerState.currentPage }.collect { page ->
-                photosViewModel.onTabSelected(selectedTab = photosViewState.tabs[page])
-                pagerState.scrollToPage(PhotosTab.values()[page].ordinal)
-            }
-        }
-
-        PhotosBodyView(
-            tabs = photosViewState.tabs,
-            selectedTab = photosViewState.selectedTab,
-            pagerState = pagerState,
-            onTabSelected = this::onTabSelected,
-            timelineLazyGridState = timelineLazyGridState,
-            albumsLazyGridState = albumsLazyGridState,
-            timelineView = { TimelineView(timelineViewState = timelineViewState) },
-            albumsView = { AlbumsView(albumsViewState = albumsViewState, timelineViewState) },
-            timelineViewState = timelineViewState,
-            albumsViewState = albumsViewState,
-        )
-
-        CameraUploadsBusinessAlertDialog(
-            show = timelineViewState.shouldShowBusinessAccountPrompt,
-            onConfirm = {
-                enableCameraUploads()
-                timelineViewModel.setBusinessAccountPromptState(shouldShow = false)
-            },
-            onDeny = { timelineViewModel.setBusinessAccountPromptState(shouldShow = false) },
-        )
-    }
-
-    @Composable
-    private fun TimelineView(timelineViewState: TimelineViewState) = TimelineView(
-        timelineViewState = timelineViewState,
-        photoDownload = photosViewModel::downloadPhoto,
-        lazyGridState = timelineLazyGridState,
-        onTextButtonClick = this::onCameraUploadsButtonClicked,
-        onFABClick = this::openFilterFragment,
-        onCardClick = timelineViewModel::onCardClick,
-        onTimeBarTabSelected = timelineViewModel::onTimeBarTabSelected,
-        enableCUView = { EnableCUView(timelineViewState = timelineViewState) },
-        photosGridView = { PhotosGridView(timelineViewState = timelineViewState) },
-        emptyView = {
-            EmptyState(
-                timelineViewState = timelineViewState,
-                onFABClick = this::openFilterFragment,
-                setEnableCUPage = timelineViewModel::shouldEnableCUPage,
-            )
-        }
-    )
-
-    @Composable
-    private fun AlbumsView(
-        albumsViewState: AlbumsViewState,
-        timelineViewState: TimelineViewState,
-    ) =
-        AlbumsView(
-            albumsViewState = albumsViewState,
-            openAlbum = this::openAlbum,
-            downloadPhoto = photosViewModel::downloadPhoto,
-            onDialogPositiveButtonClicked = albumsViewModel::createNewAlbum,
-            setDialogInputPlaceholder = albumsViewModel::setPlaceholderAlbumTitle,
-            setShowCreateAlbumDialog = albumsViewModel::setShowCreateAlbumDialog,
-            setInputValidity = albumsViewModel::setNewAlbumNameValidity,
-            openPhotosSelectionActivity = this::openAlbumPhotosSelection,
-            setIsAlbumCreatedSuccessfully = albumsViewModel::setIsAlbumCreatedSuccessfully,
-            allPhotos = timelineViewState.photos,
-            clearAlbumDeletedMessage = { albumsViewModel.updateAlbumDeletedMessage(message = "") },
-            onAlbumSelection = { album ->
-                if (album.id in albumsViewState.selectedAlbumIds) {
-                    albumsViewModel.unselectAlbum(album)
-                } else {
-                    albumsViewModel.selectAlbum(album)
-                }
-            },
-            closeDeleteAlbumsConfirmation = {
-                albumsViewModel.closeDeleteAlbumsConfirmation()
-                albumsViewModel.clearAlbumSelection()
-            },
-            deleteAlbums = ::deleteAlbums,
-            lazyGridState = albumsLazyGridState,
-        ) {
-            getFeatureFlagUseCase(AppFeatures.UserAlbums)
-        }
-
-    @Composable
-    private fun EnableCUView(timelineViewState: TimelineViewState) = EnableCU(
-        timelineViewState = timelineViewState,
-        onUploadVideosChanged = timelineViewModel::setCUUploadVideos,
-        onUseCellularConnectionChanged = timelineViewModel::setCUUseCellularConnection,
-        enableCUClick = this::onCameraUploadsButtonClicked,
-    )
-
-    @Composable
-    private fun PhotosGridView(timelineViewState: TimelineViewState) = PhotosGridView(
-        timelineViewState = timelineViewState,
-        downloadPhoto = photosViewModel::downloadPhoto,
-        lazyGridState = timelineLazyGridState,
-        onClick = timelineViewModel::onClick,
-        onLongPress = timelineViewModel::onLongPress,
-    )
-
-    private fun onTabSelected(tab: PhotosTab) {
-        if (photosViewModel.state.value.selectedTab != tab) {
-            photosViewModel.onTabSelected(selectedTab = tab)
-            lifecycleScope.launch {
-                pagerState.scrollToPage(tab.ordinal)
-            }
-        }
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         if (!managerActivity.isInPhotosPage) {
             return
@@ -591,8 +457,8 @@ class PhotosFragment : Fragment() {
     private fun openFilterFragment() {
         timelineViewModel.updateFilterState(
             showFilterDialog = true,
-            scrollStartIndex = timelineLazyGridState.firstVisibleItemIndex,
-            scrollStartOffset = timelineLazyGridState.firstVisibleItemScrollOffset
+            scrollStartIndex = viewComposeCoordinator.lazyGridState?.firstVisibleItemIndex ?: 0,
+            scrollStartOffset = viewComposeCoordinator.lazyGridState?.firstVisibleItemScrollOffset ?: 0,
         )
         managerActivity.skipToFilterFragment(PhotosFilterFragment())
     }
@@ -724,9 +590,7 @@ class PhotosFragment : Fragment() {
         }
     }
 
-    fun switchToAlbum() {
-        lifecycleScope.launch { pagerState.scrollToPage(PhotosTab.Albums.ordinal) }
-    }
+    fun switchToAlbum() {}
 
     fun refreshViewLayout() {
         handleMenuIcons(!timelineViewModel.state.value.enableCameraUploadPageShowing)
@@ -758,27 +622,9 @@ class PhotosFragment : Fragment() {
      */
     fun doesAccountHavePhotos(): Boolean = timelineViewModel.state.value.photos.isNotEmpty()
 
-    private fun deleteAlbums(albumIds: List<AlbumId>) {
-        albumsViewModel.deleteAlbums(albumIds)
-
-        val albums = albumsViewModel.state.value.albums
-        val message = context?.getQuantityStringOrDefault(
-            R.plurals.photos_album_deleted_message,
-            quantity = albumIds.size,
-            albumIds.size.takeIf { it > 1 } ?: albums.find {
-                it.id is Album.UserAlbum && it.id.id == albumIds.firstOrNull()
-            }?.title?.getTitleString(requireContext()),
-        ).orEmpty()
-        albumsViewModel.updateAlbumDeletedMessage(message)
-    }
-
     override fun onPause() {
         albumsViewModel.updateAlbumDeletedMessage(message = "")
         super.onPause()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     companion object {
