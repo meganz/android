@@ -976,7 +976,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Muta le notifiche delle chat per</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Muta le notifiche delle chat</string>
+    <string name="title_dialog_mute_chatroom_notifications">Muta le notifiche delle chat per</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">On</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1369,7 +1369,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">L’utente non è un contatto</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Utilizza dati cellulare</string>
+    <string name="camera_uploads_cellular_connection">Usa dati mobili</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Carica video</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1493,7 +1493,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus di registrazione</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Ottieni app desktop di MEGA</string>
+    <string name="title_install_desktop">Install a MEGA Desktop App</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d gg rimanenti</string>
     <!-- State to indicate an achievement has expired -->
@@ -1505,7 +1505,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Come funziona</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">Invita i tuoi amici a creare un account gratuito su MEGA e ad installare una delle app per mobile di MEGA. Riceverai spazio di archiviazione gratuito come bonus per ogni registrazione e installazione dell\’app.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Bonus dello spazio di archiviazione applicabile ai nuovi inviti solo quando l\’app per mobile o per desktop di MEGA è installata.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1563,7 +1563,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">Oggetto</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">E-mail</string>
+    <string name="new_file_email_when_uploading">Indirizzo email</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Inoltra</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2232,7 +2232,7 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Ottieni il link della chat</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Attiva la rotazione della chiave di criptazione</string>
+    <string name="make_chat_private_option">Attiva Rotazione della chiave di criptazione</string>
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">Rotazione della chiave di criptazione attivata</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2320,9 +2320,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]L’account[/B] [A]%s[/A] [B]è stato eliminato.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]Il tuo file pubblicamente condiviso[/A] [B]%s[/B] [C]è stato rimosso.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]Il tuo file pubblicamente condiviso[/A] [B]%s[/B] è stato rimosso.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]La tua cartella pubblicamente condivisa[/A] [B]%s[/B] [C]è stata rimossa.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]La tua cartella pubblicamente condivisa[/A] [B]%s[/B] è stata rimossa.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">Questo file è stato soggetto ad un avviso di chiusura.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2338,9 +2338,9 @@
         <item quantity="other">%d file non sono stati scaricati in quanto violavano i nostri Termini di Servizio.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]Il tuo file pubblicamente condiviso[/A] [B]%s[/B] [C]è stato reintegrato.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]Il tuo file pubblicamente condiviso[/A] [B]%s[/B] è stato reintegrato.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]La tua cartella pubblicamente condivisa[/A] [B]%s[/B] [C]è stata reintegrata.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]La tua cartella pubblicamente condivisa[/A] [B]%s[/B] è stata reintegrata.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Richiesta inviata</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2380,7 +2380,7 @@
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Wallet[/A] (abbonamento)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">NUOVO</string>
+    <string name="new_label_notification_item">Nuovo</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">Per aggiornare il tuo abbonamento corrente, per favore contatta il nostro team di supporto per un [A]piano fatto apposta per te[/A].</string>
     <!-- Input field description in the create file dialog. -->
@@ -3820,7 +3820,7 @@
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">Copia e rinomina</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">Apply this option to the next %1$d conflicts</string>
+    <string name="file_apply_for_all">Applica questa opzione ai prossimi %1$d conflitti</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">Unisci la cartella di destinazione con la cartella che stai copiando.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -4133,8 +4133,9 @@
     <string name="scheduled_meetings_meeting_link_copied">Link copiato negli appunti</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one">“%s” deleted</item>
-        <item quantity="other">%d albums deleted</item>
+        <item quantity="one">“%s” eliminato</item>
+        <item quantity="many">%d di album eliminati</item>
+        <item quantity="other">%d album eliminati</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
@@ -4878,92 +4879,128 @@
     <string name="media_player_video_select_subtitle_file_empty_message">Nessun sottotitolo trovato</string>
     <!-- Success message when left shared folders -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
-        <item quantity="one">Left %1$d shared folder</item>
-        <item quantity="other">Left %1$d shared folders</item>
+        <item quantity="one">%1$d cartella condivisa abbandonata</item>
+        <item quantity="many">%1$d di cartelle condivise abbandonate</item>
+        <item quantity="other">%1$d cartelle condivise abbandonate</item>
     </plurals>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
-        <item quantity="one">Couldn’t leave %1$d shared folder</item>
-        <item quantity="other">Couldn’t leave %1$d shared folders</item>
+        <item quantity="one">Impossibile abbandonare %1$d cartella condivisa</item>
+        <item quantity="many">Impossibile abbandonare %1$d di cartelle condivise</item>
+        <item quantity="other">Impossibile abbandonare %1$d cartelle condivise</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
-        <item quantity="one">Left %1$d shared folder,&#160;</item>
-        <item quantity="other">Left %1$d shared folders,&#160;</item>
+        <item quantity="one">%1$d cartella condivisa abbandonata,&#160;</item>
+        <item quantity="many">%1$d di cartelle condivise abbandonate,&#160;</item>
+        <item quantity="other">%1$d cartelle condivise abbandonate,&#160;</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
-        <item quantity="one">couldn’t leave %1$d shared folder</item>
-        <item quantity="other">couldn’t leave %1$d shared folders</item>
+        <item quantity="one">impossibile abbandonare %1$d cartella condivisa</item>
+        <item quantity="many">impossibile abbandonare %1$d di cartelle condivise</item>
+        <item quantity="other">impossibile abbandonare %1$d cartelle condivise</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
-    <string name="meetings_list_ongoing_call_message">Meeting in progress</string>
+    <string name="meetings_list_ongoing_call_message">Meeting in corso</string>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
     <plurals name="general_move_node_snackbar_success">
-        <item quantity="one">Moved %1$d item</item>
-        <item quantity="other">Moved %1$d items</item>
+        <item quantity="one">%1$d oggetto spostato</item>
+        <item quantity="many">%1$d di oggetti spostati</item>
+        <item quantity="other">%1$d oggetti spostati</item>
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
     <plurals name="general_move_node_snackbar_fail">
-        <item quantity="one">Couldn’t move %1$d item</item>
-        <item quantity="other">Couldn’t move %1$d items</item>
+        <item quantity="one">Impossibile spostare %1$d oggetto</item>
+        <item quantity="many">Impossibile spostare %1$d di oggetti</item>
+        <item quantity="other">Impossibile spostare %1$d oggetti</item>
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
     <plurals name="general_move_node_snackbar_concat_success">
-        <item quantity="one">Moved %1$d item,&#160;</item>
-        <item quantity="other">Moved %1$d items,&#160;</item>
+        <item quantity="one">%1$d oggetto spostato,&#160;</item>
+        <item quantity="many">%1$d di oggetti spostati,&#160;</item>
+        <item quantity="other">%1$d oggetti spostati,&#160;</item>
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
     <plurals name="general_move_node_snackbar_concat_fail">
-        <item quantity="one">couldn’t move %1$d item</item>
-        <item quantity="other">couldn’t move %1$d items</item>
+        <item quantity="one">impossibile spostare %1$d oggetto</item>
+        <item quantity="many">impossibile spostare %1$d di oggetti</item>
+        <item quantity="other">impossibile spostare %1$d oggetti</item>
     </plurals>
     <!-- Text hint of option to add meeting name in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_name_hint">Meeting name</string>
+    <string name="meetings_schedule_meeting_name_hint">Nome del meeting</string>
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_label">Recurrence</string>
+    <string name="meetings_schedule_meeting_recurrence_label">Evento</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_send_calendar_invite_label">Invia invito per calendario</string>
     <!-- Title of option to add description in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_add_description_label">Add description</string>
+    <string name="meetings_schedule_meeting_add_description_label">Aggiungi descrizione</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Il nome del meeting è obbligatorio</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter fewer than 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Inserisci meno di 30&#160;caratteri</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 4,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Inserisci meno di 4000&#160;caratteri</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting scheduled</string>
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting programmato</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_never_label">Mai</string>
     <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_calendar_select_date_label">Select date</string>
+    <string name="meetings_schedule_meeting_calendar_select_date_label">Seleziona data</string>
     <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
-    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Discard this meeting?</string>
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Annullare questo meeting?</string>
     <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
     <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">Continua a modificare</string>
     <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
     <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">Scarta</string>
     <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
-        <item quantity="one">Added %1$d participant</item>
-        <item quantity="other">Added %1$d participants</item>
+        <item quantity="one">%1$d partecipante aggiunto</item>
+        <item quantity="many">%1$d di partecipanti aggiunti</item>
+        <item quantity="other">%1$d partecipanti aggiunti</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
-        <item quantity="one">Couldn’t share %1$d folder</item>
-        <item quantity="other">Couldn’t share %1$d folders</item>
+        <item quantity="one">Impossibile condividere %1$d cartella</item>
+        <item quantity="many">Impossibile condividere %1$d di cartelle</item>
+        <item quantity="other">Impossibile condividere %1$d cartelle</item>
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">Couldn’t remove access of %1$d contact</item>
-        <item quantity="other">Couldn’t remove access of %1$d contacts</item>
+        <item quantity="one">Impossibile rimuovere l\’accesso per %1$d contatto</item>
+        <item quantity="many">Impossibile rimuovere l\’accesso per %1$d di contatti</item>
+        <item quantity="other">Impossibile rimuovere l\’accesso per %1$d contatti</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
-        <item quantity="one">Couldn’t update permissions for %1$d contact</item>
-        <item quantity="other">Couldn’t update permissions for %1$d contacts</item>
+        <item quantity="one">Impossibile aggiornare i permessi di %1$d contatto</item>
+        <item quantity="many">Impossibile aggiornare i permessi di %1$d di contatti</item>
+        <item quantity="other">Impossibile aggiornare i permessi di %1$d contatti</item>
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, capito</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="one">%1$d oggetto rimosso permanentemente</item>
+        <item quantity="many">%1$d di oggetti rimossi permanentemente</item>
+        <item quantity="other">%1$d oggetti rimossi permanentemente</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="one">Impossibile rimuovere permanentemente %1$d oggetto</item>
+        <item quantity="many">Impossibile rimuovere permanentemente %1$d di oggetti</item>
+        <item quantity="other">Impossibile rimuovere permanentemente %1$d oggetti</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="one">%1$d oggetto rimosso permanentemente,&#160;</item>
+        <item quantity="many">%1$d di oggetti rimossi permanentemente,&#160;</item>
+        <item quantity="other">%1$d oggetti rimossi permanentemente,&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="one">impossibile rimuovere permanentemente %1$d oggetto</item>
+        <item quantity="many">impossibile rimuovere permanentemente %1$d di oggetti</item>
+        <item quantity="other">impossibile rimuovere permanentemente %1$d oggetti</item>
+    </plurals>
 </resources>

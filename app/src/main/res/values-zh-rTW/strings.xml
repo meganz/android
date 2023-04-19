@@ -497,7 +497,7 @@
     <!-- when did the last session happen -->
     <string name="my_account_last_session">上次工作階段</string>
     <!-- message displayed while the app is changing the password -->
-    <string name="my_account_changing_password">正在變更密碼</string>
+    <string name="my_account_changing_password">正在更改密碼</string>
     <!-- when changing the password -->
     <string name="my_account_change_password_newPassword1">新密碼</string>
     <!-- when changing the password -->
@@ -944,7 +944,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">對話通知靜音</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">聊天通知靜音</string>
+    <string name="title_dialog_mute_chatroom_notifications">對話通知靜音</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">開啟</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1301,7 +1301,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">該使用者不是您的聯絡人</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">使用行動網路</string>
+    <string name="camera_uploads_cellular_connection">使用行動數據</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">上傳影片</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1389,7 +1389,7 @@
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B]已清空對話紀錄[/B]</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_permissions_changing_folder">修改權限</string>
+    <string name="context_permissions_changing_folder">更改權限</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">刪除共享資料夾裡的聯絡人</string>
     <!-- confirmation message before removing a file -->
@@ -1425,7 +1425,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">註冊獎勵</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">安裝MEGA桌面應用程式</string>
+    <string name="title_install_desktop">Install a MEGA Desktop App</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">還剩%1$d天</string>
     <!-- State to indicate an achievement has expired -->
@@ -1491,7 +1491,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">標題</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">電子郵件</string>
+    <string name="new_file_email_when_uploading">電子郵件地址</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">轉寄</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2176,7 +2176,7 @@
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
     <string name="subtitle_chat_message_enabled_ERK">加密金鑰輪替更安全一些，但是不允許您建立對話連結，而且新加入的與會者將看不到舊的訊息。</string>
     <!-- Message shown when a contact request has not been sent because the invitation has been sent before -->
-    <string name="invite_not_sent_already_sent">給聯絡人%s的邀請之前已發送過，可在已發送請求的頁面中查看。</string>
+    <string name="invite_not_sent_already_sent">給聯絡人%s的邀請之前已發送過，可在已發送請求的分頁中查看。</string>
     <!-- Label shown to indicate the QR is saving in Cloud Drive -->
     <string name="save_qr_cloud_drive">正在將%s儲存到雲端硬碟⋯</string>
     <!-- General label for files -->
@@ -2220,9 +2220,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]帳戶[/B][A]%s[/A][B]已刪除。[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]您公開共享的檔案[/A][B]%s[/B][C]已被移除。[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]您公開共享的檔案[/A][B]%s[/B]已被移除。</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]您公開共享的資料夾[/A][B]%s[/B][C]已被移除。[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]您公開共享的資料夾[/A][B]%s[/B]已被移除。</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">此檔案已認定需被移除。</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2236,9 +2236,9 @@
         <item quantity="other">%d個檔案因違反我們的服務條款而無法下載。</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]您公開共享的檔案[/A][B]%s[/B][C]已經恢復。[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]您公開共享的檔案[/A][B]%s[/B]已經恢復。</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]您公開共享的資料夾[/A][B]%s[/B][C]已經恢復。[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]您公開共享的資料夾[/A][B]%s[/B]已經恢復。</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">發送的邀請</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -3110,7 +3110,7 @@
     <!-- Text to show as production api server option -->
     <string name="production_api_server">生產力</string>
     <!-- Title to show in a dialog to change api server -->
-    <string name="title_change_server">變更伺服器</string>
+    <string name="title_change_server">更改伺服器</string>
     <!-- Show line numbers action -->
     <string name="action_show_line_numbers">顯示行數</string>
     <!-- Hide line numbers action -->
@@ -3162,7 +3162,7 @@
         <item quantity="other">未恢復%d個項目</item>
     </plurals>
     <!-- Button of the warning dialog indicating the renamed name file extension is not the same to confirm the change. -->
-    <string name="action_change_anyway">仍要變更</string>
+    <string name="action_change_anyway">仍要更改</string>
     <!-- String to show the transfer quota and the used space in My Account section. E.g.: 15GB / 20GB. The placeholders are for warning the user and set used storage in red if is in storage over quota.-->
     <string name="used_storage_transfer">[A]%1$s[/A] / %2$s</string>
     <!-- String to show the transfer quota and the used space in My Account section -->
@@ -3620,7 +3620,7 @@
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">複製並重新命名</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">Apply this option to the next %1$d conflicts</string>
+    <string name="file_apply_for_all">將此選項套用於接下來的%1$d個衝突</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">將目的地資料夾與您複製的資料夾合併。</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -4406,7 +4406,7 @@
     <!-- Album selection dialog title -->
     <string name="photos_album_selection_dialog_title">無法選擇更多。</string>
     <!-- Album selection dialog body -->
-    <string name="photos_album_selection_dialog_body">您一次最多只能新增150個項目到相簿。</string>
+    <string name="photos_album_selection_dialog_body">您一次最多只能在一個相簿中新增150個項目。</string>
     <!--  -->
     <string name="shared_items_contact_not_in_contact_list_dialog_title">無法驗證聯絡人</string>
     <!--  -->
@@ -4532,9 +4532,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">會議名稱為必填</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter fewer than 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">輸入少於30&#160;個字元</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 4,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">輸入少於4,000&#160;個字元</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">已安排會議</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4553,19 +4553,33 @@
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
-        <item quantity="one">Couldn’t share %1$d folder</item>
-        <item quantity="other">Couldn’t share %1$d folders</item>
+        <item quantity="other">無法共享%1$d個資料夾</item>
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">Couldn’t remove access of %1$d contact</item>
-        <item quantity="other">Couldn’t remove access of %1$d contacts</item>
+        <item quantity="one">Couldn’t remove access for %1$d contact</item>
+        <item quantity="other">Couldn’t remove access for %1$d contacts</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
-        <item quantity="one">Couldn’t update permissions for %1$d contact</item>
-        <item quantity="other">Couldn’t update permissions for %1$d contacts</item>
+        <item quantity="other">無法更新%1$d個聯絡人的權限</item>
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">好的，明白了</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="other">已永久移除%1$d個項目</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="other">無法永久移除%1$d個項目</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="other">永久移除%1$d個項目，&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="other">無法永久移除%1$d個項目</item>
+    </plurals>
 </resources>

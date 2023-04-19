@@ -45,7 +45,7 @@ task clean(type: Delete) {
 // Define versions in a single place
 ext {
     // App
-    appVersion = "7.9"
+    appVersion = "8.0"
 
     // Sdk and tools
     compileSdkVersion = 33
@@ -54,7 +54,7 @@ ext {
     buildToolsVerion = '33.0.1'
 
     // Prebuilt MEGA SDK version
-    megaSdkVersion = '20230414.111203-dev'
+    megaSdkVersion = '20230419.061555-rel'
 }
 
 ext.shouldSuppressWarnings = { ->

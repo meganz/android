@@ -960,7 +960,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Mute chat notifications for</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Mute chat notifications</string>
+    <string name="title_dialog_mute_chatroom_notifications">Mute chat notifications for</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">On</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1335,7 +1335,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">The user is not a contact</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Use cellular connection</string>
+    <string name="camera_uploads_cellular_connection">Use mobile data</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Upload videos</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1459,7 +1459,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Registration bonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Get a MEGA Desktop App</string>
+    <string name="title_install_desktop">Install a MEGA Desktop App</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d d left</string>
     <!-- State to indicate an achievement has expired -->
@@ -1527,7 +1527,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">Subject</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">Email</string>
+    <string name="new_file_email_when_uploading">Email address</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Forward</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2182,7 +2182,7 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Get chat link</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Enable Encryption Key Rotation</string>
+    <string name="make_chat_private_option">Enable Encryption key rotation</string>
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">Encryption key rotation enabled</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2270,9 +2270,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]The account [/B][A]%s[/A][B] has been deleted.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been taken down.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]Your publicly shared file [/A][B]%s[/B] has been taken down.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been taken down.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]Your publicly shared folder [/A][B]%s[/B] has been taken down.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">This file has been the subject of a takedown notice.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2287,9 +2287,9 @@
         <item quantity="other">%d files were not downloaded as they violated our Terms of Service.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]Your publicly shared file [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]Your publicly shared file [/A][B]%s[/B] has been reinstated.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]Your publicly shared folder [/A][B]%s[/B][C] has been reinstated.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]Your publicly shared folder [/A][B]%s[/B] has been reinstated.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Sent request</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2329,7 +2329,7 @@
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (subscription)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">NEW</string>
+    <string name="new_label_notification_item">New</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">To upgrade your current subscription, please contact our support team for a [A]custom plan[/A].</string>
     <!-- Input field description in the create file dialog. -->
@@ -4762,8 +4762,8 @@
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">Couldn’t remove access of %1$d contact</item>
-        <item quantity="other">Couldn’t remove access of %1$d contacts</item>
+        <item quantity="one">Couldn’t remove access for %1$d contact</item>
+        <item quantity="other">Couldn’t remove access for %1$d contacts</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">

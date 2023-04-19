@@ -253,7 +253,7 @@
     <!-- Title of the dialog to choose permissions when sharing. -->
     <string name="dialog_select_permissions">Quyền hạn được chia sẻ</string>
     <!-- menu item -->
-    <string name="file_properties_shared_folder_change_permissions">Chỉnh lại quyền hạn</string>
+    <string name="file_properties_shared_folder_change_permissions">Đổi quyền&#160;hạn</string>
     <!-- when listing all the contacts that shares a folder -->
     <string name="file_properties_shared_folder_select_contact">Được chia sẻ với</string>
     <!-- shows the owner of an incoming shared folder -->
@@ -694,7 +694,7 @@
     <!-- Preference screen item action button -->
     <string name="settings_about_privacy_policy">Chính&#160;Sách Riêng&#160;Tư</string>
     <!--  -->
-    <string name="settings_about_terms_of_service">Điều Khoản Dịch Vụ</string>
+    <string name="settings_about_terms_of_service">Điều&#160;Khoản Dịch&#160;Vụ</string>
     <!-- App means “Application” -->
     <string name="settings_about_app_version">Phiên bản ứng dụng</string>
     <!-- Title of the label where the SDK version is shown -->
@@ -884,7 +884,7 @@
     <!-- Error message shown when opening a folder link which doesn’t exist -->
     <string name="general_error_folder_not_found">Liên kết thư mục bất khả dụng</string>
     <!-- Error message shown when opening a folder link which has been removed due to ToS/AUP violation -->
-    <string name="folder_link_unavaible_ToS_violation">Đường liên kết thư mục đã bị xóa bỏ do vi phạm Điều Khoản Dịch Vụ.</string>
+    <string name="folder_link_unavaible_ToS_violation">Đường liên&#160;kết thư&#160;mục đã bị xóa bỏ do vi&#160;phạm Điều&#160;Khoản Dịch&#160;Vụ.</string>
     <!-- Error message shown when opening a file link which doesn’t exist -->
     <string name="general_error_file_not_found">Đường liên kết này không còn tồn tại</string>
     <!-- Error message shown when opening a file link which has been removed due to ToS/AUP violation -->
@@ -944,7 +944,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Im lặng tất cả các âm báo chát trong</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Tắt tiếng các âm báo chát</string>
+    <string name="title_dialog_mute_chatroom_notifications">Im lặng tất cả các âm báo chát trong</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Bật</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1301,7 +1301,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">Người dùng này không có trong sổ liên lạc</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Dùng mạng viễn thông để tải lên</string>
+    <string name="camera_uploads_cellular_connection">Dùng mạng dữ&#160;liệu dI&#160;dộng</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Cho&#160;phép video được tải&#160;lên</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1323,7 +1323,7 @@
     <!-- Message show when a participant hasn’t been successfully invited to a group chat -->
     <string name="add_participant_error">Lỗi. Không thêm được thành viên</string>
     <!-- Message show when a participant has been successfully removed from a group chat -->
-    <string name="remove_participant_success">Đã loại bỏ thành viên</string>
+    <string name="remove_participant_success">Đã loại&#160;bỏ thành&#160;viên</string>
     <!-- Message show when a participant hasn’t been successfully removed from a group chat -->
     <string name="remove_participant_error">Lỗi. Không loại bỏ được thành viên</string>
     <!--  -->
@@ -1389,7 +1389,7 @@
     <!-- Text shown when the chat history was cleared by someone -->
     <string name="history_cleared_by">[A]%1$s[/A][B] đã xóa lịch sử nội dung chát[/B]</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
-    <string name="context_permissions_changing_folder">Đang thay đổi quyền hạn</string>
+    <string name="context_permissions_changing_folder">Đang thay&#160;đổi quyền&#160;hạn</string>
     <!-- Item menu option upon clicking on one or multiple files. -->
     <string name="context_removing_contact_folder">Đang loại bỏ tên liên lạc khỏi mục chia sẻ</string>
     <!-- confirmation message before removing a file -->
@@ -1409,7 +1409,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Mời bạn bè tham gia và nhận thưởng</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s of storage for each invite. Valid for 365 days.</string>
+    <string name="figures_achievements_text_referrals">%1$s vào không&#160;gian lưu&#160;trữ cho mỗi lần mời. Hạn dùng là 365&#160;ngày.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s vào không gian lưu trữ. Hạn dùng là 365 ngày.</string>
     <!-- title of the section for unlocked rewards -->
@@ -1425,7 +1425,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Thưởng tài khoản mới</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Cài&#160;đặt App MEGA cho Máy&#160;Tính</string>
+    <string name="title_install_desktop">Cài App MEGA cho Máy Tính</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">còn lại %1$d ngày</string>
     <!-- State to indicate an achievement has expired -->
@@ -1437,7 +1437,7 @@
     <!-- title of screen to invite friends and get an achievement -->
     <string name="title_achievement_invite_friends">Cách hoạt động</string>
     <!-- first paragraph of screen to invite friends and get an achievement -->
-    <string name="first_paragraph_achievement_invite_friends">Invite your friends to create a free MEGA account and to install a MEGA Mobile App. You will receive free storage as a bonus for every signup and app installation.</string>
+    <string name="first_paragraph_achievement_invite_friends">Mời bạn&#160;bè của bạn tạo một tài&#160;khoản MEGA miễn&#160;phí và cài&#160;đặt App MEGA cho Di&#160;Động. Bạn sẽ nhận được thêm không&#160;gian miễn&#160;phí như một phần&#160;thưởng cho mỗi lần đăng&#160;ký và cài đặt ứng&#160;dụng.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
     <string name="second_paragraph_achievement_invite_friends">Phần thưởng không gian lưu trữ miễn phí chỉ có áp dụng cho những lời mời mới và khi App MEGA cho Di Động hoặc App MEGA cho Máy Tính được cài đặt.</string>
     <!-- Text shown when the user sends a contact invitation -->
@@ -1491,7 +1491,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">Tiêu đề</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">E-mail</string>
+    <string name="new_file_email_when_uploading">Địa chỉ email</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Chuyển tin nhắn</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2132,7 +2132,7 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Lấy liên kết vào cuộc chát</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Bật Luân&#160;Phiên Chìa&#160;Khóa&#160;Mã</string>
+    <string name="make_chat_private_option">Bật Luân&#160;phiên chìa&#160;khóa&#160;mã</string>
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">Luân&#160;phiên chìa&#160;khóa&#160;mã được bật</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2220,9 +2220,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]Tài khoản [/B][A]%s[/A][B] đã bị xóa.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]Tệp tin chia sẻ công khai của bạn [/A][B]%s[/B][C] đã bị gỡ bỏ.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]Tệp tin chia sẻ công khai của bạn [/A][B]%s[/B] đã bị gỡ bỏ.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]Thư mục chia sẻ công khai của bạn [/A][B]%s[/B][C] đã bị gỡ bỏ.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]Thư mục chia sẻ công khai của bạn [/A][B]%s[/B] đã bị gỡ bỏ.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">Tệp tin này đã bị yêu cầu cần phải gỡ bỏ.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2236,9 +2236,9 @@
         <item quantity="other">%d tệp tin không được tải xuống do vi phạm Điều Khoản Dịch Vụ.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]Tệp tin chia sẻ công khai của bạn [/A][B]%s[/B][C] đã được khôi phục.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]Tệp tin chia sẻ công khai của bạn [/A][B]%s[/B] đã được khôi phục.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]Thư mục chia sẻ công khai của bạn [/A][B]%s[/B][C] đã được khôi phục.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]Thư mục chia sẻ công khai của bạn [/A][B]%s[/B] đã được khôi phục.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Yêu cầu gửi đi</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2278,7 +2278,7 @@
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (đình kỳ)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">MỚI</string>
+    <string name="new_label_notification_item">Mới</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">Để nâng cấp gói đăng ký dịch vụ hiện tại, quý khách xin liên hệ bộ trợ giúp để mua [A]gói theo nhu cầu[/A].</string>
     <!-- Input field description in the create file dialog. -->
@@ -2606,7 +2606,7 @@
         <item quantity="other">%d tệp tin đang chờ.</item>
     </plurals>
     <!-- Title of the login screen -->
-    <string name="login_to_mega">Đăng nhập vào MEGA</string>
+    <string name="login_to_mega">Đăng&#160;nhập vào MEGA</string>
     <!-- Title of the create account screen -->
     <string name="create_account_title">Tạo tài khoản MEGA</string>
     <!-- Label to reference a recents section -->
@@ -3620,7 +3620,7 @@
     <!-- Copy and rename action button for a name collision. -->
     <string name="copy_and_rename">Sao chép và đánh số</string>
     <!-- Option given to the user in a name collision. If is marked, then the action chosen will be applied for the rest of collisions. The placeholder is for the number of pending name collisions conflicts that remain unsolved. -->
-    <string name="file_apply_for_all">Apply this option to the next %1$d conflicts</string>
+    <string name="file_apply_for_all">Áp&#160;dụng lựa&#160;chọn này cho %1$d&#160;lần mâu&#160;thuẫn tiếp&#160;theo</string>
     <!-- Informs about what is expected after choose the option copy and merge for a name collision. -->
     <string name="warning_copy_and_merge">Hợp nhất thư mục ở vị trí này với thư mục bạn đang muốn sao chép sau đây.</string>
     <!-- Copy and merge action button for a name collision. -->
@@ -3923,8 +3923,7 @@
     <string name="scheduled_meetings_meeting_link_copied">Đã sao&#160;chép đường liên&#160;kết vào bảng&#160;nhớ&#160;tạm</string>
     <!-- Message after selected albums are deleted. -->
     <plurals name="photos_album_deleted_message">
-        <item quantity="one">“%s” deleted</item>
-        <item quantity="other">%d albums deleted</item>
+        <item quantity="other">Đã xóa %d album</item>
     </plurals>
     <!-- Delete albums confirmation title. -->
     <plurals name="photos_album_delete_confirmation_title">
@@ -4367,7 +4366,7 @@
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">Nâng&#160;cấp bảo&#160;mật tài&#160;khoản</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">We’re upgrading your account’s security. You should see this message only once. If you’ve seen it before, first make sure it has been for this account and not for another MEGA account you have.\n\nIf you’re sure and it’s the second time you’re seeing this message for this account, stop using this account.</string>
+    <string name="shared_items_security_upgrade_dialog_content">Chúng&#160;tôi đang nâng&#160;cấp bảo&#160;mật cho tài&#160;khoản của bạn. Bạn sẽ thấy thông&#160;báo này chỉ một lần duy&#160;nhất. Nếu bạn đã nhìn thấy cái này trước đây, trước tiên hãy đảm&#160;bảo rằng thông&#160;báo đó là dành cho tài&#160;khoản này chứ không phải tài&#160;khoản MEGA khác mà bạn có.\n\nNếu bạn chắc&#160;rằng đây là lần thứ hai bạn nhìn&#160;thấy thông&#160;báo này cho tài&#160;khoản này, hãy ngưng sử dụng tài khoản này.</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="other">Bạn hiện đang chia&#160;sẻ các thư&#160;mục sau&#160;đây: %s</item>
@@ -4490,54 +4489,46 @@
     <string name="media_player_video_select_subtitle_file_empty_message">Không có phụ&#160;đề nào</string>
     <!-- Success message when left shared folders -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success">
-        <item quantity="one">Left %1$d shared folder</item>
-        <item quantity="other">Left %1$d shared folders</item>
+        <item quantity="other">Đã rời khỏi %1$d thư&#160;mục chia&#160;sẻ</item>
     </plurals>
     <!-- Snackbar with error message, shown in Incoming Shares, when user tries to leave some shared folders and it fails. -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail">
-        <item quantity="one">Couldn’t leave %1$d shared folder</item>
-        <item quantity="other">Couldn’t leave %1$d shared folders</item>
+        <item quantity="other">Đã không&#160;thể rời khỏi %1$d thư&#160;mục chia&#160;sẻ</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_success_concat">
-        <item quantity="one">Left %1$d shared folder,&#160;</item>
-        <item quantity="other">Left %1$d shared folders,&#160;</item>
+        <item quantity="other">Đã rời khỏi %1$d thư&#160;mục chia&#160;sẻ, &#160;</item>
     </plurals>
     <!-- Sub message when left some shared folders with success, but there are others weren't, this is the second part of the sentence, the full sentence is: Left x shared folder(s), couldn't leave x shared folder(s) -->
     <plurals name="shared_items_incoming_shares_snackbar_leaving_shares_fail_concat">
-        <item quantity="one">couldn’t leave %1$d shared folder</item>
-        <item quantity="other">couldn’t leave %1$d shared folders</item>
+        <item quantity="other">và không&#160;thể rời khỏi %1$d thư&#160;mục chia&#160;sẻ</item>
     </plurals>
     <!-- Text shown in the list of meetings when there is a call in progress -->
-    <string name="meetings_list_ongoing_call_message">Meeting in progress</string>
+    <string name="meetings_list_ongoing_call_message">Cuộc họp đang diễn ra</string>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request is successful -->
     <plurals name="general_move_node_snackbar_success">
-        <item quantity="one">Moved %1$d item</item>
-        <item quantity="other">Moved %1$d items</item>
+        <item quantity="other">Đã di&#160;chuyển %1$d&#160;mục</item>
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when move request failed -->
     <plurals name="general_move_node_snackbar_fail">
-        <item quantity="one">Couldn’t move %1$d item</item>
-        <item quantity="other">Couldn’t move %1$d items</item>
+        <item quantity="other">Đã không di&#160;chuyển được %1$d&#160;mục</item>
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the success part Space after "," is required because it will be concatenated with `general_move_node_snackbar_concat_fail` ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
     <plurals name="general_move_node_snackbar_concat_success">
-        <item quantity="one">Moved %1$d item,&#160;</item>
-        <item quantity="other">Moved %1$d items,&#160;</item>
+        <item quantity="other">Đã di&#160;chuyển %1$d&#160;mục, &#160;</item>
     </plurals>
     <!-- Result message after move action will be shown as a snackbar, this plurals template will be used when some move request are successful and some failed, this is the failed part this will be concatenated with `general_move_node_snackbar_concat_success` as the trailing text ** eg: Moved 1 item, couldn't move 1 item || Moved 2 items, couldn't move 1 item || Moved 2 items, couldn't move 3 items -->
     <plurals name="general_move_node_snackbar_concat_fail">
-        <item quantity="one">couldn’t move %1$d item</item>
-        <item quantity="other">couldn’t move %1$d items</item>
+        <item quantity="other">không di&#160;chuyển được %1$d&#160;mục</item>
     </plurals>
     <!-- Text hint of option to add meeting name in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_name_hint">Meeting name</string>
+    <string name="meetings_schedule_meeting_name_hint">Tên cuộc họp</string>
     <!-- Title of option to set a recurrence in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_recurrence_label">Recurrence</string>
+    <string name="meetings_schedule_meeting_recurrence_label">Tái diễn</string>
     <!-- Title of option to send calendar invite in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_send_calendar_invite_label">Gửi thư&#160;mời lịch</string>
     <!-- Title of option to add description in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_add_description_label">Add description</string>
+    <string name="meetings_schedule_meeting_add_description_label">Thêm miêu&#160;tả</string>
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Tên cho cuộc&#160;họp là bắt&#160;buộc</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
@@ -4545,37 +4536,49 @@
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_description_too_long_error">Nhập ít hơn 4 000&#160;ký&#160;tự</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
-    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting scheduled</string>
+    <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Cuộc họp được lên lịch</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
     <string name="meetings_schedule_meeting_recurrence_never_label">Không bao giờ</string>
     <!-- Text shown in the calendar to select date for a start/end date of a scheduled meeting in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_calendar_select_date_label">Select date</string>
+    <string name="meetings_schedule_meeting_calendar_select_date_label">Chọn ngày</string>
     <!-- The title for discard meeting dialog. When user taps on discard schedule meeting icon this dialog will be shown -->
-    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Discard this meeting?</string>
+    <string name="meetings_schedule_meeting_discard_meeting_dialog_title">Bỏ cuộc họp này?</string>
     <!-- The Keep editing option to continue editing schedule meeting in discard meeting dialog -->
     <string name="meetings_schedule_meeting_discard_meeting_dialog_keep_editing_option">Tiếp&#160;tục chỉnh&#160;sửa</string>
     <!-- The Discard option to finish editing schedule meeting in discard meeting dialog -->
     <string name="meetings_schedule_meeting_discard_meeting_dialog_discard_option">Hủy bỏ</string>
     <!-- Success message when participants was added to the meeting in Schedule meeting screen -->
     <plurals name="meetings_schedule_meeting_snackbar_adding_participants_success">
-        <item quantity="one">Added %1$d participant</item>
-        <item quantity="other">Added %1$d participants</item>
+        <item quantity="other">Đã thêm %1$d thành&#160;viên</item>
     </plurals>
     <!-- error message when sharing a folder(s) fails to be completed-->
     <plurals name="shared_items_cloud_drive_snackbar_sharing_folder_failed">
-        <item quantity="one">Couldn’t share %1$d folder</item>
-        <item quantity="other">Couldn’t share %1$d folders</item>
+        <item quantity="other">Đã không&#160;thể chia&#160;sẻ %1$d thư&#160;mục</item>
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">Couldn’t remove access of %1$d contact</item>
-        <item quantity="other">Couldn’t remove access of %1$d contacts</item>
+        <item quantity="other">Đã không&#160;thể loại&#160;bỏ quyền truy&#160;cập của %1$d tên liên&#160;lạc</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
-        <item quantity="one">Couldn’t update permissions for %1$d contact</item>
-        <item quantity="other">Couldn’t update permissions for %1$d contacts</item>
+        <item quantity="other">Đã không&#160;thể cập&#160;nhật quyền&#160;hạn của %1$d tên liên&#160;lạc</item>
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, hiểu rồi</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="other">Đã xóa vĩnh&#160;viễn %1$d&#160;mục</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="other">Đã không&#160;thể xóa vĩnh&#160;viễn %1$d&#160;mục</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="other">Đã xóa vĩnh&#160;viễn %1$d&#160;mục, &#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="other">không&#160;thể xóa vĩnh&#160;viễn %1$d&#160;mục</item>
+    </plurals>
 </resources>

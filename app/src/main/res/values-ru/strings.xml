@@ -992,7 +992,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Отключить уведомления чата на</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Отключить уведомления чата</string>
+    <string name="title_dialog_mute_chatroom_notifications">Отключить уведомления чата на</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Вкл</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1403,7 +1403,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">Пользователя нет в контактах</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Использовать сотовую связь</string>
+    <string name="camera_uploads_cellular_connection">Использовать данные мобильного устройства</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Загружать видео</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1599,7 +1599,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">Объект</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">Эл. адрес</string>
+    <string name="new_file_email_when_uploading">Адрес электронной почты</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Переслать</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2282,7 +2282,7 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Ссылка на чат</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Включить чередование ключей шифрования</string>
+    <string name="make_chat_private_option">Включить Чередование ключей шифрования</string>
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">Чередование ключей шифрования включено</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2370,9 +2370,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]Аккаунт [/B][A]%s[/A][B] был удалён.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]Ваш общедоступный файл [/A][B]%s[/B][C] был заблокирован.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]Ваш общедоступный файл [/A][B]%s[/B] был заблокирован.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]Ваша общедоступная папка [/A][B]%s[/B][C] была заблокирована.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]Ваша общедоступная папка [/A][B]%s[/B] была заблокирована.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">К этому файлу предъявлено заявление на изъятие.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2389,9 +2389,9 @@
         <item quantity="other">%d файла не было скачано из-за нарушения наших условий использования.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]Ваш общедоступный файл [/A][B]%s[/B][C] был восстановлен.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]Ваш общедоступный файл [/A][B]%s[/B] был восстановлен.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]Ваша общедоступная папка [/A][B]%s[/B][C] была восстановлена.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]Ваша общедоступная папка [/A][B]%s[/B] была восстановлена.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Отправлен запрос</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2431,7 +2431,7 @@
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (подписка)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">НОВЫЕ</string>
+    <string name="new_label_notification_item">Новые</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">Чтобы улучшить вашу текущую подписку, обратитесь в нашу команду поддержки за [A]индивидуальным планом[/A].</string>
     <!-- Input field description in the create file dialog. -->
@@ -5175,7 +5175,7 @@
         <item quantity="one">Не удалось закрыть доступ %1$d контакту.</item>
         <item quantity="few">Не удалось закрыть доступ %1$d контактам.</item>
         <item quantity="many">Не удалось закрыть доступ %1$d контактам.</item>
-        <item quantity="other">Не удалось закрыть доступ %1$d контакта.</item>
+        <item quantity="other">Не удалось закрыть доступ для %1$d контакта.</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
@@ -5186,4 +5186,32 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">Понятно</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="one">%1$d элемент безвозвратно удалён</item>
+        <item quantity="few">%1$d элемента безвозвратно удалены</item>
+        <item quantity="many">%1$d элементов безвозвратно удалено</item>
+        <item quantity="other">%1$d элемента безвозвратно удалено</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="one">Не удалось безвозвратно удалить %1$d элемент</item>
+        <item quantity="few">Не удалось безвозвратно удалить %1$d элемента</item>
+        <item quantity="many">Не удалось безвозвратно удалить %1$d элементов</item>
+        <item quantity="other">Не удалось безвозвратно удалить %1$d элемента</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="one">%1$d элемент безвозвратно удалён,&#160;</item>
+        <item quantity="few">%1$d элемента безвозвратно удалены,&#160;</item>
+        <item quantity="many">%1$d элементов безвозвратно удалено,&#160;</item>
+        <item quantity="other">%1$d элемента безвозвратно удалено,&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="one">%1$d элемент не удалось удалить</item>
+        <item quantity="few">%1$d элемента не удалось удалить</item>
+        <item quantity="many">%1$d элементов не удалось удалить</item>
+        <item quantity="other">%1$d элемента не удалось удалить</item>
+    </plurals>
 </resources>

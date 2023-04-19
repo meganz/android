@@ -1301,7 +1301,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">该用户不是联系人</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">使用蜂窝连接</string>
+    <string name="camera_uploads_cellular_connection">使用移动数据</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">上传视频</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1491,7 +1491,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">主题</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">电子邮箱</string>
+    <string name="new_file_email_when_uploading">电子邮件地址</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">转发</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2220,9 +2220,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]帐户[/B][A]%s[/A][B]已被删除。[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]您公开的共享文件[/A][B]%s[/B][C]已被删除。[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]您公开的共享文件[/A][B]%s[/B]已被删除。</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]您公开的共享文件夹[/A][B]%s[/B][C]已被删除。[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]您公开的共享文件夹[/A][B]%s[/B]已被删除。</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">此文件已被删除。</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2236,9 +2236,9 @@
         <item quantity="other">%d个文件因违反我们的服务条款而无法下载。</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]您公开的共享文件[/A][B]%s[/B][C]已被恢复。[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]您公开的共享文件[/A][B]%s[/B]已被恢复。</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]您公开的共享文件夹[/A][B]%s[/B][C]已被恢复。[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]您公开的共享文件夹[/A][B]%s[/B]已被恢复。</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">已发送请求</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -4557,7 +4557,7 @@
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="other">无法移除%1$d个联系人的访问权限</item>
+        <item quantity="other">无法为%1$d个联系人移除访问权限</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
@@ -4565,4 +4565,20 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">好的，明白了</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="other">%1$d个项目已被永久移除</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="other">无法永久移除%1$d个项目</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="other">%1$d个项目已被永久移除，&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="other">无法永久移除%1$d个项目</item>
+    </plurals>
 </resources>

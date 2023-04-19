@@ -976,7 +976,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Silenciar las notificaciones del chat durante</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Silenciar notificaciones del chat</string>
+    <string name="title_dialog_mute_chatroom_notifications">Silenciar las notificaciones del chat durante</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Activado</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1369,7 +1369,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">El usuario no es un contacto</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Usar conexión de datos</string>
+    <string name="camera_uploads_cellular_connection">Usar datos móviles</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Subir vídeos</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1493,7 +1493,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bono por registro de cuenta</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Instala la app de escritorio</string>
+    <string name="title_install_desktop">Install a MEGA Desktop App</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">Quedan %1$d d</string>
     <!-- State to indicate an achievement has expired -->
@@ -1563,7 +1563,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">Asunto</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">Correo electrónico</string>
+    <string name="new_file_email_when_uploading">Dirección de correo electrónico</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Reenviar</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2232,7 +2232,7 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Obtén enlace de chat</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Activar rotación de la clave de cifrado</string>
+    <string name="make_chat_private_option">Activar Rotación de la clave de cifrado</string>
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">Rotación de la clave de cifrado activada</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2320,9 +2320,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]La cuenta [/B][A]%s[/A][B] ha sido eliminada.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]El archivo que has compartido públicamente [/A][B]%s[/B][C] ha sido retirado.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]El archivo que has compartido públicamente [/A][B]%s[/B] ha sido retirado.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]La carpeta que has compartido públicamente [/A][B]%s[/B][C] ha sido retirada.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]La carpeta que has compartido públicamente [/A][B]%s[/B] ha sido retirada.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">Este archivo ha sido sujeto a notificación y retirada.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2338,9 +2338,9 @@
         <item quantity="other">No se han podido descargar %d archivos porque infringen nuestros Términos de servicio.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]El archivo que has compartido públicamente [/A][B]%s[/B][C] ha sido restaurado.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]El archivo que has compartido públicamente [/A][B]%s[/B] ha sido restaurado.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]La carpeta que has compartido públicamente [/A][B]%s[/B][C] ha sido restaurada.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]La carpeta que has compartido públicamente [/A][B]%s[/B] ha sido restaurada.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Solicitud enviada</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2380,7 +2380,7 @@
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (suscripción)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">NUEVA</string>
+    <string name="new_label_notification_item">Nueva</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">Para ampliar tu suscripción, contacta con nuestro equipo de soporte para un [A]plan personalizado[/A].</string>
     <!-- Input field description in the create file dialog. -->
@@ -4263,7 +4263,7 @@
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_until">
         <item quantity="one">%1$s cada semana desde el [A]%3$s hasta el %4$s[/A] de [B]%5$s a %6$s[/B]</item>
         <item quantity="many">%1$scada%2$d semanas desde el [A]%3$s hasta el%4$s[/A] de [B]%5$s a %6$s[/B]</item>
-        <item quantity="other">%1$scada%2$d semanas desde el [A]%3$s hasta el %4$s[/A] de [B]%5$s a %6$s[/B]</item>
+        <item quantity="other">%1$s cada %2$d semanas desde el [A]%3$s hasta el %4$s[/A] de [B]%5$s a %6$s[/B]</item>
     </plurals>
     <!-- Scheduled meeting date and time description, for a weekly recurring meeting without ending date. %1$s is the placeholder for the day of the week, %2$d for the period of weeks (in case of plural), %3$s for the start date, %4$s for the start time and %5$s for the end time. [A][/A] and [B][/B] format placeholders are respectively to bold the date and/or time parameters if required - e.g: Monday, every 2 weeks, effective 2 February 2023 from 13:30 to 14:00 -->
     <plurals name="notification_subtitle_scheduled_meeting_recurring_weekly_one_day_forever">
@@ -4738,7 +4738,7 @@
     <!-- This is the title of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_title">Actualización de seguridad de la cuenta</string>
     <!-- This is the body of upgrade security dialog -->
-    <string name="shared_items_security_upgrade_dialog_content">We’re upgrading your account’s security. You should see this message only once. If you’ve seen it before, first make sure it has been for this account and not for another MEGA account you have.\n\nIf you’re sure and it’s the second time you’re seeing this message for this account, stop using this account.</string>
+    <string name="shared_items_security_upgrade_dialog_content">Estamos mejorando la seguridad de tu cuenta. Deberías ver este mensaje solo una vez. Si lo has visto antes, primero asegúrate de que haya sido para esta cuenta y no para otra cuenta  que tengas en MEGA. \n\nSi estás seguro que es la segunda vez que ves este mensaje para esta cuenta, deja de usarla.</string>
     <!-- This string will get displayed along with the folder name which user wants to share. There can be one or more folder names -->
     <plurals name="shared_items_security_upgrade_dialog_node_sharing_info">
         <item quantity="one">Actualmente estás compartiendo la siguiente carpeta: %s</item>
@@ -4967,9 +4967,9 @@
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">No se ha podido remover el acceso de %1$d contacto</item>
-        <item quantity="many">No se ha podido remover el acceso de %1$d de contactos</item>
-        <item quantity="other">No se ha podido remover el acceso de %1$d contactos</item>
+        <item quantity="one">No se ha podido remover el acceso para %1$d contacto</item>
+        <item quantity="many">No se ha podido remover el acceso para %1$d de contactos</item>
+        <item quantity="other">No se ha podido remover el acceso para %1$d contactos</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
@@ -4979,4 +4979,28 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">Entendido</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="one">%1$d elemento eliminado permanentemente</item>
+        <item quantity="many">%1$d elementos eliminados permanentemente</item>
+        <item quantity="other">%1$d elementos eliminados permanentemente</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="one">No se ha podido eliminar %1$d elemento</item>
+        <item quantity="many">No se han podido eliminar %1$d elementos</item>
+        <item quantity="other">No se han podido eliminar %1$d elementos</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="one">%1$d elemento eliminado permanentemente,&#160;</item>
+        <item quantity="many">%1$d elementos eliminados permanentemente,&#160;</item>
+        <item quantity="other">%1$d elementos eliminados permanentemente,&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="one">no se ha podido eliminar %1$d elemento</item>
+        <item quantity="many">no se han podido eliminar %1$d elementos</item>
+        <item quantity="other">no se han podido eliminar %1$d elementos</item>
+    </plurals>
 </resources>

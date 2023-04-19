@@ -1301,7 +1301,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">이 이용자는 연락처에 없습니다</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">셀룰러 연결 사용</string>
+    <string name="camera_uploads_cellular_connection">모바일 데이터 사용</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">동영상 업로드</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1425,7 +1425,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">가입 보너스</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">MEGA 데스크톱 앱 받기</string>
+    <string name="title_install_desktop">Install a MEGA Desktop App</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d일 남음</string>
     <!-- State to indicate an achievement has expired -->
@@ -1491,7 +1491,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">제목</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">이메일</string>
+    <string name="new_file_email_when_uploading">이메일 주소</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">전달</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2220,9 +2220,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[A]%s [/A][B]계정이[/B] [B]삭제되었습니다.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B][C] 이/가 게시중단 되었습니다.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B] 이/가 게시중단 되었습니다.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]당신이 공개적으로 공유한 [/A][B]%s[/B][C] 폴더가 게시중단 되었습니다.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]당신이 공개적으로 공유한 [/A][B]%s[/B] 폴더가 게시중단 되었습니다.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">이 파일은 게시중단 통보 대상입니다.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2236,9 +2236,9 @@
         <item quantity="other">%d개의 파일이 이용 약관 위반으로 인해 다운로드되지 않았습니다.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B][C] 이/가 복구되었습니다.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]공개적으로 공유한 파일 [/A][B]%s[/B] 이/가 복구되었습니다.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]공개적으로 공유한 폴더 [/A][B]%s[/B][C] 이/가 복구되었습니다.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]공개적으로 공유한 폴더 [/A][B]%s[/B] 이/가 복구되었습니다.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">보낸 요청</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -4557,7 +4557,7 @@
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="other">%1$d개의 연락처에 대한 접근을 제거할 수 없습니다</item>
+        <item quantity="other">%1$d개의 연락처에 대한 접근 권한을 제거할 수 없습니다</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
@@ -4565,4 +4565,20 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">예, 알겠습니다</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="other">%1$d개의 항목을 영구적으로 삭제했습니다</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="other">%1$d개의 항목을 영구적으로 삭제하지 못 했습니다</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="other">%1$d개의 항목을 영구적으로 삭제했습니다,&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="other">%1$d개의 항목을 영구적으로 삭제하지 못 했습니다</item>
+    </plurals>
 </resources>

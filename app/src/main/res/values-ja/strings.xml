@@ -944,7 +944,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">以下用のチャット通知をミュート</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">チャット通知をミュート</string>
+    <string name="title_dialog_mute_chatroom_notifications">以下用のチャット通知をミュート</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">オン</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1301,7 +1301,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">このユーザーは連絡先ではありません</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">モバイル接続を使う</string>
+    <string name="camera_uploads_cellular_connection">モバイルデータを利用します</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">動画をアップロード</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1425,7 +1425,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">ご登録ボーナス</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">MEGAデスクトップアプリを取得</string>
+    <string name="title_install_desktop">MEGAデスクトップアプリをインストール</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">残り%1$d日</string>
     <!-- State to indicate an achievement has expired -->
@@ -1491,7 +1491,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">件名</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">メール</string>
+    <string name="new_file_email_when_uploading">メールアドレス</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">転送</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2220,9 +2220,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]アカウント[/B][A]%s[/A][B]は削除されました。[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]あなたの公開共有されたファイル[/A][B]%s[/B][C]は削除されました。[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]あなたの公開共有されたファイル[/A][B]%s[/B]は削除されました。</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]あなたの公開共有されたフォルダ[/A][B]%s[/B][C]は削除されました。[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]あなたの公開共有されたフォルダ[/A][B]%s[/B]は削除されました。</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">このファイルは削除通知の対象となっています。</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2236,9 +2236,9 @@
         <item quantity="other">%d個のファイルは当社のご利用規約に違反するため、ダウンロードされませんでした。</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]あなたの公開共有されたファイル[/A][B]%s[/B][C]は復活しました。[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]あなたの公開共有されたファイル[/A][B]%s[/B]は復活しました。</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]あなたの公開共有されたフォルダ[/A][B]%s[/B][C]は復活しました。[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]あなたの公開共有されたフォルダ[/A][B]%s[/B]は復活しました。</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">送信済み要求</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -4532,9 +4532,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">ミーティング名が必要です</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter fewer than 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">30&#160;文字未満で入力してください</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 4,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">4000&#160;文字未満で入力してください</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">ミーティングがスケジュールされました</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4557,7 +4557,7 @@
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="other">%1$d件の連絡先のアクセスを削除できませんでした</item>
+        <item quantity="other">%1$d件の連絡先用のアクセスを削除できませんでした</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
@@ -4565,4 +4565,20 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">はい、わかりました。</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="other">%1$d個の項目を恒久的に削除しました</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="other">%1$d個の項目を恒久的に削除することはできませんでした</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="other">%1$d個の項目を恒久的に削除しましたが、&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="other">%1$d個の項目を恒久的に削除することはできませんでした</item>
+    </plurals>
 </resources>

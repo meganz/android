@@ -960,7 +960,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Stummschalten für</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Chatbenachrichtigungen stummschalten</string>
+    <string name="title_dialog_mute_chatroom_notifications">Stummschalten für</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">An</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1335,7 +1335,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">Dieser Benutzer ist kein Kontakt</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Mobildatenverbindung verwenden</string>
+    <string name="camera_uploads_cellular_connection">Mobildatennutzung erlauben</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Videos uploaden</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1459,7 +1459,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Anmeldebonus</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">MEGA-Desktop-App herunterladen</string>
+    <string name="title_install_desktop">Install a MEGA Desktop App</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d Tage</string>
     <!-- State to indicate an achievement has expired -->
@@ -1527,7 +1527,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">Betreff</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">E-mail</string>
+    <string name="new_file_email_when_uploading">E-Mail-Adresse</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Weiterleiten</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2270,9 +2270,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]Der Account [/B][A]%s[/A][B] wurde gelöscht.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]Ihr Dateilink [/A][B]%s[/B][C] wurde durch eine Löschanfrage deaktiviert.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]Ihr Dateilink [/A][B]%s[/B] wurde durch eine Löschanfrage deaktiviert.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]Ihr Ordnerlink [/A][B]%s[/B][C] wurde durch eine Löschanfrage deaktiviert.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]Ihr Ordnerlink [/A][B]%s[/B] wurde durch eine Löschanfrage deaktiviert.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">Diese Datei wurde wegen einer Beschwerde gelöscht.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2287,9 +2287,9 @@
         <item quantity="other">%d Dateien wurden nicht heruntergeladen, da sie gegen unsere Nutzungsbedingungen verstoßen.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]Ihr Dateilink [/A][B]%s[/B][C] wurde wiederhergestellt.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]Ihr Dateilink [/A][B]%s[/B] wurde wiederhergestellt.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]Ihr Ordnerlink [/A][B]%s[/B][C] wurde wiederhergestellt.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]Ihr Ordnerlink [/A][B]%s[/B] wurde wiederhergestellt.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Anfrage abgeschickt</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2329,7 +2329,7 @@
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (monatliche/jährliche Zahlung)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">NEU</string>
+    <string name="new_label_notification_item">Neu</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">Um Ihr aktuelles Abonnement zu upgraden, wenden Sie sich bitte an unser Supportteam, um ein [A]persönliches Angebot[/A] zu erhalten.</string>
     <!-- Input field description in the create file dialog. -->
@@ -4735,9 +4735,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">Der Meetingname ist erforderlich</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter fewer than 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Bitte weniger als 30&#160;Zeichen eingeben</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 4,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Bitte weniger als 4.000&#160;Zeichen eingeben</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting geplant</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4772,4 +4772,24 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">Alles klar</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="one">%1$d Element unwiderruflich gelöscht</item>
+        <item quantity="other">%1$d Elemente unwiderruflich gelöscht</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="one">%1$d Element konnte nicht unwiderruflich gelöscht werden</item>
+        <item quantity="other">%1$d Elemente konnten nicht unwiderruflich gelöscht werden</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="one">%1$d Element unwiderruflich gelöscht,&#160;</item>
+        <item quantity="other">%1$d Elemente unwiderruflich gelöscht,&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="one">%1$d Element konnte nicht unwiderruflich gelöscht werden</item>
+        <item quantity="other">%1$d Elemente konnten nicht unwiderruflich gelöscht werden</item>
+    </plurals>
 </resources>

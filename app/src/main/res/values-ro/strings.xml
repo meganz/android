@@ -976,7 +976,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Amuțește notificările de chat timp de</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Amuțește notificările de chat</string>
+    <string name="title_dialog_mute_chatroom_notifications">Amuțește notificările de chat timp de</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Activat</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1369,7 +1369,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">Utilizatorul nu este un contact</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Folosește conexiunea de rețea celulară</string>
+    <string name="camera_uploads_cellular_connection">Folosește datele mobile</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Încarcă videoclipuri</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1493,7 +1493,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus de înregistrare</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Obține aplicația desktop MEGA</string>
+    <string name="title_install_desktop">Install a MEGA Desktop App</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d z rămase</string>
     <!-- State to indicate an achievement has expired -->
@@ -1563,7 +1563,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">Subiect</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">E-mail</string>
+    <string name="new_file_email_when_uploading">Adresă de e-mail</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Redirecționează</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2231,7 +2231,7 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Obține linkul chatului</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Activează rotația cheii de criptare</string>
+    <string name="make_chat_private_option">Activează Rotația cheii de criptare</string>
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">Rotația cheii de criptare, activată</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2319,9 +2319,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]Contul [/B][A]%s[/A][B] a fost șters.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]Fișierul tău partajat public [/A][B]%s[/B][C] a fost eliminat.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]Fișierul tău partajat public [/A][B]%s[/B] a fost eliminat.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]Folderul tău partajat public [/A][B]%s[/B][C] a fost eliminat.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]Folderul tău partajat public [/A][B]%s[/B] a fost eliminat.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">Acest fișier a făcut obiectul unei notificări de eliminare.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2337,9 +2337,9 @@
         <item quantity="other">%d de fișiere nu au fost descărcate deoarece au încălcat Termenii de utilizare a serviciului.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]Fișierul tău partajat public [/A][B]%s[/B][C] a fost restabilit.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]Fișierul tău partajat public [/A][B]%s[/B] a fost restabilit.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]Folderul tău partajat public [/A][B]%s[/B][C] a fost restabilit.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]Folderul tău partajat public [/A][B]%s[/B] a fost restabilit.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Cerere trimisă</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2379,7 +2379,7 @@
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (abonament)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">NOU</string>
+    <string name="new_label_notification_item">Nou</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">Pentru a upgrada abonamentul actual, te rugăm să contactezi echipa noastră de asistență pentru un [A]plan personalizat[/A].</string>
     <!-- Input field description in the create file dialog. -->
@@ -4938,8 +4938,8 @@
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">Couldn’t remove access of %1$d contact</item>
-        <item quantity="other">Couldn’t remove access of %1$d contacts</item>
+        <item quantity="one">Couldn’t remove access for %1$d contact</item>
+        <item quantity="other">Couldn’t remove access for %1$d contacts</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">
@@ -4948,4 +4948,24 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, am înțeles</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="one">Permanently removed %1$d item</item>
+        <item quantity="other">Permanently removed %1$d items</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="one">Couldn’t permanently remove %1$d item</item>
+        <item quantity="other">Couldn’t permanently remove %1$d items</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="one">Permanently removed %1$d item,&#160;</item>
+        <item quantity="other">Permanently removed %1$d items,&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="one">couldn’t permanently remove %1$d item</item>
+        <item quantity="other">couldn’t permanently remove %1$d items</item>
+    </plurals>
 </resources>

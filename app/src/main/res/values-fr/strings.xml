@@ -976,11 +976,11 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Mettre les notifications en sourdine pendant</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Mettre en sourdine les notifications des conversations</string>
+    <string name="title_dialog_mute_chatroom_notifications">Mettre les notifications en sourdine pendant</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
-    <string name="mute_chat_notification_option_on">Activée</string>
+    <string name="mute_chat_notification_option_on">Activé</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
-    <string name="mute_chatroom_notification_option_off">Désactivée</string>
+    <string name="mute_chatroom_notification_option_off">Désactivé</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until tomorrow at 8 a.m. -->
     <string name="mute_chatroom_notification_option_until_tomorrow_morning">Jusqu’à demain matin</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that chat notifications will be disabled until today at 8 a.m. -->
@@ -1493,7 +1493,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Prime d’inscription</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Obtenir l’appli&#160;MEGA pour ordinateur</string>
+    <string name="title_install_desktop">Installer une Appli&#160;MEGA pour ordinateur</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d j restants</string>
     <!-- State to indicate an achievement has expired -->
@@ -1507,19 +1507,19 @@
     <!-- first paragraph of screen to invite friends and get an achievement -->
     <string name="first_paragraph_achievement_invite_friends">Invitez vos amies et amis à créer un compte&#160;MEGA gratuit et à installer une appli&#160;MEGA mobile. Vous recevrez de l’espace de stockage gratuit en prime pour chaque inscription et installation d’appli.</string>
     <!-- second paragraph of screen to invite friends and get an achievement -->
-    <string name="second_paragraph_achievement_invite_friends">La prime d’espace de stockage gratuit n’est applicable que pour les nouvelles invitations et si l’appli&#160;MEGA mobile ou l’appli&#160;MEGA pour ordinateur est installée.</string>
+    <string name="second_paragraph_achievement_invite_friends">La prime d’espace de stockage gratuit n’est applicable que pour les nouvelles invitations et si l’Appli&#160;MEGA mobile ou l’Appli&#160;MEGA pour ordinateur est installée.</string>
     <!-- Text shown when the user sends a contact invitation -->
     <string name="subtitle_confirmation_invite_friends">L’invitation a été envoyée</string>
     <!-- Error shown when the user writes a email with an incorrect format -->
     <string name="invalid_email_to_invite">L’adresse courriel est mal formée</string>
     <!-- info paragraph about the achievement install megasync -->
-    <string name="paragraph_info_achievement_install_desktop">En installant l’appli&#160;MEGA pour ordinateur, vous obtenez %1$s d’espace de stockage gratuit valable pendant 365&#160;jours. L’appli&#160;MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
+    <string name="paragraph_info_achievement_install_desktop">En installant l’Appli&#160;MEGA pour ordinateur, vous obtenez %1$s d’espace de stockage gratuit valable pendant 365&#160;jours. L’Appli&#160;MEGA pour ordinateur est offerte pour Windows, macOS et la plupart des versions de Linux.</string>
     <!-- info paragraph about the achievement install mobile app -->
     <string name="paragraph_info_achievement_install_mobile_app">En installant l’appli&#160;MEGA mobile, vous obtenez %1$s d’espace de stockage gratuit valable pendant 365&#160;jours. Nos applis mobiles sont proposées pour iOS et Android.</string>
     <!-- info paragraph about the achievement ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
     <string name="paragraph_info_achievement_add_phone">Quand vous confirmez votre numéro de téléphone, vous obtenez %1$s d’espace de stockage gratuit valable pendant 365&#160;jours.</string>
     <!-- info paragraph about the completed achievement install megasync -->
-    <string name="result_paragraph_info_achievement_install_desktop">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre appli&#160;MEGA pour ordinateur.</string>
+    <string name="result_paragraph_info_achievement_install_desktop">Vous avez reçu %1$s d’espace de stockage pour avoir installé notre Appli&#160;MEGA pour ordinateur.</string>
     <!-- info paragraph about the completed achievement install mobile app -->
     <string name="result_paragraph_info_achievement_install_mobile_app">Vous avez reçu %1$s d’espace de stockage pour avoir installé l’appli&#160;MEGA mobile.</string>
     <!-- info paragraph about the completed achievement of ‘add phone number’. Placeholder 1: bonus storage space e.g. 20GB. Placeholder 2: bonus transfer quota e.g. 50GB -->
@@ -2232,7 +2232,7 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Obtenir le lien de la conversation</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Activer la rotation de la clé de chiffrement</string>
+    <string name="make_chat_private_option">Activer Rotation de la clé de chiffrement</string>
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">La rotation de la clé de chiffrement est activée</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2320,9 +2320,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]Le compte [/B][A]%s[/A][B] a été supprimé.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]Votre fichier [B]%s[/B] partagé publiquement[/A][C] a été retiré.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]Votre fichier [B]%s[/B] partagé publiquement[/A] a été retiré.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]Votre dossier [B]%s[/B] partagé publiquement[/A][C] a été retiré.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]Votre dossier [B]%s[/B] partagé publiquement[/A] a été retiré.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">Ce fichier a fait l’objet d’un avis de retrait.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2338,9 +2338,9 @@
         <item quantity="other">%d fichiers n’ont pas été téléchargés pour non-respect des Conditions générales d’utilisation.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]Votre fichier [B]%s[/B] partagé publiquement[/A][C] a été rétabli.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]Votre fichier [B]%s[/B] partagé publiquement[/A] a été rétabli.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]Votre dossier [B]%s[/B] partagé publiquement[/A][C] a été rétabli.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]Votre dossier [B]%s[/B] partagé publiquement[/A] a été rétabli.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Une demande a été envoyée</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2380,7 +2380,7 @@
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (abonnement)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">NOUVELLE</string>
+    <string name="new_label_notification_item">Nouvelle</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">Pour surclasser votre abonnement actuel, veuillez contacter notre équipe d’assistance afin d’obtenir un [A]abonnement personnalisé[/A].</string>
     <!-- Input field description in the create file dialog. -->
@@ -3624,13 +3624,13 @@
     <!-- The title of warning dialog for adding item to "My backup" -->
     <string name="backup_add_item_title">Configurer la sauvegarde</string>
     <!-- If users want to add items to the "My backup" folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_to_root_text">Pour faire en sorte que ces éléments ajoutés à votre dossier de sauvegarde sont automatiquement synchronisés vers le Nuage&#160;MEGA, veuillez le paramétrer dans l’appli&#160;MEGA pour ordinateur.</string>
+    <string name="backup_add_item_to_root_text">Pour faire en sorte que ces éléments ajoutés à votre dossier de sauvegarde sont automatiquement synchronisés vers le Nuage&#160;MEGA, veuillez le paramétrer dans l’Appli&#160;MEGA pour ordinateur.</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_title">En lecture seule</string>
     <!-- If users want to share items in the "My backup" folder, Warning dialog will show to confirm -->
     <string name="backup_share_permission_text">Ce dossier ne peut être partagé qu’en lecture seule, car c’est un dossier de sauvegarde. Tout changement apporté à son contenu pourrait désactiver la sauvegarde.</string>
     <!-- If users want to add items to the "My backup" device folder, Warning dialog will show to confirm -->
-    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée dans l’appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
+    <string name="backup_add_item_text">Les éléments dans ce dossier font partie d’une sauvegarde configurée et sont synchronisés vers un dossier local. Cette action brisera la synchronisation et désactivera la sauvegarde. La sauvegarde peut être réactivée dans l’Appli&#160;MEGA pour ordinateur. Voulez-vous vraiment poursuivre ?</string>
     <!-- Share multi backup folders, show below warning message -->
     <string name="backup_multi_share_permission_text">Ces dossiers ne peuvent être partagés qu’en lecture seule ; comme ce sont des dossiers de sauvegarde, tout changement apporté à leur contenu pourrait désactiver les sauvegardes.</string>
     <!-- Share multi folders mix with backup and non-backup folders, show below warning message -->
@@ -4979,4 +4979,28 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">J’ai compris</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="one">%1$d&#160;élément a été supprimé définitivement</item>
+        <item quantity="many">%1$d d’éléments ont été supprimés définitivement</item>
+        <item quantity="other">%1$d&#160;éléments ont été supprimés définitivement</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="one">Impossible de supprimer %1$d&#160;élément définitivement</item>
+        <item quantity="many">Impossible de supprimer %1$d d’éléments définitivement</item>
+        <item quantity="other">Impossible de supprimer %1$d&#160;éléments définitivement</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="one">%1$d&#160;élément a été supprimé définitivement,&#160;</item>
+        <item quantity="many">%1$d d’éléments ont été supprimés définitivement,&#160;</item>
+        <item quantity="other">%1$d&#160;éléments ont été supprimés définitivement,&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="one">impossible de supprimer %1$d&#160;élément définitivement</item>
+        <item quantity="many">impossible de supprimer %1$d d’éléments définitivement</item>
+        <item quantity="other">impossible de supprimer %1$d&#160;éléments définitivement</item>
+    </plurals>
 </resources>

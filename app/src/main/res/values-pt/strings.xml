@@ -976,7 +976,7 @@
     <!-- Subtitle of the dialogue to mute the general chat notifications. -->
     <string name="subtitle_dialog_mute_chat_notifications">Silenciar as notificações de chat por</string>
     <!-- Title of the dialogue to mute the notifications of a specific chat. -->
-    <string name="title_dialog_mute_chatroom_notifications">Silenciar as notificações de chats</string>
+    <string name="title_dialog_mute_chatroom_notifications">Silenciar as notificações do chat por</string>
     <!-- Label for the setting option that indicates the general notifications are enabled. -->
     <string name="mute_chat_notification_option_on">Ativado</string>
     <!-- Label for the dialog box option to mute a chat. This option will indicate that notifications for that chat are enabled. -->
@@ -1369,7 +1369,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">O usuário não é um contato</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Usar plano de dados</string>
+    <string name="camera_uploads_cellular_connection">Usar dados celulares</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Upload de vídeos</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -1563,7 +1563,7 @@
     <!-- Title of the field subject when a new file is created to upload -->
     <string name="new_file_subject_when_uploading">Assunto</string>
     <!-- Title of the field email when a new contact is created to upload -->
-    <string name="new_file_email_when_uploading">E-mail</string>
+    <string name="new_file_email_when_uploading">Email</string>
     <!-- Item of a menu to forward a message chat to another chatroom -->
     <string name="forward_menu_item">Encaminhar</string>
     <!-- name of the button to attach file from MEGA to another app -->
@@ -2232,7 +2232,7 @@
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Obter o link do chat</string>
     <!-- Title of the option to make a public chat private -->
-    <string name="make_chat_private_option">Ativar a rotação da chave de criptografia</string>
+    <string name="make_chat_private_option">Ativar Rotação da chave de criptografia</string>
     <!-- Title of the view to inform that a chat is private -->
     <string name="private_chat">A rotação da chave de criptografia foi ativada</string>
     <!-- Text of the dialog to change a public chat to private (enable encryption key rotation) -->
@@ -2320,9 +2320,9 @@
     <!-- Subtitle of the historic notification for an account deleted -->
     <string name="subtitle_account_notification_deleted">[B]A conta [/B][A]%s[/A][B] foi eliminada.[/B]</string>
     <!-- Subtitle of file takedown historic notification -->
-    <string name="subtitle_file_takedown_notification">[A]O seu arquivo compartilhado publicamente [/A] [B]%s[/B][C] foi removido.[/C]</string>
+    <string name="subtitle_file_takedown_notification">[A]O seu arquivo compartilhado publicamente [/A] [B]%s[/B] foi removido.</string>
     <!-- Subtitle of folder takedown historic notification -->
-    <string name="subtitle_folder_takedown_notification">[A]A sua pasta compartilhada publicamente [/A] [B]%s[/B][C] foi removida.[/C]</string>
+    <string name="subtitle_folder_takedown_notification">[A]A sua pasta compartilhada publicamente [/A] [B]%s[/B] foi removida.</string>
     <!-- Popup notification text on mouse-over of taken down file. -->
     <string name="message_file_takedown_pop_out_notification">Este arquivo foi alvo de um aviso de remoção.</string>
     <!-- Popup notification text on mouse-over taken down folder. -->
@@ -2338,9 +2338,9 @@
         <item quantity="other">Não foi feito o download de %d arquivos porque eles infringiam os nossos Termos de serviço.</item>
     </plurals>
     <!-- Subtitle of a file takedown reinstated historic notification -->
-    <string name="subtitle_file_takedown_reinstated_notification">[A]O seu arquivo compartilhado publicamente [/A] [B]%s[/B][C] foi restaurado.[/C]</string>
+    <string name="subtitle_file_takedown_reinstated_notification">[A]O seu arquivo compartilhado publicamente [/A] [B]%s[/B] foi restaurado.</string>
     <!-- Subtitle of a folder takedown reinstated historic notification -->
-    <string name="subtitle_folder_takedown_reinstated_notification">[A]A sua pasta compartilhada publicamente [/A] [B]%s[/B][C] foi restaurada.[/C]</string>
+    <string name="subtitle_folder_takedown_reinstated_notification">[A]A sua pasta compartilhada publicamente [/A] [B]%s[/B] foi restaurada.</string>
     <!-- Title of the historic notification for outgoing contact requests -->
     <string name="title_outgoing_contact_request">Enviar solicitação</string>
     <!-- Title of the historic notification for incoming contact requests -->
@@ -2380,7 +2380,7 @@
     <!-- one of the payment methods -->
     <string name="payment_method_google_wallet">[A]Google Pay[/A] (assinatura)</string>
     <!-- Capital letters. Text of the label of a new historic notifications -->
-    <string name="new_label_notification_item">NOVAS</string>
+    <string name="new_label_notification_item">Nova</string>
     <!-- When user is on PRO 3 plan, we will display an extra label to notify user that they can still contact support to have a customised plan. -->
     <string name="label_custom_plan">Para fazer o upgrade do seu plano atual, entre em contato com a nossa equipe de suporte e solicite um [A]plano personalizado[/A].</string>
     <!-- Input field description in the create file dialog. -->
@@ -4122,7 +4122,7 @@
     <!-- In Settings view the explanation of a setting, which allows to use media discovery view automatically. -->
     <string name="settings_media_discovery_view_context">Abrir automaticamente pastas somente com imagens e vídeos na Galeria multimídia. Isso permite que você veja os arquivos na galeria e filtre por data.</string>
     <!-- Context of banner for media discovery view. When user opens a folder, which can be viewed in Media discovery view, the banner will be shown with this text to let user know, where the setting can be changed. -->
-    <string name="cloud_drive_media_discovery_banner_context">Como esta pasta comente inclui imagens e vídeos, nós a abrimos automaticamente na Galeria multimídia, o que permite que você veja os arquivos na galeria e filtre por data. Você pode desativar esta opção nas Configurações.</string>
+    <string name="cloud_drive_media_discovery_banner_context">Como esta pasta somente inclui imagens e vídeos, nós a abrimos automaticamente na Galeria multimídia, o que permite que você veja os arquivos na galeria e filtre por data. Você pode desativar esta opção nas Configurações.</string>
     <!-- Banner option for user to open settings, where he can disable the media discovery view setting. -->
     <string name="cloud_drive_media_discovery_banner_settings">Configurações</string>
     <!-- Banner option for user that he understood the explanation and agrees with media discovery view setting being enabled. -->
@@ -4979,4 +4979,28 @@
     </plurals>
     <!--This is the label of the button of upgrade security dialog -->
     <string name="shared_items_security_upgrade_dialog_button_ok_got_it">OK, entendido</string>
+    <!-- Message for the snackbar displayed after success removal the selected items from rubbish bin-->
+    <plurals name="rubbish_bin_remove_items_snackbar_success">
+        <item quantity="one">%1$d item foi permanentemente eliminado</item>
+        <item quantity="many">%1$d de itens foram permanentemente eliminados</item>
+        <item quantity="other">%1$d itens foram permanentemente eliminados</item>
+    </plurals>
+    <!-- Message for the snackbar displayed after fail to removal the selected items from rubbish bin -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail">
+        <item quantity="one">Não foi possível eliminar permanentemente %1$d item</item>
+        <item quantity="many">Não foi possível eliminar permanentemente %1$d de itens</item>
+        <item quantity="other">Não foi possível eliminar permanentemente %1$d itens</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_success_concat">
+        <item quantity="one">%1$d item foi permanentemente eliminado,&#160;</item>
+        <item quantity="many">%1$d de itens foram permanentemente eliminados,&#160;</item>
+        <item quantity="other">%1$d itens foram permanentemente eliminados,&#160;</item>
+    </plurals>
+    <!-- Sub message when remove some items from rubbish bin with success, but there are others weren't. This is the second part of the sentence. The full sentence is: Permanently removed x item(s), couldn't permanently remove x item(s) -->
+    <plurals name="rubbish_bin_remove_items_snackbar_fail_concat">
+        <item quantity="one">mas não foi possível eliminar permanentemente %1$d item</item>
+        <item quantity="many">mas não foi possível eliminar permanentemente %1$d de itens</item>
+        <item quantity="other">mas não foi possível eliminar permanentemente %1$d itens</item>
+    </plurals>
 </resources>
