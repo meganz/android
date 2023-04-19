@@ -30,7 +30,7 @@ import mega.privacy.android.app.imageviewer.ImageViewerActivity.Companion.getInt
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.adapters.VersionsFileAdapter
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.modalbottomsheet.VersionBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.VersionsBottomSheetDialogFragment
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -86,7 +86,7 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
     var totalRemoveSelected = 0
     var errorRemove = 0
     var completedRemove = 0
-    private var bottomSheetDialogFragment: VersionBottomSheetDialogFragment? = null
+    private var bottomSheetDialogFragment: VersionsBottomSheetDialogFragment? = null
     private val nodeSaver = NodeSaver(
         this, this, this,
         showSaveToDeviceConfirmDialog(this)
@@ -307,9 +307,40 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         selectedNode = sNode
         selectedNodeHandle = selectedNode?.handle ?: 0L
         selectedPosition = sPosition
-        bottomSheetDialogFragment = VersionBottomSheetDialogFragment().also {
-            it.show(supportFragmentManager, it.tag)
-        }
+
+        supportFragmentManager.setFragmentResultListener(
+            VersionsBottomSheetDialogFragment.REQUEST_KEY_VERSIONS_DIALOG,
+            this,
+        ) { _, bundle -> handleResult(bundle) }
+
+        bottomSheetDialogFragment = VersionsBottomSheetDialogFragment.newInstance(
+            accessLevel = accessLevel,
+            nodeHandle = selectedNodeHandle,
+            selectedPosition = selectedPosition,
+        ).also { it.show(supportFragmentManager, it.tag) }
+    }
+
+    /**
+     * Handles the Fragment result from calling [VersionsBottomSheetDialogFragment]
+     *
+     * @param bundle The Bundle
+     */
+    private fun handleResult(bundle: Bundle) {
+        bundle.getString(VersionsBottomSheetDialogFragment.BUNDLE_KEY_VERSIONS_DIALOG)
+            ?.let { value ->
+                when (value) {
+                    VersionsBottomSheetDialogFragment.ACTION_REVERT_VERSION -> {
+                        checkRevertVersion()
+                    }
+                    VersionsBottomSheetDialogFragment.ACTION_DELETE_VERSION -> {
+                        showConfirmationRemoveVersion()
+                    }
+                    VersionsBottomSheetDialogFragment.ACTION_DOWNLOAD_VERSION -> {
+                        selectedNode?.let { nonNullNode -> downloadNodes(listOf(nonNullNode)) }
+                    }
+                    else -> Unit
+                }
+            }
     }
 
     fun downloadNodes(nodes: List<MegaNode>?) {
