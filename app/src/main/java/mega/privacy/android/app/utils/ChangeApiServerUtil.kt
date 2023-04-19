@@ -16,6 +16,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.utils.AlertDialogUtil.enableOrDisableDialogButton
 import mega.privacy.android.app.utils.Constants.*
+import timber.log.Timber
 import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
@@ -130,17 +131,30 @@ object ChangeApiServerUtil {
         }
 
         val megaApi = MegaApplication.getInstance().megaApi
+        val megaApiFolder = MegaApplication.getInstance().megaApiFolder
 
-        if (currentApiServerValue == SANDBOX3_SERVER_VALUE) {
+        var disablePkp = false
+
+        if ((currentApiServerValue == SANDBOX3_SERVER_VALUE
+                    || currentApiServerValue == STAGING_444_SERVER_VALUE)
+            && newApiServerValue != SANDBOX3_SERVER_VALUE && newApiServerValue != STAGING_444_SERVER_VALUE
+        ) {
             megaApi.setPublicKeyPinning(true)
-        } else if (newApiServerValue == SANDBOX3_SERVER_VALUE) {
+            megaApiFolder.setPublicKeyPinning(true)
+            Timber.d("Current Api server: $currentApiServerValue. Key pinning enabled.")
+        } else if (newApiServerValue == SANDBOX3_SERVER_VALUE
+            || newApiServerValue == STAGING_444_SERVER_VALUE
+        ) {
             megaApi.setPublicKeyPinning(false)
+            megaApiFolder.setPublicKeyPinning(false)
+            disablePkp = true
+            Timber.d("New Api server: $newApiServerValue. Key pinning disabled.")
         }
 
         val apiServer = getApiServerFromValue(newApiServerValue)
-        megaApi.changeApiUrl(apiServer)
-        preferences.edit().putInt(API_SERVER, getApiServerValue(apiServer))
-            .apply()
+        megaApi.changeApiUrl(apiServer, disablePkp)
+        megaApiFolder.changeApiUrl(apiServer, disablePkp)
+        preferences.edit().putInt(API_SERVER, newApiServerValue).apply()
 
         val intent = Intent(activity, LoginActivity::class.java)
             .putExtra(VISIBLE_FRAGMENT, LOGIN_FRAGMENT)

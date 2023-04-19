@@ -206,13 +206,18 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         val apiServerValue =
             getSharedPreferences(ChangeApiServerUtil.API_SERVER_PREFERENCES, MODE_PRIVATE)
                 .getInt(ChangeApiServerUtil.API_SERVER, ChangeApiServerUtil.PRODUCTION_SERVER_VALUE)
+        var disablePkp = false
         if (apiServerValue != ChangeApiServerUtil.PRODUCTION_SERVER_VALUE) {
-            if (apiServerValue == ChangeApiServerUtil.SANDBOX3_SERVER_VALUE) {
+            if (apiServerValue == ChangeApiServerUtil.SANDBOX3_SERVER_VALUE
+                || apiServerValue == ChangeApiServerUtil.STAGING_444_SERVER_VALUE
+            ) {
                 megaApi.setPublicKeyPinning(false)
+                megaApiFolder.setPublicKeyPinning(false)
+                disablePkp = true
             }
             val apiServer = getApiServerFromValue(apiServerValue)
-            megaApi.changeApiUrl(apiServer)
-            megaApiFolder.changeApiUrl(apiServer)
+            megaApi.changeApiUrl(apiServer, disablePkp)
+            megaApiFolder.changeApiUrl(apiServer, disablePkp)
         }
 
         val useHttpsOnly = java.lang.Boolean.parseBoolean(dbH.useHttpsOnly)
