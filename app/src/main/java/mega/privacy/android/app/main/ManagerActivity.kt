@@ -3483,6 +3483,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
             }
+            DrawerItem.SYNC -> {
+                supportActionBar?.subtitle = null
+                supportActionBar?.title = "Sync"
+                viewModel.setIsFirstNavigationLevel(false)
+            }
             DrawerItem.RUBBISH_BIN -> {
                 supportActionBar?.subtitle = null
                 val node =
@@ -5045,6 +5050,8 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                                 fileBrowserFragment?.onBackPressed()
                             }
                         }
+                    } else if (drawerItem === DrawerItem.SYNC) {
+                        onBackPressedDispatcher.onBackPressed()
                     } else if (drawerItem === DrawerItem.RUBBISH_BIN) {
                         rubbishBinFragment = getRubbishBinFragment()
                         rubbishBinFragment?.onBackPressed()
