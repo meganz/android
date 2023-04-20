@@ -13,8 +13,6 @@ import mega.privacy.android.domain.usecase.GetContactCredentials
 import mega.privacy.android.domain.usecase.GetContactData
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
-import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.ResetCredentials
 import mega.privacy.android.domain.usecase.StartConversation
@@ -53,10 +51,6 @@ internal abstract class ContactsModule {
             MonitorContactRequestUpdates(contactsRepository::monitorContactRequestUpdates)
 
         @Provides
-        fun provideMonitorLastSeenUpdates(contactsRepository: ContactsRepository): MonitorLastGreenUpdates =
-            MonitorLastGreenUpdates(contactsRepository::monitorChatPresenceLastGreenUpdates)
-
-        @Provides
         fun provideRequestLastGreen(contactsRepository: ContactsRepository): RequestLastGreen =
             RequestLastGreen(contactsRepository::requestLastGreen)
 
@@ -67,10 +61,6 @@ internal abstract class ContactsModule {
         @Provides
         fun provideStartConversation(contactsRepository: ContactsRepository): StartConversation =
             StartConversation(contactsRepository::startConversation)
-
-        @Provides
-        fun provideMonitorChatOnlineStatusUpdates(contactsRepository: ContactsRepository): MonitorOnlineStatusUpdates =
-            MonitorOnlineStatusUpdates(contactsRepository::monitorChatOnlineStatusUpdates)
 
         @Provides
         fun provideGetContactData(contactsRepository: ContactsRepository): GetContactData =

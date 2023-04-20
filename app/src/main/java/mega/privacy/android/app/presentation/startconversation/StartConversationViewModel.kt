@@ -28,8 +28,8 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
-import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
+import mega.privacy.android.domain.usecase.contact.MonitorLastGreenUpdatesUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.core.ui.controls.SearchWidgetState
@@ -39,17 +39,17 @@ import javax.inject.Inject
 /**
  * StartConversationFragment view model.
  *
- * @property getVisibleContactsUseCase           [GetVisibleContactsUseCase]
- * @property getContactData               [GetContactData]
- * @property startConversation            [StartConversation]
- * @property monitorContactUpdates        [MonitorContactUpdates]
- * @property applyContactUpdates          [ApplyContactUpdates]
- * @property monitorLastGreenUpdates      [MonitorLastGreenUpdates]
- * @property monitorOnlineStatusUpdates   [MonitorOnlineStatusUpdates]
- * @property monitorContactRequestUpdates [MonitorContactRequestUpdates]
- * @property addNewContacts               [AddNewContacts]
- * @property requestLastGreen             [RequestLastGreen]
- * @property state                        Current view state as [StartConversationState]
+ * @property getVisibleContactsUseCase          [GetVisibleContactsUseCase]
+ * @property getContactData                     [GetContactData]
+ * @property startConversation                  [StartConversation]
+ * @property monitorContactUpdates              [MonitorContactUpdates]
+ * @property applyContactUpdates                [ApplyContactUpdates]
+ * @property monitorLastGreenUpdatesUseCase     [MonitorLastGreenUpdatesUseCase]
+ * @property monitorOnlineStatusUseCase         [MonitorOnlineStatusUseCase]
+ * @property monitorContactRequestUpdates       [MonitorContactRequestUpdates]
+ * @property addNewContacts                     [AddNewContacts]
+ * @property requestLastGreen                   [RequestLastGreen]
+ * @property state        Current view state as [StartConversationState]
  */
 @HiltViewModel
 class StartConversationViewModel @Inject constructor(
@@ -58,8 +58,8 @@ class StartConversationViewModel @Inject constructor(
     private val startConversation: StartConversation,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val applyContactUpdates: ApplyContactUpdates,
-    private val monitorLastGreenUpdates: MonitorLastGreenUpdates,
-    private val monitorOnlineStatusUpdates: MonitorOnlineStatusUpdates,
+    private val monitorLastGreenUpdatesUseCase: MonitorLastGreenUpdatesUseCase,
+    private val monitorOnlineStatusUseCase: MonitorOnlineStatusUseCase,
     private val monitorContactRequestUpdates: MonitorContactRequestUpdates,
     private val addNewContacts: AddNewContacts,
     private val requestLastGreen: RequestLastGreen,
@@ -198,7 +198,7 @@ class StartConversationViewModel @Inject constructor(
 
     private fun observeLastGreenUpdates() {
         viewModelScope.launch {
-            monitorLastGreenUpdates().collectLatest { (handle, lastGreen) ->
+            monitorLastGreenUpdatesUseCase().collectLatest { (handle, lastGreen) ->
                 _state.value.contactItemList.apply {
                     findItemByHandle(handle)?.apply {
                         toMutableList().apply {
@@ -213,7 +213,7 @@ class StartConversationViewModel @Inject constructor(
 
     private fun observeOnlineStatusUpdates() {
         viewModelScope.launch {
-            monitorOnlineStatusUpdates().collectLatest { (userHandle, status) ->
+            monitorOnlineStatusUseCase().collectLatest { (userHandle, status) ->
                 if (status != UserStatus.Online) {
                     requestLastGreen(userHandle)
                 }

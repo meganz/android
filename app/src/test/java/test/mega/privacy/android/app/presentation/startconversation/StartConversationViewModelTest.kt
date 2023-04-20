@@ -29,8 +29,8 @@ import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
-import mega.privacy.android.domain.usecase.MonitorLastGreenUpdates
-import mega.privacy.android.domain.usecase.MonitorOnlineStatusUpdates
+import mega.privacy.android.domain.usecase.contact.MonitorLastGreenUpdatesUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.core.ui.controls.SearchWidgetState
 import org.junit.After
@@ -108,11 +108,11 @@ class StartConversationViewModelTest {
         onBlocking { invoke(eq(testContactList), any()) }.thenReturn(testContactList)
     }
 
-    private val monitorLastGreenUpdates = mock<MonitorLastGreenUpdates> {
+    private val monitorLastGreenUpdatesUseCase = mock<MonitorLastGreenUpdatesUseCase> {
         on { invoke() }.thenReturn(emptyFlow())
     }
 
-    private val monitorOnlineStatusUpdates = mock<MonitorOnlineStatusUpdates> {
+    private val monitorOnlineStatusUseCase = mock<MonitorOnlineStatusUseCase> {
         on { invoke() }.thenReturn(emptyFlow())
     }
 
@@ -135,8 +135,8 @@ class StartConversationViewModelTest {
             startConversation = startConversation,
             monitorContactUpdates = monitorContactUpdates,
             applyContactUpdates = applyContactUpdates,
-            monitorLastGreenUpdates = monitorLastGreenUpdates,
-            monitorOnlineStatusUpdates = monitorOnlineStatusUpdates,
+            monitorLastGreenUpdatesUseCase = monitorLastGreenUpdatesUseCase,
+            monitorOnlineStatusUseCase = monitorOnlineStatusUseCase,
             monitorContactRequestUpdates = monitorContactRequestUpdates,
             addNewContacts = addNewContacts,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
