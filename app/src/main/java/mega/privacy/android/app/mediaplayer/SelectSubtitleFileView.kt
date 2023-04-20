@@ -173,8 +173,8 @@ internal fun SelectSubtitleFileView(
                 Button(
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 24.dp),
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = colorResource(id = R.color.teal_300),
-                        disabledBackgroundColor = colorResource(id = R.color.teal_100)
+                        backgroundColor = colorResource(id = R.color.teal_300_teal_200),
+                        disabledBackgroundColor = colorResource(id = R.color.teal_200_alpha_038)
                     ),
                     onClick = {
                         onAddSubtitleCallback(viewModel.getSelectedSubtitleFileInfoFlow().value)
