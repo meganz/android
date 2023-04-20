@@ -174,11 +174,30 @@ class ScheduleMeetingViewModel @Inject constructor(
 
     /**
      * Description text
+     *
+     * @param text Meeting description
      */
-    fun onDescriptionChange(text: String?) =
+    fun onDescriptionChange(text: String) =
         _state.update { state ->
-            state.copy(descriptionText = text)
+            state.copy(descriptionText = text.ifEmpty { "" })
         }
+
+    /**
+     * Title meeting text
+     *
+     * @param text Meeting title
+     */
+    fun onTitleChange(text: String) {
+        _state.update { state ->
+            state.copy(meetingTitle = text.ifEmpty { "" })
+        }
+
+        if (text.isNotEmpty()) {
+            _state.update { state ->
+                state.copy(isEmptyTitleError = false)
+            }
+        }
+    }
 
     /**
      * Updates state after shown snackBar.
@@ -194,9 +213,16 @@ class ScheduleMeetingViewModel @Inject constructor(
         }
 
     /**
-     * Schedule meeting
+     * Schedule meeting option
      */
     fun onScheduleMeetingTap() {
+        _state.update { state ->
+            state.copy(isEmptyTitleError = state.meetingTitle.isEmpty())
+        }
+
+        if (state.value.meetingTitle.isNotEmpty()) {
+            Timber.d("Schedule meeting")
+        }
     }
 
     /**

@@ -937,4 +937,8 @@ public class Constants {
     public static final long LONG_SNACKBAR_DURATION = 2750;
 
     public static final String CANNOT_OPEN_FILE_SHOWN = "CANNOT_OPEN_FILE_SHOWN";
+
+    public static final int MAX_TITLE_SIZE = 30;
+
+    public static final int MAX_DESCRIPTION_SIZE = 4000;
 }

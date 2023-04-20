@@ -15,10 +15,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AppBarDefaults
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -30,22 +27,15 @@ import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -53,7 +43,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
@@ -64,19 +53,17 @@ import mega.privacy.android.app.presentation.extensions.title
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
 import mega.privacy.android.app.presentation.meeting.model.ScheduledMeetingInfoState
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.controls.CustomDivider
 import mega.privacy.android.core.ui.controls.MegaSwitch
-import mega.privacy.android.core.ui.controls.textFields.TextFieldGenericDescription
+import mega.privacy.android.core.ui.controls.textfields.GenericDescriptionTextField
+import mega.privacy.android.core.ui.controls.textfields.GenericTitleTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.grey_alpha_038
-import mega.privacy.android.core.ui.theme.grey_alpha_054
-import mega.privacy.android.core.ui.theme.grey_alpha_087
-import mega.privacy.android.core.ui.theme.secondary_dark
-import mega.privacy.android.core.ui.theme.secondary_light
-import mega.privacy.android.core.ui.theme.white
-import mega.privacy.android.core.ui.theme.white_alpha_038
-import mega.privacy.android.core.ui.theme.white_alpha_054
+import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.core.ui.theme.extensions.grey_087_white_087
+import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_054
+import mega.privacy.android.core.ui.theme.extensions.teal_300_200
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -110,8 +97,10 @@ internal fun ScheduleMeetingView(
     onDismiss: () -> Unit,
     onSnackbarShown: () -> Unit,
     onDiscardMeetingDialog: () -> Unit,
-    onDescriptionValueChange: (String?) -> Unit,
+    onDescriptionValueChange: (String) -> Unit,
+    onTitleValueChange: (String) -> Unit,
 ) {
+
     is24hourFormat = DateFormat.is24HourFormat(LocalContext.current)
     val listState = rememberLazyListState()
     val firstItemVisible by remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
@@ -122,8 +111,10 @@ internal fun ScheduleMeetingView(
         scaffoldState = scaffoldState,
         snackbarHost = {
             SnackbarHost(hostState = it) { data ->
-                Snackbar(snackbarData = data,
-                    backgroundColor = black.takeIf { isLight() } ?: white)
+                Snackbar(
+                    snackbarData = data,
+                    backgroundColor = MaterialTheme.colors.black_white
+                )
             }
         },
         topBar = {
@@ -131,6 +122,7 @@ internal fun ScheduleMeetingView(
                 state = state,
                 onAcceptClicked = onAcceptClicked,
                 onDiscardClicked = onDiscardClicked,
+                onValueChange = onTitleValueChange,
                 elevation = !firstItemVisible
             )
         }
@@ -153,6 +145,7 @@ internal fun ScheduleMeetingView(
                     onTimeClicked = onStartTimeClicked
                 )
             }
+
             item(key = "Schedule meeting end date and time") {
                 ScheduledMeetingDateAndTime(
                     state = state,
@@ -203,9 +196,6 @@ internal fun ScheduleMeetingView(
     onScrollChange(!firstItemVisible)
 }
 
-@Composable
-private fun isLight(): Boolean = MaterialTheme.colors.isLight
-
 /**
  * Scheduled meeting date and time
  *
@@ -230,7 +220,8 @@ private fun ScheduledMeetingDateAndTime(
                 .align(Alignment.CenterStart)
                 .clickable { onDateClicked() },
             style = MaterialTheme.typography.subtitle1,
-            color = grey_alpha_087.takeIf { isLight() } ?: white)
+            color = MaterialTheme.colors.grey_087_white_087
+        )
 
         Text(
             text = timeFormatter.format(if (isStart) state.startDate else state.endDate),
@@ -238,20 +229,21 @@ private fun ScheduledMeetingDateAndTime(
                 .align(Alignment.CenterEnd)
                 .clickable { onTimeClicked() },
             style = MaterialTheme.typography.subtitle1,
-            color = grey_alpha_087.takeIf { isLight() } ?: white)
+            color = MaterialTheme.colors.grey_087_white_087
+        )
     }
 }
 
 /**
  * Add description to the scheduled meeting.
  *
- * @param state [ScheduleMeetingState]
- * @param onValueChange
+ * @param state                 [ScheduleMeetingState]
+ * @param onValueChange         When description changes
  */
 @Composable
 private fun AddDescriptionButton(
     state: ScheduleMeetingState,
-    onValueChange: (String?) -> Unit,
+    onValueChange: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -260,7 +252,7 @@ private fun AddDescriptionButton(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .padding(start = 18.dp, end = 0.dp, top = 1.dp, bottom = 0.dp)
+                .padding(start = 18.dp, end = 16.dp, top = 1.dp, bottom = 0.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -272,24 +264,25 @@ private fun AddDescriptionButton(
                         .clip(RectangleShape)
                         .wrapContentSize(Alignment.TopCenter)
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.ic_sched_meeting_description),
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_sched_meeting_description),
                         contentDescription = "${stringResource(id = R.string.meetings_schedule_meeting_add_description_label)} icon",
-                        tint = grey_alpha_054.takeIf { isLight() }
-                            ?: white_alpha_054)
+                        tint = MaterialTheme.colors.grey_white_alpha_054
+                    )
                 }
 
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    TextFieldGenericDescription(
-                        value = if (state.descriptionText.isNullOrEmpty()) "" else state.descriptionText,
-                        placeholderText = stringResource(id = R.string.meetings_schedule_meeting_add_description_label),
+                    GenericDescriptionTextField(
+                        value = state.descriptionText.ifEmpty { "" },
+                        placeholderId = R.string.meetings_schedule_meeting_add_description_label,
                         onValueChange = { text ->
                             onValueChange(text)
                         },
-                        errorText = stringResource(id = R.string.meetings_schedule_meeting_meeting_description_too_long_error),
-                        charLimit = 4000
+                        charLimitErrorId = R.string.meetings_schedule_meeting_meeting_description_too_long_error,
+                        charLimit = Constants.MAX_DESCRIPTION_SIZE
                     )
                 }
             }
@@ -323,7 +316,6 @@ private fun ActionButton(
                 hasSwitch = when (action) {
                     ScheduleMeetingAction.Recurrence,
                     ScheduleMeetingAction.AddParticipants,
-                    ScheduleMeetingAction.SendCalendarInvite,
                     ScheduleMeetingAction.AddDescription,
                     -> false
                     else -> true
@@ -349,6 +341,7 @@ private fun ActionButton(
  * @param state                     [ScheduledMeetingInfoState]
  * @param onAcceptClicked           When on accept scheduled meeting is clicked
  * @param onDiscardClicked          When on discard is clicked
+ * @param onValueChange             When title changes
  * @param elevation                 True if it has elevation. False, if it does not.
  */
 @Composable
@@ -356,6 +349,7 @@ private fun ScheduleMeetingAppBar(
     state: ScheduleMeetingState,
     onAcceptClicked: () -> Unit,
     onDiscardClicked: () -> Unit,
+    onValueChange: (String) -> Unit,
     elevation: Boolean,
 ) {
     Surface(
@@ -364,7 +358,6 @@ private fun ScheduleMeetingAppBar(
         elevation = if (elevation) AppBarDefaults.TopAppBarElevation else 0.dp,
         color = MaterialTheme.colors.surface
     ) {
-        val focusRequester = remember { FocusRequester() }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -383,7 +376,7 @@ private fun ScheduleMeetingAppBar(
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
                             contentDescription = "Cancel schedule meeting button",
-                            tint = grey_alpha_087.takeIf { isLight() } ?: white
+                            tint = MaterialTheme.colors.grey_087_white_087
                         )
                     }
                 }
@@ -392,53 +385,34 @@ private fun ScheduleMeetingAppBar(
                     modifier = Modifier
                         .wrapContentSize(Alignment.CenterEnd)
                 ) {
-                    IconButton(onClick = { onAcceptClicked() }) {
+                    IconButton(onClick = { if (state.hasMeetingTitleRightLength()) onAcceptClicked() }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_confirm),
                             contentDescription = "Accept schedule meeting button",
-                            tint = if (state.meetingName == null)
-                                grey_alpha_038.takeIf { isLight() } ?: white_alpha_038
-                            else
-                                secondary_light.takeIf { isLight() } ?: secondary_dark
+                            tint = if (state.isValidMeetingTitle()) MaterialTheme.colors.teal_300_200
+                            else MaterialTheme.colors.grey_white_alpha_038
                         )
                     }
                 }
             }
 
-            TextField(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp)
-                    .focusRequester(focusRequester),
-                value = "",
-                onValueChange = { },
-                placeholder = {
-                    Text(
-                        modifier = Modifier.alpha(ContentAlpha.medium),
-                        text = stringResource(id = R.string.meetings_schedule_meeting_name_hint),
-                        color = grey_alpha_038.takeIf { isLight() } ?: white_alpha_038,
-                        style = MaterialTheme.typography.h6,
-                    )
-                },
-                textStyle = MaterialTheme.typography.h6,
-                singleLine = true,
-                leadingIcon = {},
-                trailingIcon = {},
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = { }),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colors.secondary,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent
+                    .padding(start = 72.dp, end = 15.dp, bottom = 20.dp)
+            ) {
+                GenericTitleTextField(
+                    value = state.meetingTitle.ifEmpty { "" },
+                    isEmptyValueError = state.isEmptyTitleError,
+                    placeholderId = R.string.meetings_schedule_meeting_name_hint,
+                    onValueChange = { text ->
+                        onValueChange(text)
+                    },
+                    charLimitErrorId = R.string.meetings_schedule_meeting_meeting_name_too_long_error,
+                    emptyValueErrorId = R.string.meetings_schedule_meeting_empty_meeting_name_error,
+                    charLimit = Constants.MAX_TITLE_SIZE
                 )
-            )
-        }
-
-        DisposableEffect(Unit) {
-            focusRequester.requestFocus()
-            onDispose { }
+            }
         }
     }
 }
@@ -473,21 +447,24 @@ private fun ActionOption(
                     .clip(RectangleShape)
                     .wrapContentSize(Alignment.TopCenter)
             ) {
-                Icon(painter = painterResource(id = action.icon),
+                Icon(
+                    painter = painterResource(id = action.icon),
                     contentDescription = "${action.name} icon",
-                    tint = grey_alpha_054.takeIf { isLight() }
-                        ?: white_alpha_054)
+                    tint = MaterialTheme.colors.grey_white_alpha_054
+                )
             }
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                Text(modifier = Modifier
-                    .padding(start = 32.dp, end = 15.dp),
+                Text(
+                    modifier = Modifier
+                        .padding(start = 32.dp, end = 15.dp),
                     style = MaterialTheme.typography.subtitle1,
                     text = stringResource(id = action.title),
-                    color = grey_alpha_087.takeIf { isLight() } ?: white)
+                    color = MaterialTheme.colors.grey_087_white_087
+                )
 
                 var subtitle: String? = null
 
@@ -512,15 +489,17 @@ private fun ActionOption(
                 }
 
                 subtitle?.let {
-                    Text(modifier = Modifier
-                        .padding(
-                            start = 32.dp,
-                            end = 16.dp,
-                            top = if (action == ScheduleMeetingAction.MeetingLink) 10.dp else if (action == ScheduleMeetingAction.Recurrence) 6.dp else 2.dp
-                        ),
+                    Text(
+                        modifier = Modifier
+                            .padding(
+                                start = 32.dp,
+                                end = 16.dp,
+                                top = if (action == ScheduleMeetingAction.MeetingLink) 10.dp else if (action == ScheduleMeetingAction.Recurrence) 6.dp else 2.dp
+                            ),
                         style = MaterialTheme.typography.body2,
                         text = it,
-                        color = grey_alpha_054.takeIf { isLight() } ?: white_alpha_054)
+                        color = MaterialTheme.colors.grey_white_alpha_054
+                    )
                 }
             }
         }
@@ -577,7 +556,7 @@ private fun DiscardMeetingAlertDialog(
 fun PreviewDiscardMeetingAlertDialog() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         DiscardMeetingAlertDialog(state = ScheduleMeetingState(
-            meetingName = "Title meeting",
+            meetingTitle = "Title meeting",
             freq = OccurrenceFrequencyType.Invalid,
             participantItemList = emptyList(),
             finish = false,
@@ -600,7 +579,7 @@ private fun PreviewScheduleMeetingView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         ScheduleMeetingView(
             state = ScheduleMeetingState(
-                meetingName = "Title meeting",
+                meetingTitle = "Title meeting",
                 freq = OccurrenceFrequencyType.Invalid,
                 participantItemList = emptyList(),
                 finish = false,
@@ -619,6 +598,7 @@ private fun PreviewScheduleMeetingView() {
             onSnackbarShown = {},
             onDiscardMeetingDialog = {},
             onDescriptionValueChange = { },
+            onTitleValueChange = { }
         )
     }
 }

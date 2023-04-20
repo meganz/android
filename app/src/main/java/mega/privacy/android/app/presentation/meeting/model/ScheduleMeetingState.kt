@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.meeting.model
 
 import mega.privacy.android.app.presentation.meeting.ScheduleMeetingViewModel
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -8,7 +9,7 @@ import java.time.temporal.ChronoUnit
 /**
  * Data class defining the state of [ScheduleMeetingViewModel]
  *
- * @property meetingName                            Meeting name
+ * @property meetingTitle                           Meeting title
  * @property freq                                   [OccurrenceFrequencyType].
  * @property startDate                              Start Date.
  * @property endDate                                End Date.
@@ -24,9 +25,10 @@ import java.time.temporal.ChronoUnit
  * @property numOfParticipants                      Number of participants.
  * @property isEditingDescription                   True, if is editing description. False, if not.
  * @property descriptionText                        Description text
+ * @property isEmptyTitleError                      True, if an attempt has been made to create a meeting without a title. False, if not.
  */
 data class ScheduleMeetingState constructor(
-    val meetingName: String? = null,
+    val meetingTitle: String = "",
     val freq: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
     val startDate: Instant = Instant.now(),
     val endDate: Instant = Instant.now().plus(1, ChronoUnit.HOURS),
@@ -41,5 +43,17 @@ data class ScheduleMeetingState constructor(
     val openAddContact: Boolean? = null,
     val numOfParticipants: Int = 1,
     val isEditingDescription: Boolean = false,
-    val descriptionText: String? = "",
-)
+    val descriptionText: String = "",
+    val isEmptyTitleError: Boolean = false,
+) {
+    /**
+     * Check if it's valid title
+     */
+    fun isValidMeetingTitle(): Boolean =
+        meetingTitle.isNotBlank() && hasMeetingTitleRightLength()
+
+    /**
+     * Check if meeting title has the right length
+     */
+    fun hasMeetingTitleRightLength(): Boolean = meetingTitle.length <= Constants.MAX_TITLE_SIZE
+}

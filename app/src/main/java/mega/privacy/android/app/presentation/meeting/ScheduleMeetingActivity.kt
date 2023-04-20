@@ -125,7 +125,8 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                 onDismiss = { viewModel.dismissDialog() },
                 onSnackbarShown = viewModel::snackbarShown,
                 onDiscardMeetingDialog = { finish() },
-                onDescriptionValueChange = { text -> viewModel.onDescriptionChange(text) }
+                onDescriptionValueChange = { text -> viewModel.onDescriptionChange(text) },
+                onTitleValueChange = { text -> viewModel.onTitleChange(text) },
             )
         }
     }

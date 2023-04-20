@@ -6,6 +6,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -21,17 +23,20 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -65,14 +70,19 @@ fun MegaTextField(
     shape: Shape =
         MaterialTheme.shapes.small.copy(bottomEnd = ZeroCornerSize, bottomStart = ZeroCornerSize),
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(
-        backgroundColor = MaterialTheme.colors.surface,
+        backgroundColor = Color.Transparent,
         unfocusedIndicatorColor = if (!MaterialTheme.colors.isLight) white_alpha_012 else grey_alpha_012,
         textColor = MaterialTheme.colors.onSurface,
         cursorColor = MaterialTheme.colors.secondary,
         focusedLabelColor = MaterialTheme.colors.secondary,
         focusedIndicatorColor = MaterialTheme.colors.secondary,
     ),
+    contentPadding: PaddingValues = PaddingValues(top = 13.dp, bottom = 13.dp),
+    defaultMinHeight: Dp = TextFieldDefaults.MinHeight,
+    defaultMinWidth: Dp = TextFieldDefaults.MinWidth,
 ) {
+    val scrollState = rememberScrollState(0)
+
     // If color is not provided via the text style, use content color as a default
     val textColor = textStyle.color.takeOrElse {
         colors.textColor(enabled).value
@@ -85,6 +95,7 @@ fun MegaTextField(
     )
     var modifiedModifier = modifier
         .background(colors.backgroundColor(enabled).value, shape)
+
     if (showBorder) {
         modifiedModifier = modifiedModifier.then(
             Modifier.indicatorLine(
@@ -102,9 +113,10 @@ fun MegaTextField(
             value = value,
             modifier = modifiedModifier
                 .defaultMinSize(
-                    minWidth = TextFieldDefaults.MinWidth,
-                    minHeight = TextFieldDefaults.MinHeight
-                ),
+                    minWidth = defaultMinWidth,
+                    minHeight = defaultMinHeight
+                )
+                .fillMaxWidth(),
             onValueChange = onValueChange,
             enabled = enabled,
             readOnly = readOnly,
@@ -131,15 +143,16 @@ fun MegaTextField(
                     isError = isError,
                     interactionSource = interactionSource,
                     colors = colors,
-                    contentPadding = PaddingValues(
-                        0.dp,
-                        12.dp,
-                        0.dp,
-                        12.dp
-                    ) // following mega design
+                    contentPadding = contentPadding
                 )
             }
         )
+    }
+
+    LaunchedEffect(scrollState.maxValue) {
+        scrollState.scrollTo(scrollState.maxValue)
+        // or
+        // scrollState.animateScrollTo(scrollState.maxValue)
     }
 }
 
