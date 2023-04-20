@@ -121,11 +121,8 @@ public class TurnOnNotificationsFragment extends Fragment implements View.OnClic
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.turnOnNotifications_fragment_container: {
-                ((ManagerActivity) context).deleteTurnOnNotificationsFragment();
-                break;
-            }
+        if (v.getId() == R.id.turnOnNotifications_fragment_container) {
+            ((ManagerActivity) context).deleteTurnOnNotificationsFragment();
         }
     }
 }

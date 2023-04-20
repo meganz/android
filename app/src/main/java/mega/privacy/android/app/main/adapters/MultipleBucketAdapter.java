@@ -359,26 +359,22 @@ public class MultipleBucketAdapter
         List<NodeItem> selectedNodes = this.nodes.stream().filter(NodeItem::getSelected).collect(Collectors.toList());
         NodeItem node = getItemAtPosition(holder.getAbsoluteAdapterPosition());
         if (node == null) return;
-        switch (v.getId()) {
-            case R.id.three_dots: {
-                if (selectedNodes.isEmpty()) {
-                    if (!isOnline(context)) {
-                        ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
-                        break;
-                    }
-                    ((ManagerActivity) context).showNodeOptionsPanel(node.getNode(), RECENTS_MODE);
-                } else {
-                    if (fragment instanceof RecentsBucketFragment) {
-                        ((RecentsBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
-                    }
+        int id = v.getId();
+        if (id == R.id.three_dots) {
+            if (selectedNodes.isEmpty()) {
+                if (!isOnline(context)) {
+                    ((ManagerActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_server_connection_problem), -1);
+                    return;
                 }
-                break;
-            }
-            case R.id.multiple_bucket_layout: {
+                ((ManagerActivity) context).showNodeOptionsPanel(node.getNode(), RECENTS_MODE);
+            } else {
                 if (fragment instanceof RecentsBucketFragment) {
                     ((RecentsBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
                 }
-                break;
+            }
+        } else if (id == R.id.multiple_bucket_layout) {
+            if (fragment instanceof RecentsBucketFragment) {
+                ((RecentsBucketFragment) fragment).handleItemClick(holder.getAdapterPosition(), node, true);
             }
         }
     }

@@ -216,47 +216,38 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             Timber.d("onActionItemClicked");
             final ArrayList<MegaShare> shares = adapter.getSelectedShares();
 
-            switch (item.getItemId()) {
-                case R.id.action_file_contact_list_permissions: {
-                    //Change permissions
-                    dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
+            int itemId = item.getItemId();
+            if (itemId == R.id.action_file_contact_list_permissions) {//Change permissions
+                dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
 
-                    final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
-                    dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int item) {
-                            clearSelections();
-                            if (permissionsDialog != null) {
-                                permissionsDialog.dismiss();
-                            }
-                            statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_permissions_changing_folder));
-                            contactController.changePermissions(contactController.getEmailShares(shares), item, node);
+                final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
+                dialogBuilder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        clearSelections();
+                        if (permissionsDialog != null) {
+                            permissionsDialog.dismiss();
                         }
-                    });
-
-                    permissionsDialog = dialogBuilder.create();
-                    permissionsDialog.show();
-                    break;
-                }
-                case R.id.action_file_contact_list_delete: {
-                    if (shares != null && !shares.isEmpty()) {
-                        if (shares.size() > 1) {
-                            Timber.d("Remove multiple contacts");
-                            showConfirmationRemoveMultipleContactFromShare(shares);
-                        } else {
-                            Timber.d("Remove one contact");
-                            showConfirmationRemoveContactFromShare(shares.get(0).getUser());
-                        }
+                        statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_permissions_changing_folder));
+                        contactController.changePermissions(contactController.getEmailShares(shares), item, node);
                     }
-                    break;
+                });
+
+                permissionsDialog = dialogBuilder.create();
+                permissionsDialog.show();
+            } else if (itemId == R.id.action_file_contact_list_delete) {
+                if (shares != null && !shares.isEmpty()) {
+                    if (shares.size() > 1) {
+                        Timber.d("Remove multiple contacts");
+                        showConfirmationRemoveMultipleContactFromShare(shares);
+                    } else {
+                        Timber.d("Remove one contact");
+                        showConfirmationRemoveContactFromShare(shares.get(0).getUser());
+                    }
                 }
-                case R.id.cab_menu_select_all: {
-                    selectAll();
-                    break;
-                }
-                case R.id.cab_menu_unselect_all: {
-                    clearSelections();
-                    break;
-                }
+            } else if (itemId == R.id.cab_menu_select_all) {
+                selectAll();
+            } else if (itemId == R.id.cab_menu_unselect_all) {
+                clearSelections();
             }
             return false;
         }
@@ -535,23 +526,18 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle presses on the action bar items
-        switch (item.getItemId()) {
-            case android.R.id.home: {
-                onBackPressed();
-                return true;
-            }
-            case R.id.action_select: {
-                selectAll();
-                return true;
-            }
-            case R.id.action_folder_contacts_list_share_folder: {
-                handleShareFolder();
-                return true;
-            }
-            default: {
-                return super.onOptionsItemSelected(item);
-            }
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            onBackPressed();
+            return true;
+        } else if (itemId == R.id.action_select) {
+            selectAll();
+            return true;
+        } else if (itemId == R.id.action_folder_contacts_list_share_folder) {
+            handleShareFolder();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     /**

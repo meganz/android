@@ -496,25 +496,19 @@ public class MegaContactsAttachedAdapter extends RecyclerView.Adapter<MegaContac
         int currentPosition = holder.getAdapterPosition();
         Contact c = (Contact) getItem(currentPosition);
 
-        switch (v.getId()) {
-            case R.id.contact_list_three_dots:
-            case R.id.contact_grid_three_dots: {
-                Timber.d("Click contact three dots!");
-                if (!multipleSelect) {
-                    if ((c.getEmail().equals(megaChatApi.getMyEmail()))) {
-                        ((ContactAttachmentActivity) context).showSnackbar(context.getString(R.string.contact_is_me));
-                    } else {
-                        ((ContactAttachmentActivity) context).showOptionsPanel(c.getEmail());
-                    }
+        int id = v.getId();
+        if (id == R.id.contact_list_three_dots || id == R.id.contact_grid_three_dots) {
+            Timber.d("Click contact three dots!");
+            if (!multipleSelect) {
+                if ((c.getEmail().equals(megaChatApi.getMyEmail()))) {
+                    ((ContactAttachmentActivity) context).showSnackbar(context.getString(R.string.contact_is_me));
+                } else {
+                    ((ContactAttachmentActivity) context).showOptionsPanel(c.getEmail());
                 }
-                break;
             }
-            case R.id.contact_list_item_layout:
-            case R.id.contact_grid_item_layout: {
-                Timber.d("contact_item_layout");
-                ((ContactAttachmentActivity) context).itemClick(currentPosition);
-                break;
-            }
+        } else if (id == R.id.contact_list_item_layout || id == R.id.contact_grid_item_layout) {
+            Timber.d("contact_item_layout");
+            ((ContactAttachmentActivity) context).itemClick(currentPosition);
         }
     }
 

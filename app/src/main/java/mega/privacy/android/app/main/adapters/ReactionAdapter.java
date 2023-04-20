@@ -283,17 +283,15 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
                 ((ChatActivity) context).isMultiselectOn())
             return;
 
-        switch (v.getId()) {
-            case R.id.more_reactions_layout:
-                ((ChatActivity) context).openReactionBottomSheet(chatId, megaMessage);
-                break;
-            case R.id.item_reaction_layout:
-                if (holder.itemEmojiReaction.getEmoji() == null) {
-                    addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.itemEmojiReactionText.getText().toString(), false);
-                } else {
-                    addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.itemEmojiReaction.getEmoji(), false);
-                }
-                break;
+        int id = v.getId();
+        if (id == R.id.more_reactions_layout) {
+            ((ChatActivity) context).openReactionBottomSheet(chatId, megaMessage);
+        } else if (id == R.id.item_reaction_layout) {
+            if (holder.itemEmojiReaction.getEmoji() == null) {
+                addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.itemEmojiReactionText.getText().toString(), false);
+            } else {
+                addReactionInMsg(context, chatId, megaMessage.getMessage().getMsgId(), holder.itemEmojiReaction.getEmoji(), false);
+            }
         }
     }
 
@@ -310,10 +308,8 @@ public class ReactionAdapter extends RecyclerView.Adapter<ReactionAdapter.ViewHo
             return true;
         }
 
-        switch (v.getId()) {
-            case R.id.item_reaction_layout:
-               ((ChatActivity) context).openInfoReactionBottomSheet(chatId, megaMessage, holder.reaction);
-                break;
+        if (v.getId() == R.id.item_reaction_layout) {
+            ((ChatActivity) context).openInfoReactionBottomSheet(chatId, megaMessage, holder.reaction);
         }
 
         return true;

@@ -575,30 +575,22 @@ public class VersionsFileAdapter extends RecyclerView.Adapter<VersionsFileAdapte
 
         final MegaNode n = (MegaNode) getItem(currentPosition);
 
-        switch (v.getId()) {
-            case R.id.version_file_three_dots_layout: {
-
-                Timber.d("version_file_three_dots: %s", currentPosition);
-                if (!isOnline(context)) {
-                    ((VersionsFileActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
-                    return;
-                }
-
-                if (multipleSelect) {
-                    ((VersionsFileActivity) context).itemClick(currentPosition);
-                } else {
-                    ((VersionsFileActivity) context).showOptionsPanel(n, currentPosition);
-
-                }
-
-                break;
+        int id = v.getId();
+        if (id == R.id.version_file_three_dots_layout) {
+            Timber.d("version_file_three_dots: %s", currentPosition);
+            if (!isOnline(context)) {
+                ((VersionsFileActivity) context).showSnackbar(context.getString(R.string.error_server_connection_problem));
+                return;
             }
-            case R.id.version_file_item_layout: {
 
+            if (multipleSelect) {
                 ((VersionsFileActivity) context).itemClick(currentPosition);
+            } else {
+                ((VersionsFileActivity) context).showOptionsPanel(n, currentPosition);
 
-                break;
             }
+        } else if (id == R.id.version_file_item_layout) {
+            ((VersionsFileActivity) context).itemClick(currentPosition);
         }
     }
 

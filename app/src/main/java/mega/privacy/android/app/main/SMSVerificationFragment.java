@@ -78,21 +78,19 @@ public class SMSVerificationFragment extends Fragment implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.enable_button:
-                Timber.d("To sms verification");
-                startActivity(new Intent(context, SMSVerificationActivity.class));
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        fadeOut();
-                    }
-                }, 1000);
-                break;
-            case R.id.not_now_button_2:
-                Timber.d("Don't verify now");
-                fadeOut();
-                break;
+        int id = v.getId();
+        if (id == R.id.enable_button) {
+            Timber.d("To sms verification");
+            startActivity(new Intent(context, SMSVerificationActivity.class));
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    fadeOut();
+                }
+            }, 1000);
+        } else if (id == R.id.not_now_button_2) {
+            Timber.d("Don't verify now");
+            fadeOut();
         }
     }
 

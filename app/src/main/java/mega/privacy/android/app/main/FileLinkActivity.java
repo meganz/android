@@ -309,15 +309,10 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
         Timber.d("onOptionsItemSelected");
 
         int id = item.getItemId();
-        switch (id) {
-            case android.R.id.home: {
-                finish();
-                break;
-            }
-            case R.id.share_link: {
-                shareLink(this, url);
-                break;
-            }
+        if (id == android.R.id.home) {
+            finish();
+        } else if (id == R.id.share_link) {
+            shareLink(this, url);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -653,20 +648,14 @@ public class FileLinkActivity extends TransfersManagementActivity implements Meg
     @Override
     public void onClick(View v) {
 
-        switch (v.getId()) {
-            case R.id.file_link_button_download: {
-                PermissionUtils.checkNotificationsPermission(this);
-                nodeSaver.saveNode(document, false, false, false, true);
-                break;
-            }
-            case R.id.file_link_button_import: {
-                importNode();
-                break;
-            }
-            case R.id.button_preview_content: {
-                showFile();
-                break;
-            }
+        int id = v.getId();
+        if (id == R.id.file_link_button_download) {
+            PermissionUtils.checkNotificationsPermission(this);
+            nodeSaver.saveNode(document, false, false, false, true);
+        } else if (id == R.id.file_link_button_import) {
+            importNode();
+        } else if (id == R.id.button_preview_content) {
+            showFile();
         }
     }
 

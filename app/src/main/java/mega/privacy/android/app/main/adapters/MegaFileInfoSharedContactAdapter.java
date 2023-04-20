@@ -42,20 +42,15 @@ public class MegaFileInfoSharedContactAdapter extends MegaSharedFolderAdapter {
         int currentPosition = holder.currentPosition;
         final MegaShare s = (MegaShare) getItem(currentPosition);
 
-        switch (v.getId()) {
-            case R.id.shared_folder_three_dots_layout: {
-                if (multipleSelect) {
-                    listener.itemClick(currentPosition);
-                } else {
-                    listener.showOptionsPanel(s);
-                }
-
-                break;
-            }
-            case R.id.shared_folder_item_layout: {
+        int id = v.getId();
+        if (id == R.id.shared_folder_three_dots_layout) {
+            if (multipleSelect) {
                 listener.itemClick(currentPosition);
-                break;
+            } else {
+                listener.showOptionsPanel(s);
             }
+        } else if (id == R.id.shared_folder_item_layout) {
+            listener.itemClick(currentPosition);
         }
     }
 

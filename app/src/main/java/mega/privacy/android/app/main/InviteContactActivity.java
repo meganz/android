@@ -263,7 +263,6 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
         emptySubTextView = findViewById(R.id.invite_contact_list_empty_subtext);
         noPermissionHeader = findViewById(R.id.no_permission_header);
 
-        progressBar = findViewById(R.id.add_contact_progress_bar);
         progressBar = findViewById(R.id.invite_contact_progress_bar);
         refreshInviteContactButton();
         //orientation changes
@@ -372,25 +371,18 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
-            case android.R.id.home: {
-                onBackPressed();
-                break;
-            }
-            case R.id.action_my_qr: {
-                initMyQr();
-                break;
-            }
-            case R.id.action_more: {
-                Timber.i("more button clicked - share invitation through other app");
-                String message = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-                sendIntent.setType(TYPE_TEXT_PLAIN);
-                startActivity(Intent.createChooser(sendIntent, getString(R.string.invite_contact_chooser_title)));
-                break;
-            }
+        if (id == android.R.id.home) {
+            onBackPressed();
+        } else if (id == R.id.action_my_qr) {
+            initMyQr();
+        } else if (id == R.id.action_more) {
+            Timber.i("more button clicked - share invitation through other app");
+            String message = getResources().getString(R.string.invite_contacts_to_start_chat_text_message, contactLink);
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, message);
+            sendIntent.setType(TYPE_TEXT_PLAIN);
+            startActivity(Intent.createChooser(sendIntent, getString(R.string.invite_contact_chooser_title)));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -700,23 +692,19 @@ public class InviteContactActivity extends PasscodeActivity implements ContactIn
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.layout_scan_qr: {
-                Timber.d("Scan QR code pressed");
-                if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
-                    showConfirmationOpenCamera(this, ACTION_OPEN_QR, true);
-                    break;
-                }
-                initScanQR();
-                break;
+        int id = v.getId();
+        if (id == R.id.layout_scan_qr) {
+            Timber.d("Scan QR code pressed");
+            if (isNecessaryDisableLocalCamera() != MEGACHAT_INVALID_HANDLE) {
+                showConfirmationOpenCamera(this, ACTION_OPEN_QR, true);
+                return;
             }
-            case R.id.fab_button_next: {
-                enableFabButton(false);
-                Timber.d("invite Contacts");
-                inviteContacts(addedContacts);
-                hideKeyboard(this, 0);
-                break;
-            }
+            initScanQR();
+        } else if (id == R.id.fab_button_next) {
+            enableFabButton(false);
+            Timber.d("invite Contacts");
+            inviteContacts(addedContacts);
+            hideKeyboard(this, 0);
         }
     }
 

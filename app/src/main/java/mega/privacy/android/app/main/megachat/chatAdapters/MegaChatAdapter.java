@@ -7630,108 +7630,78 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             return;
         }
 
-        switch (v.getId()) {
-            case R.id.content_own_message_voice_clip_play_pause:
-            case R.id.content_contact_message_voice_clip_play_pause:
-                if (!(((ChatActivity) context).isRecordingNow())) {
-                    playOrPauseVoiceClip(currentPositionInAdapter, holder);
-                }
-                break;
-
-            case R.id.content_own_message_voice_clip_not_available:
-            case R.id.content_contact_message_voice_clip_not_available: {
-                ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_message_voice_clip), -1);
-                break;
+        int id = v.getId();
+        if (id == R.id.content_own_message_voice_clip_play_pause || id == R.id.content_contact_message_voice_clip_play_pause) {
+            if (!(((ChatActivity) context).isRecordingNow())) {
+                playOrPauseVoiceClip(currentPositionInAdapter, holder);
+            }
+        } else if (id == R.id.content_own_message_voice_clip_not_available || id == R.id.content_contact_message_voice_clip_not_available) {
+            ((ChatActivity) context).showSnackbar(SNACKBAR_TYPE, context.getString(R.string.error_message_voice_clip), -1);
+        } else if (id == R.id.forward_own_rich_links || id == R.id.forward_own_contact || id == R.id.forward_own_file || id == R.id.forward_own_preview_portrait || id == R.id.forward_own_preview_landscape || id == R.id.forward_contact_rich_links || id == R.id.forward_contact_contact || id == R.id.forward_contact_file || id == R.id.forward_contact_preview_portrait || id == R.id.forward_contact_preview_landscape || id == R.id.forward_own_location || id == R.id.forward_contact_location || id == R.id.own_contact_link_forward || id == R.id.others_contact_link_forward) {
+            ArrayList<AndroidMegaChatMessage> messageArray = new ArrayList<>();
+            int currentPositionInMessages = currentPositionInAdapter - 1;
+            messageArray.add(messages.get(currentPositionInMessages));
+            ((ChatActivity) context).forwardMessages(messageArray);
+        } else if (id == R.id.content_own_message_text || id == R.id.content_contact_message_text || id == R.id.url_own_message_text || id == R.id.url_contact_message_text) {
+            if (isIsClickAlreadyIntercepted()) {
+                resetIsClickAlreadyIntercepted();
+                return;
             }
 
-            case R.id.forward_own_rich_links:
-            case R.id.forward_own_contact:
-            case R.id.forward_own_file:
-            case R.id.forward_own_preview_portrait:
-            case R.id.forward_own_preview_landscape:
-            case R.id.forward_contact_rich_links:
-            case R.id.forward_contact_contact:
-            case R.id.forward_contact_file:
-            case R.id.forward_contact_preview_portrait:
-            case R.id.forward_contact_preview_landscape:
-            case R.id.forward_own_location:
-            case R.id.forward_contact_location:
-            case R.id.own_contact_link_forward:
-            case R.id.others_contact_link_forward:
-                ArrayList<AndroidMegaChatMessage> messageArray = new ArrayList<>();
-                int currentPositionInMessages = currentPositionInAdapter - 1;
-                messageArray.add(messages.get(currentPositionInMessages));
-                ((ChatActivity) context).forwardMessages(messageArray);
-                break;
 
-            case R.id.content_own_message_text:
-            case R.id.content_contact_message_text:
-            case R.id.url_own_message_text:
-            case R.id.url_contact_message_text:
-                if (isIsClickAlreadyIntercepted()) {
-                    resetIsClickAlreadyIntercepted();
-                    break;
-                }
+            if (!isMultipleSelect() && checkIfIsGiphyOrGifMessage(currentPositionInAdapter - 1, holder)) {
+                return;
+            }
 
-            case R.id.message_chat_item_layout:
-            case R.id.content_own_message_thumb_portrait_gif_view:
-            case R.id.content_own_message_thumb_landscape_gif_view:
-            case R.id.content_contact_message_thumb_portrait_gif_view:
-            case R.id.content_contact_message_thumb_landscape_gif_view:
-                if (!isMultipleSelect() && checkIfIsGiphyOrGifMessage(currentPositionInAdapter - 1, holder)) {
-                    break;
-                }
+            int[] screenPosition = new int[2];
+            int[] dimens = new int[4];
+            checkItem(v, holder, screenPosition, dimens);
 
-                int[] screenPosition = new int[2];
-                int[] dimens = new int[4];
+            ((ChatActivity) context).itemClick(currentPositionInAdapter, dimens);
+        } else if (id == R.id.message_chat_item_layout || id == R.id.content_own_message_thumb_portrait_gif_view || id == R.id.content_own_message_thumb_landscape_gif_view || id == R.id.content_contact_message_thumb_portrait_gif_view || id == R.id.content_contact_message_thumb_landscape_gif_view) {
+            if (!isMultipleSelect() && checkIfIsGiphyOrGifMessage(currentPositionInAdapter - 1, holder)) {
+                return;
+            }
+
+            int[] screenPosition = new int[2];
+            int[] dimens = new int[4];
+            checkItem(v, holder, screenPosition, dimens);
+
+            ((ChatActivity) context).itemClick(currentPositionInAdapter, dimens);
+        } else if (id == R.id.url_always_allow_button) {
+            ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_FALSE;
+            megaApi.enableRichPreviews(true);
+            this.notifyItemChanged(currentPositionInAdapter);
+        } else if (id == R.id.url_no_disable_button || id == R.id.url_not_now_button) {
+            ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_FALSE;
+            int counter = MegaApplication.getCounterNotNowRichLinkWarning();
+            if (counter < 1) {
+                counter = 1;
+            } else {
+                counter++;
+            }
+            megaApi.setRichLinkWarningCounterValue(counter);
+            this.notifyItemChanged(currentPositionInAdapter);
+        } else if (id == R.id.url_never_button) {
+            ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_CONFIRMATION;
+            this.notifyItemChanged(currentPositionInAdapter);
+        } else if (id == R.id.url_yes_disable_button) {
+            ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_FALSE;
+            megaApi.enableRichPreviews(false);
+            this.notifyItemChanged(currentPositionInAdapter);
+        } else if (id == R.id.own_contact_link_container || id == R.id.others_contact_link_container) {
+            int[] dimens;
+            int[] screenPosition;
+            if (isMultipleSelect()) {
+                screenPosition = new int[2];
+                dimens = new int[4];
                 checkItem(v, holder, screenPosition, dimens);
-
                 ((ChatActivity) context).itemClick(currentPositionInAdapter, dimens);
-                break;
-
-            case R.id.url_always_allow_button: {
-                ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_FALSE;
-                megaApi.enableRichPreviews(true);
-                this.notifyItemChanged(currentPositionInAdapter);
-                break;
+            } else {
+                int positionInMessages = currentPositionInAdapter - 1;
+                InviteContactUseCase.ContactLinkResult result = messages.get(positionInMessages).getContactLinkResult();
+                ((ChatActivity) context).openContactLinkMessage(result);
             }
-            case R.id.url_no_disable_button:
-            case R.id.url_not_now_button: {
-                ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_FALSE;
-                int counter = MegaApplication.getCounterNotNowRichLinkWarning();
-                if (counter < 1) {
-                    counter = 1;
-                } else {
-                    counter++;
-                }
-                megaApi.setRichLinkWarningCounterValue(counter);
-                this.notifyItemChanged(currentPositionInAdapter);
-                break;
-            }
-            case R.id.url_never_button: {
-                ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_CONFIRMATION;
-                this.notifyItemChanged(currentPositionInAdapter);
-                break;
-            }
-            case R.id.url_yes_disable_button: {
-                ((ChatActivity) context).showRichLinkWarning = RICH_WARNING_FALSE;
-                megaApi.enableRichPreviews(false);
-                this.notifyItemChanged(currentPositionInAdapter);
-                break;
-            }
-            case R.id.own_contact_link_container:
-            case R.id.others_contact_link_container:
-                if (isMultipleSelect()) {
-                    screenPosition = new int[2];
-                    dimens = new int[4];
-                    checkItem(v, holder, screenPosition, dimens);
-                    ((ChatActivity) context).itemClick(currentPositionInAdapter, dimens);
-                } else {
-                    int positionInMessages = currentPositionInAdapter - 1;
-                    InviteContactUseCase.ContactLinkResult result = messages.get(positionInMessages).getContactLinkResult();
-                    ((ChatActivity) context).openContactLinkMessage(result);
-                }
-                break;
         }
     }
 

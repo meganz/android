@@ -79,11 +79,8 @@ public class ReferralBonusesFragment extends Fragment implements OnClickListener
     @Override
     public void onClick(View v) {
         Timber.d("onClick");
-        switch (v.getId()) {
-            case R.id.referral_bonuses_layout: {
-                Timber.d("Go to section Referral bonuses");
-                break;
-            }
+        if (v.getId() == R.id.referral_bonuses_layout) {
+            Timber.d("Go to section Referral bonuses");
         }
     }
 

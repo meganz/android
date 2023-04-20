@@ -616,72 +616,46 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
 
         ViewHolderParticipantsHeader holderHeader = (ViewHolderParticipantsHeader) listFragment.findViewHolderForAdapterPosition(0);
 
-        switch (v.getId()) {
-            case R.id.participant_list_three_dots:
-            case R.id.participant_list_item_layout:
-                ViewHolderParticipantsList holder = (ViewHolderParticipantsList) v.getTag();
-                int currentPosition = holder.currentPosition;
-                MegaChatParticipant p = getParticipant(currentPosition);
-                groupChatInfoActivity.showParticipantsPanel(p);
-                break;
-
-            case R.id.add_participant_list_item_layout:
-                groupChatInfoActivity.chooseAddParticipantDialog();
-                break;
-
-            case R.id.chat_group_contact_properties_edit_icon:
-                groupChatInfoActivity.showRenameGroupDialog(false);
-                break;
-
-            case R.id.chat_group_contact_properties_leave_layout:
-                groupChatInfoActivity.showConfirmationLeaveChat();
-                break;
-
-            case R.id.chat_group_contact_properties_end_call_layout:
-                groupChatInfoActivity.showEndCallForAllDialog();
-                break;
-
-            case R.id.manage_chat_history_group_info_layout:
-                Intent intentManageChat = new Intent(groupChatInfoActivity, ManageChatHistoryActivity.class);
-                intentManageChat.putExtra(CHAT_ID, chatId);
-                intentManageChat.putExtra(IS_FROM_CONTACTS, false);
-                groupChatInfoActivity.startActivity(intentManageChat);
-                break;
-
-            case R.id.chat_group_contact_properties_archive_layout:
-                new ChatController(groupChatInfoActivity).archiveChat(groupChatInfoActivity.getChat());
-                break;
-
-            case R.id.chat_group_contact_properties_layout:
-                if (holderHeader != null) {
-                    if (holderHeader.notificationsSwitch.isChecked()) {
-                        createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId);
-                    } else {
-                        MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
-                    }
+        int id = v.getId();
+        if (id == R.id.participant_list_three_dots || id == R.id.participant_list_item_layout) {
+            ViewHolderParticipantsList holder = (ViewHolderParticipantsList) v.getTag();
+            int currentPosition = holder.currentPosition;
+            MegaChatParticipant p = getParticipant(currentPosition);
+            groupChatInfoActivity.showParticipantsPanel(p);
+        } else if (id == R.id.add_participant_list_item_layout) {
+            groupChatInfoActivity.chooseAddParticipantDialog();
+        } else if (id == R.id.chat_group_contact_properties_edit_icon) {
+            groupChatInfoActivity.showRenameGroupDialog(false);
+        } else if (id == R.id.chat_group_contact_properties_leave_layout) {
+            groupChatInfoActivity.showConfirmationLeaveChat();
+        } else if (id == R.id.chat_group_contact_properties_end_call_layout) {
+            groupChatInfoActivity.showEndCallForAllDialog();
+        } else if (id == R.id.manage_chat_history_group_info_layout) {
+            Intent intentManageChat = new Intent(groupChatInfoActivity, ManageChatHistoryActivity.class);
+            intentManageChat.putExtra(CHAT_ID, chatId);
+            intentManageChat.putExtra(IS_FROM_CONTACTS, false);
+            groupChatInfoActivity.startActivity(intentManageChat);
+        } else if (id == R.id.chat_group_contact_properties_archive_layout) {
+            new ChatController(groupChatInfoActivity).archiveChat(groupChatInfoActivity.getChat());
+        } else if (id == R.id.chat_group_contact_properties_layout) {
+            if (holderHeader != null) {
+                if (holderHeader.notificationsSwitch.isChecked()) {
+                    createMuteNotificationsAlertDialogOfAChat(groupChatInfoActivity, chatId);
+                } else {
+                    MegaApplication.getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(groupChatInfoActivity, NOTIFICATIONS_ENABLED, chatId);
                 }
-                break;
-
-            case R.id.chat_group_allow_participants_layout:
-            case R.id.chat_group_allow_participants_properties_switch:
-                updateAllowAddParticipants(!getChat().isOpenInvite());
-                groupChatInfoActivity.setOpenInvite();
-                break;
-
-            case R.id.chat_group_contact_properties_chat_link_layout: {
-                megaChatApi.queryChatLink(chatId, groupChatInfoActivity);
-                break;
             }
-            case R.id.chat_group_contact_properties_private_layout: {
-                groupChatInfoActivity.showConfirmationPrivateChatDialog();
-                break;
-            }
-            case R.id.chat_group_contact_properties_chat_files_shared_layout: {
-                Intent nodeHistoryIntent = new Intent(groupChatInfoActivity, NodeAttachmentHistoryActivity.class);
-                nodeHistoryIntent.putExtra("chatId", chatId);
-                groupChatInfoActivity.startActivity(nodeHistoryIntent);
-                break;
-            }
+        } else if (id == R.id.chat_group_allow_participants_layout || id == R.id.chat_group_allow_participants_properties_switch) {
+            updateAllowAddParticipants(!getChat().isOpenInvite());
+            groupChatInfoActivity.setOpenInvite();
+        } else if (id == R.id.chat_group_contact_properties_chat_link_layout) {
+            megaChatApi.queryChatLink(chatId, groupChatInfoActivity);
+        } else if (id == R.id.chat_group_contact_properties_private_layout) {
+            groupChatInfoActivity.showConfirmationPrivateChatDialog();
+        } else if (id == R.id.chat_group_contact_properties_chat_files_shared_layout) {
+            Intent nodeHistoryIntent = new Intent(groupChatInfoActivity, NodeAttachmentHistoryActivity.class);
+            nodeHistoryIntent.putExtra("chatId", chatId);
+            groupChatInfoActivity.startActivity(nodeHistoryIntent);
         }
     }
 

@@ -319,40 +319,36 @@ public class ContactAttachmentActivity extends PasscodeActivity implements MegaR
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.contact_attachment_chat_option_button: {
-                Timber.d("Click on ACTION button");
+        int id = v.getId();
+        if (id == R.id.contact_attachment_chat_option_button) {
+            Timber.d("Click on ACTION button");
 
-                if (inviteAction) {
-                    ArrayList<String> contactEmails = new ArrayList<>();
-                    ContactController contactControllerC = new ContactController(this);
-                    for (int i = 0; i < contacts.size(); i++) {
-                        Contact contact = contacts.get(i);
-                        MegaUser checkContact = megaApi.getContact(contact.getEmail());
-                        if (!contact.getEmail().equals(megaApi.getMyEmail()) && (checkContact == null || checkContact.getVisibility() != MegaUser.VISIBILITY_VISIBLE)) {
-                            contactEmails.add(contact.getEmail());
-                        }
+            if (inviteAction) {
+                ArrayList<String> contactEmails = new ArrayList<>();
+                ContactController contactControllerC = new ContactController(this);
+                for (int i = 0; i < contacts.size(); i++) {
+                    Contact contact = contacts.get(i);
+                    MegaUser checkContact = megaApi.getContact(contact.getEmail());
+                    if (!contact.getEmail().equals(megaApi.getMyEmail()) && (checkContact == null || checkContact.getVisibility() != MegaUser.VISIBILITY_VISIBLE)) {
+                        contactEmails.add(contact.getEmail());
                     }
-
-                    if (!contactEmails.isEmpty()) {
-                        contactControllerC.inviteMultipleContacts(contactEmails);
-                    }
-                } else {
-                    ArrayList<Long> contactHandles = new ArrayList<>();
-
-                    for (int i = 0; i < contacts.size(); i++) {
-                        contactHandles.add(contacts.get(i).getUserId());
-                    }
-
-                    startGroupConversation(contactHandles);
                 }
 
-                break;
+                if (!contactEmails.isEmpty()) {
+                    contactControllerC.inviteMultipleContacts(contactEmails);
+                }
+            } else {
+                ArrayList<Long> contactHandles = new ArrayList<>();
+
+                for (int i = 0; i < contacts.size(); i++) {
+                    contactHandles.add(contacts.get(i).getUserId());
+                }
+
+                startGroupConversation(contactHandles);
             }
-            case R.id.contact_attachment_chat_cancel_button: {
-                Timber.d("Click on Cancel button");
-                finish();
-            }
+        } else if (id == R.id.contact_attachment_chat_cancel_button) {
+            Timber.d("Click on Cancel button");
+            finish();
         }
     }
 

@@ -365,20 +365,15 @@ public class MegaSharedFolderAdapter extends RecyclerView.Adapter<MegaSharedFold
         int currentPosition = holder.currentPosition;
         final MegaShare s = (MegaShare) getItem(currentPosition);
 
-        switch (v.getId()) {
-            case R.id.shared_folder_three_dots_layout: {
-                if (multipleSelect) {
-                    ((FileContactListActivity) context).itemClick(currentPosition);
-                } else {
-                    ((FileContactListActivity) context).showOptionsPanel(s);
-                }
-
-                break;
-            }
-            case R.id.shared_folder_item_layout: {
+        int id = v.getId();
+        if (id == R.id.shared_folder_three_dots_layout) {
+            if (multipleSelect) {
                 ((FileContactListActivity) context).itemClick(currentPosition);
-                break;
+            } else {
+                ((FileContactListActivity) context).showOptionsPanel(s);
             }
+        } else if (id == R.id.shared_folder_item_layout) {
+            ((FileContactListActivity) context).itemClick(currentPosition);
         }
     }
 
