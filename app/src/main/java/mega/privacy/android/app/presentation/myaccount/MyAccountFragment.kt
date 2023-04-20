@@ -333,7 +333,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
         state.accountType.toAccountAttributes().let { account ->
             binding.upgradeButton.apply {
-                isEnabled = false
+                isEnabled = !state.isBusinessAccount
                 text = getString(
                     when {
                         state.isBusinessAccount && state.isMasterBusinessAccount -> R.string.admin_label
