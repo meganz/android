@@ -1047,7 +1047,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
             MegaChatListItem chat = chats.get(position);
             if (updateLastCallMessage(holder, chat)) {
                 Timber.d("Exist a call in position %s", position);
-                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
+                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorSecondary));
                 ((ViewHolderNormalChatList) holder).textViewContent.setVisibility(View.VISIBLE);
                 return;
             }
@@ -1514,7 +1514,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
             if (chat.getUnreadCount() == 0) {
                 ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, android.R.attr.textColorSecondary));
             } else {
-                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
+                ((ViewHolderNormalChatList) holder).textViewContent.setTextColor(ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorSecondary));
             }
         } else {
             Timber.w("Holder is NULL: %s", position);
@@ -1530,7 +1530,7 @@ public class MegaListChatAdapter extends RecyclerView.Adapter<MegaListChatAdapte
         } else {
             image.setImageDrawable(mutateIconSecondary(context, resource, R.color.teal_300_teal_200));
             text.setTextColor(ContextCompat.getColor(context, R.color.teal_300_teal_200));
-            senderText.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
+            senderText.setTextColor(ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorSecondary));
         }
     }
 

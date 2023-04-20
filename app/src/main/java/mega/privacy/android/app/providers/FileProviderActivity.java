@@ -1737,7 +1737,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
     public void activateButton(Boolean show) {
         attachButton.setEnabled(show);
         if (show) {
-            attachButton.setTextColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+            attachButton.setTextColor(ColorUtils.getThemeColor(this, com.google.android.material.R.attr.colorSecondary));
         } else {
             attachButton.setTextColor(ContextCompat.getColor(this, R.color.teal_300_038_teal_200_038));
         }

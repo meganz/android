@@ -72,7 +72,7 @@ class ReportIssueFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.report_issue_submit_action, menu)
-        menu.findItem(R.id.menu_report_issue_submit)?.icon?.setTint(requireContext().getColor(R.color.design_default_color_secondary))
+        menu.findItem(R.id.menu_report_issue_submit)?.icon?.setTint(requireContext().getColor(com.google.android.material.R.color.design_default_color_secondary))
         super.onCreateOptionsMenu(menu, inflater)
     }
 

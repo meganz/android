@@ -169,7 +169,7 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
     private fun quitEmailError() = with(binding) {
         confirmEmailNewEmailLayout.apply {
             error = null
-            setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+            setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
         }
         confirmEmailNewEmailErrorIcon.isVisible = false
     }

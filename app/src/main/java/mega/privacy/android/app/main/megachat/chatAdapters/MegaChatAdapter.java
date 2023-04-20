@@ -3785,7 +3785,7 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                     String textToShow = String.format(context.getString(R.string.text_deleted_message_by), toCDATA(((ViewHolderMessageChat) holder).fullNameTitle));
                     try {
                         textToShow = textToShow.replace("[A]", "<font color=\'"
-                                + ColorUtils.getThemeColorHexString(context, R.attr.colorSecondary)
+                                + ColorUtils.getThemeColorHexString(context, com.google.android.material.R.attr.colorSecondary)
                                 + "\'>");
                         textToShow = textToShow.replace("[/A]", "</font>");
                         textToShow = textToShow.replace("[B]", "<font color=\'"
@@ -6341,8 +6341,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             ((ViewHolderMessageChat) holder).ownMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contactMessageLayout.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).contentOwnMessageText.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
-            ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinkTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setTextColor(ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorError));
+            ((ViewHolderMessageChat) holder).contentOwnMessageText.setLinkTextColor(ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorError));
 
 
             if (message.getType() == MegaChatMessage.TYPE_INVALID) {
@@ -6405,8 +6405,8 @@ public class MegaChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             ((ViewHolderMessageChat) holder).contentContactMessageLayout.setVisibility(View.VISIBLE);
             ((ViewHolderMessageChat) holder).contactManagementMessageLayout.setVisibility(View.GONE);
-            ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
-            ((ViewHolderMessageChat) holder).contentContactMessageText.setLinkTextColor(ColorUtils.getThemeColor(context, R.attr.colorError));
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setTextColor(ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorError));
+            ((ViewHolderMessageChat) holder).contentContactMessageText.setLinkTextColor(ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorError));
 
 
             if (message.getType() == MegaChatMessage.TYPE_INVALID) {

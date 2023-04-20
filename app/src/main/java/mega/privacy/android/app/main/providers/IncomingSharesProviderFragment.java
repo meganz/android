@@ -170,7 +170,7 @@ public class IncomingSharesProviderFragment extends Fragment implements CheckScr
             List<MegaNode> documents = adapter.getSelectedNodes();
 
             int itemId = item.getItemId();
-            if (itemId == R.id.action_mode_close_button) {
+            if (itemId == androidx.appcompat.R.id.action_mode_close_button) {
                 Timber.d("Close button");
                 selectAll();
             } else if (itemId == R.id.cab_menu_select_all) {

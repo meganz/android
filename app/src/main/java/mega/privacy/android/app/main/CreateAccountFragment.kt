@@ -1,5 +1,6 @@
 package mega.privacy.android.app.main
 
+import com.google.android.material.R as MaterialR
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -101,9 +102,11 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                 text.isNullOrEmpty() -> {
                     getString(R.string.error_enter_email)
                 }
+
                 Constants.EMAIL_ADDRESS.matcher(text.toString()).matches().not() -> {
                     getString(R.string.error_invalid_email)
                 }
+
                 else -> {
                     null
                 }
@@ -126,10 +129,12 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
             binding.createAccountPasswordText.text.isNullOrEmpty() -> {
                 getString(R.string.error_enter_password)
             }
+
             !passwdValid -> {
                 binding.containerPasswdElements.isVisible = false
                 getString(R.string.error_password)
             }
+
             else -> {
                 null
             }
@@ -142,9 +147,11 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                 confirm.isEmpty() -> {
                     getString(R.string.error_enter_password)
                 }
+
                 password != confirm -> {
                     getString(R.string.error_passwords_dont_match)
                 }
+
                 else -> {
                     null
                 }
@@ -216,7 +223,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                 } else {
                     passwdValid = false
                     containerPasswdElements.isVisible = false
-                    createAccountPasswordTextLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+                    createAccountPasswordTextLayout.setHintTextAppearance(MaterialR.style.TextAppearance_Design_Hint)
                     resetEditTextUnderlineColor(createAccountPasswordText)
                 }
             }
@@ -452,30 +459,37 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
                 createAccountNameText.requestFocus()
                 false
             }
+
             userLastnameError != null -> {
                 createAccountLastNameText.requestFocus()
                 false
             }
+
             emailError != null -> {
                 createAccountEmailText.requestFocus()
                 false
             }
+
             passwordError != null -> {
                 createAccountPasswordText.requestFocus()
                 false
             }
+
             passwordConfirmError != null -> {
                 createAccountPasswordTextConfirm.requestFocus()
                 false
             }
+
             !createAccountChkTOS.isChecked -> {
                 loginActivity?.showSnackbar(getString(R.string.create_account_no_terms))
                 false
             }
+
             !checkboxTop.chkTop.isChecked -> {
                 loginActivity?.showSnackbar(getString(R.string.create_account_no_top))
                 false
             }
+
             else -> {
                 true
             }
@@ -567,7 +581,7 @@ class CreateAccountFragment : Fragment(), MegaRequestListenerInterface,
 
         layout.apply {
             error = null
-            setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+            setHintTextAppearance(MaterialR.style.TextAppearance_Design_Hint)
         }
         icon.isVisible = false
     }

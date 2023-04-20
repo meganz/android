@@ -2,6 +2,7 @@
 
 package mega.privacy.android.app.main
 
+import com.google.android.material.R as MaterialR
 import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -6425,7 +6426,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     private fun rotateFab(isExpand: Boolean) {
         var rotate = FAB_DEFAULT_ANGEL
         var color = Color.WHITE
-        var bkColor = ColorUtils.getThemeColor(this, R.attr.colorSecondary)
+        var bkColor = ColorUtils.getThemeColor(this, MaterialR.attr.colorSecondary)
         if (isExpand) {
             rotate = FAB_ROTATE_ANGEL
             color = Color.BLACK
@@ -6958,7 +6959,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 myAccountInfo.usedFormatted,
                 myAccountInfo.totalFormatted
             )
-            var colorString = ColorUtils.getThemeColorHexString(this, R.attr.colorSecondary)
+            var colorString = ColorUtils.getThemeColorHexString(this, MaterialR.attr.colorSecondary)
             when (viewModel.getStorageState()) {
                 StorageState.Green -> {}
                 StorageState.Orange -> colorString =
@@ -9652,7 +9653,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     fun showKeyboardForSearch() {
         if (searchView != null) {
-            searchView?.findViewById<View>(R.id.search_src_text)?.let { showKeyboardDelayed(it) }
+            searchView?.findViewById<View>(androidx.appcompat.R.id.search_src_text)?.let { showKeyboardDelayed(it) }
             searchView?.requestFocus()
         }
     }

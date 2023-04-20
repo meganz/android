@@ -63,7 +63,7 @@ public class TextUtil {
         String colorStart = ColorUtils.getColorHexString(context, R.color.grey_900_grey_100);
         String colorEnd = isOwnMessage ?
                 ColorUtils.getColorHexString(context, R.color.grey_500_grey_400) :
-                ColorUtils.getThemeColorHexString(context, R.attr.colorSecondary);
+                ColorUtils.getThemeColorHexString(context, com.google.android.material.R.attr.colorSecondary);
 
         return replaceFormatText(textToShow, colorStart, colorEnd);
     }

@@ -110,7 +110,7 @@ open class ChooseAccountActivity : PasscodeActivity(), Scrollable {
                 Util.getHexValue(
                     ColorUtils.getThemeColor(
                         this@ChooseAccountActivity,
-                        R.attr.colorSecondary
+                        com.google.android.material.R.attr.colorSecondary
                     )
                 )
 

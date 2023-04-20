@@ -70,7 +70,7 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
         super.onStart()
         if (showSimpleList) {
             val dialog = dialog ?: return
-            BottomSheetBehavior.from(dialog.findViewById(R.id.design_bottom_sheet)).state =
+            BottomSheetBehavior.from(dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet)).state =
                 BottomSheetBehavior.STATE_EXPANDED
         }
     }

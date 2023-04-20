@@ -4390,11 +4390,11 @@ public class ChatActivity extends PasscodeActivity
     public void onClick(View v) {
         Timber.d("onClick");
 
-        if (joiningOrLeaving && v.getId() != R.id.home)
+        if (joiningOrLeaving && v.getId() != androidx.appcompat.R.id.home)
             return;
         MegaChatCall callInThisChat;
         int id = v.getId();
-        if (id == R.id.home) {
+        if (id == androidx.appcompat.R.id.home) {
             onBackPressed();
         } else if (id == R.id.call_on_hold_layout) {
             callInThisChat = megaChatApi.getChatCall(chatRoom.getChatId());
@@ -9333,7 +9333,7 @@ public class ChatActivity extends PasscodeActivity
                 if (MegaApplication.getChatManagement().isRequestSent(callInThisChat.getCallId())) {
                     tapToReturnLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                 } else {
-                    callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+                    callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, com.google.android.material.R.attr.colorSecondary));
                     updateCallInProgressLayout(callInThisChat, getString(R.string.call_in_progress_layout));
                 }
                 break;
@@ -9341,7 +9341,7 @@ public class ChatActivity extends PasscodeActivity
     }
 
     private void tapToReturnLayout(MegaChatCall call, String text) {
-        callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, R.attr.colorSecondary));
+        callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(this, com.google.android.material.R.attr.colorSecondary));
         showCallInProgressLayout(text, false, call);
         callInProgressLayout.setOnClickListener(this);
     }

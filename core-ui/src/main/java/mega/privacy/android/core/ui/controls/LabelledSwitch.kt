@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.airbnb.android.showkase.annotation.ShowkaseComposable
-import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -71,7 +70,7 @@ private fun PreviewLabelledSwitch(
 ) {
     var checked by remember { mutableStateOf(initialValue) }
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        LabelledSwitch(label = stringResource(if (checked) R.string.on else R.string.off),
+        LabelledSwitch(label = stringResource(if (checked) androidx.compose.ui.R.string.on else androidx.compose.ui.R.string.off),
             checked = checked,
             onCheckChanged = { checked = !checked })
     }

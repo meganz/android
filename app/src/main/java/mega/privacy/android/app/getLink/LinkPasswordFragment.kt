@@ -1,5 +1,6 @@
 package mega.privacy.android.app.getLink
 
+import com.google.android.material.R as MaterialR
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -304,12 +305,12 @@ class LinkPasswordFragment : Fragment(), Scrollable {
         when (editText.id) {
             R.id.password_text -> {
                 binding.passwordLayout.error = null
-                binding.passwordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+                binding.passwordLayout.setHintTextAppearance(MaterialR.style.TextAppearance_Design_Hint)
                 binding.passwordErrorIcon.visibility = GONE
             }
             R.id.confirm_password_text -> {
                 binding.confirmPasswordLayout.error = null
-                binding.confirmPasswordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+                binding.confirmPasswordLayout.setHintTextAppearance(MaterialR.style.TextAppearance_Design_Hint)
                 binding.confirmPasswordErrorIcon.visibility = GONE
             }
         }

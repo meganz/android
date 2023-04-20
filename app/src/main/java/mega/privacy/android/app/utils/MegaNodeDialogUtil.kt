@@ -945,7 +945,7 @@ object MegaNodeDialogUtil {
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) = Unit
             override fun afterTextChanged(editable: Editable) {
                 editTextLayout.error = null
-                editTextLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+                editTextLayout.setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
             }
         })
 

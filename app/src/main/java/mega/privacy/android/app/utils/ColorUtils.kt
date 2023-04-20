@@ -28,6 +28,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.MaterialShapeUtils
 import com.google.android.material.shape.ShapeAppearanceModel
 import mega.privacy.android.app.R
+import com.google.android.material.R as MaterialR
 import kotlin.math.roundToInt
 
 
@@ -63,7 +64,7 @@ object ColorUtils {
 
     @JvmStatic
     fun tintIcon(context: Context, drawableId: Int): Drawable {
-        return tintIcon(context, drawableId, getThemeColor(context, R.attr.colorControlNormal))
+        return tintIcon(context, drawableId, getThemeColor(context, MaterialR.attr.colorControlNormal))
     }
 
     private fun doSetEditTextUnderlineColor(
@@ -240,8 +241,8 @@ object ColorUtils {
     @JvmStatic
     fun setErrorAwareInputAppearance(editText: EditText, error: Boolean) {
         if (error) {
-            editText.setTextColor(getThemeColor(editText.context, R.attr.colorError))
-            setEditTextUnderlineColorAttr(editText, R.attr.colorError)
+            editText.setTextColor(getThemeColor(editText.context, MaterialR.attr.colorError))
+            setEditTextUnderlineColorAttr(editText, MaterialR.attr.colorError)
             editText.highlightColor =
                 ContextCompat.getColor(editText.context, R.color.teal_100_teal_050)
         } else {

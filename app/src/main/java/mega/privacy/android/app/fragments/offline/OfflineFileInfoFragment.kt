@@ -21,11 +21,15 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.MegaOffline
 import mega.privacy.android.app.MimeTypeThumbnail
 import mega.privacy.android.app.R
+import com.google.android.material.R as MaterialR
 import mega.privacy.android.app.databinding.FragmentOfflineFileInfoBinding
-import mega.privacy.android.app.utils.*
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
+import mega.privacy.android.app.utils.OfflineUtils
+import mega.privacy.android.app.utils.RunOnUIThreadUtils
+import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.getStatusBarHeight
+import mega.privacy.android.app.utils.autoCleared
 import timber.log.Timber
 import kotlin.math.abs
 
@@ -113,7 +117,10 @@ class OfflineFileInfoFragment : Fragment() {
                     }
 
                     binding.collapseToolbar.setStatusBarScrimColor(
-                        getThemeColor(requireContext(), R.attr.colorPrimaryVariant)
+                        getThemeColor(
+                            requireContext(),
+                            MaterialR.attr.colorPrimaryVariant
+                        )
                     )
                     setColorFilterBlack()
                 } else {
@@ -135,7 +142,10 @@ class OfflineFileInfoFragment : Fragment() {
                     )
 
                     binding.collapseToolbar.setStatusBarScrimColor(
-                        getThemeColor(requireContext(), R.attr.colorPrimaryVariant)
+                        getThemeColor(
+                            requireContext(),
+                            MaterialR.attr.colorPrimaryVariant
+                        )
                     )
 
                     binding.appBar.addOnOffsetChangedListener(OnOffsetChangedListener { appBarLayout, offset ->

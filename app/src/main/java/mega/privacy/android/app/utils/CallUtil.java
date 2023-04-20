@@ -452,7 +452,7 @@ public class CallUtil {
             return;
 
         callInProgressText.setText(context.getString(R.string.call_in_progress_layout));
-        callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(context, R.attr.colorSecondary));
+        callInProgressLayout.setBackgroundColor(ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorSecondary));
 
         if (MegaApplication.getChatManagement().isRequestSent(call.getCallId())) {
             activateChrono(false, callInProgressChrono, null);

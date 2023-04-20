@@ -109,7 +109,7 @@ public class ManageTransferBottomSheetDialogFragment extends BaseBottomSheetDial
                 break;
 
             case STATE_FAILED:
-                location.setTextColor(ColorUtils.getThemeColor(requireContext(), R.attr.colorError));
+                location.setTextColor(ColorUtils.getThemeColor(requireContext(), com.google.android.material.R.attr.colorError));
                 location.setText(String.format("%s: %s", getString(R.string.failed_label), transfer.getError()));
                 params.rightMargin = 0;
                 stateIcon.setImageBitmap(null);

@@ -180,16 +180,16 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
     public ViewPagerBottomSheetBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs,
-                R.styleable.BottomSheetBehavior_Layout);
-        TypedValue value = a.peekValue(R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight);
+                com.google.android.material.R.styleable.BottomSheetBehavior_Layout);
+        TypedValue value = a.peekValue(com.google.android.material.R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight);
         if (value != null && value.data == PEEK_HEIGHT_AUTO) {
             setPeekHeight(value.data);
         } else {
             setPeekHeight(a.getDimensionPixelSize(
-                    R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight, PEEK_HEIGHT_AUTO));
+                    com.google.android.material.R.styleable.BottomSheetBehavior_Layout_behavior_peekHeight, PEEK_HEIGHT_AUTO));
         }
-        setHideable(a.getBoolean(R.styleable.BottomSheetBehavior_Layout_behavior_hideable, false));
-        setSkipCollapsed(a.getBoolean(R.styleable.BottomSheetBehavior_Layout_behavior_skipCollapsed,
+        setHideable(a.getBoolean(com.google.android.material.R.styleable.BottomSheetBehavior_Layout_behavior_hideable, false));
+        setSkipCollapsed(a.getBoolean(com.google.android.material.R.styleable.BottomSheetBehavior_Layout_behavior_skipCollapsed,
                 false));
         a.recycle();
         ViewConfiguration configuration = ViewConfiguration.get(context);
@@ -249,7 +249,7 @@ public class ViewPagerBottomSheetBehavior<V extends View> extends CoordinatorLay
         if (mPeekHeightAuto) {
             if (mPeekHeightMin == 0) {
                 mPeekHeightMin = parent.getResources().getDimensionPixelSize(
-                        R.dimen.design_bottom_sheet_peek_height_min);
+                        com.google.android.material.R.dimen.design_bottom_sheet_peek_height_min);
             }
             peekHeight = Math.max(mPeekHeightMin, mParentHeight - parent.getWidth() * 9 / 16);
         } else {

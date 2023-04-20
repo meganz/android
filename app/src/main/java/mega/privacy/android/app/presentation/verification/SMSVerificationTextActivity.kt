@@ -114,7 +114,7 @@ class SMSVerificationTextActivity : PasscodeActivity(),
                 super.updateDrawState(ds)
                 ds.isUnderlineText = false
                 ds.color =
-                    getThemeColor(this@SMSVerificationTextActivity, R.attr.colorSecondary)
+                    getThemeColor(this@SMSVerificationTextActivity, com.google.android.material.R.attr.colorSecondary)
                 ds.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
             }
         }

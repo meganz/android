@@ -781,7 +781,7 @@ class HomepageFragment : Fragment() {
         // The background tint of the FAB
         val backgroundTintAnim = ObjectAnimator.ofArgb(
             fabMaskMain.background.mutate(), "tint",
-            if (isExpand) Color.WHITE else getThemeColor(requireContext(), R.attr.colorSecondary)
+            if (isExpand) Color.WHITE else getThemeColor(requireContext(), com.google.android.material.R.attr.colorSecondary)
         )
 
         AnimatorSet().apply {

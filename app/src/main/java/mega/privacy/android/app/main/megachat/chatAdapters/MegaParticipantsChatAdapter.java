@@ -381,7 +381,7 @@ public class MegaParticipantsChatAdapter extends RecyclerView.Adapter<MegaPartic
                             holderHeader.privateTitle.setAllCaps(true);
 
                             if (participantsCount <= MAX_PARTICIPANTS_CHANGE_TO_PRIVATE) {
-                                holderHeader.privateTitle.setTextColor(ColorUtils.getThemeColor(groupChatInfoActivity, R.attr.colorSecondary));
+                                holderHeader.privateTitle.setTextColor(ColorUtils.getThemeColor(groupChatInfoActivity, com.google.android.material.R.attr.colorSecondary));
                                 holderHeader.privateText.setText(R.string.make_chat_private_option_text);
                                 holderHeader.privateLayout.setOnClickListener(this);
                             } else {

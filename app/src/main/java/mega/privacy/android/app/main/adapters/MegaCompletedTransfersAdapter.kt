@@ -127,7 +127,7 @@ class MegaCompletedTransfersAdapter(
                         imageViewCompleted.setImageResource(R.drawable.ic_transfers_completed)
                     }
                     STATE_FAILED -> {
-                        textViewCompleted.setTextColor(getThemeColor(context, R.attr.colorError))
+                        textViewCompleted.setTextColor(getThemeColor(context, com.google.android.material.R.attr.colorError))
                         textViewCompleted.text = String.format("%s: %s",
                             context.getString(R.string.failed_label),
                             completedTransfer.error)

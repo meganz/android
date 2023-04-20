@@ -203,7 +203,7 @@ class SortByBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     private fun setSelectedColor(text: TextView) {
-        val colorSecondary = ColorUtils.getThemeColor(requireContext(), R.attr.colorSecondary)
+        val colorSecondary = ColorUtils.getThemeColor(requireContext(), com.google.android.material.R.attr.colorSecondary)
         text.setTextColor(colorSecondary)
 
         var icon = text.compoundDrawablesRelative[0] ?: return

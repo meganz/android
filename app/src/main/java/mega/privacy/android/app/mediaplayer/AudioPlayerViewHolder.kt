@@ -30,7 +30,7 @@ class AudioPlayerViewHolder(val binding: FragmentAudioPlayerBinding) {
     private val trackName = binding.root.findViewById<TextView>(R.id.track_name)
     private val artistName = binding.root.findViewById<TextView>(R.id.artist_name)
     private val playlist = binding.root.findViewById<ImageButton>(R.id.playlist)
-    private val shuffle = binding.root.findViewById<ImageView>(R.id.exo_shuffle)
+    private val shuffle = binding.root.findViewById<ImageView>(com.google.android.exoplayer2.ui.R.id.exo_shuffle)
 
     /**
      * Update the layout param of artwork of player view.

@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.preview.BooleanProvider
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -63,7 +62,7 @@ private fun PreviewTextMegaButton(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         TextMegaButton(
-            textId = R.string.search_label,
+            textId = androidx.appcompat.R.string.search_menu_title,
             onClick = {},
             enabled = enabled
         )

@@ -116,7 +116,7 @@ fun getRoundingParams(context: Context): RoundingParams? {
 
     roundingParams?.apply {
         setBorder(
-            ColorUtils.getThemeColor(context, R.attr.colorSecondary), Util.dp2px(
+            ColorUtils.getThemeColor(context, com.google.android.material.R.attr.colorSecondary), Util.dp2px(
                 context.resources.getDimension(R.dimen.photo_selected_border_width),
             ).toFloat()
         )

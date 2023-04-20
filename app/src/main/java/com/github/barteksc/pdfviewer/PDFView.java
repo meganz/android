@@ -771,7 +771,7 @@ public class PDFView extends RelativeLayout {
                     public void afterTextChanged(Editable editable) {
                         if (passwordLayout.getError() != null && !passwordLayout.getError().toString().isEmpty()) {
                             passwordLayout.setError(null);
-                            passwordLayout.setHintTextAppearance(R.style.TextAppearance_Design_Hint);
+                            passwordLayout.setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint);
                             passwordError.setVisibility(View.GONE);
                         }
                     }

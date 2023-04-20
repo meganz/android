@@ -93,7 +93,7 @@ private fun DropDown(
     }
     IconButtonWithTooltip(
         iconPainter = painter,
-        description = stringResource(id = R.string.abc_action_menu_overflow_description),
+        description = stringResource(id = com.google.android.material.R.string.abc_action_menu_overflow_description),
         tint = tint,
         onClick = { showMoreMenu = !showMoreMenu },
         modifier = Modifier.testTag(TAG_MENU_ACTIONS_SHOW_MORE)

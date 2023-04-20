@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils
 
+import com.google.android.material.R as MaterialR
 import android.content.Context
 import android.widget.Button
 import android.widget.ImageView
@@ -32,7 +33,7 @@ object AlertDialogUtil {
         button.setTextColor(
             if (enable) ColorUtils.getThemeColor(
                 context,
-                R.attr.colorSecondary
+                MaterialR.attr.colorSecondary
             ) else ContextCompat.getColor(context, R.color.teal_300_alpha_038)
         )
     }
@@ -66,7 +67,7 @@ object AlertDialogUtil {
     fun quitEditTextError(editTextLayout: TextInputLayout, errorIcon: ImageView) {
         editTextLayout.apply {
             error = null
-            setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+            setHintTextAppearance(MaterialR.style.TextAppearance_Design_Hint)
         }
 
         errorIcon.isVisible = false

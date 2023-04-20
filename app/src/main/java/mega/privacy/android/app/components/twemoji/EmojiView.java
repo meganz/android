@@ -53,7 +53,7 @@ public final class EmojiView extends LinearLayout implements ViewPager.OnPageCha
     setOrientation(VERTICAL);
     notSelectedTintColor = ContextCompat.getColor(context, R.color.grey_038_white_038);
     final TypedValue value = new TypedValue();
-    context.getTheme().resolveAttribute(R.attr.colorSecondary, value, true);
+    context.getTheme().resolveAttribute(com.google.android.material.R.attr.colorSecondary, value, true);
     selectedTintColor = value.data;
 
     final ViewPager emojisPager = findViewById(R.id.emojis_pager);

@@ -329,7 +329,7 @@ class FileManagementPreferencesActivity : PreferencesBaseActivity() {
             setTextColor(
                 getThemeColor(
                     this@FileManagementPreferencesActivity,
-                    R.attr.colorSecondary
+                   com.google.android.material.R.attr.colorSecondary
                 )
             )
             hint = getFormattedStringOrDefault(R.string.hint_days)

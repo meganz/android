@@ -476,7 +476,10 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         } else {
             binding.passwordProtectionSetText.transformationMethod = null
             binding.passwordProtectionSetToggle.setColorFilter(
-                ColorUtils.getThemeColor(requireContext(), R.attr.colorSecondary),
+                ColorUtils.getThemeColor(
+                    requireContext(),
+                    com.google.android.material.R.attr.colorSecondary
+                ),
                 PorterDuff.Mode.SRC_IN
             )
         }

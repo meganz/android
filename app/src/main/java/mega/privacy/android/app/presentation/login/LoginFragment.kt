@@ -1358,14 +1358,14 @@ class LoginFragment : Fragment() {
             R.id.login_email_text -> {
                 loginEmailTextLayout.apply {
                     error = null
-                    setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+                    setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
                 }
                 loginEmailTextErrorIcon.isVisible = false
             }
             R.id.login_password_text -> {
                 loginPasswordTextLayout.apply {
                     error = null
-                    setHintTextAppearance(R.style.TextAppearance_Design_Hint)
+                    setHintTextAppearance(com.google.android.material.R.style.TextAppearance_Design_Hint)
                 }
                 loginPasswordTextErrorIcon.isVisible = false
             }
