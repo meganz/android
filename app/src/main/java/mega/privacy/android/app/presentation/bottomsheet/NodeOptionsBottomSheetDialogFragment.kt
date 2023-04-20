@@ -563,8 +563,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         counterModify--
                         optionRestoreFromRubbish.visibility = View.GONE
                     }
-                    RECENTS_MODE, FAVOURITES_IN_TAB_MODE, FAVOURITES_MODE ->                 // If the Dialog Fragment is opened from the Favourites page, handle the display
-                        // of Dialog options accordingly
+                    RECENTS_MODE, FAVOURITES_IN_TAB_MODE, FAVOURITES_MODE ->
+                        // If the Dialog Fragment is opened from the Favourites page, handle the
+                        // display of the Dialog options accordingly
                         handleRecentsAndFavouritesOptionsDisplay(
                             accessLevel = accessLevel,
                             decrementShares = { counterShares-- },
@@ -646,14 +647,11 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     /**
      * Apply read-only Restrictions for Backup Nodes by hiding the following options:
      *
-     *
      * 1.) Rename
      * 2.) Move to
      * 3.) Move to Rubbish Bin
      * 4.) Favourite
      * 5.) Label
-     * 6.) Versions
-     *
      *
      * Hiding the aforementioned options will reduce the counter values for the Modify and Open
      * group options
@@ -673,7 +671,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val optionRestoreFromRubbish = contentView.findViewById<TextView>(R.id.restore_option)
         val optionRubbishBin = contentView.findViewById<TextView>(R.id.rubbish_bin_option)
         val optionRemove = contentView.findViewById<TextView>(R.id.remove_option)
-        val optionVersions = contentView.findViewById<LinearLayout>(R.id.option_versions_layout)
         if (node != null && megaApi.isInInbox(node)) {
             optionEdit.visibility = View.GONE
             optionFavourite.visibility = View.GONE
@@ -681,7 +678,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRename.visibility = View.GONE
             optionMove.visibility = View.GONE
             optionRubbishBin.visibility = View.GONE
-            optionVersions.visibility = View.GONE
             optionRemove.visibility = View.GONE
             optionLeaveShares.visibility = View.GONE
             optionOpenFolder.visibility = View.GONE
@@ -1017,7 +1013,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun onVersionsClicked(node: MegaNode) {
         val version = Intent(activity, VersionsFileActivity::class.java)
-        version.putExtra("handle", node.handle)
+        version.putExtra(Constants.HANDLE, node.handle)
         requireActivity().startActivityForResult(
             version,
             Constants.REQUEST_CODE_DELETE_VERSIONS_HISTORY

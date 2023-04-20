@@ -245,41 +245,27 @@ internal class FileInfoViewModelTest {
         }
 
     @Test
-    fun `test showHistoryVersions is true if the node contains one version and is not in the inbox`() =
+    fun `test showHistoryVersions is true if the node contains one version`() =
         runTest {
             whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(1)
-            whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
     @Test
-    fun `test showHistoryVersions is true if the node contains more than one version and is not in the inbox`() =
+    fun `test showHistoryVersions is true if the node contains more than one version`() =
         runTest {
             whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(2)
-            whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(true)
         }
 
     @Test
-    fun `test showHistoryVersions is false if the node contains one version but is in the inbox`() =
-        runTest {
-            whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(1)
-            whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(true)
-            underTest.setNode(node.handle)
-            Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
-
-        }
-
-    @Test
-    fun `test showHistoryVersions is false if the node contains no versions and is not in the inbox`() =
+    fun `test showHistoryVersions is false if the node contains no versions`() =
         runTest {
             whenever(getFileHistoryNumVersionsUseCase(any())).thenReturn(0)
-            whenever(isNodeInInbox(NODE_HANDLE)).thenReturn(false)
             underTest.setNode(node.handle)
             Truth.assertThat(underTest.uiState.value.showHistoryVersions).isEqualTo(false)
-
         }
 
     @Test

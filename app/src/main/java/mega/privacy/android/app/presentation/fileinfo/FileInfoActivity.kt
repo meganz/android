@@ -412,8 +412,6 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     }
 
     private fun updateFileHistoryVersions(show: Boolean, versions: Int) = with(bindingContent) {
-        // If the Node belongs to Backups or has no versions, then hide
-        // the Versions layout
         filePropertiesVersionsLayout.isVisible = show
         separatorVersions.isVisible = show
         if (show) {

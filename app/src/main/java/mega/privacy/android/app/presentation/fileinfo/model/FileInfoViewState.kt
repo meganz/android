@@ -121,12 +121,12 @@ internal data class FileInfoViewState(
     /**
      * determines if the file history versions should be shown
      */
-    val showHistoryVersions = !isNodeInInbox && historyVersions > 0
+    val showHistoryVersions = historyVersions > 0
 
     /**
      * determines if the folder history versions should be shown
      */
-    val showFolderHistoryVersions = !isNodeInInbox && (folderTreeInfo?.numberOfVersions ?: 0) > 0
+    val showFolderHistoryVersions = (folderTreeInfo?.numberOfVersions ?: 0) > 0
 
     /**
      * to get the uri to use for the preview, it gets [previewUriString] and [thumbnailUriString] as fallback
