@@ -597,7 +597,8 @@ private fun PasswordReminderModeLayout(
             Text(
                 text = stringResource(id = R.string.remember_pwd_dialog_button_test),
                 style = MaterialTheme.typography.button.copy(letterSpacing = 0.25.sp),
-                color = MaterialTheme.colors.secondary
+                color = MaterialTheme.colors.secondary,
+                fontWeight = FontWeight.Medium
             )
         }
 
@@ -620,7 +621,8 @@ private fun PasswordReminderModeLayout(
             Text(
                 text = stringResource(id = R.string.action_export_master_key),
                 color = MaterialTheme.colors.surface,
-                style = MaterialTheme.typography.button.copy(letterSpacing = 0.25.sp)
+                style = MaterialTheme.typography.button.copy(letterSpacing = 0.25.sp),
+                fontWeight = FontWeight.Medium
             )
         }
 
@@ -653,7 +655,8 @@ private fun PasswordReminderModeLayout(
             Text(
                 text = stringResource(id = dismissButtonText),
                 style = MaterialTheme.typography.button.copy(letterSpacing = 0.25.sp),
-                color = dismissButtonColor
+                color = dismissButtonColor,
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -745,7 +748,7 @@ private fun TestPasswordModeLayout(
                 onClick = {
                     onBackPressedDispatcher?.onBackPressed()
                 },
-                isEnabled = uiState.isLoading.not()
+                isEnabled = uiState.isLoading.not(),
             )
         }
 
@@ -753,7 +756,7 @@ private fun TestPasswordModeLayout(
             Button(
                 modifier = Modifier
                     .testTag(PROCEED_TO_LOGOUT_BUTTON_TAG)
-                    .padding(top = 220.dp)
+                    .padding(top = 60.dp)
                     .defaultMinSize(minHeight = 48.dp)
                     .fillMaxWidth()
                     .wrapContentHeight(),
@@ -768,7 +771,10 @@ private fun TestPasswordModeLayout(
             ) {
                 Text(
                     text = stringResource(id = R.string.proceed_to_logout),
-                    style = MaterialTheme.typography.button.copy(letterSpacing = 0.25.sp),
+                    style = MaterialTheme.typography.button.copy(
+                        letterSpacing = 0.25.sp,
+                        fontWeight = FontWeight.Medium
+                    ),
                     color = MaterialTheme.colors.surface
                 )
             }
@@ -907,7 +913,10 @@ private fun BorderlessActionButton(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.button.copy(letterSpacing = 0.25.sp),
+            style = MaterialTheme.typography.button.copy(
+                letterSpacing = 0.25.sp,
+                fontWeight = FontWeight.Medium
+            ),
             color = MaterialTheme.colors.secondary
         )
     }
@@ -921,11 +930,13 @@ private fun PasswordState.toAttribute(): TestPasswordAttribute {
             footerMessage = "",
             footerIcon = -1
         )
+
         PasswordState.True -> TestPasswordAttribute(
             focusedColor = MaterialTheme.colors.green500_400,
             footerMessage = stringResource(id = R.string.test_pwd_accepted),
             footerIcon = R.drawable.ic_accept_test
         )
+
         PasswordState.False -> TestPasswordAttribute(
             focusedColor = MaterialTheme.colors.red600_300,
             footerMessage = stringResource(id = R.string.test_pwd_wrong),
