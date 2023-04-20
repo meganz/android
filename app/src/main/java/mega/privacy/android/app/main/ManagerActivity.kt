@@ -1979,7 +1979,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             intent = null
                         }
                     }
-                    if (intent.action != null) {
+                    if (intent?.action != null) {
                         if (intent.action == Constants.ACTION_SHOW_TRANSFERS) {
                             if (intent.getBooleanExtra(Constants.OPENED_FROM_CHAT, false)) {
                                 sendBroadcast(Intent(ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS))
