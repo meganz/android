@@ -84,7 +84,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new Plans page UI
      */
-    PlansPageUpdate("Enable new design for Upgrade account view", false);
+    PlansPageUpdate("Enable new design for Upgrade account view", false),
+
+    /**
+     * To switch into new FolderLink Compose UI
+     */
+    FolderLinkCompose("Enable compose for FolderLink", false);
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =

@@ -47,6 +47,7 @@ import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.EditTextPIN
 import mega.privacy.android.app.constants.IntentConstants
 import mega.privacy.android.app.databinding.FragmentLoginBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.FileLinkActivity
 import mega.privacy.android.app.main.ManagerActivity
@@ -54,6 +55,7 @@ import mega.privacy.android.app.presentation.changepassword.ChangePasswordActivi
 import mega.privacy.android.app.presentation.extensions.error
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
+import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginViewModel.Companion.ACTION_FORCE_RELOAD_ACCOUNT
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
@@ -555,8 +557,7 @@ class LoginFragment : Fragment() {
                                         newIntent.data = intentData
                                     }
                                     Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
-                                        newIntent =
-                                            Intent(requireContext(), FolderLinkActivity::class.java)
+                                        newIntent = getFolderLinkIntent()
                                         newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                         intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
                                         newIntent.data = intentData
@@ -614,7 +615,7 @@ class LoginFragment : Fragment() {
                                 newIntent.data = intentData
                             }
                             Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
-                                newIntent = Intent(requireContext(), FolderLinkActivity::class.java)
+                                newIntent = getFolderLinkIntent()
                                 newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                 intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
                                 newIntent.data = intentData
@@ -1163,7 +1164,7 @@ class LoginFragment : Fragment() {
                     intent.data = intentData
                 }
                 Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
-                    intent = Intent(requireContext(), FolderLinkActivity::class.java)
+                    intent = getFolderLinkIntent()
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
                     intent.data = intentData
@@ -1504,6 +1505,13 @@ class LoginFragment : Fragment() {
         }
 
         viewModel.setQuerySignupLinkResultConsumed()
+    }
+
+    private fun getFolderLinkIntent(): Intent {
+        return if (viewModel.isFeatureEnabled(AppFeatures.FolderLinkCompose))
+            Intent(requireContext(), FolderLinkComposeActivity::class.java)
+        else
+            Intent(requireContext(), FolderLinkActivity::class.java)
     }
 
     companion object {

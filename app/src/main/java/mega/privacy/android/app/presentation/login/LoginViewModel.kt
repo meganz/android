@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.psa.PsaManager
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.entity.login.LoginStatus
@@ -103,6 +104,10 @@ class LoginViewModel @Inject constructor(
     private var pendingAction: String? = null
 
     private val cleanFetchNodesUpdate by lazy { FetchNodesUpdate() }
+
+    init {
+        viewModelScope.launch { getEnabledFeatures() }
+    }
 
     /**
      * Reset some states values.
@@ -603,6 +608,18 @@ class LoginViewModel @Inject constructor(
     fun intentSet() {
         _state.update { state -> state.copy(intentState = LoginIntentState.AlreadySet) }
     }
+
+    private suspend fun getEnabledFeatures() {
+        val enabledFeatures = setOfNotNull(
+            AppFeatures.FolderLinkCompose.takeIf { getFeatureFlagValueUseCase(it) }
+        )
+        _state.update { it.copy(enabledFlags = enabledFeatures) }
+    }
+
+    /**
+     * Check if given feature flag is enabled or not
+     */
+    fun isFeatureEnabled(feature: Feature) = state.value.enabledFlags.contains(feature)
 
     companion object {
         /**

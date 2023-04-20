@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.login.model
 
+import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 import mega.privacy.android.domain.exception.LoginException
@@ -35,6 +36,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesException
  * @property querySignupLinkResult      Result of query signup link.
  * @property isPendingToFinishActivity  True if should finish the activity, false otherwise.
  * @property isPendingToShowFragment    [LoginFragmentType] if pending, null otherwise.
+ * @property enabledFlags               Enabled Feature Flags
  */
 data class LoginState(
     val intentState: LoginIntentState? = null,
@@ -64,4 +66,5 @@ data class LoginState(
     val querySignupLinkResult: Result<String>? = null,
     val isPendingToFinishActivity: Boolean = false,
     val isPendingToShowFragment: LoginFragmentType? = null,
+    val enabledFlags: Set<Feature> = emptySet(),
 )

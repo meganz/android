@@ -308,6 +308,9 @@
             android:name=".presentation.folderlink.FolderLinkActivity"
             android:configChanges="orientation|screenSize" />
         <activity
+            android:name=".presentation.folderlink.FolderLinkComposeActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity
             android:name=".main.megachat.ContactAttachmentActivity"
             android:configChanges="orientation|screenSize" />
         <activity

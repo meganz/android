@@ -9,13 +9,16 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.activities.WebViewActivity
 import mega.privacy.android.app.databinding.ActivityOpenLinkBinding
+import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.globalmanagement.MegaChatRequestHandler
 import mega.privacy.android.app.listeners.LoadPreviewListener
 import mega.privacy.android.app.listeners.QueryRecoveryLinkListener
@@ -26,6 +29,7 @@ import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.meeting.activity.LeftMeetingActivity
 import mega.privacy.android.app.meeting.fragments.MeetingHasEndedDialogFragment
 import mega.privacy.android.app.presentation.folderlink.FolderLinkActivity
+import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.usecase.QuerySignupLinkUseCase
 import mega.privacy.android.app.utils.CallUtil
@@ -80,6 +84,7 @@ import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util.decodeURL
 import mega.privacy.android.app.utils.Util.matchRegexs
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
@@ -110,6 +115,9 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
      */
     @Inject
     lateinit var querySignupLinkUseCase: QuerySignupLinkUseCase
+
+    @Inject
+    lateinit var getFeatureFlagValueUseCase: GetFeatureFlagValueUseCase
 
     /**
      * MegaChatRequestHandler injection
@@ -197,14 +205,24 @@ class OpenLinkActivity : PasscodeActivity(), MegaRequestListenerInterface,
             }
             // Folder Download link
             matchRegexs(url, FOLDER_LINK_REGEXS) -> {
-                startActivity(
-                    Intent(this, FolderLinkActivity::class.java)
-                        .putExtra(OPENED_FROM_CHAT, intent.getBooleanExtra(OPENED_FROM_CHAT, false))
-                        .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
-                        .setAction(ACTION_OPEN_MEGA_FOLDER_LINK)
-                        .setData(Uri.parse(url))
-                )
-                finish()
+                lifecycleScope.launch {
+                    val intent = if (getFeatureFlagValueUseCase(AppFeatures.FolderLinkCompose)) {
+                        Intent(this@OpenLinkActivity, FolderLinkComposeActivity::class.java)
+                    } else {
+                        Intent(this@OpenLinkActivity, FolderLinkActivity::class.java)
+                    }
+                    startActivity(
+                        intent
+                            .putExtra(
+                                OPENED_FROM_CHAT,
+                                intent.getBooleanExtra(OPENED_FROM_CHAT, false)
+                            )
+                            .setFlags(FLAG_ACTIVITY_CLEAR_TOP)
+                            .setAction(ACTION_OPEN_MEGA_FOLDER_LINK)
+                            .setData(Uri.parse(url))
+                    )
+                    finish()
+                }
             }
             // Chat link or Meeting link
             matchRegexs(url, CHAT_LINK_REGEXS) -> {
