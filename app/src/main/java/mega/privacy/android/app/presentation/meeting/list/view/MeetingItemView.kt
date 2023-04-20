@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType.Companion.LongPress
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -88,6 +89,7 @@ internal fun MeetingItemView(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_select_contact),
                 contentDescription = "Selected meeting",
                 modifier = Modifier
+                    .testTag("selectedImage")
                     .size(40.dp)
                     .constrainAs(imgAvatar) {
                         start.linkTo(parent.start, 16.dp)
@@ -242,6 +244,7 @@ internal fun MeetingItemView(
         IconButton(
             onClick = { onItemMoreClick(meeting.chatId) },
             modifier = Modifier
+                .testTag("onItemMore")
                 .size(24.dp)
                 .constrainAs(btnMore) {
                     end.linkTo(parent.end, 16.dp)

@@ -88,7 +88,7 @@ private fun ListView(
     LazyColumn(
         state = listState,
         modifier = modifier
-            .testTag("MeetingListView")
+            .testTag("ListView")
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = { listInteraction = true }
@@ -196,7 +196,7 @@ private fun isSameDay(timeStampA: Long?, timeStampB: Long?): Boolean =
 
 @Composable
 private fun EmptyView() {
-    Surface(Modifier.testTag("MeetingListEmptyView")) {
+    Surface(Modifier.testTag("EmptyView")) {
         MegaEmptyView(
             imageVector = ImageVector.vectorResource(id = R.drawable.ic_no_search_results),
             text = stringResource(R.string.no_results_found)
