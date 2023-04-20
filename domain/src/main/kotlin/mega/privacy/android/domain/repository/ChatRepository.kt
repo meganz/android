@@ -220,4 +220,13 @@ interface ChatRepository {
      * @param archive   True to archive, false to unarchive
      */
     suspend fun archiveChat(chatId: Long, archive: Boolean)
+
+    /**
+     * Get Peer Handle
+     *
+     * @param chatId id of the chat
+     * @param peerNo required peer number
+     * @return peer handle for the selected peer [Long]
+     */
+    suspend fun getPeerHandle(chatId: Long, peerNo: Long): Long?
 }

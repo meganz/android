@@ -276,6 +276,7 @@ internal class ChatRepositoryImpl @Inject constructor(
                         continuation.resumeWith(Result.success(InviteContactRequest.AlreadyContact))
                     }
                 }
+
                 MegaError.API_EARGS -> continuation.resumeWith(Result.success(InviteContactRequest.InvalidEmail))
                 else -> continuation.failWithError(error, "onRequestInviteContactCompleted")
             }
@@ -414,5 +415,11 @@ internal class ChatRepositoryImpl @Inject constructor(
                     )
                 )
             }
+        }
+
+    override suspend fun getPeerHandle(chatId: Long, peerNo: Long): Long? =
+        withContext(ioDispatcher) {
+            val chatRoom = megaChatApiGateway.getChatRoom(chatId)
+            chatRoom?.getPeerHandle(peerNo)
         }
 }
