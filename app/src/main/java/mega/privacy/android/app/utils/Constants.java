@@ -625,7 +625,7 @@ public class Constants {
     public static final String IS_FROM_CONTACTS = "IS_FROM_CONTACTS";
     public static final String IS_FLOATING_WINDOW = "IS_FLOATING_WINDOW";
     public static final String SCHEDULED_MEETING_ID = "SCHEDULED_MEETING_ID";
-
+    public static final String SCHEDULED_MEETING_CREATED = "SCHEDULED_MEETING_CREATED";
     public static final int INVALID_POSITION = -1;
     public static final int INVALID_ID = -1;
     public static final String INVALID_OPTION = "-1";

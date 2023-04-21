@@ -139,14 +139,6 @@ class ScheduleMeetingViewModel @Inject constructor(
     }
 
     /**
-     * Open chat room
-     *
-     * @param chatId Chat id.
-     */
-    fun openChatRoom(chatId: Long?) =
-        _state.update { it.copy(openChatRoom = chatId) }
-
-    /**
      * Set end date
      *
      * @param newDate   End Date
@@ -267,7 +259,7 @@ class ScheduleMeetingViewModel @Inject constructor(
                         if (state.value.enabledMeetingLinkOption) {
                             createMeetingLink(id)
                         } else {
-                            openChatRoom(id)
+                            openInfo(id)
                         }
                     }
                 }
@@ -280,10 +272,10 @@ class ScheduleMeetingViewModel @Inject constructor(
      *
      * @param chatId Chat Id.
      */
-    private fun openChatRoom(chatId: Long) {
-        Timber.d("Scheduled meeting created, open chat room $chatId")
+    fun openInfo(chatId: Long?) {
+        Timber.d("Scheduled meeting created, open scheduled meeting info with chat id $chatId")
         _state.update { state ->
-            state.copy(openChatRoom = chatId)
+            state.copy(chatIdToOpenInfoScreen = chatId)
         }
     }
 
@@ -300,7 +292,7 @@ class ScheduleMeetingViewModel @Inject constructor(
                 Timber.e(exception)
             }.onSuccess { request ->
                 request.chatHandle?.let { id ->
-                    openChatRoom(id)
+                    openInfo(id)
                 }
             }
         }

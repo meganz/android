@@ -965,6 +965,15 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
         _state.update { it.copy(openSendToChat = shouldOpen) }
     }
 
+    /**
+     * Check whether the initial bar should be displayed
+     */
+    fun checkInitialSnackbar(shouldBeShown: Boolean) {
+        if (shouldBeShown) {
+            showSnackBar(R.string.meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success)
+        }
+    }
+
     companion object {
         private const val MAX_PARTICIPANTS_TO_MAKE_THE_CHAT_PRIVATE = 100
     }

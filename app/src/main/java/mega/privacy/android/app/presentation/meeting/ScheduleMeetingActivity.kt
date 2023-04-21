@@ -24,7 +24,6 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
-import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
@@ -34,6 +33,7 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
+import nz.mega.sdk.MegaChatApiJava
 import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneId
@@ -66,10 +66,10 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (openAddContact, openChatRoom) ->
-                    openChatRoom?.let {
-                        viewModel.openChatRoom(null)
-                        openChatRoom(it)
+                viewModel.state.collect { (openAddContact, openInfoScreen) ->
+                    openInfoScreen?.let {
+                        viewModel.openInfo(null)
+                        openScheduleMeetingInfo(it)
                     }
 
                     openAddContact?.let { shouldOpen ->
@@ -142,10 +142,12 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
      *
      * @param chatId Chat id.
      */
-    private fun openChatRoom(chatId: Long) {
-        val intentOpenChat = Intent(this@ScheduleMeetingActivity, ChatActivity::class.java)
-        intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
-        intentOpenChat.putExtra(Constants.CHAT_ID, chatId)
+    private fun openScheduleMeetingInfo(chatId: Long) {
+        val intentOpenChat = Intent(this, ScheduledMeetingInfoActivity::class.java).apply {
+            putExtra(Constants.CHAT_ID, chatId)
+            putExtra(Constants.SCHEDULED_MEETING_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+            putExtra(Constants.SCHEDULED_MEETING_CREATED, true)
+        }
         finish()
         this.startActivity(intentOpenChat)
     }

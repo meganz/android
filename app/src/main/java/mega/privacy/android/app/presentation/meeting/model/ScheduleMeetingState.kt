@@ -10,8 +10,8 @@ import java.time.temporal.ChronoUnit
  * Data class defining the state of [ScheduleMeetingViewModel]
  *
  * @property openAddContact                         True, if should open Add contact screen. False, if not.
- * @property openChatRoom                           Chat Id of chat room should be opened.
- * @property meetingTitle                           Meeting title
+ * @property chatIdToOpenInfoScreen                 Chat id to open the scheduled meeting info screen.
+ * @property meetingTitle                           Meeting title.
  * @property freq                                   [OccurrenceFrequencyType].
  * @property startDate                              Start Date.
  * @property endDate                                End Date.
@@ -24,12 +24,12 @@ import java.time.temporal.ChronoUnit
  * @property addParticipantsNoContactsDialog        True if show add participants no contacts dialog, false if not.
  * @property numOfParticipants                      Number of participants.
  * @property isEditingDescription                   True, if is editing description. False, if not.
- * @property descriptionText                        Description text
+ * @property descriptionText                        Description text.
  * @property isEmptyTitleError                      True, if an attempt has been made to create a meeting without a title. False, if not.
  */
 data class ScheduleMeetingState constructor(
     val openAddContact: Boolean? = null,
-    val openChatRoom: Long? = null,
+    val chatIdToOpenInfoScreen: Long? = null,
     val meetingTitle: String = "",
     val freq: OccurrenceFrequencyType = OccurrenceFrequencyType.Invalid,
     val startDate: Instant = Instant.now(),

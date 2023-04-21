@@ -55,6 +55,7 @@ import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CHAT_ID
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_CONTACT_TYPE
 import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_TOOL_BAR_TITLE
+import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_CREATED
 import mega.privacy.android.app.utils.Constants.SCHEDULED_MEETING_ID
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.ThemeMode
@@ -177,6 +178,8 @@ class ScheduledMeetingInfoActivity : PasscodeActivity(), SnackbarShower {
         )
 
         setContent { ScheduledMeetingInfoView() }
+
+        viewModel.checkInitialSnackbar(intent.getBooleanExtra(SCHEDULED_MEETING_CREATED, false))
 
         addContactLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
