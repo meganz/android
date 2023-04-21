@@ -10,7 +10,7 @@ import kotlin.math.abs
  */
 class FadeOutPageTransformer : ViewPager2.PageTransformer {
 
-    override fun transformPage(@NonNull page: View, position: Float) {
+    override fun transformPage(page: View, position: Float) {
         page.translationX = -position * page.width
         page.alpha = 1 - abs(position)
     }

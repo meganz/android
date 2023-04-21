@@ -350,8 +350,8 @@ object PermissionUtils {
      */
     @JvmStatic
     fun shouldShowRequestPermissionRationale(
-        @NonNull activity: Activity,
-        @NonNull permission: String,
+        activity: Activity,
+        permission: String,
     ): Boolean {
         return ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
     }
@@ -363,7 +363,7 @@ object PermissionUtils {
      * @return an OnClickListener, which leads to the APP info page, in where, users can grant MEGA permissions.
      */
     @JvmStatic
-    fun toAppInfo(@NonNull context: Context): View.OnClickListener {
+    fun toAppInfo(context: Context): View.OnClickListener {
         return View.OnClickListener {
             context.navigateToAppSettings()
         }
@@ -401,9 +401,9 @@ object PermissionUtils {
      */
     @JvmStatic
     fun requestPermission(
-        @NonNull activity: Activity,
-        @NonNull requestCode: Int,
-        @NonNull vararg permissions: String?,
+        activity: Activity,
+        requestCode: Int,
+        vararg permissions: String?,
     ) {
         ActivityCompat.requestPermissions(
             activity,

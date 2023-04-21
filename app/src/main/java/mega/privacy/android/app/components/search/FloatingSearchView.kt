@@ -186,7 +186,7 @@ class FloatingSearchView(context: Context, attrs: AttributeSet?) : FrameLayout(c
         menuClickListener = listener
     }
 
-    fun attachNavigationDrawerToMenuButton(@NonNull drawerLayout: DrawerLayout) {
+    fun attachNavigationDrawerToMenuButton(drawerLayout: DrawerLayout) {
         drawerLayout.addDrawerListener(drawerListener)
         setOnLeftMenuClickListener(NavDrawerLeftMenuClickListener(drawerLayout))
     }
