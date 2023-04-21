@@ -179,7 +179,15 @@ class SlideshowFragment : Fragment() {
             onImageTap = {
                 slideshowViewModel.updateIsPlaying(false)
             }
-        )
+        ) {
+            LaunchedEffect(pagerState.canScrollForward) {
+                // Not repeat and the last one.
+                if (!pagerState.canScrollForward && !repeat && isPlaying) {
+                    Timber.d("Slideshow canScrollForward")
+                    slideshowViewModel.updateIsPlaying(false)
+                }
+            }
+        }
 
         LaunchedEffect(isPlaying) {
             if (isPlaying) {
@@ -212,13 +220,6 @@ class SlideshowFragment : Fragment() {
             }
         }
 
-        LaunchedEffect(pagerState.canScrollForward) {
-            // Not repeat and the last one.
-            if (!pagerState.canScrollForward && !repeat && isPlaying) {
-                slideshowViewModel.updateIsPlaying(false)
-            }
-        }
-
         LaunchedEffect(pagerState.currentPage) {
             // When move to next, reset scale
             if (photoState.isScaled) {
@@ -245,6 +246,7 @@ class SlideshowFragment : Fragment() {
         isPlaying: Boolean,
         onPlayIconClick: () -> Unit,
         onImageTap: ((Offset) -> Unit),
+        HandleEffectComposable: @Composable () -> Unit,
     ) {
         Scaffold(
             scaffoldState = scaffoldState,
@@ -288,6 +290,8 @@ class SlideshowFragment : Fragment() {
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
+
+                    HandleEffectComposable()
                 }
 
                 if (!isPlaying) {
