@@ -24,6 +24,7 @@ import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -237,6 +238,7 @@ class NodeRepositoryImplTest {
         whenever(megaApiGateway.getNumChildFiles(megaNode)).thenReturn(3)
         whenever(megaApiGateway.isPendingShare(megaNode)).thenReturn(true)
         whenever(megaApiGateway.isInRubbish(megaNode)).thenReturn(true)
+        whenever(fileTypeInfoMapper.invoke(megaNode)).thenReturn(PdfFileTypeInfo)
         return megaNode
     }
 
