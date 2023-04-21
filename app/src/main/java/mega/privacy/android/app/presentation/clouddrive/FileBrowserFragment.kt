@@ -29,12 +29,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
 import com.jeremyliao.liveeventbus.LiveEventBus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -582,6 +582,11 @@ class FileBrowserFragment : RotatableFragment() {
                     markHandledPendingRefresh()
                 }
             }
+        }
+
+        viewLifecycleOwner.collectFlow(fileBrowserViewModel.state.map { it.nodes.isEmpty() }
+            .distinctUntilChanged()) {
+            setupToolbar()
         }
 
         fileBrowserViewModel.state.flowWithLifecycle(

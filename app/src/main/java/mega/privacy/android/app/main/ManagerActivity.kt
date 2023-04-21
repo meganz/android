@@ -4876,7 +4876,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 DrawerItem.CLOUD_DRIVE -> if (!isInMDMode) {
                     openLinkMenuItem?.isVisible = isFirstNavigationLevel
                     moreMenuItem.isVisible = !isFirstNavigationLevel
-                    if (isCloudAdded && (fileBrowserFragment?.itemCount ?: 0) > 0) {
+                    if (isCloudAdded && fileBrowserState().nodes.isNotEmpty()) {
                         searchMenuItem?.isVisible = true
                     }
                 }
