@@ -283,23 +283,13 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
     }
 
     private fun startForeground() {
-        CoroutineScope(ioDispatcher).launch {
-            if (getDownloadCount() > 0) {
-                isForeground = kotlin.runCatching {
-                    val notification = createInitialNotification()
-                    startForeground(
-                        Constants.NOTIFICATION_DOWNLOAD,
-                        notification
-                    )
-                }.fold(
-                    onSuccess = { true },
-                    onFailure = {
-                        Timber.w(it)
-                        false
-                    }
-                )
-            }
-        }
+        isForeground = runCatching {
+            val notification = createInitialNotification()
+            startForeground(
+                Constants.NOTIFICATION_DOWNLOAD,
+                notification
+            )
+        }.isSuccess
     }
 
     @Suppress("DEPRECATION")
@@ -492,6 +482,10 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             )
         } else {
             Timber.w("currentDir is not a directory")
+        }
+
+        if (getDownloadCount() <= 0) {
+            cancel()
         }
     }
 
