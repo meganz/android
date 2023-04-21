@@ -1,6 +1,6 @@
 package mega.privacy.android.app.imageviewer
 
-import android.graphics.PointF
+import android.graphics.Matrix
 import android.graphics.drawable.Animatable
 import android.net.Uri
 import android.os.Bundle
@@ -82,10 +82,7 @@ class ImageViewerPageFragment : Fragment() {
     private val enableZoom by lazy { arguments?.getBoolean(EXTRA_ENABLE_ZOOM, true) ?: true }
     private val controllerListener by lazy { buildImageControllerListener() }
     private val screenSize: Size by lazy { requireContext().getScreenSize() }
-
-    private var currentImagePoint: PointF = PointF(0.0f, 0.0f)
-    private var currentViewPoint: PointF = PointF(0.0f, 0.0f)
-    private var currentZoomScale: Float = 1.0f
+    private var transform: Matrix = Matrix()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -141,14 +138,12 @@ class ImageViewerPageFragment : Fragment() {
                         onSingleTapCallback = {
                             viewModel.showToolbar(!viewModel.isToolbarShown())
                         },
-                        onZoomCallback = { zoomScale, ip, vp ->
+                        onTransformChanged = { changedTransform ->
                             if (!hasZoomBeenTriggered) {
                                 hasZoomBeenTriggered = true
                                 viewModel.loadSingleImage(itemId, fullSize = true)
                             }
-                            currentZoomScale = zoomScale
-                            currentImagePoint = ip
-                            currentViewPoint = vp
+                            transform = Matrix(changedTransform)
                         }
                     )
                 )
@@ -261,6 +256,9 @@ class ImageViewerPageFragment : Fragment() {
                 .setControllerListener(controllerListener)
                 .setAutoPlayAnimations(true)
                 .build()
+            val zoomableController =
+                binding.image.zoomableController as AbstractAnimatedZoomableController
+            zoomableController.transform = transform
 
             if (imageResult.isVideo) {
                 binding.image.post { showVideoButton() }
@@ -278,13 +276,8 @@ class ImageViewerPageFragment : Fragment() {
             if (imageResult.isFullyLoaded) {
                 binding.image.post {
                     if (imageResult.isVideo) showVideoButton()
-                    imageResult.previewUri?.let {
-                        applyCurrentZoomAndOffset()
-                    }
                     binding.progress.hide()
                 }
-            } else {
-                resetCurrentZoomAndOffset()
             }
         }
 
@@ -304,20 +297,6 @@ class ImageViewerPageFragment : Fragment() {
                     binding.progress.hide()
                 }
             }
-        }
-    }
-
-    private fun resetCurrentZoomAndOffset() {
-        currentZoomScale = 1.0f
-        currentImagePoint = PointF(0.0f, 0.0f)
-        currentViewPoint = PointF(0.0f, 0.0f)
-    }
-
-    private fun applyCurrentZoomAndOffset() {
-        if (currentZoomScale != 1.0f) {
-            val zoomableController =
-                binding.image.zoomableController as AbstractAnimatedZoomableController
-            zoomableController.zoomToPoint(currentZoomScale, currentImagePoint, currentViewPoint)
         }
     }
 

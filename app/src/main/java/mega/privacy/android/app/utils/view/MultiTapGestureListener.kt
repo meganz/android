@@ -1,5 +1,6 @@
 package mega.privacy.android.app.utils.view
 
+import android.graphics.Matrix
 import android.graphics.PointF
 import android.view.GestureDetector.SimpleOnGestureListener
 import android.view.MotionEvent
@@ -15,12 +16,12 @@ import kotlin.math.hypot
  *
  * @property zoomableDraweeView     Zoomable View
  * @property onSingleTapCallback    Callback to be called when single tap is triggered.
- * @property onZoomCallback         Callback to be called when any zoom action is triggered.
+ * @property onTransformChanged     Callback to be called when any zoom action/scroll is triggered.
  */
 class MultiTapGestureListener constructor(
     private val zoomableDraweeView: ZoomableDraweeView,
     private val onSingleTapCallback: () -> Unit,
-    private val onZoomCallback: (Float, PointF, PointF) -> Unit,
+    private val onTransformChanged: (Matrix) -> Unit,
 ) : SimpleOnGestureListener() {
 
     private val doubleTapViewPoint = PointF()
@@ -55,9 +56,7 @@ class MultiTapGestureListener constructor(
         distanceY: Float,
     ): Boolean {
         val zc = this.zoomableDraweeView.zoomableController as AbstractAnimatedZoomableController
-        val vp = PointF(e1.x, e1.y)
-        val ip = zc.mapViewToImage(vp)
-        onZoomCallback.invoke(zc.scaleFactor, ip, vp)
+        onTransformChanged(zc.transform)
         return super.onScroll(e1, e2, distanceX, distanceY)
     }
 
@@ -76,46 +75,48 @@ class MultiTapGestureListener constructor(
                 this.doubleTapViewPoint.set(vp)
                 this.doubleTapImagePoint.set(ip)
                 this.doubleTapScale = zc.scaleFactor
-                onZoomCallback.invoke(this.doubleTapScale, ip, vp)
+                onTransformChanged(zc.transform)
             }
+
             MotionEvent.ACTION_UP -> {
                 if (this.doubleTapScroll) {
                     maxScale = this.calcScale(vp)
                     zc.zoomToPoint(maxScale, this.doubleTapImagePoint, this.doubleTapViewPoint)
-                    onZoomCallback.invoke(maxScale,
-                        this.doubleTapImagePoint,
-                        this.doubleTapViewPoint)
+                    onTransformChanged(zc.transform)
                 } else {
                     maxScale = zc.maxScaleFactor / doubleTapMaxScaleDivider
                     val minScale = zc.minScaleFactor
                     if (zc.scaleFactor < (maxScale + minScale) / 2.0f) {
-                        zc.zoomToPoint(maxScale,
+                        zc.zoomToPoint(
+                            maxScale,
                             ip,
                             vp,
                             DefaultZoomableController.LIMIT_ALL,
                             durationMs,
-                            null as Runnable?)
-                        onZoomCallback.invoke(maxScale, ip, vp)
+                            null as Runnable?
+                        )
+                        onTransformChanged(zc.transform)
                     } else {
-                        zc.zoomToPoint(minScale,
+                        zc.zoomToPoint(
+                            minScale,
                             ip,
                             vp,
                             DefaultZoomableController.LIMIT_ALL,
                             durationMs,
-                            null as Runnable?)
-                        onZoomCallback.invoke(minScale, ip, vp)
+                            null as Runnable?
+                        )
+                        onTransformChanged(zc.transform)
                     }
                 }
                 this.doubleTapScroll = false
             }
+
             MotionEvent.ACTION_MOVE -> {
                 this.doubleTapScroll = this.doubleTapScroll || this.shouldStartDoubleTapScroll(vp)
                 if (this.doubleTapScroll) {
                     maxScale = this.calcScale(vp)
                     zc.zoomToPoint(maxScale, this.doubleTapImagePoint, this.doubleTapViewPoint)
-                    onZoomCallback.invoke(maxScale,
-                        this.doubleTapImagePoint,
-                        this.doubleTapViewPoint)
+                    onTransformChanged(zc.transform)
                 }
             }
         }
@@ -123,8 +124,10 @@ class MultiTapGestureListener constructor(
     }
 
     private fun shouldStartDoubleTapScroll(viewPoint: PointF): Boolean {
-        val dist = hypot((viewPoint.x - doubleTapViewPoint.x).toDouble(),
-            (viewPoint.y - doubleTapViewPoint.y).toDouble())
+        val dist = hypot(
+            (viewPoint.x - doubleTapViewPoint.x).toDouble(),
+            (viewPoint.y - doubleTapViewPoint.y).toDouble()
+        )
         return dist > 20.0
     }
 
