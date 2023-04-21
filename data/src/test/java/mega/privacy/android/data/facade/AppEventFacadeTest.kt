@@ -8,6 +8,8 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
+import nz.mega.sdk.MegaTransfer
 import org.junit.Before
 import org.junit.Test
 import kotlin.contracts.ExperimentalContracts
@@ -58,4 +60,27 @@ class AppEventFacadeTest {
     fun `test that is SMSVerification Shown default value is the correct one`() = runTest {
         assertThat(underTest.isSMSVerificationShown()).isFalse()
     }
+
+    @Test
+    fun `test that broadcast completed transfer fires an event`() = runTest {
+        val expected = CompletedTransfer(
+            fileName = "",
+            type = MegaTransfer.TYPE_UPLOAD,
+            state = MegaTransfer.STATE_COMPLETED,
+            size = "",
+            nodeHandle = "",
+            path = "",
+            timeStamp = 0L,
+            error = "",
+            originalPath = "",
+            parentHandle = 0L
+        )
+        underTest.monitorCompletedTransfer.test {
+            underTest.broadcastCompletedTransfer(expected)
+
+            val actual = awaitItem()
+            assertThat(actual).isEqualTo(expected)
+        }
+    }
+
 }

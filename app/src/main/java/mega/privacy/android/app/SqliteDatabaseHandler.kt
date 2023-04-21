@@ -48,6 +48,7 @@ import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
@@ -1857,6 +1858,27 @@ class SqliteDatabaseHandler @Inject constructor(
         return result
     }
 
+    override fun addCompletedTransfer(transfer: CompletedTransfer) {
+        val values = ContentValues().apply {
+            put(KEY_TRANSFER_FILENAME, encrypt(transfer.fileName))
+            put(KEY_TRANSFER_TYPE, encrypt(transfer.type.toString()))
+            put(KEY_TRANSFER_STATE, encrypt(transfer.state.toString()))
+            put(KEY_TRANSFER_SIZE, encrypt(transfer.size))
+            put(KEY_TRANSFER_HANDLE, encrypt(transfer.nodeHandle))
+            put(KEY_TRANSFER_PATH, encrypt(transfer.path))
+            put(KEY_TRANSFER_OFFLINE, encrypt(transfer.isOfflineFile.toString()))
+            put(KEY_TRANSFER_TIMESTAMP, encrypt(transfer.timeStamp.toString()))
+            put(KEY_TRANSFER_ERROR, encrypt(transfer.error))
+            put(KEY_TRANSFER_ORIGINAL_PATH, encrypt(transfer.originalPath))
+            put(KEY_TRANSFER_PARENT_HANDLE, encrypt(transfer.parentHandle.toString()))
+        }
+
+        db.insert(TABLE_COMPLETED_TRANSFERS, null, values)
+        if (DatabaseUtils.queryNumEntries(db, TABLE_COMPLETED_TRANSFERS) > MAX_TRANSFERS) {
+            deleteOldestTransfer()
+        }
+    }
+
     /**
      * Deletes the oldest completed transfer.
      */
@@ -1922,6 +1944,7 @@ class SqliteDatabaseHandler @Inject constructor(
             offline, timeStamp, error, originalPath, parentHandle)
     }
 
+    @Deprecated("To be replaced by addCompletedTransfer")
     override fun setCompletedTransfer(transfer: AndroidCompletedTransfer): Long {
         val values = ContentValues().apply {
             put(KEY_TRANSFER_FILENAME, encrypt(transfer.fileName))

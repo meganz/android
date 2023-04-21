@@ -7,6 +7,7 @@ import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 
 /**
@@ -681,6 +682,13 @@ interface MegaLocalStorageGateway {
      * Clears chat items.
      */
     suspend fun clearChatItems()
+
+    /**
+     * Add a completed transfer
+     *
+     * @param transfer the completed transfer to add
+     */
+    suspend fun addCompletedTransfer(transfer: CompletedTransfer)
 
     /**
      * Clears completed transfers.

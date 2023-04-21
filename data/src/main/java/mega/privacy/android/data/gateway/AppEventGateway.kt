@@ -1,6 +1,7 @@
 package mega.privacy.android.data.gateway
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 
 internal interface AppEventGateway {
 
@@ -18,6 +19,11 @@ internal interface AppEventGateway {
      * [Int] value representing pending elements waiting for upload
      */
     val monitorCameraUploadProgress: Flow<Pair<Int, Int>>
+
+    /**
+     * Monitor completed transfer
+     */
+    val monitorCompletedTransfer: Flow<CompletedTransfer>
 
     /**
      * Broadcast upload pause state
@@ -136,4 +142,11 @@ internal interface AppEventGateway {
      * Monitor push notification settings
      */
     fun monitorPushNotificationSettings(): Flow<Boolean>
+
+    /**
+     * Broadcast completed transfer
+     *
+     * @param transfer the completed transfer to be broadcast
+     */
+    suspend fun broadcastCompletedTransfer(transfer: CompletedTransfer)
 }

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.shareIn
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import javax.inject.Inject
 
@@ -33,12 +34,16 @@ internal class AppEventFacade @Inject constructor(
     private val _finishActivity = MutableSharedFlow<Boolean>()
 
     private val updateUpgradeSecurityState = MutableStateFlow(false)
+    private val _monitorCompletedTransfer = MutableSharedFlow<CompletedTransfer>()
 
     override val monitorCameraUploadPauseState =
         _monitorCameraUploadPauseState.toSharedFlow(appScope)
 
     override val monitorCameraUploadProgress =
         _monitorCameraUploadProgress.toSharedFlow(appScope)
+
+    override val monitorCompletedTransfer =
+        _monitorCompletedTransfer.toSharedFlow(appScope)
 
     override suspend fun broadcastUploadPauseState() =
         _monitorCameraUploadPauseState.emit(true)
@@ -97,6 +102,9 @@ internal class AppEventFacade @Inject constructor(
 
     override fun monitorPushNotificationSettings() =
         pushNotificationSettingsUpdate.toSharedFlow(appScope)
+
+    override suspend fun broadcastCompletedTransfer(transfer: CompletedTransfer) =
+        _monitorCompletedTransfer.emit(transfer)
 }
 
 private fun <T> Flow<T>.toSharedFlow(

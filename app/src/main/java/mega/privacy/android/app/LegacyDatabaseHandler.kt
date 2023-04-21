@@ -53,6 +53,8 @@ interface LegacyDatabaseHandler : DatabaseHandler {
      * @return The completed transfer which has the id value as identifier.
      */
     fun getCompletedTransfer(id: Long): AndroidCompletedTransfer?
+
+    @Deprecated("To be replaced by DatabaseHandler.addCompletedTransfer")
     fun setCompletedTransfer(transfer: AndroidCompletedTransfer): Long
 
     /**

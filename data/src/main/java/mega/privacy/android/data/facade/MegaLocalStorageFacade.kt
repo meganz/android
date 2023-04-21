@@ -9,6 +9,7 @@ import mega.privacy.android.data.model.node.OfflineInformation
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 import nz.mega.sdk.MegaApiJava.ORDER_DEFAULT_ASC
 import nz.mega.sdk.MegaApiJava.ORDER_FAV_ASC
@@ -381,6 +382,9 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun clearNonContacts() = dbHandler.clearNonContacts()
 
     override suspend fun clearChatItems() = dbHandler.clearChatItems()
+
+    override suspend fun addCompletedTransfer(transfer: CompletedTransfer) =
+        dbHandler.addCompletedTransfer(transfer)
 
     override suspend fun clearCompletedTransfers() = dbHandler.clearCompletedTransfers()
 

@@ -10,6 +10,7 @@ import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
 
 interface DatabaseHandler {
@@ -188,6 +189,13 @@ interface DatabaseHandler {
     fun setVibrationEnabledChat(enabled: String?)
     fun setWrittenTextItem(handle: String?, text: String?, editedMsgId: String?): Int
     fun areNotificationsEnabled(handle: String?): String?
+
+    /**
+     * Add a completed transfer
+     *
+     * @param transfer the completed transfer to add
+     */
+    fun addCompletedTransfer(transfer: CompletedTransfer)
 
     /**
      * Deletes a completed transfer.
