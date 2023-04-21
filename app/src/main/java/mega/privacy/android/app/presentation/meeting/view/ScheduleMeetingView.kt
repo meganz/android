@@ -385,7 +385,7 @@ private fun ScheduleMeetingAppBar(
                     modifier = Modifier
                         .wrapContentSize(Alignment.CenterEnd)
                 ) {
-                    IconButton(onClick = { if (state.hasMeetingTitleRightLength()) onAcceptClicked() }) {
+                    IconButton(onClick = { onAcceptClicked() }) {
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_confirm),
                             contentDescription = "Accept schedule meeting button",
@@ -559,7 +559,6 @@ fun PreviewDiscardMeetingAlertDialog() {
             meetingTitle = "Title meeting",
             freq = OccurrenceFrequencyType.Invalid,
             participantItemList = emptyList(),
-            finish = false,
             buttons = ScheduleMeetingAction.values().asList(),
             snackBar = null,
             discardMeetingDialog = true,
@@ -582,7 +581,6 @@ private fun PreviewScheduleMeetingView() {
                 meetingTitle = "Title meeting",
                 freq = OccurrenceFrequencyType.Invalid,
                 participantItemList = emptyList(),
-                finish = false,
                 buttons = ScheduleMeetingAction.values().asList(),
                 snackBar = null
             ),

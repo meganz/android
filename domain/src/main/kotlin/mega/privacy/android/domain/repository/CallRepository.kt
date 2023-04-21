@@ -168,9 +168,9 @@ interface CallRepository {
         startDate: Long,
         endDate: Long,
         description: String,
-        flags: ChatScheduledFlags,
-        rules: ChatScheduledRules,
-        attributes: String,
+        flags: ChatScheduledFlags?,
+        rules: ChatScheduledRules?,
+        attributes: String?,
     ): ChatRequest
 
     /**

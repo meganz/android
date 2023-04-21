@@ -1,6 +1,5 @@
 package mega.privacy.android.core.ui.controls.textfields
 
-import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
@@ -25,9 +24,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.controls.MegaTextField
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_087_white_087
 import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_038
@@ -46,6 +45,7 @@ import mega.privacy.android.core.ui.theme.extensions.teal_300_200
 fun GenericDescriptionTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
     @StringRes placeholderId: Int? = null,
     @StringRes charLimitErrorId: Int? = null,
     charLimit: Int,
@@ -73,7 +73,7 @@ fun GenericDescriptionTextField(
         )
 
         MegaTextField(
-            modifier = Modifier
+            modifier = modifier
                 .focusRequester(focusRequester)
                 .onFocusChanged {
                     if (isFocused != it.isFocused) {
@@ -110,7 +110,7 @@ fun GenericDescriptionTextField(
 
         charLimitErrorId?.let { id ->
             if (isCharLimitError) {
-                ErrorTextTextField(errorTextId = id)
+                ErrorTextTextField(errorText = stringResource(id = id))
             }
         }
 
@@ -120,19 +120,13 @@ fun GenericDescriptionTextField(
     }
 }
 
-@Preview
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES
-)
+@CombinedThemePreviews
 @Composable
 private fun PreviewGenericDescriptionTextField() {
-    var content by remember {
-        mutableStateOf("")
-    }
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         GenericDescriptionTextField(
-            value = content,
-            onValueChange = { content = it },
+            value = "Description text",
+            onValueChange = { },
             charLimit = 4000
         )
     }

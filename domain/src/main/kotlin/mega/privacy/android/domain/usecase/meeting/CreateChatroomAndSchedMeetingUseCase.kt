@@ -45,9 +45,9 @@ class CreateChatroomAndSchedMeetingUseCase @Inject constructor(
         startDate: Long,
         endDate: Long,
         description: String,
-        flags: ChatScheduledFlags,
-        rules: ChatScheduledRules,
-        attributes: String,
+        flags: ChatScheduledFlags?,
+        rules: ChatScheduledRules?,
+        attributes: String?,
     ): ChatRequest =
         callRepository.createChatroomAndSchedMeeting(
             peerList,

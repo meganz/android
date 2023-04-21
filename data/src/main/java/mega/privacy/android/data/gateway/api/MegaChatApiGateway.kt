@@ -616,7 +616,7 @@ interface MegaChatApiGateway {
         description: String,
         flags: MegaChatScheduledFlags?,
         rules: MegaChatScheduledRules?,
-        attributes: String,
+        attributes: String?,
         listener: MegaChatRequestListenerInterface,
     )
 }

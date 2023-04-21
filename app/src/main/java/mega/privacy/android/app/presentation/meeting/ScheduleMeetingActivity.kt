@@ -24,6 +24,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
 import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.AddContactActivity
+import mega.privacy.android.app.main.megachat.ChatActivity
 import mega.privacy.android.app.presentation.extensions.changeStatusBarColor
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingAction
@@ -65,7 +66,12 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (_, _, _, _, _, _, _, _, _, _, _, _, openAddContact) ->
+                viewModel.state.collect { (openAddContact, openChatRoom) ->
+                    openChatRoom?.let {
+                        viewModel.openChatRoom(null)
+                        openChatRoom(it)
+                    }
+
                     openAddContact?.let { shouldOpen ->
                         if (shouldOpen) {
                             viewModel.removeAddContact()
@@ -129,6 +135,19 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
                 onTitleValueChange = { text -> viewModel.onTitleChange(text) },
             )
         }
+    }
+
+    /**
+     * Open chat room
+     *
+     * @param chatId Chat id.
+     */
+    private fun openChatRoom(chatId: Long) {
+        val intentOpenChat = Intent(this@ScheduleMeetingActivity, ChatActivity::class.java)
+        intentOpenChat.action = Constants.ACTION_CHAT_SHOW_MESSAGES
+        intentOpenChat.putExtra(Constants.CHAT_ID, chatId)
+        finish()
+        this.startActivity(intentOpenChat)
     }
 
     private fun showDatePicker(isStart: Boolean) {

@@ -35,7 +35,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.CallRepository
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatRequest
-import timber.log.Timber
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
@@ -272,9 +271,9 @@ internal class CallRepositoryImpl @Inject constructor(
         startDate: Long,
         endDate: Long,
         description: String,
-        flags: ChatScheduledFlags,
-        rules: ChatScheduledRules,
-        attributes: String,
+        flags: ChatScheduledFlags?,
+        rules: ChatScheduledRules?,
+        attributes: String?,
     ): ChatRequest = withContext(dispatcher) {
         suspendCoroutine { continuation ->
             val callback = OptionalMegaChatRequestListenerInterface(
@@ -330,10 +329,8 @@ internal class CallRepositoryImpl @Inject constructor(
     private fun onRequestCompleted(continuation: Continuation<ChatRequest>) =
         { request: MegaChatRequest, error: MegaChatError ->
             if (error.errorCode == MegaChatError.ERROR_OK) {
-                Timber.d("Success")
                 continuation.resumeWith(Result.success(chatRequestMapper(request)))
             } else {
-                Timber.e("Error: ${error.errorString}")
                 continuation.failWithError(error, "onRequestCompleted")
             }
         }

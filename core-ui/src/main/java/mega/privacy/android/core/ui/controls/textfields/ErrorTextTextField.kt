@@ -1,30 +1,41 @@
 package mega.privacy.android.core.ui.controls.textfields
 
-import androidx.annotation.StringRes
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import mega.privacy.android.core.ui.preview.CombinedThemePreviews
+import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
  * Error text in text field
  *
- * @param errorTextId   String resource
+ * @param errorText   String
  */
 @Composable
-fun ErrorTextTextField(@StringRes errorTextId: Int) {
+fun ErrorTextTextField(
+    errorText: String, modifier: Modifier = Modifier,
+) {
     Text(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(top = 4.dp),
-        text = stringResource(id = errorTextId),
+        text = errorText,
         style = MaterialTheme.typography.caption,
         color = MaterialTheme.colors.error,
         textAlign = TextAlign.Start
     )
+}
+
+@CombinedThemePreviews
+@Composable
+private fun PreviewErrorTextTextField() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        ErrorTextTextField(errorText = "Error text")
+    }
 }

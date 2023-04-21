@@ -7,7 +7,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,7 +22,6 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,8 +79,6 @@ fun MegaTextField(
     defaultMinHeight: Dp = TextFieldDefaults.MinHeight,
     defaultMinWidth: Dp = TextFieldDefaults.MinWidth,
 ) {
-    val scrollState = rememberScrollState(0)
-
     // If color is not provided via the text style, use content color as a default
     val textColor = textStyle.color.takeOrElse {
         colors.textColor(enabled).value
@@ -147,12 +143,6 @@ fun MegaTextField(
                 )
             }
         )
-    }
-
-    LaunchedEffect(scrollState.maxValue) {
-        scrollState.scrollTo(scrollState.maxValue)
-        // or
-        // scrollState.animateScrollTo(scrollState.maxValue)
     }
 }
 

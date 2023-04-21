@@ -422,7 +422,7 @@ internal class MegaChatApiFacade @Inject constructor(
         description: String,
         flags: MegaChatScheduledFlags?,
         rules: MegaChatScheduledRules?,
-        attributes: String,
+        attributes: String?,
         listener: MegaChatRequestListenerInterface,
     ) {
         chatApi.createChatroomAndSchedMeeting(

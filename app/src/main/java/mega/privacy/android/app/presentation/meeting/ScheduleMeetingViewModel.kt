@@ -11,26 +11,33 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
+import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
+import mega.privacy.android.domain.usecase.meeting.CreateChatroomAndSchedMeetingUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import java.time.Instant
+import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
 /**
  * ScheduleMeetingActivity view model.
- * @property monitorConnectivityUseCase     [MonitorConnectivityUseCase]
- * @property getVisibleContactsUseCase      [GetVisibleContactsUseCase]
- * @property getContactFromEmailUseCase     [GetContactFromEmailUseCase]
- * @property state                          Current view state as [ScheduleMeetingState]
+ * @property monitorConnectivityUseCase                 [MonitorConnectivityUseCase]
+ * @property getVisibleContactsUseCase                  [GetVisibleContactsUseCase]
+ * @property getContactFromEmailUseCase                 [GetContactFromEmailUseCase]
+ * @property createChatroomAndSchedMeetingUseCase       [CreateChatroomAndSchedMeetingUseCase]
+ * @property createChatLink                             [CreateChatLink]
+ * @property state                                      Current view state as [ScheduleMeetingState]
  */
 @HiltViewModel
 class ScheduleMeetingViewModel @Inject constructor(
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val getContactFromEmailUseCase: GetContactFromEmailUseCase,
+    private val createChatroomAndSchedMeetingUseCase: CreateChatroomAndSchedMeetingUseCase,
+    private val createChatLink: CreateChatLink,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ScheduleMeetingState())
@@ -52,11 +59,10 @@ class ScheduleMeetingViewModel @Inject constructor(
     /**
      * Enable or disable meeting link option
      */
-    fun onMeetingLinkTap() {
+    fun onMeetingLinkTap() =
         _state.update { state ->
             state.copy(enabledMeetingLinkOption = !state.enabledMeetingLinkOption)
         }
-    }
 
     /**
      * Add participants to the schedule meeting.
@@ -131,6 +137,14 @@ class ScheduleMeetingViewModel @Inject constructor(
             }
         }
     }
+
+    /**
+     * Open chat room
+     *
+     * @param chatId Chat id.
+     */
+    fun openChatRoom(chatId: Long?) =
+        _state.update { it.copy(openChatRoom = chatId) }
 
     /**
      * Set end date
@@ -216,14 +230,80 @@ class ScheduleMeetingViewModel @Inject constructor(
      * Schedule meeting option
      */
     fun onScheduleMeetingTap() {
+        if (!state.value.isMeetingTitleTooLong()) {
+            Timber.d("Meeting title too long")
+            return
+        }
+
         _state.update { state ->
             state.copy(isEmptyTitleError = state.meetingTitle.isEmpty())
         }
 
         if (state.value.meetingTitle.isNotEmpty()) {
-            Timber.d("Schedule meeting")
+            viewModelScope.launch {
+                runCatching {
+                    _state.value.let {
+                        createChatroomAndSchedMeetingUseCase(
+                            peerList = it.participantItemList,
+                            isMeeting = true,
+                            publicChat = true,
+                            title = it.meetingTitle,
+                            speakRequest = false,
+                            waitingRoom = false,
+                            openInvite = it.enabledAllowAddParticipantsOption,
+                            timezone = ZoneId.systemDefault().id,
+                            startDate = it.startDate.epochSecond,
+                            endDate = it.endDate.epochSecond,
+                            description = it.descriptionText,
+                            flags = null,
+                            rules = null,
+                            attributes = null
+                        )
+                    }
+                }.onFailure { exception ->
+                    Timber.e(exception)
+                }.onSuccess {
+                    it.chatHandle?.let { id ->
+                        if (state.value.enabledMeetingLinkOption) {
+                            createMeetingLink(id)
+                        } else {
+                            openChatRoom(id)
+                        }
+                    }
+                }
+            }
         }
     }
+
+    /**
+     * Open chat room with specific id
+     *
+     * @param chatId Chat Id.
+     */
+    private fun openChatRoom(chatId: Long) {
+        Timber.d("Scheduled meeting created, open chat room $chatId")
+        _state.update { state ->
+            state.copy(openChatRoom = chatId)
+        }
+    }
+
+    /**
+     * Create meeting link
+     *
+     * @param chatId Chat Id.
+     */
+    private fun createMeetingLink(chatId: Long) =
+        viewModelScope.launch {
+            runCatching {
+                createChatLink(chatId)
+            }.onFailure { exception ->
+                Timber.e(exception)
+            }.onSuccess { request ->
+                request.chatHandle?.let { id ->
+                    openChatRoom(id)
+                }
+            }
+        }
 
     /**
      * Dismiss alert dialogs

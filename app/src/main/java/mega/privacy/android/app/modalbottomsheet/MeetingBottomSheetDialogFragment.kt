@@ -7,15 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.databinding.BottomSheetMeetingBinding
 import mega.privacy.android.app.databinding.BottomSheetMeetingSimpleBinding
-import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.interfaces.MeetingBottomSheetDialogActionListener
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import javax.inject.Inject
@@ -47,16 +44,14 @@ class MeetingBottomSheetDialogFragment : BottomSheetDialogFragment(), View.OnCli
         super.setupDialog(dialog, style)
 
         if (showSimpleList) {
-            val binding = BottomSheetMeetingSimpleBinding.inflate(LayoutInflater.from(context), null, false)
+            val binding =
+                BottomSheetMeetingSimpleBinding.inflate(LayoutInflater.from(context), null, false)
             binding.btnStartMeeting.setOnClickListener(this)
             binding.btnJoinMeeting.setOnClickListener(this)
+            binding.dividerSchedule.isVisible = true
+            binding.btnScheduleMeeting.isVisible = true
+            binding.btnScheduleMeeting.setOnClickListener(this)
 
-            activity?.lifecycleScope?.launch {
-                val scheduleMeetingEnabled = getFeatureFlagUseCase(AppFeatures.ScheduleMeeting)
-                binding.dividerSchedule.isVisible = scheduleMeetingEnabled
-                binding.btnScheduleMeeting.isVisible = scheduleMeetingEnabled
-                binding.btnScheduleMeeting.setOnClickListener(this@MeetingBottomSheetDialogFragment)
-            }
             dialog.setContentView(binding.root)
         } else {
             val binding = BottomSheetMeetingBinding.inflate(LayoutInflater.from(context), null, false)
