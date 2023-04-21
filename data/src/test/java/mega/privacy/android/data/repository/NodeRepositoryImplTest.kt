@@ -16,13 +16,13 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
+import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
@@ -55,7 +55,7 @@ class NodeRepositoryImplTest {
     private val megaApiFolderGateway: MegaApiFolderGateway = mock()
     private val megaChatApiGateway: MegaChatApiGateway = mock()
     private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
-    private val megaShareMapper: MegaShareMapper = mock()
+    private val shareDataMapper: ShareDataMapper = mock()
     private val megaExceptionMapper: MegaExceptionMapper = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
     private val cacheFolderGateway: CacheFolderGateway = mock()
@@ -79,7 +79,7 @@ class NodeRepositoryImplTest {
             megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = UnconfinedTestDispatcher(),
             megaLocalStorageGateway = megaLocalStorageGateway,
-            megaShareMapper = megaShareMapper,
+            shareDataMapper = shareDataMapper,
             megaExceptionMapper = megaExceptionMapper,
             sortOrderIntMapper = sortOrderIntMapper,
             cacheFolderGateway = cacheFolderGateway,

@@ -1,5 +1,7 @@
 package mega.privacy.android.domain.entity
 
+import mega.privacy.android.domain.entity.shares.AccessPermission
+
 /**
  * Share data
  *
@@ -13,7 +15,7 @@ package mega.privacy.android.domain.entity
 data class ShareData(
     val user: String?,
     val nodeHandle: Long,
-    val access: Int,
+    val access: AccessPermission,
     val timeStamp: Long,
     val isPending: Boolean,
     val isVerified: Boolean,

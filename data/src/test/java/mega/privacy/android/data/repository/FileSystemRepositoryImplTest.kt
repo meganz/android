@@ -18,10 +18,10 @@ import mega.privacy.android.data.gateway.api.StreamingGateway
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.FileNotCreatedException
@@ -59,7 +59,7 @@ internal class FileSystemRepositoryImplTest {
     private val megaChatApiGateway: MegaChatApiGateway = mock()
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
     private val megaLocalStorageGateway: MegaLocalStorageGateway = mock()
-    private val megaShareMapper: MegaShareMapper = mock()
+    private val shareDataMapper: ShareDataMapper = mock()
     private val megaExceptionMapper: MegaExceptionMapper = mock()
     private val sortOrderIntMapper: SortOrderIntMapper = mock()
     private val cacheFolderGateway: CacheFolderGateway = mock()
@@ -81,7 +81,7 @@ internal class FileSystemRepositoryImplTest {
             megaChatApiGateway = megaChatApiGateway,
             ioDispatcher = ioDispatcher,
             megaLocalStorageGateway = megaLocalStorageGateway,
-            megaShareMapper = megaShareMapper,
+            shareDataMapper = shareDataMapper,
             megaExceptionMapper = megaExceptionMapper,
             sortOrderIntMapper = sortOrderIntMapper,
             cacheFolderGateway = cacheFolderGateway,
@@ -104,7 +104,7 @@ internal class FileSystemRepositoryImplTest {
             megaApiFolderGateway,
             megaChatApiGateway,
             megaLocalStorageGateway,
-            megaShareMapper,
+            shareDataMapper,
             megaExceptionMapper,
             sortOrderIntMapper,
             cacheFolderGateway,

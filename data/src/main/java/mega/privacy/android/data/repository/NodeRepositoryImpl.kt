@@ -23,13 +23,13 @@ import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
 import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
+import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.FileTypeInfo
 import mega.privacy.android.domain.entity.FolderTreeInfo
@@ -61,7 +61,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaChatApiGateway
  * @property ioDispatcher
  * @property megaLocalStorageGateway
- * @property megaShareMapper
+ * @property shareDataMapper
  * @property megaExceptionMapper
  * @property sortOrderIntMapper
  * @property cacheFolderGateway
@@ -79,7 +79,7 @@ internal class NodeRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
-    private val megaShareMapper: MegaShareMapper,
+    private val shareDataMapper: ShareDataMapper,
     private val megaExceptionMapper: MegaExceptionMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val cacheFolderGateway: CacheFolderGateway,
@@ -98,20 +98,20 @@ internal class NodeRepositoryImpl @Inject constructor(
     override suspend fun getOutgoingSharesNode(order: SortOrder): List<ShareData> =
         withContext(ioDispatcher) {
             megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order))
-                .map { megaShareMapper(it) }
+                .map { shareDataMapper(it) }
         }
 
     override suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData> =
         withContext(ioDispatcher) {
             megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)).map {
-                megaShareMapper(it)
+                shareDataMapper(it)
             }
         }
 
     override suspend fun getUnverifiedOutgoingShares(order: SortOrder): List<ShareData> =
         withContext(ioDispatcher) {
             megaApiGateway.getOutgoingSharesNode(sortOrderIntMapper(order)).map {
-                megaShareMapper(it)
+                shareDataMapper(it)
             }
         }
 

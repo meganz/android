@@ -32,6 +32,7 @@ import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.contacts.ContactRequest
 import mega.privacy.android.domain.entity.contacts.ContactRequestStatus
 import mega.privacy.android.domain.entity.node.NodeUpdate
+import mega.privacy.android.domain.entity.shares.AccessPermission
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.entity.user.UserUpdate
 import mega.privacy.android.domain.entity.verification.UnVerified
@@ -40,19 +41,19 @@ import mega.privacy.android.domain.entity.verification.Verified
 import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 import mega.privacy.android.domain.usecase.CheckCameraUpload
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.GetNumUnreadUserAlerts
 import mega.privacy.android.domain.usecase.HasInboxChildren
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
-import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
 import mega.privacy.android.domain.usecase.account.SetLatestTargetPath
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
+import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
@@ -119,7 +120,7 @@ class ManagerViewModelTest {
         ShareData(
             user = "user",
             nodeHandle = 8766L,
-            access = 0,
+            access = AccessPermission.READ,
             timeStamp = 987654678L,
             isPending = true,
             isVerified = false,
@@ -127,7 +128,7 @@ class ManagerViewModelTest {
         ShareData(
             user = "user",
             nodeHandle = 8766L,
-            access = 0,
+            access = AccessPermission.READ,
             timeStamp = 987654678L,
             isPending = true,
             isVerified = false,

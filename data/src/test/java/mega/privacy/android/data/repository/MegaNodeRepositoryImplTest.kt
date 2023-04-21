@@ -35,7 +35,7 @@ class MegaNodeRepositoryImplTest {
             megaChatApiGateway = mock(),
             ioDispatcher = testDispatcher,
             megaLocalStorageGateway = mock(),
-            megaShareMapper = mock(),
+            shareDataMapper = mock(),
             megaExceptionMapper = mock(),
             sortOrderIntMapper = mock(),
             cacheFolderGateway = mock(),

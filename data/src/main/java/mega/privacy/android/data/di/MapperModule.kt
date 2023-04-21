@@ -29,7 +29,6 @@ import mega.privacy.android.data.mapper.MediaStoreFileTypeUriMapper
 import mega.privacy.android.data.mapper.MegaAchievementMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
 import mega.privacy.android.data.mapper.MegaPurchaseMapper
-import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.MegaSkuMapper
 import mega.privacy.android.data.mapper.MimeTypeMapper
 import mega.privacy.android.data.mapper.NodeUpdateMapper
@@ -98,7 +97,6 @@ import mega.privacy.android.data.mapper.toOfflineNodeInformation
 import mega.privacy.android.data.mapper.toPaymentMethodType
 import mega.privacy.android.data.mapper.toPaymentPlatformType
 import mega.privacy.android.data.mapper.toPricing
-import mega.privacy.android.data.mapper.toShareModel
 import mega.privacy.android.data.mapper.toStorageState
 import mega.privacy.android.data.mapper.toSubscriptionOptionList
 import mega.privacy.android.data.mapper.toSubscriptionStatus
@@ -113,7 +111,6 @@ import mega.privacy.android.data.mapper.videoQualityToInt
 import mega.privacy.android.data.mapper.viewtype.ViewTypeMapper
 import mega.privacy.android.data.mapper.viewtype.ViewTypeMapperImpl
 import mega.privacy.android.domain.entity.Currency
-import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.preference.StartScreen
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaNode
@@ -239,12 +236,6 @@ internal abstract class MapperModule {
          */
         @Provides
         fun provideNodeUpdateMapper(): NodeUpdateMapper = ::mapMegaNodeListToNodeUpdate
-
-        /**
-         * Provide mega share mapper
-         */
-        @Provides
-        fun provideMegaShareMapper(): MegaShareMapper = ::toShareModel
 
         /**
          * Provide boolean preference mapper

@@ -25,10 +25,10 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.ChatFilesFolderUserAttributeMapper
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.MegaExceptionMapper
-import mega.privacy.android.data.mapper.MegaShareMapper
 import mega.privacy.android.data.mapper.NodeMapper
 import mega.privacy.android.data.mapper.OfflineNodeInformationMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
+import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.data.qualifier.FileVersionsOption
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.node.FileNode
@@ -53,7 +53,7 @@ import kotlin.coroutines.suspendCoroutine
  * @property megaChatApiGateway
  * @property ioDispatcher
  * @property megaLocalStorageGateway
- * @property megaShareMapper
+ * @property shareDataMapper
  * @property megaExceptionMapper
  * @property sortOrderIntMapper
  * @property cacheFolderGateway
@@ -71,7 +71,7 @@ internal class FileSystemRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val megaLocalStorageGateway: MegaLocalStorageGateway,
-    private val megaShareMapper: MegaShareMapper,
+    private val shareDataMapper: ShareDataMapper,
     private val megaExceptionMapper: MegaExceptionMapper,
     private val sortOrderIntMapper: SortOrderIntMapper,
     private val cacheFolderGateway: CacheFolderGateway,
