@@ -26,8 +26,7 @@ fun ErrorTextTextField(
             .fillMaxWidth()
             .padding(top = 4.dp),
         text = errorText,
-        style = MaterialTheme.typography.caption,
-        color = MaterialTheme.colors.error,
+        style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error),
         textAlign = TextAlign.Start
     )
 }
