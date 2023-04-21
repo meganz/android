@@ -32,7 +32,6 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
-import androidx.lifecycle.Lifecycle
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,9 +59,9 @@ import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
 import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
-import mega.privacy.android.app.main.controllers.ChatController
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.ChatActivity
+import mega.privacy.android.app.main.megachat.ChatExplorerActivity
 import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
@@ -95,7 +94,6 @@ import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
-import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.checkNotificationsPermission
@@ -795,7 +793,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             Timber.d("Selected contact NULL")
             return
         }
-        val intent = ChatController.getSelectChatsToAttachContactIntent(this, user)
+        val handle = viewModel.userHandle ?: return
+        val intent = Intent(this, ChatExplorerActivity::class.java).apply {
+            putExtra(Constants.USER_HANDLES, arrayOf(handle))
+        }
         shareContactResultLauncher.launch(intent)
     }
 
@@ -1004,17 +1005,16 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             showOverDiskQuotaPaywallWarning()
             return
         }
-        user?.let {
-            val chat = megaChatApi.getChatRoomByUser(it.handle)
-            if (chat == null) {
-                Timber.d("No chat, create it!")
-                val peers = MegaChatPeerList.createInstance()
-                peers.addPeer(it.handle, MegaChatPeerList.PRIV_STANDARD)
-                megaChatApi.createChat(false, peers, megaChatRequestListenerInterface)
-            } else {
-                Timber.d("There is already a chat, open it!")
-                navigateToChatActivity(chat.chatId)
-            }
+        val userHandle = viewModel.userHandle ?: return
+        val chat = megaChatApi.getChatRoomByUser(userHandle)
+        if (chat == null) {
+            Timber.d("No chat, create it!")
+            val peers = MegaChatPeerList.createInstance()
+            peers.addPeer(userHandle, MegaChatPeerList.PRIV_STANDARD)
+            megaChatApi.createChat(false, peers, megaChatRequestListenerInterface)
+        } else {
+            Timber.d("There is already a chat, open it!")
+            navigateToChatActivity(chat.chatId)
         }
     }
 
@@ -1048,10 +1048,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Collecting Flows from ViewModel
      */
     private fun collectFlows() {
-        this.collectFlow(
-            viewModel.state,
-            Lifecycle.State.STARTED
-        ) { contactInfoState: ContactInfoState ->
+        collectFlow(viewModel.state) { contactInfoState: ContactInfoState ->
             if (contactInfoState.isUserRemoved) {
                 finish()
             }
@@ -1250,11 +1247,12 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         }
 
         val builder = MaterialAlertDialogBuilder(this)
-            .setTitle(getString(viewModel.nickName?.let { R.string.add_nickname }
-                ?: run { R.string.edit_nickname }))
+            .setTitle(getString(viewModel.nickName
+                ?.let { R.string.add_nickname } ?: run { R.string.edit_nickname })
+            )
             .setPositiveButton(getString(R.string.button_set)) { _, _ ->
                 val name = emojiEditText.text.toString()
-                if (TextUtil.isTextEmpty(name)) {
+                if (name.isEmpty()) {
                     Timber.w("Input is empty")
                     emojiEditText.error = getString(R.string.invalid_string)
                     emojiEditText.requestFocus()

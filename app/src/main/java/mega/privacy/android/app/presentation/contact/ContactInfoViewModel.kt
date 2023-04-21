@@ -11,7 +11,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.takeWhile
@@ -55,11 +55,11 @@ import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
 import mega.privacy.android.domain.usecase.contact.GetUserOnlineStatusByHandleUseCase
 import mega.privacy.android.domain.usecase.contact.RemoveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.contact.SetUserAliasUseCase
-import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.meeting.MonitorChatCallUpdates
 import mega.privacy.android.domain.usecase.meeting.MonitorChatSessionUpdatesUseCase
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
 import timber.log.Timber
 import java.io.File
@@ -116,15 +116,13 @@ class ContactInfoViewModel @Inject constructor(
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : BaseRxViewModel() {
 
-    /**
-     * private UI state
-     */
     private val _state = MutableStateFlow(ContactInfoState())
 
     /**
-     * public UI State
+     * UI State ContactInfo
+     * Flow of [ContactInfoState]
      */
-    val state: StateFlow<ContactInfoState> = _state
+    val state = _state.asStateFlow()
 
     /**
      * Parent Handle
@@ -142,6 +140,12 @@ class ContactInfoViewModel @Inject constructor(
      */
     val userStatus: UserStatus
         get() = state.value.userStatus
+
+    /**
+     * User status
+     */
+    val userHandle: Long?
+        get() = state.value.contactItem?.handle
 
 
     /**
