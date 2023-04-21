@@ -216,7 +216,7 @@ internal class DefaultPhotosRepository @Inject constructor(
                 } else {
                     var photo: Photo? = null
                     megaApiFacade.getMegaNodeByHandle(id.longValue)?.also { node ->
-                        photo = mapMegaNodeToPhoto(node)
+                        photo = mapMegaNodeToPhoto(node, filterSvg = false)
                         photo?.let {
                             photosCache[id] = it
                         }
@@ -286,19 +286,26 @@ internal class DefaultPhotosRepository @Inject constructor(
     /**
      * Map megaNode to Photo.
      */
-    private suspend fun mapMegaNodeToPhoto(megaNode: MegaNode): Photo? {
+    private suspend fun mapMegaNodeToPhoto(megaNode: MegaNode, filterSvg: Boolean = true): Photo? {
         val fileType = fileTypeInfoMapper(megaNode)
         val isValid =
             megaNode.isFile
                     && (fileType is VideoFileTypeInfo
-                    || fileType is ImageFileTypeInfo
-                    && fileType !is SvgFileTypeInfo)
-                    && !megaApiFacade.isInRubbish(megaNode)
+                    || (fileType is ImageFileTypeInfo && checkSvg(filterSvg, fileType))
+                    && !megaApiFacade.isInRubbish(megaNode))
         if (isValid.not()) return null
         return if (fileType is ImageFileTypeInfo) {
             mapMegaNodeToImage(megaNode)
         } else {
             mapMegaNodeToVideo(megaNode)
+        }
+    }
+
+    private fun checkSvg(filterSvg: Boolean, fileType: ImageFileTypeInfo): Boolean {
+        return if (filterSvg) {
+            fileType !is SvgFileTypeInfo
+        } else {
+            true
         }
     }
 

@@ -3,6 +3,7 @@ package mega.privacy.android.app
 import android.app.Activity
 import android.content.Intent
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.StrictMode
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -10,6 +11,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.multidex.MultiDexApplication
 import androidx.work.Configuration
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.decode.SvgDecoder
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -85,7 +91,8 @@ import javax.inject.Provider
  * @property globalNetworkStateHandler
  */
 @HiltAndroidApp
-class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLifecycleObserver {
+class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLifecycleObserver,
+    ImageLoaderFactory {
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
@@ -233,6 +240,19 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
         if (BuildConfig.ACTIVATE_GREETER) greeter.get().initialize()
     }
 
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .components {
+                if (SDK_INT >= Build.VERSION_CODES.P) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(GifDecoder.Factory())
+                }
+                add(SvgDecoder.Factory())
+            }
+            .build()
+    }
+
     /**
      * On start
      *
@@ -274,10 +294,12 @@ class MegaApplication : MultiDexApplication(), Configuration.Provider, DefaultLi
             )
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder() // Other StrictMode checks that you've previously added.
-                    .detectUnsafeIntentLaunch()
-                    .penaltyLog()
-                    .build())
+                StrictMode.setVmPolicy(
+                    StrictMode.VmPolicy.Builder() // Other StrictMode checks that you've previously added.
+                        .detectUnsafeIntentLaunch()
+                        .penaltyLog()
+                        .build()
+                )
             }
         }
     }

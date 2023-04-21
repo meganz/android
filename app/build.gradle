@@ -262,6 +262,8 @@ dependencies {
     implementation androidx.compose.activity
     implementation androidx.compose.viewmodel
     implementation lib.coil
+    implementation lib.coil.gif
+    implementation lib.coil.svg
     implementation lib.coil.compose
 
     // Google

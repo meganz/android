@@ -55,21 +55,32 @@ class SlideshowViewModel @Inject constructor(
     fun setData(
         items: List<ImageItem>,
     ) {
-        playSlideshow(items = items)
+        playSlideshow(imageItems = items)
     }
 
-    private fun playSlideshow(items: List<ImageItem>) {
+    private fun playSlideshow(imageItems: List<ImageItem>) {
         if (_state.value.items.isNotEmpty())
             return
         viewModelScope.launch {
-            val ids = items.map { it.getNodeHandle() ?: it.id }
+            val ids = imageItems.map { it.getNodeHandle() ?: it.id }
+            val slideshowItems = getPhotosByIds(ids = ids.map { id -> NodeId(id) })
+                .filterIsInstance<Photo.Image>()
+            val order = _state.value.order ?: SlideshowOrder.Shuffle
+            val sortedItems = sortItems(slideshowItems, order)
             _state.update {
                 it.copy(
-                    items = getPhotosByIds(ids = ids.map { id -> NodeId(id) })
-                        .filterIsInstance<Photo.Image>(),
+                    items = sortedItems,
                     isPlaying = true
                 )
             }
+        }
+    }
+
+    private fun sortItems(slideshowItems: List<Photo>, order: SlideshowOrder): List<Photo> {
+        return when (order) {
+            SlideshowOrder.Shuffle -> slideshowItems.shuffled()
+            SlideshowOrder.Newest -> slideshowItems.sortedByDescending { it.modificationTime }
+            SlideshowOrder.Oldest -> slideshowItems.sortedBy { it.modificationTime }
         }
     }
 
@@ -89,6 +100,7 @@ class SlideshowViewModel @Inject constructor(
      * Update Playing status
      */
     fun updateIsPlaying(isPlaying: Boolean) {
+        Timber.d("Slideshow updateIsPlaying isPlaying+$isPlaying")
         _state.update {
             it.copy(isPlaying = isPlaying)
         }
@@ -109,12 +121,25 @@ class SlideshowViewModel @Inject constructor(
                 Timber.d("Slideshow monitorOrderSetting order+$order")
                 val isFirstInSlideshow = _state.value.isFirstInSlideshow
                 Timber.d("Slideshow monitorOrderSetting shouldPlayFromFirst+${!isFirstInSlideshow}")
-                _state.update {
-                    it.copy(
-                        order = order ?: SlideshowOrder.Shuffle,
-                        shouldPlayFromFirst = !isFirstInSlideshow,
-                        isFirstInSlideshow = false
-                    )
+                if (isFirstInSlideshow) {
+                    _state.update {
+                        it.copy(
+                            order = order ?: SlideshowOrder.Shuffle,
+                            shouldPlayFromFirst = false,
+                            isFirstInSlideshow = false,
+                        )
+                    }
+                } else {
+                    val slideshowItems = _state.value.items
+                    val settingOrder = order ?: SlideshowOrder.Shuffle
+                    val sortedItems = sortItems(slideshowItems, settingOrder)
+                    _state.update {
+                        it.copy(
+                            order = settingOrder,
+                            shouldPlayFromFirst = true,
+                            items = sortedItems
+                        )
+                    }
                 }
             }.launchIn(viewModelScope)
 

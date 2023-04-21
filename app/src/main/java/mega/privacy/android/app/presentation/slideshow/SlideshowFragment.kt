@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -93,6 +92,7 @@ class SlideshowFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         return ComposeView(requireContext()).apply {
+            keepScreenOn = true
             setContent {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -147,6 +147,13 @@ class SlideshowFragment : Fragment() {
         }
     }
 
+    override fun onStop() {
+        if (activity?.isChangingConfigurations != true && activity?.isFinishing != true) {
+            slideshowViewModel.updateIsPlaying(false)
+        }
+        super.onStop()
+    }
+
     @Composable
     private fun SlideshowBody() {
         val slideshowViewState by slideshowViewModel.state.collectAsStateWithLifecycle()
@@ -159,13 +166,20 @@ class SlideshowFragment : Fragment() {
         val repeat = slideshowViewState.repeat
         val isPlaying = slideshowViewState.isPlaying
 
-        val playItems = remember(items, order) {
-            when (order) {
-                SlideshowOrder.Shuffle -> items.shuffled()
-                SlideshowOrder.Newest -> items.sortedByDescending { it.modificationTime }
-                SlideshowOrder.Oldest -> items.sortedBy { it.modificationTime }
+        SlideshowCompose(
+            scaffoldState = scaffoldState,
+            playItems = items,
+            pagerState = pagerState,
+            photoState = photoState,
+            isPlaying = isPlaying,
+            onPlayIconClick = {
+                photoState.resetScale()
+                slideshowViewModel.updateIsPlaying(!isPlaying)
+            },
+            onImageTap = {
+                slideshowViewModel.updateIsPlaying(false)
             }
-        }
+        )
 
         LaunchedEffect(isPlaying) {
             if (isPlaying) {
@@ -220,20 +234,6 @@ class SlideshowFragment : Fragment() {
                 slideshowViewModel.updateIsPlaying(false)
             }
         }
-
-        SlideshowCompose(
-            scaffoldState = scaffoldState,
-            playItems = playItems,
-            pagerState = pagerState,
-            photoState = photoState,
-            isPlaying = isPlaying,
-            onPlayIconClick = {
-                slideshowViewModel.updateIsPlaying(!isPlaying)
-            },
-            onImageTap = {
-                slideshowViewModel.updateIsPlaying(false)
-            }
-        )
     }
 
     @Composable
@@ -307,10 +307,7 @@ class SlideshowFragment : Fragment() {
                     ) {
                         IconButton(onClick = onPlayIconClick) {
                             Icon(
-                                painter = if (isPlaying)
-                                    painterResource(id = R.drawable.ic_pause)
-                                else
-                                    painterResource(id = R.drawable.ic_play),
+                                painter = painterResource(id = R.drawable.ic_play),
                                 contentDescription = null,
                                 modifier = Modifier,
                                 tint = if (MaterialTheme.colors.isLight)
