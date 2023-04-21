@@ -14,12 +14,14 @@ import mega.privacy.android.data.extensions.failWithError
 import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.isBackgroundTransfer
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -38,6 +40,10 @@ import kotlin.coroutines.suspendCoroutine
  * @param megaApiGateway    [MegaApiGateway]
  * @param ioDispatcher      [IoDispatcher]
  * @param dbH               [DatabaseHandler]
+ * @param transferEventMapper [TransferEventMapper]
+ * @param transferMapper [TransferEventMapper]
+ * @param appEventGateway [AppEventGateway]
+ * @param localStorageGateway [MegaLocalStorageGateway]
  */
 internal class DefaultTransfersRepository @Inject constructor(
     private val megaApiGateway: MegaApiGateway,
@@ -46,6 +52,7 @@ internal class DefaultTransfersRepository @Inject constructor(
     private val transferEventMapper: TransferEventMapper,
     private val transferMapper: TransferMapper,
     private val appEventGateway: AppEventGateway,
+    private val localStorageGateway: MegaLocalStorageGateway,
 ) : TransfersRepository, TransferRepository {
 
     override suspend fun cancelTransfer(transfer: MegaTransfer) = withContext(ioDispatcher) {
@@ -277,4 +284,13 @@ internal class DefaultTransfersRepository @Inject constructor(
         }
         transfers.sortedBy { it.priority }
     }
+
+    override fun monitorCompletedTransfer(): Flow<CompletedTransfer> =
+        appEventGateway.monitorCompletedTransfer
+
+    override suspend fun addCompletedTransfer(transfer: CompletedTransfer) =
+        withContext(ioDispatcher) {
+            localStorageGateway.addCompletedTransfer(transfer)
+            appEventGateway.broadcastCompletedTransfer(transfer)
+        }
 }

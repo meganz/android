@@ -3,16 +3,20 @@ package mega.privacy.android.data.repository
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.AppEventGateway
+import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.mapper.TransferEventMapper
 import mega.privacy.android.data.mapper.TransferMapper
 import mega.privacy.android.data.model.GlobalTransfer
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.exception.MegaException
 import nz.mega.sdk.MegaCancelToken
@@ -41,6 +45,7 @@ class DefaultTransfersRepositoryTest {
     private val cancelToken = mock<MegaCancelToken>()
     private val appEventGateway: AppEventGateway = mock()
     private val transferMapper: TransferMapper = mock()
+    private val localStorageGateway: MegaLocalStorageGateway = mock()
 
     @Before
     fun setUp() {
@@ -50,8 +55,9 @@ class DefaultTransfersRepositoryTest {
             dbH = databaseHandler,
             transferEventMapper = transferEventMapper,
             appEventGateway = appEventGateway,
-            transferMapper = transferMapper
-        )
+            transferMapper = transferMapper,
+            localStorageGateway = localStorageGateway,
+            )
     }
 
     private fun mockStartUpload() = megaApiGateway.startUpload(
@@ -367,5 +373,25 @@ class DefaultTransfersRepositoryTest {
             whenever(transferMapper.invoke(any())).thenReturn(mock())
             whenever(megaApiGateway.getTransfersByTag(any())).thenReturn(mock())
             assertThat(underTest.getInProgressTransfers()).hasSize(data.numDownloads + data.numUploads)
+        }
+
+    @Test
+    fun `test that addCompletedTransfer call local storage gateway addCompletedTransfer and app event gateway broadcastCompletedTransfer`() =
+        runTest {
+            val expected = mock<CompletedTransfer>()
+            underTest.addCompletedTransfer(expected)
+            verify(localStorageGateway).addCompletedTransfer(expected)
+            verify(appEventGateway).broadcastCompletedTransfer(expected)
+        }
+
+    @Test
+    fun `test that monitorCompletedTransfer returns the result of app event gateway monitorCompletedTransfer`() =
+        runTest {
+            val expected = mock<CompletedTransfer>()
+            whenever(appEventGateway.monitorCompletedTransfer).thenReturn(flowOf(expected))
+            underTest.monitorCompletedTransfer().test {
+                assertThat(awaitItem()).isEqualTo(expected)
+                awaitComplete()
+            }
         }
 }

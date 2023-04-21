@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 
@@ -173,4 +174,18 @@ interface TransferRepository {
      *
      */
     suspend fun getInProgressTransfers(): List<Transfer>
+
+    /**
+     * Monitor completed transfers
+     *
+     * @return a flow of completed transfer
+     */
+    fun monitorCompletedTransfer(): Flow<CompletedTransfer>
+
+    /**
+     * Add a completed transfer to local storage
+     *
+     * @param transfer
+     */
+    suspend fun addCompletedTransfer(transfer: CompletedTransfer)
 }
