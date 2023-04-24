@@ -343,6 +343,10 @@ fun ChangePasswordView(
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
+@Deprecated(
+    message = "This has been deprecated in favour of PasswordTextField base component of core-ui",
+    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.textfields.PasswordTextField")
+)
 fun PasswordTextField(
     modifier: Modifier,
     label: String,
