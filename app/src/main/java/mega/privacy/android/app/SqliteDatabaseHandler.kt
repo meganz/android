@@ -11,6 +11,9 @@ import android.provider.Settings
 import android.text.TextUtils
 import android.util.Base64
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.main.megachat.AndroidMegaChatMessage
 import mega.privacy.android.app.main.megachat.ChatItemPreferences
@@ -33,6 +36,7 @@ import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFER
 import mega.privacy.android.data.database.MegaDatabaseConstant.DATABASE_NAME
 import mega.privacy.android.data.database.MegaDatabaseConstant.DATABASE_VERSION
 import mega.privacy.android.data.database.MegaDatabaseConstant.TABLE_CONTACTS
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.mapper.StorageStateIntMapper
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.model.ChatSettings
@@ -50,6 +54,7 @@ import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.login.EphemeralCredentials
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.user.UserCredentials
+import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaTransfer
 import timber.log.Timber
@@ -63,9 +68,11 @@ import javax.inject.Inject
  */
 class SqliteDatabaseHandler @Inject constructor(
     @ApplicationContext private val context: Context,
+    @ApplicationScope private val applicationScope: CoroutineScope,
     private val legacyLoggingSettings: LegacyLoggingSettings,
     private val storageStateMapper: StorageStateMapper,
     private val storageStateIntMapper: StorageStateIntMapper,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway
 ) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION), LegacyDatabaseHandler {
     private var db: SQLiteDatabase
     override fun onCreate(db: SQLiteDatabase) {
@@ -2303,143 +2310,32 @@ class SqliteDatabaseHandler @Inject constructor(
         return null
     }
 
-    override fun setContact(contact: Contact) {
-        val values = ContentValues().apply {
-            put(KEY_CONTACT_HANDLE, encrypt(contact.userId.toString()))
-            put(KEY_CONTACT_MAIL, encrypt(contact.email))
-            put(KEY_CONTACT_NAME, encrypt(contact.firstName))
-            put(KEY_CONTACT_LAST_NAME, encrypt(contact.lastName))
-            put(KEY_CONTACT_NICKNAME, encrypt(contact.nickname))
+    override fun setContact(contact: Contact) =
+        runBlocking { megaLocalRoomGateway.saveContact(contact) }
+
+    override fun setContactName(name: String?, mail: String?) {
+        applicationScope.launch {
+            megaLocalRoomGateway.setContactName(name, mail)
         }
-        db.insert(TABLE_CONTACTS, null, values)
     }
 
-    override fun setContactName(name: String?, mail: String?): Int {
-        val values = ContentValues().apply {
-            put(KEY_CONTACT_NAME, encrypt(name))
+    override fun setContactLastName(lastName: String?, mail: String?) {
+        applicationScope.launch {
+            megaLocalRoomGateway.setContactLastName(lastName, mail)
         }
-        return db.update(TABLE_CONTACTS,
-            values,
-            KEY_CONTACT_MAIL + " = '" + encrypt(mail) + "'",
-            null)
     }
 
-    override fun setContactLastName(lastName: String?, mail: String?): Int {
-        val values = ContentValues().apply {
-            put(KEY_CONTACT_LAST_NAME, encrypt(lastName))
+    override fun setContactNickname(nickname: String?, handle: Long) {
+        applicationScope.launch {
+            megaLocalRoomGateway.setContactNickname(handle, nickname)
         }
-        return db.update(TABLE_CONTACTS,
-            values,
-            "$KEY_CONTACT_MAIL = '${encrypt(mail)}'",
-            null)
     }
 
-    override fun setContactNickname(nickname: String?, handle: Long): Int {
-        val values = ContentValues().apply {
-            put(KEY_CONTACT_NICKNAME, encrypt(nickname))
-        }
-        return db.update(TABLE_CONTACTS,
-            values,
-            "$KEY_CONTACT_HANDLE = '${encrypt(handle.toString())}'",
-            null)
-    }
+    override fun findContactByHandle(handleParam: Long): Contact? =
+        runBlocking { megaLocalRoomGateway.findContactByHandle(handleParam) }
 
-    override val contactsSize: Int
-        get() {
-            val selectQuery = "SELECT * FROM $TABLE_CONTACTS"
-            try {
-                return db.rawQuery(selectQuery, null)?.count ?: 0
-            } catch (e: Exception) {
-                Timber.e(e, "Exception opening or managing DB cursor")
-            }
-            return 0
-        }
-
-    override fun setContactMail(handle: Long, mail: String?): Int {
-        Timber.d("setContactMail: %d %s", handle, mail)
-        val values = ContentValues().apply {
-            put(KEY_CONTACT_MAIL, encrypt(mail))
-        }
-        return db.update(TABLE_CONTACTS,
-            values,
-            "$KEY_CONTACT_HANDLE = '${encrypt(handle.toString())}'",
-            null)
-    }
-
-    override fun setContactFistName(handle: Long, firstName: String?): Int {
-        Timber.d("setContactFistName: %d %s", handle, firstName)
-        val values = ContentValues().apply {
-            put(KEY_CONTACT_NAME, encrypt(firstName))
-        }
-        return db.update(TABLE_CONTACTS,
-            values,
-            "$KEY_CONTACT_HANDLE = '${encrypt(handle.toString())}'",
-            null)
-    }
-
-    override fun setContactLastName(handle: Long, lastName: String?): Int {
-        Timber.d("setContactLastName: %d %s", handle, lastName)
-        val values = ContentValues().apply {
-            put(KEY_CONTACT_LAST_NAME, encrypt(lastName))
-        }
-        return db.update(TABLE_CONTACTS,
-            values,
-            "$KEY_CONTACT_HANDLE = '${encrypt(handle.toString())}'",
-            null)
-    }
-
-    override fun findContactByHandle(handleParam: String?): Contact? {
-        Timber.d("findContactByHandle: %s", handleParam)
-        val selectQuery =
-            "SELECT * FROM $TABLE_CONTACTS WHERE $KEY_CONTACT_HANDLE = '${encrypt(handleParam)}'"
-        Timber.d("QUERY: %s", selectQuery)
-        try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val handle = decrypt(cursor.getString(1))
-                    val mail = decrypt(cursor.getString(2))
-                    val name = decrypt(cursor.getString(3))
-                    val lastName = decrypt(cursor.getString(4))
-                    val nickname = decrypt(cursor.getString(5))
-                    return Contact(
-                        handle?.toLongOrNull() ?: 0L,
-                        mail,
-                        name,
-                        lastName,
-                        nickname)
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return null
-    }
-
-    override fun findContactByEmail(mail: String?): Contact? {
-        Timber.d("findContactByEmail: %s", mail)
-        val selectQuery =
-            "SELECT * FROM $TABLE_CONTACTS WHERE $KEY_CONTACT_MAIL = '${encrypt(mail)}'"
-        Timber.d("QUERY: %s", selectQuery)
-        try {
-            db.rawQuery(selectQuery, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    val handle = decrypt(cursor.getString(1))
-                    val name = decrypt(cursor.getString(3))
-                    val lastName = decrypt(cursor.getString(4))
-                    val nickname = decrypt(cursor.getString(5))
-                    return Contact(handle?.toLongOrNull() ?: 0L,
-                        mail,
-                        name,
-                        lastName,
-                        nickname
-                    )
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Exception opening or managing DB cursor")
-        }
-        return null
-    }
+    override fun findContactByEmail(mail: String?): Contact? =
+        runBlocking { megaLocalRoomGateway.findContactByEmail(mail) }
 
     override fun setOfflineFile(offline: MegaOffline): Long {
         Timber.d("setOfflineFile: %s", offline.handle)
@@ -3958,7 +3854,9 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun clearContacts() {
-        db.execSQL("DELETE FROM $TABLE_CONTACTS")
+        applicationScope.launch {
+            megaLocalRoomGateway.clearContacts()
+        }
     }
 
     override fun clearNonContacts() {

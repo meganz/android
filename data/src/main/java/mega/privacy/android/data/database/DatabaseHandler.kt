@@ -61,8 +61,6 @@ interface DatabaseHandler {
      */
     var chatVideoQuality: Int
 
-    val contactsSize: Int
-
     /**
      * Sets the local path selected from an external SD card as Media Uploads local folder.
      *
@@ -215,12 +213,9 @@ interface DatabaseHandler {
     fun setNonContactFirstName(name: String?, handle: String?): Int
     fun setNonContactLastName(lastName: String?, handle: String?): Int
     fun setNonContactEmail(email: String?, handle: String?): Int
-    fun setContactName(name: String?, mail: String?): Int
-    fun setContactLastName(lastName: String?, mail: String?): Int
-    fun setContactNickname(nickname: String?, handle: Long): Int
-    fun setContactMail(handle: Long, mail: String?): Int
-    fun setContactFistName(handle: Long, firstName: String?): Int
-    fun setContactLastName(handle: Long, lastName: String?): Int
+    fun setContactName(name: String?, mail: String?)
+    fun setContactLastName(lastName: String?, mail: String?)
+    fun setContactNickname(nickname: String?, handle: Long)
 
     fun exists(handle: Long): Boolean
     fun removeById(id: Int): Int
@@ -317,7 +312,7 @@ interface DatabaseHandler {
 
     fun findNonContactByHandle(handle: String?): NonContactInfo?
     fun setContact(contact: Contact)
-    fun findContactByHandle(handleParam: String?): Contact?
+    fun findContactByHandle(handleParam: Long): Contact?
     fun findContactByEmail(mail: String?): Contact?
 
     /**

@@ -22,6 +22,7 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.extensions.replaceIfExists
 import mega.privacy.android.data.extensions.sortList
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -103,6 +104,7 @@ internal class DefaultContactsRepository @Inject constructor(
     private val localStorageGateway: MegaLocalStorageGateway,
     private val contactWrapper: ContactWrapper,
     private val databaseHandler: DatabaseHandler,
+    private val megaLocalRoomGateway: MegaLocalRoomGateway,
     @ApplicationContext private val context: Context,
 ) : ContactsRepository {
 
@@ -324,7 +326,7 @@ internal class DefaultContactsRepository @Inject constructor(
                     )
                 )
             }.also { request ->
-                databaseHandler.setContactFistName(handle, request.text)
+                megaLocalRoomGateway.setContactFistName(handle, request.text)
                 if (shouldNotify) {
                     contactWrapper.notifyFirstNameUpdate(context, handle)
                 }
@@ -352,7 +354,7 @@ internal class DefaultContactsRepository @Inject constructor(
                     )
                 )
             }.also { request ->
-                databaseHandler.setContactLastName(handle, request.text)
+                megaLocalRoomGateway.setContactLastName(handle, request.text)
                 if (shouldNotify) {
                     contactWrapper.notifyLastNameUpdate(context, handle)
                 }
@@ -726,7 +728,7 @@ internal class DefaultContactsRepository @Inject constructor(
     }
 
     override suspend fun getContactDatabaseSize(): Int = withContext(ioDispatcher) {
-        databaseHandler.contactsSize
+        megaLocalRoomGateway.getContactCount()
     }
 
     override suspend fun getContactEmail(handle: Long): String = withContext(ioDispatcher) {
@@ -737,7 +739,7 @@ internal class DefaultContactsRepository @Inject constructor(
             megaApiGateway.getUserEmail(handle, listener)
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }.also {
-            databaseHandler.setContactMail(handle, it)
+            megaLocalRoomGateway.setContactMail(handle, it)
         }
     }
 

@@ -37,7 +37,7 @@ import timber.log.Timber;
 public class ContactUtil {
 
     public static Contact getContactDB(long contactHandle) {
-        return MegaApplication.getInstance().getDbH().findContactByHandle(String.valueOf(contactHandle));
+        return MegaApplication.getInstance().getDbH().findContactByHandle(contactHandle);
     }
 
     public static String getMegaUserNameDB(MegaUser user) {

@@ -250,7 +250,7 @@ public class ContactController {
         MegaUser user = megaApi.getContact(email);
         if (user == null) return;
         //Check the user is not previously in the DB
-        if (dbH.findContactByHandle(String.valueOf(user.getHandle())) == null) {
+        if (dbH.findContactByHandle(user.getHandle()) == null) {
             Contact contact = new Contact(user.getHandle(), user.getEmail(), "", "", "");
             dbH.setContact(contact);
         }

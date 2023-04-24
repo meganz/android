@@ -45,7 +45,7 @@ class ContactDaoTest {
             firstName = "Hai",
             lastName = "Luong"
         )
-        contactDao.add(contact)
+        contactDao.insertOrUpdate(contact)
         val actual = contactDao.getByEmail("lh@mega.co.nz")
         Truth.assertThat(actual?.handle).isEqualTo(contact.handle)
         Truth.assertThat(actual?.mail).isEqualTo(contact.mail)
@@ -64,7 +64,7 @@ class ContactDaoTest {
             firstName = "Hai",
             lastName = "Luong"
         )
-        contactDao.add(contact)
+        contactDao.insertOrUpdate(contact)
         val actual = contactDao.getByHandle("handle")
         Truth.assertThat(actual?.handle).isEqualTo(contact.handle)
         Truth.assertThat(actual?.mail).isEqualTo(contact.mail)
@@ -84,7 +84,7 @@ class ContactDaoTest {
                 firstName = "Hai${it}",
                 lastName = "Luong${it}"
             )
-            contactDao.add(contact)
+            contactDao.insertOrUpdate(contact)
             contact
         }
         contactDao.getAll().first().forEachIndexed { i, entity ->
@@ -107,7 +107,7 @@ class ContactDaoTest {
                 firstName = "Hai${it}",
                 lastName = "Luong${it}"
             )
-            contactDao.add(contact)
+            contactDao.insertOrUpdate(contact)
         }
         contactDao.deleteAll()
         Truth.assertThat(contactDao.getAll().first().size).isEqualTo(0)

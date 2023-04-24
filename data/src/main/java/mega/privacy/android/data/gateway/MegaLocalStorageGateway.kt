@@ -2,9 +2,9 @@ package mega.privacy.android.data.gateway
 
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.MegaAttributes
-import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.data.model.chat.NonContactInfo
 import mega.privacy.android.data.model.node.OfflineInformation
+import mega.privacy.android.domain.entity.Contact
 import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.backup.Backup
 import mega.privacy.android.domain.entity.transfer.CompletedTransfer
@@ -744,7 +744,7 @@ interface MegaLocalStorageGateway {
      * @param handle user handle
      * @return [Int] the number of rows effected
      */
-    suspend fun setContactNickName(nickName: String, handle: Long): Int
+    suspend fun setContactNickName(nickName: String, handle: Long)
 
     /**
      * Get Camera upload Backup ID

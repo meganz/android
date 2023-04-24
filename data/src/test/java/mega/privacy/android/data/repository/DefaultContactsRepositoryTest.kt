@@ -11,6 +11,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.gateway.CacheFolderGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -81,6 +82,7 @@ class DefaultContactsRepositoryTest {
     private val localStorageGateway = mock<MegaLocalStorageGateway>()
     private val contactWrapper: ContactWrapper = mock()
     private val databaseHandler: DatabaseHandler = mock()
+    private val megaLocalRoomGateway: MegaLocalRoomGateway = mock()
     private val context: Context = mock()
 
     private val userEmail = "test@mega.nz"
@@ -124,6 +126,7 @@ class DefaultContactsRepositoryTest {
             databaseHandler = databaseHandler,
             chatConnectionStateMapper = chatConnectionStateMapper,
             context = context,
+            megaLocalRoomGateway = megaLocalRoomGateway
         )
 
         whenever(megaApiGateway.userHandleToBase64(userHandle)).thenReturn("LTEyMzQ1Ng==")
@@ -233,7 +236,7 @@ class DefaultContactsRepositoryTest {
         }
         val result =
             underTest.getUserFirstName(handle = userHandle, skipCache = true, shouldNotify = false)
-        verify(databaseHandler, times(1)).setContactFistName(userHandle, testName)
+        verify(megaLocalRoomGateway, times(1)).setContactFistName(userHandle, testName)
         verifyNoInteractions(contactWrapper)
 
         assertThat(result).isEqualTo(testName)
@@ -802,7 +805,7 @@ class DefaultContactsRepositoryTest {
                 underTest.getContactEmail(handle)
             )
 
-            verify(databaseHandler, times(1)).setContactMail(handle, expectedEmail)
+            verify(megaLocalRoomGateway, times(1)).setContactMail(handle, expectedEmail)
         }
 
     @Test

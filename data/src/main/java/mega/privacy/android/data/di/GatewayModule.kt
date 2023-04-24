@@ -18,6 +18,7 @@ import mega.privacy.android.data.facade.FileManagementPreferencesFacade
 import mega.privacy.android.data.facade.MegaApiFacade
 import mega.privacy.android.data.facade.MegaApiFolderFacade
 import mega.privacy.android.data.facade.MegaChatApiFacade
+import mega.privacy.android.data.facade.MegaLocalRoomFacade
 import mega.privacy.android.data.facade.MegaLocalStorageFacade
 import mega.privacy.android.data.facade.PermissionFacade
 import mega.privacy.android.data.facade.SDCardFacade
@@ -41,6 +42,7 @@ import mega.privacy.android.data.gateway.DeviceGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileCompressionGateway
 import mega.privacy.android.data.gateway.FileGateway
+import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.PermissionGateway
 import mega.privacy.android.data.gateway.SDCardGateway
@@ -233,4 +235,8 @@ internal abstract class GatewayModule {
      */
     @Binds
     abstract fun bindSDCardGateway(implementation: SDCardFacade): SDCardGateway
+
+    @Binds
+    @Singleton
+    abstract fun bindMegaLocalRoomGateway(implementation: MegaLocalRoomFacade): MegaLocalRoomGateway
 }

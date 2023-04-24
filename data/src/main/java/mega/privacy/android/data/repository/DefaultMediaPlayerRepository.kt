@@ -515,7 +515,7 @@ internal class DefaultMediaPlayerRepository @Inject constructor(
         }
 
     private fun getMegaUserNameDB(user: MegaUser): String? =
-        dbHandler.findContactByHandle(user.handle.toString())?.let { megaContactDB ->
+        dbHandler.findContactByHandle(user.handle)?.let { megaContactDB ->
             when {
                 megaContactDB.nickname.isNullOrEmpty().not() -> {
                     megaContactDB.nickname

@@ -2993,7 +2993,7 @@ public class AddContactActivity extends PasscodeActivity implements View.OnClick
 
     private void createMyContact() {
         if (myContact == null) {
-            Contact contactDB = dbH.findContactByHandle(String.valueOf(megaApi.getMyUserHandle() + ""));
+            Contact contactDB = dbH.findContactByHandle(MegaApiJava.base64ToUserHandle(megaApi.getMyUserHandle()));
             String myFullName = megaChatApi.getMyFullname();
 
             if (myFullName != null) {
