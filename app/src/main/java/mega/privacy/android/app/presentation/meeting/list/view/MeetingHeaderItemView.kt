@@ -15,8 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
-import mega.privacy.android.core.ui.theme.extensions.grey_087_white_087
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 
 /**
  * Meeting header item view
@@ -34,7 +33,7 @@ fun MeetingHeaderItemView(
     if (showDivider) {
         Divider(
             modifier = Modifier.padding(start = 16.dp),
-            color = MaterialTheme.colors.grey_012_white_012,
+            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
             thickness = 1.dp
         )
     }
@@ -48,7 +47,7 @@ fun MeetingHeaderItemView(
     ) {
         Text(
             text = text,
-            color = MaterialTheme.colors.grey_087_white_087,
+            color = MaterialTheme.colors.onPrimary,
             style = MaterialTheme.typography.body2,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

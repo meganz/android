@@ -30,7 +30,7 @@ import mega.privacy.android.app.presentation.meeting.model.MeetingListState
 import mega.privacy.android.app.utils.StringUtils.toSpannedHtmlText
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.controls.MegaEmptyView
-import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import java.time.Instant
 import java.time.ZoneId
@@ -174,7 +174,7 @@ private fun MeetingHeader(
         else -> {
             Divider(
                 modifier = Modifier.padding(start = 72.dp),
-                color = MaterialTheme.colors.grey_012_white_012,
+                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                 thickness = 1.dp
             )
         }

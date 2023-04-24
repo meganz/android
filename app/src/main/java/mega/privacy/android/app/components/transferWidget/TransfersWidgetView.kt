@@ -25,7 +25,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.amber_700_amber_300
-import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.TransfersInfo
 import mega.privacy.android.domain.entity.TransfersStatus.*
 
@@ -42,7 +42,7 @@ internal fun TransfersWidgetView(
         backgroundColor = MaterialTheme.colors.primary,
     ) {
 
-        val progressBackgroundColor = MaterialTheme.colors.grey_012_white_012
+        val progressBackgroundColor = MaterialTheme.colors.grey_alpha_012_white_alpha_012
         val progressColor = transfersData.progressColor()
         val progressArc = transfersData.completedProgress * 360f
         Canvas(modifier = Modifier.size(diameter.dp)) {

@@ -57,9 +57,9 @@ import mega.privacy.android.core.ui.controls.MegaTextField
 import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.blue_400_blue_200
-import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
-import mega.privacy.android.core.ui.theme.extensions.white_087_grey_087
+import mega.privacy.android.core.ui.theme.extensions.white_alpha_087_grey_alpha_087
 
 /**
  * Test tag not now button
@@ -220,7 +220,7 @@ private fun HeaderView(uiState: SMSVerificationUIState) {
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(vertical = 44.dp, horizontal = 16.dp),
-                color = MaterialTheme.colors.white_087_grey_087,
+                color = MaterialTheme.colors.white_alpha_087_grey_alpha_087,
                 style = MaterialTheme.typography.h6,
             )
         }
@@ -282,7 +282,7 @@ private fun RegionSelectionView(state: SMSVerificationUIState, onRegionSelection
     Divider(
         modifier = Modifier
             .padding(horizontal = 16.dp),
-        color = if (state.isCountryCodeValid) MaterialTheme.colors.grey_012_white_012 else MaterialTheme.colors.error,
+        color = if (state.isCountryCodeValid) MaterialTheme.colors.grey_alpha_012_white_alpha_012 else MaterialTheme.colors.error,
     )
     if (state.isCountryCodeValid.not()) {
         Text(
@@ -374,7 +374,7 @@ private fun MobileNumberInputView(
     Divider(
         modifier = Modifier
             .padding(horizontal = 16.dp),
-        color = if (state.isPhoneNumberValid) MaterialTheme.colors.grey_012_white_012 else MaterialTheme.colors.error,
+        color = if (state.isPhoneNumberValid) MaterialTheme.colors.grey_alpha_012_white_alpha_012 else MaterialTheme.colors.error,
     )
     if (!state.isPhoneNumberValid) {
         Text(

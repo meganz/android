@@ -88,7 +88,7 @@ import mega.privacy.android.core.ui.model.SpanIndicator
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.autofill
 import mega.privacy.android.core.ui.theme.extensions.conditional
-import mega.privacy.android.core.ui.theme.extensions.grey012White038
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.changepassword.PasswordStrength
@@ -363,7 +363,7 @@ fun PasswordTextField(
             MaterialTheme.colors.error
         }
         isFocused -> focusedColor
-        passwordText.isBlank() -> MaterialTheme.colors.grey012White038
+        passwordText.isBlank() -> MaterialTheme.colors.grey_alpha_012_white_alpha_038
         else -> focusedColor
     }
 
@@ -402,7 +402,7 @@ fun PasswordTextField(
                         )
                         .testTag(SEE_PASSWORD_TEST_TAG),
                     painter = painterResource(id = R.drawable.ic_see),
-                    tint = if (isShowPassword) MaterialTheme.colors.secondary else MaterialTheme.colors.grey012White038,
+                    tint = if (isShowPassword) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_alpha_012_white_alpha_038,
                     contentDescription = "see"
                 )
             }
@@ -489,7 +489,7 @@ fun PasswordStrengthBar(strengthAttribute: PasswordStrengthAttribute) {
                         .conditional(condition = column > strengthAttribute.strength) {
                             border(
                                 1.dp,
-                                MaterialTheme.colors.grey012White038,
+                                MaterialTheme.colors.grey_alpha_012_white_alpha_038,
                                 RoundedCornerShape(2.dp)
                             )
                         }

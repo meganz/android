@@ -35,9 +35,9 @@ import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.text
 import mega.privacy.android.core.ui.controls.MarqueeText
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_012
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_054
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
@@ -109,7 +109,7 @@ internal fun ContactItemView(
                 secondLineText?.let {
                     MarqueeText(
                         text = secondLineText,
-                        style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.grey_white_alpha_054)
+                        style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorSecondary)
                     )
                 }
             }
@@ -117,7 +117,7 @@ internal fun ContactItemView(
         if (includeDivider) {
             Divider(
                 modifier = Modifier.padding(start = 72.dp),
-                color = MaterialTheme.colors.grey_white_alpha_012,
+                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                 thickness = 1.dp
             )
         }

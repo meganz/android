@@ -110,11 +110,9 @@ import mega.privacy.android.core.ui.controls.SimpleTopAppBar
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.autofill
-import mega.privacy.android.core.ui.theme.extensions.green500_400
-import mega.privacy.android.core.ui.theme.extensions.grey012White038
-import mega.privacy.android.core.ui.theme.extensions.grey_087_white_087
-import mega.privacy.android.core.ui.theme.extensions.red600_300
-import mega.privacy.android.core.ui.theme.extensions.teal_300_200
+import mega.privacy.android.core.ui.theme.extensions.green_500_green_400
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
@@ -504,7 +502,7 @@ private fun PasswordReminderModeLayout(
     @StringRes val dismissButtonText: Int =
         if (uiState.isLogoutMode) R.string.proceed_to_logout else R.string.general_dismiss
     val dismissButtonColor =
-        if (uiState.isLogoutMode) MaterialTheme.colors.red600_300 else MaterialTheme.colors.secondary
+        if (uiState.isLogoutMode) MaterialTheme.colors.red_600_red_300 else MaterialTheme.colors.secondary
 
     ConstraintLayout(
         modifier = modifier
@@ -613,7 +611,7 @@ private fun PasswordReminderModeLayout(
                 coroutineScope.launch { modalSheetState.show() }
             },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = MaterialTheme.colors.teal_300_200,
+                backgroundColor = MaterialTheme.colors.secondary,
                 contentColor = MaterialTheme.colors.surface
             ),
             enabled = uiState.isLoading.not()
@@ -648,7 +646,7 @@ private fun PasswordReminderModeLayout(
             },
             colors = ButtonDefaults.textButtonColors(
                 backgroundColor = Color.Transparent,
-                contentColor = MaterialTheme.colors.red600_300
+                contentColor = MaterialTheme.colors.red_600_red_300
             ),
             enabled = uiState.isLoading.not()
         ) {
@@ -764,8 +762,8 @@ private fun TestPasswordModeLayout(
                     onDismiss(true)
                 },
                 colors = ButtonDefaults.buttonColors(
-                    backgroundColor = MaterialTheme.colors.teal_300_200,
-                    contentColor = MaterialTheme.colors.grey_087_white_087
+                    backgroundColor = MaterialTheme.colors.secondary,
+                    contentColor = MaterialTheme.colors.onPrimary
                 ),
                 enabled = uiState.isLoading.not()
             ) {
@@ -805,7 +803,7 @@ private fun PasswordTextField(
     val indicatorColor = when {
         isError -> MaterialTheme.colors.error
         isFocused -> passwordState.toAttribute().focusedColor
-        passwordText.isBlank() -> MaterialTheme.colors.grey012White038
+        passwordText.isBlank() -> MaterialTheme.colors.grey_alpha_012_white_alpha_038
         else -> passwordState.toAttribute().focusedColor
     }
 
@@ -844,7 +842,7 @@ private fun PasswordTextField(
                         )
                         .testTag(mega.privacy.android.app.presentation.changepassword.view.Constants.SEE_PASSWORD_TEST_TAG),
                     painter = painterResource(id = R.drawable.ic_see),
-                    tint = if (isShowPassword) MaterialTheme.colors.secondary else MaterialTheme.colors.grey012White038,
+                    tint = if (isShowPassword) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_alpha_012_white_alpha_038,
                     contentDescription = "see"
                 )
             }
@@ -932,13 +930,13 @@ private fun PasswordState.toAttribute(): TestPasswordAttribute {
         )
 
         PasswordState.True -> TestPasswordAttribute(
-            focusedColor = MaterialTheme.colors.green500_400,
+            focusedColor = MaterialTheme.colors.green_500_green_400,
             footerMessage = stringResource(id = R.string.test_pwd_accepted),
             footerIcon = R.drawable.ic_accept_test
         )
 
         PasswordState.False -> TestPasswordAttribute(
-            focusedColor = MaterialTheme.colors.red600_300,
+            focusedColor = MaterialTheme.colors.red_600_red_300,
             footerMessage = stringResource(id = R.string.test_pwd_wrong),
             footerIcon = R.drawable.ic_input_warning
         )

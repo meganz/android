@@ -34,7 +34,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
-import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
@@ -183,7 +183,7 @@ internal fun NodeListViewItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 64.dp, top = 8.dp),
-            color = MaterialTheme.colors.grey_012_white_012, thickness = 1.dp
+            color = MaterialTheme.colors.grey_alpha_012_white_alpha_012, thickness = 1.dp
         )
     }
 }

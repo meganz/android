@@ -131,7 +131,7 @@ fun ExportRecoveryKeyCompose(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Normal,
             style = MaterialTheme.typography.subtitle1.copy(
-                color = MaterialTheme.textColorSecondary()
+                color = MaterialTheme.colors.textColorSecondary
             ),
             modifier = Modifier.padding(top = 20.dp)
         )
@@ -140,7 +140,7 @@ fun ExportRecoveryKeyCompose(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Normal,
             style = MaterialTheme.typography.subtitle1.copy(
-                color = MaterialTheme.textColorSecondary()
+                color = MaterialTheme.colors.textColorSecondary
             ),
             modifier = Modifier.padding(top = 16.dp)
         )
@@ -156,7 +156,7 @@ fun ExportRecoveryKeyCompose(
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Normal,
             style = MaterialTheme.typography.body2.copy(
-                color = MaterialTheme.textColorSecondary()
+                color = MaterialTheme.colors.textColorSecondary
             ),
             modifier = Modifier.padding(top = 20.dp)
         )

@@ -40,8 +40,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
-import mega.privacy.android.core.ui.theme.extensions.grey_087_white_087
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 
 /**
  * TextField Generic Description
@@ -77,15 +76,15 @@ fun GenericDescriptionTextField(
         }
 
         val textFieldColors = TextFieldDefaults.textFieldColors(
-            textColor = MaterialTheme.colors.grey_087_white_087,
+            textColor = MaterialTheme.colors.onPrimary,
             backgroundColor = Color.Transparent,
             cursorColor = MaterialTheme.colors.secondary,
             errorCursorColor = MaterialTheme.colors.error,
             errorIndicatorColor = MaterialTheme.colors.error,
-            focusedLabelColor = MaterialTheme.colors.grey_087_white_087,
+            focusedLabelColor = MaterialTheme.colors.onPrimary,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
-            unfocusedLabelColor = MaterialTheme.colors.grey_white_alpha_038,
+            unfocusedLabelColor = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
             errorLabelColor = MaterialTheme.colors.error,
         )
 
@@ -140,7 +139,7 @@ fun GenericDescriptionTextField(
                                 Text(
                                     text = stringResource(id = id),
                                     style = MaterialTheme.typography.body1.copy(
-                                        color = if (isFocused) MaterialTheme.colors.grey_white_alpha_038 else MaterialTheme.colors.black_white,
+                                        color = if (isFocused) MaterialTheme.colors.grey_alpha_038_white_alpha_038 else MaterialTheme.colors.black_white,
                                         textAlign = TextAlign.Start
                                     ),
                                 )

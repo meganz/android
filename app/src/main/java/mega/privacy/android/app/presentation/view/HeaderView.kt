@@ -48,12 +48,12 @@ fun HeaderViewItem(
             ) {
                 Text(
                     style = MaterialTheme.typography.body2,
-                    color = MaterialTheme.textColorSecondary(),
+                    color = MaterialTheme.colors.textColorSecondary,
                     text = sortOrder
                 )
                 Image(
                     painter = painterResource(id = R.drawable.ic_down),
-                    colorFilter = ColorFilter.tint(color = MaterialTheme.textColorSecondary()),
+                    colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
                     contentDescription = "DropDown arrow",
                     modifier = Modifier
                         .align(Alignment.CenterVertically),
@@ -70,7 +70,7 @@ fun HeaderViewItem(
                 painter = if (isListView) painterResource(id = R.drawable.ic_grid_view_new) else painterResource(
                     id = R.drawable.ic_list_view_new
                 ),
-                colorFilter = ColorFilter.tint(color = MaterialTheme.textColorSecondary()),
+                colorFilter = ColorFilter.tint(color = MaterialTheme.colors.textColorSecondary),
                 contentDescription = "DropDown arrow"
             )
         }

@@ -37,7 +37,7 @@ import mega.privacy.android.app.presentation.testpassword.view.Constants.BOTTOM_
 import mega.privacy.android.app.presentation.testpassword.view.Constants.BOTTOM_SHEET_SAVE
 import mega.privacy.android.app.presentation.testpassword.view.Constants.BOTTOM_SHEET_TITLE
 import mega.privacy.android.core.ui.theme.black
-import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -84,7 +84,7 @@ internal fun RecoveryKeyBottomSheet(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 72.dp),
-                    color = MaterialTheme.colors.grey_012_white_012,
+                    color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                     thickness = 1.dp
                 )
                 MenuItem(

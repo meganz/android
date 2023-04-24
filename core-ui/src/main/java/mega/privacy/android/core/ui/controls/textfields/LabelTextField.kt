@@ -35,11 +35,8 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.preview.TextFieldProvider
 import mega.privacy.android.core.ui.preview.TextFieldState
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey012White038
-import mega.privacy.android.core.ui.theme.extensions.grey_087_white_087
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_038
-import mega.privacy.android.core.ui.theme.extensions.red_900_red_400
-import mega.privacy.android.core.ui.theme.extensions.teal_300_200
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -55,21 +52,21 @@ fun LabelTextField(
 ) = Column(modifier = modifier) {
     val isError = errorText != null
     val colors = TextFieldDefaults.textFieldColors(
-        textColor = MaterialTheme.colors.grey_087_white_087,
+        textColor = MaterialTheme.colors.onPrimary,
         backgroundColor = Color.Transparent,
-        cursorColor = MaterialTheme.colors.teal_300_200,
-        errorCursorColor = MaterialTheme.colors.red_900_red_400,
-        errorIndicatorColor = MaterialTheme.colors.red_900_red_400,
-        focusedIndicatorColor = MaterialTheme.colors.teal_300_200,
-        unfocusedIndicatorColor = MaterialTheme.colors.grey012White038,
-        focusedLabelColor = MaterialTheme.colors.grey_087_white_087,
-        unfocusedLabelColor = MaterialTheme.colors.grey_white_alpha_038,
-        errorLabelColor = MaterialTheme.colors.red_900_red_400,
+        cursorColor = MaterialTheme.colors.secondary,
+        errorCursorColor = MaterialTheme.colors.error,
+        errorIndicatorColor = MaterialTheme.colors.error,
+        focusedIndicatorColor = MaterialTheme.colors.secondary,
+        unfocusedIndicatorColor = MaterialTheme.colors.grey_alpha_012_white_alpha_038,
+        focusedLabelColor = MaterialTheme.colors.onPrimary,
+        unfocusedLabelColor = MaterialTheme.colors.grey_alpha_038_white_alpha_038,
+        errorLabelColor = MaterialTheme.colors.error,
     )
     var isFocused by remember { mutableStateOf(false) }
     val customTextSelectionColors = TextSelectionColors(
-        handleColor = MaterialTheme.colors.teal_300_200,
-        backgroundColor = MaterialTheme.colors.teal_300_200
+        handleColor = MaterialTheme.colors.secondary,
+        backgroundColor = MaterialTheme.colors.secondary
     )
 
     CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
@@ -81,7 +78,7 @@ fun LabelTextField(
                 .indicatorLine(true, isError, interactionSource, colors)
                 .fillMaxWidth()
                 .onFocusChanged { isFocused = it.isFocused },
-            textStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.grey_087_white_087),
+            textStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.onPrimary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Text,
@@ -104,8 +101,8 @@ fun LabelTextField(
                         text = label,
                         modifier = modifier.padding(bottom = if (isFocused) 6.dp else 0.dp),
                         style =
-                        if (isFocused) MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.teal_300_200)
-                        else MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.grey_white_alpha_038),
+                        if (isFocused) MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)
+                        else MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.grey_alpha_038_white_alpha_038),
                     )
                 },
                 colors = colors,
@@ -121,7 +118,7 @@ fun LabelTextField(
         Text(
             text = text,
             modifier = modifier.padding(top = 4.dp),
-            style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.teal_300_200),
+            style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary),
         )
     }
 }

@@ -25,7 +25,7 @@ import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfo
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 
 /**
@@ -174,7 +174,7 @@ private fun FileInfoContentDivider(
 ) {
     Divider(
         modifier = Modifier.padding(start = paddingStart, top = paddingTop, bottom = paddingBottom),
-        color = MaterialTheme.colors.grey_white_alpha_012,
+        color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
         thickness = 1.dp
     )
 }

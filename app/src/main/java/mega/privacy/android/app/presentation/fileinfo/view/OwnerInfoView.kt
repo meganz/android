@@ -23,7 +23,7 @@ import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -69,7 +69,7 @@ internal fun OwnerInfoView(
             Text(
                 text = contactItem.email,
                 maxLines = 1,
-                style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.grey_white_alpha_038),
+                style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.grey_alpha_038_white_alpha_038),
             )
         }
     }

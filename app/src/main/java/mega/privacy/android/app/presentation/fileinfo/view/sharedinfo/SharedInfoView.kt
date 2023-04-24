@@ -31,7 +31,7 @@ import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHARES_HEADE
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHOW_MORE
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -126,7 +126,7 @@ private fun ColumnScope.ContactsList(
         if (i < contacts.size - 1) {
             Divider(
                 modifier = Modifier.padding(start = 72.dp),
-                color = MaterialTheme.colors.grey_white_alpha_012,
+                color = MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                 thickness = 1.dp
             )
         }

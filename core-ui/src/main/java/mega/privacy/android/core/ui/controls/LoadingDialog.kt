@@ -54,7 +54,7 @@ fun LoadingDialog(
                     Text(
                         text = it,
                         style = MaterialTheme.typography.subtitle1,
-                        color = MaterialTheme.textColorSecondary()
+                        color = MaterialTheme.colors.textColorSecondary
                     )
                 }
 

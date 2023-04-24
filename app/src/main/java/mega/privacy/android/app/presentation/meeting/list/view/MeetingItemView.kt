@@ -38,8 +38,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.Visibility
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.view.MeetingAvatarView
-import mega.privacy.android.core.ui.theme.extensions.red600_300
-import mega.privacy.android.core.ui.theme.extensions.teal_300_200
+import mega.privacy.android.core.ui.theme.extensions.red_600_red_300
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.chat.MeetingRoomItem
 import mega.privacy.android.domain.entity.meeting.ScheduledMeetingStatus
@@ -310,10 +309,10 @@ private fun MiddleTextView(modifier: Modifier, meeting: MeetingRoomItem, timesta
     }
 
     val textColor = if (meeting.isPending) {
-        MaterialTheme.colors.red600_300
+        MaterialTheme.colors.red_600_red_300
     } else {
         if (meeting.highlight) {
-            MaterialTheme.colors.teal_300_200
+            MaterialTheme.colors.secondary
         } else {
             MaterialTheme.colors.textColorSecondary
         }
@@ -338,7 +337,7 @@ private fun BottomTextView(modifier: Modifier, meeting: MeetingRoomItem, timesta
         meeting.isPending -> {
             if (meeting.highlight) {
                 textMessage = meeting.lastMessage
-                textColor = MaterialTheme.colors.teal_300_200
+                textColor = MaterialTheme.colors.secondary
             } else {
                 textMessage = if (meeting.isRecurring()) {
                     stringResource(R.string.meetings_list_recurring_meeting_label)

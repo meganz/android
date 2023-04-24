@@ -60,10 +60,8 @@ import mega.privacy.android.core.ui.controls.textfields.GenericDescriptionTextFi
 import mega.privacy.android.core.ui.controls.textfields.GenericTitleTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.black_white
-import mega.privacy.android.core.ui.theme.extensions.grey_087_white_087
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_038
-import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_054
-import mega.privacy.android.core.ui.theme.extensions.teal_300_200
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.meeting.OccurrenceFrequencyType
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -220,7 +218,7 @@ private fun ScheduledMeetingDateAndTime(
                 .align(Alignment.CenterStart)
                 .clickable { onDateClicked() },
             style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.grey_087_white_087
+            color = MaterialTheme.colors.onPrimary
         )
 
         Text(
@@ -229,7 +227,7 @@ private fun ScheduledMeetingDateAndTime(
                 .align(Alignment.CenterEnd)
                 .clickable { onTimeClicked() },
             style = MaterialTheme.typography.subtitle1,
-            color = MaterialTheme.colors.grey_087_white_087
+            color = MaterialTheme.colors.onPrimary
         )
     }
 }
@@ -267,7 +265,7 @@ private fun AddDescriptionButton(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_sched_meeting_description),
                         contentDescription = "${stringResource(id = R.string.meetings_schedule_meeting_add_description_label)} icon",
-                        tint = MaterialTheme.colors.grey_white_alpha_054
+                        tint = MaterialTheme.colors.textColorSecondary
                     )
                 }
 
@@ -376,7 +374,7 @@ private fun ScheduleMeetingAppBar(
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_close),
                             contentDescription = "Cancel schedule meeting button",
-                            tint = MaterialTheme.colors.grey_087_white_087
+                            tint = MaterialTheme.colors.onPrimary
                         )
                     }
                 }
@@ -389,8 +387,8 @@ private fun ScheduleMeetingAppBar(
                         Icon(
                             imageVector = ImageVector.vectorResource(id = R.drawable.ic_confirm),
                             contentDescription = "Accept schedule meeting button",
-                            tint = if (state.isValidMeetingTitle()) MaterialTheme.colors.teal_300_200
-                            else MaterialTheme.colors.grey_white_alpha_038
+                            tint = if (state.isValidMeetingTitle()) MaterialTheme.colors.secondary
+                            else MaterialTheme.colors.grey_alpha_038_white_alpha_038
                         )
                     }
                 }
@@ -450,7 +448,7 @@ private fun ActionOption(
                 Icon(
                     painter = painterResource(id = action.icon),
                     contentDescription = "${action.name} icon",
-                    tint = MaterialTheme.colors.grey_white_alpha_054
+                    tint = MaterialTheme.colors.textColorSecondary
                 )
             }
 
@@ -463,7 +461,7 @@ private fun ActionOption(
                         .padding(start = 32.dp, end = 15.dp),
                     style = MaterialTheme.typography.subtitle1,
                     text = stringResource(id = action.title),
-                    color = MaterialTheme.colors.grey_087_white_087
+                    color = MaterialTheme.colors.onPrimary
                 )
 
                 var subtitle: String? = null
@@ -498,7 +496,7 @@ private fun ActionOption(
                             ),
                         style = MaterialTheme.typography.body2,
                         text = it,
-                        color = MaterialTheme.colors.grey_white_alpha_054
+                        color = MaterialTheme.colors.textColorSecondary
                     )
                 }
             }

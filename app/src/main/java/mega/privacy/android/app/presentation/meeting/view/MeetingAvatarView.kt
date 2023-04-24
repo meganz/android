@@ -31,7 +31,7 @@ import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.placeholder
 import com.google.accompanist.placeholder.shimmer
 import mega.privacy.android.app.presentation.extensions.getAvatarFirstLetter
-import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 
 /**
  * Avatar view for a Meeting user that includes default Placeholder
@@ -50,7 +50,7 @@ fun MeetingAvatarView(
     avatarColor: Int?,
     avatarTimestamp: Long? = null,
 ) {
-    val color = avatarColor?.let(::Color) ?: MaterialTheme.colors.grey_012_white_012
+    val color = avatarColor?.let(::Color) ?: MaterialTheme.colors.grey_alpha_012_white_alpha_012
     if (avatarUri.isNullOrBlank()) {
         AvatarPlaceholderView(
             char = avatarPlaceholder?.let(::getAvatarFirstLetter) ?: "U",

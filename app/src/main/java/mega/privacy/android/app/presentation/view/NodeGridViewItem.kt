@@ -29,7 +29,7 @@ import coil.compose.rememberAsyncImagePainter
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.photos.albums.view.MiddleEllipsisText
-import mega.privacy.android.core.ui.theme.extensions.grey_012_white_012
+import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.red_800_red_400
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.domain.entity.node.FileNode
@@ -60,7 +60,7 @@ internal fun NodeGridViewItem(
                 .alpha(if (nodeUIItem.isInvisible) 0f else 1f)
                 .border(
                     width = 1.dp,
-                    color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_012_white_012,
+                    color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                     shape = RoundedCornerShape(5.dp)
                 )
                 .combinedClickable(
@@ -118,7 +118,7 @@ internal fun NodeGridViewItem(
                 .fillMaxWidth()
                 .border(
                     width = 1.dp,
-                    color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_012_white_012,
+                    color = if (nodeUIItem.isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.grey_alpha_012_white_alpha_012,
                     shape = RoundedCornerShape(5.dp)
                 )
                 .combinedClickable(
