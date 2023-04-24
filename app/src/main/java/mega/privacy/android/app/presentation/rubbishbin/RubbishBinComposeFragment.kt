@@ -18,6 +18,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
@@ -150,7 +151,6 @@ class RubbishBinComposeFragment : Fragment() {
             viewModel.onItemPerformedClicked()
         } ?: run {
             (requireActivity() as ManagerActivity).setToolbarTitle()
-            (requireActivity() as ManagerActivity).invalidateOptionsMenu()
         }
     }
 
@@ -314,6 +314,11 @@ class RubbishBinComposeFragment : Fragment() {
                     markHandledPendingRefresh()
                 }
             }
+        }
+
+        viewLifecycleOwner.collectFlow(viewModel.state.map { it.nodeList.isEmpty() }
+            .distinctUntilChanged()) {
+            requireActivity().invalidateOptionsMenu()
         }
     }
 }
