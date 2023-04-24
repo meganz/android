@@ -389,23 +389,23 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
         // we don't need to create ioDispatcher here, in already run in Background Thread by rx java setup
         runBlocking {
-            processIntent(intent)
+            val isScheduleDownload = processIntent(intent)
+            if (!isScheduleDownload && getDownloadCount() <= 0) {
+                cancel()
+            }
         }
     }
 
-    private suspend fun processIntent(
-        intent: Intent,
-    ) {
-
-        if (addPendingIntentIfNotLoggedIn(intent)) return
-        if (handlePublicNode(intent)) return
+    private suspend fun processIntent(intent: Intent): Boolean {
+        if (addPendingIntentIfNotLoggedIn(intent)) return false
+        if (handlePublicNode(intent)) return false
 
         val isFolderLink = intent.getBooleanExtra(EXTRA_FOLDER_LINK, false)
         val fromMV = intent.getBooleanExtra(EXTRA_FROM_MV, false)
         Timber.d("fromMV: %s", fromMV)
         val contentUri = intent.getStringExtra(EXTRA_CONTENT_URI)?.let { Uri.parse(it) }
         val highPriority = intent.getBooleanExtra(Constants.HIGH_PRIORITY_TRANSFER, false)
-        val node: MegaNode = getNodeForIntent(intent, isFolderLink) ?: return
+        val node: MegaNode = getNodeForIntent(intent, isFolderLink) ?: return false
 
         fromMediaViewers[node.handle] = fromMV
         currentDir = getDir(intent)
@@ -428,7 +428,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             if (megaApi.getNumPendingDownloadsNonBackground() == 0) {
                 onQueueComplete(node.handle)
             }
-            return
+            return true
         }
         acquireLocks()
         if (contentUri != null || currentDir?.isDirectory == true) {
@@ -480,13 +480,12 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                 highPriority,
                 token
             )
+            return true
         } else {
             Timber.w("currentDir is not a directory")
         }
 
-        if (getDownloadCount() <= 0) {
-            cancel()
-        }
+        return false
     }
 
     private fun handlePublicNode(intent: Intent): Boolean {
