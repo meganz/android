@@ -21,16 +21,19 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
     companion object {
         private const val CHAT_LINK = "CHAT_LINK"
         private const val IS_MODERATOR = "IS_MODERATOR"
+        private const val CHAT_TITLE = "CHAT_TITLE"
     }
 
     private lateinit var binding: BottomSheetManageChatLinkBinding
 
     private var chatLink = ""
     private var isModerator = false
+    private var chatTitle: String? = null
 
-    fun setValues(chatLink: String, isModerator: Boolean) {
+    fun setValues(chatLink: String, isModerator: Boolean, chatTitle: String?) {
         this.chatLink = chatLink
         this.isModerator = isModerator
+        this.chatTitle = chatTitle
     }
 
     override fun onCreateView(
@@ -45,6 +48,7 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
         if (savedInstanceState != null) {
             chatLink = savedInstanceState.getString(CHAT_LINK, "")
             isModerator = savedInstanceState.getBoolean(IS_MODERATOR, false)
+            chatTitle = savedInstanceState.getString(CHAT_TITLE, null)
         }
 
         return contentView
@@ -69,6 +73,7 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
             val sharingIntent = Intent(Intent.ACTION_SEND)
             sharingIntent.type = TYPE_TEXT_PLAIN
             sharingIntent.putExtra(Intent.EXTRA_TEXT, chatLink)
+            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, chatTitle)
             startActivity(Intent.createChooser(sharingIntent, getString(R.string.context_share)))
 
             setStateBottomSheetBehaviorHidden()
@@ -86,6 +91,7 @@ class ManageChatLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment() 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putString(CHAT_LINK, chatLink)
         outState.putBoolean(IS_MODERATOR, isModerator)
+        outState.putString(CHAT_TITLE, chatTitle)
 
         super.onSaveInstanceState(outState)
     }

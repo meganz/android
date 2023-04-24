@@ -2544,6 +2544,7 @@ class InMeetingFragment : MeetingBaseFragment(), BottomFloatingPanelListener, Sn
         meetingActivity.startActivity(Intent().apply {
             action = Intent.ACTION_SEND
             putExtra(Intent.EXTRA_TEXT, meetingLink)
+            putExtra(Intent.EXTRA_SUBJECT, inMeetingViewModel.chatTitle.value)
             type = "text/plain"
         })
     }

@@ -654,7 +654,8 @@ class GroupChatInfoActivity : PasscodeActivity(), MegaChatRequestListenerInterfa
         (bottomSheetDialogFragment as ManageChatLinkBottomSheetDialogFragment).setValues(
             chatLink
                 ?: return,
-            chat?.ownPrivilege == MegaChatRoom.PRIV_MODERATOR
+            chat?.ownPrivilege == MegaChatRoom.PRIV_MODERATOR,
+            chat?.title
         )
 
         bottomSheetDialogFragment?.show(supportFragmentManager, bottomSheetDialogFragment?.tag)

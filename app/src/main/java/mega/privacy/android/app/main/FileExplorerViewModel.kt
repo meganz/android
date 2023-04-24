@@ -205,17 +205,19 @@ class FileExplorerViewModel @Inject constructor(
         subject: String?,
         email: String?,
         context: Context,
-    ) = with(StringBuilder()) {
-        append("[InternetShortcut]\n").append("URL=").append(text).append("\n\n")
+    ): String {
+        val builder = StringBuilder()
+        builder.append("[InternetShortcut]\n").append("URL=").append(text).append("\n\n")
         subject?.let {
-            append(context.getString(R.string.new_file_subject_when_uploading))
+            builder.append(context.getString(R.string.new_file_subject_when_uploading))
                 .append(": ").append(it).append("\n")
         }
         email?.let {
-            append(context.getString(R.string.new_file_email_when_uploading))
+            builder.append(context.getString(R.string.new_file_email_when_uploading))
                 .append(": ").append(it)
         }
-    }.toString()
+        return builder.toString()
+    }
 
     /**
      * Builds message content from the shared text.
@@ -230,20 +232,21 @@ class FileExplorerViewModel @Inject constructor(
         subject: String?,
         email: String?,
         context: Context,
-    ) =
-        with(StringBuilder()) {
-            subject?.let {
-                append(context.getString(R.string.new_file_subject_when_uploading))
-                    .append(": ").append(it).append("\n\n")
-            }
-            email?.let {
-                append(context.getString(R.string.new_file_email_when_uploading))
-                    .append(": ").append(it).append("\n\n")
-            }
-            text?.let {
-                append(it)
-            }
-        }.toString()
+    ): String {
+        val builder = StringBuilder()
+        subject?.let {
+            builder.append(context.getString(R.string.new_file_subject_when_uploading))
+                .append(": ").append(it).append("\n\n")
+        }
+        email?.let {
+            builder.append(context.getString(R.string.new_file_email_when_uploading))
+                .append(": ").append(it).append("\n\n")
+        }
+        text?.let {
+            builder.append(it)
+        }
+        return builder.toString()
+    }
 
     /**
      * Builds the final content text to share as chat message.

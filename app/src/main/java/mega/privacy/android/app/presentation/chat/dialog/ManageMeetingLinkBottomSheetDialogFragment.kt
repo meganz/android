@@ -31,6 +31,7 @@ class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment
 
     private var chatRoomId: Long = MegaChatApiJava.MEGACHAT_INVALID_HANDLE
     private var link: String? = null
+    private var title: String = ""
 
     /**
      * onCreateView()
@@ -46,11 +47,12 @@ class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                viewModel.state.collect { (chatId, _, _, _, _, _, meetingLink) ->
+                viewModel.state.collect { (chatId, _, _, _, _, _, meetingLink, chatTitle) ->
                     if (chatRoomId != chatId)
                         chatRoomId = chatId
 
                     link = meetingLink
+                    title = chatTitle
                 }
             }
         }
@@ -71,6 +73,7 @@ class ManageMeetingLinkBottomSheetDialogFragment : BaseBottomSheetDialogFragment
             val sharingIntent = Intent(Intent.ACTION_SEND)
             sharingIntent.type = Constants.TYPE_TEXT_PLAIN
             sharingIntent.putExtra(Intent.EXTRA_TEXT, link)
+            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, title)
             startActivity(Intent.createChooser(sharingIntent, getString(R.string.context_share)))
 
             setStateBottomSheetBehaviorHidden()
