@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.meeting.model.ScheduleMeetingState
+import mega.privacy.android.domain.entity.chat.ChatScheduledFlags
 import mega.privacy.android.domain.usecase.CreateChatLink
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
@@ -62,6 +63,14 @@ class ScheduleMeetingViewModel @Inject constructor(
     fun onMeetingLinkTap() =
         _state.update { state ->
             state.copy(enabledMeetingLinkOption = !state.enabledMeetingLinkOption)
+        }
+
+    /**
+     * Enable or disable send calendar invite option
+     */
+    fun onSendCalendarInviteTap() =
+        _state.update { state ->
+            state.copy(enabledSendCalendarInviteOption = !state.enabledSendCalendarInviteOption)
         }
 
     /**
@@ -235,6 +244,11 @@ class ScheduleMeetingViewModel @Inject constructor(
             viewModelScope.launch {
                 runCatching {
                     _state.value.let {
+                        val flags = ChatScheduledFlags(
+                            sendEmails = it.enabledSendCalendarInviteOption,
+                            isEmpty = false
+                        )
+
                         createChatroomAndSchedMeetingUseCase(
                             peerList = it.participantItemList,
                             isMeeting = true,
@@ -247,7 +261,7 @@ class ScheduleMeetingViewModel @Inject constructor(
                             startDate = it.startDate.epochSecond,
                             endDate = it.endDate.epochSecond,
                             description = it.descriptionText,
-                            flags = null,
+                            flags = flags,
                             rules = null,
                             attributes = null
                         )

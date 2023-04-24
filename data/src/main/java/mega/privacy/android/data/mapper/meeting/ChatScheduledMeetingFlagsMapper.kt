@@ -11,6 +11,6 @@ internal class ChatScheduledMeetingFlagsMapper @Inject constructor(
 ) {
     operator fun invoke(megaChatScheduledFlags: MegaChatScheduledFlags?): ChatScheduledFlags? =
         megaChatScheduledFlags?.let { flags ->
-            ChatScheduledFlags(megaChatScheduledFlags.emailsDisabled(), flags.isEmpty)
+            ChatScheduledFlags(megaChatScheduledFlags.sendEmails(), flags.isEmpty)
         }
 }

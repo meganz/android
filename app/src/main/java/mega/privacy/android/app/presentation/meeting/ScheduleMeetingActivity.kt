@@ -218,7 +218,7 @@ class ScheduleMeetingActivity : PasscodeActivity(), SnackbarShower {
             ScheduleMeetingAction.Recurrence -> Timber.d("Recurrence option")
             ScheduleMeetingAction.MeetingLink -> viewModel.onMeetingLinkTap()
             ScheduleMeetingAction.AddParticipants -> viewModel.onAddParticipantsTap()
-            ScheduleMeetingAction.SendCalendarInvite -> Timber.d("Send calendar invite option")
+            ScheduleMeetingAction.SendCalendarInvite -> viewModel.onSendCalendarInviteTap()
             ScheduleMeetingAction.AllowNonHostAddParticipants -> viewModel.onAllowNonHostAddParticipantsTap()
             ScheduleMeetingAction.AddDescription -> viewModel.onAddDescriptionTap()
         }

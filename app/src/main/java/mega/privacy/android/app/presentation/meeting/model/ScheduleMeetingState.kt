@@ -16,11 +16,13 @@ import java.time.temporal.ChronoUnit
  * @property startDate                              Start Date.
  * @property endDate                                End Date.
  * @property participantItemList                    List of participants handles.
+ * @property enabledAllowAddParticipantsOption      True if is enabled the allow non-hosts to add participants option, false otherwise.
+ * @property enabledMeetingLinkOption               True if is enabled the meeting link option, false otherwise.
+ * @property enabledSendCalendarInviteOption       True if is enabled the send calendar invite option, false otherwise.
+ * @property descriptionText                        Description text
  * @property buttons                                List of available action buttons.
  * @property snackBar                               String resource id for showing an snackBar.
- * @property enabledMeetingLinkOption               True if is enabled the meeting link option, false otherwise.
  * @property discardMeetingDialog                   True if show discard meeting alert dialog, false if not.
- * @property enabledAllowAddParticipantsOption      True if is enabled the allow non-hosts to add participants option, false otherwise.
  * @property addParticipantsNoContactsDialog        True if show add participants no contacts dialog, false if not.
  * @property numOfParticipants                      Number of participants.
  * @property isEditingDescription                   True, if is editing description. False, if not.
@@ -37,6 +39,7 @@ data class ScheduleMeetingState constructor(
     val participantItemList: List<Long> = emptyList(),
     val enabledMeetingLinkOption: Boolean = false,
     val enabledAllowAddParticipantsOption: Boolean = true,
+    val enabledSendCalendarInviteOption: Boolean = false,
     val descriptionText: String = "",
     val buttons: List<ScheduleMeetingAction> = ScheduleMeetingAction.values().asList(),
     val snackBar: Int? = null,

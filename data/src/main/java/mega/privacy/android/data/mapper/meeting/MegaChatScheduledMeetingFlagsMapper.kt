@@ -10,9 +10,8 @@ import javax.inject.Inject
 internal class MegaChatScheduledMeetingFlagsMapper @Inject constructor() {
     operator fun invoke(chatScheduledFlags: ChatScheduledFlags?): MegaChatScheduledFlags? =
         chatScheduledFlags?.let { flags ->
-            val megaChatScheduledFlags: MegaChatScheduledFlags =
-                MegaChatScheduledFlags.createInstance()
-            megaChatScheduledFlags.setEmailsDisabled(flags.isEmailsDisabled)
-            return@let megaChatScheduledFlags
+            MegaChatScheduledFlags.createInstance().apply {
+                setSendEmails(flags.sendEmails)
+            }
         }
 }
