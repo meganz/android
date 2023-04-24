@@ -79,7 +79,7 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new RubbishBin Compose UI
      */
-    RubbishBinCompose("Enable compose for RubbishBin", false),
+    RubbishBinCompose("Enable compose for RubbishBin", true),
 
     /**
      * To switch into new Plans page UI
