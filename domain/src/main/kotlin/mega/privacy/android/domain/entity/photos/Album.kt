@@ -28,11 +28,13 @@ sealed interface Album {
      * @property title
      * @property cover
      * @property modificationTime
+     * @property isExported
      */
     data class UserAlbum(
         val id: AlbumId,
         val title: String,
         val cover: Photo?,
         val modificationTime: Long,
+        val isExported: Boolean,
     ) : Album
 }

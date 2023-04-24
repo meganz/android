@@ -24,4 +24,9 @@ interface UserSet {
      * The Set modification time
      */
     val modificationTime: Long
+
+    /**
+     * Flag is set exported
+     */
+    val isExported: Boolean
 }

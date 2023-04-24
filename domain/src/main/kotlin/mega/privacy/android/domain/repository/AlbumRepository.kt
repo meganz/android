@@ -3,6 +3,9 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumIdLink
+import mega.privacy.android.domain.entity.photos.AlbumIdPhotoIds
+import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
@@ -134,6 +137,30 @@ interface AlbumRepository {
      * @param elementId the element id to be set as cover
      */
     suspend fun updateAlbumCover(albumId: AlbumId, elementId: NodeId)
+
+    /**
+     * Export albums
+     *
+     * @param albumIds list of album ids to be exported
+     * @return list of generated links
+     */
+    suspend fun exportAlbums(albumIds: List<AlbumId>): List<AlbumIdLink>
+
+    /**
+     * Disable export albums
+     *
+     * @param albumIds list of exported album ids to be disabled
+     * @return number of successful operations
+     */
+    suspend fun disableExportAlbums(albumIds: List<AlbumId>): Int
+
+    /**
+     * Fetch public album
+     *
+     * @param albumLink public link as identifier
+     * @return a pair of album id and photo id list
+     */
+    suspend fun fetchPublicAlbum(albumLink: AlbumLink): AlbumIdPhotoIds
 
     /**
      * Clear all albums cache

@@ -195,5 +195,6 @@ class AlbumsViewTest {
         title: String = "",
         cover: Photo? = null,
         modificationTime: Long = 0L,
-    ): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime)
+        isExported: Boolean = false,
+    ): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime, isExported)
 }

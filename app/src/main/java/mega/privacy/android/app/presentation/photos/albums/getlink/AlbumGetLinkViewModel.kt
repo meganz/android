@@ -72,6 +72,7 @@ class AlbumGetLinkViewModel @Inject constructor(
                     photos.maxByOrNull { it.modificationTime }
                 },
                 modificationTime = album.modificationTime,
+                isExported = album.isExported,
             ),
             numPhotos = photos.size,
         )

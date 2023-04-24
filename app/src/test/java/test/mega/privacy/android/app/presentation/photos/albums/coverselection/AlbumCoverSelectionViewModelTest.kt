@@ -130,7 +130,8 @@ class AlbumCoverSelectionViewModelTest {
         title: String = "",
         cover: Photo? = null,
         modificationTime: Long = 0L,
-    ) = Album.UserAlbum(id, title, cover, modificationTime)
+        isExported: Boolean = false,
+    ) = Album.UserAlbum(id, title, cover, modificationTime, isExported)
 
     private fun createImage(
         id: Long,

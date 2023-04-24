@@ -54,6 +54,7 @@ class DefaultGetUserAlbumsTest {
         name: String = "",
         cover: Long? = null,
         modificationTime: Long = 0L,
+        isExported: Boolean = false,
     ): UserSet = object : UserSet {
         override val id: Long = id
 
@@ -62,5 +63,7 @@ class DefaultGetUserAlbumsTest {
         override val cover: Long? = cover
 
         override val modificationTime: Long = modificationTime
+
+        override val isExported: Boolean = isExported
     }
 }

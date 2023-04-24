@@ -732,6 +732,22 @@ internal class MegaApiFacade @Inject constructor(
 
     override suspend fun putSetCover(sid: Long, eid: Long) = megaApi.putSetCover(sid, eid)
 
+    override fun exportSet(sid: Long, listener: MegaRequestListenerInterface) {
+        megaApi.exportSet(sid, listener)
+    }
+
+    override fun disableExportSet(sid: Long, listener: MegaRequestListenerInterface) {
+        megaApi.disableExportSet(sid, listener)
+    }
+
+    override fun fetchPublicSet(publicSetLink: String, listener: MegaRequestListenerInterface) {
+        megaApi.fetchPublicSet(publicSetLink, listener)
+    }
+
+    override fun getPreviewElementNode(eid: Long, listener: MegaRequestListenerInterface) {
+        megaApi.getPreviewElementNode(eid, listener)
+    }
+
     override fun removeRequestListener(listener: MegaRequestListenerInterface) =
         megaApi.removeRequestListener(listener)
 

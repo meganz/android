@@ -10,6 +10,7 @@ typealias UserSetMapper = (
     @JvmSuppressWildcards String,
     @JvmSuppressWildcards Long?,
     @JvmSuppressWildcards Long,
+    @JvmSuppressWildcards Boolean,
 ) -> @JvmSuppressWildcards UserSet
 
 internal fun toUserSet(
@@ -17,6 +18,7 @@ internal fun toUserSet(
     name: String,
     cover: Long?,
     modificationTime: Long,
+    isExported: Boolean,
 ): UserSet = object : UserSet {
     override val id: Long = id
 
@@ -25,4 +27,6 @@ internal fun toUserSet(
     override val cover: Long? = cover
 
     override val modificationTime: Long = modificationTime
+
+    override val isExported: Boolean = isExported
 }

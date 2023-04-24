@@ -19,6 +19,7 @@ class CreateAlbumUseCase @Inject constructor(
             title = newUserSet.name,
             cover = coverPhoto,
             modificationTime = newUserSet.modificationTime,
+            isExported = newUserSet.isExported,
         )
     }
 }

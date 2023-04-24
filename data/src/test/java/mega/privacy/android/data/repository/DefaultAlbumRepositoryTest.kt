@@ -65,7 +65,8 @@ class DefaultAlbumRepositoryTest {
             testMegaSet.id(),
             testMegaSet.name(),
             null,
-            testMegaSet.ts()
+            testMegaSet.ts(),
+            false,
         )
 
         val request = mock<MegaRequest> {
@@ -230,6 +231,7 @@ class DefaultAlbumRepositoryTest {
                 name = "Album $it",
                 cover = -1L,
                 modificationTime = it,
+                isExported = false,
             )
         }
 
@@ -289,6 +291,7 @@ class DefaultAlbumRepositoryTest {
             name = "Album 1",
             cover = null,
             modificationTime = 0L,
+            isExported = false,
         )
 
         val megaSet = mock<MegaSet> {
@@ -400,6 +403,7 @@ class DefaultAlbumRepositoryTest {
         name: String,
         cover: Long?,
         modificationTime: Long,
+        isExported: Boolean,
     ): UserSet = object : UserSet {
         override val id: Long = id
 
@@ -409,12 +413,15 @@ class DefaultAlbumRepositoryTest {
 
         override val modificationTime: Long = modificationTime
 
+        override val isExported: Boolean = isExported
+
         override fun equals(other: Any?): Boolean {
             val otherSet = other as? UserSet ?: return false
             return id == otherSet.id
                     && name == otherSet.name
                     && cover == otherSet.cover
                     && modificationTime == otherSet.modificationTime
+                    && isExported == otherSet.isExported
         }
     }
 }

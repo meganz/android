@@ -22,12 +22,16 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.facade.AlbumStringResourceGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.listener.CreateSetElementListenerInterface
+import mega.privacy.android.data.listener.DisableExportSetsListenerInterface
+import mega.privacy.android.data.listener.ExportSetsListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.listener.RemoveSetElementListenerInterface
 import mega.privacy.android.data.mapper.UserSetMapper
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumId
+import mega.privacy.android.domain.entity.photos.AlbumIdLink
+import mega.privacy.android.domain.entity.photos.AlbumLink
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
 import mega.privacy.android.domain.entity.photos.AlbumPhotosAddingProgress
 import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
@@ -112,6 +116,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                                         newSet.name(),
                                         newSet.cover(),
                                         newSet.ts(),
+                                        newSet.isExported,
                                     )
                                 )
                             )
@@ -318,6 +323,82 @@ internal class DefaultAlbumRepository @Inject constructor(
             )
         }
 
+    override suspend fun exportAlbums(albumIds: List<AlbumId>): List<AlbumIdLink> =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = ExportSetsListenerInterface(
+                    totalSets = albumIds.size,
+                    onCompletion = { setLinks ->
+                        val albumIdsLinks = setLinks.map { (sid, link) ->
+                            AlbumId(sid) to AlbumLink(link)
+                        }
+                        continuation.resumeWith(Result.success(albumIdsLinks))
+                    },
+                )
+
+                for (albumId in albumIds) {
+                    megaApiGateway.exportSet(
+                        sid = albumId.id,
+                        listener = listener,
+                    )
+                }
+
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
+
+    override suspend fun disableExportAlbums(albumIds: List<AlbumId>) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = DisableExportSetsListenerInterface(
+                totalSets = albumIds.size,
+                onCompletion = { success, _ ->
+                    continuation.resumeWith(Result.success(success))
+                }
+            )
+
+            for (albumId in albumIds) {
+                megaApiGateway.disableExportSet(
+                    sid = albumId.id,
+                    listener = listener,
+                )
+            }
+
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
+    override suspend fun fetchPublicAlbum(albumLink: AlbumLink) = withContext(ioDispatcher) {
+        suspendCancellableCoroutine { continuation ->
+            val listener = OptionalMegaRequestListenerInterface(
+                onRequestFinish = { request, error ->
+                    if (error.errorCode == MegaError.API_OK) {
+                        val albumId = AlbumId(request.megaSet.id())
+                        val albumPhotoIds = request.megaSetElementList.let { elementList ->
+                            (0 until elementList.size()).map { index ->
+                                elementList.get(index).toAlbumPhotoId()
+                            }
+                        }
+                        continuation.resumeWith(Result.success(albumId to albumPhotoIds))
+                    } else {
+                        continuation.failWithError(error, "fetchPublicAlbum")
+                    }
+                }
+            )
+            megaApiGateway.fetchPublicSet(
+                publicSetLink = albumLink.link,
+                listener = listener,
+            )
+
+            continuation.invokeOnCancellation {
+                megaApiGateway.removeRequestListener(listener)
+            }
+        }
+    }
+
     override fun clearCache() {
         monitorNodeUpdatesJob?.cancel()
         monitorNodeUpdatesJob = null
@@ -342,7 +423,7 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     private fun MegaSet.toUserSet(): UserSet {
         val cover = cover().takeIf { it != -1L }
-        return userSetMapper(id(), name(), cover, ts())
+        return userSetMapper(id(), name(), cover, ts(), isExported)
     }
 
     private fun MegaSetElement.toAlbumPhotoId(): AlbumPhotoId = AlbumPhotoId(

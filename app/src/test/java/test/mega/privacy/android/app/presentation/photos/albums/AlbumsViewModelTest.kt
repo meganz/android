@@ -691,6 +691,7 @@ class AlbumsViewModelTest {
             title = "Album 1",
             cover = null,
             modificationTime = 0L,
+            isExported = false,
         )
 
         // when
@@ -711,6 +712,7 @@ class AlbumsViewModelTest {
             title = "Album 1",
             cover = null,
             modificationTime = 0L,
+            isExported = false,
         )
 
         // when
@@ -732,6 +734,7 @@ class AlbumsViewModelTest {
             title = "Album 1",
             cover = null,
             modificationTime = 0L,
+            isExported = false,
         )
 
         val expectedAlbum2 = Album.UserAlbum(
@@ -739,6 +742,7 @@ class AlbumsViewModelTest {
             title = "Album 2",
             cover = null,
             modificationTime = 0L,
+            isExported = false,
         )
 
         // when
@@ -758,7 +762,8 @@ class AlbumsViewModelTest {
         title: String = "",
         cover: Photo? = null,
         modificationTime: Long = 0L,
-    ): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime)
+        isExported: Boolean = false,
+    ): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime, isExported)
 
     private fun createImage(
         id: Long = 2L,

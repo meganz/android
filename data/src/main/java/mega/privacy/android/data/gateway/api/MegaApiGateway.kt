@@ -1312,6 +1312,104 @@ interface MegaApiGateway {
     suspend fun putSetCover(sid: Long, eid: Long)
 
     /**
+     * Generate a public link of a Set in MEGA
+     *
+     * The associated request type with this request is MegaRequest::TYPE_EXPORT_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns id of the Set used as parameter
+     * - MegaRequest::getFlag - Returns a boolean set to true representing the call was
+     * meant to enable/create the export
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getMegaSet - MegaSet including the public id
+     * - MegaRequest::getLink - Public link
+     *
+     * MegaError::API_OK results in onSetsUpdate being triggered as well
+     *
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param sid      MegaHandle to get the public link
+     * @param listener MegaRequestListener to track this request
+     */
+    fun exportSet(sid: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Stop sharing a Set
+     *
+     * The associated request type with this request is MegaRequest::TYPE_EXPORT_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns id of the Set used as parameter
+     * - MegaRequest::getFlag - Returns a boolean set to false representing the call was
+     * meant to disable the export
+     *
+     * MegaError::API_OK results in onSetsUpdate being triggered as well
+     *
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param sid      Set MegaHandle to stop sharing
+     * @param listener MegaRequestListener to track this request
+     */
+    fun disableExportSet(sid: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Gets a MegaNode for the foreign MegaSetElement that can be used to download the Element
+     *
+     * The associated request type with this request is MegaRequest::TYPE_GET_EXPORTED_SET_ELEMENT
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getPublicMegaNode - Returns the MegaNode (ownership transferred)
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_EACCESS - Public Set preview mode is not enabled
+     * - MegaError::API_EARGS - MegaHandle for SetElement provided as param doesn't match any Element
+     * in previewed Set
+     *
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param eid      MegaHandle of target SetElement from Set in preview mode
+     * @param listener MegaRequestListener to track this request
+     */
+    fun getPreviewElementNode(eid: Long, listener: MegaRequestListenerInterface)
+
+    /**
+     * Request to fetch a public/exported Set and its Elements.
+     *
+     * The associated request type with this request is MegaRequest::TYPE_FETCH_SET
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getLink - Returns the link used for the public Set fetch request
+     *
+     * In addition to fetching the Set (including Elements), SDK's instance is set
+     * to preview mode for the public Set. This mode allows downloading of foreign
+     * SetElements included in the public Set.
+     *
+     * To disable the preview mode and release resources used by the preview Set,
+     * use MegaApi::stopPublicSetPreview
+     *
+     * Valid data in the MegaRequest object received in onRequestFinish when the error code
+     * is MegaError::API_OK:
+     * - MegaRequest::getMegaSet - Returns the Set
+     * - MegaRequest::getMegaSetElementList - Returns the list of Elements
+     *
+     * On the onRequestFinish error, the error code associated to the MegaError can be:
+     * - MegaError::API_ENOENT - Set could not be found.
+     * - MegaError::API_EINTERNAL - Received answer could not be read or decrypted.
+     * - MegaError::API_EARGS - Malformed (from API).
+     * - MegaError::API_EACCESS - Permissions Error (from API).
+     *
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param publicSetLink Public link to a Set in MEGA
+     * @param listener      MegaRequestListener to track this request
+     */
+    fun fetchPublicSet(publicSetLink: String, listener: MegaRequestListenerInterface)
+
+    /**
      * Remove request listener
      */
     fun removeRequestListener(listener: MegaRequestListenerInterface)
