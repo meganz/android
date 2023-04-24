@@ -6,7 +6,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.domain.repository.MediaPlayerRepository
-import mega.privacy.android.domain.usecase.AreCredentialsNull
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodes
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodesByEmail
 import mega.privacy.android.domain.usecase.DefaultGetAudioNodesByParentHandle
@@ -31,19 +30,10 @@ import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
 import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
 import mega.privacy.android.domain.usecase.GetAudiosByParentHandleFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandle
-import mega.privacy.android.domain.usecase.GetInboxNode
-import mega.privacy.android.domain.usecase.GetLocalFilePath
-import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApi
-import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolder
-import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApi
 import mega.privacy.android.domain.usecase.GetNodesByHandles
-import mega.privacy.android.domain.usecase.GetParentNodeByHandle
-import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetRootNode
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetRubbishNode
-import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApi
-import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetTicker
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
 import mega.privacy.android.domain.usecase.GetUserNameByEmail
@@ -163,21 +153,6 @@ abstract class MediaPlayerUseCases {
     abstract fun bindGetNodesByHandles(implementation: DefaultGetNodesByHandles): GetNodesByHandles
 
     companion object {
-
-        /**
-         * Provide implementation for [GetLocalFolderLinkFromMegaApiFolder]
-         */
-        @Provides
-        fun provideGetLocalLinkFromMegaApiFolder(mediaPlayerRepository: MediaPlayerRepository): GetLocalFolderLinkFromMegaApiFolder =
-            GetLocalFolderLinkFromMegaApiFolder(mediaPlayerRepository::getLocalLinkForFolderLinkFromMegaApiFolder)
-
-        /**
-         * Provide implementation for [GetLocalFolderLinkFromMegaApi]
-         */
-        @Provides
-        fun provideGetLocalFolderLinkFromMegaApi(mediaPlayerRepository: MediaPlayerRepository): GetLocalFolderLinkFromMegaApi =
-            GetLocalFolderLinkFromMegaApi(mediaPlayerRepository::getLocalLinkForFolderLinkFromMegaApi)
-
         /**
          * Provide implementation for [GetUserNameByEmail]
          */
@@ -193,25 +168,11 @@ abstract class MediaPlayerUseCases {
             GetRootNode(mediaPlayerRepository::getRootNode)
 
         /**
-         * Provide implementation for [GetInboxNode]
-         */
-        @Provides
-        fun provideGetInboxNode(mediaPlayerRepository: MediaPlayerRepository): GetInboxNode =
-            GetInboxNode(mediaPlayerRepository::getInboxNode)
-
-        /**
          * Provide implementation for [GetRubbishNode]
          */
         @Provides
         fun provideGetRubbishNode(mediaPlayerRepository: MediaPlayerRepository): GetRubbishNode =
             GetRubbishNode(mediaPlayerRepository::getRubbishNode)
-
-        /**
-         * Provide implementation for [GetParentNodeByHandle]
-         */
-        @Provides
-        fun provideGetParentNodeByHandle(mediaPlayerRepository: MediaPlayerRepository): GetParentNodeByHandle =
-            GetParentNodeByHandle(mediaPlayerRepository::getParentNodeByHandle)
 
         /**
          * Provide implementation for [GetRootNodeFromMegaApiFolder]
@@ -221,53 +182,11 @@ abstract class MediaPlayerUseCases {
             GetRootNodeFromMegaApiFolder(mediaPlayerRepository::getRootNodeFromMegaApiFolder)
 
         /**
-         * Provide implementation for [GetParentNodeFromMegaApiFolder]
-         */
-        @Provides
-        fun provideGetParentNodeFromMegaApiFolder(mediaPlayerRepository: MediaPlayerRepository): GetParentNodeFromMegaApiFolder =
-            GetParentNodeFromMegaApiFolder(mediaPlayerRepository::getParentNodeFromMegaApiFolder)
-
-        /**
          * Provide implementation for [GetUnTypedNodeByHandle]
          */
         @Provides
         fun provideGetUnTypedNodeByHandle(mediaPlayerRepository: MediaPlayerRepository): GetUnTypedNodeByHandle =
             GetUnTypedNodeByHandle(mediaPlayerRepository::getUnTypedNodeByHandle)
-
-        /**
-         * Provide implementation for [GetThumbnailFromMegaApiFolder]
-         */
-        @Provides
-        fun provideGetThumbnailFromMegaApiFolder(mediaPlayerRepository: MediaPlayerRepository): GetThumbnailFromMegaApiFolder =
-            GetThumbnailFromMegaApiFolder(mediaPlayerRepository::getThumbnailFromMegaApiFolder)
-
-        /**
-         * Provide implementation for [GetThumbnailFromMegaApiFolder]
-         */
-        @Provides
-        fun provideGetThumbnailFromMegaApi(mediaPlayerRepository: MediaPlayerRepository): GetThumbnailFromMegaApi =
-            GetThumbnailFromMegaApi(mediaPlayerRepository::getThumbnailFromMegaApi)
-
-        /**
-         * Provide implementation for [GetLocalFilePath]
-         */
-        @Provides
-        fun provideGetLocalFilePath(mediaPlayerRepository: MediaPlayerRepository): GetLocalFilePath =
-            GetLocalFilePath(mediaPlayerRepository::getLocalFilePath)
-
-        /**
-         * Provide implementation for [GetLocalLinkFromMegaApi]
-         */
-        @Provides
-        fun provideGetLocalLinkFromMegaApi(mediaPlayerRepository: MediaPlayerRepository): GetLocalLinkFromMegaApi =
-            GetLocalLinkFromMegaApi(mediaPlayerRepository::getLocalLinkFromMegaApi)
-
-        /**
-         * Provide implementation for [AreCredentialsNull]
-         */
-        @Provides
-        fun provideCredentialsNull(mediaPlayerRepository: MediaPlayerRepository): AreCredentialsNull =
-            AreCredentialsNull(mediaPlayerRepository::areCredentialsNull)
 
         /**
          * Provide implementation for [GetFileUrlByNodeHandle]
