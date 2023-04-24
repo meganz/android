@@ -101,6 +101,13 @@ internal class NodeRepositoryImpl @Inject constructor(
                 .map { shareDataMapper(it) }
         }
 
+    override suspend fun getNodeOutgoingShares(nodeId: NodeId): List<ShareData> =
+        withContext(ioDispatcher) {
+            megaApiGateway.getMegaNodeByHandle(nodeId.longValue)?.let { megaNode ->
+                megaApiGateway.getOutShares(megaNode).map { shareDataMapper(it) }
+            } ?: emptyList()
+        }
+
     override suspend fun getUnverifiedIncomingShares(order: SortOrder): List<ShareData> =
         withContext(ioDispatcher) {
             megaApiGateway.getUnverifiedIncomingShares(sortOrderIntMapper(order)).map {

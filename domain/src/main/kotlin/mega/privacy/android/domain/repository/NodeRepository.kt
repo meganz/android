@@ -29,6 +29,14 @@ interface NodeRepository {
     suspend fun getOutgoingSharesNode(order: SortOrder): List<ShareData>
 
     /**
+     * Get a list of all outgoing shares for a given node
+     *
+     * @param nodeId the [NodeId] of the desired node
+     * @return List of [ShareData] for the given node
+     */
+    suspend fun getNodeOutgoingShares(nodeId: NodeId): List<ShareData>
+
+    /**
      * Provides Unverified incoming shares count from SDK
      *
      * @return List of [ShareData]

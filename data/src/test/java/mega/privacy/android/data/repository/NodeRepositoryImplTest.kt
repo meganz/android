@@ -24,6 +24,7 @@ import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -34,10 +35,12 @@ import nz.mega.sdk.MegaFolderInfo
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
+import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaShare.ACCESS_READ
 import nz.mega.sdk.MegaUser
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -47,6 +50,7 @@ import org.mockito.kotlin.whenever
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NodeRepositoryImplTest {
 
     private lateinit var underTest: NodeRepository
@@ -70,7 +74,7 @@ class NodeRepositoryImplTest {
     private val accessPermissionMapper: AccessPermissionMapper = mock()
     private val nodeShareKeyResultMapper = mock<NodeShareKeyResultMapper>()
 
-    @Before
+    @BeforeAll
     fun setup() {
         underTest = NodeRepositoryImpl(
             context = context,
@@ -191,6 +195,37 @@ class NodeRepositoryImplTest {
         assertThat(actual.size).isEqualTo(1)
         assertThat(actual[0].base64Id).isEqualTo("base64Handle")
     }
+
+    @Test
+    fun `test that when getMegaNodeByHandle returns null then getNodeOutgoingShares returns an empty list`() =
+        runTest {
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle)).thenReturn(null)
+            val actual = underTest.getNodeOutgoingShares(nodeId)
+            assertThat(actual).isEmpty()
+        }
+
+    @Test
+    fun `test that when getMegaNodeByHandle returns a node and getOutShares returns an empty list then getNodeOutgoingShares returns an empty list`() =
+        runTest {
+            val node: MegaNode = mock()
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle)).thenReturn(node)
+            whenever(megaApiGateway.getOutShares(node)).thenReturn(emptyList())
+            val actual = underTest.getNodeOutgoingShares(nodeId)
+            assertThat(actual).isEmpty()
+        }
+
+    @Test
+    fun `test that when getMegaNodeByHandle returns a node and getOutShares returns a list of shares then getNodeOutgoingShares returns the mapped list`() =
+        runTest {
+            val node: MegaNode = mock()
+            val megaShare: MegaShare = mock()
+            val share: ShareData = mock()
+            whenever(megaApiGateway.getMegaNodeByHandle(nodeHandle)).thenReturn(node)
+            whenever(megaApiGateway.getOutShares(node)).thenReturn(listOf(megaShare))
+            whenever(shareDataMapper(megaShare)).thenReturn(share)
+            val actual = underTest.getNodeOutgoingShares(nodeId)
+            assertThat(actual).containsExactly(share)
+        }
 
     private suspend fun mockFolderInfoResponse() {
         val fileNode: MegaNode = mock()

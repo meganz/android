@@ -20,13 +20,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.app.presentation.fileinfo.model.ContactPermission
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_012
+import mega.privacy.android.domain.entity.contacts.ContactPermission
 
 /**
  * Content for FileInfo screen, all except toolbar, bottom sheets, dialogs

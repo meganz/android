@@ -30,7 +30,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
-import mega.privacy.android.app.presentation.fileinfo.model.ContactPermission
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.utils.LocationInfo
@@ -38,6 +37,7 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import java.time.Instant
 import kotlin.time.Duration.Companion.days

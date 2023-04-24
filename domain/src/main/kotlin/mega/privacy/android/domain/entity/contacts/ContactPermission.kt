@@ -1,6 +1,5 @@
-package mega.privacy.android.app.presentation.fileinfo.model
+package mega.privacy.android.domain.entity.contacts
 
-import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.shares.AccessPermission
 
 /**

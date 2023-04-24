@@ -27,13 +27,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
-import mega.privacy.android.app.presentation.fileinfo.model.ContactPermission
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHARES_HEADER
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHOW_MORE
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_white_alpha_012
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 
 /**

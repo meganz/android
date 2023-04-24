@@ -7,12 +7,12 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
-import mega.privacy.android.app.presentation.fileinfo.model.ContactPermission
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHARES_HEADER
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHOW_MORE
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.MAX_CONTACTS_TO_SHOW
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoView
+import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import org.junit.Rule
 import org.junit.Test

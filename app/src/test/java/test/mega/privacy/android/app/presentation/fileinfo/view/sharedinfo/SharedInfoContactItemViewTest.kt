@@ -7,10 +7,10 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
-import mega.privacy.android.app.presentation.fileinfo.model.ContactPermission
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_CONTACT_ITEM_SHARED_DOTS
 import mega.privacy.android.app.presentation.fileinfo.view.sharedinfo.SharedInfoContactItemView
+import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
 import org.junit.Before
 import org.junit.Rule
@@ -29,9 +29,9 @@ class SharedInfoContactItemViewTest {
     private val clickEvent = mock<() -> Unit>()
     private val longClickEvent = mock<() -> Unit>()
     private val moreOptionsClickEvent = mock<() -> Unit>()
-    private val contactItem = mock<ContactPermission>{
+    private val contactItem = mock<ContactPermission> {
         on { accessPermission }.thenReturn(AccessPermission.READWRITE)
-        on { contactItem}.thenReturn(contactItemForPreviews)
+        on { contactItem }.thenReturn(contactItemForPreviews)
     }
 
     @Before
