@@ -47,8 +47,8 @@ import mega.privacy.android.core.ui.theme.white_alpha_012
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 @Deprecated(
-    message = "This has been deprecated in favour of LabelTextField base component of core-ui",
-    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.textfields.LabelTextField")
+    message = "This has been deprecated in favour of all the TextField base component of core-ui inside textfields",
+    replaceWith = ReplaceWith("mega.privacy.android.core.ui.controls.textfields")
 )
 fun MegaTextField(
     value: String,

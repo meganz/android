@@ -38,6 +38,17 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_038
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_038_white_alpha_038
 
+/**
+ * Text field with label.
+ *
+ * @param onTextChange    Action required for notifying about text changes.
+ * @param label           Label required for showing as placeholder if the field is empty and as label if not.
+ * @param imeAction       [ImeAction]
+ * @param keyboardActions [KeyboardActions]
+ * @param modifier        [Modifier]
+ * @param text            Typed text.
+ * @param errorText       Error to show if any.
+ */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LabelTextField(
@@ -48,8 +59,8 @@ fun LabelTextField(
     modifier: Modifier = Modifier,
     text: String = "",
     errorText: String? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = Column(modifier = modifier) {
+    val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
     val isError = errorText != null
     val colors = TextFieldDefaults.textFieldColors(
         textColor = MaterialTheme.colors.onPrimary,
@@ -116,13 +127,7 @@ fun LabelTextField(
         }
     }
 
-    errorText?.apply {
-        Text(
-            text = text,
-            modifier = modifier.padding(top = 4.dp),
-            style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error),
-        )
-    }
+    errorText?.apply { ErrorTextTextField(errorText = this) }
 }
 
 @CombinedThemePreviews

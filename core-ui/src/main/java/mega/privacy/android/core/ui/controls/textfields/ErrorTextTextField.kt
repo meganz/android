@@ -13,13 +13,15 @@ import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 
 /**
- * Error text in text field
+ * Error text in text field.
  *
- * @param errorText   String
+ * @param errorText Error text.
+ * @param modifier  [Modifier]
  */
 @Composable
 fun ErrorTextTextField(
-    errorText: String, modifier: Modifier = Modifier,
+    errorText: String,
+    modifier: Modifier = Modifier,
 ) {
     Text(
         modifier = modifier
