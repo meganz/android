@@ -19,7 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
@@ -42,11 +41,12 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 @Composable
 internal fun SharedInfoView(
     contacts: List<ContactPermission>,
+    selectedContacts: List<String>,
     expanded: Boolean,
     onHeaderClick: () -> Unit,
     onContactClick: (ContactPermission) -> Unit,
     onContactLongClick: (ContactPermission) -> Unit,
-    onMoreOptionsClick: (ContactPermission) -> Unit,
+    onContactMoreOptionsClick: (ContactPermission) -> Unit,
     onShowMoreContactsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -58,9 +58,10 @@ internal fun SharedInfoView(
             if (expanded) {
                 ContactsList(
                     contacts,
+                    selectedContacts,
                     onContactClick,
                     onContactLongClick,
-                    onMoreOptionsClick,
+                    onContactMoreOptionsClick,
                     onShowMoreContactsClick
                 )
             }
@@ -69,7 +70,6 @@ internal fun SharedInfoView(
 }
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class)
 private fun Header(
     contacts: List<ContactPermission>,
     expanded: Boolean,
@@ -110,6 +110,7 @@ private fun Header(
 @Composable
 private fun ColumnScope.ContactsList(
     contacts: List<ContactPermission>,
+    selectedContacts: List<String>,
     onContactClick: (ContactPermission) -> Unit,
     onContactLongClick: (ContactPermission) -> Unit,
     onMoreOptionsClick: (ContactPermission) -> Unit,
@@ -119,6 +120,7 @@ private fun ColumnScope.ContactsList(
     contacts.take(MAX_CONTACTS_TO_SHOW).forEachIndexed { i, contactItem ->
         SharedInfoContactItemView(
             contactItem = contactItem,
+            selected = selectedContacts.contains(contactItem.contactItem.email),
             onClick = { onContactClick(contactItem) },
             onMoreOptionsClick = { onMoreOptionsClick(contactItem) },
             onLongClick = { onContactLongClick(contactItem) },
@@ -162,11 +164,12 @@ private fun SharedInfoPreview() {
                     AccessPermission.values()[it.mod(AccessPermission.values().size)]
                 )
             },
+            selectedContacts = emptyList(),
             expanded = expanded,
             onHeaderClick = { expanded = !expanded },
             onContactClick = {},
             onContactLongClick = {},
-            onMoreOptionsClick = {},
+            onContactMoreOptionsClick = {},
             onShowMoreContactsClick = {},
         )
     }

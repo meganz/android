@@ -2,7 +2,12 @@ package mega.privacy.android.app.presentation.contact.view
 
 
 import android.text.format.DateFormat
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,13 +60,13 @@ import java.util.Locale
  * @param statusOverride to allow change the status text, if null connection status description will be shown
  * @param includeDivider to show or not a divider at the bottom of the view, default is true
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ContactItemView(
     contactItem: ContactItem,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     statusOverride: String? = null,
+    selected: Boolean = false,
     includeDivider: Boolean = true,
 ) {
     Column(modifier = modifier) {
@@ -78,7 +83,7 @@ internal fun ContactItemView(
                 .padding(end = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ContactAvatarVerified(contactItem)
+            ContactAvatarVerified(contactItem, selected = selected)
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val contactName = with(contactItem) {
@@ -191,7 +196,7 @@ fun ContactStatus(
 }
 
 @Composable
-fun ContactAvatar(
+private fun ContactAvatar(
     modifier: Modifier = Modifier,
     contactItem: ContactItem,
 ) {
@@ -208,21 +213,38 @@ fun ContactAvatar(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun ContactAvatarVerified(
     contactItem: ContactItem,
     modifier: Modifier = Modifier,
+    selected: Boolean = false,
 ) {
     Box(
         modifier = modifier,
     ) {
-        ContactAvatar(
-            contactItem = contactItem,
-            modifier = Modifier
-                .padding(16.dp)
-                .size(40.dp)
-                .clip(CircleShape),
-        )
+        val avatarModifier = Modifier
+            .padding(16.dp)
+            .size(40.dp)
+        AnimatedContent(
+            targetState = selected,
+            transitionSpec = {
+                scaleIn(animationSpec = tween(220)) with scaleOut(animationSpec = tween(90))
+            }
+        ) {
+            if (selected) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_chat_avatar_select),
+                    contentDescription = stringResource(id = R.string.selected_items, 1),
+                    modifier = avatarModifier,
+                )
+            } else {
+                ContactAvatar(
+                    contactItem = contactItem,
+                    modifier = avatarModifier.clip(CircleShape),
+                )
+            }
+        }
         if (contactItem.areCredentialsVerified) {
             Image(
                 modifier = Modifier
@@ -278,10 +300,11 @@ private fun PreviewContactItem() {
     )
 }
 
-internal val contactItemForPreviews = ContactItem(
-    handle = -1,
-    email = "email@mega.nz",
-    contactData = ContactData("Full name", "Alias", null),
+internal val contactItemForPreviews get() = contactItemForPreviews(-1)
+internal fun contactItemForPreviews(id: Int) = ContactItem(
+    handle = id.toLong(),
+    email = "email$id@mega.nz",
+    contactData = ContactData("Full name $id", "Alias $id", null),
     defaultAvatarColor = "blue",
     visibility = UserVisibility.Visible,
     timestamp = 2345262L,

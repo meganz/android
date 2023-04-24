@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -33,7 +34,9 @@ import mega.privacy.android.core.ui.theme.grey_alpha_026
 
 @Composable
 internal fun FileInfoHeader(
-    viewState: FileInfoViewState,
+    previewUri: String?,
+    iconResource: Int?,
+    accessPermissionDescription: Int?,
     modifier: Modifier = Modifier,
 ) {
     ConstraintLayout(
@@ -43,14 +46,18 @@ internal fun FileInfoHeader(
         val (shadowTop, shadowBottom, icon, permission) = createRefs()
 
         //preview or icon
-        if (viewState.hasPreview) {
-            viewState.actualPreviewUriString?.let { uri ->
-                PreviewWithShadow(shadowBottom, shadowTop, uri)
-            }
+        if (previewUri != null) {
+            PreviewWithShadow(
+                shadowBottom,
+                shadowTop,
+                previewUri,
+                Modifier.testTag(TEST_TAG_PREVIEW)
+            )
         } else {
-            viewState.iconResource?.let { icRes ->
+            iconResource?.let { icRes ->
                 Image(
                     modifier = Modifier
+                        .testTag(TEST_TAG_ICON)
                         .constrainAs(icon) {
                             start.linkTo(parent.start, 16.dp)
                             top.linkTo(parent.top, 44.dp)
@@ -62,22 +69,21 @@ internal fun FileInfoHeader(
                 )
             }
 
-
             //permission text
-            if (viewState.isIncomingSharedNode) {
-                viewState.accessPermission.description()?.let { strRes ->
-                    Text(
-                        text = stringResource(id = strRes),
-                        style = MaterialTheme.typography.body2.copy(
-                            color = MaterialTheme.colors.textColorSecondary,
-                            letterSpacing = (-0.025).sp
-                        ),
-                        modifier = Modifier.constrainAs(permission) {
+            accessPermissionDescription?.let { strRes ->
+                Text(
+                    text = stringResource(id = strRes),
+                    style = MaterialTheme.typography.body2.copy(
+                        color = MaterialTheme.colors.textColorSecondary,
+                        letterSpacing = (-0.025).sp
+                    ),
+                    modifier = Modifier
+                        .testTag(TEST_TAG_ACCESS)
+                        .constrainAs(permission) {
                             start.linkTo(parent.start, paddingStartDefault.dp)
                             bottom.linkTo(parent.bottom, 5.dp)
                         }
-                    )
-                }
+                )
             }
         }
     }
@@ -88,10 +94,11 @@ private fun ConstraintLayoutScope.PreviewWithShadow(
     shadowTop: ConstrainedLayoutReference,
     shadowBottom: ConstrainedLayoutReference,
     previewString: String,
+    modifier: Modifier = Modifier,
 ) {
 
     Image(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         painter = rememberAsyncImagePainter(model = previewString),
         contentDescription = "Preview"
     )
@@ -143,8 +150,14 @@ private fun FileInfoHeaderPreview(
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FileInfoHeader(
-            viewState = viewState,
-            modifier = Modifier.height(182.dp)
+            previewUri = viewState.actualPreviewUriString,
+            iconResource = viewState.iconResource,
+            accessPermissionDescription = viewState.accessPermission.description(),
+            modifier = Modifier.height(182.dp),
         )
     }
 }
+
+internal const val TEST_TAG_PREVIEW = "TestTagPreview"
+internal const val TEST_TAG_ICON = "TestTagIcon"
+internal const val TEST_TAG_ACCESS = "TestTagAccess"

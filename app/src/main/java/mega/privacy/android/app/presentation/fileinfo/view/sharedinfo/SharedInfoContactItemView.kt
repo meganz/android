@@ -31,6 +31,7 @@ import mega.privacy.android.domain.entity.shares.AccessPermission
 @Composable
 internal fun SharedInfoContactItemView(
     contactItem: ContactPermission,
+    selected: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
     onMoreOptionsClick: () -> Unit,
@@ -49,6 +50,7 @@ internal fun SharedInfoContactItemView(
         statusOverride = contactItem.accessPermission.description()?.let {
             stringResource(id = it)
         } ?: "",
+        selected = selected,
         includeDivider = false,
     )
     IconButton(
@@ -69,6 +71,7 @@ private fun SharedInfoContactItemViewPreview() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         SharedInfoContactItemView(
             contactItem = ContactPermission(contactItemForPreviews, AccessPermission.READWRITE),
+            selected = false,
             onClick = {},
             onLongClick = {},
             onMoreOptionsClick = {},

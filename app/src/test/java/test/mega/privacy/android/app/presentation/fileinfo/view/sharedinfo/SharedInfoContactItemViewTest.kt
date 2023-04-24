@@ -41,7 +41,8 @@ class SharedInfoContactItemViewTest {
                 contactItem = contactItem,
                 onClick = clickEvent,
                 onLongClick = longClickEvent,
-                onMoreOptionsClick = moreOptionsClickEvent
+                onMoreOptionsClick = moreOptionsClickEvent,
+                selected = false,
             )
         }
     }

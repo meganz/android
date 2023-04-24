@@ -38,10 +38,12 @@ internal fun FileInfoContent(
     onLocationClick: () -> Unit,
     availableOfflineChanged: (checked: Boolean) -> Unit,
     onVersionsClick: () -> Unit,
-    onSharedWithContactClick: (ContactPermission) -> Unit,
-    onSharedWithContactLongClick: (ContactPermission) -> Unit,
-    onSharedWithContactMoreOptionsClick: (ContactPermission) -> Unit,
-    onShowMoreSharedWithContactsClick: () -> Unit,
+    onContactClick: (ContactPermission) -> Unit,
+    onContactSelected: (ContactPermission) -> Unit,
+    onContactUnselected: (ContactPermission) -> Unit,
+    onContactsClosed: () -> Unit,
+    onContactMoreOptionsClick: (ContactPermission) -> Unit,
+    onShowMoreContactsClick: () -> Unit,
     onPublicLinkCopyClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -96,12 +98,32 @@ internal fun FileInfoContent(
             if (outShares.isNotEmpty()) {
                 SharedInfoView(
                     contacts = outShares,
+                    selectedContacts = outShareContactsSelected,
                     expanded = isShareContactExpanded,
-                    onHeaderClick = { isShareContactExpanded = !isShareContactExpanded },
-                    onContactClick = onSharedWithContactClick,
-                    onContactLongClick = onSharedWithContactLongClick,
-                    onMoreOptionsClick = onSharedWithContactMoreOptionsClick,
-                    onShowMoreContactsClick = onShowMoreSharedWithContactsClick,
+                    onHeaderClick = {
+                        if (isShareContactExpanded) {
+                            onContactsClosed()
+                        }
+                        isShareContactExpanded = !isShareContactExpanded
+                    },
+                    onContactClick = {
+                        if (viewState.outShareContactsSelected.contains(it.contactItem.email)) {
+                            onContactUnselected(it)
+                        } else if (viewState.outShareContactsSelected.isEmpty()) {
+                            onContactClick(it)
+                        } else {
+                            onContactSelected(it)
+                        }
+                    },
+                    onContactLongClick = {
+                        if (viewState.outShareContactsSelected.contains(it.contactItem.email)) {
+                            onContactUnselected(it)
+                        } else {
+                            onContactSelected(it)
+                        }
+                    },
+                    onContactMoreOptionsClick = onContactMoreOptionsClick,
+                    onShowMoreContactsClick = onShowMoreContactsClick,
                 )
                 FileInfoContentDivider()
             }
@@ -198,10 +220,12 @@ private fun FileInfoContentPreview(
                 state = state.copy(isAvailableOffline = !state.isAvailableOffline)
             },
             onVersionsClick = {},
-            onSharedWithContactClick = {},
-            onSharedWithContactLongClick = {},
-            onSharedWithContactMoreOptionsClick = {},
-            onShowMoreSharedWithContactsClick = {},
+            onContactClick = {},
+            onContactSelected = {},
+            onContactUnselected = {},
+            onContactsClosed = {},
+            onContactMoreOptionsClick = {},
+            onShowMoreContactsClick = {},
             onPublicLinkCopyClick = {},
             onLocationClick = {},
             modifier = Modifier.verticalScroll(scrollState)

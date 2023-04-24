@@ -38,11 +38,13 @@ class SharedInfoViewTest {
             SharedInfoView(
                 contacts = contacts(MAX_CONTACTS_TO_SHOW + 1),
                 expanded = true,
+                selectedContacts = emptyList(),
                 onHeaderClick = {},
                 onContactClick = {},
                 onContactLongClick = {},
-                onMoreOptionsClick = {},
-                onShowMoreContactsClick = {})
+                onContactMoreOptionsClick = {},
+                onShowMoreContactsClick = {}
+            )
         }
         composeTestRule.onAllNodesWithTag(TEST_TAG_CONTACT_ITEM_SHARED)
             .assertCountEquals(MAX_CONTACTS_TO_SHOW)
@@ -54,11 +56,13 @@ class SharedInfoViewTest {
             SharedInfoView(
                 contacts = contacts(MAX_CONTACTS_TO_SHOW + 1),
                 expanded = true,
+                selectedContacts = emptyList(),
                 onHeaderClick = {},
                 onContactClick = {},
                 onContactLongClick = {},
-                onMoreOptionsClick = {},
-                onShowMoreContactsClick = {})
+                onContactMoreOptionsClick = {},
+                onShowMoreContactsClick = {},
+            )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_SHOW_MORE, useUnmergedTree = true).assertExists()
     }
@@ -69,11 +73,13 @@ class SharedInfoViewTest {
             SharedInfoView(
                 contacts = contacts(MAX_CONTACTS_TO_SHOW),
                 expanded = true,
+                selectedContacts = emptyList(),
                 onHeaderClick = {},
                 onContactClick = {},
                 onContactLongClick = {},
-                onMoreOptionsClick = {},
-                onShowMoreContactsClick = {})
+                onContactMoreOptionsClick = {},
+                onShowMoreContactsClick = {},
+            )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_SHOW_MORE, useUnmergedTree = true)
             .assertDoesNotExist()
@@ -85,11 +91,13 @@ class SharedInfoViewTest {
             SharedInfoView(
                 contacts = contacts(MAX_CONTACTS_TO_SHOW),
                 expanded = false,
+                selectedContacts = emptyList(),
                 onHeaderClick = {},
                 onContactClick = {},
                 onContactLongClick = {},
-                onMoreOptionsClick = {},
-                onShowMoreContactsClick = {})
+                onContactMoreOptionsClick = {},
+                onShowMoreContactsClick = {},
+            )
         }
         composeTestRule.onNodeWithTag(TEST_TAG_CONTACT_ITEM_SHARED).assertDoesNotExist()
     }
@@ -101,10 +109,11 @@ class SharedInfoViewTest {
             SharedInfoView(
                 contacts = contacts(MAX_CONTACTS_TO_SHOW),
                 expanded = false,
+                selectedContacts = emptyList(),
                 onHeaderClick = onHeaderClick,
                 onContactClick = {},
                 onContactLongClick = {},
-                onMoreOptionsClick = {},
+                onContactMoreOptionsClick = {},
                 onShowMoreContactsClick = {}
             )
         }

@@ -69,4 +69,29 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     object Delete : MenuActionWithoutIcon(
         R.string.general_remove,
     ), FileInfoMenuAction
+
+    sealed interface SelectionModeAction : FileInfoMenuAction {
+        object SelectAll : MenuActionWithoutIcon(
+            R.string.action_select_all
+        ), SelectionModeAction
+
+        object ClearSelection : MenuActionWithoutIcon(
+            R.string.action_unselect_all
+        ), SelectionModeAction
+
+        object ChangePermission : MenuActionString(
+            R.drawable.ic_change_permissions_w,
+            R.string.file_properties_shared_folder_change_permissions,
+
+            ), SelectionModeAction
+
+        object Remove : MenuActionString(
+            R.drawable.ic_close_white,
+            R.string.context_remove,
+        ), SelectionModeAction
+
+        companion object {
+            fun all() = listOf(SelectAll, ClearSelection, ChangePermission, Remove)
+        }
+    }
 }

@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -30,6 +33,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
+import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.utils.LocationInfo
@@ -45,6 +49,7 @@ import kotlin.time.Duration.Companion.days
 /**
  * View to render the File Info Screen, including toolbar, content, etc.
  */
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun FileInfoScreen(
     viewState: FileInfoViewState,
@@ -54,7 +59,8 @@ internal fun FileInfoScreen(
     availableOfflineChanged: (checked: Boolean) -> Unit,
     onVersionsClick: () -> Unit,
     onSharedWithContactClick: (ContactPermission) -> Unit,
-    onSharedWithContactLongClick: (ContactPermission) -> Unit,
+    onSharedWithContactSelected: (ContactPermission) -> Unit,
+    onSharedWithContactUnselected: (ContactPermission) -> Unit,
     onSharedWithContactMoreOptionsClick: (ContactPermission) -> Unit,
     onShowMoreSharedWithContactsClick: () -> Unit,
     onPublicLinkCopyClick: () -> Unit,
@@ -65,6 +71,7 @@ internal fun FileInfoScreen(
     Box(modifier = modifier.fillMaxSize()) {
         val density = LocalDensity.current.density
         val tintColorBase = MaterialTheme.colors.onSurface
+        val actionModeSelect = viewState.outShareContactsSelected.isNotEmpty()
         val headerHeight by remember {
             derivedStateOf { headerMaxHeight - (scrollState.value / density).coerceAtLeast(0f) }
         }
@@ -88,7 +95,10 @@ internal fun FileInfoScreen(
             }
         }
         FileInfoHeader(
-            viewState = viewState,
+            previewUri = viewState.actualPreviewUriString?.takeIf { viewState.hasPreview },
+            iconResource = viewState.iconResource,
+            accessPermissionDescription = viewState.accessPermission.description()
+                ?.takeIf { viewState.isIncomingSharedNode },
             modifier = Modifier
                 .alpha(alpha)
                 .height(headerHeight.dp)
@@ -96,15 +106,27 @@ internal fun FileInfoScreen(
         Scaffold(
             backgroundColor = Color.Transparent,
             topBar = {
-                FileInfoTopBar(
-                    viewState = viewState,
-                    tintColor = tintColor,
-                    opacityTransitionDelta = topBarOpacityTransitionDelta,
-                    onBackPressed = onBackPressed,
-                    onActionClick = onMenuActionClick,
-                )
+                Crossfade(
+                    targetState = actionModeSelect,
+                ) { actionModeSelect ->
+                    if (actionModeSelect) {
+                        FileInfoSelectActionModeTopBar(
+                            count = viewState.outShareContactsSelected.size,
+                            onActionClick = onMenuActionClick
+                        )
+                    } else {
+                        FileInfoTopBar(
+                            title = viewState.title,
+                            actions = viewState.actions,
+                            tintColor = tintColor,
+                            opacityTransitionDelta = topBarOpacityTransitionDelta,
+                            onBackPressed = onBackPressed,
+                            onActionClick = onMenuActionClick,
+                        )
+                    }
+                }
             }) { innerPadding ->
-            BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                 //to set the minimum height of the colum so it's always possible to collapse the header
                 val boxWithConstraintsScope = this
                 Column(
@@ -112,17 +134,19 @@ internal fun FileInfoScreen(
                         .verticalScroll(scrollState)
                         .padding(innerPadding)
                 ) {
-                    Spacer(Modifier.height(spacerHeight.dp))
+                    Spacer(Modifier.height(spacerHeight.dp)) //to give space for the header (that it's outside this column)
                     FileInfoContent(
                         viewState = viewState,
                         onLinkClick = onLinkClick,
                         onLocationClick = onLocationClick,
                         availableOfflineChanged = availableOfflineChanged,
                         onVersionsClick = onVersionsClick,
-                        onSharedWithContactClick = onSharedWithContactClick,
-                        onSharedWithContactLongClick = onSharedWithContactLongClick,
-                        onSharedWithContactMoreOptionsClick = onSharedWithContactMoreOptionsClick,
-                        onShowMoreSharedWithContactsClick = onShowMoreSharedWithContactsClick,
+                        onContactClick = onSharedWithContactClick,
+                        onContactSelected = onSharedWithContactSelected,
+                        onContactUnselected = onSharedWithContactUnselected,
+                        onContactMoreOptionsClick = onSharedWithContactMoreOptionsClick,
+                        onContactsClosed = { onMenuActionClick(FileInfoMenuAction.SelectionModeAction.ClearSelection) },
+                        onShowMoreContactsClick = onShowMoreSharedWithContactsClick,
                         onPublicLinkCopyClick = onPublicLinkCopyClick,
                         modifier = Modifier.heightIn(
                             min = boxWithConstraintsScope.maxHeight
@@ -143,6 +167,7 @@ private fun FileInfoScreenPreview(
     var state by mutableStateOf(viewState) //not remembered to allow multiple states in device, don't do that in real code, just in previews
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FileInfoScreen(
+            modifier = Modifier.background(color = MaterialTheme.colors.background),
             viewState = state,
             onBackPressed = {},
             onLinkClick = {},
@@ -151,12 +176,30 @@ private fun FileInfoScreenPreview(
             },
             onVersionsClick = {},
             onSharedWithContactClick = {},
-            onSharedWithContactLongClick = {},
+            onSharedWithContactSelected = {
+                state =
+                    state.copy(outShareContactsSelected = state.outShareContactsSelected + it.contactItem.email)
+            },
+            onSharedWithContactUnselected = {
+                state =
+                    state.copy(outShareContactsSelected = state.outShareContactsSelected - it.contactItem.email)
+            },
             onSharedWithContactMoreOptionsClick = {},
             onShowMoreSharedWithContactsClick = {},
             onPublicLinkCopyClick = {},
             onLocationClick = {},
-            onMenuActionClick = {},
+            onMenuActionClick = { action ->
+                when (action) {
+                    FileInfoMenuAction.SelectionModeAction.ClearSelection -> {
+                        state = state.copy(outShareContactsSelected = emptyList())
+                    }
+                    FileInfoMenuAction.SelectionModeAction.SelectAll -> {
+                        state = state.copy(
+                            outShareContactsSelected = state.outShares.map { it.contactItem.email })
+                    }
+                    else -> {}
+                }
+            },
         )
     }
 }
@@ -211,6 +254,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             creationTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
             modificationTime = Instant.now().epochSecond,
             hasPreview = true,
+            actions = listOf(FileInfoMenuAction.Move, FileInfoMenuAction.Copy)
         )
 
         val viewStateFile2 = FileInfoViewState(
@@ -225,7 +269,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             thumbnailUriString = null,
             folderTreeInfo = null,
             outShares = List(6) {
-                ContactPermission(contactItemForPreviews, AccessPermission.READWRITE)
+                ContactPermission(contactItemForPreviews(it), AccessPermission.READWRITE)
             },
             nodeLocationInfo = LocationInfo("Cloud drive"),
             isAvailableOffline = false,
@@ -245,6 +289,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             creationTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
             modificationTime = null,
             hasPreview = false,
+            actions = listOf(FileInfoMenuAction.Move, FileInfoMenuAction.Copy)
         )
 
         val viewStateFolder = FileInfoViewState(
@@ -276,6 +321,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             creationTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
             modificationTime = Instant.now().epochSecond,
             hasPreview = false,
+            actions = listOf(FileInfoMenuAction.Move, FileInfoMenuAction.Copy)
         )
 
         val viewStateFolder2 = FileInfoViewState(
@@ -294,7 +340,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             isAvailableOfflineEnabled = true,
             isAvailableOfflineAvailable = false,
             outShares = List(6) {
-                ContactPermission(contactItemForPreviews, AccessPermission.READWRITE)
+                ContactPermission(contactItemForPreviews(it), AccessPermission.READWRITE)
             },
             inShareOwnerContactItem = contactItemForPreviews,
             accessPermission = AccessPermission.FULL,
@@ -310,6 +356,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             creationTime = Instant.now().epochSecond - 10.days.inWholeSeconds,
             modificationTime = Instant.now().epochSecond,
             hasPreview = false,
+            actions = listOf(FileInfoMenuAction.Move, FileInfoMenuAction.Copy)
         )
     }
 }
