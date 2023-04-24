@@ -64,7 +64,7 @@ android {
 
         testInstrumentationRunner "test.mega.privacy.android.app.HiltTestRunner"
 
-        resourceConfigurations += ["en", "ar", "de", "es", "fr", "id", "it", "ja", "ko", "nl", "pl", "pt", "ro", "ru", "th", "vi", "zh-rCN", "zh-rTW"]
+        resourceConfigurations += ["en", "ar", "de", "es", "fr", "in", "it", "ja", "ko", "nl", "pl", "pt", "ro", "ru", "th", "vi", "zh-rCN", "zh-rTW"]
     }
 
     sourceSets {
