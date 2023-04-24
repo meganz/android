@@ -16,6 +16,7 @@ import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
+import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
@@ -57,6 +59,8 @@ class FolderLinkViewModelTest {
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase = mock()
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase = mock()
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
+    private val addNodeType: AddNodeType = mock()
+    private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -85,7 +89,9 @@ class FolderLinkViewModelTest {
             setViewType,
             fetchFolderNodesUseCase,
             getFolderParentNodeUseCase,
-            getFolderLinkChildrenNodesUseCase
+            getFolderLinkChildrenNodesUseCase,
+            addNodeType,
+            getIntentToOpenFileMapper
         )
     }
 
@@ -107,7 +113,7 @@ class FolderLinkViewModelTest {
             assertThat(initial.parentNode).isNull()
             assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
             assertThat(initial.title).isEqualTo("")
-            assertThat(initial.isMultipleSelect).isFalse()
+            assertThat(initial.selectedNodeCount).isEqualTo(0)
             assertThat(initial.finishActivity).isFalse()
             assertThat(initial.errorDialogTitle).isEqualTo(-1)
             assertThat(initial.errorDialogContent).isEqualTo(-1)
@@ -279,7 +285,7 @@ class FolderLinkViewModelTest {
             underTest.fetchNodes(base64Handle)
             underTest.onItemLongClick(nodeUIItem)
             val newValue = expectMostRecentItem()
-            assertThat(newValue.isMultipleSelect).isTrue()
+            assertThat(newValue.selectedNodeCount).isGreaterThan(0)
             assertThat(newValue.nodesList[0].isSelected).isTrue()
         }
     }
@@ -296,7 +302,7 @@ class FolderLinkViewModelTest {
             underTest.fetchNodes(base64Handle)
             underTest.onSelectAllClicked()
             val newValue = expectMostRecentItem()
-            assertThat(newValue.isMultipleSelect).isTrue()
+            assertThat(newValue.selectedNodeCount).isGreaterThan(0)
             newValue.nodesList.forEach {
                 assertThat(it.isSelected).isTrue()
             }
@@ -315,13 +321,13 @@ class FolderLinkViewModelTest {
             underTest.fetchNodes(base64Handle)
             underTest.onSelectAllClicked()
             var newValue = expectMostRecentItem()
-            assertThat(newValue.isMultipleSelect).isTrue()
+            assertThat(newValue.selectedNodeCount).isGreaterThan(0)
             newValue.nodesList.forEach {
                 assertThat(it.isSelected).isTrue()
             }
             underTest.onClearAllClicked()
             newValue = expectMostRecentItem()
-            assertThat(newValue.isMultipleSelect).isFalse()
+            assertThat(newValue.selectedNodeCount).isEqualTo(0)
             newValue.nodesList.forEach {
                 assertThat(it.isSelected).isFalse()
             }

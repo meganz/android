@@ -1,12 +1,15 @@
 package mega.privacy.android.app.presentation.folderlink
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
@@ -24,11 +28,16 @@ import mega.privacy.android.app.presentation.extensions.errorDialogContentId
 import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
+import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
+import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.exception.FetchFolderNodesException
+import mega.privacy.android.domain.usecase.AddNodeType
 import mega.privacy.android.domain.usecase.HasCredentials
 import mega.privacy.android.domain.usecase.RootNodeExistsUseCase
 import mega.privacy.android.domain.usecase.folderlink.FetchFolderNodesUseCase
@@ -59,6 +68,8 @@ class FolderLinkViewModel @Inject constructor(
     private val fetchFolderNodesUseCase: FetchFolderNodesUseCase,
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
+    private val addNodeType: AddNodeType,
+    private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper
 ) : ViewModel() {
 
     /**
@@ -336,13 +347,14 @@ class FolderLinkViewModel @Inject constructor(
      */
     fun onItemLongClick(nodeUIItem: NodeUIItem) {
         val list = _state.value.nodesList
-        list.firstOrNull { it.id.longValue == nodeUIItem.id.longValue }
-            ?.apply { isSelected = !isSelected }
+        val index = list.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
+        val newNode = NodeUIItem(nodeUIItem.node, !nodeUIItem.isSelected, false)
+        val newNodesList = list.updateItemAt(index = index, item = newNode)
 
-        val isMultipleSelect = list.count { it.isSelected } > 0
+        val selectedNodeCount = newNodesList.count { it.isSelected }
 
         _state.update {
-            it.copy(nodesList = list, isMultipleSelect = isMultipleSelect)
+            it.copy(nodesList = newNodesList, selectedNodeCount = selectedNodeCount)
         }
     }
 
@@ -358,7 +370,7 @@ class FolderLinkViewModel @Inject constructor(
         val list = _state.value.nodesList
         list.forEach { it.isSelected = true }
         _state.update {
-            it.copy(nodesList = list, isMultipleSelect = true)
+            it.copy(nodesList = list, selectedNodeCount = list.size)
         }
     }
 
@@ -369,7 +381,7 @@ class FolderLinkViewModel @Inject constructor(
         val list = _state.value.nodesList
         list.forEach { it.isSelected = false }
         _state.update {
-            it.copy(nodesList = list, isMultipleSelect = false)
+            it.copy(nodesList = list, selectedNodeCount = 0)
         }
     }
 
@@ -464,4 +476,64 @@ class FolderLinkViewModel @Inject constructor(
             } ?: Timber.w("url NULL")
         }
     }
+
+    /**
+     * Handle item click
+     *
+     * @param nodeUIItem    Item that is clicked
+     * @param activity      Activity
+     */
+    fun onItemClick(nodeUIItem: NodeUIItem, activity: Activity) {
+        viewModelScope.launch {
+            if (isMultipleNodeSelected()) {
+                onItemLongClick(nodeUIItem)
+            } else {
+                if (nodeUIItem.node is FolderNode) {
+                    openFolder(nodeUIItem)
+                } else if (nodeUIItem.node is FileNode) {
+                    runCatching {
+                        getIntentToOpenFileMapper(
+                            activity = activity,
+                            fileNode = nodeUIItem.node,
+                            Constants.FOLDER_LINK_ADAPTER
+                        )
+                    }.onSuccess { intent ->
+                        intent?.let { _state.update { it.copy(openFile = triggered(intent)) } }
+                    }.onFailure {
+                        Timber.e("itemClick:ERROR:httpServerGetLocalLink")
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Navigate to selected folder
+     *
+     * @param nodeUIItem    Folder node to navigate to
+     */
+    private fun openFolder(nodeUIItem: NodeUIItem) {
+        viewModelScope.launch {
+            val children = getFolderLinkChildrenNodesUseCase(nodeUIItem.id.longValue, null)
+            _state.update {
+                it.copy(
+                    parentNode = addNodeType(nodeUIItem.node as FolderNode) as TypedFolderNode,
+                    title = nodeUIItem.name,
+                    nodesList = children.map { childNode ->
+                        NodeUIItem(childNode, isSelected = false, isInvisible = false)
+                    }
+                )
+            }
+        }
+    }
+
+    /**
+     * Get if multiple nodes are selected
+     */
+    private fun isMultipleNodeSelected(): Boolean = state.value.selectedNodeCount > 0
+
+    /**
+     * Reset and notify that openFile event is consumed
+     */
+    fun resetOpenFile() = _state.update { it.copy(openFile = consumed()) }
 }

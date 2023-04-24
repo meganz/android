@@ -282,7 +282,7 @@ fun NodesView(
  */
 @Composable
 private fun rememberNodeListForGrid(nodeUIItems: List<NodeUIItem>, spanCount: Int) =
-    remember(key1 = nodeUIItems.size) {
+    remember(key1 = nodeUIItems.count { it.isSelected } + nodeUIItems.size) {
         val folderCount = nodeUIItems.count {
             it.node is FolderNode
         }

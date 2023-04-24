@@ -1,8 +1,13 @@
 package mega.privacy.android.app.presentation.folderlink
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -18,6 +23,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
+import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.main.DecryptAlertDialog
 import mega.privacy.android.app.main.ManagerActivity
@@ -27,11 +33,14 @@ import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
 import mega.privacy.android.app.presentation.login.LoginActivity
 import mega.privacy.android.app.presentation.transfers.TransfersManagementActivity
 import mega.privacy.android.app.utils.AlertDialogUtil
+import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -54,11 +63,28 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
 
     private var mKey: String? = null
     private var statusDialog: AlertDialog? = null
+    private val nodeSaver = NodeSaver(
+        this, this, this,
+        showSaveToDeviceConfirmDialog(this)
+    )
+
+    private val storagePermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+            nodeSaver.handleRequestPermissionsResult(Constants.REQUEST_WRITE_STORAGE)
+        }
+
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            viewModel.handleBackPress()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFolderLinkComposeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 
         binding.folderLinkView.apply {
             setContent {
@@ -85,15 +111,34 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onMoreClicked = { },
                 stringUtilWrapper = stringUtilWrapper,
                 onMenuClick = { },
-                onItemClicked = { },
+                onItemClicked = { viewModel.onItemClick(it, this) },
                 onLongClick = viewModel::onItemLongClick,
                 onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                 onSortOrderClick = { },
                 onSelectAllActionClicked = viewModel::onSelectAllClicked,
                 onClearAllActionClicked = viewModel::onClearAllClicked,
                 onSaveToDeviceClicked = { },
+                onOpenFile = ::onOpenFile,
+                onResetOpenFile = viewModel::resetOpenFile,
                 getEmptyViewString()
             )
+        }
+    }
+
+    /**
+     * Open the selected file in a separate activity
+     *
+     * @param intent    Intent of the activity to open
+     */
+    private fun onOpenFile(intent: Intent) {
+        try {
+            startActivity(intent)
+        } catch (e: Exception) {
+            Toast.makeText(
+                this,
+                getString(R.string.intent_not_available),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
@@ -232,6 +277,40 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         }
 
         return HtmlCompat.fromHtml(textToShow, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
+    }
+
+    /**
+     * Download nodes
+     *
+     * @param nodes List of nodes to download
+     */
+    fun downloadNodes(nodes: List<MegaNode>) {
+        val hasStoragePermission =
+            PermissionUtils.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (!hasStoragePermission) {
+            storagePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            return
+        }
+        PermissionUtils.checkNotificationsPermission(this)
+        nodeSaver.saveNodes(
+            nodes,
+            highPriority = false,
+            isFolderLink = true,
+            fromMediaViewer = false,
+            needSerialize = false
+        )
+    }
+
+    @SuppressLint("CheckResult")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+        Timber.d("onActivityResult")
+        if (intent == null) {
+            return
+        }
+        if (nodeSaver.handleActivityResult(this, requestCode, resultCode, intent)) {
+            return
+        }
     }
 
     companion object {

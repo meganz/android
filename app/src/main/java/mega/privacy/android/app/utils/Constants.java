@@ -282,6 +282,8 @@ public class Constants {
     public static final String INTENT_EXTRA_KEY_VIEWER_FROM = "viewerFrom";
     public static final String INTENT_EXTRA_KEY_FROM_DOWNLOAD_SERVICE = "fromDownloadService";
     public static final String INTENT_EXTRA_KEY_INSIDE = "inside";
+
+    public static final String INTENT_EXTRA_KEY_APP = "APP";
     public static final String INTENT_EXTRA_KEY_IS_URL = "isUrl";
     public static final String INTENT_EXTRA_KEY_POSITION = "position";
     public static final String INTENT_EXTRA_KEY_IS_FOLDER_LINK = "isFolderLink";

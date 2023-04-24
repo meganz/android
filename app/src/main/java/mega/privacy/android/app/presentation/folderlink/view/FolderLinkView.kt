@@ -1,6 +1,7 @@
 package mega.privacy.android.app.presentation.folderlink.view
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -40,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
@@ -67,6 +69,8 @@ internal fun FolderLinkView(
     onSelectAllActionClicked: () -> Unit,
     onClearAllActionClicked: () -> Unit,
     onSaveToDeviceClicked: () -> Unit,
+    onOpenFile: (Intent) -> Unit,
+    onResetOpenFile: () -> Unit,
     emptyViewString: String,
 ) {
     val listState = rememberLazyListState()
@@ -83,10 +87,16 @@ internal fun FolderLinkView(
     val title =
         if (!state.isNodesFetched) "MEGA - ${stringResource(id = R.string.general_loading)}" else state.title
 
+    EventEffect(
+        event = state.openFile,
+        onConsumed = onResetOpenFile,
+        action = onOpenFile
+    )
+
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
-            if (state.isMultipleSelect) {
+            if (state.selectedNodeCount > 0) {
                 FolderLinkSelectedTopAppBar(
                     title = title,
                     elevation = !firstItemVisible,

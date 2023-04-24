@@ -12,9 +12,19 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.main.PdfViewerActivity
+import mega.privacy.android.app.presentation.folderlink.FolderLinkComposeActivity
 import mega.privacy.android.app.textEditor.TextEditorActivity
 import mega.privacy.android.app.textEditor.TextEditorViewModel
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.Constants.AUTHORITY_STRING_FILE_PROVIDER
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_ADAPTER_TYPE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_APP
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_FILE_NAME
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_INSIDE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_IS_FOLDER_LINK
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE
+import mega.privacy.android.app.utils.Constants.INTENT_EXTRA_KEY_PLACEHOLDER
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.FileNode
@@ -65,16 +75,25 @@ class GetIntentToOpenFileMapper @Inject constructor(
     suspend operator fun invoke(
         activity: Activity,
         fileNode: FileNode,
+        viewType: Int
     ): Intent? {
         return if (MimeTypeList.typeForName(fileNode.name).isPdf) {
             val mimeType = MimeTypeList.typeForName(fileNode.name).type
             val pdfIntent = Intent(activity, PdfViewerActivity::class.java)
-            pdfIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            pdfIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
 
-            pdfIntent.putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER)
-            pdfIntent.putExtra("inside", true)
-            pdfIntent.putExtra("APP", true)
+            pdfIntent.apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
+                putExtra(
+                    INTENT_EXTRA_KEY_IS_FOLDER_LINK,
+                    viewType == Constants.FOLDER_LINK_ADAPTER
+                )
+                putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
+                putExtra(INTENT_EXTRA_KEY_INSIDE, true)
+                putExtra(INTENT_EXTRA_KEY_APP, true)
+            }
 
             getLocalFileForNode(fileNode)?.let {
                 val path = it.path
@@ -82,7 +101,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     pdfIntent.setDataAndType(
                         FileProvider.getUriForFile(
                             activity,
-                            "mega.privacy.android.app.providers.fileprovider",
+                            AUTHORITY_STRING_FILE_PROVIDER,
                             it
                         ),
                         MimeTypeList.typeForName(fileNode.name).type
@@ -100,8 +119,8 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     getFileUrlByNodeHandle(fileNode.id.longValue) ?: throw UrlDownloadException()
                 pdfIntent.setDataAndType(Uri.parse(path), mimeType)
             }
-            pdfIntent.putExtra("HANDLE", fileNode.id.longValue)
             pdfIntent
+
         } else if (MimeTypeList.typeForName(fileNode.name).isURL) {
             val intent = Intent(Intent.ACTION_VIEW)
             val br = getLocalFileForNode(fileNode)?.let {
@@ -121,13 +140,15 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 intent.data = Uri.parse(url)
             }
             intent
+
         } else if (MimeTypeList.typeForName(fileNode.name)
                 .isOpenableTextFile(fileNode.size)
         ) {
             val textFileIntent = Intent(activity, TextEditorActivity::class.java)
-            textFileIntent.putExtra(Constants.INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
+            textFileIntent.putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
                 .putExtra(TextEditorViewModel.MODE, TextEditorViewModel.VIEW_MODE)
             textFileIntent
+
         } else if (MimeTypeList.typeForName(fileNode.name).isVideoMimeType ||
             MimeTypeList.typeForName(fileNode.name).isAudio
         ) {
@@ -146,14 +167,16 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     Pair(Util.getMediaIntent(activity, fileNode.name), true)
                 }
 
-            intentInternalIntentPair.first.putExtra(
-                "placeholder",
-                0
-            )
+            intentInternalIntentPair.first.putExtra(INTENT_EXTRA_KEY_PLACEHOLDER, 0)
             intentInternalIntentPair.first.apply {
-                putExtra("FILENAME", fileNode.name)
-                putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER)
-                putExtra("parentNodeHandle", -1L)
+                putExtra(INTENT_EXTRA_KEY_ADAPTER_TYPE, viewType)
+                putExtra(
+                    INTENT_EXTRA_KEY_IS_FOLDER_LINK,
+                    viewType == Constants.FOLDER_LINK_ADAPTER
+                )
+                putExtra(INTENT_EXTRA_KEY_HANDLE, fileNode.id.longValue)
+                putExtra(INTENT_EXTRA_KEY_FILE_NAME, fileNode.name)
+                putExtra(INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
             }
             getLocalFileForNode(fileNode)?.let {
                 val path = it.path
@@ -161,7 +184,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     intentInternalIntentPair.first.setDataAndType(
                         FileProvider.getUriForFile(
                             activity,
-                            "mega.privacy.android.app.providers.fileprovider",
+                            AUTHORITY_STRING_FILE_PROVIDER,
                             it
                         ),
                         MimeTypeList.typeForName(fileNode.name).type
@@ -179,7 +202,6 @@ class GetIntentToOpenFileMapper @Inject constructor(
                     getFileUrlByNodeHandle(fileNode.id.longValue) ?: throw UrlDownloadException()
                 intentInternalIntentPair.first.setDataAndType(Uri.parse(path), mimeType)
             }
-            intentInternalIntentPair.first.putExtra("HANDLE", fileNode.id.longValue)
             if (opusFile) {
                 intentInternalIntentPair.first.setDataAndType(
                     intentInternalIntentPair.first.data,
@@ -187,6 +209,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 )
             }
             intentInternalIntentPair.first
+
         } else if (MimeTypeList.typeForName(fileNode.name).isImage) {
             ImageViewerActivity.getIntentForParentNode(
                 activity,
@@ -194,15 +217,20 @@ class GetIntentToOpenFileMapper @Inject constructor(
                 getCloudSortOrder(),
                 fileNode.id.longValue
             )
+
         } else {
-            getNodeByHandle(fileNode.id.longValue)?.let {
-                MegaNodeUtil.onNodeTapped(
-                    activity,
-                    it,
-                    (activity as ManagerActivity)::saveNodeByTap,
-                    activity,
-                    activity
-                )
+            getNodeByHandle(fileNode.id.longValue)?.let { node ->
+                if (viewType == Constants.FOLDER_LINK_ADAPTER) {
+                    (activity as FolderLinkComposeActivity).downloadNodes(listOf(node))
+                } else {
+                    MegaNodeUtil.onNodeTapped(
+                        activity,
+                        node,
+                        (activity as ManagerActivity)::saveNodeByTap,
+                        activity,
+                        activity
+                    )
+                }
             }
             null
         }

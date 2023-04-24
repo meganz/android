@@ -1,6 +1,9 @@
 package mega.privacy.android.app.presentation.folderlink.model
 
+import android.content.Intent
 import androidx.annotation.StringRes
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
@@ -25,8 +28,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property parentNode                 Parent node of the nodes shown
  * @property currentViewType            Whether list or grid view
  * @property title                      Title of the folder
- * @property isMultipleSelect           Whether multiple nodes are selected
+ * @property selectedNodeCount          Count of nodes selected
  * @property finishActivity             Whether to finish the activity
+ * @property openFile                   State to handle file opening
  * @property errorDialogTitle           String id of title for error dialog
  * @property errorDialogContent         String id of content for error dialog
  * @property snackBarMessage            String id of content for snack bar
@@ -48,8 +52,9 @@ data class FolderLinkState(
     val parentNode: TypedFolderNode? = null,
     val currentViewType: ViewType = ViewType.LIST,
     val title: String = "",
-    val isMultipleSelect: Boolean = false,
+    val selectedNodeCount: Int = 0,
     val finishActivity: Boolean = false,
+    val openFile: StateEventWithContent<Intent> = consumed(),
     @StringRes val errorDialogTitle: Int = -1,
     @StringRes val errorDialogContent: Int = -1,
     @StringRes val snackBarMessage: Int = -1,

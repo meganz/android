@@ -40,6 +40,8 @@ class FolderLinkViewTest {
                 onSelectAllActionClicked = { },
                 onClearAllActionClicked = { },
                 onSaveToDeviceClicked = { },
+                onOpenFile = { },
+                onResetOpenFile = { },
                 emptyViewString = stringResource(id = R.string.file_browser_empty_folder)
             )
         }
@@ -63,7 +65,7 @@ class FolderLinkViewTest {
     fun `test that correct toolbar is displayed when node is selected`() {
         val title = "1 selected"
         setComposeContent(
-            FolderLinkState(isNodesFetched = true, title = title, isMultipleSelect = true)
+            FolderLinkState(isNodesFetched = true, title = title, selectedNodeCount = 1)
         )
         composeTestRule.onNodeWithContentDescription(fromId(R.string.general_back_button))
             .assertIsDisplayed()

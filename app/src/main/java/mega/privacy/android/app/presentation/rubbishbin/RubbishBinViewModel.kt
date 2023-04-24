@@ -16,6 +16,7 @@ import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.presentation.rubbishbin.model.RubbishBinState
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -419,5 +420,6 @@ class RubbishBinViewModel @Inject constructor(
         getIntentToOpenFileMapper(
             activity = activity,
             fileNode = fileNode,
+            Constants.RUBBISH_BIN_ADAPTER
         )
 }
