@@ -41,7 +41,7 @@ data class MyAccountHomeUIState(
     val canVerifyPhoneNumber: Boolean = false,
     val avatar: File? = null,
     val avatarColor: Int? = null,
-    val accountType: AccountType? = AccountType.FREE,
+    val accountType: AccountType? = null,
     val isBusinessAccount: Boolean = false,
     val isMasterBusinessAccount: Boolean = false,
     val isAchievementsEnabled: Boolean = false,

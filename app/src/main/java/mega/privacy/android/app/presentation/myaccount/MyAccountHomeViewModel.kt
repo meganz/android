@@ -183,19 +183,27 @@ class MyAccountHomeViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching {
                 val accountDetails = getAccountDetailsUseCase(false)
+                _uiState.update {
+                    it.copy(
+                        accountType = accountDetails.accountTypeIdentifier,
+                        isBusinessAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
+                        isMasterBusinessAccount = accountDetails.isMasterBusinessAccount,
+                    )
+                }
+
                 val isBusinessStatusActive = getBusinessStatusUseCase().let { status ->
                     (status == BusinessAccountStatus.GracePeriod || status == BusinessAccountStatus.Expired).not()
                 }
+                _uiState.update {
+                    it.copy(isBusinessStatusActive = isBusinessStatusActive)
+                }
+
                 val achievements = getAccountAchievements(
                     AchievementType.MEGA_ACHIEVEMENT_ADD_PHONE,
                     awardIndex = 0,
                 )
                 _uiState.update {
                     it.copy(
-                        accountType = accountDetails.accountTypeIdentifier,
-                        isBusinessAccount = accountDetails.isBusinessAccount && accountDetails.accountTypeIdentifier == AccountType.BUSINESS,
-                        isMasterBusinessAccount = accountDetails.isMasterBusinessAccount,
-                        isBusinessStatusActive = isBusinessStatusActive,
                         isAchievementsEnabled = achievements != null,
                         bonusStorageSms = achievements?.grantedStorage ?: 0
                     )

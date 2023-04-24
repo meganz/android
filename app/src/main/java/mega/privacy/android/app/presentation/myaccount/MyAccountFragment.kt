@@ -128,7 +128,6 @@ class MyAccountFragment : Fragment(), Scrollable {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.refreshAccountInfo()
         messageResultCallback = activity as? MessageResultCallback
     }
 
@@ -256,7 +255,6 @@ class MyAccountFragment : Fragment(), Scrollable {
      */
     override fun onDestroy() {
         super.onDestroy()
-
         changeApiServerDialog?.dismiss()
     }
 
@@ -382,9 +380,7 @@ class MyAccountFragment : Fragment(), Scrollable {
 
     private fun setAchievements(isAchievementsEnabled: Boolean) {
         binding.achievementsLayout.apply {
-            isVisible = isAchievementsEnabled
-
-            if (!isVisible) {
+            if (!isVisible || isAchievementsEnabled.not()) {
                 return@apply
             }
 
