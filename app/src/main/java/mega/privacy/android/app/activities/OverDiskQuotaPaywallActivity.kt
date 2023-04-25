@@ -43,7 +43,6 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
 
     private var timer: CountDownTimer? = null
 
-    private var scrollContentLayout: ScrollView? = null
     private var overDiskQuotaPaywallText: TextView? = null
     private var deletionWarningText: TextView? = null
     private var dismissButton: Button? = null
@@ -76,8 +75,6 @@ class OverDiskQuotaPaywallActivity : PasscodeActivity(), View.OnClickListener {
         setContentView(R.layout.activity_over_disk_quota_paywall)
 
         setDrawUnderStatusBar(this, true)
-
-        scrollContentLayout = findViewById(R.id.scroll_content_layout)
 
         overDiskQuotaPaywallText = findViewById(R.id.over_disk_quota_paywall_text)
         deletionWarningText = findViewById(R.id.over_disk_quota_paywall_deletion_warning)
