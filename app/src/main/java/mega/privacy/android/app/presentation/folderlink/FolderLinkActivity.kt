@@ -684,14 +684,14 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                             askForDecryptionKeyDialog()
                         }
                         else -> {
-                            try {
+                            if (it.errorDialogTitle != -1 && it.errorDialogContent != -1) {
                                 Timber.w("Show error dialog")
                                 showErrorDialog(it.errorDialogTitle, it.errorDialogContent)
-
-                            } catch (ex: Exception) {
+                            } else if (it.snackBarMessage != -1) {
                                 showSnackbar(it.snackBarMessage)
                                 finish()
                             }
+
                         }
                     }
                 }
