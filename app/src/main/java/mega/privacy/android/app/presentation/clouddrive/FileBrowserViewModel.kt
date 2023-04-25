@@ -10,9 +10,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
@@ -34,6 +36,7 @@ import javax.inject.Inject
  * @param monitorNodeUpdates Monitor node updates
  * @param getFileBrowserParentNodeHandle To get parent handle of current node
  * @param getIsNodeInRubbish To get current node is in rubbish
+ * @param getFileBrowserChildrenUseCase [GetFileBrowserChildrenUseCase]
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
@@ -43,6 +46,7 @@ class FileBrowserViewModel @Inject constructor(
     private val monitorNodeUpdates: MonitorNodeUpdates,
     private val getFileBrowserParentNodeHandle: GetParentNodeHandle,
     private val getIsNodeInRubbish: IsNodeInRubbish,
+    private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -180,12 +184,29 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun refreshNodes() {
         viewModelScope.launch {
+            val nodeList =
+                getNodeUiItems(getFileBrowserChildrenUseCase(_state.value.fileBrowserHandle))
             _state.update {
                 it.copy(
                     nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList(),
-                    parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle)
+                    parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle),
+                    nodesList = nodeList
                 )
             }
+        }
+    }
+
+    /**
+     * This will map list of [Node] to [NodeUIItem]
+     */
+    private fun getNodeUiItems(nodeList: List<Node>): List<NodeUIItem> {
+        val existingNodeList = _state.value.nodesList
+        return nodeList.mapIndexed { index, it ->
+            NodeUIItem(
+                node = it,
+                isSelected = if (existingNodeList.size > index) existingNodeList[index].isSelected else false,
+                isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false
+            )
         }
     }
 

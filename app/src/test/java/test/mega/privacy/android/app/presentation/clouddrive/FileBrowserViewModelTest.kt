@@ -12,6 +12,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
+import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
@@ -48,6 +49,7 @@ class FileBrowserViewModelTest {
     }
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
+    private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -65,7 +67,8 @@ class FileBrowserViewModelTest {
             monitorMediaDiscoveryView = monitorMediaDiscoveryView,
             monitorNodeUpdates = monitorNodeUpdates,
             getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle,
-            getIsNodeInRubbish = isNodeInRubbish
+            getIsNodeInRubbish = isNodeInRubbish,
+            getFileBrowserChildrenUseCase = getFileBrowserChildrenUseCase
         )
     }
 
@@ -79,6 +82,7 @@ class FileBrowserViewModelTest {
             assertThat(initial.nodes).isEmpty()
             assertThat(initial.parentHandle).isNull()
             assertThat(initial.mediaHandle).isEqualTo(-1L)
+            assertThat(initial.nodesList).isEmpty()
         }
     }
 
@@ -116,6 +120,9 @@ class FileBrowserViewModelTest {
             whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(
                 listOf(mock(), mock())
             )
+            whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(
+                listOf(mock(), mock())
+            )
             val update = mapOf<Node, List<NodeChanges>>(
                 mock<Node>() to emptyList(),
                 mock<Node>() to emptyList()
@@ -130,9 +137,11 @@ class FileBrowserViewModelTest {
         runTest {
             val newValue = 123456789L
             whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(null)
+            whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
             underTest.setBrowserParentHandle(newValue)
             assertThat(underTest.state.value.nodes.size).isEqualTo(0)
             verify(getBrowserChildrenNode, times(1)).invoke(newValue)
+            verify(getFileBrowserChildrenUseCase, times(1)).invoke(newValue)
         }
 
     @Test
@@ -225,10 +234,14 @@ class FileBrowserViewModelTest {
     fun `test that when handle on back pressed and parent handle is not null, then getBrowserChildrenNode is invoked once`() =
         runTest {
             val newValue = 123456789L
-            // to update handles rubbishBinHandle
+            // to update handles fileBrowserHandle
+            whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(
+                listOf(mock(), mock())
+            )
             underTest.setBrowserParentHandle(newValue)
             underTest.onBackPressed()
             verify(getBrowserChildrenNode, times(1)).invoke(newValue)
+            verify(getFileBrowserChildrenUseCase, times(1)).invoke(newValue)
         }
 
     @Test

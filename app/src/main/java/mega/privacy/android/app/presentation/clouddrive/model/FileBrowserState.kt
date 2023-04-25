@@ -1,5 +1,6 @@
 package mega.privacy.android.app.presentation.clouddrive.model
 
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
@@ -14,6 +15,7 @@ import nz.mega.sdk.MegaNode
  * @property parentHandle Parent Handle of current Node
  * @property mediaHandle MediaHandle of current Node
  * @property isPendingRefresh
+ * @property nodesList list of [NodeUIItem]
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -23,4 +25,5 @@ data class FileBrowserState(
     val parentHandle: Long? = null,
     val mediaHandle: Long = -1L,
     val isPendingRefresh: Boolean = false,
+    val nodesList: List<NodeUIItem> = emptyList()
 )
