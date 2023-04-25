@@ -50,9 +50,9 @@ import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.StartUpload
-import mega.privacy.android.app.globalmanagement.TransfersManagement.Companion.addCompletedTransfer
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
+import mega.privacy.android.app.presentation.transfers.model.mapper.CompletedTransferMapper
 import mega.privacy.android.app.receivers.CameraServiceIpChangeHandler
 import mega.privacy.android.app.receivers.CameraServiceWakeLockHandler
 import mega.privacy.android.app.receivers.CameraServiceWifiLockHandler
@@ -130,6 +130,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocal
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
 import mega.privacy.android.domain.usecase.login.GetSessionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.transfer.AddCompletedTransferUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -558,6 +559,19 @@ class CameraUploadsService : LifecycleService() {
      */
     @Inject
     lateinit var createTempFileAndRemoveCoordinatesUseCase: CreateTempFileAndRemoveCoordinatesUseCase
+
+    /**
+     * Add completed transfer to local storage
+     */
+    @Inject
+    lateinit var addCompletedTransferUseCase: AddCompletedTransferUseCase
+
+    /**
+     * Temporary mapper that convert a CompletedTransfer to legacy model [AndroidCompletedTransfer]
+     * Should be removed once [AndroidCompletedTransfer] removed from codebase
+     */
+    @Inject
+    lateinit var completedTransferMapper: CompletedTransferMapper
 
     /**
      * Coroutine Scope for camera upload work
@@ -1685,10 +1699,8 @@ class CameraUploadsService : LifecycleService() {
     private suspend fun transferFinished(transfer: MegaTransfer, e: MegaError) {
         val path = transfer.path
         if (transfer.state == MegaTransfer.STATE_COMPLETED) {
-            addCompletedTransfer(
-                AndroidCompletedTransfer(transfer, e, this),
-                tempDbHandler
-            )
+            val androidCompletedTransfer = AndroidCompletedTransfer(transfer, e, this)
+            addCompletedTransferUseCase(completedTransferMapper(androidCompletedTransfer))
         }
 
         if (e.errorCode == MegaError.API_OK) {

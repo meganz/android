@@ -54,15 +54,14 @@ class CompletedTransfersFragment : TransfersBaseFragment() {
         binding.transfersEmptyText.text = TextUtil.formatEmptyScreenText(requireContext(),
             getString(R.string.completed_transfers_empty_new))
 
-        adapter = MegaCompletedTransfersAdapter(context = requireActivity(),
+        adapter = MegaCompletedTransfersAdapter(
+            context = requireActivity(),
             transfers = viewModel.getCompletedTransfers(),
-            megaApi = megaApi)
+            megaApi = megaApi
+        )
         setupFlow()
-        setCompletedTransfers()
         binding.transfersListView.adapter = adapter
     }
-
-    private fun setCompletedTransfers() = viewModel.setCompletedTransfers()
 
     private fun setupFlow() {
         viewModel.completedState.flowWithLifecycle(

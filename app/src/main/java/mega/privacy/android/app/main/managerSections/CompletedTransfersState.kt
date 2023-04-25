@@ -16,7 +16,7 @@ sealed class CompletedTransfersState {
     ) : CompletedTransfersState()
 
     /**
-    ß * Update when the transfer is finished
+     * Update when the transfer is finished
      *
      * @property newTransfers updated [AndroidCompletedTransfer] list
      */

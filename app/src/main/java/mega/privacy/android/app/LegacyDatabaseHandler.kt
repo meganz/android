@@ -25,7 +25,7 @@ interface LegacyDatabaseHandler : DatabaseHandler {
      *
      * @return The list with the completed transfers.
      */
-    val completedTransfers: ArrayList<AndroidCompletedTransfer?>
+    val completedTransfers: List<AndroidCompletedTransfer?>
 
     /**
      * Gets the completed transfers which have as state cancelled or failed.

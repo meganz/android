@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.presentation.transfers.model.mapper.AndroidCompletedTransferMapper
 import mega.privacy.android.app.utils.Constants.INVALID_POSITION
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.data.database.DatabaseHandler.Companion.MAX_TRANSFERS
@@ -23,6 +24,7 @@ import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
@@ -49,7 +51,9 @@ class TransfersViewModel @Inject constructor(
     private val moveTransferToLastByTagUseCase: MoveTransferToLastByTagUseCase,
     private val getTransferByTagUseCase: GetTransferByTagUseCase,
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase,
-    private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
+    monitorTransferEventsUseCase: MonitorTransferEventsUseCase,
+    monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase,
+    androidCompletedTransferMapper: AndroidCompletedTransferMapper,
 ) : ViewModel() {
     private val _activeState = MutableStateFlow<ActiveTransfersState>(ActiveTransfersState.Default)
 
@@ -91,6 +95,7 @@ class TransfersViewModel @Inject constructor(
 
     init {
         getAllActiveTransfers()
+        setCompletedTransfers()
         viewModelScope.launch {
             monitorTransferEventsUseCase()
                 .catch { Timber.e(it) }
@@ -109,6 +114,14 @@ class TransfersViewModel @Inject constructor(
                         is TransferEvent.TransferDataEvent,
                         -> Unit
                     }
+                }
+        }
+        viewModelScope.launch {
+            monitorCompletedTransferEventUseCase()
+                .catch { Timber.e(it) }
+                .collect {
+                    val androidCompletedTransfer = androidCompletedTransferMapper(it)
+                    completedTransferFinished(androidCompletedTransfer)
                 }
         }
     }

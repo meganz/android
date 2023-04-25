@@ -1,19 +1,27 @@
 package mega.privacy.android.app.main.managerSections
 
 import app.cash.turbine.test
-import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.AndroidCompletedTransfer
 import mega.privacy.android.app.LegacyDatabaseHandler
 import mega.privacy.android.app.globalmanagement.TransfersManagement
+import mega.privacy.android.app.presentation.transfers.model.mapper.AndroidCompletedTransferMapper
+import mega.privacy.android.domain.entity.transfer.CompletedTransfer
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.usecase.transfer.GetInProgressTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.GetTransferByTagUseCase
+import mega.privacy.android.domain.usecase.transfer.MonitorCompletedTransferEventUseCase
 import mega.privacy.android.domain.usecase.transfer.MonitorFailedTransfer
 import mega.privacy.android.domain.usecase.transfer.MonitorTransferEventsUseCase
 import mega.privacy.android.domain.usecase.transfer.MoveTransferBeforeByTagUseCase
@@ -29,6 +37,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.math.BigInteger
 
+@ExperimentalCoroutinesApi
 internal class TransfersViewModelTest {
     private lateinit var underTest: TransfersViewModel
     private val transfersManagement: TransfersManagement = mock()
@@ -41,10 +50,12 @@ internal class TransfersViewModelTest {
     private val getTransferByTagUseCase: GetTransferByTagUseCase = mock()
     private val getInProgressTransfersUseCase: GetInProgressTransfersUseCase = mock()
     private val monitorTransferEventsUseCase: MonitorTransferEventsUseCase = mock()
+    private val monitorCompletedTransferEventUseCase: MonitorCompletedTransferEventUseCase = mock()
+    private val androidCompletedTransferMapper: AndroidCompletedTransferMapper = mock()
 
     @Before
     fun setUp() {
-        Dispatchers.setMain(ioDispatcher)
+        Dispatchers.setMain(StandardTestDispatcher())
         initViewModel()
     }
 
@@ -59,7 +70,9 @@ internal class TransfersViewModelTest {
             moveTransferToLastByTagUseCase = moveTransferToLastByTagUseCase,
             getTransferByTagUseCase = getTransferByTagUseCase,
             getInProgressTransfersUseCase = getInProgressTransfersUseCase,
-            monitorTransferEventsUseCase = monitorTransferEventsUseCase
+            monitorTransferEventsUseCase = monitorTransferEventsUseCase,
+            monitorCompletedTransferEventUseCase = monitorCompletedTransferEventUseCase,
+            androidCompletedTransferMapper = androidCompletedTransferMapper,
         )
     }
 
@@ -79,6 +92,7 @@ internal class TransfersViewModelTest {
             whenever(moveTransferToFirstByTagUseCase.invoke(transferTag)).thenReturn(Unit)
             underTest.getAllActiveTransfers()
             underTest.moveTransfer(transfer, 0)
+            advanceUntilIdle()
             verify(getTransferByTagUseCase, times(1)).invoke(transferTag)
         }
 
@@ -101,10 +115,11 @@ internal class TransfersViewModelTest {
             whenever(moveTransferToLastByTagUseCase.invoke(any())).thenReturn(Unit)
             underTest.getAllActiveTransfers()
             underTest.moveTransfer(transfers.first(), transfers.lastIndex)
+            advanceUntilIdle()
             verify(moveTransferToLastByTagUseCase, times(1)).invoke(any())
             verify(getTransferByTagUseCase, times(1)).invoke(transfers.first().tag)
             underTest.activeState.test {
-                Truth.assertThat(awaitItem())
+                assertThat(awaitItem())
                     .isInstanceOf(ActiveTransfersState.TransferMovementFinishedUpdated::class.java)
             }
         }
@@ -128,11 +143,35 @@ internal class TransfersViewModelTest {
             whenever(moveTransferBeforeByTagUseCase.invoke(any(), any())).thenReturn(Unit)
             underTest.getAllActiveTransfers()
             underTest.moveTransfer(transfers.first(), 2)
+            advanceUntilIdle()
             verify(moveTransferBeforeByTagUseCase, times(1)).invoke(any(), any())
             verify(getTransferByTagUseCase, times(1)).invoke(transfers.first().tag)
             underTest.activeState.test {
-                Truth.assertThat(awaitItem())
+                assertThat(awaitItem())
                     .isInstanceOf(ActiveTransfersState.TransferMovementFinishedUpdated::class.java)
             }
         }
+
+    @Test
+    fun `test that when a completed transfer event is received, the completed transfer list state is updated with the added completed transfer`() =
+        runTest {
+            val completedTransfer = mock<CompletedTransfer>()
+            val expected = mock<AndroidCompletedTransfer>()
+
+            whenever(dbH.completedTransfers).thenReturn(emptyList())
+            whenever(monitorCompletedTransferEventUseCase()).thenReturn(
+                flow { emit(completedTransfer) }
+            )
+            whenever(androidCompletedTransferMapper.invoke(completedTransfer)).thenReturn(expected)
+
+            underTest.completedState.test {
+                assertThat(awaitItem()).isEqualTo(CompletedTransfersState.TransfersUpdated(emptyList()))
+                assertThat(awaitItem()).isEqualTo(
+                    CompletedTransfersState.TransferFinishUpdated(
+                        listOf(expected)
+                    )
+                )
+            }
+        }
+
 }
