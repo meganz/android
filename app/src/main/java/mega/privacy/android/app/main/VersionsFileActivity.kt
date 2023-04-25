@@ -323,7 +323,6 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
         ) { _, bundle -> handleResult(bundle) }
 
         bottomSheetDialogFragment = VersionsBottomSheetDialogFragment.newInstance(
-            accessLevel = accessLevel,
             nodeHandle = selectedNodeHandle,
             selectedPosition = selectedPosition,
         ).also { it.show(supportFragmentManager, it.tag) }

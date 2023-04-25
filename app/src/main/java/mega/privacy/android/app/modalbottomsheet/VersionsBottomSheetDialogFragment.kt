@@ -5,16 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.databinding.BottomSheetVersionsFileBinding
 import mega.privacy.android.app.presentation.versions.dialog.VersionsBottomSheetDialogViewModel
+import mega.privacy.android.app.presentation.versions.dialog.model.VersionsBottomSheetDialogState
 import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
-import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaShare
 
 /**
  * [BaseBottomSheetDialogFragment] that displays the list of options when selecting the Menu icon
@@ -27,10 +27,6 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private val binding get() = _binding!!
 
     private val viewModel by viewModels<VersionsBottomSheetDialogViewModel>()
-
-    private val accessLevel by lazy { arguments?.getInt(ACCESS_LEVEL) }
-    private val nodeHandle by lazy { arguments?.getLong(NODE_HANDLE) }
-    private val selectedPosition by lazy { arguments?.getInt(SELECTED_POSITION) }
 
     /**
      * onCreateView
@@ -46,7 +42,6 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         itemsLayout = binding.itemListBottomSheetContactFile
         binding.setupViews()
 
-        viewModel.init(nodeHandle)
         return binding.root
     }
 
@@ -118,51 +113,33 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
      * Establishes the ViewModel Observers
      */
     private fun setupObservers() {
-        viewLifecycleOwner.collectFlow(viewModel.state) { state ->
-            state.node?.let { binding.setupContent(it) }
+        viewLifecycleOwner.collectFlow(viewModel.state) { uiState ->
+            binding.setupContent(uiState)
         }
     }
 
     /**
      * Sets up the View content
      *
-     * @param node The Node to set the content
+     * @param uiState The UI State
      */
-    private fun BottomSheetVersionsFileBinding.setupContent(node: MegaNode) {
-        with(this) {
-            versionsFileNameText.text = node.name
-            versionsFileInfoText.text = MegaNodeUtil.getFileInfo(
-                node = node,
-                context = requireContext(),
-            )
-            ModalBottomSheetUtil.setNodeThumbnail(
-                context = requireContext(),
-                node = node,
-                nodeThumb = versionsFileThumbnail,
-            )
-            val isRevertVisible = when (accessLevel) {
-                MegaShare.ACCESS_READWRITE -> {
-                    optionDeleteLayout.visibility = View.GONE
-                    separatorDelete.visibility = View.GONE
-                    true
-                }
-                MegaShare.ACCESS_FULL, MegaShare.ACCESS_OWNER -> {
-                    optionDeleteLayout.visibility = View.VISIBLE
-                    separatorDelete.visibility = View.VISIBLE
-                    true
-                }
-                else -> {
-                    optionDeleteLayout.visibility = View.GONE
-                    separatorDelete.visibility = View.GONE
-                    false
-                }
-            }
-            if (!isRevertVisible || selectedPosition == 0) {
-                optionRevertLayout.visibility = View.GONE
-                separatorRevert.visibility = View.GONE
-            } else {
-                optionRevertLayout.visibility = View.VISIBLE
-                separatorRevert.visibility = View.VISIBLE
+    private fun BottomSheetVersionsFileBinding.setupContent(uiState: VersionsBottomSheetDialogState) {
+        uiState.node?.let { node ->
+            with(this) {
+                versionsFileNameText.text = node.name
+                versionsFileInfoText.text = MegaNodeUtil.getFileInfo(
+                    node = node,
+                    context = requireContext(),
+                )
+                ModalBottomSheetUtil.setNodeThumbnail(
+                    context = requireContext(),
+                    node = node,
+                    nodeThumb = versionsFileThumbnail,
+                )
+                optionDeleteLayout.isVisible = uiState.canDeleteVersion
+                separatorDelete.isVisible = uiState.canDeleteVersion
+                optionRevertLayout.isVisible = uiState.canRevertVersion
+                separatorRevert.isVisible = uiState.canRevertVersion
             }
         }
     }
@@ -193,28 +170,30 @@ class VersionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
          */
         const val REQUEST_KEY_VERSIONS_DIALOG = "REQUEST_KEY_VERSIONS_DIALOG"
 
-        // Properties
-        private const val ACCESS_LEVEL = "ACCESS_LEVEL"
-        private const val NODE_HANDLE = "NODE_HANDLE"
-        private const val SELECTED_POSITION = "SELECTED_POSITION"
+        /**
+         * Parameter Key to receive the Node Handle
+         */
+        const val PARAM_NODE_HANDLE = "PARAM_NODE_HANDLE"
+
+        /**
+         * Parameter Key to receive the Version's selected position
+         */
+        const val PARAM_SELECTED_POSITION = "PARAM_SELECTED_POSITION"
 
         /**
          * Instantiates [VersionsBottomSheetDialogFragment] with properties
          *
-         * @param accessLevel The Node Access Level
          * @param nodeHandle A potentially nullable Node Handle
          * @param selectedPosition The selected position
          */
         fun newInstance(
-            accessLevel: Int,
             nodeHandle: Long?,
             selectedPosition: Int,
         ): VersionsBottomSheetDialogFragment {
             val fragment = VersionsBottomSheetDialogFragment()
             fragment.arguments = bundleOf(
-                ACCESS_LEVEL to accessLevel,
-                NODE_HANDLE to nodeHandle,
-                SELECTED_POSITION to selectedPosition,
+                PARAM_NODE_HANDLE to nodeHandle,
+                PARAM_SELECTED_POSITION to selectedPosition,
             )
             return fragment
         }
