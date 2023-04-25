@@ -150,12 +150,12 @@ class SMSVerificationViewModelTest {
     }
 
     @Test
-    fun `test that sms send code states are updated when verification code is send`() = runTest {
+    fun `test that sms send code states are updated when verification code is sent`() = runTest {
         val phoneNumber = "+012324567"
         val expected =
             getInitialState().copy(
                 isVerificationCodeSent = true,
-                isNextEnabled = false,
+                isNextEnabled = true,
                 phoneNumber = phoneNumber
             )
         whenever(formatPhoneNumber(any(), any())).thenReturn(phoneNumber)

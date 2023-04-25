@@ -238,6 +238,7 @@ class SMSVerificationViewModel @Inject constructor(
                     _uiState.update { state ->
                         state.copy(
                             isVerificationCodeSent = true,
+                            isNextEnabled = true
                         )
                     }
                 }.onFailure { error ->

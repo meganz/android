@@ -1,6 +1,7 @@
 package test.mega.privacy.android.app.presentation.verification
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -45,6 +46,7 @@ class SMSVerificationViewTest {
             onNodeWithText(state.countryCodeText).assertIsDisplayed()
             onNodeWithText(R.string.verify_account_phone_number_placeholder).assertIsDisplayed()
             onNodeWithTag(NEXT_BUTTON_TEST_TAG).assertIsDisplayed()
+            onNodeWithTag(NEXT_BUTTON_TEST_TAG).assertIsEnabled()
         }
     }
 

@@ -81,7 +81,7 @@ data class SMSVerificationUIState(
     /**
      * whether sent button should be disabled or not
      */
-    val isNextEnabled: Boolean = false,
+    val isNextEnabled: Boolean = true,
 
     ) {
     /**
