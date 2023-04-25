@@ -132,7 +132,7 @@ class InfoAchievementsFragment : Fragment() {
                 setFirstParagraphText(
                     getString(
                         R.string.result_paragraph_info_achievement_install_mobile_app,
-                        awardedStorage
+                        Util.getSizeString(awardedStorage, context)
                     )
                 )
             }
