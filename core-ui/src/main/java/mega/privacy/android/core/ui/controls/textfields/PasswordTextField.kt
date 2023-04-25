@@ -92,7 +92,7 @@ fun PasswordTextField(
         BasicTextField(
             value = text,
             onValueChange = onTextChange,
-            modifier = modifier
+            modifier = Modifier
                 .background(Color.Transparent)
                 .indicatorLine(true, isError, interactionSource, colors)
                 .fillMaxWidth()
@@ -123,7 +123,7 @@ fun PasswordTextField(
                 label = {
                     Text(
                         text = stringResource(id = R.string.password_text),
-                        modifier = modifier.padding(bottom = if (isFocused) 6.dp else 0.dp),
+                        modifier = Modifier.padding(bottom = if (isFocused) 6.dp else 0.dp),
                         style = when {
                             isError -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error)
                             isFocused -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)

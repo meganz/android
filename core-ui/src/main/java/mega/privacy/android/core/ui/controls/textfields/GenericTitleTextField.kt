@@ -74,7 +74,7 @@ fun GenericTitleTextField(
         isCharLimitError = text.length > charLimit
     }
 
-    Column {
+    Column(modifier = modifier) {
         if (value.isNotEmpty()) {
             validate(value)
         }
@@ -109,7 +109,7 @@ fun GenericTitleTextField(
             @OptIn(ExperimentalMaterialApi::class)
             BasicTextField(
                 value = value,
-                modifier = modifier
+                modifier = Modifier
                     .defaultMinSize(
                         minWidth = TextFieldDefaults.MinWidth,
                         minHeight = 48.dp

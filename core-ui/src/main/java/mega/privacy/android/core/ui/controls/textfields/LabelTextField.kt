@@ -84,7 +84,7 @@ fun LabelTextField(
         BasicTextField(
             value = text,
             onValueChange = onTextChange,
-            modifier = modifier
+            modifier = Modifier
                 .background(Color.Transparent)
                 .indicatorLine(true, isError, interactionSource, colors)
                 .fillMaxWidth()
@@ -110,7 +110,7 @@ fun LabelTextField(
                 label = {
                     Text(
                         text = label,
-                        modifier = modifier.padding(bottom = if (isFocused) 6.dp else 0.dp),
+                        modifier = Modifier.padding(bottom = if (isFocused) 6.dp else 0.dp),
                         style = when {
                             isError -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error)
                             isFocused -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)

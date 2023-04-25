@@ -78,7 +78,7 @@ fun GenericTextField(
         BasicTextField(
             value = text,
             onValueChange = onTextChange,
-            modifier = modifier
+            modifier = Modifier
                 .background(Color.Transparent)
                 .indicatorLine(true, isError, interactionSource, colors)
                 .fillMaxWidth(),
