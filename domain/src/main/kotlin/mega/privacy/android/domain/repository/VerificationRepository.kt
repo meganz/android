@@ -12,6 +12,16 @@ import mega.privacy.android.domain.entity.verification.VerifiedPhoneNumber
 interface VerificationRepository {
 
     /**
+     * Set the status for RequestPhoneNumber
+     */
+    suspend fun setRequestPhoneNumberShown(isShown: Boolean)
+
+    /**
+     * Checks if request phone number is already shown before or not from Data Store,The default value is set to false
+     */
+    suspend fun isRequestPhoneNumberShown(): Boolean
+
+    /**
      * Set the status for SMSVerification
      */
     suspend fun setSMSVerificationShown(isShown: Boolean)

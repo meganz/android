@@ -14,6 +14,7 @@ import mega.privacy.android.data.extensions.getRequestListener
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.preferences.RequestPhoneNumberPreferencesGateway
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.CountryCallingCodeMapper
 import mega.privacy.android.data.mapper.verification.SmsPermissionMapper
@@ -35,6 +36,7 @@ import javax.inject.Inject
  * @property telephonyGateway
  * @property countryCallingCodeMapper
  * @property smsPermissionMapper
+ * @property requestPhoneNumberPreferencesGateway
  * @property appScope
  */
 internal class DefaultVerificationRepository @Inject constructor(
@@ -44,10 +46,19 @@ internal class DefaultVerificationRepository @Inject constructor(
     private val telephonyGateway: TelephonyGateway,
     private val countryCallingCodeMapper: CountryCallingCodeMapper,
     private val smsPermissionMapper: SmsPermissionMapper,
-    @ApplicationScope private val appScope: CoroutineScope,
+    private val requestPhoneNumberPreferencesGateway: RequestPhoneNumberPreferencesGateway,
+    @ApplicationScope
+    private val appScope: CoroutineScope,
 ) : VerificationRepository {
 
     private val verifiedPhoneNumberFlow = MutableSharedFlow<VerifiedPhoneNumber>(replay = 1)
+
+    override suspend fun setRequestPhoneNumberShown(isShown: Boolean) {
+        requestPhoneNumberPreferencesGateway.setRequestPhoneNumberPreference(isShown)
+    }
+
+    override suspend fun isRequestPhoneNumberShown() =
+        requestPhoneNumberPreferencesGateway.isRequestPhoneNumberPreferenceShown()
 
     override suspend fun setSMSVerificationShown(isShown: Boolean) =
         appEventGateway.setSMSVerificationShown(isShown)

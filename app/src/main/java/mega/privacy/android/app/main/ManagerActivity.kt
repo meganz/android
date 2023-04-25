@@ -346,6 +346,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.Transfer
 import mega.privacy.android.domain.entity.transfer.TransferState
 import mega.privacy.android.domain.qualifier.ApplicationScope
+import mega.privacy.android.domain.usecase.IsRequestPhoneNumberShownUseCase
+import mega.privacy.android.domain.usecase.SetRequestPhoneNumberShownUseCase
 import mega.privacy.android.feature.sync.ui.SyncFragment
 import nz.mega.sdk.MegaAccountDetails
 import nz.mega.sdk.MegaAchievementsDetails
@@ -376,7 +378,8 @@ import javax.inject.Inject
 @Suppress("KDocMissingDocumentation")
 @AndroidEntryPoint
 class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterface,
-    MegaChatRequestListenerInterface, NavigationView.OnNavigationItemSelectedListener, View.OnClickListener,
+    MegaChatRequestListenerInterface, NavigationView.OnNavigationItemSelectedListener,
+    View.OnClickListener,
     BottomNavigationView.OnNavigationItemSelectedListener, UploadBottomSheetDialogActionListener,
     ChatManagementCallback, ActionNodeCallback, SnackbarShower,
     MeetingBottomSheetDialogActionListener, LoadPreviewListener.OnPreviewLoadedCallback,
@@ -410,6 +413,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
     internal val rubbishBinViewModel: RubbishBinViewModel by viewModels()
     internal val searchViewModel: SearchViewModel by viewModels()
     private val userInfoViewModel: UserInfoViewModel by viewModels()
+
+    @Inject
+    lateinit var isRequestPhoneNumberShownUseCase: IsRequestPhoneNumberShownUseCase
+
+    @Inject
+    lateinit var setRequestPhoneNumberShownUseCase: SetRequestPhoneNumberShownUseCase
 
     @Inject
     lateinit var checkPasswordReminderUseCase: CheckPasswordReminderUseCase
@@ -9661,6 +9670,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             searchView?.requestFocus()
         }
     }
+
 
     fun hideKeyboardSearch() {
         Util.hideKeyboard(this)

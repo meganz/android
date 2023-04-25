@@ -8,3 +8,10 @@ import javax.inject.Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 @Qualifier
 internal annotation class CameraTimestampsPreference
+
+/**
+ * Annotation for RequestPhoneNumberPreferencesDataStore
+ */
+@Retention(AnnotationRetention.RUNTIME)
+@Qualifier
+internal annotation class RequestPhoneNumberPreference

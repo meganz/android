@@ -45,6 +45,7 @@ class DefaultVerificationRepositoryTest {
             countryCallingCodeMapper = countryCallingCodeMapper,
             appScope = CoroutineScope(SupervisorJob() + UnconfinedTestDispatcher()),
             smsPermissionMapper = mock(),
+            requestPhoneNumberPreferencesGateway = mock(),
         )
     }
 

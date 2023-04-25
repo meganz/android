@@ -289,13 +289,19 @@ class SqliteDatabaseHandler @Inject constructor(
         }
         if (oldVersion <= 8) {
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_LAST_UPLOAD_FOLDER TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_LAST_UPLOAD_FOLDER = '" + encrypt(
-                "") + "';")
+            db.execSQL(
+                "UPDATE $TABLE_PREFERENCES SET $KEY_LAST_UPLOAD_FOLDER = '" + encrypt(
+                    ""
+                ) + "';"
+            )
         }
         if (oldVersion <= 9) {
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_LAST_CLOUD_FOLDER_HANDLE TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_LAST_CLOUD_FOLDER_HANDLE = '" + encrypt(
-                "") + "';")
+            db.execSQL(
+                "UPDATE $TABLE_PREFERENCES SET $KEY_LAST_CLOUD_FOLDER_HANDLE = '" + encrypt(
+                    ""
+                ) + "';"
+            )
         }
         if (oldVersion <= 12) {
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SEC_FOLDER_ENABLED TEXT;")
@@ -331,9 +337,11 @@ class SqliteDatabaseHandler @Inject constructor(
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_URI_EXTERNAL_SD_CARD TEXT;")
             db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_URI_EXTERNAL_SD_CARD = '${encrypt("")}';")
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = '${
-                encrypt("false")
-            }';")
+            db.execSQL(
+                "UPDATE $TABLE_PREFERENCES SET $KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD = '${
+                    encrypt("false")
+                }';"
+            )
         }
         if (oldVersion <= 17) {
             val CREATE_CONTACTS_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_CONTACTS(" +
@@ -364,9 +372,11 @@ class SqliteDatabaseHandler @Inject constructor(
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PASSCODE_LOCK_TYPE TEXT;")
             if (isPasscodeLockEnabled(db)) {
                 Timber.d("PIN enabled!")
-                db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_TYPE = '${
-                    encrypt(Constants.PIN_4)
-                }';")
+                db.execSQL(
+                    "UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_TYPE = '${
+                        encrypt(Constants.PIN_4)
+                    }';"
+                )
             } else {
                 Timber.d("PIN NOT enabled!")
                 db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_TYPE = '${encrypt("")}';")
@@ -375,12 +385,16 @@ class SqliteDatabaseHandler @Inject constructor(
         if (oldVersion <= 20) {
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PREFERRED_SORT_CLOUD TEXT;")
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PREFERRED_SORT_OTHERS TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_SORT_CLOUD = '${
-                encrypt(MegaApiJava.ORDER_DEFAULT_ASC.toString())
-            }';")
-            db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_SORT_OTHERS = '${
-                encrypt(MegaApiJava.ORDER_DEFAULT_ASC.toString())
-            }';")
+            db.execSQL(
+                "UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_SORT_CLOUD = '${
+                    encrypt(MegaApiJava.ORDER_DEFAULT_ASC.toString())
+                }';"
+            )
+            db.execSQL(
+                "UPDATE $TABLE_PREFERENCES SET $KEY_PREFERRED_SORT_OTHERS = '${
+                    encrypt(MegaApiJava.ORDER_DEFAULT_ASC.toString())
+                }';"
+            )
         }
         if (oldVersion <= 21) {
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_ACCOUNT_DETAILS_TIMESTAMP TEXT;")
@@ -390,9 +404,11 @@ class SqliteDatabaseHandler @Inject constructor(
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_PRICING_TIMESTAMP TEXT;")
             db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_PRICING_TIMESTAMP = '${encrypt("")}';")
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = '${
-                encrypt("")
-            }';")
+            db.execSQL(
+                "UPDATE $TABLE_ATTRIBUTES SET $KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = '${
+                    encrypt("")
+                }';"
+            )
         }
         if (oldVersion <= 22) {
             val CREATE_CHAT_ITEM_TABLE = "CREATE TABLE IF NOT EXISTS $TABLE_CHAT_ITEMS(" +
@@ -507,9 +523,11 @@ class SqliteDatabaseHandler @Inject constructor(
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_LAST_PUBLIC_HANDLE TEXT;")
             db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_LAST_PUBLIC_HANDLE = '${encrypt("-1")}';")
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_LAST_PUBLIC_HANDLE_TIMESTAMP TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = '${
-                encrypt("-1")
-            }';")
+            db.execSQL(
+                "UPDATE $TABLE_ATTRIBUTES SET $KEY_LAST_PUBLIC_HANDLE_TIMESTAMP = '${
+                    encrypt("-1")
+                }';"
+            )
         }
         if (oldVersion <= 42) {
             val CREATE_NEW_PENDING_MSG_TABLE =
@@ -545,9 +563,11 @@ class SqliteDatabaseHandler @Inject constructor(
         }
         if (oldVersion <= 46) {
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_STORAGE_STATE INTEGER;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES SET $KEY_STORAGE_STATE = '${
-                encrypt(storageStateIntMapper(StorageState.Unknown).toString())
-            }';")
+            db.execSQL(
+                "UPDATE $TABLE_ATTRIBUTES SET $KEY_STORAGE_STATE = '${
+                    encrypt(storageStateIntMapper(StorageState.Unknown).toString())
+                }';"
+            )
         }
         if (oldVersion <= 47) {
             db.execSQL(CREATE_MEGA_CONTACTS_TABLE)
@@ -556,9 +576,11 @@ class SqliteDatabaseHandler @Inject constructor(
         }
         if (oldVersion <= 48) {
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PREFERRED_SORT_CAMERA_UPLOAD TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES " +
-                    "SET $KEY_PREFERRED_SORT_CAMERA_UPLOAD = " +
-                    "'${encrypt(MegaApiJava.ORDER_MODIFICATION_DESC.toString())}';")
+            db.execSQL(
+                "UPDATE $TABLE_PREFERENCES " +
+                        "SET $KEY_PREFERRED_SORT_CAMERA_UPLOAD = " +
+                        "'${encrypt(MegaApiJava.ORDER_MODIFICATION_DESC.toString())}';"
+            )
         }
         if (oldVersion <= 49) {
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_SD_CARD_URI TEXT;")
@@ -569,9 +591,11 @@ class SqliteDatabaseHandler @Inject constructor(
         }
         if (oldVersion <= 51) {
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_LAST_PUBLIC_HANDLE_TYPE INTEGER;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES " +
-                    "SET $KEY_LAST_PUBLIC_HANDLE_TYPE = " +
-                    "'${encrypt(MegaApiJava.AFFILIATE_TYPE_INVALID.toString())}';")
+            db.execSQL(
+                "UPDATE $TABLE_ATTRIBUTES " +
+                        "SET $KEY_LAST_PUBLIC_HANDLE_TYPE = " +
+                        "'${encrypt(MegaApiJava.AFFILIATE_TYPE_INVALID.toString())}';"
+            )
         }
         if (oldVersion <= 52) {
             recreateChatSettings(db, getChatSettingsFromDBv52(db))
@@ -585,8 +609,10 @@ class SqliteDatabaseHandler @Inject constructor(
         }
         if (oldVersion <= 54) {
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_MY_CHAT_FILES_FOLDER_HANDLE TEXT;")
-            db.execSQL("UPDATE $TABLE_ATTRIBUTES " +
-                    "SET $KEY_MY_CHAT_FILES_FOLDER_HANDLE = '${encrypt(MegaApiJava.INVALID_HANDLE.toString())}';")
+            db.execSQL(
+                "UPDATE $TABLE_ATTRIBUTES " +
+                        "SET $KEY_MY_CHAT_FILES_FOLDER_HANDLE = '${encrypt(MegaApiJava.INVALID_HANDLE.toString())}';"
+            )
         }
         if (oldVersion <= 55) {
             db.execSQL("ALTER TABLE $TABLE_CONTACTS ADD COLUMN $KEY_CONTACT_NICKNAME TEXT;")
@@ -599,25 +625,33 @@ class SqliteDatabaseHandler @Inject constructor(
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_URI_MEDIA_EXTERNAL_SD_CARD TEXT;")
             db.execSQL("UPDATE $TABLE_PREFERENCES SET $KEY_URI_MEDIA_EXTERNAL_SD_CARD = '${encrypt("")}';")
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD BOOLEAN;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES " +
-                    "SET $KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD = '${encrypt("false")}';")
+            db.execSQL(
+                "UPDATE $TABLE_PREFERENCES " +
+                        "SET $KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD = '${encrypt("false")}';"
+            )
             db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_OFFLINE BOOLEAN;")
             db.execSQL("UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_OFFLINE = '${encrypt("false")}';")
             db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_TIMESTAMP TEXT;")
-            db.execSQL("UPDATE $TABLE_COMPLETED_TRANSFERS " +
-                    "SET $KEY_TRANSFER_TIMESTAMP = '${
-                        encrypt(System.currentTimeMillis().toString())
-                    }';")
+            db.execSQL(
+                "UPDATE $TABLE_COMPLETED_TRANSFERS " +
+                        "SET $KEY_TRANSFER_TIMESTAMP = '${
+                            encrypt(System.currentTimeMillis().toString())
+                        }';"
+            )
             db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_ERROR TEXT;")
             db.execSQL("UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_ERROR = '${encrypt("")}';")
             db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_ORIGINAL_PATH TEXT;")
-            db.execSQL("UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_ORIGINAL_PATH = '${
-                encrypt("")
-            }';")
+            db.execSQL(
+                "UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_ORIGINAL_PATH = '${
+                    encrypt("")
+                }';"
+            )
             db.execSQL("ALTER TABLE $TABLE_COMPLETED_TRANSFERS ADD COLUMN $KEY_TRANSFER_PARENT_HANDLE TEXT;")
-            db.execSQL("UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_PARENT_HANDLE = '${
-                encrypt(MegaApiJava.INVALID_HANDLE.toString())
-            }';")
+            db.execSQL(
+                "UPDATE $TABLE_COMPLETED_TRANSFERS SET $KEY_TRANSFER_PARENT_HANDLE = '${
+                    encrypt(MegaApiJava.INVALID_HANDLE.toString())
+                }';"
+            )
         }
         if (oldVersion <= 58) {
             db.execSQL("ALTER TABLE $TABLE_ATTRIBUTES ADD COLUMN $KEY_TRANSFER_QUEUE_STATUS BOOLEAN;")
@@ -629,10 +663,12 @@ class SqliteDatabaseHandler @Inject constructor(
         }
         if (oldVersion <= 60) {
             db.execSQL("ALTER TABLE $TABLE_PREFERENCES ADD COLUMN $KEY_PASSCODE_LOCK_REQUIRE_TIME TEXT;")
-            db.execSQL("UPDATE $TABLE_PREFERENCES " +
-                    "SET $KEY_PASSCODE_LOCK_REQUIRE_TIME = '${
-                        encrypt("" + if (isPasscodeLockEnabled(db)) PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE else Constants.REQUIRE_PASSCODE_INVALID)
-                    }';")
+            db.execSQL(
+                "UPDATE $TABLE_PREFERENCES " +
+                        "SET $KEY_PASSCODE_LOCK_REQUIRE_TIME = '${
+                            encrypt("" + if (isPasscodeLockEnabled(db)) PasscodeUtil.REQUIRE_PASSCODE_IMMEDIATE else Constants.REQUIRE_PASSCODE_INVALID)
+                        }';"
+            )
         }
         if (oldVersion <= 61) {
             recreateAttributes(db, getAttributes(db))
@@ -896,7 +932,8 @@ class SqliteDatabaseHandler @Inject constructor(
             type = cursor.getInt(10),
             nodeHandle = if (!nodeHandle.isNullOrEmpty()) nodeHandle.toLong() else null,
             isCopyOnly = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(12))),
-            isSecondary = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(13))))
+            isSecondary = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(13)))
+        )
     }
 
     override fun findSyncRecordByLocalPath(localPath: String?, isSecondary: Boolean): SyncRecord? {
@@ -987,8 +1024,11 @@ class SqliteDatabaseHandler @Inject constructor(
         try {
             db.rawQuery(selectQuery, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
-                    var should = cursor.getString(cursor.getColumnIndexOrThrow(
-                        KEY_SHOULD_CLEAR_CAMSYNC_RECORDS))
+                    var should = cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            KEY_SHOULD_CLEAR_CAMSYNC_RECORDS
+                        )
+                    )
                     should = decrypt(should)
                     return if (should.isNullOrEmpty()) {
                         false
@@ -1245,16 +1285,31 @@ class SqliteDatabaseHandler @Inject constructor(
             var values: ContentValues
             for ((id, handle, localName, email, normalizedPhoneNumber) in contacts) {
                 values = ContentValues().apply {
-                    put(KEY_MEGA_CONTACTS_ID, encrypt(
-                        id))
-                    put(KEY_MEGA_CONTACTS_HANDLE, encrypt(
-                        handle.toString()))
-                    put(KEY_MEGA_CONTACTS_LOCAL_NAME, encrypt(
-                        localName))
-                    put(KEY_MEGA_CONTACTS_EMAIL, encrypt(
-                        email))
-                    put(KEY_MEGA_CONTACTS_PHONE_NUMBER, encrypt(
-                        normalizedPhoneNumber))
+                    put(
+                        KEY_MEGA_CONTACTS_ID, encrypt(
+                            id
+                        )
+                    )
+                    put(
+                        KEY_MEGA_CONTACTS_HANDLE, encrypt(
+                            handle.toString()
+                        )
+                    )
+                    put(
+                        KEY_MEGA_CONTACTS_LOCAL_NAME, encrypt(
+                            localName
+                        )
+                    )
+                    put(
+                        KEY_MEGA_CONTACTS_EMAIL, encrypt(
+                            email
+                        )
+                    )
+                    put(
+                        KEY_MEGA_CONTACTS_PHONE_NUMBER, encrypt(
+                            normalizedPhoneNumber
+                        )
+                    )
                 }
                 db.insert(TABLE_MEGA_CONTACTS, null, values)
             }
@@ -1278,38 +1333,54 @@ class SqliteDatabaseHandler @Inject constructor(
                                 cursor.getString(cursor.getColumnIndexOrThrow(KEY_MEGA_CONTACTS_ID))
                             contact.id = decrypt(id)
                         } catch (exception: IllegalArgumentException) {
-                            Timber.e(exception,
-                                "Exception getting MEGA contact ID. Contact will not be included")
+                            Timber.e(
+                                exception,
+                                "Exception getting MEGA contact ID. Contact will not be included"
+                            )
                             continue
                         }
                         try {
                             val handle =
-                                cursor.getString(cursor.getColumnIndexOrThrow(
-                                    KEY_MEGA_CONTACTS_HANDLE))
+                                cursor.getString(
+                                    cursor.getColumnIndexOrThrow(
+                                        KEY_MEGA_CONTACTS_HANDLE
+                                    )
+                                )
                             contact.handle = decrypt(handle)?.toLong() ?: 0
                         } catch (exception: IllegalArgumentException) {
-                            Timber.e(exception,
-                                "Exception getting MEGA contact handle. Contact will not be included")
+                            Timber.e(
+                                exception,
+                                "Exception getting MEGA contact handle. Contact will not be included"
+                            )
                             continue
                         }
                         try {
-                            val localName = cursor.getString(cursor.getColumnIndexOrThrow(
-                                KEY_MEGA_CONTACTS_LOCAL_NAME))
+                            val localName = cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                    KEY_MEGA_CONTACTS_LOCAL_NAME
+                                )
+                            )
                             contact.localName = decrypt(localName)
                         } catch (exception: IllegalArgumentException) {
                             Timber.w(exception, "Exception getting MEGA contact local name")
                         }
                         try {
                             val email =
-                                cursor.getString(cursor.getColumnIndexOrThrow(
-                                    KEY_MEGA_CONTACTS_EMAIL))
+                                cursor.getString(
+                                    cursor.getColumnIndexOrThrow(
+                                        KEY_MEGA_CONTACTS_EMAIL
+                                    )
+                                )
                             contact.email = decrypt(email)
                         } catch (exception: IllegalArgumentException) {
                             Timber.w(exception, "Exception getting MEGA contact email")
                         }
                         try {
-                            val phoneNumber = cursor.getString(cursor.getColumnIndexOrThrow(
-                                KEY_MEGA_CONTACTS_PHONE_NUMBER))
+                            val phoneNumber = cursor.getString(
+                                cursor.getColumnIndexOrThrow(
+                                    KEY_MEGA_CONTACTS_PHONE_NUMBER
+                                )
+                            )
                             contact.normalizedPhoneNumber = decrypt(phoneNumber)
                         } catch (exception: IllegalArgumentException) {
                             Timber.w(exception, "Exception getting MEGA contact phone number")
@@ -1381,11 +1452,15 @@ class SqliteDatabaseHandler @Inject constructor(
             put(KEY_SEC_VIDEO_SYNC_TIMESTAMP, encrypt(prefs.getSecVideoSyncTimeStamp()))
             put(KEY_STORAGE_ADVANCED_DEVICES, encrypt(prefs.getStorageAdvancedDevices()))
             put(KEY_PREFERRED_VIEW_LIST, encrypt(prefs.getPreferredViewList()))
-            put(KEY_PREFERRED_VIEW_LIST_CAMERA,
-                encrypt(prefs.getPreferredViewListCameraUploads()))
+            put(
+                KEY_PREFERRED_VIEW_LIST_CAMERA,
+                encrypt(prefs.getPreferredViewListCameraUploads())
+            )
             put(KEY_URI_EXTERNAL_SD_CARD, encrypt(prefs.getUriExternalSDCard()))
-            put(KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD,
-                encrypt(prefs.getCameraFolderExternalSDCard()))
+            put(
+                KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD,
+                encrypt(prefs.getCameraFolderExternalSDCard())
+            )
             put(KEY_PASSCODE_LOCK_TYPE, encrypt(prefs.getPasscodeLockType()))
             put(KEY_PREFERRED_SORT_CLOUD, encrypt(prefs.getPreferredSortCloud()))
             put(KEY_PREFERRED_SORT_CAMERA_UPLOAD, encrypt(prefs.preferredSortCameraUpload))
@@ -1397,8 +1472,10 @@ class SqliteDatabaseHandler @Inject constructor(
             put(KEY_UPLOAD_VIDEO_QUALITY, encrypt(prefs.getUploadVideoQuality()))
             put(KEY_CONVERSION_ON_CHARGING, encrypt(prefs.getConversionOnCharging()))
             put(KEY_CHARGING_ON_SIZE, encrypt(prefs.getChargingOnSize()))
-            put(KEY_SHOULD_CLEAR_CAMSYNC_RECORDS,
-                encrypt(prefs.getShouldClearCameraSyncRecords()))
+            put(
+                KEY_SHOULD_CLEAR_CAMSYNC_RECORDS,
+                encrypt(prefs.getShouldClearCameraSyncRecords())
+            )
             put(KEY_SHOW_INVITE_BANNER, encrypt(prefs.showInviteBanner))
             put(KEY_SD_CARD_URI, encrypt(prefs.getSdCardUri()))
             put(KEY_ASK_FOR_DISPLAY_OVER, encrypt(prefs.askForDisplayOver))
@@ -1481,14 +1558,26 @@ class SqliteDatabaseHandler @Inject constructor(
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_PASSCODE_LOCK_CODE)))
                     val askAlways =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_STORAGE_ASK_ALWAYS)))
-                    val downloadLocation = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_STORAGE_DOWNLOAD_LOCATION)))
+                    val downloadLocation = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_STORAGE_DOWNLOAD_LOCATION
+                            )
+                        )
+                    )
                     val camSyncTimeStamp =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_CAM_SYNC_TIMESTAMP)))
                     val lastFolderUpload =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_UPLOAD_FOLDER)))
-                    val lastFolderCloud = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_LAST_CLOUD_FOLDER_HANDLE)))
+                    val lastFolderCloud = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_LAST_CLOUD_FOLDER_HANDLE
+                            )
+                        )
+                    )
                     val secondaryFolderEnabled =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SEC_FOLDER_ENABLED)))
                     val secondaryPath =
@@ -1499,16 +1588,34 @@ class SqliteDatabaseHandler @Inject constructor(
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SEC_SYNC_TIMESTAMP)))
                     val keepFileNames =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_KEEP_FILE_NAMES)))
-                    val storageAdvancedDevices = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_STORAGE_ADVANCED_DEVICES)))
+                    val storageAdvancedDevices = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_STORAGE_ADVANCED_DEVICES
+                            )
+                        )
+                    )
                     val preferredViewList =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_PREFERRED_VIEW_LIST)))
-                    val preferredViewListCamera = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_PREFERRED_VIEW_LIST_CAMERA)))
+                    val preferredViewListCamera = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_PREFERRED_VIEW_LIST_CAMERA
+                            )
+                        )
+                    )
                     val uriExternalSDCard =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_URI_EXTERNAL_SD_CARD)))
-                    val cameraFolderExternalSDCard = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD)))
+                    val cameraFolderExternalSDCard = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD
+                            )
+                        )
+                    )
                     val pinLockType =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_PASSCODE_LOCK_TYPE)))
                     val preferredSortCloud =
@@ -1521,39 +1628,97 @@ class SqliteDatabaseHandler @Inject constructor(
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_AUTO_PLAY)))
                     val uploadVideoQuality =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_UPLOAD_VIDEO_QUALITY)))
-                    val conversionOnCharging = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_CONVERSION_ON_CHARGING)))
+                    val conversionOnCharging = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_CONVERSION_ON_CHARGING
+                            )
+                        )
+                    )
                     val chargingOnSize =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_CHARGING_ON_SIZE)))
-                    val shouldClearCameraSyncRecords = decrypt(cursor.getString(getColumnIndex(
-                        cursor,
-                        KEY_SHOULD_CLEAR_CAMSYNC_RECORDS)))
-                    val camVideoSyncTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_CAM_VIDEO_SYNC_TIMESTAMP)))
-                    val secVideoSyncTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_SEC_VIDEO_SYNC_TIMESTAMP)))
+                    val shouldClearCameraSyncRecords = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_SHOULD_CLEAR_CAMSYNC_RECORDS
+                            )
+                        )
+                    )
+                    val camVideoSyncTimeStamp = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_CAM_VIDEO_SYNC_TIMESTAMP
+                            )
+                        )
+                    )
+                    val secVideoSyncTimeStamp = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_SEC_VIDEO_SYNC_TIMESTAMP
+                            )
+                        )
+                    )
                     val removeGPS =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_REMOVE_GPS)))
                     val closeInviteBanner =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SHOW_INVITE_BANNER)))
-                    val preferredSortCameraUpload = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_PREFERRED_SORT_CAMERA_UPLOAD)))
+                    val preferredSortCameraUpload = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_PREFERRED_SORT_CAMERA_UPLOAD
+                            )
+                        )
+                    )
                     val sdCardUri =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SD_CARD_URI)))
                     val askForDisplayOver =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_ASK_FOR_DISPLAY_OVER)))
-                    val askForSetDownloadLocation = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_ASK_SET_DOWNLOAD_LOCATION)))
-                    val mediaSDCardUri = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_URI_MEDIA_EXTERNAL_SD_CARD)))
-                    val isMediaOnSDCard = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD)))
-                    val passcodeLockRequireTime = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_PASSCODE_LOCK_REQUIRE_TIME)))
+                    val askForSetDownloadLocation = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_ASK_SET_DOWNLOAD_LOCATION
+                            )
+                        )
+                    )
+                    val mediaSDCardUri = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_URI_MEDIA_EXTERNAL_SD_CARD
+                            )
+                        )
+                    )
+                    val isMediaOnSDCard = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD
+                            )
+                        )
+                    )
+                    val passcodeLockRequireTime = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_PASSCODE_LOCK_REQUIRE_TIME
+                            )
+                        )
+                    )
                     val fingerprintLock =
                         if (cursor.getColumnIndex(KEY_FINGERPRINT_LOCK) != Constants.INVALID_VALUE) decrypt(
-                            cursor.getString(getColumnIndex(cursor,
-                                KEY_FINGERPRINT_LOCK))) else "false"
+                            cursor.getString(
+                                getColumnIndex(
+                                    cursor,
+                                    KEY_FINGERPRINT_LOCK
+                                )
+                            )
+                        ) else "false"
                     prefs = MegaPreferences(
                         firstTime,
                         wifi,
@@ -1598,7 +1763,8 @@ class SqliteDatabaseHandler @Inject constructor(
                         mediaSDCardUri,
                         isMediaOnSDCard,
                         passcodeLockRequireTime,
-                        fingerprintLock)
+                        fingerprintLock
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -1628,7 +1794,8 @@ class SqliteDatabaseHandler @Inject constructor(
                     chatSettings = ChatSettings(
                         notificationSound,
                         vibrationEnabled,
-                        videoQuality)
+                        videoQuality
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -1659,7 +1826,8 @@ class SqliteDatabaseHandler @Inject constructor(
                     chatSettings = ChatSettings(
                         notificationSound,
                         vibrationEnabled,
-                        videoQuality)
+                        videoQuality
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -1702,7 +1870,8 @@ class SqliteDatabaseHandler @Inject constructor(
                     chatSettings = ChatSettings(
                         notificationSound,
                         vibrationEnabled,
-                        videoQuality)
+                        videoQuality
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -1747,9 +1916,11 @@ class SqliteDatabaseHandler @Inject constructor(
     override var chatVideoQuality: Int
         get() {
             Timber.d("getChatVideoQuality")
-            return getIntValue(TABLE_CHAT_SETTINGS,
+            return getIntValue(
+                TABLE_CHAT_SETTINGS,
                 KEY_CHAT_VIDEO_QUALITY,
-                VideoQuality.MEDIUM.value)
+                VideoQuality.MEDIUM.value
+            )
         }
         set(chatVideoQuality) {
             Timber.d("setChatVideoQuality")
@@ -1815,14 +1986,18 @@ class SqliteDatabaseHandler @Inject constructor(
         Timber.d("setWrittenTextItem: %s %s", text, handle)
         val values = ContentValues().apply {
             put(KEY_CHAT_ITEM_WRITTEN_TEXT, encrypt(text))
-            put(KEY_CHAT_ITEM_EDITED_MSG_ID,
-                if (!TextUtil.isTextEmpty(editedMsgId)) encrypt(editedMsgId) else "")
+            put(
+                KEY_CHAT_ITEM_EDITED_MSG_ID,
+                if (!TextUtil.isTextEmpty(editedMsgId)) encrypt(editedMsgId) else ""
+            )
         }
 
-        return db.update(TABLE_CHAT_ITEMS,
+        return db.update(
+            TABLE_CHAT_ITEMS,
             values,
             "$KEY_CHAT_HANDLE = '${encrypt(handle)}'",
-            null)
+            null
+        )
     }
 
     override fun findChatPreferencesByHandle(handle: String?): ChatItemPreferences? {
@@ -1947,8 +2122,10 @@ class SqliteDatabaseHandler @Inject constructor(
         val error = decrypt(cursor.getString(9))
         val originalPath = decrypt(cursor.getString(10))
         val parentHandle = decrypt(cursor.getString(11))!!.toLong()
-        return AndroidCompletedTransfer(id, filename, typeInt, stateInt, size, nodeHandle, path,
-            offline, timeStamp, error, originalPath, parentHandle)
+        return AndroidCompletedTransfer(
+            id, filename, typeInt, stateInt, size, nodeHandle, path,
+            offline, timeStamp, error, originalPath, parentHandle
+        )
     }
 
     @Deprecated("To be replaced by addCompletedTransfer")
@@ -2116,22 +2293,32 @@ class SqliteDatabaseHandler @Inject constructor(
         values.put(KEY_ATTR_ASK_SIZE_DOWNLOAD, encrypt(attr.askSizeDownload))
         values.put(KEY_ATTR_ASK_NOAPP_DOWNLOAD, encrypt(attr.askNoAppDownload))
         values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP, encrypt(attr.accountDetailsTimeStamp))
-        values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
-            encrypt(attr.extendedAccountDetailsTimeStamp))
+        values.put(
+            KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
+            encrypt(attr.extendedAccountDetailsTimeStamp)
+        )
         values.put(KEY_INVALIDATE_SDK_CACHE, encrypt(attr.invalidateSdkCache))
         values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.useHttpsOnly))
         values.put(KEY_USE_HTTPS_ONLY, encrypt(attr.useHttpsOnly))
         values.put(KEY_SHOW_COPYRIGHT, encrypt(attr.showCopyright))
         values.put(KEY_SHOW_NOTIF_OFF, encrypt(attr.showNotifOff))
         values.put(KEY_LAST_PUBLIC_HANDLE, encrypt(attr.lastPublicHandle.toString()))
-        values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP,
-            encrypt(attr.lastPublicHandleTimeStamp.toString()))
-        values.put(KEY_STORAGE_STATE,
-            encrypt(storageStateIntMapper(attr.storageState).toString()))
-        values.put(KEY_LAST_PUBLIC_HANDLE_TYPE,
-            encrypt(attr.lastPublicHandleType.toString()))
-        values.put(KEY_MY_CHAT_FILES_FOLDER_HANDLE,
-            encrypt(attr.myChatFilesFolderHandle.toString()))
+        values.put(
+            KEY_LAST_PUBLIC_HANDLE_TIMESTAMP,
+            encrypt(attr.lastPublicHandleTimeStamp.toString())
+        )
+        values.put(
+            KEY_STORAGE_STATE,
+            encrypt(storageStateIntMapper(attr.storageState).toString())
+        )
+        values.put(
+            KEY_LAST_PUBLIC_HANDLE_TYPE,
+            encrypt(attr.lastPublicHandleType.toString())
+        )
+        values.put(
+            KEY_MY_CHAT_FILES_FOLDER_HANDLE,
+            encrypt(attr.myChatFilesFolderHandle.toString())
+        )
         values.put(KEY_TRANSFER_QUEUE_STATUS, encrypt(attr.transferQueueStatus))
         db.insert(TABLE_ATTRIBUTES, null, values)
     }
@@ -2151,32 +2338,69 @@ class SqliteDatabaseHandler @Inject constructor(
                     val online = decrypt(cursor.getString(getColumnIndex(cursor, KEY_ATTR_ONLINE)))
                     val intents =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_ATTR_INTENTS)))
-                    val askSizeDownload = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_ATTR_ASK_SIZE_DOWNLOAD)))
-                    val askNoAppDownload = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_ATTR_ASK_NOAPP_DOWNLOAD)))
+                    val askSizeDownload = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_ATTR_ASK_SIZE_DOWNLOAD
+                            )
+                        )
+                    )
+                    val askNoAppDownload = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_ATTR_ASK_NOAPP_DOWNLOAD
+                            )
+                        )
+                    )
                     if (!legacyLoggingSettings.areSDKLogsEnabled() && cursor.getColumnIndex(
-                            KEY_FILE_LOGGER_SDK) != Constants.INVALID_VALUE
+                            KEY_FILE_LOGGER_SDK
+                        ) != Constants.INVALID_VALUE
                     ) {
                         val fileLoggerSDK =
                             decrypt(cursor.getString(getColumnIndex(cursor, KEY_FILE_LOGGER_SDK)))
-                        legacyLoggingSettings.updateSDKLogs(java.lang.Boolean.parseBoolean(
-                            fileLoggerSDK))
+                        legacyLoggingSettings.updateSDKLogs(
+                            java.lang.Boolean.parseBoolean(
+                                fileLoggerSDK
+                            )
+                        )
                     }
-                    val accountDetailsTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_ACCOUNT_DETAILS_TIMESTAMP)))
-                    val extendedAccountDetailsTimeStamp = decrypt(cursor.getString(getColumnIndex(
-                        cursor,
-                        KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP)))
+                    val accountDetailsTimeStamp = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_ACCOUNT_DETAILS_TIMESTAMP
+                            )
+                        )
+                    )
+                    val extendedAccountDetailsTimeStamp = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP
+                            )
+                        )
+                    )
                     val invalidateSdkCache =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_INVALIDATE_SDK_CACHE)))
                     if (!legacyLoggingSettings.areKarereLogsEnabled() && cursor.getColumnIndex(
-                            KEY_FILE_LOGGER_KARERE) != Constants.INVALID_VALUE
+                            KEY_FILE_LOGGER_KARERE
+                        ) != Constants.INVALID_VALUE
                     ) {
-                        val fileLoggerKarere = decrypt(cursor.getString(getColumnIndex(cursor,
-                            KEY_FILE_LOGGER_KARERE)))
-                        legacyLoggingSettings.updateKarereLogs(java.lang.Boolean.parseBoolean(
-                            fileLoggerKarere))
+                        val fileLoggerKarere = decrypt(
+                            cursor.getString(
+                                getColumnIndex(
+                                    cursor,
+                                    KEY_FILE_LOGGER_KARERE
+                                )
+                            )
+                        )
+                        legacyLoggingSettings.updateKarereLogs(
+                            java.lang.Boolean.parseBoolean(
+                                fileLoggerKarere
+                            )
+                        )
                     }
                     val useHttpsOnly =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_USE_HTTPS_ONLY)))
@@ -2186,14 +2410,32 @@ class SqliteDatabaseHandler @Inject constructor(
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_SHOW_NOTIF_OFF)))
                     val lastPublicHandle =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_LAST_PUBLIC_HANDLE)))
-                    val lastPublicHandleTimeStamp = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_LAST_PUBLIC_HANDLE_TIMESTAMP)))
+                    val lastPublicHandleTimeStamp = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_LAST_PUBLIC_HANDLE_TIMESTAMP
+                            )
+                        )
+                    )
                     val storageState =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_STORAGE_STATE)))
-                    val lastPublicHandleType = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_LAST_PUBLIC_HANDLE_TYPE)))
-                    val myChatFilesFolderHandle = decrypt(cursor.getString(getColumnIndex(cursor,
-                        KEY_MY_CHAT_FILES_FOLDER_HANDLE)))
+                    val lastPublicHandleType = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_LAST_PUBLIC_HANDLE_TYPE
+                            )
+                        )
+                    )
+                    val myChatFilesFolderHandle = decrypt(
+                        cursor.getString(
+                            getColumnIndex(
+                                cursor,
+                                KEY_MY_CHAT_FILES_FOLDER_HANDLE
+                            )
+                        )
+                    )
                     val transferQueueStatus =
                         decrypt(cursor.getString(getColumnIndex(cursor, KEY_TRANSFER_QUEUE_STATUS)))
                     attr = MegaAttributes(
@@ -2243,10 +2485,12 @@ class SqliteDatabaseHandler @Inject constructor(
         val values = ContentValues().apply {
             put(KEY_NONCONTACT_FIRSTNAME, encrypt(name))
         }
-        val rows = db.update(TABLE_NON_CONTACTS,
+        val rows = db.update(
+            TABLE_NON_CONTACTS,
             values,
             "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
-            null)
+            null
+        )
         if (rows == 0) {
             values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
             db.insert(TABLE_NON_CONTACTS, null, values)
@@ -2258,10 +2502,12 @@ class SqliteDatabaseHandler @Inject constructor(
         val values = ContentValues().apply {
             put(KEY_NONCONTACT_LASTNAME, encrypt(lastName))
         }
-        val rows = db.update(TABLE_NON_CONTACTS,
+        val rows = db.update(
+            TABLE_NON_CONTACTS,
             values,
             "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
-            null)
+            null
+        )
         if (rows == 0) {
             values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
             db.insert(TABLE_NON_CONTACTS, null, values)
@@ -2273,10 +2519,12 @@ class SqliteDatabaseHandler @Inject constructor(
         val values = ContentValues().apply {
             put(KEY_NONCONTACT_EMAIL, encrypt(email))
         }
-        val rows = db.update(TABLE_NON_CONTACTS,
+        val rows = db.update(
+            TABLE_NON_CONTACTS,
             values,
             "$KEY_NONCONTACT_HANDLE = '${encrypt(handle)}'",
-            null)
+            null
+        )
         if (rows == 0) {
             values.put(KEY_NONCONTACT_HANDLE, encrypt(handle))
             db.insert(TABLE_NON_CONTACTS, null, values)
@@ -2301,7 +2549,8 @@ class SqliteDatabaseHandler @Inject constructor(
                         fullName,
                         firstName,
                         lastName,
-                        email)
+                        email
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -2422,14 +2671,16 @@ class SqliteDatabaseHandler @Inject constructor(
                             val type = decrypt(cursor.getString(5))
                             val incoming = cursor.getInt(6)
                             val handleIncoming = decrypt(cursor.getString(7))
-                            val offline = MegaOffline(id,
+                            val offline = MegaOffline(
+                                id,
                                 handle.toString(),
                                 path.toString(),
                                 name.toString(),
                                 parent,
                                 type,
                                 incoming,
-                                handleIncoming.toString())
+                                handleIncoming.toString()
+                            )
                             listOffline.add(offline)
                         } while (cursor.moveToNext())
                     }
@@ -2455,14 +2706,16 @@ class SqliteDatabaseHandler @Inject constructor(
                         val type = cursor.getString(5)
                         val incoming = cursor.getInt(6)
                         val handleIncoming = cursor.getString(7)
-                        val offline = MegaOffline(id,
+                        val offline = MegaOffline(
+                            id,
                             handle,
                             path,
                             name,
                             parent,
                             type,
                             incoming,
-                            handleIncoming)
+                            handleIncoming
+                        )
                         listOffline.add(offline)
                     } while (cursor.moveToNext())
                 }
@@ -2514,14 +2767,16 @@ class SqliteDatabaseHandler @Inject constructor(
                     val type = decrypt(cursor.getString(5))
                     val incoming = cursor.getInt(6)
                     val handleIncoming = decrypt(cursor.getString(7))
-                    return MegaOffline(id,
+                    return MegaOffline(
+                        id,
                         nodeHandle.toString(),
                         path.toString(),
                         name.toString(),
                         parent,
                         type,
                         incoming,
-                        handleIncoming.toString())
+                        handleIncoming.toString()
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -2547,14 +2802,18 @@ class SqliteDatabaseHandler @Inject constructor(
                         val _type = decrypt(cursor.getString(5))
                         val _incoming = cursor.getInt(6)
                         val _handleIncoming = decrypt(cursor.getString(7))
-                        listOffline.add(MegaOffline(_id,
-                            _handle.toString(),
-                            _path.toString(),
-                            _name.toString(),
-                            _parent,
-                            _type,
-                            _incoming,
-                            _handleIncoming.toString()))
+                        listOffline.add(
+                            MegaOffline(
+                                _id,
+                                _handle.toString(),
+                                _path.toString(),
+                                _name.toString(),
+                                _parent,
+                                _type,
+                                _incoming,
+                                _handleIncoming.toString()
+                            )
+                        )
                     } while (cursor.moveToNext())
                 }
             }
@@ -2579,14 +2838,16 @@ class SqliteDatabaseHandler @Inject constructor(
                         val _type = decrypt(cursor.getString(5))
                         val _incoming = cursor.getInt(6)
                         val _handleIncoming = decrypt(cursor.getString(7))
-                        offline = MegaOffline(_id,
+                        offline = MegaOffline(
+                            _id,
                             _handle.toString(),
                             _path.toString(),
                             _name.toString(),
                             _parent,
                             _type,
                             _incoming,
-                            _handleIncoming.toString())
+                            _handleIncoming.toString()
+                        )
                     } while (cursor.moveToNext())
                 }
             }
@@ -2617,14 +2878,18 @@ class SqliteDatabaseHandler @Inject constructor(
                         val _type = decrypt(cursor.getString(5))
                         val _incoming = cursor.getInt(6)
                         val _handleIncoming = decrypt(cursor.getString(7))
-                        listOffline.add(MegaOffline(_id,
-                            _handle.toString(),
-                            _path.toString(),
-                            _name.toString(),
-                            _parent,
-                            _type,
-                            _incoming,
-                            _handleIncoming.toString()))
+                        listOffline.add(
+                            MegaOffline(
+                                _id,
+                                _handle.toString(),
+                                _path.toString(),
+                                _name.toString(),
+                                _parent,
+                                _type,
+                                _incoming,
+                                _handleIncoming.toString()
+                            )
+                        )
                     } while (cursor.moveToNext())
                 }
             }
@@ -2652,14 +2917,16 @@ class SqliteDatabaseHandler @Inject constructor(
                         val _type = decrypt(cursor.getString(5))
                         val _incoming = cursor.getInt(6)
                         val _handleIncoming = decrypt(cursor.getString(7))
-                        offline = MegaOffline(_id,
+                        offline = MegaOffline(
+                            _id,
                             _handle.toString(),
                             _path.toString(),
                             _name.toString(),
                             _parent,
                             _type,
                             _incoming,
-                            _handleIncoming.toString())
+                            _handleIncoming.toString()
+                        )
                     } while (cursor.moveToNext())
                 }
             }
@@ -2670,9 +2937,11 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun deleteOfflineFile(mOff: MegaOffline): Int {
-        return this.writableDatabase.delete(TABLE_OFFLINE,
+        return this.writableDatabase.delete(
+            TABLE_OFFLINE,
             "$KEY_OFF_HANDLE = ?",
-            arrayOf(encrypt(mOff.handle.toString())))
+            arrayOf(encrypt(mOff.handle.toString()))
+        )
     }
 
     override fun setFirstTime(firstTime: Boolean) {
@@ -2828,8 +3097,10 @@ class SqliteDatabaseHandler @Inject constructor(
                             encrypt(folderHandle)
                         }' WHERE $KEY_ID = '1'"
                     db.execSQL(UPDATE_PREFERENCES_TABLE)
-                    Timber.d("KEY_LAST_CLOUD_FOLDER_HANDLE UPLOAD FOLDER: %s",
-                        UPDATE_PREFERENCES_TABLE)
+                    Timber.d(
+                        "KEY_LAST_CLOUD_FOLDER_HANDLE UPLOAD FOLDER: %s",
+                        UPDATE_PREFERENCES_TABLE
+                    )
                 } else {
                     values.put(KEY_LAST_CLOUD_FOLDER_HANDLE, encrypt(folderHandle))
                     db.insert(TABLE_PREFERENCES, null, values)
@@ -3010,9 +3281,11 @@ class SqliteDatabaseHandler @Inject constructor(
     override var uriMediaExternalSdCard: String?
         get() = getStringValue(TABLE_PREFERENCES, KEY_URI_MEDIA_EXTERNAL_SD_CARD, "")
         set(uriMediaExternalSdCard) {
-            setStringValue(TABLE_PREFERENCES,
+            setStringValue(
+                TABLE_PREFERENCES,
                 KEY_URI_MEDIA_EXTERNAL_SD_CARD,
-                uriMediaExternalSdCard)
+                uriMediaExternalSdCard
+            )
         }
 
     override fun setCameraFolderExternalSDCard(cameraFolderExternalSDCard: Boolean) {
@@ -3027,8 +3300,10 @@ class SqliteDatabaseHandler @Inject constructor(
                         }' WHERE $KEY_ID = '1'"
                     db.execSQL(UPDATE_PREFERENCES_TABLE)
                 } else {
-                    values.put(KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD,
-                        encrypt(cameraFolderExternalSDCard.toString()))
+                    values.put(
+                        KEY_CAMERA_FOLDER_EXTERNAL_SD_CARD,
+                        encrypt(cameraFolderExternalSDCard.toString())
+                    )
                     db.insert(TABLE_PREFERENCES, null, values)
                 }
             }
@@ -3049,9 +3324,11 @@ class SqliteDatabaseHandler @Inject constructor(
     override var mediaFolderExternalSdCard: Boolean
         get() = getBooleanValue(TABLE_PREFERENCES, KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD, false)
         set(mediaFolderExternalSdCard) {
-            setStringValue(TABLE_PREFERENCES,
+            setStringValue(
+                TABLE_PREFERENCES,
                 KEY_MEDIA_FOLDER_EXTERNAL_SD_CARD,
-                mediaFolderExternalSdCard.toString())
+                mediaFolderExternalSdCard.toString()
+            )
         }
 
     override var passcodeLockType: String?
@@ -3142,8 +3419,10 @@ class SqliteDatabaseHandler @Inject constructor(
                         }' WHERE $KEY_ID = '1'"
                     db.execSQL(UPDATE_ATTRIBUTE_TABLE)
                 } else {
-                    values.put(KEY_ACCOUNT_DETAILS_TIMESTAMP,
-                        encrypt(accountDetailsTimeStamp.toString()))
+                    values.put(
+                        KEY_ACCOUNT_DETAILS_TIMESTAMP,
+                        encrypt(accountDetailsTimeStamp.toString())
+                    )
                     db.insert(TABLE_ATTRIBUTES, null, values)
                 }
             }
@@ -3166,8 +3445,10 @@ class SqliteDatabaseHandler @Inject constructor(
                         }' WHERE $KEY_ID = '1'"
                     db.execSQL(UPDATE_ATTRIBUTE_TABLE)
                 } else {
-                    values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
-                        encrypt(extendedAccountDetailsTimestamp.toString()))
+                    values.put(
+                        KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
+                        encrypt(extendedAccountDetailsTimestamp.toString())
+                    )
                     db.insert(TABLE_ATTRIBUTES, null, values)
                 }
             }
@@ -3190,8 +3471,10 @@ class SqliteDatabaseHandler @Inject constructor(
                         }' WHERE $KEY_ID = '1'"
                     db.execSQL(UPDATE_ATTRIBUTE_TABLE)
                 } else {
-                    values.put(KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
-                        encrypt(extendedAccountDetailsTimestamp.toString()))
+                    values.put(
+                        KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP,
+                        encrypt(extendedAccountDetailsTimestamp.toString())
+                    )
                     db.insert(TABLE_ATTRIBUTES, null, values)
                 }
             }
@@ -3368,8 +3651,10 @@ class SqliteDatabaseHandler @Inject constructor(
                             }' WHERE $KEY_ID = '1'"
                         db.execSQL(UPDATE_PREFERENCES_TABLE)
                     } else {
-                        values.put(KEY_PASSCODE_LOCK_ENABLED,
-                            encrypt(passcodeLockEnabled.toString()))
+                        values.put(
+                            KEY_PASSCODE_LOCK_ENABLED,
+                            encrypt(passcodeLockEnabled.toString())
+                        )
                         db.insert(TABLE_PREFERENCES, null, values)
                     }
                 }
@@ -3389,7 +3674,8 @@ class SqliteDatabaseHandler @Inject constructor(
                         val UPDATE_PREFERENCES_TABLE =
                             "UPDATE $TABLE_PREFERENCES SET $KEY_PASSCODE_LOCK_CODE= '${
                                 encrypt(
-                                    passcodeLockCode)
+                                    passcodeLockCode
+                                )
                             }' WHERE $KEY_ID = '1'"
                         db.execSQL(UPDATE_PREFERENCES_TABLE)
                     } else {
@@ -3412,14 +3698,18 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param requiredTime The time required before ask for the passcode.
      */
     override var passcodeRequiredTime: Int
-        get() = getStringValue(TABLE_PREFERENCES,
+        get() = getStringValue(
+            TABLE_PREFERENCES,
             KEY_PASSCODE_LOCK_REQUIRE_TIME,
-            Constants.REQUIRE_PASSCODE_INVALID.toString())?.toIntOrNull()
+            Constants.REQUIRE_PASSCODE_INVALID.toString()
+        )?.toIntOrNull()
             ?: Constants.REQUIRE_PASSCODE_INVALID
         set(requiredTime) {
-            setStringValue(TABLE_PREFERENCES,
+            setStringValue(
+                TABLE_PREFERENCES,
                 KEY_PASSCODE_LOCK_REQUIRE_TIME,
-                requiredTime.toString())
+                requiredTime.toString()
+            )
         }
     /**
      * Checks if the fingerprint lock setting is enabled.
@@ -3453,9 +3743,11 @@ class SqliteDatabaseHandler @Inject constructor(
     override var askSetDownloadLocation: Boolean
         get() = getBooleanValue(TABLE_PREFERENCES, KEY_ASK_SET_DOWNLOAD_LOCATION, true)
         set(askSetDownloadLocation) {
-            setStringValue(TABLE_PREFERENCES,
+            setStringValue(
+                TABLE_PREFERENCES,
                 KEY_ASK_SET_DOWNLOAD_LOCATION,
-                askSetDownloadLocation.toString())
+                askSetDownloadLocation.toString()
+            )
         }
 
     override fun setStorageDownloadLocation(storageDownloadLocation: String?) {
@@ -3668,8 +3960,10 @@ class SqliteDatabaseHandler @Inject constructor(
                         }' WHERE $KEY_ID = '1'"
                     db.execSQL(UPDATE_ATTRIBUTE_TABLE)
                 } else {
-                    values.put(KEY_LAST_PUBLIC_HANDLE_TIMESTAMP,
-                        encrypt(lastPublicHandleTimeStamp.toString()))
+                    values.put(
+                        KEY_LAST_PUBLIC_HANDLE_TIMESTAMP,
+                        encrypt(lastPublicHandleTimeStamp.toString())
+                    )
                     db.insert(TABLE_ATTRIBUTES, null, values)
                 }
             }
@@ -3696,9 +3990,11 @@ class SqliteDatabaseHandler @Inject constructor(
     override var lastPublicHandleType: Int
         get() {
             Timber.i("Getting the last public handle type from DB")
-            return getIntValue(TABLE_ATTRIBUTES,
+            return getIntValue(
+                TABLE_ATTRIBUTES,
                 KEY_LAST_PUBLIC_HANDLE_TYPE,
-                MegaApiJava.AFFILIATE_TYPE_INVALID)
+                MegaApiJava.AFFILIATE_TYPE_INVALID
+            )
         }
         set(lastPublicHandleType) {
             Timber.i("Setting the last public handle type in the DB")
@@ -3743,9 +4039,11 @@ class SqliteDatabaseHandler @Inject constructor(
     override var myChatFilesFolderHandle: Long
         get() {
             Timber.i("Getting the storage state from DB")
-            return getLongValue(TABLE_ATTRIBUTES,
+            return getLongValue(
+                TABLE_ATTRIBUTES,
                 KEY_MY_CHAT_FILES_FOLDER_HANDLE,
-                MegaApiJava.INVALID_HANDLE)
+                MegaApiJava.INVALID_HANDLE
+            )
         }
         set(myChatFilesFolderHandle) {
             Timber.i("Setting the storage state in the DB")
@@ -3768,9 +4066,11 @@ class SqliteDatabaseHandler @Inject constructor(
         }
         set(transferQueueStatus) {
             Timber.i("Setting the storage state in the DB")
-            setStringValue(TABLE_ATTRIBUTES,
+            setStringValue(
+                TABLE_ATTRIBUTES,
                 KEY_TRANSFER_QUEUE_STATUS,
-                transferQueueStatus.toString())
+                transferQueueStatus.toString()
+            )
         }
 
     override val showNotifOff: String?
@@ -3797,12 +4097,15 @@ class SqliteDatabaseHandler @Inject constructor(
                 if (cursor != null && cursor.moveToFirst()) {
                     val UPDATE_ATTRIBUTES_TABLE =
                         "UPDATE $TABLE_ATTRIBUTES SET $KEY_INVALIDATE_SDK_CACHE='" + encrypt(
-                            invalidateSdkCache.toString()) + "' WHERE " + KEY_ID + " ='1'"
+                            invalidateSdkCache.toString()
+                        ) + "' WHERE " + KEY_ID + " ='1'"
                     db.execSQL(UPDATE_ATTRIBUTES_TABLE)
                     Timber.d("UPDATE_ATTRIBUTES_TABLE : %s", UPDATE_ATTRIBUTES_TABLE)
                 } else {
-                    values.put(KEY_INVALIDATE_SDK_CACHE,
-                        encrypt(invalidateSdkCache.toString()))
+                    values.put(
+                        KEY_INVALIDATE_SDK_CACHE,
+                        encrypt(invalidateSdkCache.toString())
+                    )
                     db.insert(TABLE_ATTRIBUTES, null, values)
                 }
             }
@@ -3963,7 +4266,8 @@ class SqliteDatabaseHandler @Inject constructor(
                     val fingerPrint = decrypt(cursor.getString(7))
                     val transferTag = cursor.getInt(8)
                     val state = cursor.getInt(9)
-                    pendMsg = PendingMessageSingle(messageId,
+                    pendMsg = PendingMessageSingle(
+                        messageId,
                         chatId,
                         timestamp,
                         idTempKarere,
@@ -3972,7 +4276,8 @@ class SqliteDatabaseHandler @Inject constructor(
                         name,
                         nodeHandle,
                         transferTag,
-                        state)
+                        state
+                    )
                 }
             }
         } catch (e: Exception) {
@@ -3988,10 +4293,12 @@ class SqliteDatabaseHandler @Inject constructor(
      * @param transferTag Identifier of the transfer.
      */
     override fun updatePendingMessageOnTransferStart(idMessage: Long, transferTag: Int) {
-        updatePendingMessage(idMessage,
+        updatePendingMessage(
+            idMessage,
             transferTag,
             Constants.INVALID_OPTION,
-            PendingMessageSingle.STATE_UPLOADING)
+            PendingMessageSingle.STATE_UPLOADING
+        )
     }
 
     /**
@@ -4076,7 +4383,8 @@ class SqliteDatabaseHandler @Inject constructor(
                         val fingerPrint = decrypt(cursor.getString(7))
                         val transferTag = cursor.getInt(8)
                         val state = cursor.getInt(9)
-                        val pendMsg = PendingMessageSingle(id,
+                        val pendMsg = PendingMessageSingle(
+                            id,
                             chatId,
                             timestamp,
                             idTempKarere,
@@ -4085,7 +4393,8 @@ class SqliteDatabaseHandler @Inject constructor(
                             name,
                             nodeHandle,
                             transferTag,
-                            state)
+                            state
+                        )
                         val aPMsg = AndroidMegaChatMessage(pendMsg, true)
                         pendMsgs.add(aPMsg)
                     } while (cursor.moveToNext())
@@ -4121,16 +4430,20 @@ class SqliteDatabaseHandler @Inject constructor(
 
     override fun removeSentPendingMessages() {
         Timber.d("removeSentPendingMessages")
-        db.delete(TABLE_PENDING_MSG_SINGLE,
+        db.delete(
+            TABLE_PENDING_MSG_SINGLE,
             KEY_PENDING_MSG_STATE + "=" + PendingMessageSingle.STATE_SENT,
-            null)
+            null
+        )
     }
 
     override fun removePendingMessageByChatId(idChat: Long) {
         Timber.d("removePendingMessageByChatId")
-        db.delete(TABLE_PENDING_MSG_SINGLE,
+        db.delete(
+            TABLE_PENDING_MSG_SINGLE,
             "$KEY_PENDING_MSG_ID_CHAT = '${encrypt(idChat.toString())}'",
-            null)
+            null
+        )
     }
 
     override fun removePendingMessageById(idMsg: Long) {
@@ -4212,12 +4525,16 @@ class SqliteDatabaseHandler @Inject constructor(
                             val nodeHandle = decrypt(cursor.getString(4))
                             val path = decrypt(cursor.getString(5))
                             val appData = decrypt(cursor.getString(6))
-                            sdTransfers.add(SDTransfer(tag,
-                                name!!,
-                                size!!,
-                                nodeHandle!!,
-                                path!!,
-                                appData!!))
+                            sdTransfers.add(
+                                SDTransfer(
+                                    tag,
+                                    name!!,
+                                    size!!,
+                                    nodeHandle!!,
+                                    path!!,
+                                    appData!!
+                                )
+                            )
                         } while (cursor.moveToPrevious())
                     }
                 }
@@ -4239,9 +4556,11 @@ class SqliteDatabaseHandler @Inject constructor(
     }
 
     override fun removeSDTransfer(tag: Int) {
-        db.delete(TABLE_SD_TRANSFERS,
+        db.delete(
+            TABLE_SD_TRANSFERS,
             "$KEY_SD_TRANSFERS_TAG=$tag",
-            null)
+            null
+        )
     }
 
     override fun saveBackup(backup: Backup): Boolean {
@@ -4255,12 +4574,16 @@ class SqliteDatabaseHandler @Inject constructor(
         values.put(KEY_BACKUP_SUB_STATE, backup.subState)
         values.put(KEY_BACKUP_EXTRA_DATA, encrypt(backup.extraData))
         values.put(KEY_BACKUP_START_TIME, encrypt(backup.startTimestamp.toString()))
-        values.put(KEY_BACKUP_LAST_TIME,
-            encrypt(backup.lastFinishTimestamp.toString()))
+        values.put(
+            KEY_BACKUP_LAST_TIME,
+            encrypt(backup.lastFinishTimestamp.toString())
+        )
         values.put(KEY_BACKUP_TARGET_NODE_PATH, encrypt(backup.targetFolderPath))
         values.put(KEY_BACKUP_EX, encrypt(backup.isExcludeSubFolders.toString()))
-        values.put(KEY_BACKUP_DEL,
-            encrypt(java.lang.Boolean.toString(backup.isDeleteEmptySubFolders)))
+        values.put(
+            KEY_BACKUP_DEL,
+            encrypt(java.lang.Boolean.toString(backup.isDeleteEmptySubFolders))
+        )
         // Default value is false.
         values.put(KEY_BACKUP_OUTDATED, encrypt("false"))
         val result = db.insertOrThrow(TABLE_BACKUPS, null, values)
@@ -4345,36 +4668,97 @@ class SqliteDatabaseHandler @Inject constructor(
 
     private fun getBackupFromCursor(cursor: Cursor): Backup? {
         try {
-            return Backup(backupId = (decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
-                KEY_BACKUP_ID))) ?: return null)
-                .toLong(),
+            return Backup(
+                backupId = (decrypt(
+                    cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            KEY_BACKUP_ID
+                        )
+                    )
+                ) ?: return null)
+                    .toLong(),
                 backupType = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BACKUP_TYPE)),
-                targetNode = (decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
-                    KEY_BACKUP_TARGET_NODE))) ?: return null)
+                targetNode = (decrypt(
+                    cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            KEY_BACKUP_TARGET_NODE
+                        )
+                    )
+                ) ?: return null)
                     .toLong(),
-                localFolder = decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
-                    KEY_BACKUP_LOCAL_FOLDER))) ?: return null,
+                localFolder = decrypt(
+                    cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            KEY_BACKUP_LOCAL_FOLDER
+                        )
+                    )
+                ) ?: return null,
                 backupName = decrypt(cursor.getString(cursor.getColumnIndexOrThrow(KEY_BACKUP_NAME)))!!,
-                state = BackupState.fromValue(cursor.getInt(cursor.getColumnIndexOrThrow(
-                    KEY_BACKUP_STATE))),
+                state = BackupState.fromValue(
+                    cursor.getInt(
+                        cursor.getColumnIndexOrThrow(
+                            KEY_BACKUP_STATE
+                        )
+                    )
+                ),
                 subState = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_BACKUP_SUB_STATE)),
-                extraData = decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
-                    KEY_BACKUP_EXTRA_DATA))) ?: return null,
-                startTimestamp = (decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
-                    KEY_BACKUP_START_TIME))) ?: return null)
+                extraData = decrypt(
+                    cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            KEY_BACKUP_EXTRA_DATA
+                        )
+                    )
+                ) ?: return null,
+                startTimestamp = (decrypt(
+                    cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            KEY_BACKUP_START_TIME
+                        )
+                    )
+                ) ?: return null)
                     .toLong(),
-                lastFinishTimestamp = (decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
-                    KEY_BACKUP_LAST_TIME))) ?: return null)
+                lastFinishTimestamp = (decrypt(
+                    cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            KEY_BACKUP_LAST_TIME
+                        )
+                    )
+                ) ?: return null)
                     .toLong(),
-                targetFolderPath = decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
-                    KEY_BACKUP_TARGET_NODE_PATH))) ?: return null,
-                isExcludeSubFolders = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
-                    KEY_BACKUP_EX)))),
-                isDeleteEmptySubFolders = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(
-                    cursor.getColumnIndexOrThrow(
-                        KEY_BACKUP_DEL)))),
-                outdated = java.lang.Boolean.parseBoolean(decrypt(cursor.getString(cursor.getColumnIndexOrThrow(
-                    KEY_BACKUP_OUTDATED))))
+                targetFolderPath = decrypt(
+                    cursor.getString(
+                        cursor.getColumnIndexOrThrow(
+                            KEY_BACKUP_TARGET_NODE_PATH
+                        )
+                    )
+                ) ?: return null,
+                isExcludeSubFolders = java.lang.Boolean.parseBoolean(
+                    decrypt(
+                        cursor.getString(
+                            cursor.getColumnIndexOrThrow(
+                                KEY_BACKUP_EX
+                            )
+                        )
+                    )
+                ),
+                isDeleteEmptySubFolders = java.lang.Boolean.parseBoolean(
+                    decrypt(
+                        cursor.getString(
+                            cursor.getColumnIndexOrThrow(
+                                KEY_BACKUP_DEL
+                            )
+                        )
+                    )
+                ),
+                outdated = java.lang.Boolean.parseBoolean(
+                    decrypt(
+                        cursor.getString(
+                            cursor.getColumnIndexOrThrow(
+                                KEY_BACKUP_OUTDATED
+                            )
+                        )
+                    )
+                )
             )
         } catch (exception: IllegalArgumentException) {
             Timber.w(exception, "Exception getting Backup")
@@ -4673,8 +5057,10 @@ class SqliteDatabaseHandler @Inject constructor(
         private const val KEY_SHOW_COPYRIGHT = "showcopyright"
         private const val KEY_SHOW_NOTIF_OFF = "shownotifoff"
         private const val KEY_ACCOUNT_DETAILS_TIMESTAMP = "accountdetailstimestamp"
+
         @Deprecated("Unused database properties")
         private const val KEY_PAYMENT_METHODS_TIMESTAMP = "paymentmethodsstimestamp"
+
         @Deprecated("Unused database properties")
         private const val KEY_PRICING_TIMESTAMP = "pricingtimestamp"
         private const val KEY_EXTENDED_ACCOUNT_DETAILS_TIMESTAMP = "extendedaccountdetailstimestamp"
@@ -4768,6 +5154,7 @@ class SqliteDatabaseHandler @Inject constructor(
         private const val KEY_MEGA_CONTACTS_LOCAL_NAME = "localname"
         private const val KEY_MEGA_CONTACTS_EMAIL = "email"
         private const val KEY_MEGA_CONTACTS_PHONE_NUMBER = "phonenumber"
+        private const val KEY_SHOW_SMS_VERIFICATION_DIALOG = "showSmsVerificationDialog"
         private const val CREATE_MEGA_CONTACTS_TABLE =
             "CREATE TABLE IF NOT EXISTS $TABLE_MEGA_CONTACTS(" +
                     "$KEY_ID INTEGER PRIMARY KEY, " +
