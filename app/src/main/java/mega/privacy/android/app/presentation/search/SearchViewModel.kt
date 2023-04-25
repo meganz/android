@@ -19,6 +19,7 @@ import mega.privacy.android.app.fragments.homepage.Event
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.search.model.SearchState
+import mega.privacy.android.domain.entity.preference.ViewType
 import mega.privacy.android.domain.entity.transfer.TransferEvent
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
@@ -373,4 +374,13 @@ class SearchViewModel @Inject constructor(
      * @return last position saved
      */
     fun popLastPositionStack(): Int = lastPositionStack.takeIf { it.isNotEmpty() }?.pop() ?: 0
+
+    /**
+     * Updates the value of [SearchState.currentViewType]
+     *
+     * @param newViewType The new [ViewType]
+     */
+    fun setCurrentViewType(newViewType: ViewType) {
+        _state.update { it.copy(currentViewType = newViewType) }
+    }
 }

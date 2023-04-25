@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.search.model
 
 import mega.privacy.android.app.main.DrawerItem
 import mega.privacy.android.app.presentation.manager.model.SharesTab
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
 /**
@@ -18,6 +19,7 @@ import nz.mega.sdk.MegaNode
  * @param searchDepth current search depth count
  * @param isInProgress current progress state of the search request
  * @param isMandatoryFingerPrintVerificationRequired - isMandatoryFingerPrintVerificationRequired
+ * @param currentViewType [ViewType]
  */
 data class SearchState(
     val nodes: List<MegaNode>?,
@@ -29,4 +31,5 @@ data class SearchState(
     val searchDepth: Int,
     val isInProgress: Boolean,
     val isMandatoryFingerPrintVerificationRequired: Boolean = false,
+    val currentViewType: ViewType = ViewType.LIST,
 )

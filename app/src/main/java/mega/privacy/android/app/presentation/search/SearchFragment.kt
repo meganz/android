@@ -33,13 +33,13 @@ import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
+import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.components.CustomizedGridLayoutManager
 import mega.privacy.android.app.components.NewGridRecyclerView
 import mega.privacy.android.app.components.PositionDividerItemDecoration
 import mega.privacy.android.app.components.dragger.DragToExitSupport
 import mega.privacy.android.app.components.scrollBar.FastScroller
-import mega.privacy.android.app.databinding.FragmentFilebrowsergridBinding
-import mega.privacy.android.app.databinding.FragmentFilebrowserlistBinding
+import mega.privacy.android.app.databinding.FragmentSearchBinding
 import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.imageviewer.ImageViewerActivity
@@ -67,8 +67,9 @@ import mega.privacy.android.app.utils.MegaNodeUtil.allHaveOwnerAccessAndNotTaken
 import mega.privacy.android.app.utils.MegaNodeUtil.areAllFileNodesAndNotTakenDown
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.Util.hideKeyboard
-import mega.privacy.android.app.utils.Util.noChangeRecyclerViewItemAnimator
+import mega.privacy.android.app.utils.displayMetrics
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
 import nz.mega.sdk.MegaError
@@ -93,6 +94,9 @@ class SearchFragment : RotatableFragment() {
         fun newInstance(): SearchFragment = SearchFragment()
     }
 
+    /**
+     * MegaApi
+     */
     @MegaApi
     @Inject
     lateinit var megaApi: MegaApiAndroid
@@ -109,7 +113,7 @@ class SearchFragment : RotatableFragment() {
     private val rubbishBinViewModel: RubbishBinViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
 
-    private var recyclerView: RecyclerView? = null
+    private var recyclerView: NewGridRecyclerView? = null
     private lateinit var emptyImageView: ImageView
     private lateinit var emptyTextView: LinearLayout
     private lateinit var emptyTextViewFirst: TextView
@@ -118,13 +122,9 @@ class SearchFragment : RotatableFragment() {
     private lateinit var searchProgressBar: ProgressBar
 
     //Bindings
-    private var _listBinding: FragmentFilebrowserlistBinding? = null
-    private val listBinding: FragmentFilebrowserlistBinding
-        get() = _listBinding!!
-
-    private var _gridBinding: FragmentFilebrowsergridBinding? = null
-    private val gridBinding: FragmentFilebrowsergridBinding
-        get() = _gridBinding!!
+    private var _binding: FragmentSearchBinding? = null
+    private val binding: FragmentSearchBinding
+        get() = _binding!!
 
     private lateinit var gridLayoutManager: CustomizedGridLayoutManager
     private val outMetrics: DisplayMetrics by lazy {
@@ -139,19 +139,14 @@ class SearchFragment : RotatableFragment() {
 
     private lateinit var activityContext: Context
 
+    private val itemDecoration: PositionDividerItemDecoration by lazy(LazyThreadSafetyMode.NONE) {
+        PositionDividerItemDecoration(requireContext(), displayMetrics())
+    }
+
     /**
      * Returns [SearchState] of [SearchViewModel]
      */
     private fun state() = searchViewModel.state.value
-
-    /**
-     * [Boolean] value referenced from [managerActivity]
-     *
-     * If "true", the contents are displayed in a List View-like manner
-     * If "false", the contents are displayed in a Grid View-like manner
-     */
-    private val isList: Boolean
-        get() = managerActivity.isList
 
     /**
      * Returns instance of [ManagerActivity] from [requireActivity]
@@ -174,6 +169,11 @@ class SearchFragment : RotatableFragment() {
         if (megaApi.rootNode == null) {
             return null
         }
+        requireActivity().windowManager.defaultDisplay?.getMetrics(outMetrics)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        initViews()
+        setupRecyclerView()
+        initObservers()
 
         if (this::adapter.isInitialized.not()) {
             adapter = MegaNodeAdapter(
@@ -183,11 +183,19 @@ class SearchFragment : RotatableFragment() {
                 state().searchParentHandle,
                 recyclerView,
                 Constants.SEARCH_ADAPTER,
-                if (isList) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
+                if (state().currentViewType == ViewType.LIST) MegaNodeAdapter.ITEM_VIEW_TYPE_LIST else MegaNodeAdapter.ITEM_VIEW_TYPE_GRID,
                 sortByHeaderViewModel
             )
+            adapter.isMultipleSelect = false
         }
+        recyclerView?.adapter = adapter
+        return binding.root
+    }
 
+    /**
+     * Init observers
+     */
+    private fun initObservers() {
         sortByHeaderViewModel.showDialogEvent.observe(
             viewLifecycleOwner,
             EventObserver { managerActivity.showNewSortByPanel(Constants.ORDER_CLOUD) })
@@ -209,76 +217,47 @@ class SearchFragment : RotatableFragment() {
                 updateSearchProgressView(state.isInProgress)
                 state.nodes?.let {
                     setNodes(it)
+                    switchViewType()
                 }
             }
         )
 
-        adapter.isMultipleSelect = false
-        requireActivity().windowManager.defaultDisplay?.getMetrics(outMetrics)
+        viewLifecycleOwner.collectFlow(sortByHeaderViewModel.state) { state ->
+            handleViewType(state.viewType)
+        }
+    }
 
-        return if (isList) {
-            _listBinding = FragmentFilebrowserlistBinding.inflate(inflater, container, false)
-            recyclerView = listBinding.fileListViewBrowser
-            fastScroller = listBinding.fastscroll
-            emptyImageView = listBinding.fileListEmptyImage
-            emptyTextView = listBinding.fileListEmptyText
-            emptyTextViewFirst = listBinding.fileListEmptyTextFirst
-            contentLayout = listBinding.contentLayout
-            searchProgressBar = listBinding.layoutGeneralProgressBar.progressbar
-            layoutManager = LinearLayoutManager(requireContext())
-            recyclerView?.apply {
-                setPadding(0, 0, 0, Util.scaleHeightPx(85, outMetrics))
-                clipToPadding = false
-                layoutManager = this@SearchFragment.layoutManager
-                setHasFixedSize(true)
-                itemAnimator = noChangeRecyclerViewItemAnimator()
-                addItemDecoration(
-                    PositionDividerItemDecoration(
-                        requireContext(),
-                        resources.displayMetrics
-                    )
-                )
-                addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        checkScroll()
-                    }
-                })
-                adapter = this@SearchFragment.adapter
-                fastScroller.setRecyclerView(this)
-            }
-            adapter.setListFragment(recyclerView)
-            adapter.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
-            listBinding.root
-        } else {
-            _gridBinding = FragmentFilebrowsergridBinding.inflate(inflater, container, false)
-            recyclerView = gridBinding.fileGridViewBrowser
-            fastScroller = gridBinding.fastscroll
-            emptyImageView = gridBinding.fileGridEmptyImage
-            emptyTextView = gridBinding.fileGridEmptyText
-            emptyTextViewFirst = gridBinding.fileGridEmptyTextFirst
-            contentLayout = gridBinding.contentLayout
-            searchProgressBar = gridBinding.layoutGeneralProgressBar.progressbar
-            gridLayoutManager = recyclerView?.layoutManager as CustomizedGridLayoutManager
-            recyclerView?.apply {
-                clipToPadding = false
-                setHasFixedSize(true)
-                itemAnimator = DefaultItemAnimator()
-                addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        super.onScrolled(recyclerView, dx, dy)
-                        checkScroll()
-                    }
-                })
-                adapter = this@SearchFragment.adapter
-                fastScroller.setRecyclerView(this)
-            }
-            adapter.setListFragment(recyclerView)
-            adapter.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
-            gridLayoutManager.spanSizeLookup =
-                adapter.getSpanSizeLookup(gridLayoutManager.spanCount)
+    /**
+     * init views
+     */
+    private fun initViews() {
+        recyclerView = binding.fileGridViewBrowser
+        emptyImageView = binding.fileGridEmptyImage
+        emptyTextView = binding.fileGridEmptyText
+        fastScroller = binding.fastscroll
+        fastScroller.setRecyclerView(binding.fileGridViewBrowser)
+        contentLayout = binding.contentLayout
+        searchProgressBar = binding.layoutGeneralProgressBar.progressbar
+        emptyImageView = binding.fileGridEmptyImage
+        emptyTextView = binding.fileGridEmptyText
+        emptyTextViewFirst = binding.fileGridEmptyTextFirst
+    }
 
-            gridBinding.root
+    /**
+     * Establishes the [NewGridRecyclerView]
+     */
+    private fun setupRecyclerView() {
+        recyclerView?.let {
+            it.itemAnimator = DefaultItemAnimator()
+            it.setPadding(0, 0, 0, Util.scaleHeightPx(85, displayMetrics()))
+            it.clipToPadding = false
+            it.setHasFixedSize(true)
+            it.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+                    checkScroll()
+                }
+            })
         }
     }
 
@@ -596,8 +575,7 @@ class SearchFragment : RotatableFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _gridBinding = null
-        _listBinding = null
+        _binding = null
     }
 
     override fun onDestroy() {
@@ -835,7 +813,7 @@ class SearchFragment : RotatableFragment() {
             Timber.d("Scroll to $lastVisiblePosition position")
 
             if (lastVisiblePosition >= 0) {
-                if (isList) {
+                if (state().currentViewType == ViewType.LIST) {
                     layoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
                 } else {
                     gridLayoutManager.scrollToPositionWithOffset(lastVisiblePosition, 0)
@@ -855,25 +833,23 @@ class SearchFragment : RotatableFragment() {
      * @param position Position of item which is clicked
      */
     fun itemClick(position: Int) {
-        val actualPosition = position - 1
-        val nodes: List<MegaNode> = state().nodes ?: emptyList()
-        Timber.d("Position: $actualPosition")
+        val node = adapter.getItem(position)
+        Timber.d("Position: $position")
         if (adapter.isMultipleSelect) {
             adapter.toggleSelection(position)
             if (adapter.selectedNodes.size > 0) {
                 updateActionModeTitle()
             }
         } else {
-            Timber.d("nodes.size(): ${nodes.size}")
             managerActivity.setTextSubmitted()
-            if (!searchViewModel.isSearchQueryValid() && nodes[actualPosition].isFolder) {
+            if (!searchViewModel.isSearchQueryValid() && node.isFolder) {
                 managerActivity.closeSearchView()
-                managerActivity.openSearchFolder(nodes[actualPosition])
+                managerActivity.openSearchFolder(node)
                 return
             }
-            if (nodes[actualPosition].isFolder) {
+            if (node.isFolder) {
                 var lastFirstVisiblePosition: Int
-                if (isList) {
+                if (state().currentViewType == ViewType.LIST) {
                     lastFirstVisiblePosition =
                         layoutManager.findFirstCompletelyVisibleItemPosition()
                 } else {
@@ -886,13 +862,13 @@ class SearchFragment : RotatableFragment() {
                     }
                 }
                 searchViewModel.onFolderClicked(
-                    nodes[actualPosition].handle,
+                    node.handle,
                     lastFirstVisiblePosition
                 )
                 Timber.d("Push to stack $lastFirstVisiblePosition position")
                 clickAction()
             } else {
-                openFile(node = nodes[actualPosition], position = actualPosition)
+                openFile(node = node, position = position)
             }
         }
     }
@@ -1131,6 +1107,45 @@ class SearchFragment : RotatableFragment() {
                 managerActivity,
                 managerActivity
             )
+        }
+    }
+
+    /**
+     * Updates the View Type of this Fragment
+     *
+     * Changing the View Type will cause the scroll position to be lost. To avoid that, only
+     * refresh the contents when the new View Type is different from the original View Type
+     *
+     * @param viewType The new View Type received from [SearchViewModel]
+     */
+    private fun handleViewType(viewType: ViewType) {
+        if (viewType != state().currentViewType) {
+            searchViewModel.setCurrentViewType(viewType)
+            switchViewType()
+        }
+    }
+
+    /**
+     * Switches how items in the [MegaNodeAdapter] are being displayed, based on the current
+     * [ViewType] in [SearchViewModel]
+     */
+    private fun switchViewType() {
+        recyclerView?.run {
+            when (state().currentViewType) {
+                ViewType.LIST -> {
+                    switchToLinear()
+                    if (itemDecorationCount == 0) addItemDecoration(itemDecoration)
+                    this@SearchFragment.adapter.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_LIST
+                }
+                ViewType.GRID -> {
+                    switchBackToGrid()
+                    removeItemDecoration(itemDecoration)
+                    (layoutManager as CustomizedGridLayoutManager).apply {
+                        spanSizeLookup = this@SearchFragment.adapter.getSpanSizeLookup(spanCount)
+                    }
+                    this@SearchFragment.adapter.adapterType = MegaNodeAdapter.ITEM_VIEW_TYPE_GRID
+                }
+            }
         }
     }
 }
