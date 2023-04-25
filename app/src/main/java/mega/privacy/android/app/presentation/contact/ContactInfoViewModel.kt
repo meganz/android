@@ -147,6 +147,18 @@ class ContactInfoViewModel @Inject constructor(
     val userHandle: Long?
         get() = state.value.contactItem?.handle
 
+    /**
+     * User email
+     */
+    val userEmail: String?
+        get() = state.value.contactItem?.email
+
+    /**
+     * chat id
+     */
+    val chatId: Long?
+        get() = state.value.chatRoom?.chatId
+
 
     /**
      * Nick name
@@ -367,6 +379,7 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun updateContactInfo(chatHandle: Long, email: String? = null) = viewModelScope.launch {
         val isFromContacts = chatHandle == -1L
+        _state.update { it.copy(isFromContacts = isFromContacts) }
         var userInfo: ContactItem? = null
         var chatRoom: ChatRoom? = null
         if (isFromContacts) {
@@ -387,7 +400,6 @@ class ContactInfoViewModel @Inject constructor(
 
         _state.update {
             it.copy(
-                isFromContacts = isFromContacts,
                 lastGreen = userInfo?.lastSeen ?: 0,
                 userStatus = userInfo?.status ?: UserStatus.Invalid,
                 contactItem = userInfo,

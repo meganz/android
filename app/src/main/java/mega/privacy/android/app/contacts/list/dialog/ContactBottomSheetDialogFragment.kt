@@ -86,8 +86,8 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private var folderHandle: Long? = null
 
     private lateinit var binding: BottomSheetContactDetailBinding
-    private lateinit var selectFileLauncher: ActivityResultLauncher<List<MegaUser>>
-    private lateinit var selectFolderLauncher: ActivityResultLauncher<List<MegaUser>>
+    private lateinit var selectFileLauncher: ActivityResultLauncher<String>
+    private lateinit var selectFolderLauncher: ActivityResultLauncher<String>
     private lateinit var selectChatLauncher: ActivityResultLauncher<MegaUser>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -233,7 +233,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionSendFile.setOnClickListener {
-            selectFileLauncher.launch(listOf(megaUser))
+            selectFileLauncher.launch(megaUser.email)
         }
 
         binding.optionShareContact.setOnClickListener {
@@ -241,7 +241,7 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.optionShareFolder.setOnClickListener {
-            selectFolderLauncher.launch(listOf(megaUser))
+            selectFolderLauncher.launch(megaUser.email)
         }
 
         binding.optionRemove.setOnClickListener { showRemoveContactDialog(megaUser) }

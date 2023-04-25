@@ -195,8 +195,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private var bottomSheetDialogFragment: ContactFileListBottomSheetDialogFragment? = null
     private var contactNicknameBottomSheetDialogFragment: ContactNicknameBottomSheetDialogFragment? =
         null
-    private lateinit var selectFolderResultLauncher: ActivityResultLauncher<List<MegaUser>>
-    private lateinit var selectFileResultLauncher: ActivityResultLauncher<List<MegaUser>>
+    private lateinit var selectFolderResultLauncher: ActivityResultLauncher<String>
+    private lateinit var selectFileResultLauncher: ActivityResultLauncher<String>
     private lateinit var selectFolderToCopyLauncher: ActivityResultLauncher<LongArray>
     private val manageShareReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -542,9 +542,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun configureFileToShareLauncher() {
         selectFileResultLauncher =
             registerForActivityResult(SelectFileToShareActivityContract()) { result ->
-                user?.let {
-                    megaAttacher.handleSelectFileResult(result, it, this)
-                }
+                result?.putStringArrayListExtra(
+                    Constants.SELECTED_CONTACTS,
+                    arrayListOf(viewModel.userEmail)
+                )
+                megaAttacher.handleSelectFileResult(result, this)
             }
     }
 
@@ -682,7 +684,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun modifyNickName() {
         if (contentContactProperties.nicknameText.text == getString(R.string.add_nickname)) {
             showConfirmationSetNickname(null)
-        } else if (contentContactProperties.emailText.text.isNotEmpty() && !contactNicknameBottomSheetDialogFragment.isBottomSheetDialogShown()) {
+        } else if (!viewModel.userEmail.isNullOrEmpty() && !contactNicknameBottomSheetDialogFragment.isBottomSheetDialogShown()) {
             contactNicknameBottomSheetDialogFragment =
                 ContactNicknameBottomSheetDialogFragment().apply {
                     show(
@@ -768,7 +770,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun contactPropertiesClicked() {
         val intentManageChat = Intent(this, ManageChatHistoryActivity::class.java).apply {
-            putExtra(Constants.EMAIL, contentContactProperties.emailText.text)
+            putExtra(Constants.EMAIL, viewModel.userEmail)
             putExtra(Constants.CHAT_ID, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
             putExtra(Constants.IS_FROM_CONTACTS, viewModel.isFromContacts)
         }
@@ -777,7 +779,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun sharedFilesClicked() {
         val nodeHistoryIntent = Intent(this, NodeAttachmentHistoryActivity::class.java)
-        chat?.chatId?.let {
+        viewModel.chatId?.let {
             nodeHistoryIntent.putExtra("chatId", it)
         }
         startActivity(nodeHistoryIntent)
@@ -789,7 +791,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             showOverDiskQuotaPaywallWarning()
             return
         }
-        if (contentContactProperties.emailText.text.isNullOrEmpty()) {
+        if (viewModel.userEmail.isNullOrEmpty()) {
             Timber.d("Selected contact NULL")
             return
         }
@@ -812,7 +814,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun verifyCredentialsClicked() {
         val intent = Intent(this, AuthenticityCredentialsActivity::class.java)
-        intent.putExtra(Constants.EMAIL, contentContactProperties.emailText.text)
+        intent.putExtra(Constants.EMAIL, viewModel.userEmail)
         startActivity(intent)
     }
 
@@ -993,7 +995,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             showOverDiskQuotaPaywallWarning()
             return
         }
-        user?.let { selectFileResultLauncher.launch(arrayListOf(it)) }
+        viewModel.userEmail?.let { selectFileResultLauncher.launch(it) }
             ?: run { Timber.w("Selected contact NULL") }
     }
 
@@ -1142,8 +1144,8 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun pickFolderToShare() {
         Timber.d("pickFolderToShare")
-        user?.let {
-            selectFolderResultLauncher.launch(arrayListOf(it))
+        viewModel.userEmail?.let {
+            selectFolderResultLauncher.launch(it)
         } ?: run {
             showSnackbar(
                 Constants.SNACKBAR_TYPE,
@@ -1155,7 +1157,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun setOfflineAvatar() {
-        val userEmail = contentContactProperties.emailText.text ?: return
+        val userEmail = viewModel.userEmail ?: return
         Timber.d("setOfflineAvatar")
         val avatar = buildAvatarFile(this, "$userEmail.jpg")
         if (avatar?.exists() == true) {
@@ -1352,7 +1354,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             if (sharedFoldersFragment == null) {
                 supportFragmentManager.commitNow {
                     sharedFoldersFragment = ContactSharedFolderFragment().apply {
-                        setUserEmail(contentContactProperties.emailText.text.toString())
+                        setUserEmail(viewModel.userEmail)
                         replace(
                             R.id.fragment_container_shared_folders,
                             this,
