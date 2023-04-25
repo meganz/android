@@ -1,6 +1,5 @@
 package mega.privacy.android.data.gateway
 
-import nz.mega.sdk.MegaNode
 import java.io.File
 
 interface CacheFolderGateway {
@@ -25,10 +24,14 @@ interface CacheFolderGateway {
     fun createCacheFolder(name: String)
 
     /**
-     * Returns cache file if exists
+     * Returns a [File] reference in the cache folder and given subfolder and with the given file name, even if it does not exist.
+     * If the folder does not exist it will be created.
+     * If the file does not exist a [File] instance will be returned either but not created, so it can be used as path reference.
+     * see [File.exists] to check whether the file exists or not if needed.
      *
-     * @param folderName Name of the parent folder
+     * @param folderName Name of the parent folder (a subfolder of cache folder)
      * @param fileName Name of the file
+     * @return [File] pointing to the specified path. In case of an error creating the subfolder, if needed, or null [fileName], null will be returned
      */
     fun getCacheFile(folderName: String, fileName: String?): File?
 

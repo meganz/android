@@ -464,8 +464,8 @@ internal class DefaultContactsRepository @Inject constructor(
         } else {
             cacheFolderGateway.getCacheFile(
                 folderName = CacheFolderConstant.AVATAR_FOLDER,
-                fileName = "${megaUser.email}.jpg"
-            )?.absolutePath
+                fileName = megaUser.email + FileConstant.JPG_EXTENSION
+            )?.takeIf { it.exists() }?.absolutePath
         }
 
         checkLastGreen(status, megaUser.handle)
