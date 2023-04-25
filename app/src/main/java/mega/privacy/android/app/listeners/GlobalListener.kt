@@ -40,6 +40,8 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.mapper.StorageStateMapper
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetAccountDetailsUseCase
@@ -48,6 +50,7 @@ import mega.privacy.android.domain.usecase.GetPaymentMethod
 import mega.privacy.android.domain.usecase.GetPricing
 import mega.privacy.android.domain.usecase.account.SetSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.login.BroadcastAccountUpdateUseCase
+import mega.privacy.android.domain.usecase.account.BroadcastMyAccountUpdateUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaContactRequest
@@ -61,6 +64,9 @@ import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Application's Global Listener
+ */
 class GlobalListener @Inject constructor(
     private val dbH: DatabaseHandler,
     private val megaChatNotificationHandler: MegaChatNotificationHandler,
@@ -78,8 +84,12 @@ class GlobalListener @Inject constructor(
     private val getNumberOfSubscription: GetNumberOfSubscription,
     private val setSecurityUpgradeInApp: SetSecurityUpgradeInApp,
     private val broadcastAccountUpdateUseCase: BroadcastAccountUpdateUseCase,
+    private val broadcastMyAccountUpdateUseCase: BroadcastMyAccountUpdateUseCase,
 ) : MegaGlobalListenerInterface {
 
+    /**
+     * onUsersUpdate
+     */
     override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser?>?) {
 
         users?.filterNotNull()?.forEach { user ->
@@ -114,6 +124,9 @@ class GlobalListener @Inject constructor(
         }
     }
 
+    /**
+     * onUserAlertsUpdate
+     */
     override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert?>?) {
         megaChatNotificationHandler.updateAppBadge()
         notifyNotificationCountChange(api)
@@ -126,6 +139,9 @@ class GlobalListener @Inject constructor(
         )
     }
 
+    /**
+     * onNodesUpdate
+     */
     override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode?>?) {
         nodeList?.filterNotNull()?.forEach { node ->
             if (node.isInShare && node.hasChanged(MegaNode.CHANGE_TYPE_INSHARE)) {
@@ -137,8 +153,14 @@ class GlobalListener @Inject constructor(
         }
     }
 
+    /**
+     * onReloadNeeded
+     */
     override fun onReloadNeeded(api: MegaApiJava) {}
 
+    /**
+     * onAccountUpdate
+     */
     override fun onAccountUpdate(api: MegaApiJava) {
         Timber.d("onAccountUpdate")
 
@@ -156,6 +178,9 @@ class GlobalListener @Inject constructor(
         }
     }
 
+    /**
+     * onContactRequestsUpdate
+     */
     override fun onContactRequestsUpdate(
         api: MegaApiJava,
         requests: ArrayList<MegaContactRequest?>?,
@@ -200,6 +225,9 @@ class GlobalListener @Inject constructor(
         }
     }
 
+    /**
+     * onEvent
+     */
     override fun onEvent(api: MegaApiJava, event: MegaEvent?) {
         if (event == null) return
 
@@ -220,6 +248,8 @@ class GlobalListener @Inject constructor(
                                 putExtra(Constants.EXTRA_STORAGE_STATE, state)
                             }
                         appContext.sendBroadcast(intent)
+
+                        sendMyAccountUpdateBroadcast(Action.STORAGE_STATE_CHANGED, state)
                     }
                 }
             }
@@ -242,10 +272,16 @@ class GlobalListener @Inject constructor(
         }
     }
 
+    /**
+     * onSetsUpdate
+     */
     override fun onSetsUpdate(api: MegaApiJava?, sets: ArrayList<MegaSet>?) {
         Timber.d("Sets Updated")
     }
 
+    /**
+     * onSetElementsUpdate
+     */
     override fun onSetElementsUpdate(
         api: MegaApiJava?,
         elements: ArrayList<MegaSetElement>?,
@@ -258,7 +294,21 @@ class GlobalListener @Inject constructor(
             Intent(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
                 .putExtra(BroadcastConstants.ACTION_TYPE, Constants.UPDATE_ACCOUNT_DETAILS)
         )
+
+        sendMyAccountUpdateBroadcast(Action.UPDATE_ACCOUNT_DETAILS, null)
     }
+
+    /**
+     * Send broadcast to App Event
+     */
+    private fun sendMyAccountUpdateBroadcast(action: Action, storageState: StorageState?) =
+        applicationScope.launch {
+            val data = MyAccountUpdate(
+                action = action,
+                storageState = storageState
+            )
+            broadcastMyAccountUpdateUseCase(data)
+        }
 
     private fun showSharedFolderNotification(n: MegaNode) {
         Timber.d("showSharedFolderNotification")

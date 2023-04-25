@@ -117,7 +117,6 @@ import mega.privacy.android.app.components.attacher.MegaAttacher
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.components.twemoji.EmojiTextView
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_CLOSE_CHAT_AFTER_OPEN_TRANSFERS
-import mega.privacy.android.app.constants.BroadcastConstants.ACTION_TYPE
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_CREDENTIALS
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_SETTING
 import mega.privacy.android.app.constants.BroadcastConstants.ACTION_UPDATE_DISABLE_CU_UI_SETTING
@@ -128,7 +127,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_IN
 import mega.privacy.android.app.constants.BroadcastConstants.BROADCAST_ACTION_TRANSFER_FINISH
 import mega.privacy.android.app.constants.BroadcastConstants.COMPLETED_TRANSFER
 import mega.privacy.android.app.constants.BroadcastConstants.EXTRA_USER_HANDLE
-import mega.privacy.android.app.constants.BroadcastConstants.INVALID_ACTION
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_ON_HOLD_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_CALL_STATUS_CHANGE
 import mega.privacy.android.app.constants.EventConstants.EVENT_REFRESH
@@ -335,6 +333,8 @@ import mega.privacy.android.data.model.MegaAttributes
 import mega.privacy.android.data.model.MegaPreferences
 import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.Feature
+import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.Product
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.StorageState
@@ -760,35 +760,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             }
         }
     }
-    private val updateMyAccountReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            if (Constants.ACTION_STORAGE_STATE_CHANGED == intent.action) {
-                val extras = intent.extras
-                storageStateFromBroadcast =
-                    extras?.serializable(Constants.EXTRA_STORAGE_STATE) ?: StorageState.Unknown
-                if (!showStorageAlertWithDelay) {
-                    checkStorageStatus(
-                        if (storageStateFromBroadcast !== StorageState.Unknown) storageStateFromBroadcast else viewModel.getStorageState(),
-                        false
-                    )
-                }
-                updateAccountDetailsVisibleInfo()
-                return
-            }
-            val actionType = intent.getIntExtra(ACTION_TYPE, INVALID_ACTION)
-            if (actionType == Constants.UPDATE_ACCOUNT_DETAILS) {
-                Timber.d("BROADCAST TO UPDATE AFTER UPDATE_ACCOUNT_DETAILS")
-                if (isFinishing) {
-                    return
-                }
-                updateAccountDetailsVisibleInfo()
-                checkInitialScreens()
-                if (isBusinessAccount) {
-                    invalidateOptionsMenu()
-                }
-            }
-        }
-    }
+
     private val receiverUpdateOrder: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Constants.BROADCAST_ACTION_INTENT_UPDATE_ORDER != intent.action) {
@@ -2215,7 +2187,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private fun registerBroadcastReceivers() {
         registerContactUpdateReceiver()
-        registerMyAccountUpdateReceiver()
         registerCameraUploadAttributeChangedReceiver()
         registerOrderUpdatedReceiver()
         registerChatArchivedReceiver()
@@ -2245,12 +2216,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             receiverCUAttrChanged,
             IntentFilter(BROADCAST_ACTION_INTENT_CU_ATTR_CHANGE)
         )
-    }
-
-    private fun registerMyAccountUpdateReceiver() {
-        val filter = IntentFilter(Constants.BROADCAST_ACTION_INTENT_UPDATE_ACCOUNT_DETAILS)
-        filter.addAction(Constants.ACTION_STORAGE_STATE_CHANGED)
-        registerReceiver(updateMyAccountReceiver, filter)
     }
 
     private fun registerContactUpdateReceiver() {
@@ -2479,6 +2444,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 playTransfersMenuIcon?.isVisible = false
                 cancelAllTransfersMenuItem?.isVisible = false
             }
+        }
+        collectFlow(
+            targetFlow = viewModel.monitorMyAccountUpdateEvent,
+            minActiveState = Lifecycle.State.CREATED
+        ) { data ->
+            handleUpdateMyAccount(data)
         }
     }
 
@@ -3303,7 +3274,6 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         isStorageStatusDialogShown = false
         unregisterReceiver(contactUpdateReceiver)
-        unregisterReceiver(updateMyAccountReceiver)
         unregisterReceiver(receiverUpdateOrder)
         unregisterReceiver(chatArchivedReceiver)
         unregisterReceiver(receiverCUAttrChanged)
@@ -10435,6 +10405,34 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 outgoingSharesTab.orCreateBadge.number = unverifiedNodesCount
             } else {
                 outgoingSharesTab.removeBadge()
+            }
+        }
+    }
+
+    private fun handleUpdateMyAccount(data: MyAccountUpdate) {
+        when (data.action) {
+            Action.STORAGE_STATE_CHANGED -> {
+                Timber.d("BROADCAST STORAGE STATE CHANGED")
+                storageStateFromBroadcast = data.storageState ?: StorageState.Unknown
+                if (!showStorageAlertWithDelay) {
+                    checkStorageStatus(
+                        if (storageStateFromBroadcast !== StorageState.Unknown) storageStateFromBroadcast else viewModel.getStorageState(),
+                        false
+                    )
+                }
+                updateAccountDetailsVisibleInfo()
+                return
+            }
+            Action.UPDATE_ACCOUNT_DETAILS -> {
+                Timber.d("BROADCAST TO UPDATE AFTER UPDATE_ACCOUNT_DETAILS")
+                if (isFinishing) {
+                    return
+                }
+                updateAccountDetailsVisibleInfo()
+                checkInitialScreens()
+                if (isBusinessAccount) {
+                    invalidateOptionsMenu()
+                }
             }
         }
     }

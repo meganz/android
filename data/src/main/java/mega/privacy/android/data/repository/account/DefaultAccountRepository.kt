@@ -45,6 +45,8 @@ import mega.privacy.android.data.mapper.contact.MyAccountCredentialsMapper
 import mega.privacy.android.data.mapper.login.AccountSessionMapper
 import mega.privacy.android.data.mapper.login.UserCredentialsMapper
 import mega.privacy.android.data.model.GlobalUpdate
+import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -210,18 +212,21 @@ internal class DefaultAccountRepository @Inject constructor(
                     MegaError.API_OK -> {
                         continuation.resumeWith(Result.success(Unit))
                     }
+
                     MegaError.API_EACCESS -> continuation.failWithException(
                         NoLoggedInUserException(
                             error.errorCode,
                             error.errorString
                         )
                     )
+
                     MegaError.API_EMASTERONLY -> continuation.failWithException(
                         NotMasterBusinessAccountException(
                             error.errorCode,
                             error.errorString
                         )
                     )
+
                     else -> continuation.failWithError(error, "onDeleteAccountRequestFinished")
                 }
             }
@@ -252,9 +257,11 @@ internal class DefaultAccountRepository @Inject constructor(
                                     MegaChatError.ERROR_OK -> continuation.resumeWith(
                                         Result.success(Unit)
                                     )
+
                                     MegaChatError.ERROR_ACCESS -> continuation.resumeWith(
                                         Result.failure(ChatNotInitializedErrorStatus())
                                     )
+
                                     else -> continuation.failWithError(
                                         error,
                                         "retryPendingConnections"
@@ -494,6 +501,14 @@ internal class DefaultAccountRepository @Inject constructor(
         )
         // keep previous info if new info null
         myAccountInfoFacade.handleAccountDetail(newDetail)
+
+        // Send broadcast to to App Event
+        appEventGateway.broadcastMyAccountUpdate(
+            MyAccountUpdate(
+                action = Action.UPDATE_ACCOUNT_DETAILS,
+                storageState = null
+            )
+        )
     }
 
     override fun monitorAccountDetail(): Flow<AccountDetail> =
@@ -535,9 +550,11 @@ internal class DefaultAccountRepository @Inject constructor(
                         MegaError.API_EACCESS -> continuation.resumeWith(
                             Result.failure(ChangeEmailException.EmailInUse)
                         )
+
                         MegaError.API_EEXIST -> continuation.resumeWith(
                             Result.failure(ChangeEmailException.AlreadyRequested)
                         )
+
                         else -> continuation.resumeWith(
                             Result.failure(ChangeEmailException.Unknown(error.errorCode))
                         )
@@ -561,12 +578,14 @@ internal class DefaultAccountRepository @Inject constructor(
                             Timber.d("MegaRequest.TYPE_QUERY_SIGNUP_LINK MegaError API_OK")
                             continuation.resumeWith(Result.success(request.email))
                         }
+
                         MegaError.API_ENOENT -> {
                             Timber.w("MegaRequest.TYPE_QUERY_SIGNUP_LINK link no longer available.")
                             continuation.resumeWith(
                                 Result.failure(QuerySignupLinkException.LinkNoLongerAvailable)
                             )
                         }
+
                         else -> {
                             Timber.w("MegaRequest.TYPE_QUERY_SIGNUP_LINK error $error")
                             continuation.resumeWith(
@@ -785,6 +804,11 @@ internal class DefaultAccountRepository @Inject constructor(
 
     override suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean) =
         appEventGateway.setUpgradeSecurity(isSecurityUpgrade)
+
+    override fun monitorMyAccountUpdate() = appEventGateway.monitorMyAccountUpdate()
+
+    override suspend fun broadcastMyAccountUpdate(data: MyAccountUpdate) =
+        appEventGateway.broadcastMyAccountUpdate(data)
 
     companion object {
         private const val LAST_SYNC_TIMESTAMP_FILE = "last_sync_timestamp"

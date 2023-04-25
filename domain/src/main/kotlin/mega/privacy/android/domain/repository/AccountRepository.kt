@@ -1,6 +1,7 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import mega.privacy.android.domain.entity.MyAccountUpdate
 import mega.privacy.android.domain.entity.SubscriptionOption
 import mega.privacy.android.domain.entity.UserAccount
 import mega.privacy.android.domain.entity.account.AccountDetail
@@ -369,4 +370,14 @@ interface AccountRepository {
      * @param isSecurityUpgrade
      */
     suspend fun setUpgradeSecurity(isSecurityUpgrade: Boolean)
+
+    /**
+     * Monitor my account update
+     */
+    fun monitorMyAccountUpdate(): Flow<MyAccountUpdate>
+
+    /**
+     * Broadcast my account update
+     */
+    suspend fun broadcastMyAccountUpdate(data: MyAccountUpdate)
 }

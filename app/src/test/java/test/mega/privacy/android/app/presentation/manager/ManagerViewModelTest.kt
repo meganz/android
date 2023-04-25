@@ -25,6 +25,8 @@ import mega.privacy.android.app.presentation.manager.model.SharesTab
 import mega.privacy.android.app.presentation.manager.model.TransfersTab
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.MyAccountUpdate
+import mega.privacy.android.domain.entity.MyAccountUpdate.Action
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StorageState
@@ -53,6 +55,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
@@ -174,6 +177,14 @@ class ManagerViewModelTest {
         mock<RequireTwoFactorAuthenticationUseCase>()
     private val setLatestTargetPath = mock<SetLatestTargetPath>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
+    private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>() {
+        onBlocking { invoke() }.thenReturn(
+            flowOf(
+                MyAccountUpdate(Action.STORAGE_STATE_CHANGED, StorageState.Green),
+                MyAccountUpdate(Action.UPDATE_ACCOUNT_DETAILS, null)
+            )
+        )
+    }
     private val establishCameraUploadsSyncHandlesUseCase =
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
 
@@ -215,6 +226,7 @@ class ManagerViewModelTest {
             monitorSecurityUpgradeInApp = { monitorSecurityUpgradeInApp },
             listenToNewMediaUseCase = mock(),
             monitorUserUpdates = monitorUserUpdates,
+            monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate
         )
@@ -420,6 +432,17 @@ class ManagerViewModelTest {
                 assertThat(awaitItem()).isEqualTo(initialFinishActivityValue)
                 monitorFinishActivity()
                 assertThat(awaitItem()).isEqualTo(!initialFinishActivityValue)
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `test that monitor my account update events are returned`() =
+        runTest {
+            underTest.monitorMyAccountUpdateEvent.distinctUntilChanged().test {
+                assertThat(awaitItem().action).isEqualTo(Action.STORAGE_STATE_CHANGED)
+                monitorFinishActivity()
+                assertThat(awaitItem().action).isEqualTo(Action.UPDATE_ACCOUNT_DETAILS)
                 cancelAndIgnoreRemainingEvents()
             }
         }
