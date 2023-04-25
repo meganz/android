@@ -12,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ActionMode
@@ -19,6 +20,7 @@ import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.PasscodeActivity
@@ -31,6 +33,7 @@ import mega.privacy.android.app.interfaces.SnackbarShower
 import mega.privacy.android.app.main.adapters.VersionsFileAdapter
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.modalbottomsheet.VersionsBottomSheetDialogFragment
+import mega.privacy.android.app.presentation.versions.VersionsFileViewModel
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
@@ -60,10 +63,13 @@ import java.io.File
 /**
  * File Version list activity
  */
+@AndroidEntryPoint
 class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, View.OnClickListener,
     MegaGlobalListenerInterface, SnackbarShower {
 
     private lateinit var binding: ActivityVersionsFileBinding
+
+    private val viewModel by viewModels<VersionsFileViewModel>()
 
     var aB: ActionBar? = null
     var selectedNode: MegaNode? = null
@@ -173,6 +179,9 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
                 Timber.e("ERROR: node is NULL")
             }
         }
+
+        // Initialize the ViewModel
+        viewModel.init(nodeHandle = nodeHandle)
     }
 
 
@@ -387,16 +396,23 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        when (accessLevel) {
-            MegaShare.ACCESS_FULL, MegaShare.ACCESS_OWNER -> {
-                selectMenuItem?.isVisible = true
-                unSelectMenuItem?.isVisible = false
-                deleteVersionsMenuItem?.isVisible = true
-            }
-            else -> {
-                selectMenuItem?.isVisible = false
-                unSelectMenuItem?.isVisible = false
-                deleteVersionsMenuItem?.isVisible = false
+        if (viewModel.state.value.isNodeInBackups) {
+            // Apply the following properties if the Node is a Backup Node
+            selectMenuItem?.isVisible = false
+            unSelectMenuItem?.isVisible = false
+            deleteVersionsMenuItem?.isVisible = true
+        } else {
+            when (accessLevel) {
+                MegaShare.ACCESS_FULL, MegaShare.ACCESS_OWNER -> {
+                    selectMenuItem?.isVisible = true
+                    unSelectMenuItem?.isVisible = false
+                    deleteVersionsMenuItem?.isVisible = true
+                }
+                else -> {
+                    selectMenuItem?.isVisible = false
+                    unSelectMenuItem?.isVisible = false
+                    deleteVersionsMenuItem?.isVisible = false
+                }
             }
         }
         return super.onPrepareOptionsMenu(menu)
