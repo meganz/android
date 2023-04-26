@@ -11,16 +11,19 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.imageviewer.data.ImageItem
+import mega.privacy.android.app.presentation.slideshow.model.SlideshowItem
 import mega.privacy.android.app.presentation.slideshow.model.SlideshowViewState
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
+import mega.privacy.android.domain.usecase.GetChatPhotoByMessageIdUseCase
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
+import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessage
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -35,6 +38,8 @@ class SlideshowViewModel @Inject constructor(
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase,
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase,
     private val getImageByNodeHandle: GetImageByNodeHandle,
+    private val getImageForChatMessage: GetImageForChatMessage,
+    private val getChatPhotoByMessageIdUseCase: GetChatPhotoByMessageIdUseCase,
 ) : ViewModel() {
 
     /**
@@ -59,38 +64,90 @@ class SlideshowViewModel @Inject constructor(
     }
 
     private fun playSlideshow(imageItems: List<ImageItem>) {
-        if (_state.value.items.isNotEmpty())
+        if (_state.value.slideshowItems.isNotEmpty())
             return
         viewModelScope.launch {
-            val ids = imageItems.map { it.getNodeHandle() ?: it.id }
-            val slideshowItems = getPhotosByIds(ids = ids.map { id -> NodeId(id) })
-                .filterIsInstance<Photo.Image>()
+            val slideshowItems = if (imageItems.first() is ImageItem.ChatNode) {
+                imageItems.mapNotNull {
+                    val chatMessageId = (it as ImageItem.ChatNode).chatMessageId
+                    val chatRoomId = (imageItems.first() as ImageItem.ChatNode).chatRoomId
+                    val photo = getChatPhotoByMessageIdUseCase(
+                        chatRoomId,
+                        chatMessageId
+                    )
+                    if (photo != null && photo is Photo.Image) {
+                        SlideshowItem.ChatItem(
+                            photo = photo,
+                            chatRoomId = chatRoomId,
+                            messageId = chatMessageId,
+                        )
+                    } else {
+                        null
+                    }
+                }
+            } else {
+                val ids = imageItems.map {
+                    it.getNodeHandle() ?: it.id
+                }
+                getPhotosByIds(ids = ids.map { id -> NodeId(id) }).filterIsInstance<Photo.Image>()
+                    .map { SlideshowItem.DefaultItem(it) }
+            }
             val order = _state.value.order ?: SlideshowOrder.Shuffle
             val sortedItems = sortItems(slideshowItems, order)
             _state.update {
                 it.copy(
-                    items = sortedItems,
+                    slideshowItems = sortedItems,
                     isPlaying = true
                 )
             }
         }
     }
 
-    private fun sortItems(slideshowItems: List<Photo>, order: SlideshowOrder): List<Photo> {
+    private fun sortItems(
+        slideshowItems: List<SlideshowItem>,
+        order: SlideshowOrder,
+    ): List<SlideshowItem> {
         return when (order) {
             SlideshowOrder.Shuffle -> slideshowItems.shuffled()
-            SlideshowOrder.Newest -> slideshowItems.sortedByDescending { it.modificationTime }
-            SlideshowOrder.Oldest -> slideshowItems.sortedBy { it.modificationTime }
+            SlideshowOrder.Newest -> slideshowItems.sortedByDescending { it.photo.modificationTime }
+            SlideshowOrder.Oldest -> slideshowItems.sortedBy { it.photo.modificationTime }
         }
     }
 
     suspend fun downloadFullSizeImage(
+        slideshowItem: SlideshowItem,
+    ) = when (slideshowItem) {
+        is SlideshowItem.ChatItem -> getChatItemImage(
+            chatRoomId = slideshowItem.chatRoomId,
+            chatMessageId = slideshowItem.messageId
+        )
+
+        is SlideshowItem.DefaultItem -> getDefaultItemImage(
+            nodeHandle = slideshowItem.photo.id
+        )
+    }
+
+    private suspend fun getDefaultItemImage(
         nodeHandle: Long,
         fullSize: Boolean = true,
         highPriority: Boolean = false,
         resetDownloads: () -> Unit = {},
     ) = getImageByNodeHandle(
         nodeHandle = nodeHandle,
+        fullSize = fullSize,
+        highPriority = highPriority,
+        resetDownloads = resetDownloads,
+    )
+
+    private suspend fun getChatItemImage(
+        chatRoomId: Long,
+        chatMessageId: Long,
+        fullSize: Boolean = true,
+        highPriority: Boolean = false,
+        resetDownloads: () -> Unit = {},
+    ) = getImageForChatMessage(
+        chatRoomId = chatRoomId,
+        chatMessageId = chatMessageId,
         fullSize = fullSize,
         highPriority = highPriority,
         resetDownloads = resetDownloads,
@@ -130,14 +187,14 @@ class SlideshowViewModel @Inject constructor(
                         )
                     }
                 } else {
-                    val slideshowItems = _state.value.items
+                    val slideshowItems = _state.value.slideshowItems
                     val settingOrder = order ?: SlideshowOrder.Shuffle
                     val sortedItems = sortItems(slideshowItems, settingOrder)
                     _state.update {
                         it.copy(
                             order = settingOrder,
                             shouldPlayFromFirst = true,
-                            items = sortedItems
+                            slideshowItems = sortedItems
                         )
                     }
                 }

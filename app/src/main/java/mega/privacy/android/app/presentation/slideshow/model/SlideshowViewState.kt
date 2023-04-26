@@ -1,13 +1,12 @@
 package mega.privacy.android.app.presentation.slideshow.model
 
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 
 /**
  * Slideshow ViewState
  *
- * @property items Slideshow items
+ * @property slideshowItems Slideshow items
  * @property order Slideshow play order
  * @property speed Slideshow speed
  * @property repeat Loop play
@@ -16,7 +15,7 @@ import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
  * @property isFirstInSlideshow Is first time in slideshow
  */
 data class SlideshowViewState(
-    val items: List<Photo> = emptyList(),
+    val slideshowItems: List<SlideshowItem> = emptyList(),
     val order: SlideshowOrder? = null,
     val speed: SlideshowSpeed? = null,
     val repeat: Boolean = false,

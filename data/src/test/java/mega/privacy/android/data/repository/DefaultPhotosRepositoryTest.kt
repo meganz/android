@@ -9,6 +9,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -39,6 +40,7 @@ class DefaultPhotosRepositoryTest {
 
     private val nodeRepository = mock<NodeRepository>()
     private val megaApiGateway = mock<MegaApiGateway>()
+    private val megaChatApiGateway = mock<MegaChatApiGateway>()
     private val cacheFolderFacade = mock<CacheFolderGateway> {
         on { getCacheFolder(any()) }.thenReturn(null)
     }
@@ -135,6 +137,7 @@ class DefaultPhotosRepositoryTest {
         videoMapper = videoMapper,
         fileTypeInfoMapper = fileTypeInfoMapper,
         sortOrderIntMapper = sortOrderIntMapper,
+        megaChatApiGateway = megaChatApiGateway
     )
 
     private fun createMegaNode(

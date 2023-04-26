@@ -59,6 +59,7 @@ import kotlinx.coroutines.yield
 import mega.privacy.android.app.R
 import mega.privacy.android.app.imageviewer.ImageViewerViewModel
 import mega.privacy.android.app.presentation.extensions.isDarkMode
+import mega.privacy.android.app.presentation.slideshow.model.SlideshowItem
 import mega.privacy.android.app.presentation.slideshow.view.PhotoBox
 import mega.privacy.android.app.presentation.slideshow.view.PhotoState
 import mega.privacy.android.app.presentation.slideshow.view.rememberPhotoState
@@ -68,7 +69,6 @@ import mega.privacy.android.core.ui.theme.grey_alpha_070
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_070
 import mega.privacy.android.domain.entity.ThemeMode
-import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -92,7 +92,6 @@ class SlideshowFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         return ComposeView(requireContext()).apply {
-            keepScreenOn = true
             setContent {
                 val mode by getThemeMode()
                     .collectAsStateWithLifecycle(initialValue = ThemeMode.System)
@@ -125,6 +124,7 @@ class SlideshowFragment : Fragment() {
                         )
                         true
                     }
+
                     else -> true
                 }
             }
@@ -160,7 +160,7 @@ class SlideshowFragment : Fragment() {
         val scaffoldState = rememberScaffoldState()
         val pagerState = rememberPagerState()
         val photoState = rememberPhotoState()
-        val items = slideshowViewState.items
+        val items = slideshowViewState.slideshowItems
         val order = slideshowViewState.order ?: SlideshowOrder.Shuffle
         val speed = slideshowViewState.speed ?: SlideshowSpeed.Normal
         val repeat = slideshowViewState.repeat
@@ -191,6 +191,7 @@ class SlideshowFragment : Fragment() {
 
         LaunchedEffect(isPlaying) {
             if (isPlaying) {
+                this@SlideshowFragment.view?.keepScreenOn = true
                 imageViewerViewModel.showToolbar(false)
                 while (true) {
                     yield()
@@ -205,6 +206,7 @@ class SlideshowFragment : Fragment() {
                     )
                 }
             } else {
+                this@SlideshowFragment.view?.keepScreenOn = false
                 imageViewerViewModel.showToolbar(true)
             }
         }
@@ -240,7 +242,7 @@ class SlideshowFragment : Fragment() {
     @Composable
     private fun SlideshowCompose(
         scaffoldState: ScaffoldState = rememberScaffoldState(),
-        playItems: List<Photo>,
+        playItems: List<SlideshowItem>,
         pagerState: PagerState,
         photoState: PhotoState,
         isPlaying: Boolean,
@@ -258,15 +260,15 @@ class SlideshowFragment : Fragment() {
                     pageCount = playItems.size,
                     state = pagerState,
                     beyondBoundsPageCount = 5,
-                    key = { playItems[it].id }
+                    key = { playItems[it].photo.id }
                 ) { index ->
 
-                    val photo = playItems[index]
+                    val slideshowItem = playItems[index]
                     val imageState =
                         produceState<String?>(initialValue = null) {
                             runCatching {
                                 slideshowViewModel.downloadFullSizeImage(
-                                    nodeHandle = photo.id
+                                    slideshowItem = slideshowItem
                                 ).collectLatest { imageResult ->
                                     value = imageResult.getHighestResolutionAvailableUri()
                                 }

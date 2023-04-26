@@ -20,6 +20,7 @@ import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
+import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.mapper.FileTypeInfoMapper
 import mega.privacy.android.data.mapper.ImageMapper
 import mega.privacy.android.data.mapper.SortOrderIntMapper
@@ -32,6 +33,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.StaticImageFileTypeInfo
 import mega.privacy.android.domain.entity.SvgFileTypeInfo
 import mega.privacy.android.domain.entity.VideoFileTypeInfo
+import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.AlbumPhotoId
@@ -61,6 +63,7 @@ import javax.inject.Singleton
 internal class DefaultPhotosRepository @Inject constructor(
     private val nodeRepository: NodeRepository,
     private val megaApiFacade: MegaApiGateway,
+    private val megaChatApiGateway: MegaChatApiGateway,
     @ApplicationScope private val appScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val cacheFolderFacade: CacheFolderGateway,
@@ -171,9 +174,11 @@ internal class DefaultPhotosRepository @Inject constructor(
             is Photo.Image -> {
                 photo.copy(albumPhotoId = albumPhotoId?.id)
             }
+
             is Photo.Video -> {
                 photo.copy(albumPhotoId = albumPhotoId?.id)
             }
+
             else -> withContext(ioDispatcher) {
                 megaApiFacade.getMegaNodeByHandle(nodeHandle = nodeId.longValue)
                     ?.let { megaNode ->
@@ -183,9 +188,11 @@ internal class DefaultPhotosRepository @Inject constructor(
                             is StaticImageFileTypeInfo, is GifFileTypeInfo, is RawFileTypeInfo -> {
                                 mapMegaNodeToImage(megaNode, albumPhotoId?.id)
                             }
+
                             is VideoFileTypeInfo -> {
                                 mapMegaNodeToVideo(megaNode, albumPhotoId?.id)
                             }
+
                             else -> {
                                 null
                             }
@@ -411,5 +418,29 @@ internal class DefaultPhotosRepository @Inject constructor(
 
         photosStateFlow.value = null
         refreshPhotosStateFlow.value = true
+    }
+
+    override suspend fun getChatPhotoByMessageId(
+        chatId: Long,
+        messageId: Long,
+    ): Photo? =
+        withContext(ioDispatcher) {
+            val chatRoom = megaChatApiGateway.getChatRoom(chatId)
+            val chatMessage = megaChatApiGateway.getMessage(chatId, messageId)
+                ?: megaChatApiGateway.getMessageFromNodeHistory(chatId, messageId)
+            var node = chatMessage?.megaNodeList?.get(0)
+            if (chatRoom?.isPreview == true && node != null) {
+                node = megaApiFacade.authorizeChatNode(node, chatRoom.authorizationToken)
+            }
+            node?.let {
+                getPhotoFromCache(it)
+            }
+        }
+
+    private suspend fun getPhotoFromCache(node: MegaNode): Photo? {
+        return photosCache[NodeId(node.handle)]
+            ?: mapMegaNodeToPhoto(node, filterSvg = false)?.also {
+                photosCache[NodeId(node.handle)] = it
+            }
     }
 }

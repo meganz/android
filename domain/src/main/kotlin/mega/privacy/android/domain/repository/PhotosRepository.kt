@@ -64,4 +64,14 @@ interface PhotosRepository {
      * Clear all photos cache
      */
     fun clearCache()
+
+    /**
+     * Get Chat Photos by chatId and message Id
+     *
+     * @param chatId id of the chat
+     * @param messageId id of the messages
+     *
+     * @return photo
+     */
+    suspend fun getChatPhotoByMessageId(chatId: Long, messageId: Long): Photo?
 }

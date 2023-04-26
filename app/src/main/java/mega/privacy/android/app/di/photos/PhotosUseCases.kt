@@ -25,6 +25,7 @@ import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
+import mega.privacy.android.domain.usecase.GetChatPhotoByMessageIdUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPreview
@@ -37,7 +38,9 @@ import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.imageviewer.DefaultGetImageByNodeHandle
+import mega.privacy.android.domain.usecase.imageviewer.DefaultGetImageForChatMessage
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
+import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessage
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -82,6 +85,9 @@ abstract class PhotosUseCases {
     @Binds
     abstract fun bindGetImageByNodeHandle(useCase: DefaultGetImageByNodeHandle): GetImageByNodeHandle
 
+    @Binds
+    abstract fun bindGetImageForChatMessage(useCase: DefaultGetImageForChatMessage): GetImageForChatMessage
+
     companion object {
         @Provides
         fun providesIsCameraSyncPreferenceEnabled(settingsRepository: SettingsRepository): IsCameraSyncPreferenceEnabled =
@@ -98,5 +104,9 @@ abstract class PhotosUseCases {
         @Provides
         fun provideGetPhotosByIds(repository: PhotosRepository): GetPhotosByIds =
             GetPhotosByIds(repository::getPhotosByIds)
+
+        @Provides
+        fun provideGetChatPhotoByMessageId(repository: PhotosRepository): GetChatPhotoByMessageIdUseCase =
+            GetChatPhotoByMessageIdUseCase(repository::getChatPhotoByMessageId)
     }
 }
