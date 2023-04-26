@@ -16,11 +16,13 @@ import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.getState
+import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginFragmentType
 import mega.privacy.android.app.presentation.login.model.LoginIntentState
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.psa.PsaManager
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.Feature
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
@@ -146,9 +148,11 @@ class LoginViewModel @Inject constructor(
                             ACTION_FORCE_RELOAD_ACCOUNT -> {
                                 { state: LoginState -> state.copy(isPendingToFinishActivity = true) }
                             }
+
                             ACTION_OPEN_APP -> {
                                 { state: LoginState -> state.copy(intentState = LoginIntentState.ReadyForFinalSetup) }
                             }
+
                             else -> {
                                 { state: LoginState -> state }
                             }
@@ -347,6 +351,47 @@ class LoginViewModel @Inject constructor(
      */
     fun launchCancelTransfers() = viewModelScope.launch { cancelTransfersUseCase() }
 
+    fun onEmailChanged(typedEmail: String) {
+        val newAccountSession = state.value.accountSession?.copy(email = typedEmail)
+            ?: AccountSession(email = typedEmail)
+
+        _state.update { state ->
+            state.copy(accountSession = newAccountSession, emailError = null)
+        }
+    }
+
+    fun onPasswordChanged(typedPassword: String) {
+        _state.update { state ->
+            state.copy(password = typedPassword, passwordError = null)
+        }
+    }
+
+    /**
+     * Check typed values before perform login.
+     */
+    fun onLoginClicked() {
+        with(state.value) {
+            val typedEmail = accountSession?.email
+            val emailError = when {
+                typedEmail.isNullOrEmpty() -> LoginError.EmptyEmail
+                !Constants.EMAIL_ADDRESS.matcher(typedEmail).matches() -> LoginError.NotValidEmail
+                else -> null
+            }
+            val passwordError = if (password.isNullOrEmpty()) LoginError.EmptyPassword else null
+
+            if (emailError != null || passwordError != null) {
+                _state.update { state ->
+                    state.copy(
+                        emailError = emailError,
+                        passwordError = passwordError
+                    )
+                }
+            } else {
+                performLogin()
+            }
+        }
+    }
+
     /**
      * Login.
      */
@@ -500,6 +545,7 @@ class LoginViewModel @Inject constructor(
         LoginStatus.LoginStarted -> {
             Timber.d("Login started")
         }
+
         LoginStatus.LoginSucceed -> {
             //If fast login, state already updated.
             if (!isFastLogin) {
@@ -515,6 +561,7 @@ class LoginViewModel @Inject constructor(
             }
             fetchNodes()
         }
+
         LoginStatus.LoginCannotStart -> {
             _state.update {
                 it.copy(

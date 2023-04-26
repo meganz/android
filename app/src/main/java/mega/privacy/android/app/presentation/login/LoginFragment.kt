@@ -157,6 +157,7 @@ class LoginFragment : Fragment() {
                     querySignupLinkResult != null -> {
                         showQuerySignupLinkResult(querySignupLinkResult)
                     }
+
                     ongoingTransfersExist != null -> {
                         if (ongoingTransfersExist) {
                             showCancelTransfersDialog()
@@ -164,13 +165,16 @@ class LoginFragment : Fragment() {
                             loginClicked()
                         }
                     }
+
                     isLoginInProgress -> {
                         showLoginInProgress(false)
                     }
+
                     isLoginRequired -> {
                         confirmLogoutDialog?.dismiss()
                         returnToLogin()
                     }
+
                     fetchNodesUpdate != null -> {
                         with(fetchNodesUpdate) {
                             if (temporaryError == null
@@ -193,6 +197,7 @@ class LoginFragment : Fragment() {
                             }
                         }
                     }
+
                     multiFactorAuthState != null -> {
                         if (multiFactorAuthState == MultiFactorAuthState.Failed) {
                             binding.progressbarVerify2fa.isVisible = false
@@ -201,6 +206,7 @@ class LoginFragment : Fragment() {
                             hide2FAError()
                         }
                     }
+
                     is2FARequired -> {
                         show2FAScreen()
                     }
@@ -213,6 +219,7 @@ class LoginFragment : Fragment() {
                         is LoginLoggedOutFromOtherLocation -> {
                             (requireActivity() as LoginActivity).showAlertLoggedOut()
                         }
+
                         else -> (requireActivity() as LoginActivity).showSnackbar(getString(error))
                     }
 
@@ -279,10 +286,12 @@ class LoginFragment : Fragment() {
                         loginTitleBoundaries = Rect(view.left, view.top, view.right, view.bottom)
                         handler.postDelayed(onTap, ViewConfiguration.getTapTimeout().toLong())
                     }
+
                     MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                         handler.removeCallbacks(onLongPress)
                         handler.removeCallbacks(onTap)
                     }
+
                     MotionEvent.ACTION_MOVE -> if (loginTitleBoundaries != null && !loginTitleBoundaries!!.contains(
                             view.left + event.x.toInt(),
                             view.top + event.y.toInt()
@@ -501,15 +510,18 @@ class LoginFragment : Fragment() {
                             viewModel.fetchNodes(true)
                             return@apply
                         }
+
                         Constants.ACTION_REFRESH_API_SERVER -> {
                             intentParentHandle = getLongExtra("PARENT_HANDLE", -1)
                             startFastLogin()
                             return@apply
                         }
+
                         Constants.ACTION_REFRESH_AFTER_BLOCKED -> {
                             startFastLogin()
                             return@apply
                         }
+
                         else -> {
                             Timber.d("intent received $action")
                             when (action) {
@@ -523,11 +535,13 @@ class LoginFragment : Fragment() {
                                 -> {
                                     intentDataString = dataString
                                 }
+
                                 Constants.ACTION_FILE_PROVIDER -> {
                                     intentData = data
                                     intentExtras = extras
                                     intentDataString = null
                                 }
+
                                 Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL,
                                 Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL,
                                 -> {
@@ -549,6 +563,7 @@ class LoginFragment : Fragment() {
                                         intentExtras?.let { newIntent.putExtras(it) }
                                         newIntent.data = intentData
                                     }
+
                                     Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
                                         newIntent =
                                             Intent(requireContext(), FileLinkActivity::class.java)
@@ -556,12 +571,14 @@ class LoginFragment : Fragment() {
                                         intentAction = Constants.ACTION_OPEN_MEGA_LINK
                                         newIntent.data = intentData
                                     }
+
                                     Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
                                         newIntent = getFolderLinkIntent()
                                         newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                         intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
                                         newIntent.data = intentData
                                     }
+
                                     Constants.ACTION_OPEN_CONTACTS_SECTION -> {
                                         newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                         intentAction = Constants.ACTION_OPEN_CONTACTS_SECTION
@@ -608,18 +625,21 @@ class LoginFragment : Fragment() {
                                 intentExtras?.let { newIntent.putExtras(it) }
                                 newIntent.data = intentData
                             }
+
                             Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
                                 newIntent = Intent(requireContext(), FileLinkActivity::class.java)
                                 newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                 intentAction = Constants.ACTION_OPEN_MEGA_LINK
                                 newIntent.data = intentData
                             }
+
                             Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
                                 newIntent = getFolderLinkIntent()
                                 newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                                 intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
                                 newIntent.data = intentData
                             }
+
                             Constants.ACTION_OPEN_CONTACTS_SECTION -> {
                                 newIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
 
@@ -666,9 +686,11 @@ class LoginFragment : Fragment() {
                         newIntent.data = intentData
                         newIntent.action = action
                     }
+
                     Constants.ACTION_FILE_EXPLORER_UPLOAD -> {
                         showMessage(R.string.login_before_share)
                     }
+
                     Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
                         intentDataString = dataString
                     }
@@ -692,6 +714,7 @@ class LoginFragment : Fragment() {
                     handleConfirmationIntent(intent)
                     return
                 }
+
                 Constants.ACTION_RESET_PASS -> {
                     val link = intent.dataString
                     if (link != null) {
@@ -701,6 +724,7 @@ class LoginFragment : Fragment() {
                         return
                     }
                 }
+
                 Constants.ACTION_PASS_CHANGED -> {
                     when (intent.getIntExtra(Constants.RESULT, MegaError.API_OK)) {
                         MegaError.API_OK -> showMessage(R.string.pass_changed_alert)
@@ -711,6 +735,7 @@ class LoginFragment : Fragment() {
                     viewModel.intentSet()
                     return
                 }
+
                 Constants.ACTION_SHOW_WARNING_ACCOUNT_BLOCKED -> {
                     val accountBlockedString =
                         intent.getStringExtra(Constants.ACCOUNT_BLOCKED_STRING)
@@ -718,6 +743,7 @@ class LoginFragment : Fragment() {
                         Util.showErrorAlertDialog(accountBlockedString, false, activity)
                     }
                 }
+
                 ACTION_FORCE_RELOAD_ACCOUNT -> {
                     viewModel.setForceReloadAccountAsPendingAction()
                     return
@@ -890,6 +916,7 @@ class LoginFragment : Fragment() {
                 value.isEmpty() -> getString(R.string.error_enter_email)
                 !Constants.EMAIL_ADDRESS.matcher(value)
                     .matches() -> getString(R.string.error_invalid_email)
+
                 else -> null
             }
         }
@@ -983,6 +1010,7 @@ class LoginFragment : Fragment() {
                 intentShareInfo?.isNotEmpty() == true -> {
                     toSharePage()
                 }
+
                 Constants.ACTION_FILE_EXPLORER_UPLOAD == action && Constants.TYPE_TEXT_PLAIN == type -> {
                     startActivity(
                         Intent(
@@ -1006,6 +1034,7 @@ class LoginFragment : Fragment() {
                     requireActivity().finish()
                     return
                 }
+
                 Constants.ACTION_REFRESH == action && activity != null -> {
                     requireActivity().apply {
                         setResult(Activity.RESULT_OK)
@@ -1039,6 +1068,7 @@ class LoginFragment : Fragment() {
                         loginActivity.startActivity(changeMailIntent)
                         loginActivity.finish()
                     }
+
                     Constants.ACTION_RESET_PASS -> {
                         Timber.d("Action reset pass after fetch nodes")
                         val resetPassIntent = Intent(requireContext(), ManagerActivity::class.java)
@@ -1047,6 +1077,7 @@ class LoginFragment : Fragment() {
                         loginActivity.startActivity(resetPassIntent)
                         loginActivity.finish()
                     }
+
                     Constants.ACTION_CANCEL_ACCOUNT -> {
                         Timber.d("Action cancel Account after fetch nodes")
                         val cancelAccountIntent =
@@ -1075,12 +1106,14 @@ class LoginFragment : Fragment() {
                                 Timber.d("ACTION_EXPORT_MK")
                                 intent.action = Constants.ACTION_EXPORT_MASTER_KEY
                             }
+
                             Constants.ACTION_JOIN_OPEN_CHAT_LINK -> {
                                 if (intentDataString != null) {
                                     intent.action = Constants.ACTION_JOIN_OPEN_CHAT_LINK
                                     intent.data = Uri.parse(intentDataString)
                                 }
                             }
+
                             else -> intent = handleLinkNavigation(loginActivity)
                         }
                         if (uiState.isFirstTime) {
@@ -1158,17 +1191,20 @@ class LoginFragment : Fragment() {
                     intentExtras?.let { intent.putExtras(it) }
                     intent.data = intentData
                 }
+
                 Constants.ACTION_OPEN_FILE_LINK_ROOTNODES_NULL -> {
                     intent = Intent(requireContext(), FileLinkActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     intent.data = intentData
                 }
+
                 Constants.ACTION_OPEN_FOLDER_LINK_ROOTNODES_NULL -> {
                     intent = getFolderLinkIntent()
                     intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                     intentAction = Constants.ACTION_OPEN_MEGA_FOLDER_LINK
                     intent.data = intentData
                 }
+
                 Constants.ACTION_OPEN_CONTACTS_SECTION -> {
                     intent.putExtra(
                         Constants.CONTACT_HANDLE,
@@ -1338,6 +1374,7 @@ class LoginFragment : Fragment() {
                     }
                     loginEmailTextErrorIcon.isVisible = true
                 }
+
                 R.id.login_password_text -> {
                     loginPasswordTextLayout.apply {
                         setError(error)
@@ -1363,6 +1400,7 @@ class LoginFragment : Fragment() {
                 }
                 loginEmailTextErrorIcon.isVisible = false
             }
+
             R.id.login_password_text -> {
                 loginPasswordTextLayout.apply {
                     error = null
@@ -1512,6 +1550,32 @@ class LoginFragment : Fragment() {
             Intent(requireContext(), FolderLinkComposeActivity::class.java)
         else
             Intent(requireContext(), FolderLinkActivity::class.java)
+    }
+
+    private fun onForgotPassword(typedEmail: String?) {
+        Timber.d("Click on button_forgot_pass")
+        try {
+            val openTermsIntent = Intent(requireContext(), WebViewActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                data = if (typedEmail.isNullOrEmpty()) {
+                    Uri.parse(RECOVERY_URL)
+                } else {
+                    val encodedEmail =
+                        Base64.encodeToString(typedEmail.toByteArray(), Base64.DEFAULT)
+                            .replace("\n", "")
+
+                    Uri.parse(RECOVERY_URL_EMAIL + encodedEmail)
+                }
+            }
+
+            startActivity(openTermsIntent)
+        } catch (e: Exception) {
+            startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(RECOVERY_URL)))
+        }
+    }
+
+    private fun onCreateAccount() {
+        (requireActivity() as LoginActivity).showFragment(Constants.CREATE_ACCOUNT_FRAGMENT)
     }
 
     companion object {

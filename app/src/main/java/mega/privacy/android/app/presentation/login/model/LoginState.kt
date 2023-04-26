@@ -11,7 +11,9 @@ import mega.privacy.android.domain.exception.login.FetchNodesException
  *
  * @property intentState                [LoginIntentState]
  * @property accountSession             [AccountSession]
+ * @property emailError                 [LoginError].
  * @property password                   Typed password.
+ * @property passwordError              [LoginError].
  * @property accountConfirmationLink    Link for confirming a new account.
  * @property isFirstTime                True if account credentials are null for the first time
  * @property fetchNodesUpdate           [FetchNodesUpdate]. If not null, a fetch nodes is in progress.
@@ -41,7 +43,9 @@ import mega.privacy.android.domain.exception.login.FetchNodesException
 data class LoginState(
     val intentState: LoginIntentState? = null,
     val accountSession: AccountSession? = null,
+    val emailError: LoginError? = null,
     val password: String? = null,
+    val passwordError: LoginError? = null,
     val accountConfirmationLink: String? = null,
     val fetchNodesUpdate: FetchNodesUpdate? = null,
     val isFirstTime: Boolean = false,

@@ -101,7 +101,7 @@ fun PasswordTextField(
                     autofillTypes = listOf(AutofillType.Password),
                     onAutoFilled = onTextChange
                 ),
-            textStyle = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.onPrimary),
+            textStyle = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.onPrimary),
             cursorBrush = SolidColor(colors.cursorColor(isError).value),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
@@ -125,8 +125,10 @@ fun PasswordTextField(
                         text = stringResource(id = R.string.password_text),
                         modifier = Modifier.padding(bottom = if (isFocused) 6.dp else 0.dp),
                         style = when {
-                            isError -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error)
+                            isError && isFocused -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error)
+                            isError && text.isEmpty() -> MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.error)
                             isFocused -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.secondary)
+                            text.isNotEmpty() -> MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.grey_alpha_038_white_alpha_038)
                             else -> MaterialTheme.typography.body1.copy(color = MaterialTheme.colors.grey_alpha_038_white_alpha_038)
                         }
                     )
