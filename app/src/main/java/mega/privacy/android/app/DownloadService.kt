@@ -28,6 +28,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -191,6 +192,8 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         }
     }
 
+    private var monitorPausedTransfersJob: Job? = null
+
     @SuppressLint("NewApi")
     override fun onCreate() {
         super.onCreate()
@@ -226,7 +229,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
 
     @SuppressLint("WrongConstant")
     private fun setReceivers() {
-        applicationScope.launch {
+        monitorPausedTransfersJob = applicationScope.launch {
             monitorPausedTransfers().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
                 Handler(Looper.getMainLooper()).postDelayed(
@@ -333,6 +336,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         stopForeground()
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
             .removeObserver(stopServiceObserver)
+        monitorPausedTransfersJob?.cancel()
         super.onDestroy()
     }
 
@@ -343,6 +347,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
             Timber.d("Cancel intent")
             canceled = true
             megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD)
+            stopForeground()
             return START_NOT_STICKY
         }
         rxSubscriptions.add(Single.just(intent)

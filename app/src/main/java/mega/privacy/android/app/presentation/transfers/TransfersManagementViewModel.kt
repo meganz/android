@@ -78,7 +78,7 @@ class TransfersManagementViewModel @Inject constructor(
                     getPendingDownloadAndUpload(transfersInfo)
                 }
         }
-        checkTransfersState()
+        checkTransfersState(false)
     }
 
     /**
@@ -143,11 +143,13 @@ class TransfersManagementViewModel @Inject constructor(
     /**
      * Checks if transfers are paused.
      */
-    fun checkTransfersState() = viewModelScope.launch {
+    fun checkTransfersState(shouldBroadcast: Boolean = true) = viewModelScope.launch {
         areAllTransfersPaused().let { paused ->
             if (paused) {
                 _state.update { it.copy(transfersInfo = it.transfersInfo.copy(status = TransfersStatus.Paused)) }
-                broadcastPausedTransfers()
+                if (shouldBroadcast) {
+                    broadcastPausedTransfers()
+                }
             } else {
                 checkTransfersInfo(TransferType.NONE, false)
             }
