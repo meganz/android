@@ -20,15 +20,14 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.app.presentation.settings.camerauploads.model.SettingsCameraUploadsState
 import mega.privacy.android.app.presentation.settings.camerauploads.model.UploadConnectionType
-import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoQuality
+import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.ClearCacheDirectory
 import mega.privacy.android.domain.usecase.DisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DisableMediaUploadSettings
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.ResetCameraUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
@@ -53,8 +52,10 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import javax.inject.Inject
 
@@ -95,6 +96,7 @@ import javax.inject.Inject
  * @property startCameraUploadUseCase Start the camera upload
  * @property stopCameraUploadUseCase Stop the camera upload
  * @property rescheduleCameraUploadUseCase Reschedule the camera upload
+ * @property stopCameraUploadAndHeartbeatUseCase Stop the camera upload and heartbeat
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
@@ -131,6 +133,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadUseCase: StopCameraUploadUseCase,
     private val rescheduleCameraUploadUseCase: RescheduleCameraUploadUseCase,
+    private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -576,9 +579,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
 
     /**
      * Stop camera upload
+     * Cancel camera upload and heartbeat workers
      */
     fun stopCameraUpload() = viewModelScope.launch {
         stopCameraUploadUseCase()
+        stopCameraUploadAndHeartbeatUseCase()
     }
 
     /**

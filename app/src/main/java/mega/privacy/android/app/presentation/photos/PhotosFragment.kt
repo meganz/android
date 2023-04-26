@@ -77,7 +77,6 @@ import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomIn
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.zoomOut
 import mega.privacy.android.app.presentation.photos.view.showSortByDialog
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.app.utils.permission.PermissionUtils.getImagePermissionByVersion
@@ -314,7 +313,7 @@ class PhotosFragment : Fragment() {
             timelineViewModel.setBusinessAccountSuspendedPromptState(shouldShow = false)
         }
         if (state.shouldTriggerMediaPermissionsDeniedLogic) {
-            stopCameraUploadSyncHeartbeatWorkers(requireContext())
+            timelineViewModel.stopCameraUploadAndHeartbeat()
             if (!shouldShowMediaPermissionsRationale()) {
                 requireContext().navigateToAppSettings()
             }

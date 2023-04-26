@@ -55,7 +55,6 @@ import mega.privacy.android.app.utils.FileUtil.JPG_EXTENSION
 import mega.privacy.android.app.utils.FileUtil.deleteFolderAndSubfolders
 import mega.privacy.android.app.utils.FileUtil.getRecoveryKeyFileName
 import mega.privacy.android.app.utils.FileUtil.saveTextOnFile
-import mega.privacy.android.app.utils.JobUtil.stopCameraUploadSyncHeartbeatWorkers
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker
 import mega.privacy.android.app.utils.SharedPreferenceConstants.USER_INTERFACE_PREFERENCES
 import mega.privacy.android.app.utils.StorageUtils.thereIsNotEnoughFreeSpace
@@ -73,6 +72,7 @@ import mega.privacy.android.domain.repository.BillingRepository
 import mega.privacy.android.domain.repository.PhotosRepository
 import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.usecase.login.BroadcastLogoutUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaChatApiJava
@@ -125,6 +125,8 @@ class AccountController @Inject constructor(
         fun albumRepository(): AlbumRepository
 
         fun stopCameraUploadUseCase(): StopCameraUploadUseCase
+
+        fun stopCameraUploadAndHeartbeatUseCase(): StopCameraUploadAndHeartbeatUseCase
     }
 
     fun existsAvatar(): Boolean {
@@ -341,7 +343,6 @@ class AccountController @Inject constructor(
             if (dbH.preferences != null) {
                 dbH.clearPreferences()
                 dbH.setFirstTime(false)
-                stopCameraUploadSyncHeartbeatWorkers(context)
             }
 
             dbH.clearOffline()
@@ -382,6 +383,7 @@ class AccountController @Inject constructor(
             sharingScope.launch(Dispatchers.IO) {
                 with(entryPoint) {
                     stopCameraUploadUseCase()
+                    stopCameraUploadAndHeartbeatUseCase()
                     callsPreferencesGateway().clearPreferences()
                     chatPreferencesGateway().clearPreferences()
                     accountPreferencesGateway().clearPreferences()

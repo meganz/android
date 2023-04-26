@@ -73,7 +73,6 @@ import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager.updat
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.SDCardUtils
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.permission.PermissionUtils.displayNotificationPermissionRationale
@@ -1165,9 +1164,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     fun disableCameraUpload() {
         viewModel.stopCameraUpload()
-        getContext()?.let {
-            JobUtil.stopCameraUploadSyncHeartbeatWorkers(it)
-        }
         viewModel.disableCameraUploadsInDB()
         disableCameraUploadUIProcess()
     }

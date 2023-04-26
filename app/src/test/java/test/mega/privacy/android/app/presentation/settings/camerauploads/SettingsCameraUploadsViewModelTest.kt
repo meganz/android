@@ -48,6 +48,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatu
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import org.junit.After
 import org.junit.Before
@@ -103,6 +104,7 @@ class SettingsCameraUploadsViewModelTest {
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
     private val rescheduleCameraUploadUseCase = mock<RescheduleCameraUploadUseCase>()
+    private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
 
     @Before
     fun setUp() {
@@ -154,6 +156,7 @@ class SettingsCameraUploadsViewModelTest {
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadUseCase = stopCameraUploadUseCase,
             rescheduleCameraUploadUseCase = rescheduleCameraUploadUseCase,
+            stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
         )
     }
 
@@ -674,5 +677,15 @@ class SettingsCameraUploadsViewModelTest {
             underTest.rescheduleCameraUpload()
 
             verify(rescheduleCameraUploadUseCase, times(1)).invoke()
+        }
+
+    @Test
+    fun `test that when stopCameraUpload is called, stopCameraUploadAndHeartbeatUseCase is called`() =
+        runTest {
+            setupUnderTest()
+
+            underTest.stopCameraUpload()
+
+            verify(stopCameraUploadAndHeartbeatUseCase, times(1)).invoke()
         }
 }

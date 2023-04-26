@@ -35,11 +35,14 @@ import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
 
@@ -76,6 +79,8 @@ class TimelineViewModelTest {
 
     private val monitorCameraUploadProgress = mock<MonitorCameraUploadProgress>()
 
+    private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
+
     @Before
     fun setUp() {
         Dispatchers.setMain(StandardTestDispatcher())
@@ -92,6 +97,7 @@ class TimelineViewModelTest {
             mainDispatcher = StandardTestDispatcher(),
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             monitorCameraUploadProgress = monitorCameraUploadProgress,
+            stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
         )
     }
 
@@ -324,5 +330,15 @@ class TimelineViewModelTest {
                 val state = awaitItem()
                 assertThat(state.progressBarShowing).isEqualTo(false)
             }
+        }
+
+    @Test
+    fun `test that when stopCameraUploadAndHeartbeat is called, stopCameraUploadAndHeartbeatUseCase is called`() =
+        runTest {
+            underTest.stopCameraUploadAndHeartbeat()
+
+            advanceUntilIdle()
+
+            verify(stopCameraUploadAndHeartbeatUseCase, times(1)).invoke()
         }
 }

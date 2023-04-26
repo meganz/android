@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
 import timber.log.Timber
@@ -64,6 +65,7 @@ import javax.inject.Inject
  * @property ioDispatcher
  * @property mainDispatcher
  * @property checkEnableCameraUploadsStatus
+ * @property stopCameraUploadAndHeartbeatUseCase
  * @param monitorCameraUploadProgress
  */
 @HiltViewModel
@@ -79,6 +81,7 @@ class TimelineViewModel @Inject constructor(
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
+    private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
     monitorCameraUploadProgress: MonitorCameraUploadProgress,
 ) : ViewModel() {
 
@@ -460,6 +463,13 @@ class TimelineViewModel @Inject constructor(
                 scrollStartOffset = startOffset
             )
         }
+    }
+
+    /**
+     * Cancel camera upload and heartbeat workers
+     */
+    fun stopCameraUploadAndHeartbeat() = viewModelScope.launch {
+        stopCameraUploadAndHeartbeatUseCase()
     }
 }
 
