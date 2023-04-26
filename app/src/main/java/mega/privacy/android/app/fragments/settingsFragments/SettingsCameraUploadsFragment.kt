@@ -10,7 +10,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.text.InputType
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -103,7 +102,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var optionChargingOnVideoCompression: SwitchPreferenceCompat? = null
     private var optionVideoCompressionSize: Preference? = null
     private var optionKeepUploadFileNames: TwoLineCheckPreference? = null
-    private var localCameraUploadFolder: Preference? = null
+    private var optionLocalCameraFolder: Preference? = null
     private var megaCameraFolder: Preference? = null
     private var secondaryMediaFolderOn: Preference? = null
     private var localSecondaryFolder: Preference? = null
@@ -111,8 +110,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var businessCameraUploadsAlertDialog: AlertDialog? = null
     private var cameraUpload = false
     private var secondaryUpload = false
-    private var camSyncLocalPath: String? = ""
-    private var isExternalSDCardCU = false
     private var camSyncHandle: Long? = null
     private var camSyncMegaNode: MegaNode? = null
     private var camSyncMegaPath = ""
@@ -127,8 +124,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     private var megaPathSecMediaFolder = ""
     private var isExternalSDCardMU = false
 
-    private val localDCIMFolderPath: String
-        get() = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath
     private val viewModel by viewModels<SettingsCameraUploadsViewModel>()
 
     /**
@@ -242,8 +237,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         optionKeepUploadFileNames = findPreference(KEY_KEEP_FILE_NAMES)
         optionKeepUploadFileNames?.onPreferenceClickListener = this
 
-        localCameraUploadFolder = findPreference(KEY_CAMERA_UPLOAD_CAMERA_FOLDER)
-        localCameraUploadFolder?.onPreferenceClickListener = this
+        optionLocalCameraFolder = findPreference(KEY_CAMERA_UPLOAD_CAMERA_FOLDER)
+        optionLocalCameraFolder?.onPreferenceClickListener = this
 
         megaCameraFolder = findPreference(KEY_CAMERA_UPLOAD_MEGA_FOLDER)
         megaCameraFolder?.onPreferenceClickListener = this
@@ -288,34 +283,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 nodeForCameraSyncDoesNotExist()
             }
 
-            // Setting up the Primary Folder path
-            if (prefs.cameraFolderExternalSDCard != null) {
-                isExternalSDCardCU = prefs.cameraFolderExternalSDCard.toBoolean()
-            }
-            camSyncLocalPath = prefs.camSyncLocalPath
-            if (camSyncLocalPath.isNullOrBlank() || !isExternalSDCardCU
-                && !FileUtil.isFileAvailable(camSyncLocalPath?.let { File(it) })
-                && Environment.getExternalStorageDirectory() != null
-            ) {
-                val cameraDownloadLocation = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_DCIM
-                )
-                with(dbH) {
-                    setCamSyncLocalPath(cameraDownloadLocation.absolutePath)
-                    setCameraFolderExternalSDCard(false)
-                }
-                camSyncLocalPath = cameraDownloadLocation.absolutePath
-            } else if (isExternalSDCardCU) {
-                val uri = Uri.parse(prefs.uriExternalSDCard)
-                val pickedDirName = SDCardUtils.getSDCardDirName(uri)
-                if (pickedDirName != null) {
-                    camSyncLocalPath = pickedDirName
-                    localCameraUploadFolder?.summary = pickedDirName
-                } else {
-                    Timber.w("The Directory Name is Null")
-                }
-            }
-
             // Setting up the Secondary Folder path
             if (prefs.secondaryMediaFolderEnabled == null) {
                 dbH.setSecondaryUploadEnabled(false)
@@ -334,10 +301,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
             viewModel.setCameraUploadsRunning(true)
 
-            localCameraUploadFolder?.let {
-                it.summary = camSyncLocalPath
-                preferenceScreen.addPreference(it)
-            }
             checkSecondaryMediaFolder()
         } else {
             Timber.d("Camera Uploads Off")
@@ -346,10 +309,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
             viewModel.setCameraUploadsRunning(false)
 
-            localCameraUploadFolder?.let {
-                it.summary = ""
-                preferenceScreen.removePreference(it)
-            }
             megaCameraFolder?.let {
                 it.summary = ""
                 preferenceScreen.removePreference(it)
@@ -534,38 +493,14 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         Timber.d("REQUEST CODE: %d___RESULT CODE: %d", requestCode, resultCode)
         when (requestCode) {
             REQUEST_CAMERA_FOLDER -> {
-                val cameraPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
-                if (!isNewSettingValid(
-                        primaryPath = cameraPath,
-                        secondaryPath = prefs.localPathSecondaryFolder,
-                        primaryHandle = prefs.camSyncHandle,
-                        secondaryHandle = prefs.megaHandleSecondaryFolder,
-                    )
-                ) {
-                    Toast.makeText(
-                        context,
-                        getString(R.string.error_invalid_folder_selected),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return
+                val newPrimaryFolderPath = intent.getStringExtra(FileStorageActivity.EXTRA_PATH)
+                with(viewModel) {
+                    changePrimaryFolderPath(newPrimaryFolderPath)
+                    resetTimestampsAndCacheDirectory()
                 }
-                isExternalSDCardCU = SDCardUtils.isLocalFolderOnSDCard(
-                    context,
-                    cameraPath
-                ) && !FileUtil.isBasedOnFileStorage()
-                dbH.setCameraFolderExternalSDCard(isExternalSDCardCU)
-                camSyncLocalPath =
-                    if (isExternalSDCardCU) SDCardUtils.getSDCardDirName(Uri.parse(prefs.uriExternalSDCard)) else cameraPath
-                prefs.camSyncLocalPath = camSyncLocalPath
-                camSyncLocalPath?.let {
-                    dbH.setCamSyncLocalPath(it)
-                    localCameraUploadFolder?.summary = it
-                }
-                viewModel.resetTimestampsAndCacheDirectory()
                 JobUtil.rescheduleCameraUpload(context)
-
                 // Update Sync when the Primary Local Folder has changed
-                updatePrimaryLocalFolder(cameraPath)
+                updatePrimaryLocalFolder(newPrimaryFolderPath)
             }
             REQUEST_MEGA_CAMERA_FOLDER -> {
                 // Primary Folder to Sync
@@ -699,12 +634,17 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     isCameraUploadsRunning = it.isCameraUploadsRunning,
                     areUploadFileNamesKept = it.areUploadFileNamesKept,
                 )
+                handlePrimaryFolderPath(
+                    isCameraUploadsRunning = it.isCameraUploadsRunning,
+                    primaryFolderPath = it.primaryFolderPath,
+                )
                 handleBusinessAccountPrompt(it.shouldShowBusinessAccountPrompt)
                 handleBusinessAccountSuspendedPrompt(it.shouldShowBusinessAccountSuspendedPrompt)
                 handleTriggerCameraUploads(it.shouldTriggerCameraUploads)
                 handleMediaPermissionsRationale(it.shouldShowMediaPermissionsRationale)
                 handleNotificationPermissionRationale(it.shouldShowNotificationPermissionRationale)
                 handleAccessMediaLocationPermissionRationale(it.accessMediaLocationRationaleText)
+                handleInvalidFolderSelectedPrompt(it.invalidFolderSelectedTextId)
             }
         }
     }
@@ -912,6 +852,27 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
     }
 
     /**
+     * Handles the "Local Camera folder" option visibility and content when a UI State change happens
+     *
+     * @param isCameraUploadsRunning Whether Camera Uploads is running or not
+     * @param primaryFolderPath The Primary Folder path
+     */
+    private fun handlePrimaryFolderPath(
+        isCameraUploadsRunning: Boolean,
+        primaryFolderPath: String,
+    ) {
+        optionLocalCameraFolder?.run {
+            summary = if (isCameraUploadsRunning) {
+                preferenceScreen.addPreference(this)
+                primaryFolderPath
+            } else {
+                preferenceScreen.removePreference(this)
+                ""
+            }
+        }
+    }
+
+    /**
      * Handle the Business Account prompt when a UI State change happens
      *
      * @param showPrompt If true, display a Dialog explaining that the Business Account
@@ -1042,6 +1003,19 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             // Once the Rationale has been shown, notify the ViewModel
             viewModel.setAccessMediaLocationRationaleShown(false)
         }
+    }
+
+    /**
+     * Handle the display of the Invalid Folder Selected prompt when a UI State change happens
+     *
+     * @param invalidFolderSelectedTextId A [StringRes] message to be displayed, which can be nullable
+     */
+    private fun handleInvalidFolderSelectedPrompt(@StringRes invalidFolderSelectedTextId: Int?) {
+        invalidFolderSelectedTextId?.let {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_LONG).show()
+        }
+        // Once the Prompt has been shown, notify the ViewModel
+        viewModel.setInvalidFolderSelectedPromptShown(false)
     }
 
     /**
@@ -1386,7 +1360,6 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         viewModel.setCameraUploadsRunning(true)
 
         // Local Primary Folder
-        setupLocalPathForCameraUpload()
         viewModel.restorePrimaryTimestampsAndSyncRecordProcess()
 
         // Cloud Primary Folder
@@ -1405,7 +1378,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         // Configured to prevent Camera Uploads from rapidly being switched on/off.
         // After setting the Backup, it will be re-enabled
         cameraUploadOnOff?.isEnabled = false
-        localCameraUploadFolder?.isEnabled = false
+        optionLocalCameraFolder?.isEnabled = false
         megaCameraFolder?.isEnabled = false
     }
 
@@ -1432,50 +1405,10 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
 
         viewModel.setCameraUploadsRunning(false)
 
-        localCameraUploadFolder?.let { preferenceScreen.removePreference(it) }
         megaCameraFolder?.let { preferenceScreen.removePreference(it) }
         secondaryMediaFolderOn?.let { preferenceScreen.removePreference(it) }
 
         disableMediaUploadUIProcess()
-    }
-
-    /**
-     * Sets up the Local Path for Camera Uploads
-     */
-    private fun setupLocalPathForCameraUpload() {
-        var cameraFolderLocation = prefs.camSyncLocalPath
-        if (cameraFolderLocation.isNullOrBlank()) {
-            cameraFolderLocation = localDCIMFolderPath
-        }
-
-        if (camSyncLocalPath != null) {
-            if (isExternalSDCardCU) {
-                val uri = Uri.parse(prefs.uriExternalSDCard)
-                val pickedDirName = SDCardUtils.getSDCardDirName(uri)
-                if (pickedDirName != null) {
-                    camSyncLocalPath = pickedDirName
-                } else {
-                    Timber.e("pickedDirName is null")
-                }
-            } else {
-                val checkFile = camSyncLocalPath?.let { File(it) }
-                if (checkFile != null && checkFile.exists()) {
-                    Timber.w("Local path does not exist. Use the default Camera Uploads folder path instead")
-                    camSyncLocalPath = cameraFolderLocation
-                }
-            }
-        } else {
-            Timber.e("Local path is null")
-            dbH.setCameraFolderExternalSDCard(false)
-            isExternalSDCardCU = false
-            camSyncLocalPath = cameraFolderLocation
-        }
-
-        dbH.setCamSyncLocalPath(cameraFolderLocation)
-        localCameraUploadFolder?.let {
-            it.summary = camSyncLocalPath
-            preferenceScreen.addPreference(it)
-        }
     }
 
     /**
@@ -1551,7 +1484,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
         when (which) {
             MegaApiJava.BACKUP_TYPE_CAMERA_UPLOADS -> {
                 cameraUploadOnOff?.isEnabled = true
-                localCameraUploadFolder?.isEnabled = true
+                optionLocalCameraFolder?.isEnabled = true
                 megaCameraFolder?.isEnabled = true
                 secondaryMediaFolderOn?.isEnabled = true
                 localSecondaryFolder?.isEnabled = true
