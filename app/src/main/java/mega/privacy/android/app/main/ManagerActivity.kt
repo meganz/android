@@ -192,6 +192,7 @@ import mega.privacy.android.app.presentation.avatar.model.AvatarContent
 import mega.privacy.android.app.presentation.avatar.view.Avatar
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsBottomSheetDialogFragment
 import mega.privacy.android.app.presentation.bottomsheet.UploadBottomSheetDialogActionListener
+import mega.privacy.android.app.presentation.clouddrive.FileBrowserComposeFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserFragment
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
 import mega.privacy.android.app.presentation.copynode.CopyRequestResult
@@ -592,6 +593,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     // Fragments
     private var fileBrowserFragment: FileBrowserFragment? = null
+    private var fileBrowserComposeFragment: FileBrowserComposeFragment? = null
     private var rubbishBinFragment: RubbishBinFragment? = null
     private var rubbishBinComposeFragment: RubbishBinComposeFragment? = null
     private var syncFragment: SyncFragment? = null
@@ -2529,8 +2531,18 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         return canVerifyPhoneNumber
     }
 
+    /**
+     * Checks if RubbishBinCompose enabled from [AppFeatures.RubbishBinCompose]
+     */
     private fun isRubbishBinComposeEnabled(): Boolean {
         return isFeatureEnabled(AppFeatures.RubbishBinCompose)
+    }
+
+    /**
+     * Checks if ileBrowserCompose enabled from [AppFeatures.FileBrowserCompose]
+     */
+    private fun isFileBrowserComposeEnabled(): Boolean {
+        return isFeatureEnabled(AppFeatures.FileBrowserCompose)
     }
 
     /**
@@ -3352,12 +3364,19 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         tabLayoutTransfers.visibility = View.GONE
         viewPagerTransfers.visibility = View.GONE
         fragmentContainer.visibility = View.VISIBLE
-        fileBrowserFragment =
-            (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE.tag) as? FileBrowserFragment
-                ?: FileBrowserFragment.newInstance()).also {
-                replaceFragment(it, FragmentTag.CLOUD_DRIVE.tag)
-            }
-
+        if (isFileBrowserComposeEnabled()) {
+            fileBrowserComposeFragment =
+                (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
+                    ?: FileBrowserComposeFragment.newInstance()).also {
+                    replaceFragment(it, FragmentTag.CLOUD_DRIVE_COMPOSE.tag)
+                }
+        } else {
+            fileBrowserFragment =
+                (supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE.tag) as? FileBrowserFragment
+                    ?: FileBrowserFragment.newInstance()).also {
+                    replaceFragment(it, FragmentTag.CLOUD_DRIVE.tag)
+                }
+        }
     }
 
     private fun showGlobalAlertDialogsIfNeeded() {
@@ -4448,9 +4467,15 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
 
     private val isCloudAdded: Boolean
         get() {
-            fileBrowserFragment =
-                supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE.tag) as? FileBrowserFragment
-            return fileBrowserFragment != null && fileBrowserFragment?.isAdded == true
+            return if (isFileBrowserComposeEnabled()) {
+                fileBrowserComposeFragment =
+                    supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE_COMPOSE.tag) as? FileBrowserComposeFragment
+                fileBrowserComposeFragment != null && fileBrowserComposeFragment?.isAdded == true
+            } else {
+                fileBrowserFragment =
+                    supportFragmentManager.findFragmentByTag(FragmentTag.CLOUD_DRIVE.tag) as? FileBrowserFragment
+                fileBrowserFragment != null && fileBrowserFragment?.isAdded == true
+            }
         }
     private val isIncomingAdded: Boolean
         get() {
@@ -4497,7 +4522,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         }
         when (drawerItem) {
             DrawerItem.CLOUD_DRIVE -> {
-                if (fileBrowserFragment?.isResumed == true) {
+                if (isFileBrowserComposeEnabled().not() && fileBrowserFragment?.isResumed == true) {
                     fileBrowserFragment?.checkScroll()
                 }
             }
@@ -5031,6 +5056,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                             //Cloud Drive
                             if (isCloudAdded) {
                                 fileBrowserFragment?.onBackPressed()
+                                fileBrowserComposeFragment?.onBackPressed()
                             }
                         }
                     } else if (drawerItem === DrawerItem.SYNC) {
@@ -5143,7 +5169,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             R.id.action_select -> {
                 when (drawerItem) {
                     DrawerItem.CLOUD_DRIVE -> if (isCloudAdded) {
-                        fileBrowserFragment?.selectAll()
+                        if (isFileBrowserComposeEnabled()) {
+                            fileBrowserViewModel.selectAllNodes()
+                        } else {
+                            fileBrowserFragment?.selectAll()
+                        }
                     }
                     DrawerItem.RUBBISH_BIN -> {
                         if (getRubbishBinFragment() != null) {
@@ -5361,9 +5391,16 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 isInMDMode = false
                 backToDrawerItem(bottomNavigationCurrentItem)
             } else {
-                if (!isCloudAdded || fileBrowserFragment?.onBackPressed() == 0) {
-                    performOnBack()
+                if (isFileBrowserComposeEnabled()) {
+                    if (!isCloudAdded || fileBrowserComposeFragment?.onBackPressed() == 0) {
+                        performOnBack()
+                    }
+                } else {
+                    if (!isCloudAdded || fileBrowserFragment?.onBackPressed() == 0) {
+                        performOnBack()
+                    }
                 }
+
             }
         } else if (drawerItem === DrawerItem.SYNC) {
             backToDrawerItem(bottomNavigationCurrentItem)
@@ -5520,7 +5557,11 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         if (item == CLOUD_DRIVE_BNV) {
             drawerItem = DrawerItem.CLOUD_DRIVE
             if (isCloudAdded) {
-                fileBrowserFragment?.changeTransferOverQuotaBannerVisibility()
+                if (isFileBrowserComposeEnabled()) {
+                    fileBrowserViewModel.changeTransferOverQuotaBannerVisibility()
+                } else {
+                    fileBrowserFragment?.changeTransferOverQuotaBannerVisibility()
+                }
             }
         } else if (item == PHOTOS_BNV) {
             drawerItem = DrawerItem.PHOTOS

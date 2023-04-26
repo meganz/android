@@ -261,4 +261,18 @@ class FileBrowserViewModel @Inject constructor(
     fun markHandledPendingRefresh() {
         _state.update { it.copy(isPendingRefresh = false) }
     }
+
+    /**
+     * Select all [NodeUIItem]
+     */
+    fun selectAllNodes() {
+
+    }
+
+    /**
+     *  Changes the Transfer Over Quota banner visibility based on certain conditions
+     */
+    fun changeTransferOverQuotaBannerVisibility() {
+
+    }
 }

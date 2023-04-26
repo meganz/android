@@ -89,7 +89,12 @@ enum class AppFeatures(override val description: String, private val defaultValu
     /**
      * To switch into new FolderLink Compose UI
      */
-    FolderLinkCompose("Enable compose for FolderLink", false);
+    FolderLinkCompose("Enable compose for FolderLink", false),
+
+    /**
+     * To switch into new FileBrowser Compose UI
+     */
+    FileBrowserCompose("Enable compose for FileBrowser", false);
 
     companion object : FeatureFlagValueProvider {
         override suspend fun isEnabled(feature: Feature) =
