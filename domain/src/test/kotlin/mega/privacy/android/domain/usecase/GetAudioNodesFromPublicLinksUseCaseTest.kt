@@ -5,6 +5,7 @@ import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -13,8 +14,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetVideoNodesFromInSharesTest {
-    lateinit var underTest: GetVideoNodesFromInShares
+class GetAudioNodesFromPublicLinksUseCaseTest {
+    lateinit var underTest: GetAudioNodesFromPublicLinksUseCase
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
     private val addNodeType = mock<AddNodeType>()
 
@@ -24,15 +25,16 @@ class DefaultGetVideoNodesFromInSharesTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetVideoNodesFromInShares(mediaPlayerRepository, addNodeType)
+        underTest = GetAudioNodesFromPublicLinksUseCase(mediaPlayerRepository, addNodeType)
     }
 
     @Test
     fun `test that the AddNodeType has been invoked`() =
         runTest {
             val sortOrder = SortOrder.ORDER_DEFAULT_ASC
-            whenever(mediaPlayerRepository.getVideoNodesFromInShares(sortOrder)).thenReturn(
-                unTypedNodeList)
+            whenever(mediaPlayerRepository.getAudioNodesFromPublicLinks(sortOrder)).thenReturn(
+                unTypedNodeList
+            )
 
             underTest(sortOrder)
 

@@ -13,8 +13,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetAudioNodesFromInSharesTest {
-    lateinit var underTest: GetAudioNodesFromInShares
+class GetVideoNodesFromInSharesUseCaseTest {
+    lateinit var underTest: GetVideoNodesFromInSharesUseCase
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
     private val addNodeType = mock<AddNodeType>()
 
@@ -24,15 +24,16 @@ class DefaultGetAudioNodesFromInSharesTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAudioNodesFromInShares(mediaPlayerRepository, addNodeType)
+        underTest = GetVideoNodesFromInSharesUseCase(mediaPlayerRepository, addNodeType)
     }
 
     @Test
     fun `test that the AddNodeType has been invoked`() =
         runTest {
             val sortOrder = SortOrder.ORDER_DEFAULT_ASC
-            whenever(mediaPlayerRepository.getAudioNodesFromInShares(sortOrder)).thenReturn(
-                unTypedNodeList)
+            whenever(mediaPlayerRepository.getVideoNodesFromInShares(sortOrder)).thenReturn(
+                unTypedNodeList
+            )
 
             underTest(sortOrder)
 

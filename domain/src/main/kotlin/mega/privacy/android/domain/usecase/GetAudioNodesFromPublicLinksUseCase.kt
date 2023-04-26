@@ -6,12 +6,19 @@ import mega.privacy.android.domain.repository.MediaPlayerRepository
 import javax.inject.Inject
 
 /**
- * The implementation of [GetAudioNodesFromPublicLinks]
+ * The use case for get audio nodes from public links
  */
-class DefaultGetAudioNodesFromPublicLinks @Inject constructor(
+class GetAudioNodesFromPublicLinksUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
     private val addNodeType: AddNodeType,
-) : GetAudioNodesFromPublicLinks {
-    override suspend fun invoke(order: SortOrder): List<TypedNode> =
+) {
+    /**
+     * Get audio nodes from public links
+     *
+     * @param order [SortOrder]
+     * @return audio nodes
+     */
+
+    suspend operator fun invoke(order: SortOrder): List<TypedNode> =
         mediaPlayerRepository.getAudioNodesFromPublicLinks(order).map { addNodeType(it) }
 }

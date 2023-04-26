@@ -1,17 +1,22 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import javax.inject.Inject
 
 /**
- * The implementation of [GetVideoNodesFromInShares]
+ * The use case for getting video nodes from InShares
  */
-class DefaultGetVideoNodesFromInShares @Inject constructor(
+class GetVideoNodesFromInSharesUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
     private val addNodeType: AddNodeType,
-) : GetVideoNodesFromInShares {
-    override suspend fun invoke(order: SortOrder): List<TypedNode> =
+) {
+    /**
+     * Getting video nodes from InShares
+     *
+     * @param order [SortOrder]
+     * @return video nodes
+     */
+    suspend operator fun invoke(order: SortOrder) =
         mediaPlayerRepository.getVideoNodesFromInShares(order).map { addNodeType(it) }
 }

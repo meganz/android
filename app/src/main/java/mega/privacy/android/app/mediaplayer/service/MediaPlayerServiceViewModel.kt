@@ -99,36 +99,38 @@ import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodes
 import mega.privacy.android.domain.usecase.GetAudioNodesByEmail
 import mega.privacy.android.domain.usecase.GetAudioNodesByParentHandle
-import mega.privacy.android.domain.usecase.GetAudioNodesFromInShares
+import mega.privacy.android.domain.usecase.GetAudioNodesFromInSharesUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
-import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinks
+import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinksUseCase
 import mega.privacy.android.domain.usecase.GetAudiosByParentHandleFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
-import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetNodesByHandles
 import mega.privacy.android.domain.usecase.GetParentNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
-import mega.privacy.android.domain.usecase.GetRootNode
-import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolder
-import mega.privacy.android.domain.usecase.GetRubbishNode
-import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
+import mega.privacy.android.domain.usecase.GetRootNodeUseCase
+import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolderUseCase
-import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandle
+import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
+import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmail
 import mega.privacy.android.domain.usecase.GetVideoNodes
 import mega.privacy.android.domain.usecase.GetVideoNodesByEmail
 import mega.privacy.android.domain.usecase.GetVideoNodesByParentHandle
-import mega.privacy.android.domain.usecase.GetVideoNodesFromInShares
+import mega.privacy.android.domain.usecase.GetVideoNodesFromInSharesUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
-import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinks
+import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinksUseCase
 import mega.privacy.android.domain.usecase.GetVideosByParentHandleFromMegaApiFolder
+import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.DeletePlaybackInformationUseCase
+import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiFolderHttpServerStartUseCase
@@ -137,9 +139,7 @@ import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunnin
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStopUseCase
-import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SavePlaybackTimesUseCase
-import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.SendStatisticsMediaPlayerUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.TrackPlaybackPositionUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
@@ -187,14 +187,14 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getInboxNodeUseCase: GetInboxNodeUseCase,
     private val getParentNodeByHandleUseCase: GetParentNodeByHandleUseCase,
     private val getParentNodeFromMegaApiFolderUseCase: GetParentNodeFromMegaApiFolderUseCase,
-    private val getRootNode: GetRootNode,
-    private val getRootNodeFromMegaApiFolder: GetRootNodeFromMegaApiFolder,
-    private val getRubbishNode: GetRubbishNode,
-    private val getUnTypedNodeByHandle: GetUnTypedNodeByHandle,
-    private val getAudioNodesFromPublicLinks: GetAudioNodesFromPublicLinks,
-    private val getVideoNodesFromPublicLinks: GetVideoNodesFromPublicLinks,
-    private val getAudioNodesFromInShares: GetAudioNodesFromInShares,
-    private val getVideoNodesFromInShares: GetVideoNodesFromInShares,
+    private val getRootNodeUseCase: GetRootNodeUseCase,
+    private val getRootNodeFromMegaApiFolderUseCase: GetRootNodeFromMegaApiFolderUseCase,
+    private val getRubbishNodeUseCase: GetRubbishNodeUseCase,
+    private val getUnTypedNodeByHandleUseCase: GetUnTypedNodeByHandleUseCase,
+    private val getAudioNodesFromPublicLinksUseCase: GetAudioNodesFromPublicLinksUseCase,
+    private val getVideoNodesFromPublicLinksUseCase: GetVideoNodesFromPublicLinksUseCase,
+    private val getAudioNodesFromInSharesUseCase: GetAudioNodesFromInSharesUseCase,
+    private val getVideoNodesFromInSharesUseCase: GetVideoNodesFromInSharesUseCase,
     private val getAudioNodesFromOutShares: GetAudioNodesFromOutShares,
     private val getVideoNodesFromOutShares: GetVideoNodesFromOutShares,
     private val getAudioNodes: GetAudioNodes,
@@ -417,9 +417,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             buildPlaySourcesByTypedNodes(
                                 type = type,
                                 typedNodes = if (isAudioPlayer) {
-                                    getAudioNodesFromPublicLinks(order)
+                                    getAudioNodesFromPublicLinksUseCase(order)
                                 } else {
-                                    getVideoNodesFromPublicLinks(order)
+                                    getVideoNodesFromPublicLinksUseCase(order)
                                 },
                                 firstPlayHandle = firstPlayHandle
                             )
@@ -432,9 +432,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 type = type,
                                 typedNodes =
                                 if (isAudioPlayer) {
-                                    getAudioNodesFromInShares(order)
+                                    getAudioNodesFromInSharesUseCase(order)
                                 } else {
-                                    getVideoNodesFromInShares(order)
+                                    getVideoNodesFromInSharesUseCase(order)
                                 },
                                 firstPlayHandle = firstPlayHandle
                             )
@@ -487,9 +487,9 @@ class MediaPlayerServiceViewModel @Inject constructor(
 
                         if (parentHandle == INVALID_HANDLE) {
                             when (type) {
-                                RUBBISH_BIN_ADAPTER -> getRubbishNode()
+                                RUBBISH_BIN_ADAPTER -> getRubbishNodeUseCase()
                                 INBOX_ADAPTER -> getInboxNodeUseCase()
-                                else -> getRootNode()
+                                else -> getRootNodeUseCase()
                             }
                         } else {
                             getParentNodeByHandleUseCase(parentHandle)
@@ -544,7 +544,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         val order = getSortOrderFromIntent(intent)
 
                         (if (parentHandle == INVALID_HANDLE) {
-                            getRootNodeFromMegaApiFolder()
+                            getRootNodeFromMegaApiFolderUseCase()
                         } else {
                             getParentNodeFromMegaApiFolderUseCase(parentHandle)
                         })?.let { parent ->
@@ -597,7 +597,8 @@ class MediaPlayerServiceViewModel @Inject constructor(
         } else {
             playlistItems.clear()
 
-            val node: TypedFileNode? = getUnTypedNodeByHandle(firstPlayHandle) as? TypedFileNode
+            val node: TypedFileNode? =
+                getUnTypedNodeByHandleUseCase(firstPlayHandle) as? TypedFileNode
             val thumbnail = when {
                 type == OFFLINE_ADAPTER -> {
                     offlineThumbnailFileWrapper.getThumbnailFile(

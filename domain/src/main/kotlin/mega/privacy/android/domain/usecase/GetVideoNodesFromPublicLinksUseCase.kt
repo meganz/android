@@ -6,12 +6,18 @@ import mega.privacy.android.domain.repository.MediaPlayerRepository
 import javax.inject.Inject
 
 /**
- * The implementation of [GetVideoNodesFromPublicLinks]
+ * The use case for getting video nodes from public links
  */
-class DefaultGetVideoNodesFromPublicLinks @Inject constructor(
+class GetVideoNodesFromPublicLinksUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
     private val addNodeType: AddNodeType,
-) : GetVideoNodesFromPublicLinks {
-    override suspend fun invoke(order: SortOrder): List<TypedNode> =
+) {
+    /**
+     * Get video nodes from public links
+     *
+     * @param order [SortOrder]
+     * @return video nodes
+     */
+    suspend operator fun invoke(order: SortOrder) =
         mediaPlayerRepository.getVideoNodesFromPublicLinks(order).map { addNodeType(it) }
 }
