@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import javax.inject.Inject
@@ -93,6 +94,7 @@ import javax.inject.Inject
  * @property setupSecondaryFolder Sets up the Secondary Folder of Camera Uploads
  * @property startCameraUploadUseCase Start the camera upload
  * @property stopCameraUploadUseCase Stop the camera upload
+ * @property rescheduleCameraUploadUseCase Reschedule the camera upload
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
@@ -128,6 +130,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupSecondaryFolder: SetupSecondaryFolder,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadUseCase: StopCameraUploadUseCase,
+    private val rescheduleCameraUploadUseCase: RescheduleCameraUploadUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -576,5 +579,12 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun stopCameraUpload() = viewModelScope.launch {
         stopCameraUploadUseCase()
+    }
+
+    /**
+     * Reschedule camera upload
+     */
+    fun rescheduleCameraUpload() = viewModelScope.launch {
+        rescheduleCameraUploadUseCase()
     }
 }

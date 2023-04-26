@@ -46,6 +46,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.workers.RescheduleCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import org.junit.After
@@ -101,6 +102,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setupSecondaryFolder = mock<SetupSecondaryFolder>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
+    private val rescheduleCameraUploadUseCase = mock<RescheduleCameraUploadUseCase>()
 
     @Before
     fun setUp() {
@@ -151,6 +153,7 @@ class SettingsCameraUploadsViewModelTest {
             setupSecondaryFolder = setupSecondaryFolder,
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadUseCase = stopCameraUploadUseCase,
+            rescheduleCameraUploadUseCase = rescheduleCameraUploadUseCase,
         )
     }
 
@@ -661,5 +664,15 @@ class SettingsCameraUploadsViewModelTest {
             underTest.stopCameraUpload()
 
             verify(stopCameraUploadUseCase, times(1)).invoke()
+        }
+
+    @Test
+    fun `test that when rescheduleCameraUpload is called, rescheduleCameraUploadUseCase is called`() =
+        runTest {
+            setupUnderTest()
+
+            underTest.rescheduleCameraUpload()
+
+            verify(rescheduleCameraUploadUseCase, times(1)).invoke()
         }
 }

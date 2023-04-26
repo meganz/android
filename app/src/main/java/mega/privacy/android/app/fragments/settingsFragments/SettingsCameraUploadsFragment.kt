@@ -363,7 +363,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             KEY_CAMERA_UPLOAD_CHARGING -> {
                 val chargingRequired = optionChargingOnVideoCompression?.isChecked ?: false
                 viewModel.changeChargingRequiredForVideoCompression(chargingRequired)
-                JobUtil.rescheduleCameraUpload(context)
+                viewModel.rescheduleCameraUpload()
             }
             KEY_CAMERA_UPLOAD_VIDEO_QUEUE_SIZE -> showResetCompressionQueueSizeDialog()
             KEY_KEEP_FILE_NAMES -> {
@@ -416,7 +416,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     viewModel.disableMediaUploads()
                 }
                 checkIfSecondaryFolderExists()
-                JobUtil.rescheduleCameraUpload(context)
+                viewModel.rescheduleCameraUpload()
             }
             KEY_LOCAL_SECONDARY_MEDIA_FOLDER -> {
                 intent = Intent(context, FileStorageActivity::class.java).apply {
@@ -458,7 +458,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                         viewModel.changeUploadConnectionType(wifiOnly = false)
                     }
                 }
-                JobUtil.rescheduleCameraUpload(context)
+                viewModel.rescheduleCameraUpload()
             }
             KEY_CAMERA_UPLOAD_WHAT_TO -> {
                 when (value) {
@@ -473,11 +473,11 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                     }
                 }
                 viewModel.resetTimestampsAndCacheDirectory()
-                JobUtil.rescheduleCameraUpload(context)
+                viewModel.rescheduleCameraUpload()
             }
             KEY_CAMERA_UPLOAD_VIDEO_QUALITY -> {
                 viewModel.changeUploadVideoQuality(value)
-                JobUtil.rescheduleCameraUpload(context)
+                viewModel.rescheduleCameraUpload()
             }
         }
         return true
@@ -497,8 +497,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 with(viewModel) {
                     changePrimaryFolderPath(newPrimaryFolderPath)
                     resetTimestampsAndCacheDirectory()
+                    rescheduleCameraUpload()
                 }
-                JobUtil.rescheduleCameraUpload(context)
                 // Update Sync when the Primary Local Folder has changed
                 updatePrimaryLocalFolder(newPrimaryFolderPath)
             }
@@ -556,7 +556,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
                 localSecondaryFolder?.summary = localSecondaryFolderPath.orEmpty()
                 dbH.setSecSyncTimeStamp(0)
                 dbH.setSecVideoSyncTimeStamp(0)
-                JobUtil.rescheduleCameraUpload(context)
+                viewModel.rescheduleCameraUpload()
 
                 // Update Sync when the Secondary Local Folder has changed
                 updateSecondaryLocalFolder(secondaryPath)
@@ -1026,7 +1026,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      */
     private fun includeLocationTags(include: Boolean) {
         viewModel.includeLocationTags(include)
-        JobUtil.rescheduleCameraUpload(context)
+        viewModel.rescheduleCameraUpload()
     }
 
     /**
@@ -1218,7 +1218,7 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
             val newSize = value.toInt()
             if (isQueueSizeValid(newSize)) {
                 viewModel.changeVideoCompressionSizeLimit(newSize)
-                JobUtil.rescheduleCameraUpload(context)
+                viewModel.rescheduleCameraUpload()
                 compressionQueueSizeDialog?.dismiss()
             } else {
                 resetSizeInput(input)
