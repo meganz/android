@@ -99,12 +99,12 @@ import mega.privacy.android.domain.entity.statistics.MediaPlayerStatisticsEvents
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
-import mega.privacy.android.domain.usecase.GetAudioNodes
-import mega.privacy.android.domain.usecase.GetAudioNodesByEmail
+import mega.privacy.android.domain.usecase.GetAudioNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesByParentHandle
 import mega.privacy.android.domain.usecase.GetAudioNodesFromInSharesUseCase
-import mega.privacy.android.domain.usecase.GetAudioNodesFromOutShares
+import mega.privacy.android.domain.usecase.GetAudioNodesFromOutSharesUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinksUseCase
+import mega.privacy.android.domain.usecase.GetAudioNodesUseCase
 import mega.privacy.android.domain.usecase.GetAudiosByParentHandleFromMegaApiFolder
 import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
@@ -120,13 +120,13 @@ import mega.privacy.android.domain.usecase.GetRubbishNodeUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandleUseCase
-import mega.privacy.android.domain.usecase.GetUserNameByEmail
-import mega.privacy.android.domain.usecase.GetVideoNodes
-import mega.privacy.android.domain.usecase.GetVideoNodesByEmail
+import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
+import mega.privacy.android.domain.usecase.GetVideoNodesByEmailUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesByParentHandle
 import mega.privacy.android.domain.usecase.GetVideoNodesFromInSharesUseCase
-import mega.privacy.android.domain.usecase.GetVideoNodesFromOutShares
+import mega.privacy.android.domain.usecase.GetVideoNodesFromOutSharesUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinksUseCase
+import mega.privacy.android.domain.usecase.GetVideoNodesUseCase
 import mega.privacy.android.domain.usecase.GetVideosByParentHandleFromMegaApiFolder
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.DeletePlaybackInformationUseCase
@@ -195,13 +195,13 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getVideoNodesFromPublicLinksUseCase: GetVideoNodesFromPublicLinksUseCase,
     private val getAudioNodesFromInSharesUseCase: GetAudioNodesFromInSharesUseCase,
     private val getVideoNodesFromInSharesUseCase: GetVideoNodesFromInSharesUseCase,
-    private val getAudioNodesFromOutShares: GetAudioNodesFromOutShares,
-    private val getVideoNodesFromOutShares: GetVideoNodesFromOutShares,
-    private val getAudioNodes: GetAudioNodes,
-    private val getVideoNodes: GetVideoNodes,
-    private val getAudioNodesByEmail: GetAudioNodesByEmail,
-    private val getVideoNodesByEmail: GetVideoNodesByEmail,
-    private val getUserNameByEmail: GetUserNameByEmail,
+    private val getAudioNodesFromOutSharesUseCase: GetAudioNodesFromOutSharesUseCase,
+    private val getVideoNodesFromOutSharesUseCase: GetVideoNodesFromOutSharesUseCase,
+    private val getAudioNodesUseCase: GetAudioNodesUseCase,
+    private val getVideoNodesUseCase: GetVideoNodesUseCase,
+    private val getAudioNodesByEmailUseCase: GetAudioNodesByEmailUseCase,
+    private val getVideoNodesByEmailUseCase: GetVideoNodesByEmailUseCase,
+    private val getUserNameByEmailUseCase: GetUserNameByEmailUseCase,
     private val getAudiosByParentHandleFromMegaApiFolder: GetAudiosByParentHandleFromMegaApiFolder,
     private val getVideosByParentHandleFromMegaApiFolder: GetVideosByParentHandleFromMegaApiFolder,
     private val getAudioNodesByParentHandle: GetAudioNodesByParentHandle,
@@ -384,7 +384,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         playlistTitle.postValue(context.getString(R.string.upload_to_audio))
                         buildPlaySourcesByTypedNodes(
                             type = type,
-                            typedNodes = getAudioNodes(getSortOrderFromIntent(intent)),
+                            typedNodes = getAudioNodesUseCase(getSortOrderFromIntent(intent)),
                             firstPlayHandle = firstPlayHandle
                         )
                     }
@@ -392,7 +392,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
                         playlistTitle.postValue(context.getString(R.string.sortby_type_video_first))
                         buildPlaySourcesByTypedNodes(
                             type = type,
-                            typedNodes = getVideoNodes(getSortOrderFromIntent(intent)),
+                            typedNodes = getVideoNodesUseCase(getSortOrderFromIntent(intent)),
                             firstPlayHandle = firstPlayHandle
                         )
                     }
@@ -446,12 +446,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             buildPlaySourcesByTypedNodes(
                                 type = type,
                                 typedNodes = if (isAudioPlayer) {
-                                    getAudioNodesFromOutShares(
+                                    getAudioNodesFromOutSharesUseCase(
                                         lastHandle = INVALID_HANDLE,
                                         order = order
                                     )
                                 } else {
-                                    getVideoNodesFromOutShares(
+                                    getVideoNodesFromOutSharesUseCase(
                                         lastHandle = INVALID_HANDLE,
                                         order = order
                                     )
@@ -465,11 +465,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             intent.getStringExtra(INTENT_EXTRA_KEY_CONTACT_EMAIL)
                                 ?.let { email ->
                                     if (isAudioPlayer) {
-                                        getAudioNodesByEmail(email)
+                                        getAudioNodesByEmailUseCase(email)
                                     } else {
-                                        getVideoNodesByEmail(email)
+                                        getVideoNodesByEmailUseCase(email)
                                     }?.let { nodes ->
-                                        getUserNameByEmail(email)?.let {
+                                        getUserNameByEmailUseCase(email)?.let {
                                             context.getString(R.string.title_incoming_shares_with_explorer)
                                                 .let { sharesTitle ->
                                                     playlistTitle.postValue("$sharesTitle $it")

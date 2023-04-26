@@ -1,16 +1,21 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import javax.inject.Inject
 
 /**
- * The implementation of [GetVideoNodesByEmail]
+ * The use case for getting video nodes by email
  */
-class DefaultGetVideoNodesByEmail @Inject constructor(
+class GetVideoNodesByEmailUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
     private val addNodeType: AddNodeType,
-) : GetVideoNodesByEmail {
-    override suspend fun invoke(email: String): List<TypedNode>? =
+) {
+    /**
+     * Getting video nodes by email
+     *
+     * @param email email
+     * @return video nodes
+     */
+    suspend operator fun invoke(email: String) =
         mediaPlayerRepository.getVideoNodesByEmail(email)?.map { addNodeType(it) }
 }

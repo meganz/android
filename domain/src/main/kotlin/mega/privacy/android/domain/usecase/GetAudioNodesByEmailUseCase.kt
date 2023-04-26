@@ -1,16 +1,21 @@
 package mega.privacy.android.domain.usecase
 
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import javax.inject.Inject
 
 /**
- * The implementation of [GetAudioNodesByEmail]
+ * The use case for getting audio nodes by email
  */
-class DefaultGetAudioNodesByEmail @Inject constructor(
+class GetAudioNodesByEmailUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
     private val addNodeType: AddNodeType,
-) : GetAudioNodesByEmail {
-    override suspend fun invoke(email: String): List<TypedNode>? =
+) {
+    /**
+     * Getting audio nodes by email
+     *
+     * @param email email
+     * @return audio nodes
+     */
+    suspend operator fun invoke(email: String) =
         mediaPlayerRepository.getAudioNodesByEmail(email)?.map { addNodeType(it) }
 }

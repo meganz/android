@@ -2,6 +2,7 @@ package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import org.junit.Assert.*
@@ -13,8 +14,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetAudioNodesByEmailTest {
-    lateinit var underTest: GetAudioNodesByEmail
+class GetVideoNodesUseCaseTest {
+    lateinit var underTest: GetVideoNodesUseCase
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
     private val addNodeType = mock<AddNodeType>()
 
@@ -24,16 +25,18 @@ class DefaultGetAudioNodesByEmailTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetAudioNodesByEmail(mediaPlayerRepository, addNodeType)
+        underTest = GetVideoNodesUseCase(mediaPlayerRepository, addNodeType)
     }
 
     @Test
     fun `test that the AddNodeType has been invoked`() =
         runTest {
-            val email = "abc@example.com"
-            whenever(mediaPlayerRepository.getAudioNodesByEmail(email)).thenReturn(unTypedNodeList)
+            val sortOrder = SortOrder.ORDER_DEFAULT_ASC
+            whenever(mediaPlayerRepository.getVideoNodes(sortOrder)).thenReturn(
+                unTypedNodeList
+            )
 
-            underTest(email)
+            underTest(sortOrder)
 
             verify(addNodeType, times(1)).invoke(unTypeNodeOne)
             verify(addNodeType, times(1)).invoke(unTypeNodeTwo)
