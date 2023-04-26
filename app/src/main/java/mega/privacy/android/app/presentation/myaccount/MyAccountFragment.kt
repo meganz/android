@@ -308,7 +308,7 @@ class MyAccountFragment : Fragment(), Scrollable {
             usageBinding.updateBusinessOrProFlexi(
                 requireContext(),
                 formatSize(state.usedStorage),
-                formatSize(100000)
+                formatSize(state.usedTransfer)
             )
         } else {
             usageBinding.update(
