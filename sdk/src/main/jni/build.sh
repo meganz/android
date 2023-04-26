@@ -144,6 +144,14 @@ PDFVIEWER_SOURCE_FOLDER=PdfiumAndroid-pdfium-android-${PDFVIEWER_VERSION}
 PDFVIEWER_DOWNLOAD_URL=https://github.com/barteksc/PdfiumAndroid/archive/pdfium-android-${PDFVIEWER_VERSION}.zip
 PDFVIEWER_SHA1="9c346de2fcf328c65c7047f03357a049dc55b403"
 
+ICU=icu
+ICU_VERSION=71_1
+ICU_SOURCE_FILE=icu4c-${ICU_VERSION}.zip
+ICU_SOURCE_FOLDER=icu-${ICU_VERSION}
+ICU_DOWNLOAD_URL=https://github.com/unicode-org/icu/releases/download/release-71-1/icu4c-71_1-src.zip
+ICU_SHA1="0b6a02293a81ccfb2a743ce1faa009770ed8a12c"
+ICU_SOURCE_VERSION=icuSource-${ICU_VERSION}
+
 #  When using pre-built SDK, upgrading ExoPlayer must upgrade the ExoPlayer AARs under app/src/main/libs
 EXOPLAYER=ExoPlayer
 EXOPLAYER_VERSION=2.18.1
@@ -344,6 +352,8 @@ if [ "$1" == "clean" ]; then
     rm -rf ${LIBWEBSOCKETS}/${LIBWEBSOCKETS}
     rm -rf ${PDFVIEWER}/${PDFVIEWER}
     rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FOLDER}
+    rm -rf ${ICU}/${ICU_SOURCE_VERSION}
+    rm -rf ${ICU}/${ICU_SOURCE_FILE}
 
     echo "* Deleting tarballs"
     rm -rf ${CRYPTOPP}/${CRYPTOPP_SOURCE_FILE}
@@ -369,6 +379,7 @@ if [ "$1" == "clean" ]; then
     rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}
     rm -rf ${EXOPLAYER}/${FLAC_SOURCE_FILE}
     rm -rf ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
+    rm -rf ${ICU}/${ICU_SOURCE_FILE}.ready
 
     echo "* Deleting object files"
     rm -rf ../obj/local/armeabi-v7a
@@ -692,6 +703,72 @@ if [ ! -f ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready ]; then
     touch ${EXOPLAYER}/${EXOPLAYER_SOURCE_FILE}.ready
 fi
 echo "* ExoPlayer is ready"
+
+echo "* Setting up ICU"
+if [ ! -f ${ICU}/${ICU_SOURCE_FILE}.ready ]; then
+    downloadCheckAndUnpack ${ICU_DOWNLOAD_URL} ${ICU}/${ICU_SOURCE_FILE} ${ICU_SHA1} ${ICU}/${ICU_SOURCE_VERSION}
+
+    pushd "${ICU}/${ICU_SOURCE_VERSION}/icu" &>> ${LOG_FILE}
+    sed -i -e 's/\r$//' source/runConfigureICU
+    sed -i -e 's/\r$//' source/configure
+    sed -i -e 's/\r$//' source/config.sub
+    sed -i -e 's/\r$//' source/config.guess
+    sed -i -e 's/\r$//' source/config/make2sh.sed
+    sed -i -e 's/\r$//' source/mkinstalldirs
+
+    mkdir -p linux && cd linux
+
+    CONFIGURE_LINUX_OPTIONS="--enable-static --enable-shared=no --enable-extras=no --enable-strict=no --enable-icuio=no --enable-layout=no --enable-layoutex=no --enable-tools=yes --enable-tests=no --enable-samples=no --enable-dyload=no"
+    ../source/runConfigureICU Linux CFLAGS="-Os" CXXFLAGS="--std=c++11" ${CONFIGURE_LINUX_OPTIONS} &>> ${LOG_FILE}
+
+    make -j${JOBS} &>> ${LOG_FILE}
+
+    export CROSS_BUILD_DIR=$(realpath .)
+    export ANDROID_NDK=${NDK_ROOT}
+
+    popd &>> ${LOG_FILE}
+
+    for ABI in ${BUILD_ARCHS}; do
+        echo "* Compiling ICU for ${ABI}"
+        setupEnv "${ABI}"
+
+        pushd "${ICU}/${ICU_SOURCE_VERSION}/icu" &>> ${LOG_FILE}
+
+        mkdir -p ${ABI} && cd ${ABI}
+
+        if [ "${ABI}" == "armeabi-v7a" ]; then
+            HOST=arm-linux-androideabi
+            ARCH=arm
+        elif [ "${ABI}" == "arm64-v8a" ]; then
+            HOST=aarch64-linux-android
+            ARCH=arm64
+        elif [ "${ABI}" == "x86" ]; then
+            HOST=i686-linux-android
+            ARCH=x86
+        elif [ "${ABI}" == "x86_64" ]; then
+            HOST=i686-linux-android
+            ARCH=x86_64
+        fi
+
+        export ANDROID_TOOLCHAIN=$(pwd)/${ICU}/toolchain-${ABI}
+        export PATH=$ANDROID_TOOLCHAIN/bin:$PATH
+
+        rm -rf ${ANDROID_TOOLCHAIN} &>> ${LOG_FILE}
+        $NDK_ROOT/build/tools/make-standalone-toolchain.sh --arch=${ARCH} --platform=${APP_PLATFORM} --install-dir=${ANDROID_TOOLCHAIN} &>> ${LOG_FILE}
+
+        CONFIGURE_ANDROID_OPTIONS="--host=${HOST} --enable-static --enable-shared=no --enable-extras=no --enable-strict=no --enable-icuio=no --enable-layout=no --enable-layoutex=no --enable-tools=no --enable-tests=no --enable-samples=no --enable-dyload=no -with-cross-build=$CROSS_BUILD_DIR"
+
+        ../source/configure CFLAGS="-Os -fPIC" CXXFLAGS="--std=c++11 -fPIC" ${CONFIGURE_ANDROID_OPTIONS}  &>> ${LOG_FILE}
+
+        make -j${JOBS} &>> ${LOG_FILE}
+
+        popd &>> ${LOG_FILE}
+    done
+
+    cleanEnv
+    touch ${ICU}/${ICU_SOURCE_FILE}.ready
+fi
+echo "* ICU is ready"
 
 echo "* All dependencies are prepared!"
 

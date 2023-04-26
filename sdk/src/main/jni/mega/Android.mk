@@ -16,6 +16,6 @@ LOCAL_SRC_FILES := $(CPP_SOURCES) $(C_SOURCES) $(C_WRAPPER_SOURCES)
 LOCAL_C_INCLUDES += $(local_c_includes)
 LOCAL_EXPORT_C_INCLUDES += $(local_c_includes)
 LOCAL_EXPORT_CFLAGS += -DENABLE_CHAT
-LOCAL_STATIC_LIBRARIES := curl cryptopp sqlite libuv sodium mediainfo
+LOCAL_STATIC_LIBRARIES := curl cryptopp sqlite libuv sodium mediainfo icu
 include $(BUILD_STATIC_LIBRARY)
 
