@@ -114,11 +114,11 @@ interface FileSystemRepository {
     suspend fun createDirectory(path: String): File
 
     /**
-     * remove directory recursively
-     * @param path
-     * @return [Boolean]
+     * Recursively deletes the temporary Camera Uploads root directory
+     *
+     * @return true if the delete operation is successful, and false if otherwise
      */
-    suspend fun deleteDirectory(path: String): Boolean
+    suspend fun deleteCameraUploadsTemporaryRootDirectory(): Boolean
 
     /**
      * Returns cache directory of the app

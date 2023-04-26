@@ -2,6 +2,9 @@ package mega.privacy.android.data.gateway
 
 import java.io.File
 
+/**
+ * Gateway class for caching operations
+ */
 interface CacheFolderGateway {
 
     /**
@@ -102,6 +105,13 @@ interface CacheFolderGateway {
      * Removes app data.
      */
     suspend fun clearAppData()
+
+    /**
+     * Returns the Camera Uploads Cache Folder
+     *
+     * @return A [File] representing the Camera Uploads Cache Folder
+     */
+    suspend fun getCameraUploadsCacheFolder(): File
 
     /**
      * Returns cache directory of the app

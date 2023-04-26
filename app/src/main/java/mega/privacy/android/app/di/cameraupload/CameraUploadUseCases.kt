@@ -67,7 +67,6 @@ import mega.privacy.android.domain.usecase.DefaultClearSyncRecords
 import mega.privacy.android.domain.usecase.DefaultCompressVideos
 import mega.privacy.android.domain.usecase.DefaultCompressedVideoPending
 import mega.privacy.android.domain.usecase.DefaultCreateCameraUploadTemporaryRootDirectory
-import mega.privacy.android.domain.usecase.DefaultDeleteCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadSettings
 import mega.privacy.android.domain.usecase.DefaultDisableCameraUploadsInDatabase
 import mega.privacy.android.domain.usecase.DefaultDisableMediaUploadSettings
@@ -92,7 +91,6 @@ import mega.privacy.android.domain.usecase.DefaultSetupPrimaryFolder
 import mega.privacy.android.domain.usecase.DefaultSetupSecondaryFolder
 import mega.privacy.android.domain.usecase.DefaultShouldCompressVideo
 import mega.privacy.android.domain.usecase.DefaultUpdateCameraUploadTimeStamp
-import mega.privacy.android.domain.usecase.DeleteCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
@@ -734,11 +732,4 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindCreateCameraUploadTemporaryRootDirectory(implementation: DefaultCreateCameraUploadTemporaryRootDirectory): CreateCameraUploadTemporaryRootDirectory
-
-    /**
-     * Provide the [DeleteCameraUploadTemporaryRootDirectory] implementation
-     */
-    @Binds
-    abstract fun bindDeleteCameraUploadTemporaryRootDirectory(implementation: DefaultDeleteCameraUploadTemporaryRootDirectory): DeleteCameraUploadTemporaryRootDirectory
-
 }

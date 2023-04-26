@@ -94,7 +94,6 @@ import mega.privacy.android.domain.usecase.CompressedVideoPending
 import mega.privacy.android.domain.usecase.CreateCameraUploadFolder
 import mega.privacy.android.domain.usecase.CreateCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.CreateTempFileAndRemoveCoordinatesUseCase
-import mega.privacy.android.domain.usecase.DeleteCameraUploadTemporaryRootDirectory
 import mega.privacy.android.domain.usecase.DeleteSyncRecord
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.DeleteSyncRecordByLocalPath
@@ -120,6 +119,7 @@ import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
@@ -537,10 +537,10 @@ class CameraUploadsService : LifecycleService() {
     lateinit var createCameraUploadTemporaryRootDirectory: CreateCameraUploadTemporaryRootDirectory
 
     /**
-     * Delete camera upload temporary root directory
+     * Delete Camera Uploads Temporary Root Directory
      */
     @Inject
-    lateinit var deleteCameraUploadTemporaryRootDirectory: DeleteCameraUploadTemporaryRootDirectory
+    lateinit var deleteCameraUploadsTemporaryRootDirectory: DeleteCameraUploadsTemporaryRootDirectoryUseCase
 
     /**
      * Broadcast camera upload progress
@@ -1111,7 +1111,7 @@ class CameraUploadsService : LifecycleService() {
                 Timber.d("Nothing to upload.")
                 scheduleCameraUploadUseCase()
                 endService()
-                deleteCameraUploadTemporaryRootDirectory()
+                deleteCameraUploadsTemporaryRootDirectory()
             }
         } else {
             Timber.d("Start to upload %d files.", finalList.size)

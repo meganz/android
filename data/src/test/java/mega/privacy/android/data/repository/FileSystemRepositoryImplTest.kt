@@ -329,4 +329,16 @@ internal class FileSystemRepositoryImplTest {
             whenever(fileGateway.doesExternalStorageDirectoryExists()).thenReturn(externalDirExists)
             assertThat(underTest.doesExternalStorageDirectoryExists()).isEqualTo(externalDirExists)
         }
+
+    @ParameterizedTest(name = "delete root directory: {0}")
+    @ValueSource(booleans = [true, false])
+    fun `test that the camera uploads temporary root directory could be deleted`(deleteRootDirectory: Boolean) =
+        runTest {
+            whenever(cacheFolderGateway.getCameraUploadsCacheFolder()).thenReturn(mock())
+            whenever(fileGateway.deleteDirectory(any())).thenReturn(deleteRootDirectory)
+
+            assertThat(underTest.deleteCameraUploadsTemporaryRootDirectory()).isEqualTo(
+                deleteRootDirectory
+            )
+        }
 }

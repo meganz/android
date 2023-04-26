@@ -9,13 +9,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.constant.CacheFolderConstant
-import mega.privacy.android.data.extensions.getFileName
-import mega.privacy.android.data.extensions.getThumbnailFileName
 import mega.privacy.android.data.gateway.CacheFolderGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
-import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import java.io.IOException
@@ -24,6 +21,10 @@ import javax.inject.Inject
 /**
  * Default implementation of [CacheFolderGateway]
  *
+ * @property context [Context]
+ * @property fileGateway [FileGateway]
+ * @property appScope [CoroutineScope]
+ * @property ioDispatcher [CoroutineDispatcher]
  */
 internal class CacheFolderFacade @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -39,6 +40,7 @@ internal class CacheFolderFacade @Inject constructor(
         private const val OLD_PROFILE_PID_DIR = "MEGA/MEGA Profile Images"
         private const val OLD_ADVANCES_DEVICES_DIR = "MEGA/MEGA Temp"
         private const val OLD_CHAT_TEMPORARY_DIR = "MEGA/MEGA Temp/Chat"
+        private const val CAMERA_UPLOADS_CACHE_FOLDER = "cu"
     }
 
     override fun getCacheFolder(folderName: String): File? =
@@ -164,6 +166,9 @@ internal class CacheFolderFacade @Inject constructor(
             Timber.e("Exception deleting private cache", e)
         }
     }
+
+    override suspend fun getCameraUploadsCacheFolder(): File =
+        File(cacheDir, CAMERA_UPLOADS_CACHE_FOLDER)
 
     override val cacheDir: File
         get() = context.cacheDir

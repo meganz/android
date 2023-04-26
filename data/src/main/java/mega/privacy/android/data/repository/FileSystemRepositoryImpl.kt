@@ -258,9 +258,10 @@ internal class FileSystemRepositoryImpl @Inject constructor(
             fileGateway.createDirectory(path)
         }
 
-    override suspend fun deleteDirectory(path: String) =
+    override suspend fun deleteCameraUploadsTemporaryRootDirectory() =
         withContext(ioDispatcher + NonCancellable) {
-            fileGateway.deleteDirectory(path)
+            val cameraUploadsCacheFolder = cacheFolderGateway.getCameraUploadsCacheFolder()
+            fileGateway.deleteDirectory(path = "${cameraUploadsCacheFolder.absolutePath}${File.separator}")
         }
 
     override val cacheDir: File
