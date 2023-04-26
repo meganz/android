@@ -29,6 +29,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication.Companion.getInstance
@@ -152,6 +153,8 @@ class UploadService : Service() {
         }
     }
 
+    private var monitorPausedTransfersJob: Job? = null
+
     @SuppressLint("NewApi", "CheckResult", "WrongConstant")
     override fun onCreate() {
         super.onCreate()
@@ -179,7 +182,7 @@ class UploadService : Service() {
             )
         }
 
-        applicationScope.launch {
+        monitorPausedTransfersJob = applicationScope.launch {
             monitorPausedTransfers().collectLatest {
                 // delay 1 second to refresh the pause notification to prevent update is missed
                 Handler(Looper.getMainLooper()).postDelayed(
@@ -203,6 +206,7 @@ class UploadService : Service() {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({}) { t: Throwable? -> Timber.e(t) }
                     }
+
                     is GetGlobalTransferUseCase.Result.OnTransferUpdate -> {
                         val transfer = event.transfer
                         doOnTransferUpdate(transfer)
@@ -210,6 +214,7 @@ class UploadService : Service() {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({}) { t: Throwable? -> Timber.e(t) }
                     }
+
                     is GetGlobalTransferUseCase.Result.OnTransferFinish -> {
                         val transfer = event.transfer
                         val error = event.error
@@ -218,6 +223,7 @@ class UploadService : Service() {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({}) { t: Throwable? -> Timber.e(t) }
                     }
+
                     is GetGlobalTransferUseCase.Result.OnTransferTemporaryError -> {
                         val transfer = event.transfer
                         val error = event.error
@@ -226,6 +232,7 @@ class UploadService : Service() {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({}) { t: Throwable? -> Timber.e(t) }
                     }
+
                     else -> {}
                 }
             }
@@ -304,6 +311,7 @@ class UploadService : Service() {
         rxSubscriptions.clear()
         LiveEventBus.get(EVENT_FINISH_SERVICE_IF_NO_TRANSFERS, Boolean::class.java)
             .removeObserver(stopServiceObserver)
+        monitorPausedTransfersJob?.cancel()
         super.onDestroy()
     }
 
@@ -567,10 +575,12 @@ class UploadService : Service() {
                 Constants.OVERQUOTA_STORAGE_STATE -> action = Constants.ACTION_OVERQUOTA_STORAGE
                 Constants.PRE_OVERQUOTA_STORAGE_STATE -> action =
                     Constants.ACTION_PRE_OVERQUOTA_STORAGE
+
                 Constants.NOT_OVERQUOTA_STATE -> {
                     action = Constants.ACTION_SHOW_TRANSFERS
                     putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
                 }
+
                 else -> {
                     action = Constants.ACTION_SHOW_TRANSFERS
                     putExtra(ManagerActivity.TRANSFERS_TAB, TransfersTab.PENDING_TAB)
