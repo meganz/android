@@ -28,7 +28,6 @@ import mega.privacy.android.app.main.TourFragment
 import mega.privacy.android.app.presentation.extensions.toConstant
 import mega.privacy.android.app.presentation.login.confirmemail.ConfirmEmailFragment
 import mega.privacy.android.app.utils.Constants
-import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.Util
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
@@ -314,7 +313,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
 
         Util.getCustomAlertBuilder(this, title, text, null)
             .setPositiveButton(getString(R.string.general_yes)) { _, _ ->
-                JobUtil.fireStopCameraUploadJob(this@LoginActivity)
+                viewModel.stopCameraUpload()
                 dbH.setCamSyncEnabled(false)
             }.setNegativeButton(getString(R.string.general_no), null)
             .show()

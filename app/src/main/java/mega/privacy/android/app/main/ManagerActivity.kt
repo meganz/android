@@ -299,7 +299,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker
 import mega.privacy.android.app.utils.LinksUtil
 import mega.privacy.android.app.utils.MegaApiUtils
@@ -1488,7 +1487,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (intent.action == Constants.ACTION_EXPORT_MASTER_KEY || intent.action == Constants.ACTION_OPEN_MEGA_LINK || intent.action == Constants.ACTION_OPEN_MEGA_FOLDER_LINK) {
                         openLink = true
                     } else if (intent.action == Constants.ACTION_CANCEL_CAM_SYNC) {
-                        fireStopCameraUploadJob(applicationContext, true)
+                        viewModel.stopCameraUpload()
                         finish()
                         return true
                     }
@@ -2056,7 +2055,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 finish()
             }
             Constants.ACTION_CANCEL_CAM_SYNC -> {
-                fireStopCameraUploadJob(applicationContext, true)
+                viewModel.stopCameraUpload()
                 finish()
             }
             Constants.ACTION_EXPORT_MASTER_KEY -> {
@@ -2403,7 +2402,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showOnlineMode()
             } else {
                 //stop cu process
-                fireStopCameraUploadJob(this@ManagerActivity, true)
+                viewModel.stopCameraUpload()
                 showOfflineMode()
             }
         }
@@ -3068,7 +3067,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     builder.setPositiveButton(
                         getString(R.string.general_yes)
                     ) { _: DialogInterface?, _: Int ->
-                        fireStopCameraUploadJob(this@ManagerActivity, true)
+                        viewModel.stopCameraUpload()
                         dbH.setCamSyncEnabled(false)
                         sendBroadcast(Intent(ACTION_UPDATE_DISABLE_CU_SETTING))
                         transfersFragment?.destroyActionMode()
@@ -5337,7 +5336,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
         shouldSendBroadCastEvent: Boolean,
     ) {
         if (shouldStopUpload) {
-            fireStopCameraUploadJob(applicationContext, true)
+            viewModel.stopCameraUpload()
         }
         if (shouldSendBroadCastEvent) {
             sendBroadcast(Intent(ACTION_UPDATE_DISABLE_CU_UI_SETTING))
@@ -9261,7 +9260,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
             ) { _: DialogInterface?, _: Int ->
                 megaApi.cancelTransfers(MegaTransfer.TYPE_DOWNLOAD, this)
                 megaApi.cancelTransfers(MegaTransfer.TYPE_UPLOAD, this)
-                fireStopCameraUploadJob(this@ManagerActivity, false)
+                viewModel.stopCameraUpload(aborted = false)
                 refreshFragment(FragmentTag.TRANSFERS.tag)
                 refreshFragment(FragmentTag.COMPLETED_TRANSFERS.tag)
             }

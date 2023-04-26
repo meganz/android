@@ -74,6 +74,7 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -106,6 +107,7 @@ import javax.inject.Inject
  * @property monitorVerificationStatus
  * @property monitorUserUpdates
  * @property startCameraUploadUseCase
+ * @property stopCameraUploadUseCase
  *
  * @param monitorNodeUpdates
  * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
@@ -147,6 +149,7 @@ class ManagerViewModel @Inject constructor(
     private val monitorUserUpdates: MonitorUserUpdates,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
+    private val stopCameraUploadUseCase: StopCameraUploadUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
 ) : ViewModel() {
@@ -566,6 +569,15 @@ class ManagerViewModel @Inject constructor(
      */
     fun startCameraUpload() = viewModelScope.launch {
         startCameraUploadUseCase()
+    }
+
+    /**
+     * Stop camera upload
+     *
+     * @param aborted true if the CU is aborted prematurely
+     */
+    fun stopCameraUpload(aborted: Boolean = true) = viewModelScope.launch {
+        stopCameraUploadUseCase(aborted = aborted)
     }
 
     internal companion object {

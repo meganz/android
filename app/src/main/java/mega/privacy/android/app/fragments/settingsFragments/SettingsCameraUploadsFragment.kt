@@ -1164,8 +1164,8 @@ class SettingsCameraUploadsFragment : SettingsBaseFragment() {
      * It also cancels all CameraUpload and Heartbeat workers.
      */
     fun disableCameraUpload() {
+        viewModel.stopCameraUpload()
         getContext()?.let {
-            JobUtil.fireStopCameraUploadJob(it)
             JobUtil.stopCameraUploadSyncHeartbeatWorkers(it)
         }
         viewModel.disableCameraUploadsInDB()

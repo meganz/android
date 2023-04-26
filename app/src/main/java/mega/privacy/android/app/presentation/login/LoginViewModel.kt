@@ -57,6 +57,7 @@ import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
 import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -89,6 +90,7 @@ class LoginViewModel @Inject constructor(
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
     private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
+    private val stopCameraUploadUseCase: StopCameraUploadUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -675,6 +677,13 @@ class LoginViewModel @Inject constructor(
      */
     fun scheduleCameraUpload() = viewModelScope.launch {
         scheduleCameraUploadUseCase()
+    }
+
+    /**
+     * Stop camera upload
+     */
+    fun stopCameraUpload() = viewModelScope.launch {
+        stopCameraUploadUseCase()
     }
 
     companion object {

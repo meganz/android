@@ -54,6 +54,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUs
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import javax.inject.Inject
 
 /**
@@ -91,6 +92,7 @@ import javax.inject.Inject
  * @property setupPrimaryFolder Sets up the Primary Folder of Camera Uploads
  * @property setupSecondaryFolder Sets up the Secondary Folder of Camera Uploads
  * @property startCameraUploadUseCase Start the camera upload
+ * @property stopCameraUploadUseCase Stop the camera upload
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
@@ -125,6 +127,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupPrimaryFolder: SetupPrimaryFolder,
     private val setupSecondaryFolder: SetupSecondaryFolder,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
+    private val stopCameraUploadUseCase: StopCameraUploadUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -566,5 +569,12 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     fun startCameraUpload() = viewModelScope.launch {
         startCameraUploadUseCase()
+    }
+
+    /**
+     * Stop camera upload
+     */
+    fun stopCameraUpload() = viewModelScope.launch {
+        stopCameraUploadUseCase()
     }
 }

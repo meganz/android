@@ -7,7 +7,6 @@ import static mega.privacy.android.app.utils.Constants.REQUEST_WRITE_STORAGE;
 import static mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL;
 import static mega.privacy.android.app.utils.FileUtil.copyFile;
 import static mega.privacy.android.app.utils.FileUtil.getLocalFile;
-import static mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob;
 import static mega.privacy.android.app.utils.MegaNodeUtil.getCloudRootHandle;
 import static mega.privacy.android.app.utils.Util.hideKeyboard;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
@@ -1384,7 +1383,7 @@ public class FileProviderActivity extends PasscodeFileProviderActivity implement
                 if (dbH.getPreferences() != null) {
                     dbH.clearPreferences();
                     dbH.setFirstTime(false);
-                    fireStopCameraUploadJob(this, true);
+                    viewModel.stopCameraUpload();
                 }
             } else {
                 Timber.d("Logged in. Setting account auth token for folder links.");

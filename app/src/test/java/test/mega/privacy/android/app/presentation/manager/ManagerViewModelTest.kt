@@ -62,6 +62,7 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import nz.mega.sdk.MegaUserAlert
 import org.junit.After
 import org.junit.Before
@@ -179,7 +180,7 @@ class ManagerViewModelTest {
         mock<RequireTwoFactorAuthenticationUseCase>()
     private val setLatestTargetPath = mock<SetLatestTargetPath>()
     private val monitorUserUpdates = mock<MonitorUserUpdates>()
-    private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase>() {
+    private val monitorMyAccountUpdateUseCase = mock<MonitorMyAccountUpdateUseCase> {
         onBlocking { invoke() }.thenReturn(
             flowOf(
                 MyAccountUpdate(Action.STORAGE_STATE_CHANGED, StorageState.Green),
@@ -190,6 +191,7 @@ class ManagerViewModelTest {
     private val establishCameraUploadsSyncHandlesUseCase =
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
+    private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -233,6 +235,7 @@ class ManagerViewModelTest {
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
             monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate,
             startCameraUploadUseCase = startCameraUploadUseCase,
+            stopCameraUploadUseCase = stopCameraUploadUseCase,
         )
     }
 
@@ -547,5 +550,13 @@ class ManagerViewModelTest {
             underTest.startCameraUpload()
             testScheduler.advanceUntilIdle()
             verify(startCameraUploadUseCase, times(1)).invoke()
+        }
+
+    @Test
+    fun `test that when stopCameraUpload is called, stopCameraUploadUseCase is called`() =
+        runTest {
+            underTest.stopCameraUpload()
+            testScheduler.advanceUntilIdle()
+            verify(stopCameraUploadUseCase, times(1)).invoke()
         }
 }
