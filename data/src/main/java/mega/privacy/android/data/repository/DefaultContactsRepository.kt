@@ -711,20 +711,22 @@ internal class DefaultContactsRepository @Inject constructor(
         databaseHandler.clearContacts()
     }
 
-    override suspend fun saveContact(
+    override suspend fun createOrUpdateContact(
         handle: Long,
         email: String,
         firstName: String,
         lastName: String,
+        nickname: String?,
     ) = withContext(ioDispatcher) {
-        databaseHandler.setContact(
-            Contact(
+        val contact = megaLocalRoomGateway.findContactByHandle(handle)
+            ?.copy(email = email, firstName = firstName, lastName = lastName, nickname = nickname)
+            ?: Contact(
                 userId = handle,
                 email = email,
                 lastName = lastName,
                 firstName = firstName
             )
-        )
+        megaLocalRoomGateway.saveContact(contact)
     }
 
     override suspend fun getContactDatabaseSize(): Int = withContext(ioDispatcher) {
@@ -785,5 +787,9 @@ internal class DefaultContactsRepository @Inject constructor(
             megaApiGateway.removeContact(contact, listener)
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }
+    }
+
+    override suspend fun getContactHandleByEmail(email: String) = withContext(ioDispatcher) {
+        megaApiGateway.getContact(email)?.handle ?: -1L
     }
 }

@@ -46,11 +46,12 @@ internal class DefaultReloadContactDatabaseTest {
         underTest(isForceReload = true)
         verify(repository, times(1)).clearContactDatabase()
         expectedMap.forEach { entry ->
-            verify(repository, times(1)).saveContact(
+            verify(repository, times(1)).createOrUpdateContact(
                 handle = entry.key,
                 email = entry.value,
                 firstName = "firstName${entry.hashCode()}",
-                lastName = "lastName${entry.hashCode()}"
+                lastName = "lastName${entry.hashCode()}",
+                nickname = null,
             )
         }
         verify(getCurrentUserAliases, times(1)).invoke()
@@ -81,11 +82,12 @@ internal class DefaultReloadContactDatabaseTest {
             underTest(isForceReload = false)
             verify(repository, times(1)).clearContactDatabase()
             expectedMap.forEach { entry ->
-                verify(repository, times(1)).saveContact(
+                verify(repository, times(1)).createOrUpdateContact(
                     handle = entry.key,
                     email = entry.value,
                     firstName = "firstName${entry.hashCode()}",
-                    lastName = "lastName${entry.hashCode()}"
+                    lastName = "lastName${entry.hashCode()}",
+                    nickname = null,
                 )
             }
             verify(getCurrentUserAliases, times(1)).invoke()

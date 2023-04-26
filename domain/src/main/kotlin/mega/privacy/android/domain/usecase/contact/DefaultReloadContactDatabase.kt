@@ -16,13 +16,14 @@ internal class DefaultReloadContactDatabase @Inject constructor(
             contacts.forEach { contact ->
                 val firstName =
                     getUserFirstName(handle = contact.key, skipCache = true, shouldNotify = true)
-                val lasName =
+                val lastName =
                     getUserLastName(handle = contact.key, skipCache = true, shouldNotify = true)
-                contactsRepository.saveContact(
+                contactsRepository.createOrUpdateContact(
                     handle = contact.key,
                     email = contact.value,
                     firstName = firstName,
-                    lastName = lasName,
+                    lastName = lastName,
+                    nickname = null,
                 )
             }
             getCurrentUserAliases()

@@ -772,17 +772,14 @@ class DefaultContactsRepositoryTest {
     @Test
     fun `test that save contact database when call saveContact with value`() =
         runTest {
-            val expectedHandle = -1L
-            val expectedEmail = "myEmail"
-            val expectedFirstName = "firstName"
-            val expectedLastName = "lastName"
-            underTest.saveContact(
-                expectedHandle,
-                expectedEmail,
-                expectedFirstName,
-                expectedLastName
+            underTest.createOrUpdateContact(
+                -1L,
+                "myEmail",
+                "firstName",
+                "lastName",
+                "nickname",
             )
-            verify(databaseHandler, times(1)).setContact(any())
+            verify(megaLocalRoomGateway, times(1)).saveContact(any())
         }
 
     @Test

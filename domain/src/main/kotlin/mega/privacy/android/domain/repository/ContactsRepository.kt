@@ -1,8 +1,8 @@
 package mega.privacy.android.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.chat.ChatConnectionState
+import mega.privacy.android.domain.entity.contacts.AccountCredentials
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.ContactRequest
@@ -264,14 +264,21 @@ interface ContactsRepository {
     suspend fun clearContactDatabase()
 
     /**
-     * Save contact
+     * Create or update contact
      *
      * @param handle
      * @param email
      * @param firstName
      * @param lastName
+     * @param nickname
      */
-    suspend fun saveContact(handle: Long, email: String, firstName: String, lastName: String)
+    suspend fun createOrUpdateContact(
+        handle: Long,
+        email: String,
+        firstName: String,
+        lastName: String,
+        nickname: String?,
+    )
 
     /**
      * Get contact database size
@@ -340,4 +347,12 @@ interface ContactsRepository {
      * @param email email address of the user
      */
     suspend fun removeContact(email: String): Boolean
+
+    /**
+     * Get contact handle by email
+     *
+     * @param email
+     * @return
+     */
+    suspend fun getContactHandleByEmail(email: String): Long
 }
