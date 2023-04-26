@@ -423,7 +423,6 @@ object MegaNodeUtil {
         val megaApplication = MegaApplication.getInstance()
 
         return node != null && node.handle != INVALID_HANDLE &&
-                !megaApplication.megaApi.isInRubbish(node) &&
                 existsMyChatFilesFolder() &&
                 node.handle == megaApplication.dbH.myChatFilesFolderHandle
     }
