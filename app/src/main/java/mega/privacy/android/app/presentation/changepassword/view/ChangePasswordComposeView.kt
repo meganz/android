@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActionScope
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -57,6 +60,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextDecoration
@@ -152,6 +156,7 @@ internal object Constants {
 /**
  * Main Compose View for Change Password & Reset Password Screen
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ChangePasswordView(
     uiState: ChangePasswordUIState,
@@ -204,6 +209,31 @@ fun ChangePasswordView(
         var isShowPasswordChar by remember { mutableStateOf(false) }
         var isShowConfirmPasswordChar by remember { mutableStateOf(false) }
         var isTnCChecked by remember { mutableStateOf(false) }
+        val coroutineScope = rememberCoroutineScope()
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val noConnectionMessage = stringResource(id = R.string.error_server_connection_problem)
+        val notCheckedMessage = stringResource(id = R.string.create_account_no_top)
+        val onConfirmPasswordChange: () -> Unit = {
+            keyboardController?.hide()
+
+            when {
+                uiState.isConnectedToNetwork.not() -> {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(noConnectionMessage)
+                    }
+                }
+
+                isTnCChecked.not() -> {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(notCheckedMessage)
+                    }
+                }
+
+                else -> {
+                    onValidateOnSave(passwordText, confirmPasswordText)
+                }
+            }
+        }
 
         LaunchedEffect(uiState.snackBarMessage) {
             if (uiState.snackBarMessage != null) {
@@ -251,6 +281,7 @@ fun ChangePasswordView(
         ) {
             val passwordLabel =
                 if (uiState.isCurrentPassword) R.string.error_same_password else R.string.my_account_change_password_newPassword1
+            val confirmPasswordFocusRequester = remember { FocusRequester() }
 
             PasswordTextField(
                 modifier = Modifier
@@ -275,6 +306,7 @@ fun ChangePasswordView(
                         onValidatePassword(passwordText)
                     }
                 },
+                onKeyboardNext = { confirmPasswordFocusRequester.requestFocus() }
             )
 
             if (uiState.passwordStrength > PasswordStrength.INVALID && (uiState.passwordError == null || uiState.isCurrentPassword)) {
@@ -285,7 +317,8 @@ fun ChangePasswordView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 24.dp)
-                    .testTag(CONFIRM_PASSWORD_TEST_TAG),
+                    .testTag(CONFIRM_PASSWORD_TEST_TAG)
+                    .focusRequester(confirmPasswordFocusRequester),
                 label = stringResource(id = R.string.my_account_change_password_newPassword2),
                 isShowPassword = isShowConfirmPasswordChar,
                 onValueChange = { value, isAutofill ->
@@ -297,6 +330,7 @@ fun ChangePasswordView(
                 isError = uiState.confirmPasswordError != null,
                 errorFooterText = uiState.confirmPasswordError?.let { res -> stringResource(id = res) },
                 focusedColor = MaterialTheme.colors.secondary,
+                onKeyboardNext = { onConfirmPasswordChange() }
             )
 
             TnCCheckboxDescription(
@@ -312,19 +346,15 @@ fun ChangePasswordView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 31.dp, bottom = 16.dp),
-                snackBarHostState = snackBarHostState,
                 isEnabled = uiState.isCurrentPassword.not(),
                 isResetPasswordMode = uiState.isResetPasswordMode,
                 isPasswordValidated = uiState.isSaveValidationSuccessful,
-                isConnectedToNetwork = uiState.isConnectedToNetwork,
-                isTnCChecked = isTnCChecked,
                 passwordText = passwordText,
-                confirmPasswordText = confirmPasswordText,
-                onValidatePassword = onValidateOnSave,
                 onTriggerResetPassword = onTriggerResetPassword,
                 onTriggerChangePassword = onTriggerChangePassword,
                 onAfterPasswordChanged = onResetValidationState,
-                onFinishActivity = onFinishActivity
+                onFinishActivity = onFinishActivity,
+                onConfirmButtonClick = onConfirmPasswordChange
             )
 
             uiState.loadingMessage?.let { res ->
@@ -357,15 +387,16 @@ fun PasswordTextField(
     onValueChange: (value: String, isAutoFill: Boolean) -> Unit,
     onClickShowPassword: () -> Unit,
     onFocusChanged: (Boolean) -> Unit = {},
+    onKeyboardNext: (KeyboardActionScope) -> Unit,
 ) {
     var passwordText by remember { mutableStateOf("") }
     val interactionSource = remember { MutableInteractionSource() }
-    val focusRequester = remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
     val indicatorColor = when {
         isError || errorFooterText.isNullOrBlank().not() -> {
             MaterialTheme.colors.error
         }
+
         isFocused -> focusedColor
         passwordText.isBlank() -> MaterialTheme.colors.grey_alpha_012_white_alpha_038
         else -> focusedColor
@@ -373,7 +404,6 @@ fun PasswordTextField(
 
     MegaTextField(
         modifier = modifier
-            .focusRequester(focusRequester)
             .onFocusChanged {
                 if (isFocused != it.isFocused) {
                     isFocused = it.isFocused
@@ -420,7 +450,9 @@ fun PasswordTextField(
             focusedIndicatorColor = indicatorColor,
             unfocusedIndicatorColor = indicatorColor,
         ),
-        isError = errorFooterText.isNullOrBlank().not()
+        isError = errorFooterText.isNullOrBlank().not(),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = onKeyboardNext)
     )
 
     if (errorFooterText.isNullOrBlank().not()) {
@@ -563,28 +595,19 @@ fun TnCCheckboxDescription(
 /**
  * Button Action Group to Cancel and Save
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ChangePasswordActionButtonGroup(
     modifier: Modifier,
-    snackBarHostState: SnackbarHostState,
     isEnabled: Boolean = true,
     isResetPasswordMode: Boolean = false,
-    isConnectedToNetwork: Boolean = false,
     isPasswordValidated: Boolean = false,
-    isTnCChecked: Boolean = false,
     passwordText: String,
-    confirmPasswordText: String,
-    onValidatePassword: (String, String) -> Unit,
     onTriggerChangePassword: (String) -> Unit,
     onTriggerResetPassword: (String) -> Unit,
     onAfterPasswordChanged: () -> Unit,
     onFinishActivity: () -> Unit,
+    onConfirmButtonClick: () -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val noConnectionMessage = stringResource(id = R.string.error_server_connection_problem)
-    val notCheckedMessage = stringResource(id = R.string.create_account_no_top)
-    val keyboardController = LocalSoftwareKeyboardController.current
     val buttonAlpha = if (isEnabled) ENABLED_BUTTON_ALPHA else DISABLED_BUTTON_ALPHA
 
     LaunchedEffect(isPasswordValidated) {
@@ -621,25 +644,7 @@ fun ChangePasswordActionButtonGroup(
                 .defaultMinSize(10.dp)
                 .testTag(CHANGE_PASSWORD_BUTTON_TEST_TAG),
             enabled = isEnabled,
-            onClick = {
-                keyboardController?.hide()
-
-                when {
-                    isConnectedToNetwork.not() -> {
-                        coroutineScope.launch {
-                            snackBarHostState.showSnackbar(noConnectionMessage)
-                        }
-                    }
-                    isTnCChecked.not() -> {
-                        coroutineScope.launch {
-                            snackBarHostState.showSnackbar(notCheckedMessage)
-                        }
-                    }
-                    else -> {
-                        onValidatePassword(passwordText, confirmPasswordText)
-                    }
-                }
-            },
+            onClick = onConfirmButtonClick,
             content = {
                 Text(
                     text = stringResource(id = R.string.my_account_change_password),
