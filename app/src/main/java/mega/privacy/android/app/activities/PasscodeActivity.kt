@@ -3,12 +3,10 @@ package mega.privacy.android.app.activities
 import android.os.Bundle
 import dagger.hilt.android.AndroidEntryPoint
 import mega.privacy.android.app.BaseActivity
-import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.Constants.ACTION_CHAT_NOTIFICATION_MESSAGE
 import mega.privacy.android.app.utils.Constants.CHAT_ID
-import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.PasscodeUtil
 import mega.privacy.android.app.utils.Util.setAppFontSize
 import nz.mega.sdk.MegaChatApiJava.MEGACHAT_INVALID_HANDLE

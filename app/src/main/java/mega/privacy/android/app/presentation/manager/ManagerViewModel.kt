@@ -73,6 +73,7 @@ import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.verification.MonitorVerificationStatus
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
@@ -104,6 +105,7 @@ import javax.inject.Inject
  * @property getUnverifiedOutgoingShares
  * @property monitorVerificationStatus
  * @property monitorUserUpdates
+ * @property startCameraUploadUseCase
  *
  * @param monitorNodeUpdates
  * @param monitorContactUpdates monitor contact update when credentials verification occurs to update shares count
@@ -144,6 +146,7 @@ class ManagerViewModel @Inject constructor(
     private val listenToNewMediaUseCase: ListenToNewMediaUseCase,
     private val monitorUserUpdates: MonitorUserUpdates,
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
+    private val startCameraUploadUseCase: StartCameraUploadUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
 ) : ViewModel() {
@@ -555,6 +558,13 @@ class ManagerViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = false) }
         }
+    }
+
+    /**
+     * Start camera upload
+     */
+    fun startCameraUpload() = viewModelScope.launch {
+        startCameraUploadUseCase()
     }
 
     internal companion object {

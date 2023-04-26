@@ -53,6 +53,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import javax.inject.Inject
 
 /**
@@ -89,6 +90,7 @@ import javax.inject.Inject
  * @property setupDefaultSecondaryFolder Sets up a default Secondary Folder of Camera Uploads
  * @property setupPrimaryFolder Sets up the Primary Folder of Camera Uploads
  * @property setupSecondaryFolder Sets up the Secondary Folder of Camera Uploads
+ * @property startCameraUploadUseCase Start the camera upload
  */
 @HiltViewModel
 class SettingsCameraUploadsViewModel @Inject constructor(
@@ -122,6 +124,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val setupDefaultSecondaryFolder: SetupDefaultSecondaryFolder,
     private val setupPrimaryFolder: SetupPrimaryFolder,
     private val setupSecondaryFolder: SetupSecondaryFolder,
+    private val startCameraUploadUseCase: StartCameraUploadUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsCameraUploadsState())
@@ -557,4 +560,11 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     private suspend fun getUploadConnectionType() =
         if (isCameraUploadsByWifiUseCase()) UploadConnectionType.WIFI else UploadConnectionType.WIFI_OR_MOBILE_DATA
+
+    /**
+     *  Start camera upload
+     */
+    fun startCameraUpload() = viewModelScope.launch {
+        startCameraUploadUseCase()
+    }
 }

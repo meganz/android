@@ -46,6 +46,7 @@ import mega.privacy.android.domain.usecase.camerauploads.SetUploadOptionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoQualityUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetUploadVideoSyncStatusUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetVideoCompressionSizeLimitUseCase
+import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -97,6 +98,7 @@ class SettingsCameraUploadsViewModelTest {
     private val setupDefaultSecondaryFolder = mock<SetupDefaultSecondaryFolder>()
     private val setupPrimaryFolder = mock<SetupPrimaryFolder>()
     private val setupSecondaryFolder = mock<SetupSecondaryFolder>()
+    private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
 
     @Before
     fun setUp() {
@@ -145,6 +147,7 @@ class SettingsCameraUploadsViewModelTest {
             setupDefaultSecondaryFolder = setupDefaultSecondaryFolder,
             setupPrimaryFolder = setupPrimaryFolder,
             setupSecondaryFolder = setupSecondaryFolder,
+            startCameraUploadUseCase = startCameraUploadUseCase,
         )
     }
 
@@ -636,4 +639,14 @@ class SettingsCameraUploadsViewModelTest {
         verify(resetMediaUploadTimeStamps, times(1)).invoke()
         verify(disableMediaUploadSettings, times(1)).invoke()
     }
+
+    @Test
+    fun `test that when startCameraUpload is called, startCameraUploadUseCase is called`() =
+        runTest {
+            setupUnderTest()
+
+            underTest.startCameraUpload()
+
+            verify(startCameraUploadUseCase, times(1)).invoke()
+        }
 }

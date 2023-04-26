@@ -61,6 +61,7 @@ import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotification
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedOutgoingShares
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
+import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import nz.mega.sdk.MegaUserAlert
 import org.junit.After
 import org.junit.Before
@@ -68,6 +69,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -187,6 +189,7 @@ class ManagerViewModelTest {
     }
     private val establishCameraUploadsSyncHandlesUseCase =
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
+    private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -228,7 +231,8 @@ class ManagerViewModelTest {
             monitorUserUpdates = monitorUserUpdates,
             monitorMyAccountUpdateUseCase = monitorMyAccountUpdateUseCase,
             establishCameraUploadsSyncHandlesUseCase = establishCameraUploadsSyncHandlesUseCase,
-            monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate
+            monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate,
+            startCameraUploadUseCase = startCameraUploadUseCase,
         )
     }
 
@@ -535,5 +539,13 @@ class ManagerViewModelTest {
                 val state = awaitItem()
                 assertThat(state.isPushNotificationSettingsUpdatedEvent).isTrue()
             }
+        }
+
+    @Test
+    fun `test that when startCameraUpload is called, startCameraUploadUseCase is called`() =
+        runTest {
+            underTest.startCameraUpload()
+            testScheduler.advanceUntilIdle()
+            verify(startCameraUploadUseCase, times(1)).invoke()
         }
 }

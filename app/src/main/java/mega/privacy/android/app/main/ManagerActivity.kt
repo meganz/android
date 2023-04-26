@@ -298,7 +298,6 @@ import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.JobUtil.fireCameraUploadJob
 import mega.privacy.android.app.utils.JobUtil.fireStopCameraUploadJob
 import mega.privacy.android.app.utils.LastShowSMSDialogTimeChecker
 import mega.privacy.android.app.utils.LinksUtil
@@ -1983,7 +1982,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 closeDrawer()
             }
             checkCurrentStorageStatus(true)
-            fireCameraUploadJob(this@ManagerActivity)
+            viewModel.startCameraUpload()
 
             //INITIAL FRAGMENT
             if (selectDrawerItemPending) {
@@ -7979,7 +7978,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     }
                 }
                 storageState = newStorageState
-                fireCameraUploadJob(this@ManagerActivity)
+                viewModel.startCameraUpload()
             }
             StorageState.Orange -> {
                 Timber.w("STORAGE STATE ORANGE")
@@ -7998,7 +7997,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 }
                 storageState = newStorageState
                 Timber.d("Try to start CU, false.")
-                fireCameraUploadJob(this@ManagerActivity)
+                viewModel.startCameraUpload()
             }
             StorageState.Red -> {
                 Timber.w("STORAGE STATE RED")
