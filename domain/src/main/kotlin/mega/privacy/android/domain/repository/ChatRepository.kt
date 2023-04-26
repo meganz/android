@@ -229,4 +229,13 @@ interface ChatRepository {
      * @return peer handle for the selected peer [Long]
      */
     suspend fun getPeerHandle(chatId: Long, peerNo: Long): Long?
+
+    /**
+     * Creates a chat if not existing
+     *
+     * @param isGroup     True if is should create a group chat, false otherwise.
+     * @param userHandles List of contact handles.
+     * @return The chat conversation handle.
+     */
+    suspend fun createChat(isGroup: Boolean, userHandles: List<Long>): Long
 }

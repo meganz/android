@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import mega.privacy.android.data.extensions.failWithError
+import mega.privacy.android.data.extensions.getChatRequestListener
 import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -24,6 +26,7 @@ import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
+import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatSettings
 import mega.privacy.android.data.model.ChatUpdate
@@ -65,7 +68,8 @@ import kotlin.coroutines.suspendCoroutine
  * @property chatListItemMapper                 [ChatListItemMapper]
  * @property sharingScope                       [CoroutineScope]
  * @property ioDispatcher                       [CoroutineDispatcher]
- * @property deviceEventGateway           [DeviceEventGateway]
+ * @property deviceEventGateway                 [DeviceEventGateway]
+ * @property megaChatPeerListMapper             [MegaChatPeerListMapper]
  */
 internal class ChatRepositoryImpl @Inject constructor(
     private val megaChatApiGateway: MegaChatApiGateway,
@@ -75,6 +79,7 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val chatRoomMapper: ChatRoomMapper,
     private val combinedChatRoomMapper: CombinedChatRoomMapper,
     private val chatListItemMapper: ChatListItemMapper,
+    private val megaChatPeerListMapper: MegaChatPeerListMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val deviceEventGateway: DeviceEventGateway,
@@ -421,5 +426,26 @@ internal class ChatRepositoryImpl @Inject constructor(
         withContext(ioDispatcher) {
             val chatRoom = megaChatApiGateway.getChatRoom(chatId)
             chatRoom?.getPeerHandle(peerNo)
+        }
+
+    override suspend fun createChat(isGroup: Boolean, userHandles: List<Long>) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getChatRequestListener("onRequestCreateChatCompleted") {
+                    it.chatHandle
+                }
+
+                megaChatApiGateway.createChat(
+                    isGroup = isGroup,
+                    peers = megaChatPeerListMapper(userHandles),
+                    listener = listener
+                )
+                continuation.invokeOnCancellation {
+                    megaChatApiGateway.removeChatRequestListener(
+                        listener
+                    )
+                }
+            }
+
         }
 }

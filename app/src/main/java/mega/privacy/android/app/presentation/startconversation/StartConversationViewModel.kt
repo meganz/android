@@ -19,20 +19,20 @@ import mega.privacy.android.app.data.extensions.replaceIfExists
 import mega.privacy.android.app.data.extensions.sortList
 import mega.privacy.android.app.presentation.extensions.getStateFlow
 import mega.privacy.android.app.presentation.startconversation.model.StartConversationState
+import mega.privacy.android.core.ui.controls.SearchWidgetState
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.usecase.AddNewContacts
 import mega.privacy.android.domain.usecase.ApplyContactUpdates
 import mega.privacy.android.domain.usecase.GetContactData
 import mega.privacy.android.domain.usecase.GetVisibleContactsUseCase
-import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
+import mega.privacy.android.domain.usecase.RequestLastGreen
+import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
-import mega.privacy.android.domain.usecase.RequestLastGreen
-import mega.privacy.android.domain.usecase.StartConversation
-import mega.privacy.android.core.ui.controls.SearchWidgetState
+import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -41,7 +41,7 @@ import javax.inject.Inject
  *
  * @property getVisibleContactsUseCase          [GetVisibleContactsUseCase]
  * @property getContactData                     [GetContactData]
- * @property startConversation                  [StartConversation]
+ * @property startConversationUseCase                  [StartConversationUseCase]
  * @property monitorContactUpdates              [MonitorContactUpdates]
  * @property applyContactUpdates                [ApplyContactUpdates]
  * @property monitorLastGreenUpdatesUseCase     [MonitorLastGreenUpdatesUseCase]
@@ -55,7 +55,7 @@ import javax.inject.Inject
 class StartConversationViewModel @Inject constructor(
     private val getVisibleContactsUseCase: GetVisibleContactsUseCase,
     private val getContactData: GetContactData,
-    private val startConversation: StartConversation,
+    private val startConversationUseCase: StartConversationUseCase,
     private val monitorContactUpdates: MonitorContactUpdates,
     private val applyContactUpdates: ApplyContactUpdates,
     private val monitorLastGreenUpdatesUseCase: MonitorLastGreenUpdatesUseCase,
@@ -264,7 +264,10 @@ class StartConversationViewModel @Inject constructor(
         if (isConnected.value) {
             viewModelScope.launch {
                 runCatching {
-                    startConversation(false, listOf(contactItem.handle))
+                    startConversationUseCase(
+                        isGroup = false,
+                        userHandles = listOf(contactItem.handle)
+                    )
                 }.onFailure { exception ->
                     Timber.e(exception)
                     _state.update { it.copy(result = -1L, error = R.string.general_text_error) }

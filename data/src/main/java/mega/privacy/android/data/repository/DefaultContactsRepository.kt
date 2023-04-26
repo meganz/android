@@ -26,13 +26,11 @@ import mega.privacy.android.data.gateway.MegaLocalRoomGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
-import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.ContactRequestMapper
 import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStateMapper
-import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper.Companion.userStatus
 import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
@@ -56,8 +54,6 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ContactsRepository
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApi
-import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaStringMap
@@ -78,7 +74,6 @@ import kotlin.coroutines.suspendCoroutine
  * @property contactRequestMapper     [ContactRequestMapper]
  * @property userLastGreenMapper      [UserLastGreenMapper]
  * @property userUpdateMapper         [UserUpdateMapper]
- * @property megaChatPeerListMapper   [MegaChatPeerListMapper]
  * @property onlineStatusMapper       [OnlineStatusMapper]
  * @property contactItemMapper        [ContactItemMapper]
  * @property contactDataMapper        [ContactDataMapper]
@@ -94,7 +89,6 @@ internal class DefaultContactsRepository @Inject constructor(
     private val contactRequestMapper: ContactRequestMapper,
     private val userLastGreenMapper: UserLastGreenMapper,
     private val userUpdateMapper: UserUpdateMapper,
-    private val megaChatPeerListMapper: MegaChatPeerListMapper,
     private val onlineStatusMapper: OnlineStatusMapper,
     private val chatConnectionStateMapper: ChatConnectionStateMapper,
     private val contactItemMapper: ContactItemMapper,
@@ -152,33 +146,6 @@ internal class DefaultContactsRepository @Inject constructor(
             }
             .filter { it.changes.isNotEmpty() }
             .flowOn(ioDispatcher)
-
-    override suspend fun startConversation(isGroup: Boolean, userHandles: List<Long>): Long =
-        withContext(ioDispatcher) {
-            suspendCoroutine { continuation ->
-                val chat1to1 = megaChatApiGateway.getChatRoomByUser(userHandles[0])
-                if (!isGroup && chat1to1 != null) {
-                    continuation.resumeWith(Result.success(chat1to1.chatId))
-                } else {
-                    megaChatApiGateway.createChat(
-                        isGroup = isGroup,
-                        peers = megaChatPeerListMapper(userHandles),
-                        listener = OptionalMegaChatRequestListenerInterface(
-                            onRequestFinish = onRequestCreateChatCompleted(continuation)
-                        )
-                    )
-                }
-            }
-        }
-
-    private fun onRequestCreateChatCompleted(continuation: Continuation<Long>) =
-        { request: MegaChatRequest, error: MegaChatError ->
-            if (error.errorCode == MegaChatError.ERROR_OK) {
-                continuation.resumeWith(Result.success(request.chatHandle))
-            } else {
-                continuation.failWithError(error, "onRequestCreateChatCompleted")
-            }
-        }
 
     override suspend fun getVisibleContacts(): List<ContactItem> = withContext(ioDispatcher) {
         megaApiGateway.getContacts()

@@ -15,7 +15,6 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.ResetCredentials
-import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.VerifyCredentials
 import mega.privacy.android.domain.usecase.account.DefaultUpdateCurrentUserName
 import mega.privacy.android.domain.usecase.account.UpdateCurrentUserName
@@ -57,10 +56,6 @@ internal abstract class ContactsModule {
         @Provides
         fun provideMonitorContactUpdates(contactsRepository: ContactsRepository): MonitorContactUpdates =
             MonitorContactUpdates(contactsRepository::monitorContactUpdates)
-
-        @Provides
-        fun provideStartConversation(contactsRepository: ContactsRepository): StartConversation =
-            StartConversation(contactsRepository::startConversation)
 
         @Provides
         fun provideGetContactData(contactsRepository: ContactsRepository): GetContactData =

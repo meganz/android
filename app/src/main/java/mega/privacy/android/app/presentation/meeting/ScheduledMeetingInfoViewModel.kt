@@ -53,8 +53,8 @@ import mega.privacy.android.domain.usecase.RemoveChatLink
 import mega.privacy.android.domain.usecase.RemoveFromChat
 import mega.privacy.android.domain.usecase.SetOpenInvite
 import mega.privacy.android.domain.usecase.SetPublicChatToPrivate
-import mega.privacy.android.domain.usecase.StartConversation
 import mega.privacy.android.domain.usecase.UpdateChatPermissions
+import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.meeting.GetChatCall
 import mega.privacy.android.domain.usecase.meeting.MonitorScheduledMeetingUpdates
 import mega.privacy.android.domain.usecase.meeting.OpenOrStartCall
@@ -85,7 +85,7 @@ import javax.inject.Inject
  * @property getChatRoomUseCase                             [GetChatRoomUseCase]
  * @property passcodeManagement                             [PasscodeManagement]
  * @property chatManagement                                 [ChatManagement]
- * @property startConversation                              [StartConversation]
+ * @property startConversationUseCase                       [StartConversationUseCase]
  * @property openOrStartCall                                [OpenOrStartCall]
  * @property monitorChatListItemUpdates                     [MonitorChatListItemUpdates]
  * @property monitorScheduledMeetingUpdates                 [MonitorScheduledMeetingUpdates]
@@ -117,7 +117,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
     private val getChatRoomUseCase: GetChatRoomUseCase,
     private val passcodeManagement: PasscodeManagement,
     private val chatManagement: ChatManagement,
-    private val startConversation: StartConversation,
+    private val startConversationUseCase: StartConversationUseCase,
     private val openOrStartCall: OpenOrStartCall,
     private val monitorScheduledMeetingUpdates: MonitorScheduledMeetingUpdates,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
@@ -298,6 +298,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             it.copy(isHost = chat.ownPrivilege == ChatRoomPermission.Moderator)
                         }
                     }
+
                     ChatRoomChanges.OpenInvite -> {
                         Timber.d("Changes in open invite")
                         _state.update {
@@ -307,18 +308,21 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             )
                         }
                     }
+
                     ChatRoomChanges.Title -> {
                         Timber.d("Changes in chat title")
                         _state.update {
                             it.copy(chatTitle = chat.title)
                         }
                     }
+
                     ChatRoomChanges.ChatMode -> {
                         Timber.d("Changes in chat mode, isPublic ${chat.isPublic}")
                         _state.update {
                             it.copy(isPublic = chat.isPublic)
                         }
                     }
+
                     ChatRoomChanges.RetentionTime -> {
                         Timber.d("Changes in retention time")
                         updateRetentionTimeSeconds(chat.retentionTime)
@@ -331,6 +335,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                         )
                         getInstance().sendBroadcast(intentRetentionTime)
                     }
+
                     else -> {}
                 }
             }
@@ -387,6 +392,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                     ScheduledMeetingChanges.NewScheduledMeeting -> updateScheduledMeeting(
                         scheduledMeetReceived = scheduledMeetReceived
                     )
+
                     ScheduledMeetingChanges.Title,
                     ScheduledMeetingChanges.Description,
                     ScheduledMeetingChanges.StartDate,
@@ -403,6 +409,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
+
                                 ScheduledMeetingChanges.Description -> {
                                     _state.update { state ->
                                         state.copy(
@@ -412,6 +419,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
+
                                 ScheduledMeetingChanges.StartDate -> {
                                     _state.update { state ->
                                         state.copy(
@@ -421,6 +429,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
+
                                 ScheduledMeetingChanges.EndDate -> {
                                     _state.update { state ->
                                         state.copy(
@@ -430,11 +439,13 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                                         )
                                     }
                                 }
+
                                 else -> {}
                             }
 
                         }
                     }
+
                     else -> {}
                 }
             }
@@ -455,6 +466,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             queryChatLink()
                         }
                     }
+
                     else -> {}
                 }
             }
@@ -583,6 +595,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             it.copy(addParticipantsNoContactsDialog = true, openAddContact = false)
                         }
                     }
+
                     ChatUtil.areAllMyContactsChatParticipants(state.value.chatId) -> {
                         _state.update {
                             it.copy(
@@ -591,6 +604,7 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
                             )
                         }
                     }
+
                     else -> {
                         _state.update {
                             it.copy(openAddContact = true)
@@ -611,7 +625,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             if (isConnected) {
                 viewModelScope.launch {
                     runCatching {
-                        startConversation(false, listOf(participant.handle))
+                        startConversationUseCase(
+                            isGroup = false,
+                            userHandles = listOf(participant.handle)
+                        )
                     }.onFailure { exception ->
                         Timber.e(exception)
                         showSnackBar(R.string.general_text_error)
@@ -634,7 +651,10 @@ class ScheduledMeetingInfoViewModel @Inject constructor(
             if (isConnected) {
                 viewModelScope.launch {
                     runCatching {
-                        startConversation(false, listOf(participant.handle))
+                        startConversationUseCase(
+                            isGroup = false,
+                            userHandles = listOf(participant.handle)
+                        )
                     }.onFailure { exception ->
                         Timber.d(exception)
                         showSnackBar(R.string.general_text_error)

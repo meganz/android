@@ -15,9 +15,10 @@ import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
+import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
-import mega.privacy.android.data.mapper.chat.ChatRequestMapper
+import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.repository.ChatRepository
@@ -25,6 +26,7 @@ import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatListItem
 import nz.mega.sdk.MegaChatMessage
+import nz.mega.sdk.MegaChatRequest
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaUser
@@ -54,6 +56,7 @@ class ChatRepositoryImplTest {
     private val chatListItemMapper = mock<ChatListItemMapper>()
     private val sharingScope = mock<CoroutineScope>()
     private val deviceEventGateway = mock<DeviceEventGateway>()
+    private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
     private val chatId = Random.nextLong()
     private val userHandle = Random.nextLong()
@@ -82,6 +85,7 @@ class ChatRepositoryImplTest {
             sharingScope = sharingScope,
             ioDispatcher = testDispatcher,
             deviceEventGateway = deviceEventGateway,
+            megaChatPeerListMapper = megaChatPeerListMapper,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)
@@ -405,4 +409,25 @@ class ChatRepositoryImplTest {
 
             verify(megaChatApiGateway).archiveChat(eq(chatId), eq(archive), any())
         }
+
+    @Test
+    fun `test that create creates new chatroom and returns the id of new chatroom`() = runTest {
+        val megaChatRequest = mock<MegaChatRequest> {
+            on { chatHandle }.thenReturn(chatId)
+        }
+        whenever(megaChatPeerListMapper.invoke(listOf(userHandle))).thenReturn(mock())
+        whenever(
+            megaChatApiGateway.createChat(any(), any(), any())
+        ).thenAnswer {
+            ((it.arguments[2]) as OptionalMegaChatRequestListenerInterface).onRequestFinish(
+                mock(),
+                megaChatRequest,
+                megaChatErrorSuccess,
+            )
+        }
+        val actual = underTest.createChat(isGroup = true, userHandles = listOf(userHandle))
+        assertThat(actual).isEqualTo(chatId)
+        verify(megaChatApiGateway).createChat(any(), any(), any())
+    }
+
 }

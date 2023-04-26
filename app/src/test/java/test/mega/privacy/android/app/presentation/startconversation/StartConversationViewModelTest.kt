@@ -31,7 +31,7 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.contact.MonitorLastGreenUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
-import mega.privacy.android.domain.usecase.StartConversation
+import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.core.ui.controls.SearchWidgetState
 import org.junit.After
 import org.junit.Before
@@ -96,7 +96,7 @@ class StartConversationViewModelTest {
     private val invalidHandle = -1L
     private val chatHandle = Random.nextLong()
 
-    private val startConversation = mock<StartConversation> {
+    private val startConversationUseCase = mock<StartConversationUseCase> {
         onBlocking { invoke(eq(false), anyOrNull()) }.thenReturn(chatHandle)
     }
 
@@ -132,7 +132,7 @@ class StartConversationViewModelTest {
         underTest = StartConversationViewModel(
             getVisibleContactsUseCase = getVisibleContactsUseCase,
             getContactData = getContactData,
-            startConversation = startConversation,
+            startConversationUseCase = startConversationUseCase,
             monitorContactUpdates = monitorContactUpdates,
             applyContactUpdates = applyContactUpdates,
             monitorLastGreenUpdatesUseCase = monitorLastGreenUpdatesUseCase,
@@ -301,9 +301,9 @@ class StartConversationViewModelTest {
     fun `test that an invalid handle is returned if start conversation finish with an error`() =
         runTest {
             whenever(
-                startConversation(
-                    anyOrNull(),
-                    anyOrNull()
+                startConversationUseCase(
+                    isGroup = anyOrNull(),
+                    userHandles = anyOrNull()
                 )
             ).thenAnswer { throw Throwable("Complete with error") }
             scheduler.advanceUntilIdle()
@@ -320,9 +320,9 @@ class StartConversationViewModelTest {
     fun `test that an error is returned if start conversation finish with an error`() =
         runTest {
             whenever(
-                startConversation(
-                    anyOrNull(),
-                    anyOrNull()
+                startConversationUseCase(
+                    isGroup = anyOrNull(),
+                    userHandles = anyOrNull()
                 )
             ).thenAnswer { throw Throwable("Complete with error") }
             scheduler.advanceUntilIdle()

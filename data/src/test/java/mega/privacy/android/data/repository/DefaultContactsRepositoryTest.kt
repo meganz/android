@@ -21,7 +21,6 @@ import mega.privacy.android.data.mapper.InviteContactRequestMapper
 import mega.privacy.android.data.mapper.UserUpdateMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
-import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.mapper.chat.OnlineStatusMapper
 import mega.privacy.android.data.mapper.chat.UserLastGreenMapper
 import mega.privacy.android.data.mapper.contact.ContactCredentialsMapper
@@ -71,7 +70,6 @@ class DefaultContactsRepositoryTest {
     private val contactRequestMapper = mock<ContactRequestMapper>()
     private val userLastGreenMapper = mock<UserLastGreenMapper>()
     private val userUpdateMapper = mock<UserUpdateMapper>()
-    private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
     private val onlineStatusMapper = mock<OnlineStatusMapper>()
     private val contactItemMapper = mock<ContactItemMapper>()
     private val contactDataMapper = mock<ContactDataMapper>()
@@ -115,7 +113,6 @@ class DefaultContactsRepositoryTest {
             contactRequestMapper = contactRequestMapper,
             userLastGreenMapper = userLastGreenMapper,
             userUpdateMapper = userUpdateMapper,
-            megaChatPeerListMapper = megaChatPeerListMapper,
             onlineStatusMapper = onlineStatusMapper,
             contactItemMapper = contactItemMapper,
             contactDataMapper = contactDataMapper,
