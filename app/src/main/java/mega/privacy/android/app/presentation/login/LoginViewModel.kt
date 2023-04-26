@@ -56,6 +56,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.ResetChatSettingsUseCase
 import mega.privacy.android.domain.usecase.transfer.CancelTransfersUseCase
 import mega.privacy.android.domain.usecase.transfer.OngoingTransfersExistUseCase
+import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -87,6 +88,7 @@ class LoginViewModel @Inject constructor(
     private val fetchNodesUseCase: FetchNodesUseCase,
     private val ongoingTransfersExistUseCase: OngoingTransfersExistUseCase,
     private val monitorFetchNodesFinishUseCase: MonitorFetchNodesFinishUseCase,
+    private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginState())
@@ -667,6 +669,13 @@ class LoginViewModel @Inject constructor(
      * Check if given feature flag is enabled or not
      */
     fun isFeatureEnabled(feature: Feature) = state.value.enabledFlags.contains(feature)
+
+    /**
+     * Schedule camera upload
+     */
+    fun scheduleCameraUpload() = viewModelScope.launch {
+        scheduleCameraUploadUseCase()
+    }
 
     companion object {
         /**

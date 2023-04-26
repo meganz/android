@@ -12,13 +12,13 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywall
 import mega.privacy.android.app.utils.CUBackupInitializeChecker
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_BUSINESS_EXPIRED
 import mega.privacy.android.app.utils.Constants.BROADCAST_ACTION_INTENT_SSL_VERIFICATION_FAILED
-import mega.privacy.android.app.utils.JobUtil.scheduleCameraUploadJob
 import mega.privacy.android.data.database.DatabaseHandler
 import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.usecase.GetFullAccountInfo
 import mega.privacy.android.domain.usecase.login.BroadcastFetchNodesFinishUseCase
 import mega.privacy.android.domain.usecase.setting.BroadcastPushNotificationSettingsUseCase
+import mega.privacy.android.domain.usecase.workers.ScheduleCameraUploadUseCase
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaApiJava.INVALID_HANDLE
@@ -43,6 +43,7 @@ import javax.inject.Inject
  * @property applicationScope [CoroutineScope]
  * @property getFullAccountInfo [GetFullAccountInfo]
  * @property broadcastFetchNodesFinishUseCase [BroadcastFetchNodesFinishUseCase]
+ * @property scheduleCameraUploadUseCase [ScheduleCameraUploadUseCase]
  */
 class BackgroundRequestListener @Inject constructor(
     private val application: Application,
@@ -56,6 +57,7 @@ class BackgroundRequestListener @Inject constructor(
     private val getFullAccountInfo: GetFullAccountInfo,
     private val broadcastFetchNodesFinishUseCase: BroadcastFetchNodesFinishUseCase,
     private val broadcastPushNotificationSettingsUseCase: BroadcastPushNotificationSettingsUseCase,
+    private val scheduleCameraUploadUseCase: ScheduleCameraUploadUseCase,
 ) : MegaRequestListenerInterface {
     /**
      * On request start
@@ -174,7 +176,7 @@ class BackgroundRequestListener @Inject constructor(
 
             //Login check resumed pending transfers
             transfersManagement.checkResumedPendingTransfers()
-            scheduleCameraUploadJob(application)
+            applicationScope.launch { scheduleCameraUploadUseCase() }
         }
     }
 

@@ -70,7 +70,6 @@ import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL
 import mega.privacy.android.app.utils.ConstantsUrl.RECOVERY_URL_EMAIL
-import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.app.utils.ViewUtils.hideKeyboard
@@ -1493,7 +1492,7 @@ class LoginFragment : Fragment() {
                 Timber.d("Start the Camera Uploads service")
                 Handler(Looper.getMainLooper()).postDelayed({
                     Timber.d("Now I start the service")
-                    JobUtil.scheduleCameraUploadJob(this)
+                    viewModel.scheduleCameraUpload()
                 }, time.toLong())
             }
         }
