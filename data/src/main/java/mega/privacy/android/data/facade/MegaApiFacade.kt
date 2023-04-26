@@ -14,6 +14,7 @@ import mega.privacy.android.data.listener.OptionalMegaTransferListenerInterface
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.data.qualifier.MegaApi
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
@@ -1146,4 +1147,16 @@ internal class MegaApiFacade @Inject constructor(
             listener
         )
     }
+
+    override fun setCoordinates(
+        nodeId: NodeId,
+        latitude: Double,
+        longitude: Double,
+        listener: MegaRequestListenerInterface?,
+    ) = megaApi.setNodeCoordinates(
+        megaApi.getNodeByHandle(nodeId.longValue),
+        latitude,
+        longitude,
+        listener
+    )
 }

@@ -11,6 +11,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import java.util.Queue
 
@@ -672,4 +673,16 @@ interface CameraUploadRepository {
      * @param backup [Backup]
      */
     suspend fun updateLocalBackup(backup: Backup)
+
+    /**
+     * Set the GPS coordinates of image files as a node attribute.
+     * @param nodeId    Handle associated with a node that will receive the information.
+     * @param latitude  Latitude in signed decimal degrees notation
+     * @param longitude Longitude in signed decimal degrees notation
+     */
+    suspend fun setCoordinates(
+        nodeId: NodeId,
+        latitude: Double,
+        longitude: Double,
+    )
 }

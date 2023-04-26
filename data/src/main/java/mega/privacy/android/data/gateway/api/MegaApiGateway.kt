@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.data.model.GlobalTransfer
 import mega.privacy.android.data.model.GlobalUpdate
 import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.NodeId
 import nz.mega.sdk.MegaCancelToken
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -2353,4 +2354,34 @@ interface MegaApiGateway {
         backupName: String, state: Int, subState: Int,
         listener: MegaRequestListenerInterface?,
     )
+
+    /**
+     * Set the GPS coordinates of image files as a node attribute.
+     * <p>
+     * To remove the existing coordinates, set both the latitude and longitude to
+     * the value MegaNode::INVALID_COORDINATE.
+     * <p>
+     * The associated request type with this request is MegaRequest::TYPE_SET_ATTR_NODE
+     * Valid data in the MegaRequest object received on callbacks:
+     * - MegaRequest::getNodeHandle - Returns the handle of the node that receive the attribute
+     * - MegaRequest::getFlag - Returns true (official attribute)
+     * - MegaRequest::getParamType - Returns MegaApi::NODE_ATTR_COORDINATES
+     * - MegaRequest::getNumDetails - Returns the longitude, scaled to integer in the range of [0, 2^24]
+     * - MegaRequest::getTransferTag() - Returns the latitude, scaled to integer in the range of [0, 2^24)
+     * <p>
+     * If the MEGA account is a business account and it's status is expired, onRequestFinish will
+     * be called with the error code MegaError::API_EBUSINESSPASTDUE.
+     *
+     * @param nodeId    Handle associated with a node that will receive the information.
+     * @param latitude  Latitude in signed decimal degrees notation
+     * @param longitude Longitude in signed decimal degrees notation
+     * @param listener  MegaRequestListener to track this request
+     */
+    fun setCoordinates(
+        nodeId: NodeId,
+        latitude: Double,
+        longitude: Double,
+        listener: MegaRequestListenerInterface?,
+    )
+
 }

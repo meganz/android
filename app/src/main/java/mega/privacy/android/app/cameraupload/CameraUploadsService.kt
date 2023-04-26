@@ -84,6 +84,7 @@ import mega.privacy.android.domain.entity.SyncRecord
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.entity.VideoCompressionState
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.exception.NotEnoughStorageException
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.qualifier.MainDispatcher
@@ -125,6 +126,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUse
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.login.BackgroundFastLoginUseCase
@@ -572,6 +574,12 @@ class CameraUploadsService : LifecycleService() {
      */
     @Inject
     lateinit var completedTransferMapper: CompletedTransferMapper
+
+    /**
+     * Set coordinates for image files
+     */
+    @Inject
+    lateinit var setCoordinatesUseCase: SetCoordinatesUseCase
 
     /**
      * Coroutine Scope for camera upload work
@@ -1720,11 +1728,10 @@ class CameraUploadsService : LifecycleService() {
                     )
                     record.latitude?.let { latitude ->
                         record.longitude?.let { longitude ->
-                            megaApi.setNodeCoordinates(
-                                nonNullNode,
-                                latitude.toDouble(),
-                                longitude.toDouble(),
-                                null
+                            setCoordinatesUseCase(
+                                nodeId = NodeId(nonNullNode.handle),
+                                latitude = latitude.toDouble(),
+                                longitude = longitude.toDouble(),
                             )
                         }
                     }

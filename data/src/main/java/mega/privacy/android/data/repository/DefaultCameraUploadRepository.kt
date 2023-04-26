@@ -40,6 +40,7 @@ import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.entity.VideoCompressionState
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.backup.Backup
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.settings.camerauploads.UploadOption
 import mega.privacy.android.domain.exception.LocalStorageException
 import mega.privacy.android.domain.exception.UnknownException
@@ -704,4 +705,17 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     override suspend fun updateLocalBackup(backup: Backup) = withContext(ioDispatcher) {
         localStorageGateway.updateBackup(backup)
     }
+
+    override suspend fun setCoordinates(nodeId: NodeId, latitude: Double, longitude: Double) =
+        withContext(ioDispatcher) {
+            suspendCancellableCoroutine { continuation ->
+                val listener = continuation.getRequestListener("setCoordinates") {
+                    return@getRequestListener
+                }
+                megaApiGateway.setCoordinates(nodeId, latitude, longitude, listener)
+                continuation.invokeOnCancellation {
+                    megaApiGateway.removeRequestListener(listener)
+                }
+            }
+        }
 }
