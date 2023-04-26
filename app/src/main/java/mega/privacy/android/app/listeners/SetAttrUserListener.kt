@@ -2,13 +2,15 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import android.content.Intent
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.di.DatabaseEntryPoint
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.app.utils.TextUtil
 import mega.privacy.android.app.utils.Util
-import mega.privacy.android.data.database.DatabaseHandler
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError
 import nz.mega.sdk.MegaRequest
@@ -21,10 +23,10 @@ import timber.log.Timber
  *
  * @param context: Context
  */
-class SetAttrUserListener(private val context: Context?) : MegaRequestListenerInterface {
+class SetAttrUserListener(private val context: Context) : MegaRequestListenerInterface {
 
-    private val databaseHandler: DatabaseHandler by lazy {
-        MegaApplication.getInstance().dbH
+    private val databaseEntryPoint: DatabaseEntryPoint by lazy {
+        EntryPointAccessors.fromApplication(context.applicationContext)
     }
 
     /**
@@ -65,28 +67,48 @@ class SetAttrUserListener(private val context: Context?) : MegaRequestListenerIn
                     }
 
                     MegaApiJava.USER_ATTR_FIRSTNAME -> if (e.errorCode == MegaError.API_OK) {
-                        ContactUtil.updateFirstName(text, email)
+                        databaseEntryPoint.applicationScope().launch {
+                            databaseEntryPoint.localRoomGateway.setContactName(
+                                firstName = text,
+                                mail = email
+                            )
+                        }
                     }
 
                     MegaApiJava.USER_ATTR_LASTNAME -> if (e.errorCode == MegaError.API_OK) {
-                        ContactUtil.updateLastName(text, email)
+                        databaseEntryPoint.applicationScope().launch {
+                            databaseEntryPoint.localRoomGateway.setContactLastName(
+                                lastName = text,
+                                mail = email
+                            )
+                        }
                     }
 
                     MegaApiJava.USER_ATTR_ALIAS -> when (e.errorCode) {
                         MegaError.API_OK -> {
-                            databaseHandler.setContactNickname(text, nodeHandle)
+                            databaseEntryPoint.applicationScope().launch {
+                                databaseEntryPoint.localRoomGateway.setContactNickname(
+                                    nodeHandle,
+                                    text
+                                )
+                                ContactUtil.notifyNicknameUpdate(context, nodeHandle)
+                            }
                             val message = if (text == null) {
                                 context?.getString(R.string.snackbar_nickname_removed)
                             } else {
                                 context?.getString(R.string.snackbar_nickname_added)
                             }
                             Util.showSnackbar(context, message)
-                            ContactUtil.notifyNicknameUpdate(context, nodeHandle)
                         }
 
                         MegaError.API_ENOENT -> {
-                            databaseHandler.setContactNickname(null, nodeHandle)
-                            ContactUtil.notifyNicknameUpdate(context, nodeHandle)
+                            databaseEntryPoint.applicationScope().launch {
+                                databaseEntryPoint.localRoomGateway.setContactNickname(
+                                    nodeHandle,
+                                    null
+                                )
+                                ContactUtil.notifyNicknameUpdate(context, nodeHandle)
+                            }
                         }
 
                         else -> {

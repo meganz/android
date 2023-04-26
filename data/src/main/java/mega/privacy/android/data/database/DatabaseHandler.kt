@@ -213,8 +213,6 @@ interface DatabaseHandler {
     fun setNonContactFirstName(name: String?, handle: String?): Int
     fun setNonContactLastName(lastName: String?, handle: String?): Int
     fun setNonContactEmail(email: String?, handle: String?): Int
-    fun setContactName(name: String?, mail: String?)
-    fun setContactLastName(lastName: String?, mail: String?)
     fun setContactNickname(nickname: String?, handle: Long)
 
     fun exists(handle: Long): Boolean

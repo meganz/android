@@ -405,9 +405,6 @@ internal class MegaLocalStorageFacade @Inject constructor(
         searchQuery: String?,
     ): List<OfflineInformation> = dbHandler.getOfflineInformationList(path, searchQuery)
 
-    override suspend fun setContactNickName(nickName: String, handle: Long) =
-        dbHandler.setContactNickname(nickname = nickName, handle = handle)
-
     override suspend fun getCuBackUpId() = dbHandler.cuBackupID
 
     override suspend fun getMuBackUpId() = dbHandler.muBackupID

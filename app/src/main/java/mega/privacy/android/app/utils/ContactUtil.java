@@ -237,14 +237,6 @@ public class ContactUtil {
         return visibleContacts;
     }
 
-    public static void updateFirstName(String name, String email) {
-        MegaApplication.getInstance().getDbH().setContactName(name, email);
-    }
-
-    public static void updateLastName(String lastName, String email) {
-        MegaApplication.getInstance().getDbH().setContactLastName(lastName, email);
-    }
-
     /**
      * Checks if the user who their handle is received by parameter is a contact.
      *

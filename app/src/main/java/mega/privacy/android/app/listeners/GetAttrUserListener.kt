@@ -2,9 +2,12 @@ package mega.privacy.android.app.listeners
 
 import android.content.Context
 import android.content.Intent
+import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
+import mega.privacy.android.app.di.DatabaseEntryPoint
 import mega.privacy.android.app.listeners.CreateFolderListener.ExtraAction
 import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.megachat.ChatActivity
@@ -33,6 +36,10 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
     private var onlyDBUpdate = false
     private var holderPosition = 0
     private val databaseHandler: DatabaseHandler by lazy { MegaApplication.getInstance().dbH }
+
+    private val databaseEntryPoint: DatabaseEntryPoint by lazy {
+        EntryPointAccessors.fromApplication(context.applicationContext)
+    }
 
     /**
      * Constructor to init a request for check the USER_ATTR_MY_CHAT_FILES_FOLDER user's attribute
@@ -92,15 +99,29 @@ class GetAttrUserListener constructor(private val context: Context) : MegaReques
                     MegaApiJava.USER_ATTR_MY_CHAT_FILES_FOLDER ->
                         checkMyChatFilesFolderRequest(api, this, e)
                     MegaApiJava.USER_ATTR_FIRSTNAME -> if (e.errorCode == MegaError.API_OK) {
-                        ContactUtil.updateFirstName(text, email)
-                        api.getContact(email)?.let {
-                            ContactUtil.notifyFirstNameUpdate(context, it.handle)
+                        databaseEntryPoint.applicationScope().launch {
+                            if (!email.isNullOrBlank()) {
+                                databaseEntryPoint.localRoomGateway.setContactName(
+                                    firstName = text,
+                                    mail = email
+                                )
+                            }
+                            api.getContact(email)?.let {
+                                ContactUtil.notifyFirstNameUpdate(context, it.handle)
+                            }
                         }
                     }
                     MegaApiJava.USER_ATTR_LASTNAME -> if (e.errorCode == MegaError.API_OK) {
-                        ContactUtil.updateLastName(text, email)
-                        api.getContact(email)?.let {
-                            ContactUtil.notifyLastNameUpdate(context, it.handle)
+                        databaseEntryPoint.applicationScope().launch {
+                            if (!email.isNullOrBlank()) {
+                                databaseEntryPoint.localRoomGateway.setContactLastName(
+                                    lastName = text,
+                                    mail = email
+                                )
+                            }
+                            api.getContact(email)?.let {
+                                ContactUtil.notifyLastNameUpdate(context, it.handle)
+                            }
                         }
                     }
                     MegaApiJava.USER_ATTR_ALIAS -> if (e.errorCode == MegaError.API_OK) {

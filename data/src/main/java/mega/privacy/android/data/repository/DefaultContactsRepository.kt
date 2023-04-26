@@ -774,7 +774,7 @@ internal class DefaultContactsRepository @Inject constructor(
             )
             continuation.invokeOnCancellation { megaApiGateway.removeRequestListener(listener) }
         }.also {
-            localStorageGateway.setContactNickName(it, userHandle)
+            megaLocalRoomGateway.setContactNickname(userHandle, it)
         }
     }
 

@@ -738,15 +738,6 @@ interface MegaLocalStorageGateway {
     ): List<OfflineInformation>
 
     /**
-     * Set contact nick name
-     *
-     * @param nickName nick name
-     * @param handle user handle
-     * @return [Int] the number of rows effected
-     */
-    suspend fun setContactNickName(nickName: String, handle: Long)
-
-    /**
      * Get Camera upload Backup ID
      * @return [Long]
      */

@@ -2562,18 +2562,6 @@ class SqliteDatabaseHandler @Inject constructor(
     override fun setContact(contact: Contact) =
         runBlocking { megaLocalRoomGateway.saveContact(contact) }
 
-    override fun setContactName(name: String?, mail: String?) {
-        applicationScope.launch {
-            megaLocalRoomGateway.setContactName(name, mail)
-        }
-    }
-
-    override fun setContactLastName(lastName: String?, mail: String?) {
-        applicationScope.launch {
-            megaLocalRoomGateway.setContactLastName(lastName, mail)
-        }
-    }
-
     override fun setContactNickname(nickname: String?, handle: Long) {
         applicationScope.launch {
             megaLocalRoomGateway.setContactNickname(handle, nickname)

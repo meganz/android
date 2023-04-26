@@ -222,7 +222,7 @@ class SettingsChatFragment : PreferenceFragmentCompat(), Preference.OnPreference
             SettingsConstants.KEY_CHAT_RICH_LINK -> {
                 megaApi.enableRichPreviews(
                     richLinksSwitch!!.isChecked,
-                    SetAttrUserListener(context)
+                    SetAttrUserListener(requireContext())
                 )
                 return true
             }
