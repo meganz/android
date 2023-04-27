@@ -1,34 +1,53 @@
 package mega.privacy.android.app.presentation.login.view
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import de.palm.composestateevents.EventEffect
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.login.error
+import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
@@ -36,8 +55,13 @@ import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.textfields.LabelTextField
 import mega.privacy.android.core.ui.controls.textfields.PasswordTextField
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.grey_200_grey_700
+import mega.privacy.android.core.ui.theme.extensions.red_600_white_alpha_087
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
+import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
+import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 
 /**
  * Login fragment view.
@@ -50,18 +74,51 @@ fun LoginView(
     onLoginClicked: () -> Unit,
     onForgotPassword: (String?) -> Unit,
     onCreateAccount: () -> Unit,
+    onSnackbarMessageConsumed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (state.isLoginRequired) {
-        RequireLogin(
-            state = state,
-            onEmailChanged = onEmailChanged,
-            onPasswordChanged = onPasswordChanged,
-            onLoginClicked = onLoginClicked,
-            onForgotPassword = onForgotPassword,
-            onCreateAccount = onCreateAccount,
-            modifier = modifier
-        )
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scaffoldState = rememberScaffoldState()
+
+    Scaffold(modifier = modifier.fillMaxSize(), scaffoldState = scaffoldState) { paddingValues ->
+        with(state) {
+            when {
+                isLoginRequired -> RequireLogin(
+                    state = this,
+                    onEmailChanged = onEmailChanged,
+                    onPasswordChanged = onPasswordChanged,
+                    onLoginClicked = onLoginClicked,
+                    onForgotPassword = onForgotPassword,
+                    onCreateAccount = onCreateAccount,
+                    paddingValues = paddingValues,
+                    modifier = modifier
+                )
+
+                isLoginInProgress || fetchNodesUpdate != null -> LoginInProgress(
+                    state = this,
+                    paddingValues = paddingValues
+                )
+
+                is2FARequired -> TwoFactorAuthentication(
+                    state = this,
+                    paddingValues = paddingValues
+                )
+            }
+        }
+
+        SnackbarHost(modifier = Modifier.padding(8.dp), hostState = snackbarHostState)
+
+        val context = LocalContext.current
+
+        EventEffect(
+            event = state.snackbarMessage,
+            onConsumed = onSnackbarMessageConsumed
+        ) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = context.resources.getString(it),
+                duration = SnackbarDuration.Long
+            )
+        }
     }
 }
 
@@ -73,8 +130,9 @@ private fun RequireLogin(
     onLoginClicked: () -> Unit,
     onForgotPassword: (String?) -> Unit,
     onCreateAccount: () -> Unit,
+    paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
-) = Column(modifier = modifier) {
+) = Column(modifier = modifier.padding(paddingValues)) {
     val focusRequester = remember { FocusRequester() }
 
     Text(
@@ -158,14 +216,86 @@ private fun RequireLogin(
 @Composable
 private fun LoginInProgress(
     state: LoginState,
+    paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
+) = Column(
+    modifier = modifier
+        .fillMaxWidth()
+        .padding(paddingValues)
+        .padding(horizontal = 20.dp),
+    horizontalAlignment = Alignment.CenterHorizontally
 ) {
-
+    Image(
+        painter = painterResource(id = R.drawable.logo_loading_ic),
+        contentDescription = stringResource(id = R.string.login_to_mega),
+        modifier = Modifier
+            .padding(top = 112.dp)
+            .size(144.dp)
+            .testTag(MEGA_LOGO_TEST_TAG),
+        colorFilter = ColorFilter.tint(color = MaterialTheme.colors.red_600_white_alpha_087)
+    )
+    with(state) {
+        if (isCheckingSignupLink) {
+            LoginInProgressText(
+                stringId = R.string.login_querying_signup_link,
+                modifier = Modifier.padding(top = 30.dp)
+            )
+        }
+        LoginInProgressText(
+            stringId = R.string.login_connecting_to_server,
+            modifier = Modifier.padding(top = 5.dp)
+        )
+        fetchNodesUpdate?.apply {
+            LoginInProgressText(
+                stringId = R.string.download_updating_filelist,
+                modifier = Modifier.padding(top = 5.dp)
+            )
+            progress?.let {
+                if (it.floatValue > 0) {
+                    LoginInProgressText(
+                        stringId = R.string.login_preparing_filelist,
+                        modifier = Modifier.padding(top = 5.dp)
+                    )
+                    LinearProgressIndicator(
+                        progress = it.floatValue,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 10.dp, top = 10.dp, end = 10.dp)
+                            .testTag(FETCH_NODES_PROGRESS_TEST_TAG),
+                        backgroundColor = MaterialTheme.colors.grey_200_grey_700,
+                        color = MaterialTheme.colors.secondary
+                    )
+                }
+            }
+        }
+        CircularProgressIndicator(
+            modifier = Modifier
+                .padding(top = 10.dp)
+                .size(72.dp)
+                .testTag(LOGIN_PROGRESS_TEST_TAG),
+            color = MaterialTheme.colors.secondary
+        )
+        fetchNodesUpdate?.temporaryError?.let {
+            LoginInProgressText(stringId = it.messageId, modifier = Modifier.padding(top = 10.dp))
+        }
+    }
 }
+
+@Composable
+private fun LoginInProgressText(
+    @StringRes stringId: Int,
+    modifier: Modifier,
+) = Text(
+    text = stringResource(id = stringId),
+    modifier = modifier,
+    style = MaterialTheme.typography.subtitle2,
+    textAlign = TextAlign.Center
+)
 
 @Composable
 private fun TwoFactorAuthentication(
     state: LoginState,
+    paddingValues: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
 
@@ -185,6 +315,7 @@ private fun PreviewEmptyLoginView() {
             onLoginClicked = {},
             onForgotPassword = {},
             onCreateAccount = {},
+            paddingValues = PaddingValues(),
             modifier = Modifier.background(color = MaterialTheme.colors.surface)
         )
     }
@@ -197,13 +328,14 @@ private fun PreviewLoginView(
     @PreviewParameter(LoginStateProvider::class) state: LoginState,
 ) {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        RequireLogin(
+        LoginView(
             state = state,
-            onEmailChanged = { },
-            onPasswordChanged = { },
+            onEmailChanged = {},
+            onPasswordChanged = {},
             onLoginClicked = {},
             onForgotPassword = {},
             onCreateAccount = {},
+            onSnackbarMessageConsumed = {},
             modifier = Modifier.background(color = MaterialTheme.colors.surface)
         )
     }
@@ -214,7 +346,6 @@ private fun PreviewLoginView(
  */
 internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
     override val values = listOf(
-        LoginState(isLoginRequired = true),
         LoginState(
             isLoginRequired = true,
             accountSession = AccountSession(email = "email@email.es"),
@@ -227,6 +358,19 @@ internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
             emailError = LoginError.EmptyEmail,
             password = "",
             passwordError = LoginError.EmptyPassword
+        ),
+        LoginState(
+            isLoginInProgress = true,
+        ),
+        LoginState(
+            fetchNodesUpdate = FetchNodesUpdate(
+                progress = Progress(0.5F),
+                temporaryError = FetchNodesTemporaryError.ConnectivityIssues
+            ),
         )
     ).asSequence()
 }
+
+internal const val MEGA_LOGO_TEST_TAG = "MEGA_LOGO"
+internal const val FETCH_NODES_PROGRESS_TEST_TAG = "FETCH_NODES_PROGRESS"
+internal const val LOGIN_PROGRESS_TEST_TAG = "LOGIN_PROGRESS"

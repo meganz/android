@@ -1,9 +1,12 @@
 package mega.privacy.android.app.presentation.login
 
 import android.app.Activity
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
+import mega.privacy.android.app.R
 import mega.privacy.android.app.featuretoggle.AppFeatures
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.extensions.getState
@@ -184,10 +188,9 @@ class LoginViewModel @Inject constructor(
         _state.update { state -> state.copy(isPendingToShowFragment = LoginFragmentType.Tour) }
 
     /**
-     * Mark handled pending to show fragment
-     *
+     * Update state with isPendingToShowFragment as null.
      */
-    fun markHandledPendingToShowFragment() {
+    fun isPendingToShowFragmentConsumed() {
         _state.update { state -> state.copy(isPendingToShowFragment = null) }
     }
 
@@ -340,13 +343,25 @@ class LoginViewModel @Inject constructor(
     /**
      * Checks a signup link.
      */
-    fun checkSignupLink(link: String) = viewModelScope.launch {
-        val result = runCatching { querySignupLinkUseCase(link) }
+    fun checkSignupLink(link: String) {
         _state.update { state ->
             state.copy(
-                querySignupLinkResult = result,
-                intentState = LoginIntentState.AlreadySet
+                isLoginRequired = false,
+                isLoginInProgress = true,
+                isCheckingSignupLink = true
             )
+        }
+        viewModelScope.launch {
+            val result = runCatching { querySignupLinkUseCase(link) }
+            _state.update { state ->
+                state.copy(
+                    isLoginRequired = true,
+                    isLoginInProgress = false,
+                    querySignupLinkResult = result,
+                    intentState = LoginIntentState.AlreadySet,
+                    isCheckingSignupLink = false
+                )
+            }
         }
     }
 
@@ -355,6 +370,9 @@ class LoginViewModel @Inject constructor(
      */
     fun launchCancelTransfers() = viewModelScope.launch { cancelTransfersUseCase() }
 
+    /**
+     * Update email in state.
+     */
     fun onEmailChanged(typedEmail: String) {
         val newAccountSession = state.value.accountSession?.copy(email = typedEmail)
             ?: AccountSession(email = typedEmail)
@@ -364,10 +382,11 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onPasswordChanged(typedPassword: String) {
-        _state.update { state ->
-            state.copy(password = typedPassword, passwordError = null)
-        }
+    /**
+     * Update password in state.
+     */
+    fun onPasswordChanged(typedPassword: String) = _state.update { state ->
+        state.copy(password = typedPassword, passwordError = null)
     }
 
     /**
@@ -391,7 +410,23 @@ class LoginViewModel @Inject constructor(
                     )
                 }
             } else {
-                performLogin()
+                viewModelScope.launch {
+                    when {
+                        ongoingTransfersExistUseCase() -> _state.update { state ->
+                            state.copy(ongoingTransfersExist = true)
+                        }
+
+                        !isConnected -> _state.update { state ->
+                            state.copy(
+                                isLoginRequired = true,
+                                ongoingTransfersExist = null,
+                                snackbarMessage = triggered(R.string.error_server_connection_problem)
+                            )
+                        }
+
+                        else -> performLogin()
+                    }
+                }
             }
         }
     }
@@ -673,18 +708,27 @@ class LoginViewModel @Inject constructor(
     fun isFeatureEnabled(feature: Feature) = state.value.enabledFlags.contains(feature)
 
     /**
+     * Sets snackbarMessage in state.
+     */
+    fun setSnackbarMessage(@StringRes messageId: Int) =
+        _state.update { state -> state.copy(snackbarMessage = triggered(messageId)) }
+
+
+    /**
+     * Sets snackbarMessage in state as consumed.
+     */
+    fun onSnackbarMessageConsumed() =
+        _state.update { state -> state.copy(snackbarMessage = consumed()) }
+
+    /**
      * Schedule camera upload
      */
-    fun scheduleCameraUpload() = viewModelScope.launch {
-        scheduleCameraUploadUseCase()
-    }
+    fun scheduleCameraUpload() = viewModelScope.launch { scheduleCameraUploadUseCase() }
 
     /**
      * Stop camera upload
      */
-    fun stopCameraUpload() = viewModelScope.launch {
-        stopCameraUploadUseCase()
-    }
+    fun stopCameraUpload() = viewModelScope.launch { stopCameraUploadUseCase() }
 
     companion object {
         /**

@@ -59,14 +59,12 @@ import coil.request.ImageRequest
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumSummary
-import mega.privacy.android.core.ui.theme.extensions.teal_300_teal_200
 import mega.privacy.android.core.ui.theme.grey_020
 import mega.privacy.android.core.ui.theme.grey_alpha_012
 import mega.privacy.android.core.ui.theme.grey_alpha_033
 import mega.privacy.android.core.ui.theme.grey_alpha_054
 import mega.privacy.android.core.ui.theme.grey_alpha_087
 import mega.privacy.android.core.ui.theme.surface_dark
-import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.core.ui.theme.white_alpha_012
 import mega.privacy.android.core.ui.theme.white_alpha_054
@@ -275,11 +273,11 @@ private fun AlbumGetMultipleLinksBottomBar(
             modifier = Modifier.padding(all = 16.dp),
             onClick = { onButtonClick(links.joinToString(System.lineSeparator())) },
             shape = RoundedCornerShape(4.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colors.teal_300_teal_200),
+            border = BorderStroke(1.dp, MaterialTheme.colors.secondary),
         ) {
             Text(
                 text = stringResource(id = R.string.action_copy_all),
-                color = MaterialTheme.colors.teal_300_teal_200,
+                color = MaterialTheme.colors.secondary,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.W500,
                 style = MaterialTheme.typography.button,

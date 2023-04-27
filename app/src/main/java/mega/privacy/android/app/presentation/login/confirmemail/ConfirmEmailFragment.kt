@@ -73,7 +73,7 @@ class ConfirmEmailFragment : Fragment(), MegaRequestListenerInterface {
             with(uiState) {
                 if (isPendingToShowFragment != null) {
                     (requireActivity() as LoginActivity).showFragment(isPendingToShowFragment.toConstant())
-                    viewModel.markHandledPendingToShowFragment()
+                    viewModel.isPendingToShowFragmentConsumed()
                 }
             }
         }

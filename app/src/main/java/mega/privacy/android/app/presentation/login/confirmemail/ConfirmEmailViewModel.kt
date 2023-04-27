@@ -35,10 +35,9 @@ class ConfirmEmailViewModel @Inject constructor(
     }
 
     /**
-     * Mark handled pending to show fragment
-     *
+     * Update state with isPendingToShowFragment as null.
      */
-    fun markHandledPendingToShowFragment() {
+    fun isPendingToShowFragmentConsumed() {
         _state.update { state -> state.copy(isPendingToShowFragment = null) }
     }
 }

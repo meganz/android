@@ -146,7 +146,7 @@ class LoginActivity : BaseActivity(), MegaRequestListenerInterface {
                     isPendingToFinishActivity -> finish()
                     isPendingToShowFragment != null -> {
                         showFragment(isPendingToShowFragment.toConstant())
-                        viewModel.markHandledPendingToShowFragment()
+                        viewModel.isPendingToShowFragmentConsumed()
                     }
                 }
             }
