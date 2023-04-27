@@ -79,6 +79,7 @@ import mega.privacy.android.app.main.adapters.MegaSharedFolderAdapter;
 import mega.privacy.android.app.main.controllers.ContactController;
 import mega.privacy.android.app.main.controllers.NodeController;
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment;
+import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
 import mega.privacy.android.app.presentation.contact.FileContactListViewModel;
@@ -100,7 +101,7 @@ import nz.mega.sdk.MegaUserAlert;
 import timber.log.Timber;
 
 @AndroidEntryPoint
-public class FileContactListActivity extends PasscodeActivity implements OnClickListener, MegaGlobalListenerInterface {
+public class FileContactListActivity extends PasscodeActivity implements OnClickListener, MegaGlobalListenerInterface, FileContactsListBottomSheetDialogListener {
 
     @Inject
     CheckNameCollisionUseCase checkNameCollisionUseCase;
@@ -484,7 +485,7 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
             return;
 
         selectedShare = sShare;
-        bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment(selectedShare, getSelectedContact(), node);
+        bottomSheetDialogFragment = new FileContactsListBottomSheetDialogFragment(selectedShare, getSelectedContact(), node, this);
         bottomSheetDialogFragment.show(getSupportFragmentManager(), bottomSheetDialogFragment.getTag());
     }
 
@@ -692,13 +693,13 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         }
     }
 
-    public void removeFileContactShare() {
+    public void removeFileContactShare(String userEmail) {
         notifyDataSetChanged();
 
         showConfirmationRemoveContactFromShare(selectedShare.getUser());
     }
 
-    public void changePermissions() {
+    public void changePermissions(String userEmail) {
         Timber.d("changePermissions");
         notifyDataSetChanged();
         int nodeType = checkBackupNodeTypeByHandle(megaApi, node);

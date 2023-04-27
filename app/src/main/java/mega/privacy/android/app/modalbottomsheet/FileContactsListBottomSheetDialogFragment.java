@@ -19,8 +19,6 @@ import androidx.annotation.Nullable;
 import mega.privacy.android.app.R;
 import mega.privacy.android.app.components.RoundedImageView;
 import mega.privacy.android.app.components.twemoji.EmojiTextView;
-import mega.privacy.android.app.main.FileContactListActivity;
-import mega.privacy.android.app.presentation.fileinfo.FileInfoActivity;
 import mega.privacy.android.app.utils.ContactUtil;
 import nz.mega.sdk.MegaNode;
 import nz.mega.sdk.MegaShare;
@@ -29,22 +27,42 @@ import nz.mega.sdk.MegaUser;
 public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDialogFragment implements View.OnClickListener {
 
     private MegaUser contact;
-    private final MegaShare share;
+    private MegaShare share;
     private String nonContactEmail;
     private MegaNode node;
+    private FileContactsListBottomSheetDialogListener listener;
 
-    public FileContactsListBottomSheetDialogFragment(MegaShare share, MegaUser contact, MegaNode node) {
+    /**
+     * This constructor shouldn't be used, is just here to avoid crashes on recreation. Fragment will be automatically dismissed.
+     * This is a temporal fix while this dialog is migrated to compose
+     *
+     * @deprecated use other constructor
+     */
+    public FileContactsListBottomSheetDialogFragment() {
+    }
+
+    public FileContactsListBottomSheetDialogFragment(MegaShare share, MegaUser contact, MegaNode node, FileContactsListBottomSheetDialogListener listener) {
         this.share = share;
         this.contact = contact;
         this.node = node;
+        this.listener = listener;
         if (this.contact == null) {
             nonContactEmail = this.share.getUser();
         }
     }
 
-    public FileContactsListBottomSheetDialogFragment(MegaShare share, MegaNode node) {
+    public FileContactsListBottomSheetDialogFragment(MegaShare share, MegaNode node, FileContactsListBottomSheetDialogListener listener) {
         this.share = share;
         this.node = node;
+        this.listener = listener;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (share == null || node == null || listener == null) {
+            dismissAllowingStateLoss();
+        }
     }
 
     @Override
@@ -140,17 +158,9 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
     public void onClick(View v) {
         int id = v.getId();
         if (id == R.id.file_contact_list_option_permissions_layout) {
-            if (requireActivity() instanceof FileContactListActivity) {
-                ((FileContactListActivity) requireActivity()).changePermissions();
-            } else if (requireActivity() instanceof FileInfoActivity) {
-                ((FileInfoActivity) requireActivity()).changePermissions();
-            }
+            listener.changePermissions(contact.getEmail());
         } else if (id == R.id.file_contact_list_option_delete_layout) {
-            if (requireActivity() instanceof FileContactListActivity) {
-                ((FileContactListActivity) requireActivity()).removeFileContactShare();
-            } else if (requireActivity() instanceof FileInfoActivity) {
-                ((FileInfoActivity) requireActivity()).removeFileContactShare();
-            }
+            listener.removeFileContactShare(contact.getEmail());
         } else if (id == R.id.file_contact_list_option_info_layout) {
             ContactUtil.openContactInfoActivity(requireActivity(), share.getUser());
         }

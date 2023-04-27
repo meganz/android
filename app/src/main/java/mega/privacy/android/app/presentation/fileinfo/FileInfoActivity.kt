@@ -51,6 +51,7 @@ import mega.privacy.android.app.main.adapters.MegaFileInfoSharedContactAdapter
 import mega.privacy.android.app.main.adapters.MegaFileInfoSharedContactAdapter.MegaFileInfoSharedContactAdapterListener
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogFragment
+import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.extensions.description
@@ -106,7 +107,7 @@ import javax.inject.Inject
  * @property passCodeFacade [PasscodeCheck] an injected component to enforce a Passcode security check
  */
 @AndroidEntryPoint
-class FileInfoActivity : BaseActivity(), SnackbarShower {
+class FileInfoActivity : BaseActivity(), SnackbarShower, FileContactsListBottomSheetDialogListener {
 
     @Inject
     lateinit var passCodeFacade: PasscodeCheck
@@ -475,7 +476,11 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
         }?.let { share ->
             Timber.d("showNodeOptionsPanel")
             bottomSheetDialogFragment =
-                FileContactsListBottomSheetDialogFragment(share, viewModel.node)
+                FileContactsListBottomSheetDialogFragment(
+                    share,
+                    viewModel.node,
+                    this
+                )
             bottomSheetDialogFragment?.show(
                 supportFragmentManager,
                 bottomSheetDialogFragment?.tag
@@ -1062,7 +1067,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     /**
      * Receive the change permissions action to show the different permission options from bottom sheet
      */
-    fun changePermissions() {
+    override fun changePermissions(userEmail: String) {
         Timber.d("changePermissions")
         showAccessPermissionOptions(viewModel.uiState.value.outShareContactShowOptions?.access) {
             viewModel.setSharePermissionForCurrentSelectedOptions(it.toAccessPermission())
@@ -1072,8 +1077,8 @@ class FileInfoActivity : BaseActivity(), SnackbarShower {
     /**
      * Receive remove contact action to show a confirmation dialog
      */
-    fun removeFileContactShare() = viewModel.uiState.value.outShareContactShowOptions?.let {
-        showConfirmationRemoveContactsFromShare(it.user)
+    override fun removeFileContactShare(userEmail: String) {
+        showConfirmationRemoveContactsFromShare(userEmail)
     }
 
     private fun hideMultipleSelectOfSharedContacts() {
