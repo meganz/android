@@ -1,6 +1,7 @@
 package mega.privacy.android.app.service.reporter
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import mega.privacy.android.app.BuildConfig
 import mega.privacy.android.app.middlelayer.reporter.CrashReporter
 
 class FirebaseCrashReporter(
@@ -13,7 +14,7 @@ class FirebaseCrashReporter(
     }
 
     override fun setEnabled(enabled: Boolean) {
-        crashlytics.setCrashlyticsCollectionEnabled(enabled)
+        crashlytics.setCrashlyticsCollectionEnabled(enabled && !BuildConfig.DEBUG)
     }
 
     override fun log(message: String) {
