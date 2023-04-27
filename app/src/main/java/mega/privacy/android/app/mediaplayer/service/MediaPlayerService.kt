@@ -534,7 +534,7 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
     /**
      * Service is moved to background
      */
-    fun onMoveToBackground() {
+    private fun onMoveToBackground() {
         with(viewModelGateway) {
             if ((!backgroundPlayEnabled() || !isAudioPlayer()) && playing()) {
                 setPlayWhenReady(false)
@@ -632,8 +632,16 @@ abstract class MediaPlayerService : LifecycleService(), LifecycleEventObserver,
 
     override fun addSubtitle(subtitleFileUrl: String) {
         mediaPlayerGateway.addSubtitle(subtitleFileUrl)
-        currentMediaPlaySources?.let {
-            playSource(it)
+        // Don't recreate play sources if the playlist is unavailable,
+        // to avoid the subtitle not working for a single item played.
+        if (mediaPlayerIntent?.getBooleanExtra(
+                Constants.INTENT_EXTRA_KEY_IS_PLAYLIST,
+                true
+            ) == true
+        ) {
+            currentMediaPlaySources?.let {
+                playSource(it)
+            }
         }
     }
 
