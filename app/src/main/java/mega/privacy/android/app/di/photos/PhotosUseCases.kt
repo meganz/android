@@ -37,9 +37,7 @@ import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.imageviewer.DefaultGetImageByNodeHandle
-import mega.privacy.android.domain.usecase.imageviewer.DefaultGetImageForChatMessage
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
-import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessage
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -83,9 +81,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindGetImageByNodeHandle(useCase: DefaultGetImageByNodeHandle): GetImageByNodeHandle
-
-    @Binds
-    abstract fun bindGetImageForChatMessage(useCase: DefaultGetImageForChatMessage): GetImageForChatMessage
 
     companion object {
         @Provides

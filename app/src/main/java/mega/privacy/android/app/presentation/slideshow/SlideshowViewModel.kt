@@ -17,13 +17,13 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
-import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessage
+import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
+import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ class SlideshowViewModel @Inject constructor(
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase,
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase,
     private val getImageByNodeHandle: GetImageByNodeHandle,
-    private val getImageForChatMessage: GetImageForChatMessage,
+    private val getImageForChatMessageUseCase: GetImageForChatMessageUseCase,
     private val getChatPhotoByMessageIdUseCase: GetChatPhotoByMessageIdUseCase,
 ) : ViewModel() {
 
@@ -145,7 +145,7 @@ class SlideshowViewModel @Inject constructor(
         fullSize: Boolean = true,
         highPriority: Boolean = false,
         resetDownloads: () -> Unit = {},
-    ) = getImageForChatMessage(
+    ) = getImageForChatMessageUseCase(
         chatRoomId = chatRoomId,
         chatMessageId = chatMessageId,
         fullSize = fullSize,

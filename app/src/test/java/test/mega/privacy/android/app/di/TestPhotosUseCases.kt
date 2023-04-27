@@ -6,7 +6,6 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.photos.PhotosUseCases
-import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
@@ -14,7 +13,6 @@ import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
-import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessage
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
 import org.mockito.kotlin.mock
 
@@ -51,7 +49,4 @@ object TestPhotosUseCases {
 
     @Provides
     fun provideGetImageByNodeHandle(): GetImageByNodeHandle = mock()
-
-    @Provides
-    fun provideGetImageForChatMessage(): GetImageForChatMessage = mock()
 }

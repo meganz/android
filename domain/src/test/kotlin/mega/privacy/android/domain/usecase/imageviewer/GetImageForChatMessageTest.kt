@@ -13,15 +13,15 @@ import org.mockito.kotlin.whenever
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetImageForChatMessageTest {
-    private lateinit var underTest: GetImageForChatMessage
+class GetImageForChatMessageTest {
+    private lateinit var underTest: GetImageForChatMessageUseCase
 
     private val networkRepository = mock<NetworkRepository>()
     private val imageRepository = mock<ImageRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetImageForChatMessage(networkRepository, imageRepository)
+        underTest = GetImageForChatMessageUseCase(networkRepository, imageRepository)
     }
 
     @Test

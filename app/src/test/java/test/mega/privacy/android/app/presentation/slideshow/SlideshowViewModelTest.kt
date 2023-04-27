@@ -11,13 +11,13 @@ import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.presentation.slideshow.SlideshowViewModel
 import mega.privacy.android.domain.entity.slideshow.SlideshowOrder
 import mega.privacy.android.domain.entity.slideshow.SlideshowSpeed
-import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.MonitorSlideshowOrderSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowRepeatSettingUseCase
 import mega.privacy.android.domain.usecase.MonitorSlideshowSpeedSettingUseCase
 import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
-import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessage
+import mega.privacy.android.domain.usecase.imageviewer.GetImageForChatMessageUseCase
+import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -33,7 +33,7 @@ class SlideshowViewModelTest {
     private val monitorSlideshowSpeedSettingUseCase: MonitorSlideshowSpeedSettingUseCase = mock()
     private val monitorSlideshowRepeatSettingUseCase: MonitorSlideshowRepeatSettingUseCase = mock()
     private val getImageByNodeHandle: GetImageByNodeHandle = mock()
-    private val getImageForChatMessage: GetImageForChatMessage = mock()
+    private val getImageForChatMessageUseCase: GetImageForChatMessageUseCase = mock()
     private val getChatPhotoByMessageIdUseCase: GetChatPhotoByMessageIdUseCase = mock()
 
     @Before
@@ -56,7 +56,7 @@ class SlideshowViewModelTest {
         monitorSlideshowSpeedSettingUseCase = monitorSlideshowSpeedSettingUseCase,
         monitorSlideshowRepeatSettingUseCase = monitorSlideshowRepeatSettingUseCase,
         getImageByNodeHandle = getImageByNodeHandle,
-        getImageForChatMessage = getImageForChatMessage,
+        getImageForChatMessageUseCase = getImageForChatMessageUseCase,
         getChatPhotoByMessageIdUseCase = getChatPhotoByMessageIdUseCase
     )
 

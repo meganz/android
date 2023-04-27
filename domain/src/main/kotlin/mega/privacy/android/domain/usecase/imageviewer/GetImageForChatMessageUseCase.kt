@@ -7,13 +7,25 @@ import mega.privacy.android.domain.repository.NetworkRepository
 import javax.inject.Inject
 
 /**
- * Default Implementation of [GetImageForChatMessage]
+ * The use case class to get an ImageResult given a Node Chat Room Id and Chat Message Id.
  */
-class DefaultGetImageForChatMessage @Inject constructor(
+class GetImageForChatMessageUseCase @Inject constructor(
     private val networkRepository: NetworkRepository,
     private val imageRepository: ImageRepository,
-) : GetImageForChatMessage {
-    override suspend fun invoke(
+) {
+
+    /**
+     * Get an ImageResult given a Node Chat Room Id and Chat Message Id.
+     *
+     * @param chatRoomId        Chat Message Room Id
+     * @param chatMessageId     Chat Message Id
+     * @param fullSize          Flag to request full size image despite data/size requirements
+     * @param highPriority      Flag to request image with high priority
+     * @param resetDownloads    Callback to reset downloads
+     *
+     * @return Flow<ImageResult>
+     */
+    suspend operator fun invoke(
         chatRoomId: Long,
         chatMessageId: Long,
         fullSize: Boolean,
