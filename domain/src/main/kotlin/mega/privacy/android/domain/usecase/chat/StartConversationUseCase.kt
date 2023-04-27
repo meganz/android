@@ -1,12 +1,14 @@
 package mega.privacy.android.domain.usecase.chat
 
-import mega.privacy.android.domain.repository.ChatRepository
 import javax.inject.Inject
 
 /**
  * Use case for starting a new chat conversation.
  */
-class StartConversationUseCase @Inject constructor(private val chatRepository: ChatRepository) {
+class StartConversationUseCase @Inject constructor(
+    private val getChatRoomByUserUseCase: GetChatRoomByUserUseCase,
+    private val createChatRoomUseCase: CreateChatRoomUseCase,
+) {
 
     /**
      * Invoke.
@@ -16,11 +18,11 @@ class StartConversationUseCase @Inject constructor(private val chatRepository: C
      * @return The chat conversation handle.
      */
     suspend operator fun invoke(isGroup: Boolean, userHandles: List<Long>): Long {
-        val chat1to1 = chatRepository.getChatRoomByUser(userHandle = userHandles[0])
+        val chat1to1 = getChatRoomByUserUseCase(userHandle = userHandles[0])
         return if (!isGroup && chat1to1 != null) {
             chat1to1.chatId
         } else {
-            chatRepository.createChat(isGroup = isGroup, userHandles = userHandles)
+            createChatRoomUseCase(isGroup = isGroup, userHandles = userHandles)
         }
     }
 

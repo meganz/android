@@ -19,6 +19,9 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
+import mega.privacy.android.domain.entity.EventType
+import mega.privacy.android.domain.entity.StorageState
+import mega.privacy.android.domain.entity.StorageStateEvent
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
@@ -29,7 +32,9 @@ import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
+import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
@@ -51,6 +56,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import kotlin.random.Random
 
 @ExperimentalCoroutinesApi
 class ContactInfoViewModelTest {
@@ -77,6 +83,8 @@ class ContactInfoViewModelTest {
     private lateinit var monitorChatCallUpdates: MonitorChatCallUpdates
     private lateinit var monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase
     private lateinit var monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase
+    private lateinit var startConversationUseCase: StartConversationUseCase
+    private lateinit var createChatRoomUseCase: CreateChatRoomUseCase
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -123,30 +131,32 @@ class ContactInfoViewModelTest {
 
     private fun initViewModel() {
         underTest = ContactInfoViewModel(
-            monitorStorageStateEventUseCase,
-            monitorConnectivityUseCase,
-            startChatCall,
-            getChatRoomUseCase,
-            passcodeManagement,
-            chatApiGateway,
-            cameraGateway,
-            chatManagement,
-            monitorContactUpdates,
-            getUserOnlineStatusByHandleUseCase,
-            requestLastGreen,
-            getChatRoom,
-            getChatRoomByUserUseCase,
-            getContactFromChatUseCase,
-            getContactFromEmailUseCase,
-            applyContactUpdatesUseCase,
-            setUserAliasUseCase,
-            removeContactByEmailUseCase,
-            getInSharesUseCase,
-            monitorChatCallUpdates,
-            monitorChatSessionUpdatesUseCase,
-            monitorUpdatePushNotificationSettingsUseCase,
-            standardDispatcher,
-            testScope,
+            monitorStorageStateEventUseCase = monitorStorageStateEventUseCase,
+            monitorConnectivityUseCase = monitorConnectivityUseCase,
+            startChatCall = startChatCall,
+            getChatRoomUseCase = getChatRoomUseCase,
+            passcodeManagement = passcodeManagement,
+            chatApiGateway = chatApiGateway,
+            cameraGateway = cameraGateway,
+            chatManagement = chatManagement,
+            monitorContactUpdates = monitorContactUpdates,
+            getUserOnlineStatusByHandleUseCase = getUserOnlineStatusByHandleUseCase,
+            requestLastGreen = requestLastGreen,
+            getChatRoom = getChatRoom,
+            getChatRoomByUserUseCase = getChatRoomByUserUseCase,
+            getContactFromChatUseCase = getContactFromChatUseCase,
+            getContactFromEmailUseCase = getContactFromEmailUseCase,
+            applyContactUpdatesUseCase = applyContactUpdatesUseCase,
+            setUserAliasUseCase = setUserAliasUseCase,
+            removeContactByEmailUseCase = removeContactByEmailUseCase,
+            getInSharesUseCase = getInSharesUseCase,
+            monitorChatCallUpdates = monitorChatCallUpdates,
+            monitorChatSessionUpdatesUseCase = monitorChatSessionUpdatesUseCase,
+            monitorUpdatePushNotificationSettingsUseCase = monitorUpdatePushNotificationSettingsUseCase,
+            createChatRoomUseCase = createChatRoomUseCase,
+            startConversationUseCase = startConversationUseCase,
+            ioDispatcher = standardDispatcher,
+            applicationScope = testScope,
         )
     }
 
@@ -173,6 +183,8 @@ class ContactInfoViewModelTest {
         monitorChatCallUpdates = mock()
         monitorChatSessionUpdatesUseCase = mock()
         monitorUpdatePushNotificationSettingsUseCase = mock()
+        startConversationUseCase = mock()
+        createChatRoomUseCase = mock()
     }
 
     @After
@@ -289,11 +301,7 @@ class ContactInfoViewModelTest {
             whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
             whenever(setUserAliasUseCase("Spider Man", testHandle)).thenReturn("Spider Man")
             underTest.updateContactInfo(-1L, testEmail)
-            underTest.state.test {
-                val initialState = awaitItem()
-                assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
-                assertThat(initialState.snackBarMessage).isNull()
-            }
+            verifyInitialData()
             underTest.updateNickName("Spider Man")
             underTest.state.test {
                 val nextState = awaitItem()
@@ -310,16 +318,9 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when remove contact is success isUserRemoved is emitted as true`() = runTest {
-        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
-        whenever(getContactFromEmailUseCase(testEmail, skipCache = true)).thenReturn(contactItem)
-        whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
+        initContactInfoOpenedFromContact()
         whenever(removeContactByEmailUseCase(testEmail)).thenReturn(true)
-        underTest.updateContactInfo(-1L, testEmail)
-        underTest.state.test {
-            val initialState = awaitItem()
-            assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
-            assertThat(initialState.snackBarMessage).isNull()
-        }
+        verifyInitialData()
         underTest.removeContact()
         underTest.state.test {
             val nextState = awaitItem()
@@ -327,25 +328,98 @@ class ContactInfoViewModelTest {
         }
     }
 
+    private suspend fun initContactInfoOpenedFromContact() {
+        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+        whenever(getContactFromEmailUseCase(email = testEmail, skipCache = true))
+            .thenReturn(contactItem)
+        whenever(getChatRoomByUserUseCase(userHandle = testHandle)).thenReturn(chatRoom)
+        underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
+    }
+
     @Test
     fun `test that if get in share is success the value is updated in state`() = runTest {
         val nodeList = mock<List<UnTypedNode>> {
             on { size }.thenReturn(5)
         }
-        whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
-        whenever(getContactFromEmailUseCase(testEmail, skipCache = true)).thenReturn(contactItem)
-        whenever(getChatRoomByUserUseCase(testHandle)).thenReturn(chatRoom)
+        initContactInfoOpenedFromContact()
         whenever(getInSharesUseCase(testEmail)).thenReturn(nodeList)
-        underTest.updateContactInfo(-1L, testEmail)
+        verifyInitialData()
+        underTest.getInShares()
+        underTest.state.test {
+            val nextState = awaitItem()
+            assertThat(nextState.inShares.size).isEqualTo(5)
+        }
+    }
+
+    private suspend fun verifyInitialData() {
         underTest.state.test {
             val initialState = awaitItem()
             assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
             assertThat(initialState.snackBarMessage).isNull()
         }
-        underTest.getInShares()
+    }
+
+    @Test
+    fun `test that when chatNotificationsClicked is clicked chatNotificationChange is fired`() =
+        runTest {
+            initContactInfoOpenedFromContact()
+            verifyInitialData()
+            underTest.chatNotificationsClicked()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isChatNotificationChange).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that when chatNotificationsClicked is clicked new chat is created if chatroom does not exist`() =
+        runTest {
+            val newChatId = Random.nextLong()
+            val newChatRoom = mock<ChatRoom> {
+                on { chatId }.thenReturn(newChatId)
+            }
+            whenever(monitorConnectivityUseCase()).thenReturn(connectivityFlow)
+            whenever(getContactFromEmailUseCase(email = testEmail, skipCache = true)).thenReturn(
+                contactItem
+            )
+            whenever(getChatRoomByUserUseCase(userHandle = testHandle)).thenReturn(null)
+            whenever(createChatRoomUseCase(isGroup = false, userHandles = listOf(testHandle)))
+                .thenReturn(newChatId)
+            whenever(getChatRoom(newChatId)).thenReturn(newChatRoom)
+            underTest.updateContactInfo(chatHandle = -1L, email = testEmail)
+            verifyInitialData()
+            underTest.chatNotificationsClicked()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isChatNotificationChange).isTrue()
+                assertThat(state.chatRoom?.chatId).isEqualTo(newChatId)
+            }
+        }
+
+    @Test
+    fun `test that when send message is clicked chat activity is opened`() = runTest {
+        initContactInfoOpenedFromContact()
+        verifyInitialData()
+        val chatId = Random.nextLong()
+        val exampleStorageStateEvent = StorageStateEvent(
+            handle = 1L,
+            eventString = "eventString",
+            number = 0L,
+            text = "text",
+            type = EventType.Storage,
+            storageState = StorageState.Unknown
+        )
+        val storageFlow: MutableStateFlow<StorageStateEvent> =
+            MutableStateFlow(exampleStorageStateEvent)
+        whenever(monitorStorageStateEventUseCase()).thenReturn(storageFlow)
+        whenever(startConversationUseCase(isGroup = false, userHandles = listOf(testHandle)))
+            .thenReturn(chatId)
+        whenever(getChatRoom(chatId)).thenReturn(chatRoom)
+        underTest.sendMessageToChat()
         underTest.state.test {
-            val nextState = awaitItem()
-            assertThat(nextState.inShares.size).isEqualTo(5)
+            val state = awaitItem()
+            assertThat(state.chatRoom?.chatId).isEqualTo(123456L)
+            assertThat(state.shouldNavigateToChat).isTrue()
         }
     }
 }

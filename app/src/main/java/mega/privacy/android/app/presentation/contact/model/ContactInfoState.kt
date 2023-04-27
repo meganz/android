@@ -23,7 +23,10 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property isUserRemoved                              Checks if selected user is removed from contacts
  * @property inShares                                   In shares for the user
  * @property callStatusChanged                          when chat call status is changed
- * @property isPushNotificationSettingsUpdatedEvent     Push notification settings updated event
+ * @property isPushNotificationSettingsUpdated          Push notification settings updated event
+ * @property shouldNavigateToChat                       Triggers navigation to chat activity
+ * @property isChatNotificationChange                   Mute or Un-mute chat notification for the user
+ * @property isStorageOverQuota                         Storage quota over limits
  */
 data class ContactInfoState(
     val error: Int? = null,
@@ -38,7 +41,10 @@ data class ContactInfoState(
     val snackBarMessage: Int? = null,
     val isUserRemoved: Boolean = false,
     val callStatusChanged: Boolean = false,
-    val isPushNotificationSettingsUpdatedEvent: Boolean = false,
+    val isPushNotificationSettingsUpdated: Boolean = false,
+    val shouldNavigateToChat: Boolean = false,
+    val isChatNotificationChange: Boolean = false,
+    val isStorageOverQuota: Boolean = false,
     val inShares: List<UnTypedNode> = emptyList(),
 ) {
 

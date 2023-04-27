@@ -48,7 +48,9 @@ import mega.privacy.android.domain.usecase.GetChatRoom
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.RequestLastGreen
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.chat.CreateChatRoomUseCase
 import mega.privacy.android.domain.usecase.chat.GetChatRoomByUserUseCase
+import mega.privacy.android.domain.usecase.chat.StartConversationUseCase
 import mega.privacy.android.domain.usecase.contact.ApplyContactUpdatesUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromChatUseCase
 import mega.privacy.android.domain.usecase.contact.GetContactFromEmailUseCase
@@ -112,6 +114,8 @@ class ContactInfoViewModel @Inject constructor(
     private val monitorChatCallUpdates: MonitorChatCallUpdates,
     private val monitorChatSessionUpdatesUseCase: MonitorChatSessionUpdatesUseCase,
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
+    private val startConversationUseCase: StartConversationUseCase,
+    private val createChatRoomUseCase: CreateChatRoomUseCase,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : BaseRxViewModel() {
@@ -175,7 +179,7 @@ class ContactInfoViewModel @Inject constructor(
 
     private fun chatMuteUpdates() = viewModelScope.launch {
         monitorUpdatePushNotificationSettingsUseCase().collect {
-            _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = true) }
+            _state.update { it.copy(isPushNotificationSettingsUpdated = true) }
         }
     }
 
@@ -346,9 +350,7 @@ class ContactInfoViewModel @Inject constructor(
             if (status.isAwayOrOffline()) {
                 requestLastGreen(handle)
             }
-            _state.update {
-                it.copy(userStatus = status)
-            }
+            _state.update { it.copy(userStatus = status) }
         }
     }
 
@@ -468,7 +470,35 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun onConsumePushNotificationSettingsUpdateEvent() {
         viewModelScope.launch {
-            _state.update { it.copy(isPushNotificationSettingsUpdatedEvent = false) }
+            _state.update { it.copy(isPushNotificationSettingsUpdated = false) }
+        }
+    }
+
+
+    /**
+     * on Consume navigate to chat activity event
+     */
+    fun onConsumeNavigateToChatEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(shouldNavigateToChat = false) }
+        }
+    }
+
+    /**
+     * on Consume chat notification change event
+     */
+    fun onConsumeChatNotificationChangeEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(isChatNotificationChange = false) }
+        }
+    }
+
+    /**
+     * on Consume storage over quota event
+     */
+    fun onConsumeStorageOverQuotaEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(isStorageOverQuota = false) }
         }
     }
 
@@ -491,5 +521,75 @@ class ContactInfoViewModel @Inject constructor(
     fun getInShares() = viewModelScope.launch {
         val email = state.value.email ?: return@launch
         _state.update { it.copy(inShares = getInSharesUseCase(email)) }
+    }
+
+    /**
+     * Method handles sent message to chat click from UI
+     *
+     * returns if user is not online
+     * updates [ContactInfoState.isStorageOverQuota] if storage state is [StorageState.PayWall]
+     * creates chatroom exists else returns existing chat room
+     * updates [ContactInfoState.shouldNavigateToChat] to true
+     */
+    fun sendMessageToChat() = viewModelScope.launch {
+        if (!isOnline()) return@launch
+        if (getStorageState() === StorageState.PayWall) {
+            _state.update { it.copy(isStorageOverQuota = true) }
+        } else {
+            startConversation()
+        }
+    }
+
+    private suspend fun startConversation() {
+        userHandle?.let {
+            runCatching {
+                startConversationUseCase(isGroup = false, userHandles = listOf(it))
+            }.onSuccess {
+                val chatRoom = getChatRoom(it)
+                chatRoom?.let {
+                    _state.update { state ->
+                        state.copy(chatRoom = chatRoom, shouldNavigateToChat = true)
+                    }
+                }
+            }.onFailure {
+                _state.update { state ->
+                    state.copy(snackBarMessage = R.string.create_chat_error)
+                }
+            }
+        }
+    }
+
+    /**
+     * Method handles chat notification click
+     *
+     * Creates chatroom if chatroom is not existing
+     * updates [ContactInfoState.isChatNotificationChange] to true
+     */
+    fun chatNotificationsClicked() = viewModelScope.launch {
+        if (chatId == null || chatId == INVALID_CHAT_HANDLE) {
+            createChatRoom()
+        }
+        _state.update { it.copy(isChatNotificationChange = true) }
+    }
+
+    private suspend fun createChatRoom() {
+        userHandle?.let {
+            runCatching {
+                createChatRoomUseCase(isGroup = false, userHandles = listOf(it))
+            }.onSuccess {
+                val chatRoom = getChatRoom(it)
+                _state.update { state ->
+                    state.copy(chatRoom = chatRoom)
+                }
+            }.onFailure {
+                _state.update { state ->
+                    state.copy(snackBarMessage = R.string.create_chat_error)
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val INVALID_CHAT_HANDLE = -1L
     }
 }

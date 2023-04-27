@@ -4,7 +4,6 @@ import com.google.common.truth.Truth
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.chat.ChatRoom
-import mega.privacy.android.domain.repository.ChatRepository
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -15,8 +14,13 @@ import kotlin.random.Random
 @OptIn(ExperimentalCoroutinesApi::class)
 class StartConversationUseCaseTest {
 
-    private val chatRepository = mock<ChatRepository>()
-    private val underTest = StartConversationUseCase(chatRepository)
+    private val getChatRoomByUserUseCase = mock<GetChatRoomByUserUseCase>()
+    private val createChatRoomUseCase = mock<CreateChatRoomUseCase>()
+    private val underTest =
+        StartConversationUseCase(
+            getChatRoomByUserUseCase = getChatRoomByUserUseCase,
+            createChatRoomUseCase = createChatRoomUseCase,
+        )
     private val existingChatRoomId = Random.nextLong()
     private val newChatRoomId = Random.nextLong()
     private val userHandle = Random.nextLong()
@@ -24,9 +28,9 @@ class StartConversationUseCaseTest {
     @Test
     fun `test that start conversation use-case creates new chat if chatroom does not exist`() =
         runTest {
-            whenever(chatRepository.getChatRoomByUser(userHandle)).thenReturn(null)
+            whenever(getChatRoomByUserUseCase(userHandle)).thenReturn(null)
             whenever(
-                chatRepository.createChat(
+                createChatRoomUseCase(
                     isGroup = false,
                     userHandles = listOf(userHandle)
                 )
@@ -34,7 +38,7 @@ class StartConversationUseCaseTest {
                 newChatRoomId
             )
             val actual = underTest.invoke(isGroup = false, userHandles = listOf(userHandle))
-            verify(chatRepository, times(1)).createChat(
+            verify(createChatRoomUseCase, times(1)).invoke(
                 isGroup = false,
                 userHandles = listOf(userHandle)
             )
@@ -47,9 +51,9 @@ class StartConversationUseCaseTest {
             val chatRoom = mock<ChatRoom> {
                 on { chatId }.thenReturn(existingChatRoomId)
             }
-            whenever(chatRepository.getChatRoomByUser(userHandle)).thenReturn(chatRoom)
+            whenever(getChatRoomByUserUseCase(userHandle)).thenReturn(chatRoom)
             val actual = underTest.invoke(isGroup = false, userHandles = listOf(userHandle))
-            verify(chatRepository, times(0)).createChat(
+            verify(createChatRoomUseCase, times(0)).invoke(
                 isGroup = false,
                 userHandles = listOf(existingChatRoomId)
             )

@@ -16,7 +16,6 @@ class GetInSharesUseCase @Inject constructor(private val nodeRepository: NodeRep
      * @param email email of the selected user
      * @return [UnTypedNode] list of nodes are returned else empty list returned
      */
-    suspend operator fun invoke(email: String): List<UnTypedNode> {
-        return nodeRepository.getInShares(email)
-    }
+    suspend operator fun invoke(email: String): List<UnTypedNode> =
+        nodeRepository.getInShares(email)
 }

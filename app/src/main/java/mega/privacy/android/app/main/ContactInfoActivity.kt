@@ -57,7 +57,6 @@ import mega.privacy.android.app.constants.BroadcastConstants.RETENTION_TIME
 import mega.privacy.android.app.databinding.ActivityChatContactPropertiesBinding
 import mega.privacy.android.app.databinding.LayoutMenuReturnCallBinding
 import mega.privacy.android.app.interfaces.ActionNodeCallback
-import mega.privacy.android.app.listeners.CreateChatListener
 import mega.privacy.android.app.main.contactSharedFolder.ContactSharedFolderFragment
 import mega.privacy.android.app.main.controllers.NodeController
 import mega.privacy.android.app.main.megachat.ChatActivity
@@ -104,10 +103,6 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
 import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaChatError
-import nz.mega.sdk.MegaChatPeerList
-import nz.mega.sdk.MegaChatRequest
-import nz.mega.sdk.MegaChatRequestListenerInterface
 import nz.mega.sdk.MegaChatRoom
 import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
@@ -266,38 +261,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
         override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {}
         override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>?) {}
-    }
-
-    private val megaChatRequestListenerInterface = object : MegaChatRequestListenerInterface {
-        override fun onRequestStart(api: MegaChatApiJava, request: MegaChatRequest) {}
-        override fun onRequestUpdate(api: MegaChatApiJava, request: MegaChatRequest) {}
-        override fun onRequestFinish(
-            api: MegaChatApiJava,
-            request: MegaChatRequest,
-            e: MegaChatError,
-        ) {
-            Timber.d("onRequestFinish")
-            if (request.type == MegaChatRequest.TYPE_CREATE_CHATROOM) {
-                if (e.errorCode == MegaChatError.ERROR_OK) {
-                    Timber.d("Chat created ---> open it!")
-                    navigateToChatActivity(request.chatHandle)
-                } else {
-                    Timber.d("ERROR WHEN CREATING CHAT ${e.errorString}")
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.create_chat_error),
-                        -1
-                    )
-                }
-            }
-        }
-
-        override fun onRequestTemporaryError(
-            api: MegaChatApiJava,
-            request: MegaChatRequest,
-            e: MegaChatError,
-        ) {
-        }
     }
 
     private fun navigateToChatActivity(handle: Long) {
@@ -657,7 +620,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             notificationsMutedText.isVisible = false
             notificationSwitch.isClickable = false
             retentionTimeText.isVisible = false
-            notificationSwitchLayout.setOnClickListener { chatNotificationsClicked() }
+            notificationSwitchLayout.setOnClickListener { viewModel.chatNotificationsClicked() }
             verifyCredentialsLayout.setOnClickListener { verifyCredentialsClicked() }
             sharedFoldersLayout.setOnClickListener { sharedFolderClicked() }
             shareFoldersButton.setOnClickListener { sharedFolderClicked() }
@@ -667,7 +630,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             removeContactLayout.setOnClickListener { showConfirmationRemoveContact() }
             chatVideoCallLayout.setOnClickListener { startingACall(withVideo = true) }
             chatAudioCallLayout.setOnClickListener { startingACall(withVideo = false) }
-            sendChatMessageLayout.setOnClickListener { sendMessageToChat() }
+            sendChatMessageLayout.setOnClickListener { viewModel.sendMessageToChat() }
             nicknameText.setOnClickListener { modifyNickName() }
         }
         with(callInProgress) {
@@ -763,7 +726,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
 
     private fun updateChatFilesSharedLayoutVisibility(shouldShow: Boolean) {
         with(contentContactProperties) {
-            chatFilesShared.isVisible = shouldShow
+            chatFilesSharedLayout.isVisible = shouldShow
             dividerChatFilesSharedLayout.isVisible = shouldShow
         }
     }
@@ -999,27 +962,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             ?: run { Timber.w("Selected contact NULL") }
     }
 
-
-    private fun sendMessageToChat() {
-        Timber.d("sendMessageToChat")
-        if (!CallUtil.checkConnection(this)) return
-        if (viewModel.getStorageState() === StorageState.PayWall) {
-            showOverDiskQuotaPaywallWarning()
-            return
-        }
-        val userHandle = viewModel.userHandle ?: return
-        val chat = megaChatApi.getChatRoomByUser(userHandle)
-        if (chat == null) {
-            Timber.d("No chat, create it!")
-            val peers = MegaChatPeerList.createInstance()
-            peers.addPeer(userHandle, MegaChatPeerList.PRIV_STANDARD)
-            megaChatApi.createChat(false, peers, megaChatRequestListenerInterface)
-        } else {
-            Timber.d("There is already a chat, open it!")
-            navigateToChatActivity(chat.chatId)
-        }
-    }
-
     /**
      * Start call with chat created
      *
@@ -1054,15 +996,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             if (contactInfoState.isUserRemoved) {
                 finish()
             }
-            if (contactInfoState.isPushNotificationSettingsUpdatedEvent) {
-                ChatUtil.checkSpecificChatNotifications(
-                    chatHandle,
-                    contentContactProperties.notificationSwitch,
-                    contentContactProperties.notificationsMutedText,
-                    this@ContactInfoActivity
-                )
-                viewModel.onConsumePushNotificationSettingsUpdateEvent()
-            }
             if (contactInfoState.error != null) {
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
@@ -1072,6 +1005,11 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             } else if (contactInfoState.isCallStarted == true) {
                 enableCallLayouts(true)
             }
+
+            if (contactInfoState.callStatusChanged) {
+                checkScreenRotationToShowCall()
+            }
+            handleOneOffEvents(contactInfoState)
             contactInfoState.snackBarMessage?.let {
                 showSnackbar(
                     Constants.SNACKBAR_TYPE,
@@ -1080,13 +1018,40 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 )
                 viewModel.onConsumeSnackBarMessageEvent()
             }
-            if (contactInfoState.callStatusChanged) {
-                checkScreenRotationToShowCall()
-            }
+
             updateVerifyCredentialsLayout(contactInfoState)
             updateUserStatusChanges(contactInfoState)
             updateBasicInfo(contactInfoState)
             setFoldersButtonText(contactInfoState.inShares)
+        }
+    }
+
+    private fun handleOneOffEvents(contactInfoState: ContactInfoState) {
+        when {
+            contactInfoState.shouldNavigateToChat -> {
+                viewModel.chatId?.let { navigateToChatActivity(it) }
+                viewModel.onConsumeNavigateToChatEvent()
+            }
+
+            contactInfoState.isChatNotificationChange -> {
+                chatNotificationsChange()
+                viewModel.onConsumeChatNotificationChangeEvent()
+            }
+
+            contactInfoState.isStorageOverQuota -> {
+                showOverDiskQuotaPaywallWarning()
+                viewModel.onConsumeStorageOverQuotaEvent()
+            }
+
+            contactInfoState.isPushNotificationSettingsUpdated -> {
+                ChatUtil.checkSpecificChatNotifications(
+                    chatHandle,
+                    contentContactProperties.notificationSwitch,
+                    contentContactProperties.notificationsMutedText,
+                    this@ContactInfoActivity
+                )
+                viewModel.onConsumePushNotificationSettingsUpdateEvent()
+            }
         }
     }
 
@@ -1319,7 +1284,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         drawableShare?.colorFilter = null
         megaApi.removeGlobalListener(megaGlobalListenerInterface)
         megaApi.removeRequestListener(this)
-        megaChatApi.removeChatRequestListener(megaChatRequestListenerInterface)
         unregisterReceiver(retentionTimeReceiver)
         unregisterReceiver(manageShareReceiver)
         unregisterReceiver(destroyActionModeReceiver)
@@ -1405,49 +1369,17 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     /**
-     * Method that makes the necessary updates when the chat has been created.
-     *
-     * @param newChats The created chats.
-     */
-    private fun chatsCreated(newChats: List<MegaChatRoom>) {
-        if (newChats.isNotEmpty()) {
-            val newChat = newChats[0]
-            if (newChat.chatId != MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-                chat = newChat
-                updateUI()
-                chatNotificationsClicked()
-            }
-        }
-    }
-
-    /**
      * Make the necessary actions when clicking on the Chat Notifications layout.
      */
-    private fun chatNotificationsClicked() {
-        if (chatHandle == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
-            Timber.d("The chat doesn't exist, create it")
-            val chats = ArrayList<MegaChatRoom>()
-            val usersNoChat = ArrayList<MegaUser>()
-            user?.let {
-                usersNoChat.add(it)
-                val listener = CreateChatListener(
-                    CreateChatListener.CONFIGURE_DND, chats, usersNoChat, this, this
-                ) { newChats: List<MegaChatRoom> -> chatsCreated(newChats) }
-                val peers = MegaChatPeerList.createInstance()
-                peers.addPeer(it.handle, MegaChatPeerList.PRIV_STANDARD)
-                megaChatApi.createChat(false, peers, listener)
-            }
+    private fun chatNotificationsChange() {
+        if (contentContactProperties.notificationSwitch.isChecked) {
+            ChatUtil.createMuteNotificationsAlertDialogOfAChat(this, chatHandle)
         } else {
-            Timber.d("The chat exists")
-            if (contentContactProperties.notificationSwitch.isChecked) {
-                ChatUtil.createMuteNotificationsAlertDialogOfAChat(this, chatHandle)
-            } else {
-                getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
-                    this,
-                    Constants.NOTIFICATIONS_ENABLED,
-                    chatHandle
-                )
-            }
+            getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
+                this,
+                Constants.NOTIFICATIONS_ENABLED,
+                chatHandle
+            )
         }
     }
 
