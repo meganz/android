@@ -13,6 +13,7 @@ import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.photos.albums.coverselection.AlbumCoverSelectionScreen
 import mega.privacy.android.app.presentation.photos.albums.decryptionkey.AlbumDecryptionKeyScreen
 import mega.privacy.android.app.presentation.photos.albums.getlink.AlbumGetLinkScreen
+import mega.privacy.android.app.presentation.photos.albums.getmultiplelinks.AlbumGetMultipleLinksScreen
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumFlow
 import mega.privacy.android.app.presentation.photos.albums.photosselection.AlbumPhotosSelectionScreen
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -27,6 +28,7 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
         AlbumPhotosSelectionScreen,
         AlbumCoverSelectionScreen,
         AlbumGetLinkScreen,
+        AlbumGetMultipleLinksScreen,
         AlbumDecryptionKeyScreen,
     }
 
@@ -88,6 +90,23 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
                             },
                         )
                     }
+                    AlbumScreen.AlbumGetMultipleLinksScreen -> {
+                        AlbumGetMultipleLinksScreen(
+                            onBack = ::finish,
+                            onShareLinks = { links ->
+                                val linksString = links.joinToString(System.lineSeparator())
+                                val intent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, linksString)
+                                }
+                                val shareIntent = Intent.createChooser(
+                                    intent,
+                                    getString(R.string.general_share)
+                                )
+                                startActivity(shareIntent)
+                            },
+                        )
+                    }
                     AlbumScreen.AlbumDecryptionKeyScreen -> {
                         AlbumDecryptionKeyScreen(
                             onBack = ::finish,
@@ -134,6 +153,16 @@ class AlbumScreenWrapperActivity : AppCompatActivity() {
         ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
             putExtra(ALBUM_SCREEN, AlbumScreen.AlbumGetLinkScreen.name)
             putExtra(ALBUM_ID, albumId.id)
+        }
+
+        fun createAlbumGetMultipleLinksScreen(
+            context: Context,
+            albumIds: Set<AlbumId>,
+        ) = Intent(context, AlbumScreenWrapperActivity::class.java).apply {
+            putExtra(ALBUM_SCREEN, AlbumScreen.AlbumGetMultipleLinksScreen.name)
+            putExtra(ALBUM_ID, albumIds.map {
+                it.id
+            }.toLongArray())
         }
 
         fun createAlbumDecryptionKeyScreen(

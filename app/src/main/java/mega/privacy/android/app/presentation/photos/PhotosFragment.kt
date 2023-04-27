@@ -41,6 +41,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.extensions.navigateToAppSettings
@@ -138,7 +139,15 @@ class PhotosFragment : Fragment() {
         super.onCreate(savedInstanceState)
         managerActivity = activity as ManagerActivity
         timelineActionModeCallback = TimelineActionModeCallback(this)
-        albumsActionModeCallback = AlbumsActionModeCallback(this)
+
+        val isAlbumSharingEnabled = runBlocking {
+            getFeatureFlagUseCase(AppFeatures.AlbumSharing)
+        }
+
+        albumsActionModeCallback = AlbumsActionModeCallback(
+            fragment = this,
+            isAlbumSharingEnabled = isAlbumSharingEnabled,
+        )
     }
 
     override fun onCreateView(
@@ -614,6 +623,25 @@ class PhotosFragment : Fragment() {
         albumsViewModel.setCurrentSort(Sort.DEFAULT)
         albumsViewModel.setCurrentMediaType(FilterMediaType.DEFAULT)
         if (resetMessage) albumsViewModel.setSnackBarMessage("")
+    }
+
+    fun openAlbumGetLinkScreen() {
+        val albumId = albumsViewModel.state.value.selectedAlbumIds.elementAt(0)
+        val intent = AlbumScreenWrapperActivity.createAlbumGetLinkScreen(
+            context = requireContext(),
+            albumId = albumId,
+        )
+        startActivity(intent)
+        activity?.overridePendingTransition(0, 0)
+    }
+
+    fun openAlbumGetMultipleLinksScreen() {
+        val intent = AlbumScreenWrapperActivity.createAlbumGetMultipleLinksScreen(
+            context = requireContext(),
+            albumIds = albumsViewModel.state.value.selectedAlbumIds,
+        )
+        startActivity(intent)
+        activity?.overridePendingTransition(0, 0)
     }
 
     /**

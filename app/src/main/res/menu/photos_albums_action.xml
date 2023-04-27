@@ -1,6 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_menu_get_link"
+        android:icon="@drawable/ic_link"
+        android:orderInCategory="0"
+        app:iconTint="?attr/colorSecondary"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_delete"
         android:icon="@drawable/ic_trash_bin"
         android:orderInCategory="1"

@@ -8,8 +8,12 @@ import mega.privacy.android.app.presentation.photos.PhotosFragment
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.domain.entity.photos.Album
 
+/**
+ * Action Mode Callback class for Albums
+ */
 class AlbumsActionModeCallback(
     private val fragment: PhotosFragment,
+    private val isAlbumSharingEnabled: Boolean,
 ) : ActionMode.Callback {
     override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
         val inflater = mode?.menuInflater
@@ -18,12 +22,28 @@ class AlbumsActionModeCallback(
     }
 
     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+        menu?.findItem(R.id.action_menu_get_link)?.let {
+            it.isVisible = isAlbumSharingEnabled
+            it.isEnabled = isAlbumSharingEnabled
+            it.title = fragment.context?.resources?.getQuantityString(
+                R.plurals.get_links, fragment.albumsViewModel.state.value.selectedAlbumIds.size
+            )
+        }
         updateSelectAllMenu(menu, fragment.albumsViewModel.state.value)
         return true
     }
 
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
         when (item?.itemId) {
+            R.id.action_menu_get_link -> {
+                val selectedAlbums = fragment.albumsViewModel.state.value.selectedAlbumIds
+                if (selectedAlbums.size == 1) {
+                    fragment.openAlbumGetLinkScreen()
+                } else {
+                    fragment.openAlbumGetMultipleLinksScreen()
+                }
+                fragment.albumsViewModel.clearAlbumSelection()
+            }
             R.id.action_delete -> {
                 fragment.albumsViewModel.showDeleteAlbumsConfirmation()
             }
