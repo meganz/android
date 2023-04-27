@@ -6,7 +6,7 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import mega.privacy.android.app.di.photos.PhotosUseCases
-import mega.privacy.android.domain.usecase.GetChatPhotoByMessageIdUseCase
+import mega.privacy.android.domain.usecase.slideshow.GetChatPhotoByMessageIdUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
@@ -51,9 +51,6 @@ object TestPhotosUseCases {
 
     @Provides
     fun provideGetImageByNodeHandle(): GetImageByNodeHandle = mock()
-
-    @Provides
-    fun provideGetChatPhotoByMessageIdUseCase(): GetChatPhotoByMessageIdUseCase = mock()
 
     @Provides
     fun provideGetImageForChatMessage(): GetImageForChatMessage = mock()

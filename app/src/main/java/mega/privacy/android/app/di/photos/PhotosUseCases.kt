@@ -25,7 +25,6 @@ import mega.privacy.android.domain.usecase.DownloadPreview
 import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.GetChatPhotoByMessageIdUseCase
 import mega.privacy.android.domain.usecase.GetDefaultAlbumPhotos
 import mega.privacy.android.domain.usecase.GetPhotosByIds
 import mega.privacy.android.domain.usecase.GetPreview
@@ -104,9 +103,5 @@ abstract class PhotosUseCases {
         @Provides
         fun provideGetPhotosByIds(repository: PhotosRepository): GetPhotosByIds =
             GetPhotosByIds(repository::getPhotosByIds)
-
-        @Provides
-        fun provideGetChatPhotoByMessageId(repository: PhotosRepository): GetChatPhotoByMessageIdUseCase =
-            GetChatPhotoByMessageIdUseCase(repository::getChatPhotoByMessageId)
     }
 }
