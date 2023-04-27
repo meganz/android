@@ -388,6 +388,15 @@ class GetNodeUseCase @Inject constructor(
             ?: megaApiFolder.authorizeNode(megaApiFolder.getNodeByHandle(this))
 
     /**
+     * Get an authorized MegaNode that can be downloaded with any instance of MegaApi
+     *
+     * @param nodeHandle    node handle
+     * @return  MegaNode
+     */
+    fun getAuthorizedNode(nodeHandle: Long): MegaNode? =
+        megaApiFolder.getNodeByHandle(nodeHandle)?.let { megaApiFolder.authorizeNode(it) }
+
+    /**
      * Check if a node is available
      *
      * @param nodeHandle  node handle

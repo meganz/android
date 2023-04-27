@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.namecollision.data.NameCollisionType
@@ -30,6 +32,7 @@ import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
 import mega.privacy.android.domain.entity.node.FileNode
@@ -69,7 +72,10 @@ class FolderLinkViewModel @Inject constructor(
     private val getFolderParentNodeUseCase: GetFolderParentNodeUseCase,
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase,
     private val addNodeType: AddNodeType,
-    private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper
+    private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
+    private val getNodeByHandle: GetNodeByHandle,
+    private val getNodeListByIds: GetNodeListByIds,
+    private val getNodeUseCase: GetNodeUseCase,
 ) : ViewModel() {
 
     /**
@@ -377,7 +383,7 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Handle clear all clicked
      */
-    fun onClearAllClicked() {
+    fun clearAllSelection() {
         val list = _state.value.nodesList
         list.forEach { it.isSelected = false }
         _state.update {
@@ -536,4 +542,82 @@ class FolderLinkViewModel @Inject constructor(
      * Reset and notify that openFile event is consumed
      */
     fun resetOpenFile() = _state.update { it.copy(openFile = consumed()) }
+
+    /**
+     * Handle import button click
+     *
+     * @param node  Node for which import is clicked
+     */
+    fun handleImportClick(node: NodeUIItem?) {
+        state.value.rootNode?.let {
+            _state.update { it.copy(importNode = node, selectImportLocation = triggered) }
+        }
+    }
+
+    /**
+     * Reset and notify that selectImportLocation event is consumed
+     */
+    fun resetSelectImportLocation() = _state.update { it.copy(selectImportLocation = consumed) }
+
+    /**
+     * Reset import node
+     */
+    fun resetImportNode() = _state.update { it.copy(importNode = null) }
+
+    /**
+     * Handle node imports
+     *
+     * @param toHandle  Handle of the destination node
+     * @param context   Context
+     */
+    fun importNodes(toHandle: Long, context: Context) {
+        viewModelScope.launch {
+            if (isMultipleNodeSelected()) {
+                Timber.d("Is multiple select")
+                val selectedNodes = getSelectedNodes()
+                if (selectedNodes.isEmpty())
+                    return@launch
+                val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
+                val selectedMegaNodes = getNodeListByIds(selectedNodeIds)
+                checkNameCollision(selectedMegaNodes, toHandle, context)
+            } else {
+                val importNodeHandle =
+                    state.value.importNode?.id?.longValue ?: state.value.rootNode?.id?.longValue
+                if (importNodeHandle != null) {
+                    val selectedNode = getNodeUseCase.getAuthorizedNode(importNodeHandle)
+                    selectedNode?.let { checkNameCollision(listOf(it), toHandle, context) }
+                    resetImportNode()
+                } else {
+                    Timber.w("Selected Node is NULL")
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle Save to device button click
+     */
+    fun handleSaveToDevice() {
+        viewModelScope.launch {
+            if (isMultipleNodeSelected()) {
+                val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
+                val selectedNodes = getNodeListByIds(selectedNodeIds)
+                _state.update { it.copy(downloadNodes = triggered(selectedNodes)) }
+                clearAllSelection()
+            } else {
+                state.value.rootNode?.let { rootNode ->
+                    val downloadNodeId =
+                        state.value.parentNode?.id?.longValue ?: rootNode.id.longValue
+                    getNodeByHandle(downloadNodeId)?.let { downloadNode ->
+                        _state.update { it.copy(downloadNodes = triggered(listOf(downloadNode))) }
+                    }
+                } ?: Timber.w("rootNode null!!")
+            }
+        }
+    }
+
+    /**
+     * Reset and notify that downloadNodes event is consumed
+     */
+    fun resetDownloadNode() = _state.update { it.copy(downloadNodes = consumed()) }
 }

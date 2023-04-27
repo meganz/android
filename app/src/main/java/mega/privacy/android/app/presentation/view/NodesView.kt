@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -117,7 +116,7 @@ private fun NodeGridView(
     LazyVerticalGrid(
         state = gridState,
         columns = GridCells.Fixed(spanCount),
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         contentPadding = PaddingValues(4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -181,7 +180,7 @@ private fun NodeListView(
     showSortOrder: Boolean,
     listState: LazyListState,
 ) {
-    LazyColumn(state = listState) {
+    LazyColumn(state = listState, modifier = modifier) {
         item(
             key = "header"
         ) {

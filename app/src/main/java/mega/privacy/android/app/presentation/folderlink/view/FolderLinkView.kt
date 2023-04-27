@@ -4,11 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -47,8 +50,11 @@ import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.view.NodesView
+import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
 import mega.privacy.android.domain.entity.preference.ViewType
+import nz.mega.sdk.MegaNode
 
 /**
  * Main view of FolderLinkActivity
@@ -69,8 +75,13 @@ internal fun FolderLinkView(
     onSelectAllActionClicked: () -> Unit,
     onClearAllActionClicked: () -> Unit,
     onSaveToDeviceClicked: () -> Unit,
+    onImportClicked: (NodeUIItem?) -> Unit,
     onOpenFile: (Intent) -> Unit,
     onResetOpenFile: () -> Unit,
+    onDownloadNode: (List<MegaNode>) -> Unit,
+    onResetDownloadNode: () -> Unit,
+    onSelectImportLocation: () -> Unit,
+    onResetSelectImportLocation: () -> Unit,
     emptyViewString: String,
 ) {
     val listState = rememberLazyListState()
@@ -91,6 +102,18 @@ internal fun FolderLinkView(
         event = state.openFile,
         onConsumed = onResetOpenFile,
         action = onOpenFile
+    )
+
+    EventEffect(
+        event = state.downloadNodes,
+        onConsumed = onResetDownloadNode,
+        action = onDownloadNode
+    )
+
+    EventEffect(
+        event = state.selectImportLocation,
+        onConsumed = onResetSelectImportLocation,
+        action = onSelectImportLocation
     )
 
     Scaffold(
@@ -126,24 +149,34 @@ internal fun FolderLinkView(
                 state.isNodesFetched
             )
         } else {
-            NodesView(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(horizontal = 8.dp),
-                nodeUIItems = state.nodesList,
-                stringUtilWrapper = stringUtilWrapper,
-                onMenuClick = onMenuClick,
-                onItemClicked = onItemClicked,
-                onLongClick = onLongClick,
-                sortOrder = "",
-                isListView = state.currentViewType == ViewType.LIST,
-                onSortOrderClick = onSortOrderClick,
-                onChangeViewTypeClick = onChangeViewTypeClick,
-                showSortOrder = false,
-                listState = listState,
-                gridState = gridState
-            )
+            Column {
+                NodesView(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 8.dp),
+                    nodeUIItems = state.nodesList,
+                    stringUtilWrapper = stringUtilWrapper,
+                    onMenuClick = onMenuClick,
+                    onItemClicked = onItemClicked,
+                    onLongClick = onLongClick,
+                    sortOrder = "",
+                    isListView = state.currentViewType == ViewType.LIST,
+                    onSortOrderClick = onSortOrderClick,
+                    onChangeViewTypeClick = onChangeViewTypeClick,
+                    showSortOrder = false,
+                    listState = listState,
+                    gridState = gridState
+                )
+                ImportDownloadView(
+                    Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .background(MaterialTheme.colors.grey_020_grey_700),
+                    hasDbCredentials = state.hasDbCredentials,
+                    onImportClicked = onImportClicked,
+                    onSaveToDeviceClicked = onSaveToDeviceClicked
+                )
+            }
         }
     }
 }
@@ -248,6 +281,29 @@ internal fun FolderLinkSelectedTopAppBar(
 }
 
 @Composable
+internal fun ImportDownloadView(
+    modifier: Modifier,
+    hasDbCredentials: Boolean,
+    onImportClicked: (NodeUIItem?) -> Unit,
+    onSaveToDeviceClicked: () -> Unit
+) {
+    Row(modifier = modifier, horizontalArrangement = Arrangement.End) {
+        if (hasDbCredentials) {
+            TextMegaButton(
+                modifier = Modifier.padding(end = 16.dp),
+                textId = R.string.add_to_cloud,
+                onClick = { onImportClicked(null) }
+            )
+        }
+        TextMegaButton(
+            modifier = Modifier.padding(end = 16.dp),
+            textId = R.string.general_save_to_device,
+            onClick = onSaveToDeviceClicked
+        )
+    }
+}
+
+@Composable
 internal fun EmptyFolderLinkView(
     modifier: Modifier,
     emptyViewString: String,
@@ -316,6 +372,23 @@ private fun PreviewFolderLinkSelectedTopAppBar() {
             onBackPressed = {},
             onSelectAllClicked = {},
             onClearAllClicked = {},
+            onSaveToDeviceClicked = {}
+        )
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkSimpleAppBarPreview")
+@Composable
+private fun PreviewImportDownloadView() {
+    AndroidTheme(isDark = isSystemInDarkTheme()) {
+        ImportDownloadView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
+                .background(MaterialTheme.colors.grey_020_grey_700),
+            hasDbCredentials = true,
+            onImportClicked = {},
             onSaveToDeviceClicked = {}
         )
     }

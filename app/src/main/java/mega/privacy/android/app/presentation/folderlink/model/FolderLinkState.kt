@@ -2,12 +2,14 @@ package mega.privacy.android.app.presentation.folderlink.model
 
 import android.content.Intent
 import androidx.annotation.StringRes
+import de.palm.composestateevents.StateEvent
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.preference.ViewType
+import nz.mega.sdk.MegaNode
 
 /**
  * Data class defining the state of [mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel]
@@ -31,6 +33,9 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @property selectedNodeCount          Count of nodes selected
  * @property finishActivity             Whether to finish the activity
  * @property openFile                   State to handle file opening
+ * @property downloadNodes              State to download nodes
+ * @property importNode                 Node to import
+ * @property selectImportLocation       State to open location selection
  * @property errorDialogTitle           String id of title for error dialog
  * @property errorDialogContent         String id of content for error dialog
  * @property snackBarMessage            String id of content for snack bar
@@ -55,6 +60,9 @@ data class FolderLinkState(
     val selectedNodeCount: Int = 0,
     val finishActivity: Boolean = false,
     val openFile: StateEventWithContent<Intent> = consumed(),
+    val downloadNodes: StateEventWithContent<List<MegaNode>> = consumed(),
+    val importNode: NodeUIItem? = null,
+    val selectImportLocation: StateEvent = consumed,
     @StringRes val errorDialogTitle: Int = -1,
     @StringRes val errorDialogContent: Int = -1,
     @StringRes val snackBarMessage: Int = -1,

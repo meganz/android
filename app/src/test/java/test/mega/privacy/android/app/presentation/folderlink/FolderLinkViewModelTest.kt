@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -12,12 +14,15 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.GetNodeByHandle
+import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
 import mega.privacy.android.app.usecase.CopyNodeUseCase
+import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.domain.entity.folderlink.FetchFolderNodesResult
 import mega.privacy.android.domain.entity.folderlink.FolderLoginStatus
@@ -34,6 +39,7 @@ import mega.privacy.android.domain.usecase.folderlink.LoginToFolderUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.viewtype.MonitorViewType
 import mega.privacy.android.domain.usecase.viewtype.SetViewType
+import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -61,6 +67,9 @@ class FolderLinkViewModelTest {
     private val getFolderLinkChildrenNodesUseCase: GetFolderLinkChildrenNodesUseCase = mock()
     private val addNodeType: AddNodeType = mock()
     private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper = mock()
+    private val getNodeByHandle: GetNodeByHandle = mock()
+    private val getNodeListByIds: GetNodeListByIds = mock()
+    private val getNodeUseCase: GetNodeUseCase = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -91,7 +100,10 @@ class FolderLinkViewModelTest {
             getFolderParentNodeUseCase,
             getFolderLinkChildrenNodesUseCase,
             addNodeType,
-            getIntentToOpenFileMapper
+            getIntentToOpenFileMapper,
+            getNodeByHandle,
+            getNodeListByIds,
+            getNodeUseCase
         )
     }
 
@@ -115,6 +127,10 @@ class FolderLinkViewModelTest {
             assertThat(initial.title).isEqualTo("")
             assertThat(initial.selectedNodeCount).isEqualTo(0)
             assertThat(initial.finishActivity).isFalse()
+            assertThat(initial.importNode).isNull()
+            assertThat(initial.openFile).isInstanceOf(consumed<Intent>().javaClass)
+            assertThat(initial.downloadNodes).isInstanceOf(consumed<List<MegaNode>>().javaClass)
+            assertThat(initial.selectImportLocation).isEqualTo(consumed)
             assertThat(initial.errorDialogTitle).isEqualTo(-1)
             assertThat(initial.errorDialogContent).isEqualTo(-1)
             assertThat(initial.snackBarMessage).isEqualTo(-1)
@@ -325,7 +341,7 @@ class FolderLinkViewModelTest {
             newValue.nodesList.forEach {
                 assertThat(it.isSelected).isTrue()
             }
-            underTest.onClearAllClicked()
+            underTest.clearAllSelection()
             newValue = expectMostRecentItem()
             assertThat(newValue.selectedNodeCount).isEqualTo(0)
             newValue.nodesList.forEach {
@@ -378,6 +394,56 @@ class FolderLinkViewModelTest {
             val newValue = expectMostRecentItem()
             assertThat(newValue.url).isEqualTo(url)
             assertThat(newValue.folderSubHandle).isEqualTo(folderSubHandle)
+        }
+    }
+
+    @Test
+    fun `test that on resetting openFile sets the value as consumed`() = runTest {
+        underTest.state.test {
+            underTest.resetOpenFile()
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.openFile).isInstanceOf(consumed<Intent>().javaClass)
+        }
+    }
+
+    @Test
+    fun `test that on resetting downloadNode sets the value as consumed`() = runTest {
+        underTest.state.test {
+            underTest.resetDownloadNode()
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.downloadNodes).isInstanceOf(consumed<List<MegaNode>>().javaClass)
+        }
+    }
+
+    @Test
+    fun `test that on resetting selectImportLocation sets the value as consumed`() = runTest {
+        underTest.state.test {
+            underTest.resetSelectImportLocation()
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.selectImportLocation).isEqualTo(consumed)
+        }
+    }
+
+    @Test
+    fun `test that handleImportClick triggers selectImportLocation event`() = runTest {
+        val base64Handle = "1234"
+        val rootNodeName = "RootNode"
+        val rootNode = mock<TypedFolderNode>()
+        val childNode = mock<TypedNode>()
+        val childrenNodes = listOf(childNode)
+        val node = NodeUIItem(mock(), isSelected = false, isInvisible = false)
+        val fetchFolderNodeResult =
+            FetchFolderNodesResult(rootNode, mock(), childrenNodes)
+
+        whenever(rootNode.name).thenReturn(rootNodeName)
+        whenever(fetchFolderNodesUseCase(base64Handle)).thenReturn(fetchFolderNodeResult)
+
+        underTest.state.test {
+            underTest.fetchNodes(base64Handle)
+            underTest.handleImportClick(node)
+            val newValue = expectMostRecentItem()
+            assertThat(newValue.selectImportLocation).isEqualTo(triggered)
+            assertThat(newValue.importNode).isEqualTo(node)
         }
     }
 

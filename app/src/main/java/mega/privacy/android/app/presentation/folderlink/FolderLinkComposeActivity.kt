@@ -7,6 +7,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
@@ -26,6 +28,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.components.saver.NodeSaver
 import mega.privacy.android.app.databinding.ActivityFolderLinkComposeBinding
 import mega.privacy.android.app.main.DecryptAlertDialog
+import mega.privacy.android.app.main.FileExplorerActivity
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
@@ -37,6 +40,7 @@ import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmD
 import mega.privacy.android.app.utils.ColorUtils
 import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.MegaNodeUtil
+import mega.privacy.android.app.utils.MegaProgressDialogUtil
 import mega.privacy.android.app.utils.permission.PermissionUtils
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
@@ -79,6 +83,44 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
         }
     }
 
+    @SuppressLint("CheckResult")
+    private val selectImportFolderResult =
+        ActivityResultCallback<ActivityResult> { activityResult ->
+            val resultCode = activityResult.resultCode
+            val intent = activityResult.data
+
+            if (resultCode != RESULT_OK || intent == null) {
+                viewModel.resetImportNode()
+                return@ActivityResultCallback
+            }
+
+            if (!viewModel.isConnected) {
+                try {
+                    statusDialog?.dismiss()
+                } catch (exception: Exception) {
+                    Timber.e(exception)
+                }
+
+                viewModel.resetImportNode()
+                return@ActivityResultCallback
+            }
+
+            val toHandle = intent.getLongExtra("IMPORT_TO", 0)
+            statusDialog =
+                MegaProgressDialogUtil.createProgressDialog(
+                    this,
+                    getString(R.string.general_importing)
+                )
+            statusDialog?.show()
+
+            viewModel.importNodes(toHandle, this)
+        }
+
+    private val selectImportFolderLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+        selectImportFolderResult
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFolderLinkComposeBinding.inflate(layoutInflater)
@@ -116,13 +158,24 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onChangeViewTypeClick = viewModel::onChangeViewTypeClicked,
                 onSortOrderClick = { },
                 onSelectAllActionClicked = viewModel::onSelectAllClicked,
-                onClearAllActionClicked = viewModel::onClearAllClicked,
-                onSaveToDeviceClicked = { },
+                onClearAllActionClicked = viewModel::clearAllSelection,
+                onSaveToDeviceClicked = viewModel::handleSaveToDevice,
+                onImportClicked = viewModel::handleImportClick,
                 onOpenFile = ::onOpenFile,
                 onResetOpenFile = viewModel::resetOpenFile,
-                getEmptyViewString()
+                onDownloadNode = ::downloadNodes,
+                onResetDownloadNode = viewModel::resetDownloadNode,
+                onSelectImportLocation = ::onSelectImportLocation,
+                onResetSelectImportLocation = viewModel::resetSelectImportLocation,
+                emptyViewString = getEmptyViewString()
             )
         }
+    }
+
+    private fun onSelectImportLocation() {
+        val intent = Intent(this, FileExplorerActivity::class.java)
+        intent.action = FileExplorerActivity.ACTION_PICK_IMPORT_FOLDER
+        selectImportFolderLauncher.launch(intent)
     }
 
     /**
@@ -173,6 +226,11 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                             AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
                             nameCollisionActivityContract?.launch(it.collisions)
                             viewModel.resetLaunchCollisionActivity()
+                            viewModel.clearAllSelection()
+                        }
+                        it.copyResultText != null || it.copyThrowable != null -> {
+                            showCopyResult(it.copyResultText, it.copyThrowable)
+                            viewModel.resetShowCopyResult()
                         }
                         it.isLoginComplete && it.isNodesFetched -> {}
                         it.askForDecryptionKeyDialog -> {
@@ -184,7 +242,6 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                                 showErrorDialog(it.errorDialogTitle, it.errorDialogContent)
 
                             } catch (ex: Exception) {
-                                //showSnackbar(it.snackBarMessage)
                                 finish()
                             }
                         }
@@ -220,6 +277,21 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
             viewModel.resetAskForDecryptionKeyDialog()
         }
         decryptAlertDialog.show(supportFragmentManager, TAG_DECRYPT)
+    }
+
+    /**
+     * Shows the copy Result.
+     *
+     * @param copyResultText Copy result text.
+     * @param throwable
+     */
+
+    private fun showCopyResult(copyResultText: String?, throwable: Throwable?) {
+        AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
+        viewModel.clearAllSelection()
+        if (copyResultText == null) {
+            throwable?.let { manageCopyMoveException(it) }
+        }
     }
 
     override fun onDialogPositiveClick(key: String?) {

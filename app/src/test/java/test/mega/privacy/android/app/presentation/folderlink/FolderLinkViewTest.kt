@@ -40,8 +40,13 @@ class FolderLinkViewTest {
                 onSelectAllActionClicked = { },
                 onClearAllActionClicked = { },
                 onSaveToDeviceClicked = { },
+                onImportClicked = { },
                 onOpenFile = { },
                 onResetOpenFile = { },
+                onDownloadNode = { },
+                onResetDownloadNode = { },
+                onSelectImportLocation = { },
+                onResetSelectImportLocation = { },
                 emptyViewString = stringResource(id = R.string.file_browser_empty_folder)
             )
         }
@@ -94,5 +99,21 @@ class FolderLinkViewTest {
             )
         )
         composeTestRule.onNodeWithText(nodeName).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that import and save to device buttons are shown`() {
+        val nodeName = "Folder1"
+        val node = mock<TypedFolderNode>()
+        whenever(node.name).thenReturn(nodeName)
+        setComposeContent(
+            FolderLinkState(
+                isNodesFetched = true,
+                nodesList = listOf(NodeUIItem(node, isSelected = false, isInvisible = false)),
+                hasDbCredentials = true
+            )
+        )
+        composeTestRule.onNodeWithText(R.string.add_to_cloud).assertIsDisplayed()
+        composeTestRule.onNodeWithText(R.string.general_save_to_device).assertIsDisplayed()
     }
 }
