@@ -36,7 +36,7 @@ import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.GetCameraSortOrder
 import mega.privacy.android.domain.usecase.photos.GetPhotosByFolderIdUseCase
-import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandle
+import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerStartUseCase
@@ -61,7 +61,7 @@ class MediaDiscoveryViewModel @Inject constructor(
     private val megaApiHttpServerIsRunningUseCase: MegaApiHttpServerIsRunningUseCase,
     private val megaApiHttpServerStartUseCase: MegaApiHttpServerStartUseCase,
     private val megaApiHttpServerSetMaxBufferSizeUseCase: MegaApiHttpServerSetMaxBufferSizeUseCase,
-    private val getFileUrlByNodeHandle: GetFileUrlByNodeHandle,
+    private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MediaDiscoveryViewState())
@@ -308,7 +308,7 @@ class MediaDiscoveryViewModel @Inject constructor(
             }
         )
 
-        getFileUrlByNodeHandle(handle)?.let { url ->
+        getFileUrlByNodeHandleUseCase(handle)?.let { url ->
             Uri.parse(url)?.let { uri ->
                 intent.setDataAndType(uri, typeForName(name).type)
             }

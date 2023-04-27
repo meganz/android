@@ -29,14 +29,14 @@ class TrackPlaybackPositionUseCaseTest {
 
     private val mediaId: Long = 1234567
 
-    private val getTicker = mock<GetTicker>()
+    private val getTicker = mock<GetTickerUseCase>()
 
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         underTest = TrackPlaybackPositionUseCase(
             mediaPlayerRepository = mediaPlayerRepository,
-            getTicker = getTicker
+            getTickerUseCase = getTicker
         )
     }
 

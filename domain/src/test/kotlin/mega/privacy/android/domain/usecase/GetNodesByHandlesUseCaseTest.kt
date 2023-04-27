@@ -2,7 +2,6 @@ package mega.privacy.android.domain.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
-import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import org.junit.Assert.*
@@ -14,8 +13,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetNodesByHandlesTest {
-    lateinit var underTest: GetNodesByHandles
+class GetNodesByHandlesUseCaseTest {
+    lateinit var underTest: GetNodesByHandlesUseCase
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
     private val addNodeType = mock<AddNodeType>()
 
@@ -25,7 +24,7 @@ class DefaultGetNodesByHandlesTest {
 
     @Before
     fun setUp() {
-        underTest = DefaultGetNodesByHandles(mediaPlayerRepository, addNodeType)
+        underTest = GetNodesByHandlesUseCase(mediaPlayerRepository, addNodeType)
     }
 
     @Test
@@ -33,7 +32,8 @@ class DefaultGetNodesByHandlesTest {
         runTest {
             val handles: List<Long> = listOf(12345, 23456)
             whenever(mediaPlayerRepository.getNodesByHandles(handles)).thenReturn(
-                unTypedNodeList)
+                unTypedNodeList
+            )
 
             underTest(handles)
 

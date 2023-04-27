@@ -29,7 +29,7 @@ import mega.privacy.android.app.utils.MegaNodeUtil
 import mega.privacy.android.app.utils.Util
 import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.usecase.GetCloudSortOrder
-import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandle
+import mega.privacy.android.domain.usecase.GetFileUrlByNodeHandleUseCase
 import mega.privacy.android.domain.usecase.GetLocalFileForNode
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerIsRunningUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.MegaApiHttpServerSetMaxBufferSizeUseCase
@@ -46,7 +46,7 @@ import javax.inject.Inject
  * Mapper to get intent to open file
  *
  * @property getLocalFileForNode [GetLocalFileForNode] to get local file if present
- * @property getFileUrlByNodeHandle [GetFileUrlByNodeHandle] to get file url if present
+ * @property getFileUrlByNodeHandleUseCase [GetFileUrlByNodeHandleUseCase] to get file url if present
  * @property httpServerStart [MegaApiHttpServerStartUseCase] to start MegaApi Server
  * @property httpServerIsRunning [MegaApiHttpServerIsRunningUseCase] to check Mega Api Http server is running
  * @property httpServerSetMaxBufferSize [MegaApiHttpServerSetMaxBufferSizeUseCase] to get Api buffer size
@@ -55,7 +55,7 @@ import javax.inject.Inject
  */
 class GetIntentToOpenFileMapper @Inject constructor(
     private val getLocalFileForNode: GetLocalFileForNode,
-    private val getFileUrlByNodeHandle: GetFileUrlByNodeHandle,
+    private val getFileUrlByNodeHandleUseCase: GetFileUrlByNodeHandleUseCase,
     private val httpServerStart: MegaApiHttpServerStartUseCase,
     private val httpServerIsRunning: MegaApiHttpServerIsRunningUseCase,
     private val httpServerSetMaxBufferSize: MegaApiHttpServerSetMaxBufferSizeUseCase,
@@ -75,7 +75,7 @@ class GetIntentToOpenFileMapper @Inject constructor(
     suspend operator fun invoke(
         activity: Activity,
         fileNode: FileNode,
-        viewType: Int
+        viewType: Int,
     ): Intent? {
         return if (MimeTypeList.typeForName(fileNode.name).isPdf) {
             val mimeType = MimeTypeList.typeForName(fileNode.name).type
@@ -116,7 +116,8 @@ class GetIntentToOpenFileMapper @Inject constructor(
             } ?: run {
                 startHttpServer(pdfIntent, activity)
                 val path =
-                    getFileUrlByNodeHandle(fileNode.id.longValue) ?: throw UrlDownloadException()
+                    getFileUrlByNodeHandleUseCase(fileNode.id.longValue)
+                        ?: throw UrlDownloadException()
                 pdfIntent.setDataAndType(Uri.parse(path), mimeType)
             }
             pdfIntent
@@ -129,7 +130,8 @@ class GetIntentToOpenFileMapper @Inject constructor(
             } ?: run {
                 startHttpServer(intent, activity)
                 val path =
-                    getFileUrlByNodeHandle(fileNode.id.longValue) ?: throw UrlDownloadException()
+                    getFileUrlByNodeHandleUseCase(fileNode.id.longValue)
+                        ?: throw UrlDownloadException()
                 val connection = URL(path).openConnection() as HttpURLConnection
                 BufferedReader(InputStreamReader(connection.inputStream))
             }
@@ -199,7 +201,8 @@ class GetIntentToOpenFileMapper @Inject constructor(
             } ?: run {
                 startHttpServer(intentInternalIntentPair.first, activity)
                 val path =
-                    getFileUrlByNodeHandle(fileNode.id.longValue) ?: throw UrlDownloadException()
+                    getFileUrlByNodeHandleUseCase(fileNode.id.longValue)
+                        ?: throw UrlDownloadException()
                 intentInternalIntentPair.first.setDataAndType(Uri.parse(path), mimeType)
             }
             if (opusFile) {

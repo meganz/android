@@ -100,18 +100,18 @@ import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.AreCredentialsNullUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesByEmailUseCase
-import mega.privacy.android.domain.usecase.GetAudioNodesByParentHandle
+import mega.privacy.android.domain.usecase.GetAudioNodesByParentHandleUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesFromInSharesUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesFromOutSharesUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesFromPublicLinksUseCase
 import mega.privacy.android.domain.usecase.GetAudioNodesUseCase
-import mega.privacy.android.domain.usecase.GetAudiosByParentHandleFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetAudiosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetInboxNodeUseCase
 import mega.privacy.android.domain.usecase.GetLocalFilePathUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetLocalFolderLinkFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetLocalLinkFromMegaApiUseCase
-import mega.privacy.android.domain.usecase.GetNodesByHandles
+import mega.privacy.android.domain.usecase.GetNodesByHandlesUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetParentNodeFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.GetRootNodeFromMegaApiFolderUseCase
@@ -122,12 +122,12 @@ import mega.privacy.android.domain.usecase.GetThumbnailFromMegaApiUseCase
 import mega.privacy.android.domain.usecase.GetUnTypedNodeByHandleUseCase
 import mega.privacy.android.domain.usecase.GetUserNameByEmailUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesByEmailUseCase
-import mega.privacy.android.domain.usecase.GetVideoNodesByParentHandle
+import mega.privacy.android.domain.usecase.GetVideoNodesByParentHandleUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesFromInSharesUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesFromOutSharesUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesFromPublicLinksUseCase
 import mega.privacy.android.domain.usecase.GetVideoNodesUseCase
-import mega.privacy.android.domain.usecase.GetVideosByParentHandleFromMegaApiFolder
+import mega.privacy.android.domain.usecase.GetVideosByParentHandleFromMegaApiFolderUseCase
 import mega.privacy.android.domain.usecase.MonitorPlaybackTimesUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.DeletePlaybackInformationUseCase
 import mega.privacy.android.domain.usecase.mediaplayer.GetSRTSubtitleFileListUseCase
@@ -202,11 +202,11 @@ class MediaPlayerServiceViewModel @Inject constructor(
     private val getAudioNodesByEmailUseCase: GetAudioNodesByEmailUseCase,
     private val getVideoNodesByEmailUseCase: GetVideoNodesByEmailUseCase,
     private val getUserNameByEmailUseCase: GetUserNameByEmailUseCase,
-    private val getAudiosByParentHandleFromMegaApiFolder: GetAudiosByParentHandleFromMegaApiFolder,
-    private val getVideosByParentHandleFromMegaApiFolder: GetVideosByParentHandleFromMegaApiFolder,
-    private val getAudioNodesByParentHandle: GetAudioNodesByParentHandle,
-    private val getVideoNodesByParentHandle: GetVideoNodesByParentHandle,
-    private val getNodesByHandles: GetNodesByHandles,
+    private val getAudiosByParentHandleFromMegaApiFolderUseCase: GetAudiosByParentHandleFromMegaApiFolderUseCase,
+    private val getVideosByParentHandleFromMegaApiFolderUseCase: GetVideosByParentHandleFromMegaApiFolderUseCase,
+    private val getAudioNodesByParentHandleUseCase: GetAudioNodesByParentHandleUseCase,
+    private val getVideoNodesByParentHandleUseCase: GetVideoNodesByParentHandleUseCase,
+    private val getNodesByHandlesUseCase: GetNodesByHandlesUseCase,
     private val getFingerprint: GetFingerprint,
     private val fileDurationMapper: FileDurationMapper,
     private val getSRTSubtitleFileListUseCase: GetSRTSubtitleFileListUseCase,
@@ -508,12 +508,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
                                 playlistTitle.postValue(title)
                             }
                             if (isAudioPlayer) {
-                                getAudioNodesByParentHandle(
+                                getAudioNodesByParentHandleUseCase(
                                     parentHandle = parent.id.longValue,
                                     order = getSortOrderFromIntent(intent)
                                 )
                             } else {
-                                getVideoNodesByParentHandle(
+                                getVideoNodesByParentHandleUseCase(
                                     parentHandle = parent.id.longValue,
                                     order = getSortOrderFromIntent(intent)
                                 )
@@ -551,12 +551,12 @@ class MediaPlayerServiceViewModel @Inject constructor(
                             playlistTitle.postValue(parent.name)
 
                             if (isAudioPlayer) {
-                                getAudiosByParentHandleFromMegaApiFolder(
+                                getAudiosByParentHandleFromMegaApiFolderUseCase(
                                     parentHandle = parent.id.longValue,
                                     order = order
                                 )
                             } else {
-                                getVideosByParentHandleFromMegaApiFolder(
+                                getVideosByParentHandleFromMegaApiFolderUseCase(
                                     parentHandle = parent.id.longValue,
                                     order = order
                                 )
@@ -836,7 +836,7 @@ class MediaPlayerServiceViewModel @Inject constructor(
     ) {
         buildPlaySourcesByTypedNodes(
             type = type,
-            typedNodes = getNodesByHandles(handles),
+            typedNodes = getNodesByHandlesUseCase(handles),
             firstPlayHandle = firstPlayHandle
         )
     }

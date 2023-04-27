@@ -14,8 +14,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetAudiosByParentHandleFromMegaApiFolderTest {
-    lateinit var underTest: GetAudiosByParentHandleFromMegaApiFolder
+class GetVideoNodesByParentHandleUseCaseTest {
+    lateinit var underTest: GetVideoNodesByParentHandleUseCase
     private val mediaPlayerRepository = mock<MediaPlayerRepository>()
     private val addNodeType = mock<AddNodeType>()
 
@@ -25,8 +25,7 @@ class DefaultGetAudiosByParentHandleFromMegaApiFolderTest {
 
     @Before
     fun setUp() {
-        underTest =
-            DefaultGetAudiosByParentHandleFromMegaApiFolder(mediaPlayerRepository, addNodeType)
+        underTest = GetVideoNodesByParentHandleUseCase(mediaPlayerRepository, addNodeType)
     }
 
     @Test
@@ -34,8 +33,12 @@ class DefaultGetAudiosByParentHandleFromMegaApiFolderTest {
         runTest {
             val parentHandle: Long = 1234567
             val sortOrder = SortOrder.ORDER_DEFAULT_ASC
-            whenever(mediaPlayerRepository.getAudiosByParentHandleFromMegaApiFolder(parentHandle,
-                sortOrder)).thenReturn(unTypedNodeList)
+            whenever(
+                mediaPlayerRepository.getVideoNodesByParentHandle(
+                    parentHandle,
+                    sortOrder
+                )
+            ).thenReturn(unTypedNodeList)
 
             underTest(parentHandle, sortOrder)
 

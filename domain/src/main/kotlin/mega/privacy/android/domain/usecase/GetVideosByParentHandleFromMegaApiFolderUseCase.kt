@@ -1,18 +1,24 @@
 package mega.privacy.android.domain.usecase
 
 import mega.privacy.android.domain.entity.SortOrder
-import mega.privacy.android.domain.entity.node.TypedNode
 import mega.privacy.android.domain.repository.MediaPlayerRepository
 import javax.inject.Inject
 
 /**
- * The implementation of [GetVideosByParentHandleFromMegaApiFolder]
+ * The use case for getting video children by parent handle from MegaApiFolder
  */
-class DefaultGetVideosByParentHandleFromMegaApiFolder @Inject constructor(
+class GetVideosByParentHandleFromMegaApiFolderUseCase @Inject constructor(
     private val mediaPlayerRepository: MediaPlayerRepository,
     private val addNodeType: AddNodeType,
-) : GetVideosByParentHandleFromMegaApiFolder {
-    override suspend fun invoke(parentHandle: Long, order: SortOrder): List<TypedNode>? =
+) {
+    /**
+     * Get video children by parent handle from MegaApiFolder
+     *
+     * @param parentHandle parent node handle
+     * @param order list order
+     * @return video nodes
+     */
+    suspend operator fun invoke(parentHandle: Long, order: SortOrder) =
         mediaPlayerRepository.getVideosByParentHandleFromMegaApiFolder(parentHandle, order)?.map {
             addNodeType(it)
         }
