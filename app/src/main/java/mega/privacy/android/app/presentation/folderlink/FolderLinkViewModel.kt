@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import mega.privacy.android.app.R
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.domain.usecase.GetNodeListByIds
 import mega.privacy.android.app.extensions.updateItemAt
@@ -31,6 +32,7 @@ import mega.privacy.android.app.presentation.extensions.errorDialogTitleId
 import mega.privacy.android.app.presentation.extensions.snackBarMessageId
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants
@@ -76,6 +78,7 @@ class FolderLinkViewModel @Inject constructor(
     private val getNodeByHandle: GetNodeByHandle,
     private val getNodeListByIds: GetNodeListByIds,
     private val getNodeUseCase: GetNodeUseCase,
+    private val getStringFromStringResMapper: GetStringFromStringResMapper,
 ) : ViewModel() {
 
     /**
@@ -589,6 +592,7 @@ class FolderLinkViewModel @Inject constructor(
                     resetImportNode()
                 } else {
                     Timber.w("Selected Node is NULL")
+                    showSnackbar(R.string.context_no_copied)
                 }
             }
         }
@@ -620,4 +624,31 @@ class FolderLinkViewModel @Inject constructor(
      * Reset and notify that downloadNodes event is consumed
      */
     fun resetDownloadNode() = _state.update { it.copy(downloadNodes = consumed()) }
+
+    /**
+     * Trigger event to show Snackbar message
+     *
+     * @param messageId     String id of content for snack bar
+     */
+    fun showSnackbar(messageId: Int) {
+        val message = getStringFromStringResMapper(messageId)
+        showSnackbar(message)
+    }
+
+    /**
+     * Trigger event to show Snackbar message
+     *
+     * @param message     Content for snack bar
+     */
+    fun showSnackbar(message: String) =
+        _state.update { it.copy(snackbarMessageContent = triggered(message)) }
+
+
+    /**
+     * Reset and notify that snackbarMessage is consumed
+     */
+    fun resetSnackbarMessage() =
+        _state.update {
+            it.copy(snackbarMessageContent = consumed())
+        }
 }

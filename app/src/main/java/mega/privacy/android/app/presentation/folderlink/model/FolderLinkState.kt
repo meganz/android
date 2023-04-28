@@ -36,6 +36,7 @@ import nz.mega.sdk.MegaNode
  * @property downloadNodes              State to download nodes
  * @property importNode                 Node to import
  * @property selectImportLocation       State to open location selection
+ * @property snackbarMessageContent     State to show snackbar message
  * @property errorDialogTitle           String id of title for error dialog
  * @property errorDialogContent         String id of content for error dialog
  * @property snackBarMessage            String id of content for snack bar
@@ -63,6 +64,7 @@ data class FolderLinkState(
     val downloadNodes: StateEventWithContent<List<MegaNode>> = consumed(),
     val importNode: NodeUIItem? = null,
     val selectImportLocation: StateEvent = consumed,
+    val snackbarMessageContent: StateEventWithContent<String> = consumed(),
     @StringRes val errorDialogTitle: Int = -1,
     @StringRes val errorDialogContent: Int = -1,
     @StringRes val snackBarMessage: Int = -1,

@@ -102,6 +102,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 }
 
                 viewModel.resetImportNode()
+                viewModel.showSnackbar(R.string.error_server_connection_problem)
                 return@ActivityResultCallback
             }
 
@@ -167,6 +168,7 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                 onResetDownloadNode = viewModel::resetDownloadNode,
                 onSelectImportLocation = ::onSelectImportLocation,
                 onResetSelectImportLocation = viewModel::resetSelectImportLocation,
+                onResetSnackbarMessage = viewModel::resetSnackbarMessage,
                 emptyViewString = getEmptyViewString()
             )
         }
@@ -237,12 +239,9 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
                             askForDecryptionKeyDialog()
                         }
                         else -> {
-                            try {
+                            if (it.errorDialogTitle != -1 && it.errorDialogContent != -1) {
                                 Timber.w("Show error dialog")
                                 showErrorDialog(it.errorDialogTitle, it.errorDialogContent)
-
-                            } catch (ex: Exception) {
-                                finish()
                             }
                         }
                     }
@@ -289,9 +288,10 @@ class FolderLinkComposeActivity : TransfersManagementActivity(),
     private fun showCopyResult(copyResultText: String?, throwable: Throwable?) {
         AlertDialogUtil.dismissAlertDialogIfExists(statusDialog)
         viewModel.clearAllSelection()
-        if (copyResultText == null) {
-            throwable?.let { manageCopyMoveException(it) }
-        }
+        if (copyResultText != null) {
+            viewModel.showSnackbar(copyResultText)
+        } else throwable?.let { manageCopyMoveException(it) }
+            ?: viewModel.showSnackbar(R.string.context_correctly_copied)
     }
 
     override fun onDialogPositiveClick(key: String?) {

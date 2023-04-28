@@ -21,6 +21,7 @@ import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageM
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.FolderLinkViewModel
 import mega.privacy.android.app.presentation.mapper.GetIntentToOpenFileMapper
+import mega.privacy.android.app.presentation.mapper.GetStringFromStringResMapper
 import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.GetNodeUseCase
 import mega.privacy.android.app.utils.Constants
@@ -70,6 +71,7 @@ class FolderLinkViewModelTest {
     private val getNodeByHandle: GetNodeByHandle = mock()
     private val getNodeListByIds: GetNodeListByIds = mock()
     private val getNodeUseCase: GetNodeUseCase = mock()
+    private val getStringFromStringResMapper: GetStringFromStringResMapper = mock()
 
     @get:Rule
     var rule: TestRule = InstantTaskExecutorRule()
@@ -103,7 +105,8 @@ class FolderLinkViewModelTest {
             getIntentToOpenFileMapper,
             getNodeByHandle,
             getNodeListByIds,
-            getNodeUseCase
+            getNodeUseCase,
+            getStringFromStringResMapper
         )
     }
 

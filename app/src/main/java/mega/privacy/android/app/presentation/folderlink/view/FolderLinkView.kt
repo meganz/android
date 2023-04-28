@@ -22,6 +22,9 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -39,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,10 +53,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
+import mega.privacy.android.app.presentation.testpassword.view.Constants
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.extensions.grey_020_grey_700
+import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
@@ -82,11 +89,13 @@ internal fun FolderLinkView(
     onResetDownloadNode: () -> Unit,
     onSelectImportLocation: () -> Unit,
     onResetSelectImportLocation: () -> Unit,
+    onResetSnackbarMessage: () -> Unit,
     emptyViewString: String,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
+    val snackBarHostState = remember { SnackbarHostState() }
     val firstItemVisible by remember {
         derivedStateOf {
             if (state.currentViewType == ViewType.LIST)
@@ -116,6 +125,10 @@ internal fun FolderLinkView(
         action = onSelectImportLocation
     )
 
+    EventEffect(event = state.snackbarMessageContent, onConsumed = onResetSnackbarMessage) {
+        snackBarHostState.showSnackbar(it)
+    }
+
     Scaffold(
         scaffoldState = scaffoldState,
         topBar = {
@@ -135,6 +148,15 @@ internal fun FolderLinkView(
                     onBackPressed = onBackPressed,
                     onShareClicked = onShareClicked,
                     onMoreClicked = onMoreClicked
+                )
+            }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackBarHostState) { data ->
+                Snackbar(
+                    modifier = Modifier.testTag(Constants.SNACKBAR_TAG),
+                    snackbarData = data,
+                    backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white
                 )
             }
         }
