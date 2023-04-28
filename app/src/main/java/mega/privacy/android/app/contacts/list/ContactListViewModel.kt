@@ -24,6 +24,7 @@ import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactRequestsUseCase
 import mega.privacy.android.app.contacts.usecase.GetContactsUseCase
 import mega.privacy.android.app.contacts.usecase.RemoveContactUseCase
+import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.utils.CallUtil
@@ -32,6 +33,7 @@ import mega.privacy.android.app.utils.notifyObserver
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.ChatRequestParamType
 import mega.privacy.android.domain.usecase.meeting.StartChatCall
+import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaUser
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -61,6 +63,7 @@ class ContactListViewModel @Inject constructor(
     private val chatApiGateway: MegaChatApiGateway,
     private val cameraGateway: CameraGateway,
     private val chatManagement: ChatManagement,
+    private val createShareKey: CreateShareKey,
     @ApplicationContext private val context: Context,
 ) : BaseRxViewModel() {
 
@@ -263,5 +266,16 @@ class ContactListViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Init share key
+     *
+     * @param node
+     */
+    suspend fun initShareKey(node: MegaNode) = runCatching {
+        createShareKey(node)
+    }.onFailure {
+        Timber.e(it)
     }
 }

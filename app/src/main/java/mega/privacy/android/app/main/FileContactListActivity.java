@@ -82,6 +82,7 @@ import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDial
 import mega.privacy.android.app.modalbottomsheet.FileContactsListBottomSheetDialogListener;
 import mega.privacy.android.app.namecollision.data.NameCollision;
 import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase;
+import mega.privacy.android.app.presentation.contact.FileContactListActivityExtensionKt;
 import mega.privacy.android.app.presentation.contact.FileContactListViewModel;
 import mega.privacy.android.app.sync.fileBackups.FileBackupManager;
 import mega.privacy.android.app.usecase.UploadUseCase;
@@ -108,10 +109,10 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
     @Inject
     UploadUseCase uploadUseCase;
 
-    private FileContactListViewModel viewModel;
+    public FileContactListViewModel viewModel;
 
     private ContactController contactController;
-    private NodeController nodeController;
+    public NodeController nodeController;
     ActionBar aB;
     Toolbar tB;
     FileContactListActivity fileContactListActivity = this;
@@ -842,9 +843,11 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
                     dialogBuilder.setTitle(getString(R.string.file_properties_shared_folder_permissions));
                     final CharSequence[] items = {getString(R.string.file_properties_shared_folder_read_only), getString(R.string.file_properties_shared_folder_read_write), getString(R.string.file_properties_shared_folder_full_access)};
                     dialogBuilder.setSingleChoiceItems(items, -1, (dialog, item) -> {
-                        statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_sharing_folder));
                         permissionsDialog.dismiss();
-                        nodeController.shareFolder(node, emails, item);
+
+                        statusDialog = createProgressDialog(fileContactListActivity, getString(R.string.context_sharing_folder));
+                        statusDialog.show();
+                        FileContactListActivityExtensionKt.shareFolder(this, node, emails, item);
                     });
                     permissionsDialog = dialogBuilder.create();
                     permissionsDialog.show();

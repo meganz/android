@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
+import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
@@ -85,6 +86,7 @@ class ContactInfoViewModelTest {
     private lateinit var monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase
     private lateinit var startConversationUseCase: StartConversationUseCase
     private lateinit var createChatRoomUseCase: CreateChatRoomUseCase
+    private lateinit var createShareKey: CreateShareKey
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -157,6 +159,7 @@ class ContactInfoViewModelTest {
             startConversationUseCase = startConversationUseCase,
             ioDispatcher = standardDispatcher,
             applicationScope = testScope,
+            createShareKey = createShareKey
         )
     }
 
@@ -185,6 +188,7 @@ class ContactInfoViewModelTest {
         monitorUpdatePushNotificationSettingsUseCase = mock()
         startConversationUseCase = mock()
         createChatRoomUseCase = mock()
+        createShareKey = mock()
     }
 
     @After

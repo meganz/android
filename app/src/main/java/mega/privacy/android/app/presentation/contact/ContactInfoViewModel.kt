@@ -22,6 +22,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
+import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.contact.model.ContactInfoState
@@ -63,6 +64,7 @@ import mega.privacy.android.domain.usecase.meeting.StartChatCall
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetInSharesUseCase
+import nz.mega.sdk.MegaNode
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -116,6 +118,7 @@ class ContactInfoViewModel @Inject constructor(
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val startConversationUseCase: StartConversationUseCase,
     private val createChatRoomUseCase: CreateChatRoomUseCase,
+    private val createShareKey: CreateShareKey,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
 ) : BaseRxViewModel() {
@@ -587,6 +590,17 @@ class ContactInfoViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Init share key
+     *
+     * @param node
+     */
+    suspend fun initShareKey(node: MegaNode) = runCatching {
+        createShareKey(node)
+    }.onFailure {
+        Timber.e(it)
     }
 
     companion object {

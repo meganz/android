@@ -19,6 +19,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.presentation.manager.ManagerViewModel
 import mega.privacy.android.app.presentation.manager.model.SharesTab
@@ -192,6 +193,7 @@ class ManagerViewModelTest {
         mock<EstablishCameraUploadsSyncHandlesUseCase>()
     private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
     private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
+    private val createShareKey = mock<CreateShareKey>()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -236,6 +238,7 @@ class ManagerViewModelTest {
             monitorUpdatePushNotificationSettingsUseCase = monitorPushNotificationSettingsUpdate,
             startCameraUploadUseCase = startCameraUploadUseCase,
             stopCameraUploadUseCase = stopCameraUploadUseCase,
+            createShareKey = createShareKey,
             saveContactByEmailUseCase = mock()
         )
     }

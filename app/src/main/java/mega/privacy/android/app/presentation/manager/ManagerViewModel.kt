@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetInboxNode
 import mega.privacy.android.app.domain.usecase.MonitorGlobalUpdates
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
@@ -152,6 +153,7 @@ class ManagerViewModel @Inject constructor(
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadUseCase: StopCameraUploadUseCase,
     private val saveContactByEmailUseCase: SaveContactByEmailUseCase,
+    private val createShareKey: CreateShareKey,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
 ) : ViewModel() {
@@ -596,6 +598,17 @@ class ManagerViewModel @Inject constructor(
                 Timber.e(it)
             }
         }
+    }
+
+    /**
+     * Init share key
+     *
+     * @param node
+     */
+    suspend fun initShareKey(node: MegaNode) = runCatching {
+        createShareKey(node)
+    }.onFailure {
+        Timber.e(it)
     }
 
     internal companion object {

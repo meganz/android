@@ -7444,11 +7444,12 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                         -1
                     ) { _: DialogInterface?, item: Int ->
                         permissionsDialog?.dismiss()
-                        nodeController.shareFolder(
-                            megaApi.getNodeByHandle(nodeHandle),
-                            contactsData,
-                            item
-                        )
+
+                        lifecycleScope.launch {
+                            val node = megaApi.getNodeByHandle(nodeHandle)
+                            viewModel.initShareKey(node)
+                            nodeController.shareFolder(node, contactsData, item)
+                        }
                     }
                     dialogBuilder.setTitle(getString(R.string.dialog_select_permissions))
                     permissionsDialog = dialogBuilder.create()

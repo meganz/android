@@ -32,11 +32,13 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.BaseActivity
 import mega.privacy.android.app.MegaApplication.Companion.getChatManagement
 import mega.privacy.android.app.MegaApplication.Companion.getPushNotificationSettingManagement
@@ -540,7 +542,15 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                                 )
                             )
                             permissionsDialog?.dismiss()
-                            NodeController(this).shareFolder(parent, selectedContacts, item)
+                            lifecycleScope.launch {
+                                statusDialog?.show()
+                                viewModel.initShareKey(parent)
+                                NodeController(this@ContactInfoActivity).shareFolder(
+                                    parent,
+                                    selectedContacts,
+                                    item
+                                )
+                            }
                         }
                         permissionsDialog = dialogBuilder.create()
                         permissionsDialog?.show()

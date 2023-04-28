@@ -14,8 +14,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.MegaApplication
 import mega.privacy.android.app.R
 import mega.privacy.android.app.activities.contract.SelectChatsToAttachActivityContract
@@ -286,12 +288,15 @@ class ContactBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     permissions,
                     INVALID_ITEM
                 ) { dialog: DialogInterface, item: Int ->
-                    NodeController(requireContext()).shareFolder(node, selectedContacts, item)
-                    folderHandle = null
-                    selectedContacts = null
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.initShareKey(node)
+                        NodeController(requireContext()).shareFolder(node, selectedContacts, item)
+                        folderHandle = null
+                        selectedContacts = null
 
-                    dialog.dismiss()
-                    dismiss()
+                        dialog.dismiss()
+                        dismiss()
+                    }
                 }
                 .show()
         }
