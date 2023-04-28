@@ -150,44 +150,6 @@ public class ContactUtil {
         return "";
     }
 
-    public static void updateDBNickname(List<MegaUser> contacts, Context context, MegaStringMap map) {
-        ArrayList<MegaContactAdapter> contactsDB = getContactsDBList(contacts);
-        if (contactsDB.isEmpty()) return;
-        //No nicknames
-        if (map == null || map.size() == 0) {
-            for (int i = 0; i < contactsDB.size(); i++) {
-                long contactDBHandle = contactsDB.get(i).getMegaUser().getHandle();
-                String nickname = getNicknameContact(contactDBHandle);
-                if (nickname != null) {
-                    MegaApplication.getInstance().getDbH().setContactNickname(null, contactDBHandle);
-                    notifyNicknameUpdate(context, contactDBHandle);
-                }
-            }
-            return;
-        }
-
-        //Some nicknames
-        MegaStringList listHandles = map.getKeys();
-        for (int i = 0; i < contactsDB.size(); i++) {
-            long contactDBHandle = contactsDB.get(i).getMegaUser().getHandle();
-            String newNickname = null;
-            for (int j = 0; j < listHandles.size(); j++) {
-                long userHandle = MegaApiJava.base64ToUserHandle(listHandles.get(j));
-                if (contactDBHandle == userHandle) {
-                    newNickname = getNewNickname(map, listHandles.get(j));
-                    break;
-                }
-            }
-            String oldNickname = contactsDB.get(i).getMegaContactDB().getNickname();
-            if ((newNickname == null && oldNickname == null) || (newNickname != null && newNickname.equals(oldNickname))) {
-                continue;
-            } else {
-                MegaApplication.getInstance().getDbH().setContactNickname(newNickname, contactDBHandle);
-                notifyNicknameUpdate(context, contactDBHandle);
-            }
-        }
-    }
-
     public static void notifyNicknameUpdate(Context context, long userHandle) {
         notifyUserNameUpdate(context, ACTION_UPDATE_NICKNAME, userHandle);
         LiveEventBus.get(EVENT_CONTACT_NAME_CHANGE, Long.class).post(userHandle);
@@ -207,34 +169,6 @@ public class ContactUtil {
         Intent intent = new Intent(action)
                 .putExtra(EXTRA_USER_HANDLE, userHandle);
         context.sendBroadcast(intent);
-    }
-
-    private static String getNewNickname(MegaStringMap map, String key) {
-        String nicknameEncoded = map.get(key);
-        if (nicknameEncoded == null)
-            return null;
-
-        try {
-            byte[] data = Base64.decode(nicknameEncoded, Base64.URL_SAFE);
-            return new String(data, StandardCharsets.UTF_8);
-        } catch (java.lang.Exception e) {
-            Timber.e(e, "Error retrieving new nickname");
-            return null;
-        }
-    }
-
-    private static ArrayList<MegaContactAdapter> getContactsDBList(List<MegaUser> contacts) {
-        ArrayList<MegaContactAdapter> visibleContacts = new ArrayList<>();
-        for (int i = 0; i < contacts.size(); i++) {
-            if (contacts.get(i).getVisibility() == MegaUser.VISIBILITY_VISIBLE) {
-                long contactHandle = contacts.get(i).getHandle();
-                Contact contactDB = getContactDB(contactHandle);
-                String fullName = getContactNameDB(contactDB);
-                MegaContactAdapter megaContactAdapter = new MegaContactAdapter(contactDB, contacts.get(i), fullName);
-                visibleContacts.add(megaContactAdapter);
-            }
-        }
-        return visibleContacts;
     }
 
     /**

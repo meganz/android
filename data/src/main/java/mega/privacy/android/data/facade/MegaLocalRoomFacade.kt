@@ -1,5 +1,6 @@
 package mega.privacy.android.data.facade
 
+import kotlinx.coroutines.flow.first
 import mega.privacy.android.data.cryptography.EncryptData
 import mega.privacy.android.data.database.dao.ContactDao
 import mega.privacy.android.data.gateway.MegaLocalRoomGateway
@@ -65,4 +66,9 @@ internal class MegaLocalRoomFacade @Inject constructor(
     override suspend fun clearContacts() = contactDao.deleteAll()
 
     override suspend fun getContactCount() = contactDao.getCount()
+
+    override suspend fun getAllContacts(): List<Contact> {
+        val entities = contactDao.getAll().first()
+        return entities.map { contactModelMapper(it) }
+    }
 }

@@ -91,4 +91,10 @@ interface MegaLocalRoomGateway {
      * @return
      */
     suspend fun getContactCount(): Int
+
+    /**
+     * Get all contacts
+     *
+     */
+    suspend fun getAllContacts(): List<Contact>
 }

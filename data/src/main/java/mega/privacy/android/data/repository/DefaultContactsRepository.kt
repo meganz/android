@@ -464,9 +464,10 @@ internal class DefaultContactsRepository @Inject constructor(
                     )
                 )
             } ?: continuation.resumeWith(Result.failure(NullPointerException("myUser null")))
-        }.also {
-            contactWrapper.updateDBNickname(megaApiGateway.getContacts(), context, it)
         }.getDecodedAliases()
+            .also {
+                updateContactsNickname(megaApiGateway.getContacts(), it)
+            }
     }
 
     private fun onRequestGetAliasesCompleted(continuation: Continuation<MegaStringMap>) =
@@ -758,5 +759,22 @@ internal class DefaultContactsRepository @Inject constructor(
 
     override suspend fun getContactHandleByEmail(email: String) = withContext(ioDispatcher) {
         megaApiGateway.getContact(email)?.handle ?: -1L
+    }
+
+    private suspend fun updateContactsNickname(
+        contacts: List<MegaUser>?,
+        alias: Map<Long, String>,
+    ) {
+        if (contacts.isNullOrEmpty()) return
+        val localContacts = megaLocalRoomGateway.getAllContacts().associateBy { it.userId }
+        if (localContacts.isEmpty()) return
+        contacts.forEach {
+            val oldNickname = localContacts[it.handle]?.nickname
+            val newNickname = alias[it.handle]
+            if (oldNickname != newNickname) {
+                megaLocalRoomGateway.setContactNickname(it.handle, newNickname)
+                contactWrapper.notifyNicknameUpdate(context, it.handle)
+            }
+        }
     }
 }

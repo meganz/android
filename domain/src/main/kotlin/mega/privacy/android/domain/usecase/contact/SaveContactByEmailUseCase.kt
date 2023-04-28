@@ -24,7 +24,8 @@ class SaveContactByEmailUseCase @Inject constructor(
             getUserFirstName(handle = handle, skipCache = true, shouldNotify = true)
         val lastName =
             getUserLastName(handle = handle, skipCache = true, shouldNotify = true)
-        val nickname = contactsRepository.getUserAlias(handle)
+        // nickname can be throw exception if not found, we can consider it as nickname = null
+        val nickname = runCatching { contactsRepository.getUserAlias(handle) }.getOrNull()
         contactsRepository.createOrUpdateContact(
             handle = handle,
             email = email,

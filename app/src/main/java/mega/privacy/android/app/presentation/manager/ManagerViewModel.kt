@@ -55,6 +55,7 @@ import mega.privacy.android.domain.usecase.MonitorContactRequestUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorUserUpdates
 import mega.privacy.android.domain.usecase.SendStatisticsMediaDiscovery
+import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.account.MonitorSecurityUpgradeInApp
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
 import mega.privacy.android.domain.usecase.account.RequireTwoFactorAuthenticationUseCase
@@ -64,9 +65,9 @@ import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsS
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.ListenToNewMediaUseCase
+import mega.privacy.android.domain.usecase.contact.SaveContactByEmailUseCase
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import mega.privacy.android.domain.usecase.login.MonitorFinishActivityUseCase
-import mega.privacy.android.domain.usecase.account.MonitorMyAccountUpdateUseCase
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.setting.MonitorUpdatePushNotificationSettingsUseCase
 import mega.privacy.android.domain.usecase.shares.GetUnverifiedIncomingShares
@@ -150,6 +151,7 @@ class ManagerViewModel @Inject constructor(
     private val establishCameraUploadsSyncHandlesUseCase: EstablishCameraUploadsSyncHandlesUseCase,
     private val startCameraUploadUseCase: StartCameraUploadUseCase,
     private val stopCameraUploadUseCase: StopCameraUploadUseCase,
+    private val saveContactByEmailUseCase: SaveContactByEmailUseCase,
     monitorMyAccountUpdateUseCase: MonitorMyAccountUpdateUseCase,
     monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
 ) : ViewModel() {
@@ -578,6 +580,22 @@ class ManagerViewModel @Inject constructor(
      */
     fun stopCameraUpload(aborted: Boolean = true) = viewModelScope.launch {
         stopCameraUploadUseCase(aborted = aborted)
+    }
+
+    /**
+     * Add new contact
+     *
+     * @param email
+     */
+    fun addNewContact(email: String?) {
+        if (email.isNullOrEmpty()) return
+        viewModelScope.launch {
+            runCatching {
+                saveContactByEmailUseCase(email)
+            }.onFailure {
+                Timber.e(it)
+            }
+        }
     }
 
     internal companion object {

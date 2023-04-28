@@ -246,20 +246,6 @@ public class ContactController {
         }
     }
 
-    public void addContactDB(String email) {
-        MegaUser user = megaApi.getContact(email);
-        if (user == null) return;
-        //Check the user is not previously in the DB
-        if (dbH.findContactByHandle(user.getHandle()) == null) {
-            Contact contact = new Contact(user.getHandle(), user.getEmail(), "", "", "");
-            dbH.setContact(contact);
-        }
-        GetAttrUserListener listener = new GetAttrUserListener(context);
-        megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_FIRSTNAME, listener);
-        megaApi.getUserAttribute(user, MegaApiJava.USER_ATTR_LASTNAME, listener);
-        megaApi.getUserAlias(user.getHandle(), listener);
-    }
-
     public ArrayList<String> getEmailShares(ArrayList<MegaShare> shares) {
         if (shares == null || shares.isEmpty()) return null;
 

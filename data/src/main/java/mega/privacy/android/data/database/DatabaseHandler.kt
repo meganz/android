@@ -309,7 +309,6 @@ interface DatabaseHandler {
     fun clearBackups()
 
     fun findNonContactByHandle(handle: String?): NonContactInfo?
-    fun setContact(contact: Contact)
     fun findContactByHandle(handleParam: Long): Contact?
     fun findContactByEmail(mail: String?): Contact?
 

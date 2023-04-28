@@ -1,8 +1,6 @@
 package mega.privacy.android.data.wrapper
 
 import android.content.Context
-import nz.mega.sdk.MegaStringMap
-import nz.mega.sdk.MegaUser
 
 /**
  * Contact wrapper
@@ -26,11 +24,10 @@ interface ContactWrapper {
     fun notifyLastNameUpdate(context: Context, userHandle: Long)
 
     /**
-     * Update db nickname
+     * Notify nickname update
      *
-     * @param contacts
      * @param context
-     * @param map
+     * @param userHandle
      */
-    fun updateDBNickname(contacts: List<MegaUser>, context: Context, map: MegaStringMap)
+    fun notifyNicknameUpdate(context: Context, userHandle: Long)
 }

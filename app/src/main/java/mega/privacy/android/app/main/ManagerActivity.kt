@@ -9170,14 +9170,14 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     Timber.d("SENT REQUEST")
                     Timber.d("STATUS: %s, Contact Handle: %d", req.status, req.handle)
                     if (req.status === ContactRequestStatus.Accepted) {
-                        contactController.addContactDB(req.targetEmail)
+                        viewModel.addNewContact(req.targetEmail)
                     }
                 } else {
                     Timber.d("RECEIVED REQUEST")
                     setContactTitleSection()
                     Timber.d("STATUS: %s Contact Handle: %d", req.status, req.handle)
                     if (req.status === ContactRequestStatus.Accepted) {
-                        contactController.addContactDB(req.sourceEmail)
+                        viewModel.addNewContact(req.sourceEmail)
                     }
                 }
             }

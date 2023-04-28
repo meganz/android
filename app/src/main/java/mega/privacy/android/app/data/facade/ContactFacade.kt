@@ -3,8 +3,6 @@ package mega.privacy.android.app.data.facade
 import android.content.Context
 import mega.privacy.android.app.utils.ContactUtil
 import mega.privacy.android.data.wrapper.ContactWrapper
-import nz.mega.sdk.MegaStringMap
-import nz.mega.sdk.MegaUser
 import javax.inject.Inject
 
 class ContactFacade @Inject constructor() : ContactWrapper {
@@ -16,7 +14,7 @@ class ContactFacade @Inject constructor() : ContactWrapper {
         ContactUtil.notifyLastNameUpdate(context, userHandle)
     }
 
-    override fun updateDBNickname(contacts: List<MegaUser>, context: Context, map: MegaStringMap) {
-        ContactUtil.updateDBNickname(contacts, context, map)
+    override fun notifyNicknameUpdate(context: Context, userHandle: Long) {
+        ContactUtil.notifyNicknameUpdate(context, userHandle)
     }
 }
