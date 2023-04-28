@@ -711,7 +711,12 @@ class MediaPlayerFragment : Fragment() {
                                 Intent(
                                     requireActivity(),
                                     SelectSubtitleFileActivity::class.java
-                                )
+                                ).apply {
+                                    putExtra(
+                                        INTENT_KEY_SUBTITLE_FILE_ID,
+                                        viewModel.state.value.subtitleFileInfo?.id
+                                    )
+                                }
                             )
                         }) {
                         // onDismissRequest
@@ -746,5 +751,10 @@ class MediaPlayerFragment : Fragment() {
          * The intent key for passing subtitle file info
          */
         const val INTENT_KEY_SUBTITLE_FILE_INFO = "INTENT_KEY_SUBTITLE_FILE_INFO"
+
+        /**
+         * The intent key for passing subtitle file id
+         */
+        const val INTENT_KEY_SUBTITLE_FILE_ID = "INTENT_KEY_SUBTITLE_FILE_ID"
     }
 }

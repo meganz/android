@@ -1,5 +1,6 @@
 package test.mega.privacy.android.app.presentation.mediaplayer
 
+import androidx.lifecycle.SavedStateHandle
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,7 +35,8 @@ internal class SelectSubtitleFileViewModelTest {
         underTest = SelectSubtitleFileViewModel(
             getSRTSubtitleFileListUseCase = getSRTSubtitleFileListUseCase,
             subtitleFileInfoItemMapper = subtitleFileInfoItemMapper,
-            sendStatisticsMediaPlayerUseCase = mock()
+            sendStatisticsMediaPlayerUseCase = mock(),
+            savedStateHandle = SavedStateHandle()
         )
     }
 
