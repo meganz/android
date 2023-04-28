@@ -78,6 +78,14 @@ interface NodeRepository {
     suspend fun getNodeById(nodeId: NodeId): Node?
 
     /**
+     * Retrieves the Node Path with the provided Node ID
+     *
+     * @param nodeId [NodeId]
+     * @return The Node Path
+     */
+    suspend fun getNodePathById(nodeId: NodeId): String
+
+    /**
      * Get node children
      *
      * @param folderNode

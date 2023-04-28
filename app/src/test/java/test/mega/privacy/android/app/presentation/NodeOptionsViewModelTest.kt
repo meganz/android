@@ -17,7 +17,9 @@ import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.NodeOptionsViewModel
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import nz.mega.sdk.MegaNode
 import org.junit.After
 import org.junit.Before
@@ -26,6 +28,9 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
 
+/**
+ * Test class for [NodeOptionsViewModel]
+ */
 @ExperimentalCoroutinesApi
 class NodeOptionsViewModelTest {
 
@@ -33,6 +38,9 @@ class NodeOptionsViewModelTest {
     private val getNodeByHandle =
         mock<GetNodeByHandle> { onBlocking { invoke(any()) }.thenReturn(null) }
     private val createShareKey = mock<CreateShareKey>()
+    private val isNodeDeletedFromBackupsUseCase = mock<IsNodeDeletedFromBackupsUseCase> {
+        onBlocking { invoke(NodeId(any())) }.thenReturn(false)
+    }
     private val monitorConnectivityUseCase = mock<MonitorConnectivityUseCase> {
         onBlocking { invoke() }.thenReturn(
             MutableStateFlow(true)
@@ -62,8 +70,9 @@ class NodeOptionsViewModelTest {
         underTest = NodeOptionsViewModel(
             createShareKey = createShareKey,
             getNodeByHandle = getNodeByHandle,
+            isNodeDeletedFromBackupsUseCase = isNodeDeletedFromBackupsUseCase,
             monitorConnectivityUseCase = monitorConnectivityUseCase,
-            savedStateHandle = savedStateHandle
+            savedStateHandle = savedStateHandle,
         )
     }
 
@@ -76,10 +85,12 @@ class NodeOptionsViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
+            assertThat(initial.canMoveNode).isFalse()
+            assertThat(initial.canRestoreNode).isFalse()
+            assertThat(initial.isOnline).isTrue()
             assertThat(initial.node).isNull()
             assertThat(initial.shareData).isNull()
             assertThat(initial.shareKeyCreated).isNull()
-            assertThat(initial.isOnline).isTrue()
         }
     }
 
@@ -157,4 +168,45 @@ class NodeOptionsViewModelTest {
         }
     }
 
+    @Test
+    fun `test that the restore node functionality works as expected for deleted non-backup nodes`() =
+        runTest {
+            val node = mock<MegaNode>()
+            val nodeId = 123L
+            getNodeByHandle.stub {
+                onBlocking { invoke(nodeId) }.thenReturn(node)
+            }
+            isNodeDeletedFromBackupsUseCase.stub {
+                onBlocking { invoke(NodeId(any())) }.thenReturn(false)
+            }
+
+            underTest.state.test {
+                assertThat(awaitItem().node).isNull()
+                nodeIdFlow.emit(nodeId)
+                assertThat(awaitItem().node).isEqualTo(node)
+                underTest.setRestoreNodeClicked(true)
+                assertThat(awaitItem().canRestoreNode).isTrue()
+            }
+        }
+
+    @Test
+    fun `test that the restore node functionality becomes the move node functionality for deleted backup nodes`() =
+        runTest {
+            val node = mock<MegaNode>()
+            val nodeId = 123L
+            getNodeByHandle.stub {
+                onBlocking { invoke(nodeId) }.thenReturn(node)
+            }
+            isNodeDeletedFromBackupsUseCase.stub {
+                onBlocking { invoke(NodeId(any())) }.thenReturn(true)
+            }
+
+            underTest.state.test {
+                assertThat(awaitItem().node).isNull()
+                nodeIdFlow.emit(nodeId)
+                assertThat(awaitItem().node).isEqualTo(node)
+                underTest.setRestoreNodeClicked(true)
+                assertThat(awaitItem().canMoveNode).isTrue()
+            }
+        }
 }

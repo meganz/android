@@ -73,7 +73,6 @@ import mega.privacy.android.app.utils.ViewUtils.isVisible
 import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.SortOrder
 import mega.privacy.android.domain.entity.node.NodeId
-import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaShare
 import nz.mega.sdk.MegaUser
@@ -81,12 +80,11 @@ import timber.log.Timber
 import java.io.File
 import java.util.stream.Collectors
 
+/**
+ * [BaseBottomSheetDialogFragment] used to display actions of a particular Node
+ */
 @AndroidEntryPoint
 class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
-    /**
-     * Values used to control the display of option separators
-     */
-
     private var mode = DEFAULT_MODE
     private lateinit var nodeController: NodeController
     private lateinit var nodeInfo: TextView
@@ -94,11 +92,12 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private var cannotOpenFileDialog: AlertDialog? = null
     private var user: MegaUser? = null
 
-
     private val nodeOptionsViewModel: NodeOptionsViewModel by viewModels()
     private val searchViewModel: SearchViewModel by activityViewModels()
 
-
+    /**
+     * onCreateView
+     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -112,6 +111,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         return contentView
     }
 
+    /**
+     * onViewCreated
+     */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val nodeThumb = contentView.findViewById<ImageView>(R.id.node_thumbnail)
         val nodeName = contentView.findViewById<TextView>(R.id.node_name_text)
@@ -193,6 +195,17 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 nodeOptionsViewModel.shareDialogDisplayed()
             }
 
+            if (state.canMoveNode) {
+                state.node?.let { onMoveClicked(it) }
+                // Once the action has been acknowledged, notify the ViewModel
+                nodeOptionsViewModel.setMoveNodeClicked(false)
+            }
+            if (state.canRestoreNode) {
+                state.node?.let { onRestoreClicked(it) }
+                // Once the action has been acknowledged, notify the ViewModel
+                nodeOptionsViewModel.setRestoreNodeClicked(false)
+            }
+
             state.node?.let { node ->
                 if (megaApi.isInRubbish(node)) {
                     mode = RUBBISH_BIN_MODE
@@ -222,16 +235,17 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 optionLeaveShares.setOnClickListener { onLeaveShareClicked(node) }
                 optionRename.setOnClickListener { onRenameClicked(node) }
                 optionSendChat.setOnClickListener { onSendChatClicked(node) }
-                optionMove.setOnClickListener { onMoveClicked(node) }
+                optionMove.setOnClickListener { nodeOptionsViewModel.setMoveNodeClicked(true) }
                 optionCopy.setOnClickListener { onCopyClicked(node) }
                 optionRubbishBin.setOnClickListener { onDeleteClicked(node) }
-                optionRestoreFromRubbish.setOnClickListener { onRestoreClicked(node) }
+                optionRestoreFromRubbish.setOnClickListener {
+                    nodeOptionsViewModel.setRestoreNodeClicked(true)
+                }
                 optionRemove.setOnClickListener { onDeleteClicked(node) }
                 optionOpenFolder.setOnClickListener { onOpenFolderClicked(node) }
                 optionSlideshow.setOnClickListener { onSlideShowClicked(node) }
                 optionOpenWith.setOnClickListener { onOpenWithClicked(node) }
                 optionVersionsLayout.setOnClickListener { onVersionsClicked(node) }
-
 
                 val isTakenDown = node.isTakenDown
                 val accessLevel = megaApi.getAccess(node)
@@ -383,15 +397,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     RUBBISH_BIN_MODE -> {
                         Timber.d("show Rubbish bottom sheet")
                         optionEdit.visibility = View.GONE
-                        val restoreHandle = node.restoreHandle
-                        val restoreNode = megaApi.getNodeByHandle(restoreHandle)
-                        if (restoreHandle == MegaApiJava.INVALID_HANDLE || !megaApi.isInRubbish(node) || restoreNode == null || megaApi.isInRubbish(
-                                restoreNode
-                            ) || megaApi.isInInbox(restoreNode)
-                        ) {
-                            counterModify--
-                            optionRestoreFromRubbish.visibility = View.GONE
-                        }
                         optionLabel.visibility = View.GONE
                         optionFavourite.visibility = View.GONE
                         if (optionOpenWith.isVisible()) {
@@ -639,19 +644,16 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
     }
 
+    /**
+     * onDestroyView
+     */
     override fun onDestroyView() {
         dismissAlertDialogIfExists(cannotOpenFileDialog)
         super.onDestroyView()
     }
 
     /**
-     * Apply read-only Restrictions for Backup Nodes by hiding the following options:
-     *
-     * 1.) Rename
-     * 2.) Move to
-     * 3.) Move to Rubbish Bin
-     * 4.) Favourite
-     * 5.) Label
+     * When the Node is a Backup Node, apply read-only Restrictions by hiding specific options
      *
      * Hiding the aforementioned options will reduce the counter values for the Modify and Open
      * group options
@@ -668,7 +670,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         val optionMove = contentView.findViewById<TextView>(R.id.move_option)
         val optionLeaveShares = contentView.findViewById<TextView>(R.id.leave_share_option)
         val optionOpenFolder = contentView.findViewById<TextView>(R.id.open_folder_option)
-        val optionRestoreFromRubbish = contentView.findViewById<TextView>(R.id.restore_option)
         val optionRubbishBin = contentView.findViewById<TextView>(R.id.rubbish_bin_option)
         val optionRemove = contentView.findViewById<TextView>(R.id.remove_option)
         if (node != null && megaApi.isInInbox(node)) {
@@ -681,7 +682,6 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             optionRemove.visibility = View.GONE
             optionLeaveShares.visibility = View.GONE
             optionOpenFolder.visibility = View.GONE
-            optionRestoreFromRubbish.visibility = View.GONE
             decrementModify()
             decrementModify()
             decrementModify()
@@ -1086,6 +1086,9 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         OfflineUtils.saveOffline(offlineParent, node, requireActivity())
     }
 
+    /**
+     * onSaveInstanceState
+     */
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putAll(arguments)
@@ -1178,7 +1181,13 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     }
 
     companion object {
-
+        /**
+         * Instantiates the Fragment with specified parameters
+         *
+         * @param nodeId The [NodeId]
+         * @param shareData The [ShareData], which can be nullable
+         * @param mode The Mode used to display what Node actions are available
+         */
         fun newInstance(
             nodeId: NodeId,
             shareData: ShareData? = null,

@@ -4,15 +4,18 @@ import nz.mega.sdk.MegaNode
 
 /**
  * Node bottom sheet ui state
- *
+ * @property canMoveNode
+ * @property canRestoreNode
+ * @property isOnline
  * @property node
  * @property shareData
  * @property shareKeyCreated
- * @property isOnline
  */
 data class NodeBottomSheetUIState(
+    val canMoveNode: Boolean = false,
+    val canRestoreNode: Boolean = false,
+    val isOnline: Boolean = true,
     val node: MegaNode? = null,
     val shareData: NodeShareInformation? = null,
     val shareKeyCreated: Boolean? = null,
-    val isOnline: Boolean = true,
 )

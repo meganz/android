@@ -24,8 +24,8 @@ import mega.privacy.android.data.mapper.node.NodeShareKeyResultMapper
 import mega.privacy.android.data.mapper.shares.AccessPermissionMapper
 import mega.privacy.android.data.mapper.shares.ShareDataMapper
 import mega.privacy.android.domain.entity.FolderTreeInfo
-import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.PdfFileTypeInfo
+import mega.privacy.android.domain.entity.ShareData
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -41,13 +41,18 @@ import nz.mega.sdk.MegaUser
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.io.File
+import java.util.stream.Stream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -226,6 +231,36 @@ class NodeRepositoryImplTest {
             val actual = underTest.getNodeOutgoingShares(nodeId)
             assertThat(actual).containsExactly(share)
         }
+
+    @Test
+    fun `test that getNodePathById returns an empty node path if getMegaNodeByHandle returns null`() =
+        runTest {
+            whenever(megaApiGateway.getMegaNodeByHandle(any())).thenReturn(null)
+            val nodePath = underTest.getNodePathById(NodeId(123456))
+            assertThat(nodePath).isEmpty()
+            verify(megaApiGateway, times(0)).getNodePath(any())
+        }
+
+    @ParameterizedTest(name = "when getNodePath returns {0}, then getNodePathById returns {1}")
+    @MethodSource("mockGetNodePathById")
+    fun `test that getNodePathById returns the correct node path`(
+        nodePath: String?,
+        expectedNodePath: String,
+    ) = runTest {
+        val testNode = mock<MegaNode>()
+        megaApiGateway.stub {
+            onBlocking { getMegaNodeByHandle(any()) }.thenReturn(testNode)
+            onBlocking { getNodePath(testNode) }.thenReturn(nodePath)
+        }
+        val actualNodePath = underTest.getNodePathById(NodeId(123456))
+        assertThat(actualNodePath).isEqualTo(expectedNodePath)
+    }
+
+    private fun mockGetNodePathById() = Stream.of(
+        Arguments.of(null, ""),
+        Arguments.of("", ""),
+        Arguments.of("test/path", "test/path")
+    )
 
     private suspend fun mockFolderInfoResponse() {
         val fileNode: MegaNode = mock()

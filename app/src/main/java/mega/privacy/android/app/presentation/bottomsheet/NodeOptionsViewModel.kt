@@ -15,17 +15,25 @@ import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeBottomSheetUIState
 import mega.privacy.android.app.presentation.bottomsheet.model.NodeShareInformation
+import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
+import mega.privacy.android.domain.usecase.node.IsNodeDeletedFromBackupsUseCase
 import nz.mega.sdk.MegaNode
 import javax.inject.Inject
 
 /**
- * View model associated with [NodeOptionsBottomSheetDialogFragment]
+ * [ViewModel] associated with [NodeOptionsBottomSheetDialogFragment]
+ *
+ * @property createShareKey [CreateShareKey]
+ * @property getNodeByHandle [GetNodeByHandle]
+ * @property isNodeDeletedFromBackupsUseCase [IsNodeDeletedFromBackupsUseCase]
+ * @property monitorConnectivityUseCase [MonitorConnectivityUseCase]
  */
 @HiltViewModel
 class NodeOptionsViewModel @Inject constructor(
     private val createShareKey: CreateShareKey,
     private val getNodeByHandle: GetNodeByHandle,
+    private val isNodeDeletedFromBackupsUseCase: IsNodeDeletedFromBackupsUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -33,6 +41,10 @@ class NodeOptionsViewModel @Inject constructor(
     private val shareKeyCreated = MutableStateFlow<Boolean?>(null)
 
     private val _state = MutableStateFlow(NodeBottomSheetUIState())
+
+    /**
+     * The UI State for [NodeOptionsBottomSheetDialogFragment]
+     */
     val state = _state.asStateFlow()
 
     init {
@@ -42,7 +54,7 @@ class NodeOptionsViewModel @Inject constructor(
                     .map { getNodeByHandle(it) },
                 savedStateHandle.getStateFlow(SHARE_DATA_KEY, null),
                 shareKeyCreated,
-                monitorConnectivityUseCase()
+                monitorConnectivityUseCase(),
             ) { node: MegaNode?, shareData: NodeShareInformation?, shareKeyCreated: Boolean?, isOnline: Boolean ->
                 { state: NodeBottomSheetUIState ->
                     state.copy(
@@ -58,6 +70,34 @@ class NodeOptionsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Updates the UI State when the "Move" option is selected
+     *
+     * @param clicked true if the option is clicked, and false if otherwise
+     */
+    fun setMoveNodeClicked(clicked: Boolean) =
+        _state.update { it.copy(canMoveNode = clicked) }
+
+    /**
+     * Updates the UI State when the "Restore" option is selected
+     *
+     * @param clicked true if the option is clicked, and false if otherwise
+     */
+    fun setRestoreNodeClicked(clicked: Boolean) = viewModelScope.launch {
+        _state.value.node?.let { nonNullNode ->
+            val isNodeDeletedFromBackups =
+                isNodeDeletedFromBackupsUseCase(NodeId(nonNullNode.handle))
+            if (isNodeDeletedFromBackups) {
+                _state.update { it.copy(canMoveNode = clicked) }
+            } else {
+                _state.update { it.copy(canRestoreNode = clicked) }
+            }
+        }
+    }
+
+    /**
+     * Creates a Shared Key
+     */
     fun createShareKey() {
         viewModelScope.launch {
             kotlin.runCatching {
@@ -91,8 +131,19 @@ class NodeOptionsViewModel @Inject constructor(
         }
 
     companion object {
+        /**
+         * The Mode Key
+         */
         const val MODE_KEY = "MODE"
+
+        /**
+         * The Node ID Key
+         */
         const val NODE_ID_KEY = "NODE_ID_KEY"
+
+        /**
+         * The Share Data Key
+         */
         const val SHARE_DATA_KEY = "SHARE_DATA_KEY"
     }
 }
