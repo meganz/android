@@ -1,13 +1,11 @@
 package mega.privacy.android.app.di.cameraupload
 
-import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import mega.privacy.android.app.di.GetNodeModule
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
@@ -43,7 +41,6 @@ import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.SetupDefaultSecondaryFolder
 import mega.privacy.android.data.repository.MegaNodeRepository
-import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.SyncRecordType
 import mega.privacy.android.domain.entity.SyncStatus
 import mega.privacy.android.domain.repository.CameraUploadRepository
@@ -126,7 +123,6 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
 import mega.privacy.android.domain.usecase.ResetTotalUploads
-import mega.privacy.android.domain.usecase.RestartCameraUpload
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -136,9 +132,6 @@ import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
-import mega.privacy.android.domain.usecase.StartCameraUpload
-import mega.privacy.android.domain.usecase.StopCameraUpload
-import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
@@ -185,61 +178,6 @@ abstract class CameraUploadUseCases {
         @Provides
         fun provideUpdateFolderDestinationBroadcast(cameraUploadRepository: CameraUploadRepository): UpdateFolderDestinationBroadcast =
             UpdateFolderDestinationBroadcast(cameraUploadRepository::sendUpdateFolderDestinationBroadcast)
-
-
-        /**
-         * Provide the [StopCameraUpload] implementation
-         */
-        @Provides
-        fun provideStopCameraUpload(
-            jobUtilWrapper: JobUtilWrapper,
-            @ApplicationContext context: Context,
-        ): StopCameraUpload = StopCameraUpload {
-            jobUtilWrapper.fireStopCameraUploadJob(context)
-        }
-
-        /**
-         * Provide the [StopCameraUploadSyncHeartbeat] implementation
-         */
-        @Provides
-        fun provideStopCameraUploadSyncHeartbeat(
-            jobUtilWrapper: JobUtilWrapper,
-            @ApplicationContext context: Context,
-        ): StopCameraUploadSyncHeartbeat = StopCameraUploadSyncHeartbeat {
-            jobUtilWrapper.stopCameraUploadSyncHeartbeatWorkers(context)
-        }
-
-
-        /**
-         * Provide the [StartCameraUpload] implementation
-         */
-        @Provides
-        fun provideStartCameraUpload(
-            jobUtilWrapper: JobUtilWrapper,
-            @ApplicationContext context: Context,
-        ): StartCameraUpload = StartCameraUpload {
-            jobUtilWrapper.fireCameraUploadJob(
-                context,
-            )
-        }
-
-        /**
-         * Provides the [RestartCameraUpload] implementation
-         *
-         * @param jobUtilWrapper [JobUtilWrapper]
-         * @param context [Context]
-         *
-         * @return [RestartCameraUpload]
-         */
-        @Provides
-        fun provideRestartCameraUpload(
-            jobUtilWrapper: JobUtilWrapper,
-            @ApplicationContext context: Context,
-        ): RestartCameraUpload = RestartCameraUpload {
-            jobUtilWrapper.fireRestartCameraUploadJob(
-                context = context,
-            )
-        }
 
         /**
          * Provide the [MediaLocalPathExists] implementation

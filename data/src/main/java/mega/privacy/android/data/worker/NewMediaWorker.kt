@@ -12,8 +12,8 @@ import androidx.work.WorkerParameters
 import androidx.work.await
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
+import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import timber.log.Timber
 
 @HiltWorker
@@ -21,13 +21,13 @@ internal class NewMediaWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
     private val isCameraUploadSyncEnabled: IsCameraUploadSyncEnabled,
-    private val jobUtilWrapper: JobUtilWrapper,
+    private val startCameraUploadUseCase: StartCameraUploadUseCase,
 ) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         runCatching {
             if (isCameraUploadSyncEnabled()) {
                 Timber.d("Capture new media")
-                jobUtilWrapper.fireCameraUploadJob(context)
+                startCameraUploadUseCase()
                 // it's one time job, we need to re-listen again
                 scheduleWork(context, true)
             }

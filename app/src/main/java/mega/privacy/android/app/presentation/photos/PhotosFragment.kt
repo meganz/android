@@ -525,7 +525,7 @@ class PhotosFragment : Fragment() {
      * Enables the Camera Uploads feature
      */
     fun enableCameraUploads() {
-        timelineViewModel.enableCU(requireContext())
+        timelineViewModel.enableCU()
         managerActivity.refreshPhotosFragment()
     }
 

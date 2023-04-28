@@ -24,24 +24,25 @@ import mega.privacy.android.app.presentation.photos.timeline.model.ApplyFilterMe
 import mega.privacy.android.app.presentation.photos.timeline.model.PhotoListItem
 import mega.privacy.android.app.presentation.photos.timeline.model.TimelinePhotosSource
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
-import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus
 import mega.privacy.android.domain.entity.photos.Photo
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -72,12 +73,13 @@ class TimelineViewModelTest {
         )
     }
 
-    private val jobUtilWrapper =
-        mock<JobUtilWrapper> { on { isOverQuota() }.thenReturn(false) }
+    private val startCameraUploadUseCase = mock<StartCameraUploadUseCase>()
 
     private val checkEnableCameraUploadsStatus = mock<CheckEnableCameraUploadsStatus>()
 
     private val monitorCameraUploadProgress = mock<MonitorCameraUploadProgress>()
+
+    private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
 
     private val stopCameraUploadAndHeartbeatUseCase = mock<StopCameraUploadAndHeartbeatUseCase>()
 
@@ -92,11 +94,12 @@ class TimelineViewModelTest {
             setInitialCUPreferences = setInitialCUPreferences,
             enableCameraUploadsInPhotosUseCase = enableCameraUploadsInPhotosUseCase,
             getNodeListByIds = getNodeListByIds,
-            jobUtilWrapper = jobUtilWrapper,
+            startCameraUploadUseCase = startCameraUploadUseCase,
             ioDispatcher = StandardTestDispatcher(),
             mainDispatcher = StandardTestDispatcher(),
             checkEnableCameraUploadsStatus = checkEnableCameraUploadsStatus,
             monitorCameraUploadProgress = monitorCameraUploadProgress,
+            getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             stopCameraUploadAndHeartbeatUseCase = stopCameraUploadAndHeartbeatUseCase,
         )
     }
@@ -339,6 +342,29 @@ class TimelineViewModelTest {
 
             advanceUntilIdle()
 
-            verify(stopCameraUploadAndHeartbeatUseCase, times(1)).invoke()
+            verify(stopCameraUploadAndHeartbeatUseCase).invoke()
         }
+
+    @Test
+    fun `test that when enableCU is called, enableCameraUploadsInPhotosUseCase is called with the previously primary folder path set`() =
+        runTest {
+            val expected = "/previously/set/path"
+            whenever(getPrimaryFolderPathUseCase()).thenReturn(expected)
+            underTest.enableCU()
+            advanceUntilIdle()
+            verify(enableCameraUploadsInPhotosUseCase).invoke(
+                primaryFolderLocalPath = eq(expected),
+                shouldSyncVideos = any(),
+                shouldUseWiFiOnly = any(),
+                videoCompressionSizeLimit = any(),
+                videoUploadQuality = any(),
+            )
+        }
+
+    @Test
+    fun `test that when enableCU is called, startCameraUploadUseCase is called`() = runTest {
+        underTest.enableCU()
+        advanceUntilIdle()
+        verify(startCameraUploadUseCase).invoke()
+    }
 }

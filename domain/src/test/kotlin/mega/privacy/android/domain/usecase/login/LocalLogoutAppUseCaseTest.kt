@@ -9,7 +9,7 @@ import mega.privacy.android.domain.repository.PushesRepository
 import mega.privacy.android.domain.repository.TransferRepository
 import mega.privacy.android.domain.usecase.ClearPsa
 import mega.privacy.android.domain.usecase.StopAudioService
-import mega.privacy.android.domain.usecase.StopCameraUpload
+import mega.privacy.android.domain.usecase.workers.StopCameraUploadUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -25,7 +25,7 @@ class LocalLogoutAppUseCaseTest {
     private val transferRepository = mock<TransferRepository>()
     private val pushesRepository = mock<PushesRepository>()
     private val billingRepository = mock<BillingRepository>()
-    private val stopCameraUpload = mock<StopCameraUpload>()
+    private val stopCameraUploadUseCase = mock<StopCameraUploadUseCase>()
     private val stopAudioService = mock<StopAudioService>()
 
     @Before
@@ -36,7 +36,7 @@ class LocalLogoutAppUseCaseTest {
             transferRepository = transferRepository,
             pushesRepository = pushesRepository,
             billingRepository = billingRepository,
-            stopCameraUpload = stopCameraUpload,
+            stopCameraUploadUseCase = stopCameraUploadUseCase,
             stopAudioService = stopAudioService
         )
     }
@@ -56,7 +56,7 @@ class LocalLogoutAppUseCaseTest {
         verify(pushesRepository).clearPushToken()
         verify(billingRepository).clearCache()
         verify(loginRepository).broadcastLogout()
-        verify(stopCameraUpload).invoke()
+        verify(stopCameraUploadUseCase).invoke()
         verify(stopAudioService).invoke()
         verify(clearPsa).invoke()
     }

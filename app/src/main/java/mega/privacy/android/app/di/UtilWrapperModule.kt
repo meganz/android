@@ -16,7 +16,6 @@ import mega.privacy.android.app.domain.usecase.GetNodeLocationInfo
 import mega.privacy.android.app.sync.camerauploads.CameraUploadSyncManager
 import mega.privacy.android.app.utils.AvatarUtil
 import mega.privacy.android.app.utils.FileUtil
-import mega.privacy.android.app.utils.JobUtil
 import mega.privacy.android.app.utils.OfflineUtils
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapper
 import mega.privacy.android.app.utils.permission.PermissionUtilWrapperImpl
@@ -32,7 +31,6 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.wrapper.AvatarWrapper
 import mega.privacy.android.data.wrapper.CameraUploadServiceWrapper
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
-import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.BackupState
 
 /**
@@ -93,24 +91,6 @@ abstract class UtilWrapperModule {
 
                 override fun updateSecondaryFolderBackupState(backupState: BackupState) =
                     CameraUploadSyncManager.updateSecondaryFolderBackupState(backupState)
-            }
-
-        @Provides
-        fun provideJobUtilWrapper(): JobUtilWrapper =
-            object : JobUtilWrapper {
-                override fun isOverQuota(): Boolean = JobUtil.isOverQuota
-
-                override fun fireCameraUploadJob(context: Context): Int =
-                    JobUtil.fireCameraUploadJob(context)
-
-                override fun fireStopCameraUploadJob(context: Context) =
-                    JobUtil.fireStopCameraUploadJob(context)
-
-                override fun fireRestartCameraUploadJob(context: Context) =
-                    JobUtil.fireRestartCameraUploadJob(context)
-
-                override fun stopCameraUploadSyncHeartbeatWorkers(context: Context) =
-                    JobUtil.stopCameraUploadSyncHeartbeatWorkers(context)
             }
 
         @Provides

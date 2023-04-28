@@ -49,9 +49,7 @@ import mega.privacy.android.domain.usecase.GetSyncRecordByFingerprint
 import mega.privacy.android.domain.usecase.GetSyncRecordByPath
 import mega.privacy.android.domain.usecase.GetUploadFolderHandle
 import mega.privacy.android.domain.usecase.GetVideoSyncRecordsByStatus
-import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
 import mega.privacy.android.domain.usecase.HasCredentials
-import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import mega.privacy.android.domain.usecase.IsCameraUploadSyncEnabled
 import mega.privacy.android.domain.usecase.IsChargingRequired
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
@@ -71,7 +69,6 @@ import mega.privacy.android.domain.usecase.ResetMediaUploadTimeStamps
 import mega.privacy.android.domain.usecase.ResetPrimaryTimeline
 import mega.privacy.android.domain.usecase.ResetSecondaryTimeline
 import mega.privacy.android.domain.usecase.ResetTotalUploads
-import mega.privacy.android.domain.usecase.RestartCameraUpload
 import mega.privacy.android.domain.usecase.RestorePrimaryTimestamps
 import mega.privacy.android.domain.usecase.RestoreSecondaryTimestamps
 import mega.privacy.android.domain.usecase.SaveSyncRecord
@@ -81,12 +78,11 @@ import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
-import mega.privacy.android.domain.usecase.StartCameraUpload
-import mega.privacy.android.domain.usecase.StopCameraUpload
-import mega.privacy.android.domain.usecase.StopCameraUploadSyncHeartbeat
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
 import mega.privacy.android.domain.usecase.UpdateFolderDestinationBroadcast
 import mega.privacy.android.domain.usecase.UpdateFolderIconBroadcast
+import mega.privacy.android.domain.usecase.camerauploads.HasCameraSyncEnabledUseCase
+import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
 import org.mockito.kotlin.mock
 
 @TestInstallIn(
@@ -95,18 +91,6 @@ import org.mockito.kotlin.mock
 )
 @Module(includes = [TestGetNodeModule::class])
 object TestCameraUploadUseCases {
-
-    @Provides
-    fun provideStartCameraUpload() = mock<StartCameraUpload>()
-
-    @Provides
-    fun provideStopCameraUpload() = mock<StopCameraUpload>()
-
-    @Provides
-    fun provideStopCameraUploadSyncHeartbeat() = mock<StopCameraUploadSyncHeartbeat>()
-
-    @Provides
-    fun provideRestartCameraUpload() = mock<RestartCameraUpload>()
 
     @Provides
     fun provideHasCredentials() = mock<HasCredentials>()

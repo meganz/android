@@ -1,9 +1,7 @@
 package mega.privacy.android.app.presentation.photos.timeline.viewmodel
 
 import android.Manifest
-import android.content.Context
 import android.os.Build
-import android.os.Environment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +25,6 @@ import mega.privacy.android.app.presentation.photos.util.createDaysCardList
 import mega.privacy.android.app.presentation.photos.util.createMonthsCardList
 import mega.privacy.android.app.presentation.photos.util.createYearsCardList
 import mega.privacy.android.app.presentation.photos.util.groupPhotosByDay
-import mega.privacy.android.data.wrapper.JobUtilWrapper
 import mega.privacy.android.domain.entity.VideoQuality
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.CAN_ENABLE_CAMERA_UPLOADS
 import mega.privacy.android.domain.entity.account.EnableCameraUploadsStatus.SHOW_REGULAR_BUSINESS_ACCOUNT_PROMPT
@@ -38,11 +35,13 @@ import mega.privacy.android.domain.qualifier.MainDispatcher
 import mega.privacy.android.domain.usecase.CheckEnableCameraUploadsStatus
 import mega.privacy.android.domain.usecase.FilterCameraUploadPhotos
 import mega.privacy.android.domain.usecase.FilterCloudDrivePhotos
-import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
 import mega.privacy.android.domain.usecase.IsCameraSyncPreferenceEnabled
 import mega.privacy.android.domain.usecase.MonitorCameraUploadProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.photos.EnableCameraUploadsInPhotosUseCase
+import mega.privacy.android.domain.usecase.photos.GetTimelinePhotosUseCase
+import mega.privacy.android.domain.usecase.workers.StartCameraUploadUseCase
 import mega.privacy.android.domain.usecase.workers.StopCameraUploadAndHeartbeatUseCase
 import nz.mega.sdk.MegaNode
 import org.jetbrains.anko.collections.forEachWithIndex
@@ -61,10 +60,11 @@ import javax.inject.Inject
  * @property setInitialCUPreferences
  * @property enableCameraUploadsInPhotosUseCase
  * @property getNodeListByIds
- * @property jobUtilWrapper
+ * @property startCameraUploadUseCase
  * @property ioDispatcher
  * @property mainDispatcher
  * @property checkEnableCameraUploadsStatus
+ * @property getPrimaryFolderPathUseCase
  * @property stopCameraUploadAndHeartbeatUseCase
  * @param monitorCameraUploadProgress
  */
@@ -77,10 +77,11 @@ class TimelineViewModel @Inject constructor(
     val setInitialCUPreferences: SetInitialCUPreferences,
     private val enableCameraUploadsInPhotosUseCase: EnableCameraUploadsInPhotosUseCase,
     val getNodeListByIds: GetNodeListByIds,
-    private val jobUtilWrapper: JobUtilWrapper,
+    private val startCameraUploadUseCase: StartCameraUploadUseCase,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
     @MainDispatcher val mainDispatcher: CoroutineDispatcher,
     private val checkEnableCameraUploadsStatus: CheckEnableCameraUploadsStatus,
+    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val stopCameraUploadAndHeartbeatUseCase: StopCameraUploadAndHeartbeatUseCase,
     monitorCameraUploadProgress: MonitorCameraUploadProgress,
 ) : ViewModel() {
@@ -306,7 +307,7 @@ class TimelineViewModel @Inject constructor(
         }
     }
 
-    fun enableCU(context: Context) {
+    fun enableCU() {
         _state.update {
             it.copy(
                 enableCameraUploadButtonShowing = false,
@@ -316,18 +317,15 @@ class TimelineViewModel @Inject constructor(
         handleEnableZoomAndSortOptions()
 
         viewModelScope.launch(ioDispatcher) {
-            val localFile = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM
-            )
             enableCameraUploadsInPhotosUseCase(
-                primaryFolderLocalPath = localFile.absolutePath,
+                primaryFolderLocalPath = getPrimaryFolderPathUseCase(),
                 shouldSyncVideos = _state.value.cuUploadsVideos,
                 shouldUseWiFiOnly = _state.value.cuUseCellularConnection.not(),
                 videoCompressionSizeLimit = SettingsConstants.DEFAULT_CONVENTION_QUEUE_SIZE,
                 videoUploadQuality = VideoQuality.ORIGINAL,
             )
             Timber.d("CameraUpload enabled through Photos Tab - fireCameraUploadJob()")
-            jobUtilWrapper.fireCameraUploadJob(context)
+            startCameraUploadUseCase()
         }
     }
 
