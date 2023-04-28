@@ -369,7 +369,7 @@ class FileInfoViewModel @Inject constructor(
         _uiState.value.outShareContactShowOptions?.user?.let { email ->
             changeSharePermissionForUsers(
                 accessPermission,
-                FileInfoJobInProgressState.ChangeSharePermission.Set,
+                FileInfoJobInProgressState.ChangeSharePermission.Change,
                 email
             )
         }
@@ -386,9 +386,10 @@ class FileInfoViewModel @Inject constructor(
      * Set out sharing permission for contacts in [emails] list.
      */
     fun setSharePermissionForUsers(accessPermission: AccessPermission, emails: List<String>) {
+        val alreadySet = _uiState.value.outShares.map { it.contactItem.email }.containsAll(emails)
         changeSharePermissionForUsers(
             accessPermission,
-            FileInfoJobInProgressState.ChangeSharePermission.Set,
+            if (alreadySet) FileInfoJobInProgressState.ChangeSharePermission.Change else FileInfoJobInProgressState.ChangeSharePermission.Set,
             *emails.toTypedArray()
         )
     }

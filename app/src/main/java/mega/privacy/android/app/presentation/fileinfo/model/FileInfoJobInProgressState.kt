@@ -113,9 +113,24 @@ sealed class FileInfoJobInProgressState(
             failMessage = failMessage,
         ) {
         /**
-         * Permission will be changed or set
+         * Permission will be set
          */
         object Set : ChangeSharePermission(
+            progressMessage = R.string.context_sharing_folder,
+            successMessage = R.string.context_correctly_shared,
+            failMessage = null
+        ) {
+            override fun customErrorMessage(context: Context, exception: Throwable?) =
+                context.getString(
+                    R.string.number_permission_incorrectly_changed_from_shared,
+                    (exception as? ShareAccessNotSetException)?.totalNotSet ?: 1
+                )
+        }
+
+        /**
+         * Permission will be changed
+         */
+        object Change : ChangeSharePermission(
             progressMessage = R.string.context_permissions_changing_folder,
             successMessage = R.string.context_permissions_changed,
             failMessage = null
