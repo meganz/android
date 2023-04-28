@@ -268,7 +268,7 @@ class GetContactsUseCase @Inject constructor(
         val alias = megaChatApi.getUserAliasFromCache(handle)
         val fullName = megaChatApi.getUserFullnameFromCache(handle)
         val userStatus = megaChatApi.getUserOnlineStatus(handle)
-        val userImageColor = megaApi.getUserAvatarColor(this).toColorInt()
+        val userImageColor = megaApi.getUserAvatarColor(this)?.toColorInt() ?: -1
         val title = when {
             !alias.isNullOrBlank() -> alias
             !fullName.isNullOrBlank() -> fullName

@@ -182,7 +182,7 @@ object AlertsAndWarnings {
     }
 
     @JvmStatic
-    fun askForCustomizedPlan(context: Context, myEmail: String, accountType: Int) {
+    fun askForCustomizedPlan(context: Context, myEmail: String?, accountType: Int) {
         Timber.d("askForCustomizedPlan")
         val body = StringBuilder()
         body.append(context.getString(R.string.subject_mail_upgrade_plan))

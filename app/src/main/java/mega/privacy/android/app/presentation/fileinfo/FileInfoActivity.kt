@@ -391,7 +391,7 @@ class FileInfoActivity : BaseActivity(), SnackbarShower, FileContactsListBottomS
             val defaultAvatar = BitmapDrawable(
                 resources,
                 AvatarUtil.getDefaultAvatar(
-                    contactItem.defaultAvatarColor.toColorInt(),
+                    contactItem.defaultAvatarColor?.toColorInt() ?: -1,
                     contactItem.getAvatarFirstLetter(),
                     Constants.AVATAR_SIZE,
                     true

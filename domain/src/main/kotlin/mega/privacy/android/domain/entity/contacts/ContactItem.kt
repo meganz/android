@@ -19,7 +19,7 @@ data class ContactItem(
     val handle: Long,
     val email: String,
     val contactData: ContactData,
-    val defaultAvatarColor: String,
+    val defaultAvatarColor: String?,
     val visibility: UserVisibility,
     val timestamp: Long,
     val areCredentialsVerified: Boolean,

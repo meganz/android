@@ -174,7 +174,7 @@ interface MegaApiGateway {
     /**
      * Authentication token that can be used to identify the user account.
      */
-    val accountAuth: String
+    val accountAuth: String?
 
     /**
      * Fingerprint of the signing key of the current account
@@ -680,7 +680,7 @@ interface MegaApiGateway {
      * @param megaUser
      * @return The RGB color as a string with 3 components in hex: #RGB. Ie. "#FF6A19"
      */
-    suspend fun getUserAvatarColor(megaUser: MegaUser): String
+    suspend fun getUserAvatarColor(megaUser: MegaUser): String?
 
     /**
      * Get the default color for the avatar
@@ -688,7 +688,7 @@ interface MegaApiGateway {
      * @param userHandle
      * @return The RGB color as a string with 3 components in hex: #RGB. Ie. "#FF6A19"
      */
-    suspend fun getUserAvatarColor(userHandle: Long): String
+    suspend fun getUserAvatarColor(userHandle: Long): String?
 
     /**
      * Get user avatar

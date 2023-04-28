@@ -195,7 +195,7 @@ class GetContactRequestsUseCase @Inject constructor(
 
         val userEmail = if (isOutgoing) targetEmail else sourceEmail
         val userName = megaChatApi.getUserFirstnameFromCache(handle)
-        val userImageColor = megaApi.getUserAvatarColor(handle.toString()).toColorInt()
+        val userImageColor = megaApi.getUserAvatarColor(handle.toString())?.toColorInt() ?: -1
         val placeholder = getImagePlaceholder(userName ?: userEmail, userImageColor)
         val userImageFile = AvatarUtil.getUserAvatarFile(context, userEmail)
         if (userImageFile?.exists() == true) {

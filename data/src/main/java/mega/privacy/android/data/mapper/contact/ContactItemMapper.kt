@@ -27,7 +27,7 @@ internal class ContactItemMapper @Inject constructor() {
     operator fun invoke(
         megaUser: MegaUser,
         contactData: ContactData,
-        defaultAvatarColor: String,
+        defaultAvatarColor: String?,
         areCredentialsVerified: Boolean,
         status: Int,
         lastSeen: Int?,

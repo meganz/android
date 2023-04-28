@@ -125,7 +125,7 @@ internal class MegaApiFacade @Inject constructor(
 
     override val isEphemeralPlusPlus: Boolean
         get() = megaApi.isEphemeralPlusPlus
-    override val accountAuth: String
+    override val accountAuth: String?
         get() = megaApi.accountAuth
     override val myCredentials: String?
         get() = megaApi.myCredentials
@@ -430,10 +430,10 @@ internal class MegaApiFacade @Inject constructor(
     override suspend fun sendEvent(eventID: Int, message: String) =
         megaApi.sendEvent(eventID, message)
 
-    override suspend fun getUserAvatarColor(megaUser: MegaUser): String =
+    override suspend fun getUserAvatarColor(megaUser: MegaUser): String? =
         megaApi.getUserAvatarColor(megaUser)
 
-    override suspend fun getUserAvatarColor(userHandle: Long): String =
+    override suspend fun getUserAvatarColor(userHandle: Long): String? =
         megaApi.getUserAvatarColor(userHandleToBase64(userHandle))
 
     override suspend fun getUserAvatar(user: MegaUser, destinationPath: String): Boolean {

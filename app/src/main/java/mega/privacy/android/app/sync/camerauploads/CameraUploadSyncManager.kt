@@ -821,8 +821,8 @@ object CameraUploadSyncManager {
         var lastEmail = ""
         var myUserHandle = ""
         if (myUser != null) {
-            lastEmail = megaApi.myUser.email
-            myUserHandle = megaApi.myUser.handle.toString() + ""
+            lastEmail = megaApi.myUser?.email.orEmpty()
+            myUserHandle = megaApi.myUser?.handle.toString() + ""
         }
         val credentials =
             UserCredentials(

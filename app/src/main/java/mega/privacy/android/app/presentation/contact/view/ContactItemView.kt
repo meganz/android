@@ -207,7 +207,7 @@ private fun ContactAvatar(
     } else {
         DefaultContactAvatar(
             modifier = modifier,
-            color = Color(contactItem.defaultAvatarColor.toColorInt()),
+            color = Color(contactItem.defaultAvatarColor?.toColorInt() ?: -1),
             content = contactItem.getAvatarFirstLetter()
         )
     }

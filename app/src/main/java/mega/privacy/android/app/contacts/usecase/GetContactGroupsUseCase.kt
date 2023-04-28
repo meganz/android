@@ -140,7 +140,7 @@ class GetContactGroupsUseCase @Inject constructor(
         var userAvatar: File? = null
         val userName = megaChatApi.getUserFirstnameFromCache(userHandle)
         val userEmail = megaChatApi.getUserEmailFromCache(userHandle)
-        val userAvatarColor = megaApi.getUserAvatarColor(userHandle.toString()).toColorInt()
+        val userAvatarColor = megaApi.getUserAvatarColor(userHandle.toString())?.toColorInt() ?: -1
 
         if (userName.isNullOrBlank()) {
             megaApi.getUserAttribute(userHandle.toString(), USER_ATTR_FIRSTNAME, listener)

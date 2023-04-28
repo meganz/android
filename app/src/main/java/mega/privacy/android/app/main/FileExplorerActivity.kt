@@ -2047,8 +2047,8 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 var myUserHandle = ""
 
                 if (myUser != null) {
-                    lastEmail = megaApi.myUser.email
-                    myUserHandle = megaApi.myUser.handle.toString() + ""
+                    lastEmail = megaApi.myUser?.email
+                    myUserHandle = megaApi.myUser?.handle.toString() + ""
                 }
 
                 credentials = UserCredentials(lastEmail, gSession, "", "", myUserHandle)
