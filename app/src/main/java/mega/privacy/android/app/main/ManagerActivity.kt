@@ -4337,6 +4337,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 showFabButton()
             }
             DrawerItem.TRANSFERS -> {
+                transfersManagement.setAreFailedTransfers(false)
                 showHideBottomNavigationView(true)
                 supportActionBar?.subtitle = null
                 selectDrawerItemTransfers()
