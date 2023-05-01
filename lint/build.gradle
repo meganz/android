@@ -1,4 +1,3 @@
-apply plugin: 'java-library'
 apply plugin: 'kotlin'
 apply plugin: 'com.android.lint'
 
@@ -20,4 +19,16 @@ dependencies {
     testImplementation testlib.junit
     testImplementation tools.lint
     testImplementation tools.lint.tests
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "11"
+        suppressWarnings = shouldSuppressWarnings()
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+    }
+
+    kotlin {
+        jvmToolchain(11)
+    }
 }

@@ -31,6 +31,13 @@ COVERAGE_ARCHIVE = "coverage.zip"
 COVERAGE_FOLDER = "coverage"
 ARTIFACTORY_DEVELOP_CODE_COVERAGE = ""
 
+
+/**
+ * Folder to contain build outputs, including APK, AAG and symbol files
+ */
+ARCHIVE_FOLDER = "archive"
+NATIVE_SYMBOLS_FILE = "symbols.zip"
+
 /**
  * common.groovy file with common methods
  */
@@ -223,10 +230,12 @@ pipeline {
                 }
                 gitlabCommitStatus(name: 'Preparation') {
                     script {
-
                         sh("rm -fv ${CONSOLE_LOG_FILE}")
                         sh("set")
                         sh("rm -fv unit_test_result*.zip")
+
+                        sh("rm -frv $ARCHIVE_FOLDER")
+                        sh("mkdir -p ${WORKSPACE}/${ARCHIVE_FOLDER}")
                     }
                 }
             }
@@ -276,6 +285,23 @@ pipeline {
                         cp -fr ${BUILD_LIB_DOWNLOAD_FOLDER}/${GOOGLE_MAP_API_UNZIPPED}/* app/src/
                 
                     """
+                }
+            }
+        }
+        stage('Fetch native symbols') {
+            when {
+                expression { (!shouldSkipBuild()) }
+            }
+            steps {
+                script {
+                    withCredentials([
+                            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
+                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
+                    ]) {
+                        BUILD_STEP = 'Fetch native symbols'
+
+                        common.downloadAndExtractNativeSymbols()
+                    }
                 }
             }
         }
