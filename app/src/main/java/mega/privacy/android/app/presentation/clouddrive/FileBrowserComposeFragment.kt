@@ -19,6 +19,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -71,7 +72,8 @@ class FileBrowserComposeFragment : Fragment() {
                         stringUtilWrapper = stringUtilWrapper,
                         emptyState = getEmptyFolderDrawable(true),
                         onItemClick = fileBrowserViewModel::onItemClicked,
-                        onLongClick = fileBrowserViewModel::onLongItemClicked
+                        onLongClick = fileBrowserViewModel::onLongItemClicked,
+                        onMenuClick = ::showOptionsMenuForItem
                     )
                 }
             }
@@ -135,5 +137,12 @@ class FileBrowserComposeFragment : Fragment() {
      */
     fun onBackPressed(): Int {
         return 0
+    }
+
+    /**
+     * Shows Options menu for item clicked
+     */
+    private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem) {
+        (requireActivity() as ManagerActivity).showNodeOptionsPanel(nodeId = nodeUIItem.id)
     }
 }
