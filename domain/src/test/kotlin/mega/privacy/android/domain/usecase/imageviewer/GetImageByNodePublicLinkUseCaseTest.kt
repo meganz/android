@@ -13,15 +13,15 @@ import org.mockito.kotlin.whenever
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultGetImageByNodePublicLinkTest {
-    private lateinit var underTest: GetImageByNodePublicLink
+class GetImageByNodePublicLinkUseCaseTest {
+    private lateinit var underTest: GetImageByNodePublicLinkUseCase
 
     private val networkRepository = mock<NetworkRepository>()
     private val imageRepository = mock<ImageRepository>()
 
     @Before
     fun setUp() {
-        underTest = DefaultGetImageByNodePublicLink(networkRepository, imageRepository)
+        underTest = GetImageByNodePublicLinkUseCase(networkRepository, imageRepository)
     }
 
     @Test

@@ -2,12 +2,16 @@ package mega.privacy.android.domain.usecase.imageviewer
 
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.imageviewer.ImageResult
+import mega.privacy.android.domain.repository.ImageRepository
+import mega.privacy.android.domain.repository.NetworkRepository
 
 /**
- * The use case interface to get Image Result given Node Public Link
+ * The use case to get Image Result given Node Public Link
  */
-fun interface GetImageByNodePublicLink {
-
+class GetImageByNodePublicLinkUseCase(
+    private val networkRepository: NetworkRepository,
+    private val imageRepository: ImageRepository,
+) {
     /**
      * Get Image Result given Node Public Link
      *
@@ -23,5 +27,13 @@ fun interface GetImageByNodePublicLink {
         fullSize: Boolean,
         highPriority: Boolean,
         resetDownloads: () -> Unit,
-    ): Flow<ImageResult>
+    ): Flow<ImageResult> {
+        return imageRepository.getImageByNodePublicLink(
+            nodeFileLink,
+            fullSize,
+            highPriority,
+            networkRepository.isMeteredConnection() ?: false,
+            resetDownloads
+        )
+    }
 }

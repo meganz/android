@@ -36,8 +36,6 @@ import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.SetInitialCUPreferences
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
-import mega.privacy.android.domain.usecase.imageviewer.DefaultGetImageByNodeHandle
-import mega.privacy.android.domain.usecase.imageviewer.GetImageByNodeHandle
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -78,9 +76,6 @@ abstract class PhotosUseCases {
 
     @Binds
     abstract fun bindUpdateAlbumPhotosRemovingProgressCompleted(useCase: DefaultUpdateAlbumPhotosRemovingProgressCompleted): UpdateAlbumPhotosRemovingProgressCompleted
-
-    @Binds
-    abstract fun bindGetImageByNodeHandle(useCase: DefaultGetImageByNodeHandle): GetImageByNodeHandle
 
     companion object {
         @Provides
