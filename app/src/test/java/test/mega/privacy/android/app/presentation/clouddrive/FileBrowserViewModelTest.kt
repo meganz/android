@@ -2,7 +2,7 @@ package test.mega.privacy.android.app.presentation.clouddrive
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
-import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -15,11 +15,16 @@ import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.presentation.clouddrive.FileBrowserViewModel
+import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
+import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
@@ -33,7 +38,6 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
-import kotlin.test.assertFalse
 
 @ExperimentalCoroutinesApi
 class FileBrowserViewModelTest {
@@ -50,6 +54,7 @@ class FileBrowserViewModelTest {
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private val getFileBrowserParentNodeHandle = mock<GetParentNodeHandle>()
     private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase = mock()
+    private val getCloudSortOrder: GetCloudSortOrder = mock()
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
@@ -68,7 +73,8 @@ class FileBrowserViewModelTest {
             monitorNodeUpdates = monitorNodeUpdates,
             getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle,
             getIsNodeInRubbish = isNodeInRubbish,
-            getFileBrowserChildrenUseCase = getFileBrowserChildrenUseCase
+            getFileBrowserChildrenUseCase = getFileBrowserChildrenUseCase,
+            getCloudSortOrder = getCloudSortOrder
         )
     }
 
@@ -76,13 +82,14 @@ class FileBrowserViewModelTest {
     fun `test that initial state is returned`() = runTest {
         underTest.state.test {
             val initial = awaitItem()
-            assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
-            assertThat(initial.fileBrowserHandle).isEqualTo(-1L)
-            assertThat(initial.mediaDiscoveryViewSettings).isEqualTo(MediaDiscoveryViewSettings.INITIAL.ordinal)
-            assertThat(initial.nodes).isEmpty()
-            assertThat(initial.parentHandle).isNull()
-            assertThat(initial.mediaHandle).isEqualTo(-1L)
-            assertThat(initial.nodesList).isEmpty()
+            Truth.assertThat(initial.currentViewType).isEqualTo(ViewType.LIST)
+            Truth.assertThat(initial.fileBrowserHandle).isEqualTo(-1L)
+            Truth.assertThat(initial.mediaDiscoveryViewSettings)
+                .isEqualTo(MediaDiscoveryViewSettings.INITIAL.ordinal)
+            Truth.assertThat(initial.nodes).isEmpty()
+            Truth.assertThat(initial.parentHandle).isNull()
+            Truth.assertThat(initial.mediaHandle).isEqualTo(-1L)
+            Truth.assertThat(initial.nodesList).isEmpty()
         }
     }
 
@@ -92,9 +99,9 @@ class FileBrowserViewModelTest {
         underTest.state.map { it.fileBrowserHandle }.distinctUntilChanged()
             .test {
                 val newValue = 123456789L
-                assertThat(awaitItem()).isEqualTo(-1L)
+                Truth.assertThat(awaitItem()).isEqualTo(-1L)
                 underTest.setBrowserParentHandle(newValue)
-                assertThat(awaitItem()).isEqualTo(newValue)
+                Truth.assertThat(awaitItem()).isEqualTo(newValue)
             }
     }
 
@@ -102,7 +109,8 @@ class FileBrowserViewModelTest {
     fun `test that get safe browser handle returns INVALID_HANDLE if not set and root folder fails`() =
         runTest {
             whenever(getRootFolder()).thenReturn(null)
-            assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(MegaApiJava.INVALID_HANDLE)
+            Truth.assertThat(underTest.getSafeBrowserParentHandle())
+                .isEqualTo(MegaApiJava.INVALID_HANDLE)
         }
 
     @Test
@@ -110,26 +118,27 @@ class FileBrowserViewModelTest {
         runTest {
             val expectedHandle = 123456789L
             underTest.setBrowserParentHandle(expectedHandle)
-            assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(expectedHandle)
+            Truth.assertThat(underTest.getSafeBrowserParentHandle()).isEqualTo(expectedHandle)
         }
 
     @Test
     fun `test that on setting Browser Parent Handle, handle File Browser node returns some items in list`() =
         runTest {
             val newValue = 123456789L
-            whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(
+            whenever(getBrowserChildrenNode(newValue)).thenReturn(
                 listOf(mock(), mock())
             )
-            whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(
+            whenever(getFileBrowserChildrenUseCase(newValue)).thenReturn(
                 listOf(mock(), mock())
             )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
             val update = mapOf<Node, List<NodeChanges>>(
                 mock<Node>() to emptyList(),
                 mock<Node>() to emptyList()
             )
             monitorNodeUpdates.emit(NodeUpdate(update))
             underTest.setBrowserParentHandle(newValue)
-            assertThat(underTest.state.value.nodes.size).isEqualTo(2)
+            Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(2)
         }
 
     @Test
@@ -139,7 +148,7 @@ class FileBrowserViewModelTest {
             whenever(getBrowserChildrenNode.invoke(newValue)).thenReturn(null)
             whenever(getFileBrowserChildrenUseCase.invoke(newValue)).thenReturn(emptyList())
             underTest.setBrowserParentHandle(newValue)
-            assertThat(underTest.state.value.nodes.size).isEqualTo(0)
+            Truth.assertThat(underTest.state.value.nodes.size).isEqualTo(0)
             verify(getBrowserChildrenNode, times(1)).invoke(newValue)
             verify(getFileBrowserChildrenUseCase, times(1)).invoke(newValue)
         }
@@ -155,7 +164,7 @@ class FileBrowserViewModelTest {
                 newValue,
                 MediaDiscoveryViewSettings.INITIAL.ordinal
             )
-        assertFalse(shouldEnter)
+        Truth.assertThat(shouldEnter).isFalse()
     }
 
     @Test
@@ -177,7 +186,7 @@ class FileBrowserViewModelTest {
                     newValue,
                     MediaDiscoveryViewSettings.DISABLED.ordinal
                 )
-            assertFalse(shouldEnter)
+            Truth.assertThat(shouldEnter).isFalse()
         }
 
     @Test
@@ -196,7 +205,7 @@ class FileBrowserViewModelTest {
                     newValue,
                     MediaDiscoveryViewSettings.ENABLED.ordinal
                 )
-            assertFalse(shouldEnter)
+            Truth.assertThat(shouldEnter).isFalse()
         }
 
     @Test
@@ -213,13 +222,13 @@ class FileBrowserViewModelTest {
             underTest.setBrowserParentHandle(newValue)
 
             underTest.onFolderItemClicked(lastFirstVisiblePosition, newValue)
-            assertThat(underTest.popLastPositionStack()).isEqualTo(lastFirstVisiblePosition)
+            Truth.assertThat(underTest.popLastPositionStack()).isEqualTo(lastFirstVisiblePosition)
         }
 
     @Test
     fun `test that last position returns 0 when items are popped from stack and stack has no items`() {
         val poppedValue = underTest.popLastPositionStack()
-        assertThat(poppedValue).isEqualTo(0)
+        Truth.assertThat(poppedValue).isEqualTo(0)
     }
 
     @Test
@@ -256,7 +265,113 @@ class FileBrowserViewModelTest {
         underTest.setCurrentViewType(expectedValue)
 
         underTest.state.test {
-            assertThat(awaitItem().currentViewType).isEqualTo(expectedValue)
+            Truth.assertThat(awaitItem().currentViewType).isEqualTo(expectedValue)
         }
     }
+
+    @Test
+    fun `test when when nodeUIItem is long clicked, then it updates selected item by 1`() =
+        runTest {
+            val nodesListItem1 = mock<FolderNode>()
+            val nodesListItem2 = mock<FileNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(getBrowserChildrenNode(underTest.state.value.fileBrowserHandle)).thenReturn(
+                listOf(mock(), mock())
+            )
+            whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.selectedFolderNodes).isEqualTo(1)
+                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
+                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(1)
+            }
+        }
+
+    @Test
+    fun `test that when item is clicked and some items are already selected on list then checked index gets decremented by 1`() =
+        runTest {
+            val nodesListItem1 = mock<FolderNode>()
+            val nodesListItem2 = mock<FileNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(getBrowserChildrenNode(underTest.state.value.fileBrowserHandle)).thenReturn(
+                listOf(mock(), mock())
+            )
+            whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.onItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.selectedFolderNodes).isEqualTo(0)
+                Truth.assertThat(state.selectedFileNodes).isEqualTo(0)
+                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(0)
+            }
+        }
+
+    @Test
+    fun `test that when selected item gets clicked then checked index gets incremented by 1`() =
+        runTest {
+            val nodesListItem1 = mock<FileNode>()
+            val nodesListItem2 = mock<FolderNode>()
+            whenever(nodesListItem1.id.longValue).thenReturn(1L)
+            whenever(nodesListItem2.id.longValue).thenReturn(2L)
+            whenever(getBrowserChildrenNode(underTest.state.value.fileBrowserHandle)).thenReturn(
+                listOf(mock(), mock())
+            )
+            whenever(getFileBrowserChildrenUseCase(underTest.state.value.fileBrowserHandle)).thenReturn(
+                listOf(nodesListItem1, nodesListItem2)
+            )
+            whenever(getCloudSortOrder()).thenReturn(SortOrder.ORDER_NONE)
+
+            underTest.refreshNodes()
+            underTest.onLongItemClicked(
+                NodeUIItem(
+                    nodesListItem1,
+                    isSelected = true,
+                    isInvisible = false
+                )
+            )
+            underTest.onItemClicked(
+                NodeUIItem(
+                    nodesListItem2,
+                    isSelected = false,
+                    isInvisible = false
+                )
+            )
+            underTest.state.test {
+                val state = awaitItem()
+                Truth.assertThat(state.selectedFolderNodes).isEqualTo(1)
+                Truth.assertThat(state.selectedFileNodes).isEqualTo(1)
+                Truth.assertThat(state.selectedNodeHandles.size).isEqualTo(2)
+            }
+        }
 }

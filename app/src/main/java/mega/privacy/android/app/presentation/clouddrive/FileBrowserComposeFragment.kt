@@ -69,7 +69,9 @@ class FileBrowserComposeFragment : Fragment() {
                     FileBrowserComposeView(
                         uiState = uiState,
                         stringUtilWrapper = stringUtilWrapper,
-                        emptyState = getEmptyFolderDrawable(true)
+                        emptyState = getEmptyFolderDrawable(true),
+                        onItemClick = fileBrowserViewModel::onItemClicked,
+                        onLongClick = fileBrowserViewModel::onLongItemClicked
                     )
                 }
             }

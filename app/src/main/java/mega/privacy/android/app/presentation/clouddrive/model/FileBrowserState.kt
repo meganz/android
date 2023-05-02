@@ -2,6 +2,8 @@ package mega.privacy.android.app.presentation.clouddrive.model
 
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.domain.entity.SortOrder
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
@@ -16,6 +18,13 @@ import nz.mega.sdk.MegaNode
  * @property mediaHandle MediaHandle of current Node
  * @property isPendingRefresh
  * @property nodesList list of [NodeUIItem]
+ * @property isInSelection if list is in selection mode or not
+ * @property itemIndex index of item clicked
+ * @property currentFileNode [FileNode]
+ * @property selectedNodeHandles List of selected node handles
+ * @property selectedFileNodes number of selected file [NodeUIItem] on Compose
+ * @property selectedFolderNodes number of selected folder [NodeUIItem] on Compose
+ * @property sortOrder [SortOrder] of current list
  */
 data class FileBrowserState(
     val currentViewType: ViewType = ViewType.LIST,
@@ -25,5 +34,12 @@ data class FileBrowserState(
     val parentHandle: Long? = null,
     val mediaHandle: Long = -1L,
     val isPendingRefresh: Boolean = false,
-    val nodesList: List<NodeUIItem> = emptyList()
+    val nodesList: List<NodeUIItem> = emptyList(),
+    val isInSelection: Boolean = false,
+    val itemIndex: Int = -1,
+    val currentFileNode: FileNode? = null,
+    val selectedNodeHandles: List<Long> = emptyList(),
+    val selectedFileNodes: Int = 0,
+    val selectedFolderNodes: Int = 0,
+    val sortOrder: SortOrder = SortOrder.ORDER_NONE,
 )

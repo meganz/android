@@ -13,13 +13,16 @@ import mega.privacy.android.app.domain.usecase.GetBrowserChildrenNode
 import mega.privacy.android.app.domain.usecase.GetFileBrowserChildrenUseCase
 import mega.privacy.android.app.domain.usecase.GetRootFolder
 import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
+import mega.privacy.android.app.extensions.updateItemAt
 import mega.privacy.android.app.presentation.clouddrive.model.FileBrowserState
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.settings.model.MediaDiscoveryViewSettings
+import mega.privacy.android.domain.entity.node.FileNode
 import mega.privacy.android.domain.entity.node.FolderNode
 import mega.privacy.android.domain.entity.node.Node
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.preference.ViewType
+import mega.privacy.android.domain.usecase.GetCloudSortOrder
 import mega.privacy.android.domain.usecase.GetParentNodeHandle
 import mega.privacy.android.domain.usecase.IsNodeInRubbish
 import mega.privacy.android.domain.usecase.MonitorMediaDiscoveryView
@@ -37,6 +40,7 @@ import javax.inject.Inject
  * @param getFileBrowserParentNodeHandle To get parent handle of current node
  * @param getIsNodeInRubbish To get current node is in rubbish
  * @param getFileBrowserChildrenUseCase [GetFileBrowserChildrenUseCase]
+ * @param getCloudSortOrder [GetCloudSortOrder]
  */
 @HiltViewModel
 class FileBrowserViewModel @Inject constructor(
@@ -47,6 +51,7 @@ class FileBrowserViewModel @Inject constructor(
     private val getFileBrowserParentNodeHandle: GetParentNodeHandle,
     private val getIsNodeInRubbish: IsNodeInRubbish,
     private val getFileBrowserChildrenUseCase: GetFileBrowserChildrenUseCase,
+    private val getCloudSortOrder: GetCloudSortOrder,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FileBrowserState())
@@ -190,7 +195,8 @@ class FileBrowserViewModel @Inject constructor(
                 it.copy(
                     nodes = getBrowserChildrenNode(_state.value.fileBrowserHandle) ?: emptyList(),
                     parentHandle = getFileBrowserParentNodeHandle(_state.value.fileBrowserHandle),
-                    nodesList = nodeList
+                    nodesList = nodeList,
+                    sortOrder = getCloudSortOrder()
                 )
             }
         }
@@ -274,5 +280,114 @@ class FileBrowserViewModel @Inject constructor(
      */
     fun changeTransferOverQuotaBannerVisibility() {
 
+    }
+
+    /**
+     * This method will handle Item click event from NodesView and will update
+     * [state] accordingly if items already selected/unselected, update check count else get MegaNode
+     * and navigate to appropriate activity
+     *
+     * @param nodeUIItem [NodeUIItem]
+     */
+    fun onItemClicked(nodeUIItem: NodeUIItem) {
+        val index =
+            _state.value.nodesList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
+        if (_state.value.isInSelection) {
+            updateNodeInSelectionState(nodeUIItem = nodeUIItem, index = index)
+        } else {
+            if (nodeUIItem.node is FileNode) {
+                _state.update {
+                    it.copy(
+                        itemIndex = index,
+                        currentFileNode = nodeUIItem.node
+                    )
+                }
+
+            } else {
+                onFolderItemClicked(0, nodeUIItem.id.longValue)
+            }
+        }
+    }
+
+    /**
+     * This method will handle Long click on a NodesView and check the selected item
+     *
+     * @param nodeUIItem [NodeUIItem]
+     */
+    fun onLongItemClicked(nodeUIItem: NodeUIItem) {
+        nodeUIItem.isSelected = true
+        val index =
+            _state.value.nodesList.indexOfFirst { it.node.id.longValue == nodeUIItem.id.longValue }
+        val newNodesList = _state.value.nodesList.updateItemAt(index = index, item = nodeUIItem)
+        val selectedNodeList = _state.value.selectedNodeHandles.toMutableList()
+        selectedNodeList.add(nodeUIItem.id.longValue)
+        _state.update {
+            it.copy(
+                selectedFileNodes = if (nodeUIItem.node is FileNode) it.selectedFileNodes + 1 else it.selectedFileNodes,
+                selectedFolderNodes = if (nodeUIItem.node is FolderNode) it.selectedFolderNodes + 1 else it.selectedFolderNodes,
+                nodesList = newNodesList,
+                isInSelection = true,
+                selectedNodeHandles = selectedNodeList
+            )
+        }
+    }
+
+    /**
+     * This will update [NodeUIItem] list based on and update it on to the UI
+     * @param nodeUIItem [NodeUIItem] to be updated
+     * @param index Index of [NodeUIItem] in [state]
+     */
+    private fun updateNodeInSelectionState(nodeUIItem: NodeUIItem, index: Int) {
+        nodeUIItem.isSelected = !nodeUIItem.isSelected
+        val selectedNodeHandle = state.value.selectedNodeHandles.toMutableList()
+        val pair = if (nodeUIItem.isSelected) {
+            selectedNodeHandle.add(nodeUIItem.node.id.longValue)
+            selectNode(nodeUIItem)
+        } else {
+            selectedNodeHandle.remove(nodeUIItem.node.id.longValue)
+            unSelectNode(nodeUIItem)
+        }
+        val newNodesList = _state.value.nodesList.updateItemAt(index = index, item = nodeUIItem)
+        _state.update {
+            it.copy(
+                selectedFileNodes = pair.first,
+                selectedFolderNodes = pair.second,
+                nodesList = newNodesList,
+                isInSelection = pair.first > 0 || pair.second > 0,
+                selectedNodeHandles = selectedNodeHandle
+            )
+        }
+    }
+
+    /**
+     * select a node
+     * @param nodeUIItem
+     * @return Pair of count of Selected File Node and Selected Folder Node
+     */
+    private fun selectNode(nodeUIItem: NodeUIItem): Pair<Int, Int> {
+        var totalSelectedFileNode = state.value.selectedFileNodes
+        var totalSelectedFolderNode = state.value.selectedFolderNodes
+        if (nodeUIItem.node is FolderNode) {
+            totalSelectedFolderNode = _state.value.selectedFolderNodes + 1
+        } else if (nodeUIItem.node is FileNode) {
+            totalSelectedFileNode = _state.value.selectedFileNodes + 1
+        }
+        return Pair(totalSelectedFileNode, totalSelectedFolderNode)
+    }
+
+    /**
+     * un select a node
+     * @param nodeUIItem
+     * @return Pair of count of Selected File Node and Selected Folder Node
+     */
+    private fun unSelectNode(nodeUIItem: NodeUIItem): Pair<Int, Int> {
+        var totalSelectedFileNode = state.value.selectedFileNodes
+        var totalSelectedFolderNode = state.value.selectedFolderNodes
+        if (nodeUIItem.node is FolderNode) {
+            totalSelectedFolderNode = _state.value.selectedFolderNodes - 1
+        } else if (nodeUIItem.node is FileNode) {
+            totalSelectedFileNode = _state.value.selectedFileNodes - 1
+        }
+        return Pair(totalSelectedFileNode, totalSelectedFolderNode)
     }
 }
