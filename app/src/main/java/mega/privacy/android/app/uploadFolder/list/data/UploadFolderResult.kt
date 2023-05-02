@@ -17,6 +17,6 @@ data class UploadFolderResult(
     val name: String,
     val size: Long,
     val lastModified: Long,
-    val parentHandle: Long,
+    val parentHandle: Long?,
     val renameName: String? = null
 ) : Serializable

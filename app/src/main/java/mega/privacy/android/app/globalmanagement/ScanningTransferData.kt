@@ -19,7 +19,7 @@ import nz.mega.sdk.MegaTransfer
 data class ScanningTransferData(
     val transferType: Int,
     val localPath: String,
-    val node: MegaNode,
+    val node: MegaNode?,
     val isFolder: Boolean,
     var transferTag: Int = INVALID_VALUE,
     var transferStage: Long = INVALID_STAGE
@@ -50,7 +50,7 @@ data class ScanningTransferData(
     private fun isTheSameUpload(transfer: MegaTransfer): Boolean =
         transferType == MegaTransfer.TYPE_UPLOAD
                 && localPath == transfer.path
-                && node.handle == transfer.parentHandle
+                && node?.handle == transfer.parentHandle
 
     /**
      * Checks if this is a download and its data is the same as the received MegaTransfer.
@@ -62,5 +62,5 @@ data class ScanningTransferData(
     private fun isTheSameDownload(transfer: MegaTransfer): Boolean =
         transferType == MegaTransfer.TYPE_DOWNLOAD
                 && localPath == transfer.parentPath
-                && node.handle == transfer.nodeHandle
+                && node?.handle == transfer.nodeHandle
 }

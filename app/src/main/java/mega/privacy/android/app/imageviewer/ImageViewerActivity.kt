@@ -165,7 +165,7 @@ class ImageViewerActivity : BaseActivity(), PermissionRequester, SnackbarShower 
         @JvmOverloads
         fun getIntentForParentNode(
             context: Context,
-            parentNodeHandle: Long,
+            parentNodeHandle: Long?,
             childOrder: SortOrder = SortOrder.ORDER_PHOTO_ASC,
             currentNodeHandle: Long? = null,
             showSlideshow: Boolean = false,

@@ -45,7 +45,7 @@ class UploadUseCase @Inject constructor(
         absolutePath: String,
         fileName: String,
         lastModified: Long,
-        parentHandle: Long
+        parentHandle: Long?
     ): Completable = Completable.create { emitter ->
         if (monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
             showOverDiskQuotaPaywallWarning()

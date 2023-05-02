@@ -112,7 +112,7 @@ class GetFolderContentUseCase @Inject constructor(
      */
     private fun getContentToUpload(
         context: Context,
-        parentNode: MegaNode,
+        parentNode: MegaNode?,
         folderItem: FolderContent.Data,
         renameName: String? = null,
     ): Single<ArrayList<UploadFolderResult>> =
@@ -174,7 +174,7 @@ class GetFolderContentUseCase @Inject constructor(
                             name = folderName,
                             size = folderItem.size,
                             lastModified = folderItem.lastModified,
-                            parentHandle = parentNode.handle,
+                            parentHandle = parentNode?.handle,
                             renameName = renameName
                         )
                     )

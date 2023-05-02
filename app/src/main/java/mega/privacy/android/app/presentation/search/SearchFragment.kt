@@ -930,7 +930,7 @@ class SearchFragment : RotatableFragment() {
                 putExtra(
                     "parentNodeHandle",
                     if (state().searchParentHandle == -1L) -1L
-                    else megaApi.getParentNode(node).handle
+                    else megaApi.getParentNode(node)?.handle
                 )
                 putExtra("orderGetChildren", searchViewModel.getOrder())
                 putExtra("HANDLE", node.handle)

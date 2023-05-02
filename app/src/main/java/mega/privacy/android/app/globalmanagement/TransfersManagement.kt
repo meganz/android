@@ -398,7 +398,7 @@ class TransfersManagement @Inject constructor(
     fun addScanningTransfer(
         type: Int,
         localPath: String,
-        node: MegaNode,
+        node: MegaNode?,
         isFolder: Boolean,
     ): MegaCancelToken? {
         if (shouldBreakTransfersProcessing()) {

@@ -863,8 +863,8 @@ class VersionsFileActivity : PasscodeActivity(), MegaRequestListenerInterface, V
             if (n.hasChanged(MegaNode.CHANGE_TYPE_PARENT)) {
                 val oldParent = megaApi.getParentNode(node)
                 val newParent = megaApi.getParentNode(n)
-                if (oldParent.handle == newParent.handle) {
-                    if (newParent.isFile) {
+                if (oldParent?.handle == newParent?.handle) {
+                    if (newParent?.isFile == true) {
                         Timber.d("New version added")
                         node = newParent
                     } else {

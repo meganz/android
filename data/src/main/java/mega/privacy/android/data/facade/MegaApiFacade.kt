@@ -405,7 +405,8 @@ internal class MegaApiFacade @Inject constructor(
 
     override fun retryPendingConnections() = megaApi.retryPendingConnections()
 
-    override suspend fun getTransfers(type: Int): List<MegaTransfer> = megaApi.getTransfers(type)
+    override suspend fun getTransfers(type: Int): List<MegaTransfer> =
+        megaApi.getTransfers(type) ?: emptyList()
 
     override suspend fun getTransfersByTag(tag: Int): MegaTransfer? = megaApi.getTransferByTag(tag)
 
@@ -584,12 +585,15 @@ internal class MegaApiFacade @Inject constructor(
             newNodeName == null && listener == null -> {
                 megaApi.copyNode(nodeToCopy, newNodeParent)
             }
+
             newNodeName != null && listener == null -> {
                 megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName)
             }
+
             newNodeName == null && listener != null -> {
                 megaApi.copyNode(nodeToCopy, newNodeParent, listener)
             }
+
             else /*newNodeName != null && listener != null*/ -> {
                 megaApi.copyNode(nodeToCopy, newNodeParent, newNodeName, listener)
             }
@@ -606,12 +610,15 @@ internal class MegaApiFacade @Inject constructor(
             newNodeName == null && listener == null -> {
                 megaApi.moveNode(nodeToMove, newNodeParent)
             }
+
             newNodeName != null && listener == null -> {
                 megaApi.moveNode(nodeToMove, newNodeParent, newNodeName)
             }
+
             newNodeName == null && listener != null -> {
                 megaApi.moveNode(nodeToMove, newNodeParent, listener)
             }
+
             else /*newNodeName != null && listener != null*/ -> {
                 megaApi.moveNode(nodeToMove, newNodeParent, newNodeName, listener)
             }

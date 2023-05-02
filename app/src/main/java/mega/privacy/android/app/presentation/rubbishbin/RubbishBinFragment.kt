@@ -653,7 +653,7 @@ class RubbishBinFragment : Fragment() {
         if (MimeTypeList.typeForName(node.name).isImage) {
             val intent = ImageViewerActivity.getIntentForParentNode(
                 requireActivity(),
-                megaApi.getParentNode(node).handle,
+                megaApi.getParentNode(node)?.handle,
                 managerViewModel.getOrder(),
                 node.handle
             )
@@ -693,11 +693,11 @@ class RubbishBinFragment : Fragment() {
             intentInternalIntentPair.first.apply {
                 putExtra("FILENAME", node.name)
                 putExtra("adapterType", Constants.RUBBISH_BIN_ADAPTER)
-                if (megaApi.getParentNode(node).type == MegaNode.TYPE_RUBBISH) {
+                if (megaApi.getParentNode(node)?.type == MegaNode.TYPE_RUBBISH) {
                     putExtra("parentNodeHandle", -1L)
                 } else {
                     putExtra("parentNodeHandle",
-                        megaApi.getParentNode(node).handle)
+                        megaApi.getParentNode(node)?.handle)
                 }
             }
             val localPath = FileUtil.getLocalFile(node)

@@ -187,11 +187,11 @@ object MegaNodeUtil {
             }
             rootParent.handle == megaApi.rubbishNode.handle -> {
                 return app.getString(R.string.section_rubbish_bin) +
-                        path.replace("bin$SEPARATOR", "")
+                        path?.replace("bin$SEPARATOR", "")
             }
             nodeFolder.isInShare -> {
                 return app.getString(R.string.title_incoming_shares_explorer) +
-                        SEPARATOR + path.substring(path.indexOf(":") + 1)
+                        SEPARATOR + path?.substring(path.indexOf(":") + 1)
             }
             else -> ""
         }
@@ -457,7 +457,7 @@ object MegaNodeUtil {
      * @see MegaNodeUtil.existsMyChatFilesFolder
      */
     @JvmStatic
-    val myChatFilesFolder: MegaNode
+    val myChatFilesFolder: MegaNode?
         get() = MegaApplication.getInstance().megaApi.getNodeByHandle(MegaApplication.getInstance().dbH.myChatFilesFolderHandle)
 
     /**
@@ -553,9 +553,9 @@ object MegaNodeUtil {
      * @param node MegaNode to check
      * @return True if the node is a device folder, false otherwise
      */
-    private fun isDeviceBackupFolder(node: MegaNode): Boolean {
-        Timber.d("MyBackup + isDeviceBackupFolder node.handle = ${node.handle}")
-        return (node.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank() && !isNodeInRubbishOrDeleted(
+    private fun isDeviceBackupFolder(node: MegaNode?): Boolean {
+        Timber.d("MyBackup + isDeviceBackupFolder node.handle = ${node?.handle}")
+        return (node?.parentHandle == myBackupHandle && !node.deviceId.isNullOrBlank() && !isNodeInRubbishOrDeleted(
             node.handle
         ))
     }
@@ -574,8 +574,8 @@ object MegaNodeUtil {
         }
 
         while (megaApi.getParentNode(p) != null) {
-            p = megaApi.getParentNode(p)
-            if (p != null && p.parentHandle == myBackupHandle) {
+            p = megaApi.getParentNode(p)!!
+            if (p.parentHandle == myBackupHandle) {
                 Timber.d("isSubRootBackupFolder")
                 return true
             }
@@ -589,9 +589,9 @@ object MegaNodeUtil {
      * @param node MegaNode to check
      * @return True if the node is the MyBackup folder, false otherwise
      */
-    private fun isRootBackupFolder(node: MegaNode): Boolean {
-        Timber.d("MyBackup + isRootBackupFolder node.handle = ${node.handle}")
-        return (node.handle == myBackupHandle && !isNodeInRubbishOrDeleted(node.handle))
+    private fun isRootBackupFolder(node: MegaNode?): Boolean {
+        Timber.d("MyBackup + isRootBackupFolder node.handle = ${node?.handle}")
+        return (node?.handle == myBackupHandle && !isNodeInRubbishOrDeleted(node.handle))
     }
 
     /**
@@ -600,20 +600,20 @@ object MegaNodeUtil {
      * @param node MegaNode to check
      * @return The resource ID
      */
-    private fun getMyBackupSubFolderIcon(node: MegaNode): Int {
-        if (node.deviceId.isNullOrBlank()) return R.drawable.ic_folder_list
+    private fun getMyBackupSubFolderIcon(node: MegaNode?): Int {
+        if (node?.deviceId.isNullOrBlank()) return R.drawable.ic_folder_list
 
-        val folderName = node.name
+        val folderName = node?.name
         return when {
-            folderName.contains(Regex("win|desktop", RegexOption.IGNORE_CASE)) -> R.drawable.pc_win
-            folderName.contains(
+            folderName?.contains(Regex("win|desktop", RegexOption.IGNORE_CASE)) == true -> R.drawable.pc_win
+            folderName?.contains(
                 Regex(
                     "linux|debian|ubuntu|centos",
                     RegexOption.IGNORE_CASE
                 )
-            ) -> R.drawable.pc_linux
-            folderName.contains(Regex("mac", RegexOption.IGNORE_CASE)) -> R.drawable.pc_mac
-            folderName.contains(Regex("ext|drive", RegexOption.IGNORE_CASE)) -> R.drawable.ex_drive
+            ) == true -> R.drawable.pc_linux
+            folderName?.contains(Regex("mac", RegexOption.IGNORE_CASE)) == true -> R.drawable.pc_mac
+            folderName?.contains(Regex("ext|drive", RegexOption.IGNORE_CASE)) == true -> R.drawable.ex_drive
             else -> R.drawable.pc
         }
     }
@@ -628,7 +628,7 @@ object MegaNodeUtil {
     fun MegaApiJava.getRootParentNode(node: MegaNode): MegaNode {
         var rootParent = node
         while (getParentNode(rootParent) != null) {
-            rootParent = getParentNode(rootParent)
+            rootParent = getParentNode(rootParent)!!
         }
         return rootParent
     }
@@ -866,10 +866,10 @@ object MegaNodeUtil {
      */
     private fun leaveIncomingShare(
         snackbarShower: SnackbarShower,
-        node: MegaNode,
+        node: MegaNode?,
         context: Context,
     ) {
-        Timber.d("Node handle: ${node.handle}")
+        Timber.d("Node handle: ${node?.handle}")
         MegaApplication.getInstance().megaApi.remove(
             node,
             RemoveListener(
@@ -1802,8 +1802,8 @@ object MegaNodeUtil {
     ): MegaNode? {
         if (handleList != null && handleList.size > 0) {
             for (handle in handleList) {
-                val p: MegaNode = megaApi.getNodeByHandle(handle)
-                if (p.handle == myBackupHandle) {
+                val p: MegaNode? = megaApi.getNodeByHandle(handle)
+                if (p?.handle == myBackupHandle) {
                     return p
                 }
             }
@@ -1838,7 +1838,7 @@ object MegaNodeUtil {
         } else {
             val node = megaApi.getNodeByHandle(handleList[0])
 
-            when (node.parentHandle) {
+            when (node?.parentHandle) {
                 // the nodes in the handleList belong to the root node
                 megaApi.rootNode.handle -> {
                     // Check if handleList contains backup root node
@@ -1910,7 +1910,7 @@ object MegaNodeUtil {
             // If the node is not a Device node, check and return BACKUP_FOLDER
             // if the node's parent node is a Device Node, and if the Device Node's ID exists
             val deviceNode = megaApi.getNodeByHandle(selectedNode.parentHandle)
-            if ((selectedNode.parentHandle == deviceNode.handle) && !deviceNode.deviceId.isNullOrBlank()) {
+            if ((selectedNode.parentHandle == deviceNode?.handle) && !deviceNode.deviceId.isNullOrBlank()) {
                 Timber.d("MyBackup + checkBackupNodeTypeByHandle return nodeType = $BACKUP_FOLDER")
                 return BACKUP_FOLDER
             }

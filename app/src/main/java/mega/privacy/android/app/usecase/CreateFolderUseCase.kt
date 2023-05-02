@@ -26,7 +26,7 @@ class CreateFolderUseCase @Inject constructor(
      * @param folderName    Name of the folder to create.
      * @return Single with the MegaNode of the created folder.
      */
-    fun create(parent: MegaNode, folderName: String): Single<MegaNode> =
+    fun create(parent: MegaNode?, folderName: String): Single<MegaNode> =
         Single.create { emitter ->
             megaApi.createFolder(
                 folderName,
@@ -38,7 +38,8 @@ class CreateFolderUseCase @Inject constructor(
 
                     when (error.errorCode) {
                         API_OK -> emitter.onSuccess(megaApi.getNodeByHandle(request.nodeHandle))
-                        API_EEXIST -> emitter.onSuccess(megaApi.getChildNode(parent, folderName))
+                        API_EEXIST -> megaApi.getChildNode(parent, folderName)
+                            ?.let { emitter.onSuccess(it) }
                         else -> emitter.onError(error.toMegaException())
                     }
                 })

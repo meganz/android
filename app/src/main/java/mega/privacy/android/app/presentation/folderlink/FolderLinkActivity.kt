@@ -1216,7 +1216,7 @@ class FolderLinkActivity : TransfersManagementActivity(), MegaRequestListenerInt
                     } else {
                         mediaIntent.putExtra(
                             "parentNodeHandle",
-                            megaApiFolder.getParentNode(node).handle
+                            megaApiFolder.getParentNode(node)?.handle
                         )
                     }
 

@@ -45,7 +45,7 @@ class AttachmentsCopier(
         }
     }
 
-    private fun copy(parent: MegaNode) {
+    private fun copy(parent: MegaNode?) {
         for (node in nodes) {
             megaApi.copyNode(node, parent, this)
         }
@@ -118,6 +118,7 @@ class AttachmentsCopier(
                         copy(api.getNodeByHandle(chatFilesFolderHandle))
                     }
                 }
+
                 type == TYPE_CREATE_FOLDER
                         && name == context.getString(R.string.my_chat_files_folder) -> {
 
@@ -132,9 +133,12 @@ class AttachmentsCopier(
                         Timber.e("Error creating ${context.getString(R.string.my_chat_files_folder)} folder")
                     }
                 }
+
                 type == TYPE_COPY -> {
-                    if (e.errorCode == API_OK) {
-                        successNodes.add(api.getNodeByHandle(nodeHandle))
+                    val node = api.getNodeByHandle(nodeHandle)
+
+                    if (e.errorCode == API_OK && node != null) {
+                        successNodes.add(node)
                     } else {
                         failureCount++
                     }

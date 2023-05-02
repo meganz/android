@@ -393,6 +393,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         counterModify--
                         optionRestoreFromRubbish.visibility = View.GONE
                     }
+
                     INBOX_MODE -> Timber.d("show My Backups bottom sheet")
                     RUBBISH_BIN_MODE -> {
                         Timber.d("show Rubbish bottom sheet")
@@ -448,6 +449,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             optionSendChat.visibility = View.GONE
                         }
                     }
+
                     SHARED_ITEMS_MODE -> {
                         val tabSelected = (requireActivity() as ManagerActivity).tabItemShares
                         if (tabSelected === SharesTab.INCOMING_TAB || nodeController.nodeComesFromIncoming(
@@ -479,14 +481,17 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                         Timber.d("LEVEL 0 - access FULL")
                                         permissionsIcon.setImageResource(R.drawable.ic_shared_fullaccess)
                                     }
+
                                     MegaShare.ACCESS_READ -> {
                                         Timber.d("LEVEL 0 - access read")
                                         permissionsIcon.setImageResource(R.drawable.ic_shared_read)
                                     }
+
                                     MegaShare.ACCESS_READWRITE -> {
                                         Timber.d("LEVEL 0 - readwrite")
                                         permissionsIcon.setImageResource(R.drawable.ic_shared_read_write)
                                     }
+
                                     else -> {}
                                 }
                             }
@@ -508,6 +513,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                         optionMove.visibility = View.GONE
                                     }
                                 }
+
                                 MegaShare.ACCESS_READ -> {
                                     Timber.d("access read")
                                     optionLabel.visibility = View.GONE
@@ -518,6 +524,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                     optionMove.visibility = View.GONE
                                     optionRubbishBin.visibility = View.GONE
                                 }
+
                                 MegaShare.ACCESS_READWRITE -> {
                                     Timber.d("readwrite")
                                     optionLabel.visibility = View.GONE
@@ -528,6 +535,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                                     optionMove.visibility = View.GONE
                                     optionRubbishBin.visibility = View.GONE
                                 }
+
                                 else -> {}
                             }
                         } else if (tabSelected === SharesTab.OUTGOING_TAB) {
@@ -568,6 +576,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                         counterModify--
                         optionRestoreFromRubbish.visibility = View.GONE
                     }
+
                     RECENTS_MODE, FAVOURITES_IN_TAB_MODE, FAVOURITES_MODE ->
                         // If the Dialog Fragment is opened from the Favourites page, handle the
                         // display of the Dialog options accordingly
@@ -577,6 +586,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                             decrementOpen = { counterOpen-- },
                             decrementModify = { counterModify-- },
                         )
+
                     else -> {}
                 }
 
@@ -746,6 +756,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                     optionRemoveLink.visibility = View.GONE
                 }
             }
+
             else -> {}
         }
     }
@@ -958,7 +969,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
     private fun onSlideShowClicked(node: MegaNode) {
         val intent = getIntentForParentNode(
             requireContext(),
-            megaApi.getParentNode(node).handle,
+            megaApi.getParentNode(node)?.handle,
             SortOrder.ORDER_PHOTO_ASC,
             node.handle,
             true
@@ -1042,6 +1053,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             DrawerItem.SEARCH -> (requireActivity() as ManagerActivity).onNodesSearchUpdate()
             DrawerItem.HOMEPAGE -> LiveEventBus.get<Boolean>(Constants.EVENT_NODES_CHANGE)
                 .post(false)
+
             else -> {}
         }
     }
@@ -1058,6 +1070,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
             DrawerItem.SHARED_ITEMS -> if ((requireActivity() as ManagerActivity).tabItemShares === SharesTab.INCOMING_TAB) {
                 adapterType = Constants.FROM_INCOMING_SHARES
             }
+
             else -> {}
         }
         val offlineParent =
@@ -1120,6 +1133,7 @@ class NodeOptionsBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
                 SharesTab.LINKS_TAB -> Constants.LINKS_ADAPTER
                 else -> Constants.INVALID_VALUE
             }
+
             SEARCH_MODE -> Constants.SEARCH_ADAPTER
             RECENTS_MODE -> Constants.RECENTS_ADAPTER
             FAVOURITES_IN_TAB_MODE, FAVOURITES_MODE -> Constants.FAVOURITES_ADAPTER

@@ -527,7 +527,7 @@ class InboxFragment : RotatableFragment() {
         if (MimeTypeList.typeForName(node.name).isImage) {
             val intent = getIntentForParentNode(
                 context = requireContext(),
-                parentNodeHandle = megaApi.getParentNode(node).handle,
+                parentNodeHandle = megaApi.getParentNode(node)?.handle,
                 childOrder = viewModel.getOrder(),
                 currentNodeHandle = node.handle,
             )
@@ -564,12 +564,12 @@ class InboxFragment : RotatableFragment() {
             }
 
             mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_POSITION, position)
-            if (megaApi.getParentNode(node).type == MegaNode.TYPE_INCOMING) {
+            if (megaApi.getParentNode(node)?.type == MegaNode.TYPE_INCOMING) {
                 mediaIntent.putExtra(Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE, -1L)
             } else {
                 mediaIntent.putExtra(
                     Constants.INTENT_EXTRA_KEY_PARENT_NODE_HANDLE,
-                    megaApi.getParentNode(node).handle
+                    megaApi.getParentNode(node)?.handle
                 )
             }
             mediaIntent.putExtra(

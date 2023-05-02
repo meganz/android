@@ -673,7 +673,7 @@ class FileBrowserFragment : RotatableFragment() {
         if (MimeTypeList.typeForName(node.name).isImage) {
             val intent = getIntentForParentNode(
                 requireContext(),
-                megaApi.getParentNode(node).handle,
+                megaApi.getParentNode(node)?.handle,
                 managerViewModel.getOrder(),
                 node.handle
             )
@@ -715,7 +715,7 @@ class FileBrowserFragment : RotatableFragment() {
                 if (megaNode.type == MegaNode.TYPE_ROOT) {
                     mediaIntent.putExtra("parentNodeHandle", -1L)
                 } else {
-                    mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node).handle)
+                    mediaIntent.putExtra("parentNodeHandle", megaApi.getParentNode(node)?.handle)
                 }
             }
             mediaIntent.putExtra("orderGetChildren", managerViewModel.getOrder())

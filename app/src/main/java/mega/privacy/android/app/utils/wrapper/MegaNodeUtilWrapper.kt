@@ -35,7 +35,7 @@ interface MegaNodeUtilWrapper {
      * @return "My chat files" folder node
      * @see MegaNodeUtil.existsMyChatFilesFolder
      */
-    fun getMyChatFilesFolder(): MegaNode
+    fun getMyChatFilesFolder(): MegaNode?
 
     /**
      * Gets the handle of Cloud root node.
