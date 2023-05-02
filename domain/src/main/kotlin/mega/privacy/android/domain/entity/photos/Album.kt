@@ -27,6 +27,7 @@ sealed interface Album {
      * @property id
      * @property title
      * @property cover
+     * @property creationTime
      * @property modificationTime
      * @property isExported
      */
@@ -34,6 +35,7 @@ sealed interface Album {
         val id: AlbumId,
         val title: String,
         val cover: Photo?,
+        val creationTime: Long,
         val modificationTime: Long,
         val isExported: Boolean,
     ) : Album

@@ -71,6 +71,7 @@ class AlbumGetLinkViewModel @Inject constructor(
                 cover = album.cover ?: withContext(defaultDispatcher) {
                     photos.maxByOrNull { it.modificationTime }
                 },
+                creationTime = album.creationTime,
                 modificationTime = album.modificationTime,
                 isExported = album.isExported,
             ),

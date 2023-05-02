@@ -1,10 +1,9 @@
-package mega.privacy.android.domain.usecase
+package mega.privacy.android.domain.usecase.photos
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import mega.privacy.android.domain.entity.set.UserSet
 import mega.privacy.android.domain.repository.AlbumRepository
-import mega.privacy.android.domain.usecase.photos.CreateAlbumUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -43,6 +42,7 @@ class CreateAlbumUseCaseTest {
         id: Long = 1L,
         name: String = "NewAlbum",
         cover: Long = 10L,
+        creationTime: Long = 2L,
         modificationTime: Long = 2L,
         isExported: Boolean = false,
     ): UserSet = object : UserSet {
@@ -51,6 +51,8 @@ class CreateAlbumUseCaseTest {
         override val name: String = name
 
         override val cover: Long = cover
+
+        override val creationTime: Long = creationTime
 
         override val modificationTime: Long = modificationTime
 

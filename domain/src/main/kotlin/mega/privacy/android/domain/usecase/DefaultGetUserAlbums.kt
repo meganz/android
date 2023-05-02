@@ -40,6 +40,7 @@ class DefaultGetUserAlbums @Inject constructor(
                     id = AlbumId(set.id),
                     title = set.name,
                     cover = photo,
+                    creationTime = set.creationTime,
                     modificationTime = set.modificationTime,
                     isExported = set.isExported,
                 )

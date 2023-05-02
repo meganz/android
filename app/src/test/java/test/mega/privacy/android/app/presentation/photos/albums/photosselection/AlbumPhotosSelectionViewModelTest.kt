@@ -201,9 +201,10 @@ class AlbumPhotosSelectionViewModelTest {
         id: AlbumId,
         title: String = "",
         cover: Photo? = null,
+        creationTime: Long = 0L,
         modificationTime: Long = 0L,
         isExported: Boolean = false,
-    ) = Album.UserAlbum(id, title, cover, modificationTime, isExported)
+    ) = Album.UserAlbum(id, title, cover, creationTime, modificationTime, isExported)
 
     private fun createImage(
         id: Long,

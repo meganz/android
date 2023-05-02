@@ -71,7 +71,8 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     private val userSetsFlow: MutableSharedFlow<List<UserSet>> = MutableSharedFlow(replay = 1)
 
-    private val userSetsElementsFlow: MutableSharedFlow<List<UserSet>> = MutableSharedFlow(replay = 1)
+    private val userSetsElementsFlow: MutableSharedFlow<List<UserSet>> =
+        MutableSharedFlow(replay = 1)
 
     private val albumElements: MutableMap<AlbumId, List<AlbumPhotoId>> = mutableMapOf()
 
@@ -115,6 +116,7 @@ internal class DefaultAlbumRepository @Inject constructor(
                                         newSet.id(),
                                         newSet.name(),
                                         newSet.cover(),
+                                        newSet.cts(),
                                         newSet.ts(),
                                         newSet.isExported,
                                     )
@@ -423,7 +425,14 @@ internal class DefaultAlbumRepository @Inject constructor(
 
     private fun MegaSet.toUserSet(): UserSet {
         val cover = cover().takeIf { it != -1L }
-        return userSetMapper(id(), name(), cover, ts(), isExported)
+        return userSetMapper(
+            id(),
+            name(),
+            cover,
+            cts(),
+            ts(),
+            isExported
+        )
     }
 
     private fun MegaSetElement.toAlbumPhotoId(): AlbumPhotoId = AlbumPhotoId(

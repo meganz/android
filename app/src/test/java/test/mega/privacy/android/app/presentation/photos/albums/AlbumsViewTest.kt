@@ -8,7 +8,6 @@ import androidx.compose.ui.test.onParent
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import junit.framework.TestCase.assertEquals
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.photos.albums.model.AlbumsViewState
 import mega.privacy.android.app.presentation.photos.albums.view.AlbumsView
@@ -194,7 +193,9 @@ class AlbumsViewTest {
         id: AlbumId = AlbumId(0L),
         title: String = "",
         cover: Photo? = null,
+        creationTime: Long = 0L,
         modificationTime: Long = 0L,
         isExported: Boolean = false,
-    ): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime, isExported)
+    ): Album.UserAlbum =
+        Album.UserAlbum(id, title, cover, creationTime, modificationTime, isExported)
 }

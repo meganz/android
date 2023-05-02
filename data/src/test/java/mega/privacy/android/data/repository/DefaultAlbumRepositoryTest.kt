@@ -65,6 +65,7 @@ class DefaultAlbumRepositoryTest {
             testMegaSet.id(),
             testMegaSet.name(),
             null,
+            testMegaSet.cts(),
             testMegaSet.ts(),
             false,
         )
@@ -230,6 +231,7 @@ class DefaultAlbumRepositoryTest {
                 id = it,
                 name = "Album $it",
                 cover = -1L,
+                creationTime = it,
                 modificationTime = it,
                 isExported = false,
             )
@@ -290,6 +292,7 @@ class DefaultAlbumRepositoryTest {
             id = 1L,
             name = "Album 1",
             cover = null,
+            creationTime = 0L,
             modificationTime = 0L,
             isExported = false,
         )
@@ -402,6 +405,7 @@ class DefaultAlbumRepositoryTest {
         id: Long,
         name: String,
         cover: Long?,
+        creationTime: Long,
         modificationTime: Long,
         isExported: Boolean,
     ): UserSet = object : UserSet {
@@ -410,6 +414,8 @@ class DefaultAlbumRepositoryTest {
         override val name: String = name
 
         override val cover: Long? = cover
+
+        override val creationTime: Long = creationTime
 
         override val modificationTime: Long = modificationTime
 

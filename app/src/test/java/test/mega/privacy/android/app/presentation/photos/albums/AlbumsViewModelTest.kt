@@ -690,6 +690,7 @@ class AlbumsViewModelTest {
             id = AlbumId(1L),
             title = "Album 1",
             cover = null,
+            creationTime = 0L,
             modificationTime = 0L,
             isExported = false,
         )
@@ -711,6 +712,7 @@ class AlbumsViewModelTest {
             id = AlbumId(1L),
             title = "Album 1",
             cover = null,
+            creationTime = 0L,
             modificationTime = 0L,
             isExported = false,
         )
@@ -733,6 +735,7 @@ class AlbumsViewModelTest {
             id = AlbumId(1L),
             title = "Album 1",
             cover = null,
+            creationTime = 0L,
             modificationTime = 0L,
             isExported = false,
         )
@@ -741,6 +744,7 @@ class AlbumsViewModelTest {
             id = AlbumId(2L),
             title = "Album 2",
             cover = null,
+            creationTime = 0L,
             modificationTime = 0L,
             isExported = false,
         )
@@ -761,9 +765,11 @@ class AlbumsViewModelTest {
         id: AlbumId = AlbumId(0L),
         title: String = "",
         cover: Photo? = null,
+        creationTime: Long = 0L,
         modificationTime: Long = 0L,
         isExported: Boolean = false,
-    ): Album.UserAlbum = Album.UserAlbum(id, title, cover, modificationTime, isExported)
+    ): Album.UserAlbum =
+        Album.UserAlbum(id, title, cover, creationTime, modificationTime, isExported)
 
     private fun createImage(
         id: Long = 2L,
