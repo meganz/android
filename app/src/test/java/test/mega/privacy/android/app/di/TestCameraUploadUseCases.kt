@@ -19,7 +19,6 @@ import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
-import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
@@ -187,9 +186,6 @@ object TestCameraUploadUseCases {
 
     @Provides
     fun provideGetCameraUploadSelectionQuery() = mock<GetCameraUploadSelectionQuery>()
-
-    @Provides
-    fun provideIsLocalPrimaryFolderSet() = mock<IsLocalPrimaryFolderSet>()
 
     @Provides
     fun provideIsLocalSecondaryFolderSet() = mock<IsLocalSecondaryFolderSet>()

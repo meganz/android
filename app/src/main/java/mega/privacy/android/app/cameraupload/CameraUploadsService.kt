@@ -45,7 +45,7 @@ import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
 import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderSetUseCase
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
@@ -153,7 +153,7 @@ class CameraUploadsService : LifecycleService() {
 
     companion object {
 
-        private const val LOCAL_FOLDER_REMINDER_PRIMARY = 1908
+        private const val FOLDER_REMINDER_PRIMARY = 1908
         private const val LOCAL_FOLDER_REMINDER_SECONDARY = 1909
         private const val OVER_QUOTA_NOTIFICATION_CHANNEL_ID = "OVER_QUOTA_NOTIFICATION"
         private const val LOW_BATTERY_LEVEL = 20
@@ -183,10 +183,10 @@ class CameraUploadsService : LifecycleService() {
     lateinit var localPath: GetCameraUploadLocalPath
 
     /**
-     * IsLocalPrimaryFolderSet
+     * [IsPrimaryFolderSetUseCase]
      */
     @Inject
-    lateinit var isLocalPrimaryFolderSet: IsLocalPrimaryFolderSet
+    lateinit var isPrimaryFolderSetUseCase: IsPrimaryFolderSetUseCase
 
     /**
      * IsLocalSecondaryFolderSet
@@ -812,7 +812,7 @@ class CameraUploadsService : LifecycleService() {
             val state = canRunCameraUploads()
             if (state == StartCameraUploadsState.CAN_RUN_CAMERA_UPLOADS) {
                 Timber.d("Calling startWorker() successful. Starting Camera Uploads")
-                hideLocalFolderPathNotifications()
+                hideFolderPathNotifications()
                 startCameraUploads()
             } else {
                 Timber.w("Calling startWorker() failed. Proceed to handle error")
@@ -828,8 +828,8 @@ class CameraUploadsService : LifecycleService() {
      * Instructs [notificationManager] to hide the Primary and/or Secondary Folder
      * notifications if they exist
      */
-    private suspend fun hideLocalFolderPathNotifications() {
-        if (hasLocalPrimaryFolder()) notificationManager?.cancel(LOCAL_FOLDER_REMINDER_PRIMARY)
+    private suspend fun hideFolderPathNotifications() {
+        if (hasPrimaryFolder()) notificationManager?.cancel(FOLDER_REMINDER_PRIMARY)
         if (hasLocalSecondaryFolder()) notificationManager?.cancel(LOCAL_FOLDER_REMINDER_SECONDARY)
     }
 
@@ -841,7 +841,7 @@ class CameraUploadsService : LifecycleService() {
      * 4. The Device battery level is above the minimum threshold - [deviceAboveMinimumBatteryLevel],
      * 5. The Camera Uploads local path exists - [hasCameraUploadsLocalPath],
      * 6. The Wi-Fi Constraint is satisfied - [isWifiConstraintSatisfied],
-     * 7. The local Primary Folder exists - [hasLocalPrimaryFolder],
+     * 7. The Primary Folder exists - [hasPrimaryFolder],
      * 8. The local Secondary Folder exists - [hasLocalSecondaryFolder],
      * 9. The user is logged in - [isUserLoggedIn],
      * 10. The user Camera Uploads attribute exists - [missingAttributesChecked],
@@ -860,7 +860,7 @@ class CameraUploadsService : LifecycleService() {
             !isWifiConstraintSatisfied() -> StartCameraUploadsState.UNSATISFIED_WIFI_CONSTRAINT
             !deviceAboveMinimumBatteryLevel -> StartCameraUploadsState.BELOW_DEVICE_BATTERY_LEVEL
             !hasCameraUploadsLocalPath() -> StartCameraUploadsState.MISSING_LOCAL_PATH
-            !hasLocalPrimaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER
+            !hasPrimaryFolder() -> StartCameraUploadsState.MISSING_PRIMARY_FOLDER
             !hasLocalSecondaryFolder() -> StartCameraUploadsState.MISSING_LOCAL_SECONDARY_FOLDER
             !isUserLoggedIn() -> StartCameraUploadsState.LOGGED_OUT_USER
             !missingAttributesChecked -> StartCameraUploadsState.MISSING_USER_ATTRIBUTE
@@ -887,9 +887,9 @@ class CameraUploadsService : LifecycleService() {
                 endService(aborted = true)
             }
 
-            StartCameraUploadsState.MISSING_LOCAL_PRIMARY_FOLDER -> {
-                Timber.e("Local Primary Folder is disabled. Stop Camera Uploads")
-                handleLocalPrimaryFolderDisabled()
+            StartCameraUploadsState.MISSING_PRIMARY_FOLDER -> {
+                Timber.e("Primary Folder is disabled. Stop Camera Uploads")
+                handlePrimaryFolderDisabled()
                 endService(aborted = true)
             }
 
@@ -977,13 +977,13 @@ class CameraUploadsService : LifecycleService() {
         }
 
     /**
-     * Checks if the local Primary Folder from [isLocalPrimaryFolderSet] exists
+     * Checks if the Primary Folder from [isPrimaryFolderSetUseCase] exists
      *
      * @return true if it exists, and false if otherwise
      */
-    private suspend fun hasLocalPrimaryFolder(): Boolean =
-        isLocalPrimaryFolderSet().also {
-            if (!it) Timber.w("Local Primary Folder is not set")
+    private suspend fun hasPrimaryFolder(): Boolean =
+        isPrimaryFolderSetUseCase().also {
+            if (!it) Timber.w("Primary Folder is not set")
         }
 
     /**
@@ -1051,7 +1051,7 @@ class CameraUploadsService : LifecycleService() {
     private suspend fun establishFolders() {
         // Setup the Primary Folder if it is missing
         if (!isPrimaryFolderEstablished()) {
-            Timber.w("The local primary folder is missing")
+            Timber.w("The Primary Folder is missing")
 
             val primaryHandle = getPrimaryFolderHandle()
 
@@ -1433,12 +1433,12 @@ class CameraUploadsService : LifecycleService() {
     }
 
     /**
-     * Executes certain behavior when the Local Primary Folder is disabled
+     * Executes certain behavior when the Primary Folder is disabled
      */
-    private suspend fun handleLocalPrimaryFolderDisabled() {
-        localFolderUnavailableNotification(
+    private suspend fun handlePrimaryFolderDisabled() {
+        displayFolderUnavailableNotification(
             R.string.camera_notif_primary_local_unavailable,
-            LOCAL_FOLDER_REMINDER_PRIMARY
+            FOLDER_REMINDER_PRIMARY
         )
         disableCameraUploadsInDatabase()
         setPrimaryFolderLocalPathUseCase(Constants.INVALID_NON_NULL_VALUE)
@@ -1451,7 +1451,7 @@ class CameraUploadsService : LifecycleService() {
      * Executes certain behavior when the Local Secondary Folder is disabled
      */
     private suspend fun handleLocalSecondaryFolderDisabled() {
-        localFolderUnavailableNotification(
+        displayFolderUnavailableNotification(
             R.string.camera_notif_secondary_local_unavailable,
             LOCAL_FOLDER_REMINDER_SECONDARY
         )
@@ -1486,12 +1486,13 @@ class CameraUploadsService : LifecycleService() {
     }
 
     /**
-     * When local folder is unavailable, CU cannot launch, need to show a notification to let the user know.
+     * When Camera Uploads cannot launch due to the Folder being unavailable, display a Notification
+     * to inform the User
      *
      * @param resId  The content text of the notification. Here is the string's res id.
      * @param notificationId Notification id, can cancel the notification by the same id when need.
      */
-    private fun localFolderUnavailableNotification(resId: Int, notificationId: Int) {
+    private fun displayFolderUnavailableNotification(resId: Int, notificationId: Int) {
         var isShowing = false
         notificationManager?.let {
             for (notification in it.activeNotifications) {
@@ -1536,7 +1537,7 @@ class CameraUploadsService : LifecycleService() {
 
     /**
      * Create the primary upload folder on the cloud drive
-     * If the creation succeed, set up the primary folder in local
+     * If the creation succeed, set up the primary folder
      *
      * @throws Exception if the creation of the primary upload folder failed
      */
@@ -1549,7 +1550,7 @@ class CameraUploadsService : LifecycleService() {
 
     /**
      * Create the secondary upload folder on the cloud drive
-     * If the creation succeed, set up the primary folder in local
+     * If the creation succeed, set up the secondary folder in local
      *
      * @throws Exception if the creation of the secondary upload folder failed
      */

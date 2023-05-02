@@ -16,7 +16,6 @@ import mega.privacy.android.app.domain.usecase.DefaultGetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.DefaultGetPendingUploadList
 import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
-import mega.privacy.android.app.domain.usecase.DefaultIsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultIsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.DefaultProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.DefaultSaveSyncRecordsToDB
@@ -34,7 +33,6 @@ import mega.privacy.android.app.domain.usecase.GetNodesByOriginalFingerprint
 import mega.privacy.android.app.domain.usecase.GetParentMegaNode
 import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
-import mega.privacy.android.app.domain.usecase.IsLocalPrimaryFolderSet
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
@@ -505,12 +503,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindGetCameraUploadSelectionQuery(getSelectionQuery: DefaultGetCameraUploadSelectionQuery): GetCameraUploadSelectionQuery
-
-    /**
-     * Provide the [IsLocalPrimaryFolderSet] implementation
-     */
-    @Binds
-    abstract fun bindIsLocalPrimaryFolderSet(isLocalPrimaryFolderSet: DefaultIsLocalPrimaryFolderSet): IsLocalPrimaryFolderSet
 
     /**
      * Provide the [IsLocalSecondaryFolderSet] implementation

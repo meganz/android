@@ -35,9 +35,9 @@ enum class StartCameraUploadsState {
     UNSATISFIED_WIFI_CONSTRAINT,
 
     /**
-     * The local Primary Folder does not exist
+     * The Primary Folder does not exist
      */
-    MISSING_LOCAL_PRIMARY_FOLDER,
+    MISSING_PRIMARY_FOLDER,
 
     /**
      * The local Secondary Folder does not exist
