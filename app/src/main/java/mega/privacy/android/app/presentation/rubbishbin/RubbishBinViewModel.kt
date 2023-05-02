@@ -53,7 +53,7 @@ class RubbishBinViewModel @Inject constructor(
     private val monitorViewType: MonitorViewType,
     private val getCloudSortOrder: GetCloudSortOrder,
     private val getIntentToOpenFileMapper: GetIntentToOpenFileMapper,
-    private val getRubbishBinFolder: GetRubbishBinFolder
+    private val getRubbishBinFolder: GetRubbishBinFolder,
 ) : ViewModel() {
 
     /**
@@ -138,9 +138,11 @@ class RubbishBinViewModel @Inject constructor(
     private fun getNodeUiItems(nodeList: List<Node>): List<NodeUIItem> {
         val existingNodeList = _state.value.nodeList
         return nodeList.mapIndexed { index, it ->
+            val isSelected =
+                state.value.selectedNodeHandles.contains(it.id.longValue)
             NodeUIItem(
                 node = it,
-                isSelected = if (existingNodeList.size > index) existingNodeList[index].isSelected else false,
+                isSelected = if (existingNodeList.size > index) isSelected else false,
                 isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false
             )
         }

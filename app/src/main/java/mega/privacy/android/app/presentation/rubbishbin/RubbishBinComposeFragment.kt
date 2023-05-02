@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.fragments.homepage.EventObserver
 import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.data.NodeUIItem
@@ -69,6 +70,7 @@ class RubbishBinComposeFragment : Fragment() {
 
     private val viewModel: RubbishBinViewModel by activityViewModels()
     private val managerViewModel: ManagerViewModel by activityViewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     private var actionMode: ActionMode? = null
 
@@ -320,5 +322,8 @@ class RubbishBinComposeFragment : Fragment() {
             .distinctUntilChanged()) {
             requireActivity().invalidateOptionsMenu()
         }
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver{
+            viewModel.refreshNodes()
+        })
     }
 }
