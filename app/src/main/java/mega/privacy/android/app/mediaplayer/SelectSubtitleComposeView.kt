@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,6 +52,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
+import mega.privacy.android.app.mediaplayer.Constants.EMPTY_LIST_TEST_TAG
+import mega.privacy.android.app.mediaplayer.Constants.EMPTY_TOP_BAR_TEST_TAG
+import mega.privacy.android.app.mediaplayer.Constants.PROGRESS_TEST_TAG
+import mega.privacy.android.app.mediaplayer.Constants.SELECTED_TOP_BAR_TEST_TAG
+import mega.privacy.android.app.mediaplayer.Constants.SUBTITLE_FILES_TEST_TAG
 import mega.privacy.android.app.mediaplayer.model.SubtitleFileInfoItem
 import mega.privacy.android.app.mediaplayer.model.SubtitleLoadState
 import mega.privacy.android.core.ui.controls.SearchAppBar
@@ -60,25 +66,45 @@ import mega.privacy.android.core.ui.theme.teal_300
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import timber.log.Timber
 
+internal object Constants {
+    /**
+     * Test tag for progress indicator
+     */
+    const val PROGRESS_TEST_TAG = "progress_test_tag"
+
+    /**
+     * Test tag for empty top bar
+     */
+    const val EMPTY_TOP_BAR_TEST_TAG = "empty_top_bar_test_tag"
+
+    /**
+     * Test tag for subtitle files is empty
+     */
+    const val EMPTY_LIST_TEST_TAG = "empty_list_test_tag"
+
+    /**
+     * Test tag for subtitle files
+     */
+    const val SUBTITLE_FILES_TEST_TAG = "subtitle_files_test_tag"
+
+    /**
+     * Test tag for selected top bar
+     */
+    const val SELECTED_TOP_BAR_TEST_TAG = "selected_top_bar_test_tag"
+}
+
 /**
- * The screen for select subtitle file
+ * The compose for select subtitle file
  *
- * @param onAddSubtitleCallback the callback after added subtitle
- * @param onBackPressedCallback the callback for back button pressed
+ * @param onAddSubtitle the function for added subtitle
+ * @param onBackPressed the function for back button pressed
  */
 @Composable
-internal fun SelectSubtitleFileView(
-    onAddSubtitleCallback: (SubtitleFileInfo?) -> Unit,
-    onBackPressedCallback: () -> Unit,
+internal fun SelectSubtitleComposeView(
+    onAddSubtitle: (SubtitleFileInfo?) -> Unit,
+    onBackPressed: () -> Unit,
 ) {
     val viewModel: SelectSubtitleFileViewModel = viewModel()
-    val isEmpty = viewModel.state is SubtitleLoadState.Empty
-    val isLoading = viewModel.state is SubtitleLoadState.Loading
-    val items = if (viewModel.state is SubtitleLoadState.Success) {
-        (viewModel.state as SubtitleLoadState.Success).items
-    } else {
-        emptyList()
-    }
     val selectedSubtitleFileInfo by viewModel.getSelectedSubtitleFileInfoFlow()
         .collectAsStateWithLifecycle()
     val query by viewModel.getQueryStateFlow().collectAsStateWithLifecycle()
@@ -86,30 +112,72 @@ internal fun SelectSubtitleFileView(
         viewModel.getSubtitleFileInfoList()
     }
 
+    SelectSubtitleView(
+        uiState = viewModel.state,
+        searchState = viewModel.searchState,
+        query = query,
+        selectedSubtitleFileInfo = selectedSubtitleFileInfo,
+        onSearchTextChange = viewModel::searchQuery,
+        onCloseClicked = viewModel::closeSearch,
+        onSearchClicked = viewModel::searchWidgetStateUpdate,
+        itemClicked = viewModel::itemClickedUpdate,
+        onAddSubtitle = onAddSubtitle,
+        onBackPressed = onBackPressed
+    )
+}
+
+/**
+ * Select subtitle view
+ *
+ * @param uiState SubtitleLoadState
+ * @param searchState SearchWidgetState
+ * @param query search strings
+ * @param selectedSubtitleFileInfo selected SubtitleFileInfo
+ * @param onSearchTextChange the function for search test changed
+ * @param onCloseClicked the function for close clicked
+ * @param onSearchClicked the function for search clicked
+ * @param itemClicked the function for item clicked
+ * @param onAddSubtitle the function after added subtitle
+ * @param onBackPressed the function for back button pressed
+ */
+@Composable
+internal fun SelectSubtitleView(
+    uiState: SubtitleLoadState,
+    searchState: SearchWidgetState,
+    query: String?,
+    selectedSubtitleFileInfo: SubtitleFileInfo?,
+    onSearchTextChange: (String) -> Unit,
+    onCloseClicked: () -> Unit,
+    onSearchClicked: () -> Unit,
+    itemClicked: (SubtitleFileInfo) -> Unit,
+    onAddSubtitle: (SubtitleFileInfo?) -> Unit,
+    onBackPressed: () -> Unit,
+) {
+    val isEmpty = uiState is SubtitleLoadState.Empty
+    val isLoading = uiState is SubtitleLoadState.Loading
+    val items = if (uiState is SubtitleLoadState.Success) {
+        uiState.items
+    } else {
+        emptyList()
+    }
     Scaffold(
         topBar = {
             when {
-                (isEmpty || isLoading) && viewModel.searchState != SearchWidgetState.EXPANDED ->
+                (isEmpty || isLoading) && searchState != SearchWidgetState.EXPANDED ->
                     EmptyTopBar {
-                        onBackPressedCallback()
+                        onBackPressed()
                     }
                 selectedSubtitleFileInfo != null ->
                     SelectedTopBar {
-                        onBackPressedCallback()
+                        onBackPressed()
                     }
                 else -> SearchAppBar(
-                    searchWidgetState = viewModel.searchState,
+                    searchWidgetState = searchState,
                     typedSearch = query ?: "",
-                    onSearchTextChange = { search ->
-                        viewModel.searchQuery(search)
-                    },
-                    onCloseClicked = {
-                        viewModel.closeSearch()
-                    },
-                    onBackPressed = onBackPressedCallback,
-                    onSearchClicked = {
-                        viewModel.searchWidgetStateUpdate()
-                    },
+                    onSearchTextChange = onSearchTextChange,
+                    onCloseClicked = onCloseClicked,
+                    onBackPressed = onBackPressed,
+                    onSearchClicked = onSearchClicked,
                     elevation = false,
                     titleId = R.string.media_player_video_select_subtitle_file_title,
                     hintId = R.string.hint_action_search,
@@ -134,19 +202,19 @@ internal fun SelectSubtitleFileView(
                             contentAlignment = Alignment.Center,
                             content = {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(44.dp),
+                                    modifier = Modifier.size(44.dp).testTag(PROGRESS_TEST_TAG),
                                     color = teal_300,
                                 )
                             },
                         )
                         isEmpty || items.isEmpty() -> SubtitleEmptyView(
-                            modifier = Modifier.fillMaxSize(),
-                            isSearchMode = viewModel.searchState == SearchWidgetState.EXPANDED
+                            modifier = Modifier.fillMaxSize().testTag(EMPTY_LIST_TEST_TAG),
+                            isSearchMode = searchState == SearchWidgetState.EXPANDED
                         )
                         else -> SubtitleFileInfoListView(
                             subtitleInfoList = items,
                         ) { index ->
-                            viewModel.itemClickedUpdate(index)
+                            itemClicked(index)
                         }
                     }
                 }
@@ -162,7 +230,7 @@ internal fun SelectSubtitleFileView(
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 24.dp),
                     elevation = null,
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
-                    onClick = onBackPressedCallback
+                    onClick = onBackPressed
                 ) {
                     Text(
                         text = stringResource(id = R.string.general_cancel),
@@ -177,7 +245,7 @@ internal fun SelectSubtitleFileView(
                         disabledBackgroundColor = colorResource(id = R.color.teal_200_alpha_038)
                     ),
                     onClick = {
-                        onAddSubtitleCallback(viewModel.getSelectedSubtitleFileInfoFlow().value)
+                        onAddSubtitle(selectedSubtitleFileInfo)
                     },
                     enabled = items.firstOrNull { it.selected } != null
                 ) {
@@ -312,6 +380,7 @@ internal fun SubtitleFileInfoListView(
 ) {
     Timber.d("render SubtitleFileInfoListView")
     LazyColumn(
+        modifier = Modifier.testTag(SUBTITLE_FILES_TEST_TAG),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
     ) {
         itemsIndexed(
@@ -331,6 +400,7 @@ internal fun SelectedTopBar(
     onBackPressedCallback: () -> Unit,
 ) {
     TopAppBar(
+        modifier = Modifier.testTag(SELECTED_TOP_BAR_TEST_TAG),
         title = {
             Text(
                 text = "1",
@@ -358,6 +428,7 @@ internal fun EmptyTopBar(
     onBackPressedCallback: () -> Unit,
 ) {
     TopAppBar(
+        modifier = Modifier.testTag(EMPTY_TOP_BAR_TEST_TAG),
         title = {
             Text(
                 text = stringResource(id = R.string.media_player_video_select_subtitle_file_title),
@@ -382,7 +453,7 @@ internal fun EmptyTopBar(
 @Composable
 private fun PreviewSelectSubtitleFileViewWithEmptyList() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        SelectSubtitleFileView({}, {})
+        SelectSubtitleComposeView({}, {})
     }
 }
 
@@ -390,7 +461,7 @@ private fun PreviewSelectSubtitleFileViewWithEmptyList() {
 @Composable
 private fun PreviewSelectSubtitleFileView() {
     AndroidTheme(isDark = isSystemInDarkTheme()) {
-        SelectSubtitleFileView({}, {})
+        SelectSubtitleComposeView({}, {})
     }
 }
 

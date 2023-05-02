@@ -50,8 +50,8 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
         setContent {
             val themeMode by getThemeMode().collectAsState(initial = ThemeMode.System)
             AndroidTheme(isDark = themeMode.isDarkMode()) {
-                SelectSubtitleFileView(
-                    onAddSubtitleCallback = { info ->
+                SelectSubtitleComposeView(
+                    onAddSubtitle = { info ->
                         info?.let {
                             viewModel.sendAddSubtitleClickedEvent()
                             setResult(
@@ -64,7 +64,7 @@ class SelectSubtitleFileActivity : PasscodeActivity() {
                             this.finish()
                         }
                     },
-                    onBackPressedCallback = {
+                    onBackPressed = {
                         viewModel.sendSelectSubtitleCancelledEvent()
                         setResult(RESULT_OK)
                         this.finish()
