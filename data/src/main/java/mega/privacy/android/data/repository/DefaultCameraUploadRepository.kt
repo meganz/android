@@ -294,7 +294,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
             localStorageGateway.setSecondaryEnabled(secondaryCameraUpload)
         }
 
-    override suspend fun getSecondaryFolderLocalPath(): String? = withContext(ioDispatcher) {
+    override suspend fun getSecondaryFolderLocalPath() = withContext(ioDispatcher) {
         localStorageGateway.getSecondaryFolderLocalPath()
     }
 
@@ -351,8 +351,11 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun getSecondaryFolderSDCardUriPath(): String = withContext(ioDispatcher) {
-        val uriString = localStorageGateway.getSecondaryFolderSDCardUriPath()
-        sdCardGateway.getDirectoryName(uriString)
+        localStorageGateway.getSecondaryFolderSDCardUriPath()
+    }
+
+    override suspend fun setSecondaryFolderSDCardUriPath(path: String) = withContext(ioDispatcher) {
+        localStorageGateway.setSecondaryFolderSDCardUriPath(path)
     }
 
     override suspend fun shouldClearSyncRecords() = withContext(ioDispatcher) {

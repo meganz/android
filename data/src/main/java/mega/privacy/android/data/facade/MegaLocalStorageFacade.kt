@@ -193,8 +193,8 @@ internal class MegaLocalStorageFacade @Inject constructor(
     override suspend fun setSecondaryEnabled(secondaryCameraUpload: Boolean) =
         dbHandler.setSecondaryUploadEnabled(secondaryCameraUpload)
 
-    override suspend fun getSecondaryFolderLocalPath(): String? =
-        dbHandler.preferences?.localPathSecondaryFolder
+    override suspend fun getSecondaryFolderLocalPath(): String =
+        dbHandler.preferences?.localPathSecondaryFolder ?: ""
 
     override suspend fun areLocationTagsEnabled(): Boolean =
         dbHandler.preferences?.removeGPS?.toBoolean()?.not() ?: false
@@ -224,6 +224,10 @@ internal class MegaLocalStorageFacade @Inject constructor(
 
     override suspend fun getSecondaryFolderSDCardUriPath(): String =
         dbHandler.uriMediaExternalSdCard ?: ""
+
+    override suspend fun setSecondaryFolderSDCardUriPath(path: String) {
+        dbHandler.uriMediaExternalSdCard = path
+    }
 
     override suspend fun shouldClearSyncRecords(): Boolean = dbHandler.shouldClearCamsyncRecords()
 

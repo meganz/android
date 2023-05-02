@@ -600,12 +600,17 @@ class DefaultCameraUploadRepositoryTest {
             }
 
         @Test
+        fun `test that the new secondary folder SD card path is set`() = runTest {
+            val testSDCardPath = "test/sd/card/path"
+
+            underTest.setSecondaryFolderSDCardUriPath(testSDCardPath)
+            verify(localStorageGateway, times(1)).setSecondaryFolderSDCardUriPath(testSDCardPath)
+        }
+
+        @Test
         fun `test that the secondary folder SD card URI path is retrieved`() = runTest {
-            val testPath = "Secondary Folder"
-
-            whenever(localStorageGateway.getSecondaryFolderSDCardUriPath()).thenReturn("test/sd")
-            whenever(sdCardGateway.getDirectoryName(any())).thenReturn(testPath)
-
+            val testPath = "test/sd/card/path"
+            whenever(localStorageGateway.getSecondaryFolderSDCardUriPath()).thenReturn(testPath)
             assertThat(underTest.getSecondaryFolderSDCardUriPath()).isEqualTo(testPath)
         }
 

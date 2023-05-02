@@ -285,9 +285,9 @@ interface MegaLocalStorageGateway {
     /**
      * Retrieves the Secondary Folder local path
      *
-     * @return A [String] that contains the Primary Folder local path, or null if it does not exist
+     * @return A [String] that contains the Primary Folder local path, or an empty [String] if it does not exist
      */
-    suspend fun getSecondaryFolderLocalPath(): String?
+    suspend fun getSecondaryFolderLocalPath(): String
 
     /**
      * Checks the value in the Database, as to whether Location Tags should be added or not
@@ -360,6 +360,13 @@ interface MegaLocalStorageGateway {
      * if it does not exist
      */
     suspend fun getSecondaryFolderSDCardUriPath(): String
+
+    /**
+     * Sets the new Secondary Folder SD Card URI Path
+     *
+     * @param path the new Secondary Folder SD Card URI path
+     */
+    suspend fun setSecondaryFolderSDCardUriPath(path: String)
 
     /**
      * Should clear sync records

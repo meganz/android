@@ -28,7 +28,7 @@ class DefaultGetCameraUploadLocalPathSecondary @Inject constructor(
             cameraUploadRepository.getSecondaryFolderLocalPath()
         }
 
-        if (localPath != null && !localPath.endsWith(Constants.SEPARATOR)) {
+        if (!localPath.isNullOrBlank() && !localPath.endsWith(Constants.SEPARATOR)) {
             localPath += Constants.SEPARATOR
         }
         return localPath
