@@ -1,5 +1,6 @@
 package mega.privacy.android.app.mediaplayer
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -29,24 +29,30 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import mega.privacy.android.app.R
+import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
+import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_MATCHED_ITEM
+import mega.privacy.android.app.mediaplayer.MediaPlayerViewModel.Companion.SUBTITLE_SELECTED_STATE_OFF
 import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import timber.log.Timber
 
 /**
  * Adding subtitle dialog
  *
+ * @param selectOptionState selectState for updating the background color of add subtitle dialog options
  * @param matchedSubtitleFileUpdate the callback for get matched subtitle file
  * @param subtitleFileName the added subtitle file name
- * @param onAddedSubtitleClicked the callback for clicking added subtitle file option
- * @param onAutoMatch the callback for auto match subtitle file
- * @param onToSelectSubtitle the callback for to select subtitle page
- * @param onDismissRequest the callback for to select subtitle page
+ * @param onOffClicked the callback for off option is clicked
+ * @param onAddedSubtitleClicked the callback for added subtitle file option is clicked
+ * @param onAutoMatch the callback for auto match subtitle file is clicked
+ * @param onToSelectSubtitle the callback for to select subtitle page option is clicked
+ * @param onDismissRequest the dismiss request
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddSubtitleDialog(
+    selectOptionState: Int,
     matchedSubtitleFileUpdate: suspend () -> SubtitleFileInfo?,
     subtitleFileName: String? = null,
+    onOffClicked: () -> Unit,
     onAddedSubtitleClicked: () -> Unit,
     onAutoMatch: (SubtitleFileInfo) -> Unit,
     onToSelectSubtitle: () -> Unit,
@@ -106,20 +112,20 @@ fun AddSubtitleDialog(
                 )
                 OptionText(
                     text = stringResource(id = R.string.media_player_video_enable_subtitle_dialog_option_off),
-                    onClick = onDismissRequest,
-                    isSelected = addedSubtitleFileName == null && subtitleFileInfo == null
+                    onClick = onOffClicked,
+                    isSelected = selectOptionState == SUBTITLE_SELECTED_STATE_OFF
                 )
                 addedSubtitleFileName?.let {
                     OptionText(
                         text = it,
-                        isSelected = true,
+                        isSelected = selectOptionState == SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM,
                         onClick = onAddedSubtitleClicked
                     )
                 }
                 subtitleFileInfo?.let {
                     OptionText(
                         text = it.name,
-                        isSelected = addedSubtitleFileName == null,
+                        isSelected = selectOptionState == SUBTITLE_SELECTED_STATE_MATCHED_ITEM,
                         onClick = {
                             onAutoMatch(it)
                         }
@@ -163,12 +169,17 @@ private fun OptionText(
     )
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Preview
 @Composable
 private fun PreviewAddSubtitleDialogWithMatchedName() {
     AddSubtitleDialog(
+        selectOptionState = SUBTITLE_SELECTED_STATE_MATCHED_ITEM,
         matchedSubtitleFileUpdate = { null },
         subtitleFileName = "subtitleFile.srt",
+        onOffClicked = {
+            Timber.d("onOffClicked")
+        },
         onAddedSubtitleClicked = {
             Timber.d("addedSubtitleFileName")
         },
@@ -180,11 +191,14 @@ private fun PreviewAddSubtitleDialogWithMatchedName() {
         }) {}
 }
 
+@SuppressLint("UnrememberedMutableState")
 @Preview
 @Composable
 private fun PreviewAddSubtitleDialogWithoutMatchedName() {
     AddSubtitleDialog(
+        selectOptionState = SUBTITLE_SELECTED_STATE_OFF,
         matchedSubtitleFileUpdate = { null },
+        onOffClicked = {},
         onAddedSubtitleClicked = {},
         onAutoMatch = { },
         onToSelectSubtitle = { }) {}

@@ -62,7 +62,6 @@ import mega.privacy.android.app.utils.Constants.OFFLINE_ADAPTER
 import mega.privacy.android.app.utils.RunOnUIThreadUtils.runDelay
 import mega.privacy.android.app.utils.Util.isOnline
 import mega.privacy.android.app.utils.ViewUtils.isVisible
-import mega.privacy.android.domain.entity.mediaplayer.SubtitleFileInfo
 import mega.privacy.android.domain.usecase.featureflag.GetFeatureFlagValueUseCase
 import org.jetbrains.anko.configuration
 import org.jetbrains.anko.defaultSharedPreferences
@@ -142,15 +141,11 @@ class MediaPlayerFragment : Fragment() {
     private val selectSubtitleFileActivityLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                result.data?.serializable<SubtitleFileInfo>(
-                    INTENT_KEY_SUBTITLE_FILE_INFO
-                )?.let { info ->
-                    info.url?.let {
-                        viewModel.updateSubtitleInfoByAddSubtitles(info)
-                    } ?: Timber.d("The subtitle file url is null")
-                    viewModel.showSubtitle(true)
-                } ?: viewModel.showSubtitle(false)
-                viewModel.showSubtitleDialog(false)
+                viewModel.onAddSubtitleFile(
+                    result.data?.serializable(
+                        INTENT_KEY_SUBTITLE_FILE_INFO
+                    )
+                )
             }
         }
 
@@ -414,16 +409,7 @@ class MediaPlayerFragment : Fragment() {
                             isShow = isShow,
                             isSubtitleShown = viewModel.state.value.isSubtitleShown
                         ) {
-                            if (viewModel.state.value.isSubtitleShown) {
-                                serviceGateway?.hideSubtitle()
-                                viewModel.showSubtitle(false)
-                                viewModel.showSubtitleDialog(false)
-                                viewModel.sendHideSubtitleEvent()
-                            } else {
-                                viewModel.showSubtitle(true)
-                                viewModel.showSubtitleDialog(true)
-                                viewModel.sendSubtitleDialogShownEvent()
-                            }
+                            viewModel.showAddSubtitleDialog()
                         }
                     }
 
@@ -688,22 +674,19 @@ class MediaPlayerFragment : Fragment() {
             setContent {
                 if (viewModel.state.collectAsState().value.isSubtitleDialogShown) {
                     AddSubtitleDialog(
+                        selectOptionState = viewModel.selectOptionState,
                         matchedSubtitleFileUpdate = {
                             playerServiceViewModelGateway?.getMatchedSubtitleFileInfoForPlayingItem()
                         },
                         subtitleFileName = viewModel.subtitleInfoByAddSubtitles?.name,
+                        onOffClicked = {
+                            viewModel.onOffItemClicked()
+                        },
                         onAddedSubtitleClicked = {
-                            viewModel.showSubtitle(true)
-                            viewModel.showSubtitleDialog(false)
+                            viewModel.onAddedSubtitleOptionClicked()
                         },
                         onAutoMatch = { info ->
-                            info.url?.let {
-                                viewModel.updateCurrentSubtitleFileInfo(info)
-                                viewModel.showSubtitle(true)
-                                viewModel.updateSubtitleInfoByAddSubtitles(null)
-                                viewModel.sendAutoMatchSubtitleClickedEvent()
-                            } ?: Timber.d("The subtitle file url is null")
-                            viewModel.showSubtitleDialog(false)
+                            viewModel.onAutoMatchItemClicked(info)
                         },
                         onToSelectSubtitle = {
                             viewModel.sendOpenSelectSubtitlePageEvent()
@@ -720,8 +703,7 @@ class MediaPlayerFragment : Fragment() {
                             )
                         }) {
                         // onDismissRequest
-                        viewModel.showSubtitle(false)
-                        viewModel.showSubtitleDialog(false)
+                        viewModel.onDismissRequest()
                     }
                 }
             }

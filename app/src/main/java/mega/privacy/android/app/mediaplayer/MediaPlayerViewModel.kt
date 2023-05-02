@@ -10,6 +10,9 @@ import android.os.Looper
 import android.view.PixelCopy
 import android.view.SurfaceView
 import android.view.View
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -93,6 +96,12 @@ class MediaPlayerViewModel @Inject constructor(
      */
     val state: StateFlow<SubtitleDisplayState> = _state
 
+    /**
+     * SelectState for updating the background color of add subtitle dialog options
+     */
+    var selectOptionState by mutableStateOf(SUBTITLE_SELECTED_STATE_OFF)
+        private set
+
     fun getCollision(): LiveData<NameCollision> = collision
     fun onSnackbarMessage(): LiveData<Int> = snackbarMessage
     fun onExceptionThrown(): LiveData<Throwable> = throwable
@@ -134,10 +143,10 @@ class MediaPlayerViewModel @Inject constructor(
         _renameUpdate.value = node
     }
 
-    private val subtitleDialogShowKey = "SUBTITLE_DIALOG_SHOW"
-    private val subtitleShowKey = "SUBTITLE_SHOW"
-    private val videoPlayerPausedForPlaylistKey = "VIDEO_PLAYER_PAUSED_FOR_PLAYLIST"
-    private val currentSubtitleFileInfoKey = "CURRENT_SUBTITLE_FILE_INFO"
+    internal val subtitleDialogShowKey = "SUBTITLE_DIALOG_SHOW"
+    internal val subtitleShowKey = "SUBTITLE_SHOW"
+    internal val videoPlayerPausedForPlaylistKey = "VIDEO_PLAYER_PAUSED_FOR_PLAYLIST"
+    internal val currentSubtitleFileInfoKey = "CURRENT_SUBTITLE_FILE_INFO"
 
     private val _isSubtitleDialogShown = savedStateHandle.getStateFlow(
         viewModelScope,
@@ -201,7 +210,7 @@ class MediaPlayerViewModel @Inject constructor(
      *
      * @param subtitleFileInfo [SubtitleFileInfo]
      */
-    fun updateSubtitleInfoByAddSubtitles(subtitleFileInfo: SubtitleFileInfo?) {
+    private fun updateSubtitleInfoByAddSubtitles(subtitleFileInfo: SubtitleFileInfo?) {
         subtitleInfoByAddSubtitles = subtitleFileInfo
         subtitleFileInfo?.let { info ->
             if (_currentSubtitleFileInfo.value?.id != info.id) {
@@ -249,7 +258,7 @@ class MediaPlayerViewModel @Inject constructor(
      *
      * @param subtitleFileInfo [SubtitleFileInfo]
      */
-    fun updateCurrentSubtitleFileInfo(subtitleFileInfo: SubtitleFileInfo) {
+    private fun updateCurrentSubtitleFileInfo(subtitleFileInfo: SubtitleFileInfo) {
         if (subtitleFileInfo.id != _currentSubtitleFileInfo.value?.id) {
             _currentSubtitleFileInfo.update { subtitleFileInfo }
             currentMediaPlayerMediaId = subtitleFileInfo.id.toString()
@@ -260,24 +269,84 @@ class MediaPlayerViewModel @Inject constructor(
     }
 
     /**
-     * Update the subtitle shown state
-     *
-     * @param isShow true is that subtitle is shown, otherwise is false
+     * The function is for showing the add subtitle dialog
      */
-    fun showSubtitle(isShow: Boolean) {
-        _isSubtitleShown.update { isShow }
-        if (!isShow) {
-            _isAddSubtitle.update { false }
-        }
+    fun showAddSubtitleDialog() {
+        _isSubtitleShown.update { true }
+        _isAddSubtitle.update { false }
+        _isSubtitleDialogShown.update { true }
+        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SubtitleDialogShownEvent())
     }
 
     /**
-     * Update state for subtitle dialog shown state
-     *
-     * @param isShow true is show dialog, otherwise is false
+     * The function is for the added subtitle option is clicked
      */
-    fun showSubtitleDialog(isShow: Boolean) {
-        _isSubtitleDialogShown.update { isShow }
+    fun onAddedSubtitleOptionClicked() {
+        _isSubtitleShown.update { true }
+        _isSubtitleDialogShown.update { false }
+        selectOptionState = SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
+    }
+
+    /**
+     * The function is for the adding subtitle file
+     *
+     * @param info the added subtitle file info
+     */
+    fun onAddSubtitleFile(info: SubtitleFileInfo?) {
+        info?.let {
+            it.url?.let {
+                updateSubtitleInfoByAddSubtitles(info)
+                selectOptionState = SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM
+            } ?: Timber.d("The subtitle file url is null")
+            _isSubtitleShown.update { true }
+        } ?: let {
+            _isAddSubtitle.update { false }
+            _isSubtitleShown.update {
+                selectOptionState != SUBTITLE_SELECTED_STATE_OFF
+            }
+        }
+        _isSubtitleDialogShown.update { false }
+    }
+
+    /**
+     * The function is for the off item is clicked
+     */
+    fun onOffItemClicked() {
+        // Only when the subtitle file has been loaded and shown, send hide subtitle event if off item is clicked
+        if (_currentSubtitleFileInfo.value != null && selectOptionState != SUBTITLE_SELECTED_STATE_OFF) {
+            sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.HideSubtitleEvent())
+        }
+        _isAddSubtitle.update { false }
+        _isSubtitleShown.update { false }
+        _isSubtitleDialogShown.update { false }
+        selectOptionState = SUBTITLE_SELECTED_STATE_OFF
+    }
+
+    /**
+     * The function is for the dialog dismiss request
+     */
+    fun onDismissRequest() {
+        _isAddSubtitle.update { false }
+        _isSubtitleShown.update {
+            selectOptionState != SUBTITLE_SELECTED_STATE_OFF
+        }
+        _isSubtitleDialogShown.update { false }
+    }
+
+    /**
+     * The function is for the auto matched item is clicked
+     *
+     * @param info matched subtitle file info
+     */
+    fun onAutoMatchItemClicked(info: SubtitleFileInfo) {
+        info.url?.let {
+            updateCurrentSubtitleFileInfo(info)
+            _isSubtitleShown.update { true }
+            updateSubtitleInfoByAddSubtitles(null)
+            sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.AutoMatchSubtitleClickedEvent())
+            selectOptionState = SUBTITLE_SELECTED_STATE_MATCHED_ITEM
+        } ?: Timber.d("The subtitle file url is null")
+        _isSubtitleDialogShown.update { false }
     }
 
     /**
@@ -512,24 +581,6 @@ class MediaPlayerViewModel @Inject constructor(
     }
 
     /**
-     * Send SubtitleDialogShownEvent
-     */
-    fun sendSubtitleDialogShownEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.SubtitleDialogShownEvent())
-
-    /**
-     * Send HideSubtitleEvent
-     */
-    fun sendHideSubtitleEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.HideSubtitleEvent())
-
-    /**
-     * Send AutoMatchSubtitleClickedEvent
-     */
-    fun sendAutoMatchSubtitleClickedEvent() =
-        sendMediaPlayerStatisticsEvent(MediaPlayerStatisticsEvents.AutoMatchSubtitleClickedEvent())
-
-    /**
      * Send OpenSelectSubtitlePageEvent
      */
     fun sendOpenSelectSubtitlePageEvent() =
@@ -611,5 +662,20 @@ class MediaPlayerViewModel @Inject constructor(
         private const val DATE_FORMAT_PATTERN = "yyyyMMdd-HHmmss"
         private const val SCREENSHOT_NAME_PREFIX = "Screenshot_"
         private const val SCREENSHOT_NAME_SUFFIX = ".jpg"
+
+        /**
+         * The state for the off is selected
+         */
+        const val SUBTITLE_SELECTED_STATE_OFF = 900
+
+        /**
+         * The state for the matched item is selected
+         */
+        const val SUBTITLE_SELECTED_STATE_MATCHED_ITEM = 901
+
+        /**
+         * The state for the add subtitle item is selected
+         */
+        const val SUBTITLE_SELECTED_STATE_ADD_SUBTITLE_ITEM = 902
     }
 }
