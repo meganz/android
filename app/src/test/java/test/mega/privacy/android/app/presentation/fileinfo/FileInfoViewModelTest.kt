@@ -51,6 +51,7 @@ import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
@@ -121,6 +122,7 @@ internal class FileInfoViewModelTest {
     private val stopSharingNode: StopSharingNode = mock()
     private val nodeActionMapper: NodeActionMapper = mock()
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase = mock()
+    private val monitorOnlineStatusUpdates = mock<MonitorOnlineStatusUseCase>()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -172,6 +174,7 @@ internal class FileInfoViewModelTest {
             stopSharingNode = stopSharingNode,
             getAvailableNodeActionsUseCase = getAvailableNodeActionsUseCase,
             nodeActionMapper = nodeActionMapper,
+            monitorOnlineStatusUpdates = monitorOnlineStatusUpdates,
         )
     }
 

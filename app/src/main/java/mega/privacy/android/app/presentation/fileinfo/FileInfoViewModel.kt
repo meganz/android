@@ -7,6 +7,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -52,6 +53,7 @@ import mega.privacy.android.domain.usecase.MonitorChildrenUpdates
 import mega.privacy.android.domain.usecase.MonitorContactUpdates
 import mega.privacy.android.domain.usecase.MonitorNodeUpdatesById
 import mega.privacy.android.domain.usecase.account.MonitorStorageStateEventUseCase
+import mega.privacy.android.domain.usecase.contact.MonitorOnlineStatusUseCase
 import mega.privacy.android.domain.usecase.favourites.IsAvailableOfflineUseCase
 import mega.privacy.android.domain.usecase.filenode.CopyNodeByHandle
 import mega.privacy.android.domain.usecase.filenode.DeleteNodeByHandle
@@ -98,6 +100,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorNodeUpdatesById: MonitorNodeUpdatesById,
     private val monitorChildrenUpdates: MonitorChildrenUpdates,
     private val monitorContactUpdates: MonitorContactUpdates,
+    private val monitorOnlineStatusUpdates: MonitorOnlineStatusUseCase,
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle,
     private val getOutShares: GetOutShares,
     private val getNodeLocationInfo: GetNodeLocationInfo,
@@ -188,6 +191,7 @@ class FileInfoViewModel @Inject constructor(
                         monitorNodeUpdates(),
                         monitorChildrenUpdates(),
                         monitorSharesContactUpdates(),
+                        monitorOnlineState(),
                     )
                 )
             }
@@ -501,6 +505,28 @@ class FileInfoViewModel @Inject constructor(
                             updateOwner()
                         }
                     }
+                }
+            }
+        }
+
+    private fun monitorOnlineState() =
+        viewModelScope.launch {
+            monitorOnlineStatusUpdates().filter { onlineStatus ->
+                _uiState.value.outShares.any { it.contactItem.handle == onlineStatus.userHandle }
+            }.collect { onlineStatus ->
+                updateState { uiState ->
+                    uiState.outShares.indexOfFirst {
+                        it.contactItem.handle == onlineStatus.userHandle
+                    }.takeIf { it >= 0 }?.let { contactUpdatedIndex ->
+                        // lets update the online status of the corresponding user in outShares
+                        val outShares = uiState.outShares.toMutableList().apply {
+                            this[contactUpdatedIndex] = this[contactUpdatedIndex].let {
+                                it.copy(contactItem = it.contactItem.copy(status = onlineStatus.status))
+                            }
+                        }
+                        uiState.copy(outShares = outShares)
+                    }
+                        ?: uiState //this should not happen because we filtered the list, but a race condition can happen
                 }
             }
         }
