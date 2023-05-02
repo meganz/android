@@ -34,7 +34,7 @@ import mega.privacy.android.domain.entity.contacts.ContactPermission
 @Composable
 internal fun FileInfoContent(
     viewState: FileInfoViewState,
-    onLinkClick: (link: String) -> Unit,
+    onTakeDownLinkClick: (link: String) -> Unit,
     onLocationClick: () -> Unit,
     availableOfflineChanged: (checked: Boolean) -> Unit,
     onVersionsClick: () -> Unit,
@@ -59,7 +59,7 @@ internal fun FileInfoContent(
             if (showTakeDownWarning) {
                 TakeDownWarningView(
                     isFile = isFile,
-                    onLinkClick = onLinkClick,
+                    onLinkClick = onTakeDownLinkClick,
                     onCloseClick = { showTakeDownWarning = false }
                 )
             }
@@ -215,7 +215,7 @@ private fun FileInfoContentPreview(
     AndroidTheme(isDark = isSystemInDarkTheme()) {
         FileInfoContent(
             viewState = state,
-            onLinkClick = {},
+            onTakeDownLinkClick = {},
             availableOfflineChanged = {
                 state = state.copy(isAvailableOffline = !state.isAvailableOffline)
             },

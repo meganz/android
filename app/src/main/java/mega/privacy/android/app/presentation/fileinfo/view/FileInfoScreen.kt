@@ -2,7 +2,6 @@ package mega.privacy.android.app.presentation.fileinfo.view
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -13,10 +12,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -28,17 +31,24 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.description
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoMenuAction
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
+import mega.privacy.android.app.presentation.settings.exportrecoverykey.view.SNACKBAR_TEST_TAG
 import mega.privacy.android.app.utils.LocationInfo
+import mega.privacy.android.app.utils.Util
+import mega.privacy.android.core.ui.controls.LoadingDialog
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.black_white
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactPermission
@@ -49,12 +59,12 @@ import kotlin.time.Duration.Companion.days
 /**
  * View to render the File Info Screen, including toolbar, content, etc.
  */
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun FileInfoScreen(
     viewState: FileInfoViewState,
+    snackBarHostState: SnackbarHostState,
     onBackPressed: () -> Unit,
-    onLinkClick: (link: String) -> Unit,
+    onTakeDownLinkClick: (link: String) -> Unit,
     onLocationClick: () -> Unit,
     availableOfflineChanged: (checked: Boolean) -> Unit,
     onVersionsClick: () -> Unit,
@@ -67,25 +77,39 @@ internal fun FileInfoScreen(
     onMenuActionClick: (FileInfoMenuAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setStatusBarColor(
+        color = Color.Transparent,
+        darkIcons = systemUiController.statusBarDarkContentEnabled
+    )
+
     val scrollState = rememberScrollState()
     Box(modifier = modifier.fillMaxSize()) {
         val density = LocalDensity.current.density
+        val statusBarHeight = Util.getStatusBarHeight().toFloat() / density
         val tintColorBase = MaterialTheme.colors.onSurface
         val actionModeSelect = viewState.outShareContactsSelected.isNotEmpty()
         val headerHeight by remember {
-            derivedStateOf { headerMaxHeight - (scrollState.value / density).coerceAtLeast(0f) }
+            derivedStateOf {
+                (headerMaxHeight(statusBarHeight) - (scrollState.value / density))
+                    .coerceAtLeast(headerMinHeight(statusBarHeight))
+            }
         }
-
         val alpha by remember {
             derivedStateOf {
-                ((headerHeight - headerGoneHeight) / (headerStartGoneHeight - headerGoneHeight))
+                ((headerHeight - headerGoneHeight(statusBarHeight))
+                        / (headerStartGoneHeight(statusBarHeight) - headerGoneHeight(statusBarHeight)))
                     .coerceIn(0f, 1f)
             }
         }
         val topBarOpacityTransitionDelta by remember {
-            derivedStateOf { 1 - (headerHeight / headerGoneHeight).coerceIn(0f, 1f) }
+            derivedStateOf {
+                1 - ((headerHeight - headerMinHeight(statusBarHeight))
+                        / (headerGoneHeight(statusBarHeight) - headerMinHeight(statusBarHeight)))
+                    .coerceIn(0f, 1f)
+            }
         }
-        val tintColor by remember {
+        val tintColor by remember(viewState.hasPreview) {
             derivedStateOf {
                 if (viewState.hasPreview) {
                     lerp(tintColorBase, white, alpha)
@@ -104,6 +128,7 @@ internal fun FileInfoScreen(
                 .height(headerHeight.dp)
         )
         Scaffold(
+            modifier = Modifier.systemBarsPadding(),
             backgroundColor = Color.Transparent,
             topBar = {
                 Crossfade(
@@ -125,7 +150,17 @@ internal fun FileInfoScreen(
                         )
                     }
                 }
-            }) { innerPadding ->
+            },
+            snackbarHost = {
+                SnackbarHost(hostState = snackBarHostState) { data ->
+                    Snackbar(
+                        modifier = Modifier.testTag(SNACKBAR_TEST_TAG),
+                        snackbarData = data,
+                        backgroundColor = MaterialTheme.colors.black_white
+                    )
+                }
+            },
+        ) { innerPadding ->
             BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                 //to set the minimum height of the colum so it's always possible to collapse the header
                 val boxWithConstraintsScope = this
@@ -134,10 +169,10 @@ internal fun FileInfoScreen(
                         .verticalScroll(scrollState)
                         .padding(innerPadding)
                 ) {
-                    Spacer(Modifier.height(spacerHeight.dp)) //to give space for the header (that it's outside this column)
+                    Spacer(Modifier.height(spacerHeight(statusBarHeight).dp)) //to give space for the header (that it's outside this column)
                     FileInfoContent(
                         viewState = viewState,
-                        onLinkClick = onLinkClick,
+                        onTakeDownLinkClick = onTakeDownLinkClick,
                         onLocationClick = onLocationClick,
                         availableOfflineChanged = availableOfflineChanged,
                         onVersionsClick = onVersionsClick,
@@ -155,6 +190,9 @@ internal fun FileInfoScreen(
                 }
             }
         }
+        viewState.jobInProgressState?.progressMessage?.let {
+            LoadingDialog(text = stringResource(id = it))
+        }
     }
 }
 
@@ -169,8 +207,9 @@ private fun FileInfoScreenPreview(
         FileInfoScreen(
             modifier = Modifier.background(color = MaterialTheme.colors.background),
             viewState = state,
+            snackBarHostState = SnackbarHostState(),
             onBackPressed = {},
-            onLinkClick = {},
+            onTakeDownLinkClick = {},
             availableOfflineChanged = {
                 state = state.copy(isAvailableOffline = !state.isAvailableOffline)
             },
@@ -204,12 +243,13 @@ private fun FileInfoScreenPreview(
     }
 }
 
-
-private const val headerMaxHeight = 160f
-private const val headerStartGoneHeight = 110f
-private const val headerGoneHeight = 66f
 private const val appBarHeight = 44f
-private const val spacerHeight = headerMaxHeight - appBarHeight
+private fun headerMinHeight(statusBarHeight: Float) = appBarHeight + statusBarHeight
+private fun headerMaxHeight(statusBarHeight: Float) = 140f + statusBarHeight
+private fun headerStartGoneHeight(statusBarHeight: Float) = 110f + statusBarHeight
+private fun headerGoneHeight(statusBarHeight: Float) = 66f + statusBarHeight
+private fun spacerHeight(statusBarHeight: Float) =
+    headerMaxHeight(statusBarHeight) - appBarHeight - statusBarHeight
 
 /**
  * Provides different [FileInfoViewState] for previews

@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 
@@ -29,7 +30,7 @@ internal fun FileInfoTitledText(
 ) {
     Text(
         text = title,
-        style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary),
+        style = MaterialTheme.typography.subtitle2medium.copy(color = MaterialTheme.colors.textColorPrimary),
     )
     Text(
         text = text,

@@ -40,7 +40,8 @@ internal fun FileInfoTopBar(
             Text(
                 text = title,
                 style = MaterialTheme.typography.subtitle1.copy(color = tintColor),
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                maxLines = 2,
             )
         },
         navigationIcon = {

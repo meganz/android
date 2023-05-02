@@ -30,7 +30,9 @@ import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHARES_HEADE
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHOW_MORE
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.body2medium
 import mega.privacy.android.core.ui.theme.extensions.grey_alpha_012_white_alpha_012
+import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.shares.AccessPermission
@@ -88,7 +90,7 @@ private fun Header(
     ) {
         Text(
             text = stringResource(id = R.string.file_properties_shared_folder_select_contact),
-            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary)
+            style = MaterialTheme.typography.subtitle2medium.copy(color = MaterialTheme.colors.textColorPrimary)
         )
         Text(
             text =
@@ -101,8 +103,11 @@ private fun Header(
                     contacts.size
                 )
             },
-            modifier = Modifier.padding(end = 24.dp, start = 8.dp),
-            style = MaterialTheme.typography.body2.copy(color = MaterialTheme.colors.secondary),
+            modifier = Modifier
+                .padding(end = 16.dp)
+                .clickable(onClick = onHeaderClick)
+                .padding(8.dp),
+            style = MaterialTheme.typography.body2medium.copy(color = MaterialTheme.colors.secondary),
         )
     }
 }

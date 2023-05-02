@@ -20,6 +20,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
+import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
 import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import java.time.Instant.now
@@ -36,7 +37,8 @@ internal fun ShareLinkView(
 ) = Column(modifier = modifier.fillMaxWidth()) {
     Text(
         text = stringResource(id = R.string.file_properties_shared_folder_public_link_name),
-        style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary),
+        style = MaterialTheme.typography.subtitle2medium
+            .copy(color = MaterialTheme.colors.textColorPrimary),
     )
     Text(
         text = link,

@@ -22,7 +22,7 @@ internal fun RowScope.FileInfoMenuActions(
     onActionClick: (FileInfoMenuAction) -> Unit,
 ) = MenuActions(
     actions = actions,
-    maxActionsToShow = 3,
+    maxActionsToShow = MENU_ACTIONS_TO_SHOW,
     dropDownIcon = painterResource(id = R.drawable.ic_dots_vertical_white),
     tint = tint,
     onActionClick = {

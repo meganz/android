@@ -23,6 +23,12 @@ interface MenuAction {
      */
     @Composable
     fun getDescription(): String
+
+    /**
+     * similar to xml definition of menus, this sets the order of menu actions, lower will be showed first.
+     */
+    val orderInCategory: Int
+        get() = 100
 }
 
 /**

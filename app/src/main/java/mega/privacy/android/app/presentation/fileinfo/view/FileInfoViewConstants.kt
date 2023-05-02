@@ -15,3 +15,4 @@ internal const val TEST_TAG_CONTACT_ITEM_SHARED = "contactItem"
 internal const val TEST_TAG_CONTACT_ITEM_SHARED_DOTS = "contactItemDots"
 internal const val TEST_TAG_SHARES_HEADER = "shareContactsHeader"
 internal const val TEST_TAG_SHOW_MORE = "shareMoreButton"
+internal const val MENU_ACTIONS_TO_SHOW = 2

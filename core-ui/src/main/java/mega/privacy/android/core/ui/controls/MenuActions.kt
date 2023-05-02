@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import mega.privacy.android.core.R
 import mega.privacy.android.core.ui.model.MenuAction
 import mega.privacy.android.core.ui.model.MenuActionWithIcon
 
@@ -45,7 +44,8 @@ fun MenuActions(
     tint: Color,
     onActionClick: (MenuAction) -> Unit,
 ) {
-    val visible = actions
+    val sortedActions = actions.sortedBy { it.orderInCategory }
+    val visible = sortedActions
         .filterIsInstance(MenuActionWithIcon::class.java)
         .take(maxActionsToShow)
     visible.forEach {
@@ -55,7 +55,7 @@ fun MenuActions(
             onActionClick = onActionClick
         )
     }
-    actions.filterNot { visible.contains(it) }.takeIf { it.isNotEmpty() }?.let { notVisible ->
+    sortedActions.filterNot { visible.contains(it) }.takeIf { it.isNotEmpty() }?.let { notVisible ->
         DropDown(
             actions = notVisible,
             tint = tint,
