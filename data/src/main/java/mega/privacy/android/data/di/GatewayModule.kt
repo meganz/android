@@ -25,7 +25,6 @@ import mega.privacy.android.data.facade.SDCardFacade
 import mega.privacy.android.data.facade.TelephonyFacade
 import mega.privacy.android.data.facade.VerifyPurchaseFacade
 import mega.privacy.android.data.facade.VideoCompressionFacade
-import mega.privacy.android.data.facade.WorkerFacade
 import mega.privacy.android.data.gateway.AndroidDeviceGateway
 import mega.privacy.android.data.gateway.AppEventGateway
 import mega.privacy.android.data.gateway.AppInfoGateway
@@ -49,7 +48,6 @@ import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.TelephonyGateway
 import mega.privacy.android.data.gateway.VerifyPurchaseGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
-import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.ZipFileCompressionGateway
 import mega.privacy.android.data.gateway.api.MegaApiFolderGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -64,8 +62,8 @@ import mega.privacy.android.data.gateway.preferences.ChatPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FeatureFlagPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.FileManagementPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.LoggingPreferencesGateway
-import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.RequestPhoneNumberPreferencesGateway
+import mega.privacy.android.data.gateway.preferences.SlideshowPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.StatisticsPreferencesGateway
 import mega.privacy.android.data.gateway.preferences.UIPreferencesGateway
 import mega.privacy.android.data.preferences.AccountPreferencesDataStore
@@ -76,8 +74,8 @@ import mega.privacy.android.data.preferences.CameraTimestampsPreferenceDataStore
 import mega.privacy.android.data.preferences.ChatPreferencesDataStore
 import mega.privacy.android.data.preferences.FeatureFlagPreferencesDataStore
 import mega.privacy.android.data.preferences.LoggingPreferencesDataStore
-import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
 import mega.privacy.android.data.preferences.RequestPhoneNumberPreferencesDataStore
+import mega.privacy.android.data.preferences.SlideshowPreferencesDataStore
 import mega.privacy.android.data.preferences.StatisticsPreferencesDataStore
 import mega.privacy.android.data.preferences.UIPreferencesDatastore
 import javax.inject.Singleton
@@ -107,9 +105,6 @@ internal abstract class GatewayModule {
 
     @Binds
     abstract fun bindCameraUploadMediaGateway(implementation: CameraUploadMediaFacade): CameraUploadMediaGateway
-
-    @Binds
-    abstract fun bindWorkerGateway(implementation: WorkerFacade): WorkerGateway
 
     @Binds
     abstract fun bindFileCompressionGateway(implementation: ZipFileCompressionGateway): FileCompressionGateway

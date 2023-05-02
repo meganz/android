@@ -1,4 +1,4 @@
-package mega.privacy.android.data.facade
+package mega.privacy.android.app.cameraupload.facade
 
 import android.content.Context
 import androidx.work.Data
@@ -38,8 +38,10 @@ private const val CU_RESCHEDULE_INTERVAL: Long = 5000 // Milliseconds
 
 /**
  * Worker Facade implements [WorkerGateway]
+ *
+ * To be moved to data layer once Worker is moved to data layer
  */
-internal class WorkerFacade @Inject constructor(
+class WorkerFacade @Inject constructor(
     @ApplicationContext private val context: Context,
 ) : WorkerGateway {
 
