@@ -27,6 +27,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property shouldNavigateToChat                       Triggers navigation to chat activity
  * @property isChatNotificationChange                   Mute or Un-mute chat notification for the user
  * @property isStorageOverQuota                         Storage quota over limits
+ * @property isNodeUpdated                              Checks if incoming shares are updated
  */
 data class ContactInfoState(
     val error: Int? = null,
@@ -45,6 +46,7 @@ data class ContactInfoState(
     val shouldNavigateToChat: Boolean = false,
     val isChatNotificationChange: Boolean = false,
     val isStorageOverQuota: Boolean = false,
+    val isNodeUpdated: Boolean = false,
     val inShares: List<UnTypedNode> = emptyList(),
 ) {
 

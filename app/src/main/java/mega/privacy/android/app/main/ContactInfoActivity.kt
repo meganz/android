@@ -102,21 +102,12 @@ import mega.privacy.android.app.utils.permission.PermissionUtils.hasPermissions
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.contacts.UserStatus
 import mega.privacy.android.domain.entity.node.UnTypedNode
-import nz.mega.sdk.MegaApiAndroid
 import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaChatApiJava
-import nz.mega.sdk.MegaChatRoom
-import nz.mega.sdk.MegaContactRequest
 import nz.mega.sdk.MegaError
-import nz.mega.sdk.MegaEvent
-import nz.mega.sdk.MegaGlobalListenerInterface
 import nz.mega.sdk.MegaNode
 import nz.mega.sdk.MegaRequest
 import nz.mega.sdk.MegaRequestListenerInterface
-import nz.mega.sdk.MegaSet
-import nz.mega.sdk.MegaSetElement
-import nz.mega.sdk.MegaUser
-import nz.mega.sdk.MegaUserAlert
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -150,6 +141,9 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     @Inject
     lateinit var copyNodeUseCase: CopyNodeUseCase
 
+    /**
+     * Copy request mapper
+     */
     @Inject
     lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
 
@@ -162,7 +156,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private var statusDialog: AlertDialog? = null
     private var setNicknameDialog: AlertDialog? = null
 
-    //Info of the user
     private var startVideo = false
     private var isChatOpen = false
     private var firstLineTextMaxWidthExpanded = 0
@@ -175,9 +168,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         this, this, this,
         showSaveToDeviceConfirmDialog(this)
     )
-    private var user: MegaUser? = null
-    private var chatHandle: Long = 0
-    private var chat: MegaChatRoom? = null
 
     private var drawableShare: Drawable? = null
     private var drawableSend: Drawable? = null
@@ -225,44 +215,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 }
             }
         }
-    }
-
-    private val megaGlobalListenerInterface = object : MegaGlobalListenerInterface {
-        override fun onUsersUpdate(api: MegaApiJava, users: ArrayList<MegaUser>?) {
-            if (users.isNullOrEmpty()) return
-
-            for (updatedUser in users) {
-                if (updatedUser.handle == user?.handle) {
-                    user = updatedUser
-                    break
-                }
-            }
-        }
-
-        override fun onUserAlertsUpdate(api: MegaApiJava, userAlerts: ArrayList<MegaUserAlert>?) {
-            Timber.d("onUserAlertsUpdate")
-        }
-
-        override fun onNodesUpdate(api: MegaApiJava, nodeList: ArrayList<MegaNode>?) {
-            sharedFoldersFragment?.let {
-                if (it.isVisible) {
-                    viewModel.parentHandle?.let { handle -> it.setNodes(handle) }
-                }
-            }
-            viewModel.getInShares()
-        }
-
-        override fun onReloadNeeded(api: MegaApiJava) {}
-        override fun onAccountUpdate(api: MegaApiJava) {}
-        override fun onContactRequestsUpdate(
-            api: MegaApiJava,
-            requests: ArrayList<MegaContactRequest>?,
-        ) {
-        }
-
-        override fun onEvent(api: MegaApiJava, event: MegaEvent?) {}
-        override fun onSetsUpdate(api: MegaApiJava, sets: ArrayList<MegaSet>?) {}
-        override fun onSetElementsUpdate(api: MegaApiJava, elements: ArrayList<MegaSetElement>?) {}
     }
 
     private fun navigateToChatActivity(handle: Long) {
@@ -428,12 +380,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         contactStateIcon =
             if (Util.isDarkMode(this)) R.drawable.ic_offline_dark_standard else R.drawable.ic_offline_light
         checkChatChanges()
-        megaApi.addGlobalListener(megaGlobalListenerInterface)
         val extras = intent.extras
         if (extras != null) {
             setUpViews()
             getContactData(extras)
-            updateUI()
             checkScreenRotationToShowCall()
             updateViewBasedOnNetworkAvailability()
         } else {
@@ -581,23 +531,10 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun getContactData(extras: Bundle) {
-        chatHandle = extras.getLong(Constants.HANDLE, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
+        val chatHandle = extras.getLong(Constants.HANDLE, MegaChatApiJava.MEGACHAT_INVALID_HANDLE)
         isChatOpen = extras.getBoolean(Constants.ACTION_CHAT_OPEN, false)
         val userEmailExtra = extras.getString(Constants.NAME)
         viewModel.updateContactInfo(chatHandle, userEmailExtra)
-        if (chatHandle != -1L) {
-            Timber.d("From chat!!")
-            chat = megaChatApi.getChatRoom(chatHandle)
-            val userHandle = (chat ?: return).getPeerHandle(0)
-            val userHandleEncoded = MegaApiAndroid.userHandleToBase64(userHandle)
-            user = megaApi.getContact(userHandleEncoded)
-        } else {
-            Timber.d("From contacts!!")
-            user = megaApi.getContact(userEmailExtra)
-            chat = user?.let {
-                megaChatApi.getChatRoomByUser(it.handle)
-            }
-        }
     }
 
     private fun setUpViews() {
@@ -993,9 +930,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Start call
      */
     private fun startCall() {
-        user?.handle?.let {
-            viewModel.getChatRoomId(it).observe(this) { chatId -> startCallWithChat(chatId) }
-        }
+        viewModel.chatId?.let { startCallWithChat(it) }
     }
 
     /**
@@ -1033,6 +968,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             updateUserStatusChanges(contactInfoState)
             updateBasicInfo(contactInfoState)
             setFoldersButtonText(contactInfoState.inShares)
+            updateUI()
         }
     }
 
@@ -1054,13 +990,24 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
             }
 
             contactInfoState.isPushNotificationSettingsUpdated -> {
-                ChatUtil.checkSpecificChatNotifications(
-                    chatHandle,
-                    contentContactProperties.notificationSwitch,
-                    contentContactProperties.notificationsMutedText,
-                    this@ContactInfoActivity
-                )
+                viewModel.chatId?.let {
+                    ChatUtil.checkSpecificChatNotifications(
+                        it,
+                        contentContactProperties.notificationSwitch,
+                        contentContactProperties.notificationsMutedText,
+                        this@ContactInfoActivity
+                    )
+                }
                 viewModel.onConsumePushNotificationSettingsUpdateEvent()
+            }
+
+            contactInfoState.isNodeUpdated -> {
+                sharedFoldersFragment?.let {
+                    if (it.isVisible) {
+                        viewModel.parentHandle?.let { handle -> it.setNodes(handle) }
+                    }
+                }
+                viewModel.onConsumeNodeUpdateEvent()
             }
         }
     }
@@ -1162,7 +1109,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         p.color = Color.TRANSPARENT
         c.drawPaint(p)
         collapsingAppBar.apply {
-            imageLayout.setBackgroundColor(AvatarUtil.getColorAvatar(user))
+            imageLayout.setBackgroundColor(AvatarUtil.getColorAvatar(viewModel.userHandle ?: -1L))
             toolbarImage.setImageBitmap(defaultAvatar)
         }
     }
@@ -1250,14 +1197,14 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     }
 
     private fun updateAvatar(avatar: Bitmap?) {
-        if (avatar == null) {
-            setDefaultAvatar()
-        } else {
+        avatar?.let {
             if (viewModel.isOnline()) {
                 setAvatar(avatar)
-            } else if (chat != null) {
+            } else if (viewModel.chatId != null) {
                 setOfflineAvatar()
             }
+        } ?: run {
+            setDefaultAvatar()
         }
     }
 
@@ -1292,7 +1239,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
         drawableDots?.colorFilter = null
         drawableSend?.colorFilter = null
         drawableShare?.colorFilter = null
-        megaApi.removeGlobalListener(megaGlobalListenerInterface)
         megaApi.removeRequestListener(this)
         unregisterReceiver(retentionTimeReceiver)
         unregisterReceiver(manageShareReceiver)
@@ -1346,19 +1292,18 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     private fun updateUI() {
         contentContactProperties.apply {
-            val chatId = chat?.chatId
+            val chatId = viewModel.chatId
             if (chatId == null || chatId == MegaChatApiJava.MEGACHAT_INVALID_HANDLE) {
                 updateChatFilesSharedLayoutVisibility(shouldShow = false)
                 updateChatHistoryLayoutVisibility(shouldShow = false)
                 retentionTimeText.isVisible = false
             } else {
-                chatHandle = chatId
                 if (!isChatOpen) {
                     getChatManagement().openChatRoom(chatId)
                 }
                 ChatUtil.updateRetentionTimeLayout(
                     retentionTimeText,
-                    ChatUtil.getUpdatedRetentionTimeFromAChat(chatHandle),
+                    ChatUtil.getUpdatedRetentionTimeFromAChat(chatId),
                     this@ContactInfoActivity
                 )
                 if (viewModel.isOnline()) {
@@ -1367,13 +1312,13 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     updateChatHistoryLayoutVisibility(shouldShow = false)
                 }
                 updateChatFilesSharedLayoutVisibility(shouldShow = true)
+                ChatUtil.checkSpecificChatNotifications(
+                    chatId,
+                    notificationSwitch,
+                    notificationsMutedText,
+                    this@ContactInfoActivity
+                )
             }
-            ChatUtil.checkSpecificChatNotifications(
-                chatHandle,
-                notificationSwitch,
-                notificationsMutedText,
-                this@ContactInfoActivity
-            )
             makeNotificationLayoutVisible()
         }
     }
@@ -1382,13 +1327,14 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      * Make the necessary actions when clicking on the Chat Notifications layout.
      */
     private fun chatNotificationsChange() {
+        val chatId = viewModel.chatId ?: return
         if (contentContactProperties.notificationSwitch.isChecked) {
-            ChatUtil.createMuteNotificationsAlertDialogOfAChat(this, chatHandle)
+            ChatUtil.createMuteNotificationsAlertDialogOfAChat(this, chatId)
         } else {
             getPushNotificationSettingManagement().controlMuteNotificationsOfAChat(
                 this,
                 Constants.NOTIFICATIONS_ENABLED,
-                chatHandle
+                chatId
             )
         }
     }

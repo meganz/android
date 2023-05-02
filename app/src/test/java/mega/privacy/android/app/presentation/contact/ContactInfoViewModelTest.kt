@@ -27,6 +27,9 @@ import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactData
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
+import mega.privacy.android.domain.entity.node.Node
+import mega.privacy.android.domain.entity.node.NodeChanges
+import mega.privacy.android.domain.entity.node.NodeUpdate
 import mega.privacy.android.domain.entity.node.UnTypedNode
 import mega.privacy.android.domain.entity.user.UserVisibility
 import mega.privacy.android.domain.usecase.GetChatRoom
@@ -53,10 +56,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyLong
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import test.mega.privacy.android.app.presentation.shares.FakeMonitorUpdates
 import kotlin.random.Random
 
 @ExperimentalCoroutinesApi
@@ -86,6 +91,7 @@ class ContactInfoViewModelTest {
     private lateinit var monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase
     private lateinit var startConversationUseCase: StartConversationUseCase
     private lateinit var createChatRoomUseCase: CreateChatRoomUseCase
+    private val monitorNodeUpdates = FakeMonitorUpdates()
     private lateinit var createShareKey: CreateShareKey
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
@@ -159,7 +165,8 @@ class ContactInfoViewModelTest {
             startConversationUseCase = startConversationUseCase,
             ioDispatcher = standardDispatcher,
             applicationScope = testScope,
-            createShareKey = createShareKey
+            createShareKey = createShareKey,
+            monitorNodeUpdates = monitorNodeUpdates,
         )
     }
 
@@ -424,6 +431,34 @@ class ContactInfoViewModelTest {
             val state = awaitItem()
             assertThat(state.chatRoom?.chatId).isEqualTo(123456L)
             assertThat(state.shouldNavigateToChat).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that when node update is triggered state is updated`() = runTest {
+        val unTypedNode = mock<UnTypedNode> {
+            on { parentId.longValue }.thenReturn(1L)
+        }
+        val unTypedNodeNew = mock<UnTypedNode> {
+            on { parentId.longValue }.thenReturn(-1L)
+        }
+        val inShares = listOf(unTypedNode)
+        whenever(getInSharesUseCase(any())).thenReturn(inShares)
+        val node = mock<Node> {
+            on { isIncomingShare }.thenReturn(true)
+        }
+        val nodeUpdate = mock<NodeUpdate> {
+            on { changes }.thenReturn(mapOf(Pair(node, listOf(NodeChanges.Remove))))
+        }
+        initContactInfoOpenedFromContact()
+        underTest.state.test {
+            val initialState = awaitItem()
+            assertThat(initialState.primaryDisplayName).isEqualTo("Iron Man")
+            assertThat(initialState.snackBarMessage).isNull()
+            whenever(getInSharesUseCase(any())).thenReturn(listOf(unTypedNodeNew))
+            monitorNodeUpdates.emit(nodeUpdate)
+            val newState = awaitItem()
+            assertThat(newState.isNodeUpdated).isTrue()
         }
     }
 }

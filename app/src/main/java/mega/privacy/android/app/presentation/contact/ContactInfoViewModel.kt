@@ -1,18 +1,13 @@
 package mega.privacy.android.app.presentation.contact
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
@@ -22,6 +17,7 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.BaseRxViewModel
 import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
+import mega.privacy.android.app.domain.usecase.MonitorNodeUpdates
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.meeting.gateway.CameraGateway
 import mega.privacy.android.app.objects.PasscodeManagement
@@ -42,6 +38,7 @@ import mega.privacy.android.domain.entity.meeting.ChatCallChanges.Status
 import mega.privacy.android.domain.entity.meeting.ChatCallStatus
 import mega.privacy.android.domain.entity.meeting.ChatSessionChanges
 import mega.privacy.android.domain.entity.meeting.TermCodeType
+import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.user.UserChanges
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
@@ -118,6 +115,7 @@ class ContactInfoViewModel @Inject constructor(
     private val monitorUpdatePushNotificationSettingsUseCase: MonitorUpdatePushNotificationSettingsUseCase,
     private val startConversationUseCase: StartConversationUseCase,
     private val createChatRoomUseCase: CreateChatRoomUseCase,
+    private val monitorNodeUpdates: MonitorNodeUpdates,
     private val createShareKey: CreateShareKey,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     @ApplicationScope private val applicationScope: CoroutineScope,
@@ -178,6 +176,17 @@ class ContactInfoViewModel @Inject constructor(
         monitorCallUpdates()
         monitorChatSessionUpdates()
         chatMuteUpdates()
+        monitorNodeChanges()
+    }
+
+    private fun monitorNodeChanges() = viewModelScope.launch {
+        monitorNodeUpdates()
+            .filter { nodeUpdate ->
+                nodeUpdate.changes.keys.any { node -> node.isIncomingShare }
+                        || nodeUpdate.changes.values.any { it.contains(NodeChanges.Remove) }
+            }.conflate().collect {
+                getInShares()
+            }
     }
 
     private fun chatMuteUpdates() = viewModelScope.launch {
@@ -270,22 +279,6 @@ class ContactInfoViewModel @Inject constructor(
      * @return
      */
     fun isOnline(): Boolean = monitorConnectivityUseCase().value
-
-    /**
-     * Get chat id
-     *
-     * @param userHandle User handle
-     */
-    fun getChatRoomId(userHandle: Long): LiveData<Long> {
-        val result = MutableLiveData<Long>()
-        getChatRoomUseCase.get(userHandle).subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread()).subscribeBy(
-                onSuccess = { chatId ->
-                    result.value = chatId
-                }, onError = Timber::e
-            ).addTo(composite)
-        return result
-    }
 
     /**
      * Starts a call
@@ -506,6 +499,15 @@ class ContactInfoViewModel @Inject constructor(
     }
 
     /**
+     * on Consume node update event
+     */
+    fun onConsumeNodeUpdateEvent() {
+        viewModelScope.launch {
+            _state.update { it.copy(isNodeUpdated = false) }
+        }
+    }
+
+    /**
      * Remove selected contact from user account
      * InShares are removed and existing calls are closed
      * Exits from contact info page if succeeds
@@ -523,7 +525,10 @@ class ContactInfoViewModel @Inject constructor(
      */
     fun getInShares() = viewModelScope.launch {
         val email = state.value.email ?: return@launch
-        _state.update { it.copy(inShares = getInSharesUseCase(email)) }
+        val inShares = getInSharesUseCase(email)
+        if (inShares == state.value.inShares) return@launch
+        parentHandle = inShares.firstOrNull()?.parentId?.longValue ?: INVALID_NODE_HANDLE
+        _state.update { it.copy(inShares = inShares, isNodeUpdated = true) }
     }
 
     /**
@@ -605,5 +610,6 @@ class ContactInfoViewModel @Inject constructor(
 
     companion object {
         private const val INVALID_CHAT_HANDLE = -1L
+        private const val INVALID_NODE_HANDLE = -1L
     }
 }
