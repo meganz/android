@@ -601,7 +601,7 @@ class FolderLinkViewModel @Inject constructor(
     /**
      * Handle Save to device button click
      */
-    fun handleSaveToDevice() {
+    fun handleSaveToDevice(nodeUIItem: NodeUIItem?) {
         viewModelScope.launch {
             if (isMultipleNodeSelected()) {
                 val selectedNodeIds = getSelectedNodes().map { it.id.longValue }
@@ -609,9 +609,12 @@ class FolderLinkViewModel @Inject constructor(
                 _state.update { it.copy(downloadNodes = triggered(selectedNodes)) }
                 clearAllSelection()
             } else {
-                state.value.rootNode?.let { rootNode ->
-                    val downloadNodeId =
-                        state.value.parentNode?.id?.longValue ?: rootNode.id.longValue
+                val downloadNodeId =
+                    nodeUIItem?.id?.longValue
+                        ?: state.value.parentNode?.id?.longValue
+                        ?: state.value.rootNode?.id?.longValue
+
+                downloadNodeId?.let {
                     getNodeByHandle(downloadNodeId)?.let { downloadNode ->
                         _state.update { it.copy(downloadNodes = triggered(listOf(downloadNode))) }
                     }
@@ -651,4 +654,34 @@ class FolderLinkViewModel @Inject constructor(
         _state.update {
             it.copy(snackbarMessageContent = consumed())
         }
+
+    /**
+     * Handle more options/ 3 dots clicked
+     */
+    fun handleMoreOptionClick(nodeUIItem: NodeUIItem?) {
+        val moreOptionNode = nodeUIItem ?: state.value.parentNode?.let {
+            NodeUIItem(
+                it,
+                isSelected = false,
+                isInvisible = false
+            )
+        }
+        if (moreOptionNode != null) {
+            _state.update { it.copy(moreOptionNode = moreOptionNode, openMoreOption = triggered) }
+        }
+    }
+
+    /**
+     * Reset and notify openMoreOption is consumed
+     */
+    fun resetOpenMoreOption() {
+        _state.update { it.copy(openMoreOption = consumed) }
+    }
+
+    /**
+     * Reset moreOptionNode on closing of bottom sheet
+     */
+    fun resetMoreOptionNode() {
+        _state.update { it.copy(moreOptionNode = null) }
+    }
 }

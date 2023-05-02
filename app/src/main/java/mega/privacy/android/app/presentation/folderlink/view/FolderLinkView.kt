@@ -3,6 +3,7 @@ package mega.privacy.android.app.presentation.folderlink.view
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -18,9 +19,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.AppBarDefaults
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Snackbar
 import androidx.compose.material.SnackbarHost
@@ -30,12 +33,15 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,11 +55,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.launch
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
-import mega.privacy.android.app.presentation.testpassword.view.Constants
+import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
+import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
+import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
+import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.view.NodesView
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.theme.AndroidTheme
@@ -63,25 +73,59 @@ import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.preference.ViewType
 import nz.mega.sdk.MegaNode
 
+internal object Constants {
+    /**
+     * Test tag for message SnackBar
+     */
+    const val SNACKBAR_TAG = "snackbar_test_tag"
+
+    /**
+     * Test tag for save to device bottom sheet button
+     * @see FolderLinkBottomSheetView
+     */
+    const val BOTTOM_SHEET_SAVE = "bottom_sheet_save"
+
+    /**
+     * Test tag for import bottom sheet button
+     * @see FolderLinkBottomSheetView
+     */
+    const val BOTTOM_SHEET_IMPORT = "bottom_sheet_import"
+
+    /**
+     * Test tag for save to import button
+     */
+    const val IMPORT_BUTTON_TAG = "import_button_tag"
+
+    /**
+     * Test tag for save to device button
+     */
+    const val SAVE_BUTTON_TAG = "save_button_tag"
+
+    /**
+     * Test tag for app bar more option
+     */
+    const val APPBAR_MORE_OPTION_TAG = "appbar_more_option_tag"
+}
+
 /**
  * Main view of FolderLinkActivity
  */
+@OptIn(ExperimentalMaterialApi::class)
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 internal fun FolderLinkView(
     state: FolderLinkState,
     onBackPressed: () -> Unit,
     onShareClicked: () -> Unit,
-    onMoreClicked: () -> Unit,
     stringUtilWrapper: StringUtilWrapper,
-    onMenuClick: (NodeUIItem) -> Unit,
+    onMoreOptionClick: (NodeUIItem?) -> Unit,
     onItemClicked: (NodeUIItem) -> Unit,
     onLongClick: (NodeUIItem) -> Unit,
     onChangeViewTypeClick: () -> Unit,
     onSortOrderClick: () -> Unit,
     onSelectAllActionClicked: () -> Unit,
     onClearAllActionClicked: () -> Unit,
-    onSaveToDeviceClicked: () -> Unit,
+    onSaveToDeviceClicked: (NodeUIItem?) -> Unit,
     onImportClicked: (NodeUIItem?) -> Unit,
     onOpenFile: (Intent) -> Unit,
     onResetOpenFile: () -> Unit,
@@ -90,12 +134,21 @@ internal fun FolderLinkView(
     onSelectImportLocation: () -> Unit,
     onResetSelectImportLocation: () -> Unit,
     onResetSnackbarMessage: () -> Unit,
+    onResetMoreOptionNode: () -> Unit,
+    onResetOpenMoreOption: () -> Unit,
     emptyViewString: String,
 ) {
     val listState = rememberLazyListState()
     val gridState = rememberLazyGridState()
     val scaffoldState = rememberScaffoldState()
     val snackBarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val modalSheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmValueChange = { it != ModalBottomSheetValue.HalfExpanded },
+        skipHalfExpanded = true,
+    )
+
     val firstItemVisible by remember {
         derivedStateOf {
             if (state.currentViewType == ViewType.LIST)
@@ -106,6 +159,10 @@ internal fun FolderLinkView(
     }
     val title =
         if (!state.isNodesFetched) "MEGA - ${stringResource(id = R.string.general_loading)}" else state.title
+
+    BackHandler(enabled = modalSheetState.isVisible) {
+        coroutineScope.launch { modalSheetState.hide() }
+    }
 
     EventEffect(
         event = state.openFile,
@@ -125,8 +182,19 @@ internal fun FolderLinkView(
         action = onSelectImportLocation
     )
 
+    EventEffect(
+        event = state.openMoreOption,
+        onConsumed = onResetOpenMoreOption,
+        action = { modalSheetState.show() }
+    )
+
     EventEffect(event = state.snackbarMessageContent, onConsumed = onResetSnackbarMessage) {
         snackBarHostState.showSnackbar(it)
+    }
+
+    LaunchedEffect(modalSheetState.isVisible) {
+        if (!modalSheetState.isVisible)
+            onResetMoreOptionNode()
     }
 
     Scaffold(
@@ -139,7 +207,7 @@ internal fun FolderLinkView(
                     onBackPressed = onBackPressed,
                     onSelectAllClicked = onSelectAllActionClicked,
                     onClearAllClicked = onClearAllActionClicked,
-                    onSaveToDeviceClicked = onSaveToDeviceClicked
+                    onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                 )
             } else {
                 FolderLinkTopAppBar(
@@ -147,14 +215,14 @@ internal fun FolderLinkView(
                     elevation = !firstItemVisible,
                     onBackPressed = onBackPressed,
                     onShareClicked = onShareClicked,
-                    onMoreClicked = onMoreClicked
+                    onMoreClicked = { onMoreOptionClick(null) }
                 )
             }
         },
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState) { data ->
                 Snackbar(
-                    modifier = Modifier.testTag(Constants.SNACKBAR_TAG),
+                    modifier = Modifier.testTag(SNACKBAR_TAG),
                     snackbarData = data,
                     backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white
                 )
@@ -178,7 +246,7 @@ internal fun FolderLinkView(
                         .padding(horizontal = 8.dp),
                     nodeUIItems = state.nodesList,
                     stringUtilWrapper = stringUtilWrapper,
-                    onMenuClick = onMenuClick,
+                    onMenuClick = { onMoreOptionClick(it) },
                     onItemClicked = onItemClicked,
                     onLongClick = onLongClick,
                     sortOrder = "",
@@ -196,10 +264,19 @@ internal fun FolderLinkView(
                         .background(MaterialTheme.colors.grey_020_grey_700),
                     hasDbCredentials = state.hasDbCredentials,
                     onImportClicked = onImportClicked,
-                    onSaveToDeviceClicked = onSaveToDeviceClicked
+                    onSaveToDeviceClicked = { onSaveToDeviceClicked(null) }
                 )
             }
         }
+
+        FolderLinkBottomSheetView(
+            modalSheetState = modalSheetState,
+            coroutineScope = coroutineScope,
+            nodeUIItem = state.moreOptionNode,
+            showImport = state.hasDbCredentials,
+            onImportClicked = onImportClicked,
+            onSaveToDeviceClicked = onSaveToDeviceClicked
+        )
     }
 }
 
@@ -237,7 +314,10 @@ internal fun FolderLinkTopAppBar(
                 )
             }
 
-            IconButton(onClick = onMoreClicked) {
+            IconButton(
+                modifier = Modifier.testTag(APPBAR_MORE_OPTION_TAG),
+                onClick = onMoreClicked
+            ) {
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = stringResource(id = R.string.label_more),
@@ -312,13 +392,13 @@ internal fun ImportDownloadView(
     Row(modifier = modifier, horizontalArrangement = Arrangement.End) {
         if (hasDbCredentials) {
             TextMegaButton(
-                modifier = Modifier.padding(end = 16.dp),
+                modifier = Modifier.padding(end = 16.dp).testTag(IMPORT_BUTTON_TAG),
                 textId = R.string.add_to_cloud,
                 onClick = { onImportClicked(null) }
             )
         }
         TextMegaButton(
-            modifier = Modifier.padding(end = 16.dp),
+            modifier = Modifier.padding(end = 16.dp).testTag(SAVE_BUTTON_TAG),
             textId = R.string.general_save_to_device,
             onClick = onSaveToDeviceClicked
         )

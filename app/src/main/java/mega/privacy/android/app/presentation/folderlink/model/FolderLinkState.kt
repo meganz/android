@@ -37,6 +37,8 @@ import nz.mega.sdk.MegaNode
  * @property importNode                 Node to import
  * @property selectImportLocation       State to open location selection
  * @property snackbarMessageContent     State to show snackbar message
+ * @property openMoreOption             State to open more option bottom sheet
+ * @property moreOptionNode             Node to show more options for
  * @property errorDialogTitle           String id of title for error dialog
  * @property errorDialogContent         String id of content for error dialog
  * @property snackBarMessage            String id of content for snack bar
@@ -65,6 +67,8 @@ data class FolderLinkState(
     val importNode: NodeUIItem? = null,
     val selectImportLocation: StateEvent = consumed,
     val snackbarMessageContent: StateEventWithContent<String> = consumed(),
+    val openMoreOption: StateEvent = consumed,
+    val moreOptionNode: NodeUIItem? = null,
     @StringRes val errorDialogTitle: Int = -1,
     @StringRes val errorDialogContent: Int = -1,
     @StringRes val snackBarMessage: Int = -1,

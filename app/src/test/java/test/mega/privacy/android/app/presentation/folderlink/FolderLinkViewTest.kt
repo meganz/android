@@ -2,17 +2,23 @@ package test.mega.privacy.android.app.presentation.folderlink
 
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.palm.composestateevents.triggered
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.folderlink.model.FolderLinkState
+import mega.privacy.android.app.presentation.folderlink.view.Constants.APPBAR_MORE_OPTION_TAG
+import mega.privacy.android.app.presentation.folderlink.view.Constants.BOTTOM_SHEET_SAVE
+import mega.privacy.android.app.presentation.folderlink.view.Constants.IMPORT_BUTTON_TAG
+import mega.privacy.android.app.presentation.folderlink.view.Constants.SAVE_BUTTON_TAG
+import mega.privacy.android.app.presentation.folderlink.view.Constants.SNACKBAR_TAG
 import mega.privacy.android.app.presentation.folderlink.view.FolderLinkView
-import mega.privacy.android.app.presentation.testpassword.view.Constants
 import mega.privacy.android.domain.entity.node.TypedFolderNode
 import org.junit.Rule
 import org.junit.Test
@@ -33,9 +39,8 @@ class FolderLinkViewTest {
                 state = uiState,
                 onBackPressed = { },
                 onShareClicked = { },
-                onMoreClicked = { },
                 stringUtilWrapper = mock(),
-                onMenuClick = { },
+                onMoreOptionClick = { },
                 onItemClicked = { },
                 onLongClick = { },
                 onChangeViewTypeClick = { },
@@ -51,6 +56,8 @@ class FolderLinkViewTest {
                 onSelectImportLocation = { },
                 onResetSelectImportLocation = { },
                 onResetSnackbarMessage = { },
+                onResetOpenMoreOption = { },
+                onResetMoreOptionNode = { },
                 emptyViewString = stringResource(id = R.string.file_browser_empty_folder)
             )
         }
@@ -117,8 +124,8 @@ class FolderLinkViewTest {
                 hasDbCredentials = true
             )
         )
-        composeTestRule.onNodeWithText(R.string.add_to_cloud).assertIsDisplayed()
-        composeTestRule.onNodeWithText(R.string.general_save_to_device).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(IMPORT_BUTTON_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(SAVE_BUTTON_TAG).assertIsDisplayed()
     }
 
     @Test
@@ -133,6 +140,25 @@ class FolderLinkViewTest {
                 snackbarMessageContent = triggered("Test")
             )
         )
-        composeTestRule.onNodeWithTag(Constants.SNACKBAR_TAG).assertIsDisplayed()
+        composeTestRule.onNodeWithTag(SNACKBAR_TAG).assertIsDisplayed()
+    }
+
+    @Test
+    fun `test that screen should not go back when folder link bottom sheet is visible and back action triggered`() {
+        val nodeName = "Folder1"
+        val node = mock<TypedFolderNode>()
+        whenever(node.name).thenReturn(nodeName)
+        setComposeContent(
+            FolderLinkState(
+                isNodesFetched = true,
+                nodesList = listOf(NodeUIItem(node, isSelected = false, isInvisible = false)),
+                hasDbCredentials = true,
+                openMoreOption = triggered
+            )
+        )
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_SAVE).assertIsDisplayed()
+        Espresso.pressBack()
+        composeTestRule.onNodeWithTag(BOTTOM_SHEET_SAVE).assertIsNotDisplayed()
+        composeTestRule.onNodeWithTag(APPBAR_MORE_OPTION_TAG).assertIsDisplayed()
     }
 }
