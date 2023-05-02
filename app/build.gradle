@@ -8,6 +8,8 @@ apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: 'jacoco'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'de.mannodermaus.android-junit5'
+apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.firebase-perf'
 
 apply from: "$project.rootDir/tools/util.gradle"
 apply from: "$project.rootDir/tools/sdk.gradle"
@@ -65,6 +67,14 @@ android {
         testInstrumentationRunner "test.mega.privacy.android.app.HiltTestRunner"
 
         resourceConfigurations += ["en", "ar", "de", "es", "fr", "in", "it", "ja", "ko", "nl", "pl", "pt", "ro", "ru", "th", "vi", "zh-rCN", "zh-rTW"]
+
+        firebaseCrashlytics {
+            // Enable processing and uploading of native symbols to Crashlytics servers.
+            // This flag must be enabled to see properly-symbolicated native
+            // stack traces in the Crashlytics dashboard.
+            nativeSymbolUploadEnabled true
+            unstrippedNativeLibsDir nativeLibsDir()
+        }
     }
 
     sourceSets {
@@ -172,15 +182,6 @@ android {
     productFlavors {
         gms {
             dimension "service"
-            apply plugin: 'com.google.firebase.crashlytics'
-            apply plugin: 'com.google.firebase.firebase-perf'
-            firebaseCrashlytics {
-                // Enable processing and uploading of native symbols to Crashlytics servers.
-                // This flag must be enabled to see properly-symbolicated native
-                // stack traces in the Crashlytics dashboard.
-                nativeSymbolUploadEnabled true
-                unstrippedNativeLibsDir '../sdk/src/main/obj/local'
-            }
             firebaseAppDistribution {
                 appId = "1:268821755439:android:9b611c50c9f7a503"
                 releaseNotes = readReleaseNotes()

@@ -288,23 +288,6 @@ pipeline {
                 }
             }
         }
-        stage('Fetch native symbols') {
-            when {
-                expression { (!shouldSkipBuild()) }
-            }
-            steps {
-                script {
-                    withCredentials([
-                            string(credentialsId: 'ARTIFACTORY_USER', variable: 'ARTIFACTORY_USER'),
-                            string(credentialsId: 'ARTIFACTORY_ACCESS_TOKEN', variable: 'ARTIFACTORY_ACCESS_TOKEN')
-                    ]) {
-                        BUILD_STEP = 'Fetch native symbols'
-
-                        common.downloadAndExtractNativeSymbols()
-                    }
-                }
-            }
-        }
         stage('Build APK (GMS+QA)') {
             when {
                 expression { (!shouldSkipBuild()) }

@@ -283,6 +283,18 @@ boolean isDebugBuild(List<String> taskNames) {
     return debugBuild
 }
 
+/**
+ * Ensure that the native libs folder exists and return its relative path.
+ * @return path of native library symbols. The returned path is relative to root of app module
+ */
+String nativeLibsDir() {
+    exec {
+        workingDir '../'
+        commandLine 'mkdir', '-p', 'sdk/src/main/obj/local'
+    }
+    return '../sdk/src/main/obj/local'
+}
+
 ext {
     readVersionCode = this.&readVersionCode
     readVersionNameTag = this.&readVersionNameTag
@@ -300,4 +312,5 @@ ext {
     shouldActivateNocturn = this.&shouldActivateNocturn
     getNocturnTimeout = this.&getNocturnTimeout
     isDebugBuild = this.&isDebugBuild
+    nativeLibsDir = this.&nativeLibsDir
 }
