@@ -247,4 +247,14 @@ interface NodeRepository {
      * @return FileTypeInfo if found else null
      */
     suspend fun getFileTypeInfo(nodeId: NodeId): FileTypeInfo?
+
+
+    /**
+     * Get default node handle for a folder
+     *
+     * @param folderName
+     * @return [NodeId] if found else null
+     */
+    suspend fun getDefaultNodeHandle(folderName: String): NodeId?
+
 }

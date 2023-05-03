@@ -43,9 +43,7 @@ import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.CopyNode
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetChildrenNode
-import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.GetNodeByHandle
-import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderSetUseCase
 import mega.privacy.android.app.domain.usecase.IsLocalSecondaryFolderSet
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SetOriginalFingerprint
@@ -122,10 +120,12 @@ import mega.privacy.android.domain.usecase.ShouldCompressVideo
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.GetDefaultNodeHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetPrimarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetSecondarySyncHandleUseCase
 import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSizeLimitUseCase
 import mega.privacy.android.domain.usecase.camerauploads.HasPreferencesUseCase
+import mega.privacy.android.domain.usecase.camerauploads.IsPrimaryFolderSetUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCoordinatesUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetPrimaryFolderLocalPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetSecondaryFolderLocalPathUseCase
@@ -354,7 +354,7 @@ class CameraUploadsService : LifecycleService() {
      * GetDefaultNodeHandle
      */
     @Inject
-    lateinit var getDefaultNodeHandle: GetDefaultNodeHandle
+    lateinit var getDefaultNodeHandleUseCase: GetDefaultNodeHandleUseCase
 
     /**
      * LegacyDatabaseHandler
@@ -1518,7 +1518,7 @@ class CameraUploadsService : LifecycleService() {
      * @return the Primary Folder handle
      */
     private suspend fun getPrimaryFolderHandle(): Long =
-        getDefaultNodeHandle(getString(R.string.section_photo_sync))
+        getDefaultNodeHandleUseCase(getString(R.string.section_photo_sync))
 
     /**
      * Gets the Secondary Folder handle
@@ -1530,7 +1530,7 @@ class CameraUploadsService : LifecycleService() {
         val secondarySyncHandle = getSecondarySyncHandleUseCase()
         if (secondarySyncHandle == MegaApiJava.INVALID_HANDLE || getNodeByHandle(secondarySyncHandle) == null) {
             // if it's invalid or deleted then return the default value
-            return getDefaultNodeHandle(getString(R.string.section_secondary_media_uploads))
+            return getDefaultNodeHandleUseCase(getString(R.string.section_secondary_media_uploads))
         }
         return secondarySyncHandle
     }

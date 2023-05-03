@@ -12,7 +12,6 @@ import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadFolderName
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.DefaultGetCameraUploadSelectionQuery
-import mega.privacy.android.app.domain.usecase.DefaultGetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.DefaultGetNodeFromCloud
 import mega.privacy.android.app.domain.usecase.DefaultGetPendingUploadList
 import mega.privacy.android.app.domain.usecase.DefaultGetSyncFileUploadUris
@@ -24,7 +23,6 @@ import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPath
 import mega.privacy.android.app.domain.usecase.GetCameraUploadLocalPathSecondary
 import mega.privacy.android.app.domain.usecase.GetCameraUploadSelectionQuery
 import mega.privacy.android.app.domain.usecase.GetChildMegaNode
-import mega.privacy.android.app.domain.usecase.GetDefaultNodeHandle
 import mega.privacy.android.app.domain.usecase.GetFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByFingerprint
 import mega.privacy.android.app.domain.usecase.GetNodeByFingerprintAndParentNode
@@ -407,12 +405,6 @@ abstract class CameraUploadUseCases {
      */
     @Binds
     abstract fun bindGetNodeFromCloud(getNodeFromCloud: DefaultGetNodeFromCloud): GetNodeFromCloud
-
-    /**
-     * Provide the [GetDefaultNodeHandle] implementation
-     */
-    @Binds
-    abstract fun bindGetDefaultNodeHandle(getDefaultNodeHandle: DefaultGetDefaultNodeHandle): GetDefaultNodeHandle
 
     /**
      * Provide the [ResetPrimaryTimeline] implementation
