@@ -3,8 +3,8 @@ package mega.privacy.android.app.presentation.login.view
 import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LinearProgressIndicator
@@ -50,6 +51,9 @@ import mega.privacy.android.app.presentation.extensions.login.error
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
+import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
+import mega.privacy.android.app.presentation.twofactorauthentication.view.TwoFactorAuthenticationField
+import mega.privacy.android.core.ui.controls.SimpleTopAppBar
 import mega.privacy.android.core.ui.controls.buttons.RaisedDefaultMegaButton
 import mega.privacy.android.core.ui.controls.buttons.TextMegaButton
 import mega.privacy.android.core.ui.controls.textfields.LabelTextField
@@ -58,6 +62,7 @@ import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.grey_200_grey_700
 import mega.privacy.android.core.ui.theme.extensions.red_600_white_alpha_087
 import mega.privacy.android.core.ui.theme.extensions.textColorPrimary
+import mega.privacy.android.core.ui.theme.extensions.textColorSecondary
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.account.AccountSession
 import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
@@ -65,6 +70,19 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
 
 /**
  * Login fragment view.
+ *
+ * @param state                     [LoginState]
+ * @param onEmailChanged            Action when the typed email changes.
+ * @param onPasswordChanged         Action when the typed password changes.
+ * @param onLoginClicked            Action when Login is pressed.
+ * @param onForgotPassword          Action when Forgot password is pressed.
+ * @param onCreateAccount           Action when Create account is pressed.
+ * @param onSnackbarMessageConsumed Action when the snackbar message was consumed.
+ * @param on2FAPinChanged           Action when one of the 2FA's pins changed.
+ * @param on2FAChanged              Action when a 2FA code was pasted.
+ * @param onLostAuthenticatorDevice Action when Lost authenticator device is pressed.
+ * @param onBackPressed             Action when back is pressed.
+ * @param modifier                  [Modifier]
  */
 @Composable
 fun LoginView(
@@ -75,12 +93,29 @@ fun LoginView(
     onForgotPassword: (String?) -> Unit,
     onCreateAccount: () -> Unit,
     onSnackbarMessageConsumed: () -> Unit,
+    on2FAPinChanged: (String, Int) -> Unit,
+    on2FAChanged: (String) -> Unit,
+    onLostAuthenticatorDevice: () -> Unit,
+    onBackPressed: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scaffoldState = rememberScaffoldState()
 
-    Scaffold(modifier = modifier.fillMaxSize(), scaffoldState = scaffoldState) { paddingValues ->
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        scaffoldState = scaffoldState,
+        topBar = {
+            if (state.is2FARequired || state.multiFactorAuthState != null) {
+                SimpleTopAppBar(
+                    titleId = R.string.login_verification,
+                    elevation = scrollState.value > 0,
+                    onBackPressed = onBackPressed
+                )
+            }
+        },
+    ) { paddingValues ->
         with(state) {
             when {
                 isLoginRequired -> RequireLogin(
@@ -99,9 +134,12 @@ fun LoginView(
                     paddingValues = paddingValues
                 )
 
-                is2FARequired -> TwoFactorAuthentication(
+                is2FARequired || multiFactorAuthState != null -> TwoFactorAuthentication(
                     state = this,
-                    paddingValues = paddingValues
+                    paddingValues = paddingValues,
+                    on2FAPinChanged = on2FAPinChanged,
+                    on2FAChanged = on2FAChanged,
+                    onLostAuthenticatorDevice = onLostAuthenticatorDevice
                 )
             }
         }
@@ -268,13 +306,7 @@ private fun LoginInProgress(
                 }
             }
         }
-        CircularProgressIndicator(
-            modifier = Modifier
-                .padding(top = 10.dp)
-                .size(72.dp)
-                .testTag(LOGIN_PROGRESS_TEST_TAG),
-            color = MaterialTheme.colors.secondary
-        )
+        CircularProgress(testTag = LOGIN_PROGRESS_TEST_TAG)
         fetchNodesUpdate?.temporaryError?.let {
             LoginInProgressText(stringId = it.messageId, modifier = Modifier.padding(top = 10.dp))
         }
@@ -296,10 +328,65 @@ private fun LoginInProgressText(
 private fun TwoFactorAuthentication(
     state: LoginState,
     paddingValues: PaddingValues,
+    on2FAPinChanged: (String, Int) -> Unit,
+    on2FAChanged: (String) -> Unit,
+    onLostAuthenticatorDevice: () -> Unit,
     modifier: Modifier = Modifier,
+) = Box(
+    modifier = modifier
+        .fillMaxWidth()
+        .padding(paddingValues)
 ) {
+    val isChecking2FA = state.multiFactorAuthState == MultiFactorAuthState.Checking
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val isError = state.multiFactorAuthState == MultiFactorAuthState.Failed
+        Text(
+            text = stringResource(id = R.string.explain_confirm_2fa),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 40.dp),
+            style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.textColorSecondary),
+            textAlign = TextAlign.Center
+        )
+        TwoFactorAuthenticationField(
+            twoFAPin = state.twoFAPin,
+            isError = isError,
+            on2FAPinChanged = on2FAPinChanged,
+            on2FAChanged = on2FAChanged,
+            shouldRequestFocus = isChecking2FA
+        )
+        if (isError) {
+            Text(
+                text = stringResource(id = R.string.pin_error_2fa),
+                modifier = Modifier.padding(start = 10.dp, top = 18.dp, end = 10.dp),
+                style = MaterialTheme.typography.caption.copy(color = MaterialTheme.colors.error)
+            )
+        }
+        TextMegaButton(
+            textId = R.string.lost_your_authenticator_device,
+            onClick = onLostAuthenticatorDevice,
+            modifier = Modifier.padding(top = if (isError) 0.dp else 29.dp, bottom = 40.dp)
+        )
+    }
 
+    if (isChecking2FA) {
+        CircularProgress(
+            testTag = TWO_FA_PROGRESS_TEST_TAG,
+            modifier = Modifier.align(Alignment.Center)
+        )
+    }
 }
+
+@Composable
+private fun CircularProgress(testTag: String, modifier: Modifier = Modifier) =
+    CircularProgressIndicator(
+        modifier = modifier
+            .padding(top = 10.dp)
+            .size(72.dp)
+            .testTag(testTag),
+        color = MaterialTheme.colors.secondary
+    )
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DarkPreviewEmptyLoginView")
@@ -310,13 +397,14 @@ private fun PreviewEmptyLoginView() {
 
         RequireLogin(
             state = state,
-            onEmailChanged = { state = state.copy(accountSession = AccountSession(email = it)) },
+            onEmailChanged = {
+                state = state.copy(accountSession = AccountSession(email = it))
+            },
             onPasswordChanged = { state = state.copy(password = it) },
             onLoginClicked = {},
             onForgotPassword = {},
             onCreateAccount = {},
-            paddingValues = PaddingValues(),
-            modifier = Modifier.background(color = MaterialTheme.colors.surface)
+            paddingValues = PaddingValues()
         )
     }
 }
@@ -336,13 +424,16 @@ private fun PreviewLoginView(
             onForgotPassword = {},
             onCreateAccount = {},
             onSnackbarMessageConsumed = {},
-            modifier = Modifier.background(color = MaterialTheme.colors.surface)
+            on2FAPinChanged = { _, _ -> },
+            on2FAChanged = {},
+            onLostAuthenticatorDevice = {},
+            onBackPressed = {}
         )
     }
 }
 
 /**
- * TextField parameter provider for compose previews.
+ * LoginState parameter provider for compose previews.
  */
 internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
     override val values = listOf(
@@ -367,10 +458,23 @@ internal class LoginStateProvider : PreviewParameterProvider<LoginState> {
                 progress = Progress(0.5F),
                 temporaryError = FetchNodesTemporaryError.ConnectivityIssues
             ),
-        )
+        ),
+        LoginState(
+            is2FARequired = true,
+            twoFAPin = listOf("1", "2", "", "", "", "")
+        ),
+        LoginState(
+            multiFactorAuthState = MultiFactorAuthState.Failed,
+            twoFAPin = listOf("1", "2", "3", "4", "5", "6")
+        ),
+        LoginState(
+            multiFactorAuthState = MultiFactorAuthState.Checking,
+            twoFAPin = listOf("1", "2", "3", "4", "5", "6")
+        ),
     ).asSequence()
 }
 
 internal const val MEGA_LOGO_TEST_TAG = "MEGA_LOGO"
 internal const val FETCH_NODES_PROGRESS_TEST_TAG = "FETCH_NODES_PROGRESS"
 internal const val LOGIN_PROGRESS_TEST_TAG = "LOGIN_PROGRESS"
+internal const val TWO_FA_PROGRESS_TEST_TAG = "TWO_FA_PROGRESS"

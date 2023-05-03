@@ -3,8 +3,8 @@ package test.mega.privacy.android.app.presentation.login
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import de.palm.composestateevents.StateEventWithContentConsumed
-import de.palm.composestateevents.StateEventWithContentTriggered
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import mega.privacy.android.app.R
 import mega.privacy.android.app.logging.LegacyLoggingSettings
 import mega.privacy.android.app.presentation.login.LoginViewModel
 import mega.privacy.android.app.presentation.login.model.LoginError
@@ -156,7 +157,7 @@ internal class TestLoginViewModelTest {
                 assertThat(isPendingToShowFragment).isNull()
                 assertThat(enabledFlags).isEmpty()
                 assertThat(isCheckingSignupLink).isFalse()
-                assertThat(snackbarMessage).isInstanceOf(StateEventWithContentConsumed::class.java)
+                assertThat(snackbarMessage).isInstanceOf(consumed<Int>().javaClass)
             }
         }
     }
@@ -222,11 +223,11 @@ internal class TestLoginViewModelTest {
             with(underTest) {
                 state.map { it.snackbarMessage }.distinctUntilChanged()
                     .test {
-                        assertThat(awaitItem()).isInstanceOf(StateEventWithContentConsumed::class.java)
+                        assertThat(awaitItem()).isInstanceOf(consumed<Int>().javaClass)
                         onEmailChanged("test@test.com")
                         onPasswordChanged("Password")
                         onLoginClicked()
-                        assertThat(awaitItem()).isInstanceOf(StateEventWithContentTriggered::class.java)
+                        assertThat(awaitItem()).isInstanceOf(triggered(R.string.error_server_connection_problem).javaClass)
                     }
             }
         }
@@ -245,7 +246,7 @@ internal class TestLoginViewModelTest {
                 assertThat(awaitItem().emailError).isNull()
                 assertThat(awaitItem().passwordError).isNull()
                 assertThat(awaitItem().ongoingTransfersExist).isNull()
-                assertThat(awaitItem().snackbarMessage).isInstanceOf(StateEventWithContentConsumed::class.java)
+                assertThat(awaitItem().snackbarMessage).isInstanceOf(consumed<Int>().javaClass)
             }
         }
     }

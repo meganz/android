@@ -10,6 +10,11 @@ enum class MultiFactorAuthState {
     Failed,
 
     /**
+     * Checking state.
+     */
+    Checking,
+
+    /**
      * Fixed state.
      */
     Fixed

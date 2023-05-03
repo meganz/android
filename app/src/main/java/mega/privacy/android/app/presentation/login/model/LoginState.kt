@@ -23,6 +23,7 @@ import mega.privacy.android.domain.exception.login.FetchNodesException
  * @property pressedBackWhileLogin      True if pressed back while a login was in progress, false otherwise.
  * @property is2FAEnabled               True if should ask for 2FA, false otherwise.
  * @property is2FARequired              True if 2FA needs to be requested, false otherwise.
+ * @property twoFAPin                   Typed 2FA pin.
  * @property multiFactorAuthState       [MultiFactorAuthState]
  * @property isAccountConfirmed         True if account is confirmed after creation, false otherwise.
  * @property rootNodesExists            True if root node exists, false otherwise.
@@ -57,6 +58,7 @@ data class LoginState(
     val pressedBackWhileLogin: Boolean = false,
     val is2FAEnabled: Boolean = false,
     val is2FARequired: Boolean = false,
+    val twoFAPin: List<String> = listOf("", "", "", "", "", ""),
     val multiFactorAuthState: MultiFactorAuthState? = null,
     val isAccountConfirmed: Boolean = false,
     val rootNodesExists: Boolean = false,
@@ -76,5 +78,5 @@ data class LoginState(
     val isPendingToShowFragment: LoginFragmentType? = null,
     val enabledFlags: Set<Feature> = emptySet(),
     val isCheckingSignupLink: Boolean = false,
-    val snackbarMessage: StateEventWithContent<Int> = consumed()
+    val snackbarMessage: StateEventWithContent<Int> = consumed(),
 )

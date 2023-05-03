@@ -8,10 +8,13 @@ import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.extensions.messageId
 import mega.privacy.android.app.presentation.login.model.LoginError
 import mega.privacy.android.app.presentation.login.model.LoginState
+import mega.privacy.android.app.presentation.login.model.MultiFactorAuthState
 import mega.privacy.android.app.presentation.login.view.FETCH_NODES_PROGRESS_TEST_TAG
 import mega.privacy.android.app.presentation.login.view.LOGIN_PROGRESS_TEST_TAG
 import mega.privacy.android.app.presentation.login.view.LoginView
 import mega.privacy.android.app.presentation.login.view.MEGA_LOGO_TEST_TAG
+import mega.privacy.android.app.presentation.login.view.TWO_FA_PROGRESS_TEST_TAG
+import mega.privacy.android.app.presentation.twofactorauthentication.view.TWO_FACTOR_AUTHENTICATION_TEST_TAG
 import mega.privacy.android.domain.entity.Progress
 import mega.privacy.android.domain.entity.login.FetchNodesTemporaryError
 import mega.privacy.android.domain.entity.login.FetchNodesUpdate
@@ -37,7 +40,11 @@ class LoginViewTest {
                 onLoginClicked = {},
                 onForgotPassword = {},
                 onCreateAccount = {},
-                onSnackbarMessageConsumed = {}
+                onSnackbarMessageConsumed = {},
+                on2FAPinChanged = { _, _ -> },
+                on2FAChanged = {},
+                onLostAuthenticatorDevice = {},
+                onBackPressed = {}
             )
         }
     }
@@ -145,9 +152,71 @@ class LoginViewTest {
     }
 
     @Test
-    fun `test temporary error text is shown if fetch nodes update has it`() {
+    fun `test that temporary error text is shown if fetch nodes update has it`() {
         val temporaryError = FetchNodesTemporaryError.ConnectivityIssues
         setupRule(LoginState(fetchNodesUpdate = FetchNodesUpdate(temporaryError = temporaryError)))
         composeRule.onNodeWithText(fromId(temporaryError.messageId)).assertExists()
+    }
+
+    @Test
+    fun `test that toolbar is shown if 2FA screen is required`() {
+        setupRule(LoginState(is2FARequired = true))
+        composeRule.onNodeWithText(fromId(R.string.login_verification)).assertExists()
+    }
+
+    @Test
+    fun `test that informing text is shown if 2FA is required`() {
+        setupRule(LoginState(is2FARequired = true))
+        composeRule.onNodeWithText(fromId(R.string.explain_confirm_2fa)).assertExists()
+    }
+
+    @Test
+    fun `test that 2FA field id shown if 2FA screen is required`() {
+        setupRule(LoginState(is2FARequired = true))
+        composeRule.onNodeWithTag(TWO_FACTOR_AUTHENTICATION_TEST_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that lost authenticator device button is shown if 2FA is required`() {
+        setupRule(LoginState(is2FARequired = true))
+        composeRule.onNodeWithText(fromId(R.string.lost_your_authenticator_device)).assertExists()
+    }
+
+    @Test
+    fun `test that error is not visible if 2FA is required and 2FA state does not exists`() {
+        setupRule(
+            LoginState(is2FARequired = true, multiFactorAuthState = null)
+        )
+        composeRule.onNodeWithText(fromId(R.string.pin_error_2fa)).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that progress bar is shown if 2FA status is Checking`() {
+        setupRule(LoginState(multiFactorAuthState = MultiFactorAuthState.Checking))
+        composeRule.onNodeWithTag(TWO_FA_PROGRESS_TEST_TAG).assertExists()
+    }
+
+    @Test
+    fun `test that error is not visible if 2FA status is Checking`() {
+        setupRule(LoginState(multiFactorAuthState = MultiFactorAuthState.Checking))
+        composeRule.onNodeWithText(fromId(R.string.pin_error_2fa)).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that progress is not shown if 2FA status is Failed`() {
+        setupRule(LoginState(multiFactorAuthState = MultiFactorAuthState.Failed))
+        composeRule.onNodeWithTag(TWO_FA_PROGRESS_TEST_TAG).assertDoesNotExist()
+    }
+
+    @Test
+    fun `test that error is visible if 2FA status is Failed`() {
+        setupRule(LoginState(multiFactorAuthState = MultiFactorAuthState.Failed))
+        composeRule.onNodeWithText(fromId(R.string.pin_error_2fa)).assertExists()
+    }
+
+    @Test
+    fun `test that error is not visible if 2FA status is Fixed`() {
+        setupRule(LoginState(multiFactorAuthState = MultiFactorAuthState.Fixed))
+        composeRule.onNodeWithText(fromId(R.string.pin_error_2fa)).assertDoesNotExist()
     }
 }
