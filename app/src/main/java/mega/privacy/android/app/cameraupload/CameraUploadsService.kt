@@ -37,7 +37,6 @@ import mega.privacy.android.app.MimeTypeList
 import mega.privacy.android.app.R
 import mega.privacy.android.app.constants.BroadcastConstants
 import mega.privacy.android.app.constants.SettingsConstants
-import mega.privacy.android.app.domain.usecase.AreAllUploadTransfersPaused
 import mega.privacy.android.app.domain.usecase.CancelAllUploadTransfers
 import mega.privacy.android.app.domain.usecase.CancelTransfer
 import mega.privacy.android.app.domain.usecase.CopyNode
@@ -117,6 +116,7 @@ import mega.privacy.android.domain.usecase.SetSyncRecordPendingByPath
 import mega.privacy.android.domain.usecase.SetupPrimaryFolder
 import mega.privacy.android.domain.usecase.SetupSecondaryFolder
 import mega.privacy.android.domain.usecase.ShouldCompressVideo
+import mega.privacy.android.domain.usecase.camerauploads.AreAllUploadTransfersPausedUseCase
 import mega.privacy.android.domain.usecase.camerauploads.AreLocationTagsEnabledUseCase
 import mega.privacy.android.domain.usecase.camerauploads.DeleteCameraUploadsTemporaryRootDirectoryUseCase
 import mega.privacy.android.domain.usecase.camerauploads.EstablishCameraUploadsSyncHandlesUseCase
@@ -366,7 +366,7 @@ class CameraUploadsService : LifecycleService() {
      * AreAllUploadTransfersPaused
      */
     @Inject
-    lateinit var areAllUploadTransfersPaused: AreAllUploadTransfersPaused
+    lateinit var areAllUploadTransfersPausedUseCase: AreAllUploadTransfersPausedUseCase
 
     /**
      * Sync Record Type Mapper
@@ -1148,7 +1148,7 @@ class CameraUploadsService : LifecycleService() {
         // If the Service detects that all upload transfers are paused when turning on
         // Camera Uploads, update the Primary and Secondary Folder Backup States to
         // BackupState.PAUSE_UPLOADS
-        if (areAllUploadTransfersPaused()) {
+        if (areAllUploadTransfersPausedUseCase()) {
             Timber.d("All Pending Uploads Paused. Send Backup State = ${BackupState.PAUSE_UPLOADS}")
             updatePrimaryFolderBackupState(BackupState.PAUSE_UPLOADS)
             updateSecondaryFolderBackupState(BackupState.PAUSE_UPLOADS)
