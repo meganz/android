@@ -2,6 +2,7 @@ package mega.privacy.android.app.presentation.contact.model
 
 import android.graphics.Bitmap
 import mega.privacy.android.app.R
+import mega.privacy.android.app.namecollision.data.NameCollision
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.contacts.ContactItem
 import mega.privacy.android.domain.entity.contacts.UserStatus
@@ -20,6 +21,7 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property avatar                                     Bitmap of user avatar
  * @property isOnline                                   Checks if connected to internet
  * @property snackBarMessage                            One time snack bar message to be shown to the user
+ * @property snackBarMessageString                      One time snack bar message to be shown to the user
  * @property isUserRemoved                              Checks if selected user is removed from contacts
  * @property inShares                                   In shares for the user
  * @property callStatusChanged                          when chat call status is changed
@@ -28,6 +30,10 @@ import mega.privacy.android.domain.entity.node.UnTypedNode
  * @property isChatNotificationChange                   Mute or Un-mute chat notification for the user
  * @property isStorageOverQuota                         Storage quota over limits
  * @property isNodeUpdated                              Checks if incoming shares are updated
+ * @property isCopyInProgress                           Checks if folder copy in progress
+ * @property nameCollisions                             Checks if copy has name collisions
+ * @property isTransferComplete                         checks if file transfer complete
+ * @property copyError                                  Copy node error
  */
 data class ContactInfoState(
     val error: Int? = null,
@@ -40,6 +46,7 @@ data class ContactInfoState(
     val chatRoom: ChatRoom? = null,
     val isOnline: Boolean = false,
     val snackBarMessage: Int? = null,
+    val snackBarMessageString: String? = null,
     val isUserRemoved: Boolean = false,
     val callStatusChanged: Boolean = false,
     val isPushNotificationSettingsUpdated: Boolean = false,
@@ -47,6 +54,10 @@ data class ContactInfoState(
     val isChatNotificationChange: Boolean = false,
     val isStorageOverQuota: Boolean = false,
     val isNodeUpdated: Boolean = false,
+    val isCopyInProgress: Boolean = false,
+    val isTransferComplete: Boolean = false,
+    val nameCollisions: List<NameCollision> = emptyList(),
+    val copyError: Throwable? = null,
     val inShares: List<UnTypedNode> = emptyList(),
 ) {
 

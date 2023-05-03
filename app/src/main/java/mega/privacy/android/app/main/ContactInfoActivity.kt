@@ -67,23 +67,16 @@ import mega.privacy.android.app.main.megachat.NodeAttachmentHistoryActivity
 import mega.privacy.android.app.modalbottomsheet.ContactFileListBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ContactNicknameBottomSheetDialogFragment
 import mega.privacy.android.app.modalbottomsheet.ModalBottomSheetUtil.isBottomSheetDialogShown
-import mega.privacy.android.app.namecollision.data.NameCollision
-import mega.privacy.android.app.namecollision.data.NameCollisionType
-import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
 import mega.privacy.android.app.presentation.chat.dialog.AskForDisplayOverActivity
 import mega.privacy.android.app.presentation.contact.ContactInfoViewModel
 import mega.privacy.android.app.presentation.contact.authenticitycredendials.AuthenticityCredentialsActivity
 import mega.privacy.android.app.presentation.contact.model.ContactInfoState
-import mega.privacy.android.app.presentation.copynode.CopyRequestResult
-import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
 import mega.privacy.android.app.presentation.extensions.iconRes
 import mega.privacy.android.app.presentation.extensions.isAwayOrOffline
 import mega.privacy.android.app.presentation.extensions.isValid
 import mega.privacy.android.app.presentation.extensions.text
-import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.app.usecase.chat.GetChatChangesUseCase
-import mega.privacy.android.app.utils.AlertDialogUtil.dismissAlertDialogIfExists
 import mega.privacy.android.app.utils.AlertsAndWarnings.showForeignStorageOverQuotaWarningDialog
 import mega.privacy.android.app.utils.AlertsAndWarnings.showOverDiskQuotaPaywallWarning
 import mega.privacy.android.app.utils.AlertsAndWarnings.showSaveToDeviceConfirmDialog
@@ -94,6 +87,7 @@ import mega.privacy.android.app.utils.ChatUtil
 import mega.privacy.android.app.utils.ColorUtils.getColorForElevation
 import mega.privacy.android.app.utils.ColorUtils.getThemeColor
 import mega.privacy.android.app.utils.Constants
+import mega.privacy.android.app.utils.ContextUtils.isValid
 import mega.privacy.android.app.utils.MegaProgressDialogUtil.createProgressDialog
 import mega.privacy.android.app.utils.TimeUtils
 import mega.privacy.android.app.utils.Util
@@ -128,24 +122,6 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
      */
     @Inject
     lateinit var getChatChangesUseCase: GetChatChangesUseCase
-
-    /**
-     * Use case for checking name collisions before uploading, copying or moving.
-     */
-    @Inject
-    lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
-
-    /**
-     * Use case for copying MegaNodes.
-     */
-    @Inject
-    lateinit var copyNodeUseCase: CopyNodeUseCase
-
-    /**
-     * Copy request mapper
-     */
-    @Inject
-    lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
 
     private lateinit var activityChatContactBinding: ActivityChatContactPropertiesBinding
     private val contentContactProperties get() = activityChatContactBinding.contentContactProperties
@@ -404,53 +380,7 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
     private fun configureFolderToCopyLauncher() {
         selectFolderToCopyLauncher =
             registerForActivityResult(SelectFolderToCopyActivityContract()) { result ->
-                if (!viewModel.isOnline()) {
-                    showSnackbar(
-                        Constants.SNACKBAR_TYPE,
-                        getString(R.string.error_server_connection_problem),
-                        -1
-                    )
-                } else {
-                    statusDialog =
-                        createProgressDialog(this, getString(R.string.context_copying))
-                    val copyHandles = result?.first
-                    val toHandle = result?.second
-                    if (copyHandles == null || toHandle == null) return@registerForActivityResult
-                    checkNameCollisionUseCase.checkHandleList(
-                        copyHandles,
-                        toHandle,
-                        NameCollisionType.COPY,
-                        this,
-                    )
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { (collisions, handlesWithoutCollision): Pair<ArrayList<NameCollision>, LongArray>, throwable: Throwable? ->
-                            if (throwable == null) {
-                                if (collisions.isNotEmpty()) {
-                                    dismissAlertDialogIfExists(statusDialog)
-                                    nameCollisionActivityContract?.launch(collisions)
-                                }
-                                if (handlesWithoutCollision.isNotEmpty()) {
-                                    copyNodeUseCase.copy(handlesWithoutCollision, toHandle)
-                                        .subscribeOn(Schedulers.io())
-                                        .observeOn(AndroidSchedulers.mainThread())
-                                        .subscribe { copyResult: CopyRequestResult, copyThrowable: Throwable? ->
-                                            dismissAlertDialogIfExists(statusDialog)
-                                            if (sharedFoldersFragment?.isVisible == true) {
-                                                sharedFoldersFragment?.clearSelections()
-                                                sharedFoldersFragment?.hideMultipleSelect()
-                                            }
-                                            copyThrowable?.let { manageCopyMoveException(it) }
-                                                ?: showSnackbar(
-                                                    Constants.SNACKBAR_TYPE,
-                                                    copyRequestMessageMapper(copyResult),
-                                                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
-                                                )
-                                        }
-                                }
-                            }
-                        }
-                }
+                viewModel.checkCopyNameCollision(handles = result, context = this)
             }
     }
 
@@ -963,6 +893,31 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                 )
                 viewModel.onConsumeSnackBarMessageEvent()
             }
+            contactInfoState.snackBarMessageString?.let {
+                showSnackbar(
+                    Constants.SNACKBAR_TYPE,
+                    it,
+                    MegaChatApiJava.MEGACHAT_INVALID_HANDLE
+                )
+                viewModel.onConsumeSnackBarMessageEvent()
+            }
+            if (contactInfoState.isCopyInProgress) {
+                if (statusDialog == null) {
+                    statusDialog = createProgressDialog(this, getString(R.string.context_copying))
+                }
+            } else {
+                statusDialog?.dismiss()
+            }
+
+            contactInfoState.copyError?.let {
+                manageCopyMoveException(contactInfoState.copyError)
+                viewModel.onConsumeCopyException()
+            }
+
+            if (contactInfoState.nameCollisions.isNotEmpty()) {
+                nameCollisionActivityContract?.launch(ArrayList(contactInfoState.nameCollisions))
+                viewModel.onConsumeNameCollisions()
+            }
 
             updateVerifyCredentialsLayout(contactInfoState)
             updateUserStatusChanges(contactInfoState)
@@ -999,6 +954,16 @@ class ContactInfoActivity : BaseActivity(), ActionNodeCallback, MegaRequestListe
                     )
                 }
                 viewModel.onConsumePushNotificationSettingsUpdateEvent()
+            }
+
+            contactInfoState.isTransferComplete -> {
+                sharedFoldersFragment?.apply {
+                    if (isVisible) {
+                        clearSelections()
+                        hideMultipleSelect()
+                    }
+                }
+                viewModel.onConsumeIsTransferComplete()
             }
 
             contactInfoState.isNodeUpdated -> {

@@ -18,7 +18,10 @@ import mega.privacy.android.app.components.ChatManagement
 import mega.privacy.android.app.contacts.usecase.GetChatRoomUseCase
 import mega.privacy.android.app.domain.usecase.CreateShareKey
 import mega.privacy.android.app.meeting.gateway.CameraGateway
+import mega.privacy.android.app.namecollision.usecase.CheckNameCollisionUseCase
 import mega.privacy.android.app.objects.PasscodeManagement
+import mega.privacy.android.app.presentation.copynode.mapper.CopyRequestMessageMapper
+import mega.privacy.android.app.usecase.CopyNodeUseCase
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
@@ -93,6 +96,9 @@ class ContactInfoViewModelTest {
     private lateinit var createChatRoomUseCase: CreateChatRoomUseCase
     private val monitorNodeUpdates = FakeMonitorUpdates()
     private lateinit var createShareKey: CreateShareKey
+    private lateinit var checkNameCollisionUseCase: CheckNameCollisionUseCase
+    private lateinit var copyNodeUseCase: CopyNodeUseCase
+    private lateinit var copyRequestMessageMapper: CopyRequestMessageMapper
     private val scheduler = TestCoroutineScheduler()
     private val standardDispatcher = StandardTestDispatcher(scheduler)
     private val testScope = CoroutineScope(UnconfinedTestDispatcher())
@@ -167,6 +173,9 @@ class ContactInfoViewModelTest {
             applicationScope = testScope,
             createShareKey = createShareKey,
             monitorNodeUpdates = monitorNodeUpdates,
+            checkNameCollisionUseCase = checkNameCollisionUseCase,
+            copyNodeUseCase = copyNodeUseCase,
+            copyRequestMessageMapper = copyRequestMessageMapper,
         )
     }
 
@@ -196,6 +205,9 @@ class ContactInfoViewModelTest {
         startConversationUseCase = mock()
         createChatRoomUseCase = mock()
         createShareKey = mock()
+        copyRequestMessageMapper = mock()
+        copyNodeUseCase = mock()
+        checkNameCollisionUseCase = mock()
     }
 
     @After
@@ -436,14 +448,9 @@ class ContactInfoViewModelTest {
 
     @Test
     fun `test that when node update is triggered state is updated`() = runTest {
-        val unTypedNode = mock<UnTypedNode> {
-            on { parentId.longValue }.thenReturn(1L)
-        }
         val unTypedNodeNew = mock<UnTypedNode> {
             on { parentId.longValue }.thenReturn(-1L)
         }
-        val inShares = listOf(unTypedNode)
-        whenever(getInSharesUseCase(any())).thenReturn(inShares)
         val node = mock<Node> {
             on { isIncomingShare }.thenReturn(true)
         }
@@ -459,6 +466,119 @@ class ContactInfoViewModelTest {
             monitorNodeUpdates.emit(nodeUpdate)
             val newState = awaitItem()
             assertThat(newState.isNodeUpdated).isTrue()
+        }
+    }
+
+    @Test
+    fun `test that when onConsumeIsTransferComplete is triggered state is updated`() = runTest {
+        initContactInfoOpenedFromContact()
+        verifyInitialData()
+        underTest.onConsumeIsTransferComplete()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isTransferComplete).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that when onConsumeNameCollisions is triggered state is updated`() = runTest {
+        initContactInfoOpenedFromContact()
+        verifyInitialData()
+        underTest.onConsumeNameCollisions()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.nameCollisions).isEmpty()
+        }
+    }
+
+    @Test
+    fun `test that when onConsumeCopyException is called state is updated`() = runTest {
+        initContactInfoOpenedFromContact()
+        verifyInitialData()
+        underTest.onConsumeCopyException()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.copyError).isNull()
+        }
+    }
+
+    @Test
+    fun `test that when onConsumeNodeUpdateEvent is called state is updated`() = runTest {
+        initContactInfoOpenedFromContact()
+        verifyInitialData()
+        underTest.onConsumeNodeUpdateEvent()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isNodeUpdated).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that when onConsumeStorageOverQuotaEvent is called state is updated`() = runTest {
+        initContactInfoOpenedFromContact()
+        verifyInitialData()
+        underTest.onConsumeStorageOverQuotaEvent()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.isStorageOverQuota).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that when onConsumeChatNotificationChangeEvent is called state is updated`() =
+        runTest {
+            initContactInfoOpenedFromContact()
+            verifyInitialData()
+            underTest.onConsumeChatNotificationChangeEvent()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isChatNotificationChange).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that when onConsumeNavigateToChatEvent is called state is updated`() = runTest {
+        initContactInfoOpenedFromContact()
+        verifyInitialData()
+        underTest.onConsumeNavigateToChatEvent()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.shouldNavigateToChat).isFalse()
+        }
+    }
+
+    @Test
+    fun `test that when onConsumePushNotificationSettingsUpdateEvent is called state is updated`() =
+        runTest {
+            initContactInfoOpenedFromContact()
+            verifyInitialData()
+            underTest.onConsumePushNotificationSettingsUpdateEvent()
+            underTest.state.test {
+                val state = awaitItem()
+                assertThat(state.isPushNotificationSettingsUpdated).isFalse()
+            }
+        }
+
+    @Test
+    fun `test that when onConsumeSnackBarMessageEvent is called state is updated`() = runTest {
+        initContactInfoOpenedFromContact()
+        verifyInitialData()
+        underTest.onConsumeSnackBarMessageEvent()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.snackBarMessage).isNull()
+            assertThat(state.snackBarMessageString).isNull()
+        }
+    }
+
+    @Test
+    fun `test that when onConsumeChatCallStatusChangeEvent is called state is updated`() = runTest {
+        initContactInfoOpenedFromContact()
+        verifyInitialData()
+        underTest.onConsumeChatCallStatusChangeEvent()
+        underTest.state.test {
+            val state = awaitItem()
+            assertThat(state.callStatusChanged).isFalse()
         }
     }
 }
