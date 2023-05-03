@@ -206,11 +206,12 @@ class FileBrowserViewModel @Inject constructor(
      * This will map list of [Node] to [NodeUIItem]
      */
     private fun getNodeUiItems(nodeList: List<Node>): List<NodeUIItem> {
-        val existingNodeList = _state.value.nodesList
-        return nodeList.mapIndexed { index, it ->
+        val existingNodeList = state.value.nodesList
+        return nodeList.mapIndexed { index, node ->
+            val isSelected = state.value.selectedNodeHandles.contains(node.id.longValue)
             NodeUIItem(
-                node = it,
-                isSelected = if (existingNodeList.size > index) existingNodeList[index].isSelected else false,
+                node = node,
+                isSelected = if (existingNodeList.size > index) isSelected else false,
                 isInvisible = if (existingNodeList.size > index) existingNodeList[index].isInvisible else false
             )
         }

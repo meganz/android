@@ -17,11 +17,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.sample
 import mega.privacy.android.app.R
 import mega.privacy.android.app.arch.extensions.collectFlow
+import mega.privacy.android.app.fragments.homepage.EventObserver
+import mega.privacy.android.app.fragments.homepage.SortByHeaderViewModel
 import mega.privacy.android.app.main.ManagerActivity
 import mega.privacy.android.app.presentation.clouddrive.ui.FileBrowserComposeView
 import mega.privacy.android.app.presentation.data.NodeUIItem
 import mega.privacy.android.app.presentation.extensions.isDarkMode
 import mega.privacy.android.app.presentation.favourites.facade.StringUtilWrapper
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.domain.entity.ThemeMode
 import mega.privacy.android.domain.usecase.GetThemeMode
@@ -54,6 +57,7 @@ class FileBrowserComposeFragment : Fragment() {
     lateinit var getThemeMode: GetThemeMode
 
     private val fileBrowserViewModel: FileBrowserViewModel by activityViewModels()
+    private val sortByHeaderViewModel: SortByHeaderViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,7 +77,12 @@ class FileBrowserComposeFragment : Fragment() {
                         emptyState = getEmptyFolderDrawable(true),
                         onItemClick = fileBrowserViewModel::onItemClicked,
                         onLongClick = fileBrowserViewModel::onLongItemClicked,
-                        onMenuClick = ::showOptionsMenuForItem
+                        onMenuClick = ::showOptionsMenuForItem,
+                        sortOrder = getString(
+                            SortByHeaderViewModel.orderNameMap[uiState.sortOrder]
+                                ?: R.string.sortby_name
+                        ),
+                        onSortOrderClick = { showSortByPanel() }
                     )
                 }
             }
@@ -96,6 +105,10 @@ class FileBrowserComposeFragment : Fragment() {
             .distinctUntilChanged()) {
             setupToolbar()
         }
+
+        sortByHeaderViewModel.orderChangeEvent.observe(viewLifecycleOwner, EventObserver {
+            fileBrowserViewModel.refreshNodes()
+        })
     }
 
     /**
@@ -144,5 +157,12 @@ class FileBrowserComposeFragment : Fragment() {
      */
     private fun showOptionsMenuForItem(nodeUIItem: NodeUIItem) {
         (requireActivity() as ManagerActivity).showNodeOptionsPanel(nodeId = nodeUIItem.id)
+    }
+
+    /**
+     * Shows the Sort by panel.
+     */
+    private fun showSortByPanel() {
+        (requireActivity() as ManagerActivity).showNewSortByPanel(Constants.ORDER_CLOUD)
     }
 }

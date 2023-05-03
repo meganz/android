@@ -23,6 +23,8 @@ import mega.privacy.android.domain.entity.preference.ViewType
  * @param onItemClick
  * @param onLongClick
  * @param onMenuClick
+ * @param sortOrder
+ * @param onSortOrderClick
  */
 @Composable
 fun FileBrowserComposeView(
@@ -32,6 +34,8 @@ fun FileBrowserComposeView(
     onItemClick: (NodeUIItem) -> Unit,
     onLongClick: (NodeUIItem) -> Unit,
     onMenuClick: (NodeUIItem) -> Unit,
+    sortOrder: String,
+    onSortOrderClick: () -> Unit,
 ) {
     if (uiState.nodesList.isNotEmpty()) {
         NodesView(
@@ -42,9 +46,9 @@ fun FileBrowserComposeView(
             onMenuClick = onMenuClick,
             onItemClicked = onItemClick,
             onLongClick = onLongClick,
-            sortOrder = "",
+            sortOrder = sortOrder,
             isListView = uiState.currentViewType == ViewType.LIST,
-            onSortOrderClick = {},
+            onSortOrderClick = onSortOrderClick,
             onChangeViewTypeClick = {},
         )
     } else {

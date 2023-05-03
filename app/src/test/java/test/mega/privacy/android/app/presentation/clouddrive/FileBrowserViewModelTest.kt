@@ -74,7 +74,7 @@ class FileBrowserViewModelTest {
             getFileBrowserParentNodeHandle = getFileBrowserParentNodeHandle,
             getIsNodeInRubbish = isNodeInRubbish,
             getFileBrowserChildrenUseCase = getFileBrowserChildrenUseCase,
-            getCloudSortOrder = getCloudSortOrder
+            getCloudSortOrder = getCloudSortOrder,
         )
     }
 
