@@ -9,32 +9,28 @@ import androidx.compose.ui.tooling.preview.Preview
  */
 @Preview(
     showBackground = true,
-    name = "small font",
+    name = "4-Small font",
     group = "font scales",
     fontScale = 0.7f
 )
 @Preview(
     showBackground = true,
-    name = "default font",
-    group = "font scales",
-    fontScale = 1f
-)
-@Preview(
-    showBackground = true,
-    name = "large font",
+    name = "5-Large font",
     group = "font scales",
     fontScale = 1.5f
 )
-annotation class FontScalePreviews
+private annotation class FontScalePreviews
 
 /**
  * Annotation to generate a preview with french locale
  */
 @Preview(
     locale = "fr",
+    name = "3-French locale",
+    group = "locales",
     showBackground = true,
 )
-annotation class FrenchLocale
+private annotation class FrenchLocale
 
 
 /**
@@ -43,28 +39,22 @@ annotation class FrenchLocale
 @Preview(
     showBackground = true,
     backgroundColor = 0xFF121212,
-    name = "dark theme",
+    name = "1-Dark theme",
     group = "themes",
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Preview(
     showBackground = true,
-    name = "light theme",
+    name = "2-Light theme",
     group = "themes",
     uiMode = Configuration.UI_MODE_NIGHT_NO
 )
 annotation class CombinedThemePreviews
 
 /**
- * Annotation to generate previews for views with texts (font scales and locales)
+ * Annotation to generate previews for views with texts (font scales and locales) and night and day themes
  */
 @FrenchLocale
 @FontScalePreviews
-annotation class CombinedTextPreviews
-
-/**
- * Annotation to generate previews for views with texts (font scales and locales) and night and day themes
- */
-@CombinedTextPreviews
 @CombinedThemePreviews
 annotation class CombinedTextAndThemePreviews
