@@ -342,6 +342,13 @@ interface MegaLocalStorageGateway {
     suspend fun getPrimaryFolderSDCardUriPath(): String
 
     /**
+     * Sets the new Primary Folder SD Card URI Path
+     *
+     * @param path the new Primary Folder SD Card URI path
+     */
+    suspend fun setPrimaryFolderSDCardUriPath(path: String)
+
+    /**
      * Is secondary media folder enabled
      */
     suspend fun isSecondaryMediaFolderEnabled(): Boolean
