@@ -1,6 +1,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/action_menu_manage_link"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="70"
+        android:title="@string/edit_link_option"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_menu_remove_link"
+        android:icon="@drawable/ic_action_bar_null"
+        android:orderInCategory="80"
+        android:title="@string/context_remove_link_menu"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_menu_get_link"
         android:icon="@drawable/ic_action_bar_null"
         android:orderInCategory="90"

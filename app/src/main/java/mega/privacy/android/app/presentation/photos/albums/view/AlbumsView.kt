@@ -407,6 +407,55 @@ fun DeleteAlbumsConfirmationDialog(
     )
 }
 
+@Composable
+fun RemoveLinksConfirmationDialog(
+    numLinks: Int,
+    onCancel: () -> Unit,
+    onRemove: () -> Unit,
+) {
+    val isLight = MaterialTheme.colors.isLight
+
+    MegaDialog(
+        properties = DialogProperties(dismissOnClickOutside = false),
+        onDismissRequest = onCancel,
+        body = {
+            Text(
+                modifier = Modifier.padding(top = 8.dp),
+                text = pluralStringResource(
+                    id = R.plurals.remove_links_warning_text,
+                    count = numLinks,
+                ),
+                color = grey_alpha_054.takeIf { isLight } ?: white_alpha_054,
+                style = subtitle1,
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onRemove,
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.context_remove),
+                        style = button,
+                        color = teal_300.takeIf { isLight } ?: teal_200,
+                    )
+                },
+            )
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onCancel,
+                content = {
+                    Text(
+                        text = stringResource(id = R.string.button_cancel),
+                        style = button,
+                        color = teal_300.takeIf { isLight } ?: teal_200,
+                    )
+                },
+            )
+        },
+    )
+}
+
 private fun handleAlbumClicked(
     album: UIAlbum,
     numSelectedAlbums: Int,

@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -26,6 +25,7 @@ import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.usecase.DownloadThumbnail
 import mega.privacy.android.domain.usecase.GetAlbumPhotos
 import mega.privacy.android.domain.usecase.GetUserAlbum
+import mega.privacy.android.domain.usecase.photos.ExportAlbumsUseCase
 import timber.log.Timber
 import java.io.File
 import javax.inject.Inject
@@ -36,6 +36,7 @@ class AlbumGetLinkViewModel @Inject constructor(
     private val getUserAlbumUseCase: GetUserAlbum,
     private val getAlbumPhotosUseCase: GetAlbumPhotos,
     private val downloadThumbnailUseCase: DownloadThumbnail,
+    private val exportAlbumsUseCase: ExportAlbumsUseCase,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
@@ -44,7 +45,6 @@ class AlbumGetLinkViewModel @Inject constructor(
 
     fun initialize() {
         fetchAlbum()
-        fetchLink()
 
         state.update {
             it.copy(isInitialized = true)
@@ -55,14 +55,13 @@ class AlbumGetLinkViewModel @Inject constructor(
         savedStateHandle.getStateFlow<Long?>(ALBUM_ID, null)
             .filterNotNull()
             .map(::getAlbumSummary)
-            .filterNotNull()
-            .onEach(::updateAlbumSummary)
+            .onEach(::updateLink)
             .catch { exception -> Timber.e(exception) }
             .launchIn(viewModelScope)
 
     private suspend fun getAlbumSummary(id: Long): AlbumSummary? {
         val album = getUserAlbumUseCase(albumId = AlbumId(id)).firstOrNull() ?: return null
-        val photos = getAlbumPhotosUseCase(albumId = album.id).firstOrNull() ?: return null
+        val photos = getAlbumPhotosUseCase(albumId = album.id).firstOrNull().orEmpty()
 
         return AlbumSummary(
             album = Album.UserAlbum(
@@ -79,16 +78,17 @@ class AlbumGetLinkViewModel @Inject constructor(
         )
     }
 
-    private fun updateAlbumSummary(albumSummary: AlbumSummary) {
-        state.update {
-            it.copy(albumSummary = albumSummary)
-        }
-    }
+    private fun updateLink(albumSummary: AlbumSummary?) = viewModelScope.launch {
+        val albumIdLinks = exportAlbumsUseCase(albumIds = listOfNotNull(albumSummary?.album?.id))
+        val albumIdLink = albumIdLinks.firstOrNull()
+        val exitScreen = albumSummary == null || albumIdLink?.first != albumSummary.album.id
 
-    private fun fetchLink() = viewModelScope.launch {
-        delay(5000L)
         state.update {
-            it.copy(link = "https://mega.nz/folder/yhMQkSaB#ndFn_kn1WY6l74Lzdm4VJQ")
+            it.copy(
+                albumSummary = albumSummary,
+                link = albumIdLink?.second?.link.orEmpty(),
+                exitScreen = exitScreen,
+            )
         }
     }
 

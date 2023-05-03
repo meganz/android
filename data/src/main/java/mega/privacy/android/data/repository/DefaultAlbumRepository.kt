@@ -338,11 +338,15 @@ internal class DefaultAlbumRepository @Inject constructor(
                     },
                 )
 
-                for (albumId in albumIds) {
-                    megaApiGateway.exportSet(
-                        sid = albumId.id,
-                        listener = listener,
-                    )
+                if (albumIds.isNotEmpty()) {
+                    for (albumId in albumIds) {
+                        megaApiGateway.exportSet(
+                            sid = albumId.id,
+                            listener = listener,
+                        )
+                    }
+                } else {
+                    continuation.resumeWith(Result.success(listOf()))
                 }
 
                 continuation.invokeOnCancellation {
@@ -360,11 +364,15 @@ internal class DefaultAlbumRepository @Inject constructor(
                 }
             )
 
-            for (albumId in albumIds) {
-                megaApiGateway.disableExportSet(
-                    sid = albumId.id,
-                    listener = listener,
-                )
+            if (albumIds.isNotEmpty()) {
+                for (albumId in albumIds) {
+                    megaApiGateway.disableExportSet(
+                        sid = albumId.id,
+                        listener = listener,
+                    )
+                }
+            } else {
+                continuation.resumeWith(Result.success(0))
             }
 
             continuation.invokeOnCancellation {

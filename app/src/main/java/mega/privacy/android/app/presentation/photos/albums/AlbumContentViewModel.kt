@@ -16,6 +16,7 @@ import mega.privacy.android.domain.usecase.ObserveAlbumPhotosAddingProgress
 import mega.privacy.android.domain.usecase.ObserveAlbumPhotosRemovingProgress
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosAddingProgressCompleted
 import mega.privacy.android.domain.usecase.UpdateAlbumPhotosRemovingProgressCompleted
+import mega.privacy.android.domain.usecase.photos.DisableExportAlbumsUseCase
 import javax.inject.Inject
 
 @HiltViewModel
@@ -24,6 +25,7 @@ class AlbumContentViewModel @Inject constructor(
     private val updateAlbumPhotosAddingProgressCompleted: UpdateAlbumPhotosAddingProgressCompleted,
     private val observeAlbumPhotosRemovingProgress: ObserveAlbumPhotosRemovingProgress,
     private val updateAlbumPhotosRemovingProgressCompleted: UpdateAlbumPhotosRemovingProgressCompleted,
+    private val disableExportAlbumsUseCase: DisableExportAlbumsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(AlbumContentState())
     val state = _state.asStateFlow()
@@ -69,6 +71,31 @@ class AlbumContentViewModel @Inject constructor(
     fun deleteAlbum() {
         _state.update {
             it.copy(isDeleteAlbum = true)
+        }
+    }
+
+    fun showRemoveLinkConfirmation() {
+        _state.update {
+            it.copy(showRemoveLinkConfirmation = true)
+        }
+    }
+
+    fun closeRemoveLinkConfirmation() {
+        _state.update {
+            it.copy(showRemoveLinkConfirmation = false)
+        }
+    }
+
+    fun disableExportAlbum(albumId: AlbumId) = viewModelScope.launch {
+        val numRemoved = disableExportAlbumsUseCase(albumIds = listOf(albumId))
+        _state.update {
+            it.copy(isLinkRemoved = numRemoved > 0)
+        }
+    }
+
+    fun resetLinkRemoved() {
+        _state.update {
+            it.copy(isLinkRemoved = false)
         }
     }
 }

@@ -18,6 +18,7 @@ import mega.privacy.android.domain.entity.photos.AlbumPhotosRemovingProgress
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 @ExperimentalCoroutinesApi
 class AlbumContentViewModelTest {
@@ -44,6 +45,7 @@ class AlbumContentViewModelTest {
                 flowOf(AlbumPhotosRemovingProgress(false, 0))
             },
             updateAlbumPhotosRemovingProgressCompleted = {},
+            disableExportAlbumsUseCase = mock(),
         )
         underTest.observePhotosAddingProgress(albumId)
 
@@ -63,6 +65,7 @@ class AlbumContentViewModelTest {
             updateAlbumPhotosAddingProgressCompleted = { updated = true },
             observeAlbumPhotosRemovingProgress = { flowOf() },
             updateAlbumPhotosRemovingProgressCompleted = {},
+            disableExportAlbumsUseCase = mock(),
         )
         underTest.updatePhotosAddingProgressCompleted(albumId)
 
@@ -83,6 +86,7 @@ class AlbumContentViewModelTest {
                 flowOf(AlbumPhotosRemovingProgress(false, 100))
             },
             updateAlbumPhotosRemovingProgressCompleted = {},
+            disableExportAlbumsUseCase = mock(),
         )
         underTest.observePhotosRemovingProgress(albumId)
 
@@ -102,6 +106,7 @@ class AlbumContentViewModelTest {
             updateAlbumPhotosAddingProgressCompleted = { },
             observeAlbumPhotosRemovingProgress = { flowOf() },
             updateAlbumPhotosRemovingProgressCompleted = { updated = true },
+            disableExportAlbumsUseCase = mock(),
         )
         underTest.updatePhotosRemovingProgressCompleted(albumId)
 

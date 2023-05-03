@@ -47,6 +47,7 @@ import mega.privacy.android.app.presentation.photos.albums.model.getAlbumPhotos
 import mega.privacy.android.app.presentation.photos.albums.view.CreateNewAlbumDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DeleteAlbumsConfirmationDialog
 import mega.privacy.android.app.presentation.photos.albums.view.DynamicView
+import mega.privacy.android.app.presentation.photos.albums.view.RemoveLinksConfirmationDialog
 import mega.privacy.android.app.presentation.photos.model.FilterMediaType
 import mega.privacy.android.app.presentation.photos.model.Sort
 import mega.privacy.android.app.presentation.photos.timeline.viewmodel.TimelineViewModel
@@ -135,6 +136,18 @@ fun AlbumContentScreen(
             selectedAlbumIds = listOfNotNull(album?.id),
             onCancelClicked = albumsViewModel::closeDeleteAlbumsConfirmation,
             onDeleteClicked = { albumContentViewModel.deleteAlbum() },
+        )
+    }
+
+    if (albumContentState.showRemoveLinkConfirmation) {
+        val album = albumsState.currentUserAlbum
+        RemoveLinksConfirmationDialog(
+            numLinks = 1,
+            onCancel = albumContentViewModel::closeRemoveLinkConfirmation,
+            onRemove = {
+                albumContentViewModel.closeRemoveLinkConfirmation()
+                album?.id?.let(albumContentViewModel::disableExportAlbum)
+            },
         )
     }
 
@@ -240,6 +253,26 @@ fun AlbumContentScreen(
                 LaunchedEffect(message) {
                     delay(3000L)
                     albumContentViewModel.updatePhotosRemovingProgressCompleted(albumId = userAlbum.id)
+                }
+            }
+
+            if (userAlbum != null && albumContentState.isLinkRemoved) {
+                val message = pluralStringResource(
+                    id = R.plurals.context_link_removal_success,
+                    count = 1,
+                )
+                Snackbar(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(8.dp),
+                    backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white,
+                ) {
+                    Text(text = message)
+                }
+
+                LaunchedEffect(message) {
+                    delay(3000L)
+                    albumContentViewModel.resetLinkRemoved()
                 }
             }
 

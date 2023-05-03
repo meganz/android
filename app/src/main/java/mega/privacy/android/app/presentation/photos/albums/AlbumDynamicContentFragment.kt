@@ -227,7 +227,13 @@ class AlbumDynamicContentFragment : Fragment() {
                 }
                 menu.findItem(R.id.action_menu_get_link)?.let { menu ->
                     menu.title = context?.resources?.getQuantityString(R.plurals.get_links, 1)
-                    menu.isVisible = isAlbumSharingEnabled
+                    menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == false
+                }
+                menu.findItem(R.id.action_menu_manage_link)?.let { menu ->
+                    menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == true
+                }
+                menu.findItem(R.id.action_menu_remove_link)?.let { menu ->
+                    menu.isVisible = isAlbumSharingEnabled && currentUserAlbum?.isExported == true
                 }
 
                 menu.findItem(R.id.action_menu_rename)?.isVisible = true
@@ -242,6 +248,12 @@ class AlbumDynamicContentFragment : Fragment() {
         when (item.itemId) {
             R.id.action_menu_get_link -> {
                 openAlbumGetLinkScreen()
+            }
+            R.id.action_menu_manage_link -> {
+                openAlbumGetLinkScreen()
+            }
+            R.id.action_menu_remove_link -> {
+                albumContentViewModel.showRemoveLinkConfirmation()
             }
             R.id.action_menu_sort_by -> {
                 albumsViewModel.showSortByDialog(showSortByDialog = true)
@@ -292,6 +304,8 @@ class AlbumDynamicContentFragment : Fragment() {
     }
 
     val currentAlbum: Album? get() = albumsViewModel.state.value.currentAlbum
+
+    val currentUserAlbum: Album.UserAlbum? get() = albumsViewModel.state.value.currentUserAlbum
 
     override fun onPause() {
         ackPhotosAddingProgressCompleted()

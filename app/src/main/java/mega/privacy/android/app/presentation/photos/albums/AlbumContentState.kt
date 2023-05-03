@@ -7,6 +7,8 @@ data class AlbumContentState(
     val isDeleteAlbum: Boolean = false,
     val isRemovingPhotos: Boolean = false,
     val totalRemovedPhotos: Int = 0,
+    val showRemoveLinkConfirmation: Boolean = false,
+    val isLinkRemoved: Boolean = false,
 ) {
     val isAddingPhotosProgressCompleted: Boolean
         get() = !isAddingPhotos && totalAddedPhotos > 0
