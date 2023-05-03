@@ -263,7 +263,6 @@ private fun EnableCameraUploadButton(onClick: () -> Unit, isVisible: () -> Boole
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
         ) {
             Button(
                 onClick = onClick,
@@ -278,8 +277,7 @@ private fun EnableCameraUploadButton(onClick: () -> Unit, isVisible: () -> Boole
                     focusedElevation = 0.dp
                 ),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
+                    .fillMaxWidth(),
                 shape = RectangleShape
             ) {
                 Text(
