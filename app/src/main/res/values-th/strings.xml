@@ -1425,7 +1425,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">โบนัสการลงทะเบียน</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install a MEGA Desktop App</string>
+    <string name="title_install_desktop">ติดตั้งแอปเดสก์ท็อป MEGA</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">เหลืออีก %1$d วัน</string>
     <!-- State to indicate an achievement has expired -->
@@ -1916,7 +1916,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">คุณต้องการเปิด Google Play เพื่อติดตั้งแอปตัวรับรองความถูกต้องหรือไม่</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Play Store</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">คุณต้องมีแอปตัวรับรองความถูกต้องเพื่อเปิดใช้งาน 2FA บน MEGA คุณสามารถดาวน์โหลดและติดตั้งแอปพลิเคชัน Google Authenticator, Duo Mobile, Authy หรือ Microsoft Authenticator สำหรับโทรศัพท์หรือแท็บเล็ตของคุณได้</string>
     <!-- error message when importing multiple files from chat -->
@@ -4534,7 +4534,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">ต้องกรอกตัวอักษรให้น้อยกว่า 30&#160;ตัว</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">ต้องกรอกตัวอักษรให้น้อยกว่า 4,000&#160;ตัว</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">กำหนดการจัดประชุมแล้ว</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->

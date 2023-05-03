@@ -1595,7 +1595,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">مكافآت التسجيل</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install a MEGA Desktop App</string>
+    <string name="title_install_desktop">قم بتثبيت تطبيق ميغا للحاسوب المكتبي MEGA Desktop</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d يوم متبقي</string>
     <!-- State to indicate an achievement has expired -->
@@ -2151,7 +2151,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">هل ترغب في فتح متجر غوغل Google Play حتى تتمكن من تثبيت تطبيق المصادقة؟</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">متجر بلاي Play Store</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">تحتاج الى تطبيق مصادقة لتفعيل المصادقة المزدوجة 2FA على ميغا MEGA. يمكنك تنزيل وتثبيت أحد التطبيقات Google Authenticator، Duo Mobile أو Microsoft Authenticator app على موبايلك أو جهازك اللوحي.</string>
     <!-- error message when importing multiple files from chat -->
@@ -5549,7 +5549,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">أدخل أقل من 30&#160;محرفاً</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">أدخل أقل من 4000&#160;محرفاً</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">تم تحديد موعد الاجتماع</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -5582,8 +5582,12 @@
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">Couldn’t remove access for %1$d contact</item>
-        <item quantity="other">Couldn’t remove access for %1$d contacts</item>
+        <item quantity="zero">تعذرت إزالة إذن الوصول لـ %1$d جهة اتصال</item>
+        <item quantity="one">تعذرت إزالة إذن الوصول لـ %1$d جهة اتصال</item>
+        <item quantity="two">تعذرت إزالة إذن الوصول لـ %1$d جهتي اتصال</item>
+        <item quantity="few">تعذرت إزالة إذن الوصول لـ %1$d جهات اتصال</item>
+        <item quantity="many">تعذرت إزالة إذن الوصول لـ %1$d جهة اتصال</item>
+        <item quantity="other">تعذرت إزالة إذن الوصول لـ %1$d جهة اتصال</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">

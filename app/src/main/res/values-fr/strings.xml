@@ -1477,7 +1477,7 @@
     <!-- subtitle of the section for achievements -->
     <string name="achievements_subtitle">Invitez des amis et obtenez des récompenses</string>
     <!-- title of the introduction for the achievements screen -->
-    <string name="figures_achievements_text_referrals">%1$s d’espace de stockage pour chaque invitation. Valide pendant 365&#160;jours.</string>
+    <string name="figures_achievements_text_referrals">%1$s d’espace de stockage pour chaque invitation. Valable pendant 365&#160;jours.</string>
     <!-- sentence to detail the figures of storage and transfer quota related to each achievement -->
     <string name="figures_achievements_text">%1$s d’espace de stockage. Valable pendant 365&#160;jours.</string>
     <!-- title of the section for unlocked rewards -->
@@ -2010,7 +2010,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Voulez-vous ouvrir Google Play afin d’installer une appli d’authentification ?</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Magasin Play Store</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Il vous faut une appli d’authentification pour activer l’A2F avec MEGA. Vous pouvez télécharger et installer l’appli Google Authenticator, Duo Mobile, Authy ou Microsoft Authenticator pour votre téléphone ou votre tablette.</string>
     <!-- error message when importing multiple files from chat -->
@@ -4940,7 +4940,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">Saisir moins de 30&#160;caractères</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Saisir moins de 4 000&#160;caractères</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">La réunion a été planifiée</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->

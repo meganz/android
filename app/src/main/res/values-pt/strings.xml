@@ -2010,7 +2010,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Você quer acessar a Google Play Store para instalar um aplicativo de autenticação?</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Play Store</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Você precisa de um aplicativo de autenticação para ativar a 2FA no MEGA. Você pode baixar e instalar os aplicativos Google Authenticator, Duo Mobile, Authy ou Microsoft Authenticator no seu celular ou tablet.</string>
     <!-- error message when importing multiple files from chat -->
@@ -4940,7 +4940,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">Digite menos de 30&#160;caracteres</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Digite menos de 4 000&#160;caracteres</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Reunião agendada</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->

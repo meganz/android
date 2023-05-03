@@ -1425,7 +1425,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">Bonus pendaftaran</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install a MEGA Desktop App</string>
+    <string name="title_install_desktop">Instal Aplikasi Desktop MEGA</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d d tersisa</string>
     <!-- State to indicate an achievement has expired -->
@@ -1916,7 +1916,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Apakah anda ingin membuka Google Play agar dapat memasang aplikasi otentikasi?</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Play Store</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Anda memerlukan aplikasi otentikasi untuk mengaktifkan 2FA di MEGA. Anda dapat mengunduh dan memasang aplikasi Google Authenticator, Duo Mobile, Authy, atau Microsoft Authenticator untuk ponsel atau tablet anda.</string>
     <!-- error message when importing multiple files from chat -->
@@ -4534,7 +4534,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">Masukan kurang dari 30&#160;karakter</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Masukan kurang dari 4.000&#160;karakter</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Rapat dijadwalkan</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4557,8 +4557,7 @@
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">Couldn’t remove access for %1$d contact</item>
-        <item quantity="other">Couldn’t remove access for %1$d contacts</item>
+        <item quantity="other">Tidak dapat menghapus akses untuk %1$d kontak</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">

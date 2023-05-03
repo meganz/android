@@ -123,7 +123,7 @@
     <!-- Alert text before download -->
     <string name="alert_no_app">Không có ứng dụng nào trong điện thoại để mở tệp %s. Vẫn tiếp tục tải về?</string>
     <!-- Dialog option that permits user do not show it again -->
-    <string name="checkbox_not_show_again">Đừng hiện nữa</string>
+    <string name="checkbox_not_show_again">Đừng hiện lại nữa</string>
     <!-- Press back while login to cancel current login process. -->
     <string name="confirm_cancel_login">Có chắc muốn hủy bỏ quá trình đăng nhập hiện tại không?</string>
     <!-- Login button -->
@@ -227,7 +227,7 @@
     <!-- Capital letters. Incoming shared folders. The title of a tab -->
     <string name="tab_incoming_shares">Mục nhận được</string>
     <!-- Capital letters. Outgoing shared folders. The title of a tab -->
-    <string name="tab_outgoing_shares">Mục gửI đI</string>
+    <string name="tab_outgoing_shares">Mục gửi đi</string>
     <!-- Capital letters. Files with link. The title of a tab -->
     <string name="tab_links_shares">Liên kết</string>
     <!-- Label for any ‘Incoming shares’ button, link, text, title, etc. - (String as short as possible). -->
@@ -235,7 +235,7 @@
     <!-- Title of the share with file explorer -->
     <string name="title_incoming_shares_with_explorer">Mục chia sẻ nhận được từ</string>
     <!-- message when there are no files in the Cloud drive -->
-    <string name="file_browser_empty_cloud_drive">Không có tệp tin nào trong Ổ Mây</string>
+    <string name="file_browser_empty_cloud_drive">Không có tệp&#160;tin nào trong Ổ&#160;Mây</string>
     <!-- Text that indicates that a folder is currently empty -->
     <string name="file_browser_empty_folder">Thư Mục Rỗng</string>
     <!-- Title of the fragment Choose Account -->
@@ -263,7 +263,7 @@
     <!-- option to reinvite a contact -->
     <string name="contact_reinvite">Mời lại</string>
     <!-- The text of the notification button that is displayed when there is a call in progress, another call is received and ignored. -->
-    <string name="contact_ignore">Bỏ Qua</string>
+    <string name="contact_ignore">Bỏ qua</string>
     <!-- option to decline a contact invitation -->
     <string name="contact_decline">Từ chối</string>
     <!-- option to accept a contact invitation -->
@@ -317,7 +317,7 @@
     <!-- Item menu option upon right click on one or multiple files. -->
     <string name="context_clean_shares_menu">Loại bỏ chia sẻ</string>
     <!-- Item menu option upon right click on one or multiple files. -->
-    <string name="context_remove_link_menu">Xóa đường dẫn liên kết</string>
+    <string name="context_remove_link_menu">Loại&#160;bỏ đường liên&#160;kết</string>
     <!-- Warning that appears prior to remove a link of a file. Singular. -->
     <string name="context_remove_link_warning_text">Đường liên kết này không còn được được công khai nữa.</string>
     <!-- Warning that appears prior to remove links of files. Plural. -->
@@ -533,9 +533,9 @@
     <!-- title of the notification when camera upload is initializing -->
     <string name="settings_camera_notif_initializing_title">Đang khởi tạo Đăng Tải Camêra</string>
     <!-- title of the notification when camera upload’s primary local folder is unavailable. -->
-    <string name="camera_notif_primary_local_unavailable">Đăng Tải Camêra bị dừng. Không tìm thấy thư mục nội bộ.</string>
+    <string name="camera_notif_primary_local_unavailable">Đăng&#160;tải camêra bị dừng. Không tìm thấy thư&#160;mục cục&#160;bộ.</string>
     <!-- title of the notification when camera upload’s secondary local folder is unavailable. -->
-    <string name="camera_notif_secondary_local_unavailable">Đăng tải thư mục Second Media đã bị tắt. Thư mục nội bộ không có tồn tại.</string>
+    <string name="camera_notif_secondary_local_unavailable">Đăng tải thư&#160;mục Second Media đã bị tắt. Thư&#160;mục cục&#160;bộ không có tồn&#160;tại.</string>
     <!-- settings of the Appearance section -->
     <string name="settings_appearance">Giao Diện</string>
     <!-- settings of the Features section -->
@@ -642,17 +642,17 @@
         <item>Ảnh và video</item>
     </string-array>
     <!-- Title of ‘Include location tags’ setting option. Once enabled, Camera Uploads will include the location info from pictures those are being uploaded -->
-    <string name="settings_camera_upload_include_gps">Bao gồm vị trí địa lý</string>
+    <string name="settings_camera_upload_include_gps">Bao&#160;gồm vị&#160;trí địa&#160;lý</string>
     <!-- Option to choose that the video compression will only be enable when the device is charging -->
     <string name="settings_camera_upload_require_plug_in">Thông báo nhắc nhở sạc điện thoại</string>
     <!-- Option to choose that the camera sync will maintain the local file names when uploading -->
     <string name="settings_keep_file_names">Giữ nguyên tên tệp tin như trên điện thoại</string>
     <!-- The location of where the user photos or videos are stored in the device. -->
-    <string name="settings_local_camera_upload_folder">Thư mục Ảnh Camêra trong máy</string>
+    <string name="settings_local_camera_upload_folder">Thư&#160;mục Camêra cục&#160;bộ</string>
     <!-- The location of where the user photos or videos are stored in MEGA. -->
     <string name="settings_mega_camera_upload_folder">Thư mục Đăng Tải Camêra trên MEGA</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in the device. -->
-    <string name="settings_local_secondary_folder">Thư mục Secondary trong điện thoại</string>
+    <string name="settings_local_secondary_folder">Thư&#160;mục Secondary cục&#160;bộ</string>
     <!-- The location of where the user photos or videos of the secondary sync are stored in MEGA. -->
     <string name="settings_mega_secondary_folder">Thư mục Secondary trên MEGA</string>
     <!-- what kind of file are going to be uploaded. Needed for the settings summary -->
@@ -1720,7 +1720,7 @@
     <!-- Title of the notification for a missed call -->
     <string name="missed_call_notification_title">Cuộc gọi nhỡ</string>
     <!-- Refers to a location of file -->
-    <string name="file_properties_info_location">Vị trí</string>
+    <string name="file_properties_info_location">Vị&#160;trí</string>
     <!-- Title of the label to show the size of the current files inside a folder -->
     <string name="file_properties_folder_current_versions">Phiên bản hiện tại</string>
     <!-- Title of the label to show the size of the versioned files inside a folder -->
@@ -1768,7 +1768,7 @@
     <!-- Text of the dialog ‘Do you remember your password?’ -->
     <string name="remember_pwd_dialog_text">Xin thử nhập mật khẩu để kiểm tra rằng mình còn nhớ mật khẩu. Quên mất mật khẩu đồng nghĩa với việc mất toàn quyền truy cập dữ liệu.</string>
     <!-- Dialog option that permits user do not show it again -->
-    <string name="general_do_not_show">Không hiện nữa</string>
+    <string name="general_do_not_show">Đừng hiện lại nữa</string>
     <!-- Button of the dialog ‘Do you remember your password?’ that permits user test his password -->
     <string name="remember_pwd_dialog_button_test">Kiểm tra mật khẩu</string>
     <!-- Message shown to the user when is testing her password and it is correct -->
@@ -1916,7 +1916,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Bạn có muốn tới CH Google Play để tải về một app lập xác thực hay không?</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">CH Play</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Cần phải có một app lập xác thực để bật tính năng 2FA với MEGA. Bạn có thể tải và cài đặt Google Authenticator, Duo Mobile, Authy hoặc Microsoft Authenticator app về thiết bị của mình.</string>
     <!-- error message when importing multiple files from chat -->
@@ -3832,11 +3832,11 @@
     <!-- Title of the Meetings tab for the chat section -->
     <string name="chat_tab_meetings_title">Họp</string>
     <!-- Title of the location option displayed in the chat room toolbar -->
-    <string name="chat_room_toolbar_location_option">Định Vị</string>
+    <string name="chat_room_toolbar_location_option">Vị&#160;trí</string>
     <!-- Used in chat screen to indicate last message sent by me -->
     <string name="chat_last_message_sender_me">Tôi</string>
     <!-- Hint the screen is locked in video player page -->
-    <string name="video_player_locked_hint">Màn hình đã khóa</string>
+    <string name="video_player_locked_hint">Màn&#160;hình đã khóa</string>
     <!-- Hint that tap to unlock in video player page -->
     <string name="video_player_unlock_hint">Chạm để mở</string>
     <!-- Label that schedule a meeting -->
@@ -3864,7 +3864,7 @@
     <!-- Title of raw album. -->
     <string name="photos_album_title_raw">RAW</string>
     <!-- Title of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
-    <string name="chat_add_participants_no_contacts_title">Không có tên liên lạc nào</string>
+    <string name="chat_add_participants_no_contacts_title">Không có tên liên&#160;lạc nào</string>
     <!-- Message of the dialog to indicate that there are no contacts when try to add participants to a group chat or meeting -->
     <string name="chat_add_participants_no_contacts_message">Bạn không có tên nào trong sổ liên lạc để thêm vào cuộc chát này. Nếu bạn muốn thêm thành viên, trước hết hãy thêm tên của họ vào sổ liên lạc.</string>
     <!-- Title of the dialog to indicate that all contacts are already participants when try to add participants to a group chat or meeting -->
@@ -4534,7 +4534,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">Nhập ít hơn 30&#160;ký&#160;tự</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Nhập ít hơn 4 000&#160;ký&#160;tự</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Cuộc họp được lên lịch</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->

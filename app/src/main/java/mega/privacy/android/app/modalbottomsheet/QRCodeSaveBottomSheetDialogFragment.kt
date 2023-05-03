@@ -86,7 +86,7 @@ class QRCodeSaveBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private fun saveToCloudDrive() {
         val parentNode = megaApi.rootNode
-        val myEmail = megaApi.myUser.email
+        val myEmail = megaApi.myUser?.email ?: return
         val qrFile =
             buildQrFile(requireActivity(), myEmail + MyCodeFragment.QR_IMAGE_FILE_NAME)
                 ?.takeIf { FileUtil.isFileAvailable(it) }

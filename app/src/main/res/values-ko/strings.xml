@@ -1425,7 +1425,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">가입 보너스</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install a MEGA Desktop App</string>
+    <string name="title_install_desktop">MEGA 데스크톱 앱 설치</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">%1$d일 남음</string>
     <!-- State to indicate an achievement has expired -->
@@ -1916,7 +1916,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">인증기 앱을 설치할 수 있도록 Google Play를 여시겠습니까?</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Play 스토어</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">MEGA에서 2단계 인증을 활성화하려면 인증기 앱이 필요합니다. 당신의 휴대 전화 또는 태블릿용 Google 인증기, Duo Mobile, Authy 또는 Microsoft 인증기 앱을 다운로드하고 설치할 수 있습니다.</string>
     <!-- error message when importing multiple files from chat -->
@@ -4532,9 +4532,9 @@
     <!-- Error message shown when a meeting name is empty in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_empty_meeting_name_error">회의 이름은 필수입니다</string>
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_name_too_long_error">Enter fewer than 30&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_name_too_long_error">30자&#160;이하로 입력하세요</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 4,000&#160;characters</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">회의가 예약되었습니다</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->

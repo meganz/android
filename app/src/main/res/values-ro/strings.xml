@@ -1979,7 +1979,7 @@
     <!-- Title of screen Lost authenticator decive -->
     <string name="lost_your_authenticator_device">Ți-ai pierdut dispozitivul pentru autentificare?</string>
     <!-- Title of screen Login verification with Two-Factor Authentication -->
-    <string name="login_verification">Verificare la autentificare</string>
+    <string name="login_verification">Verificarea autentificării</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing password -->
     <string name="verify_2fa_subtitle_change_password">Modifică parola</string>
     <!-- Subtitle of screen verify Two-Factor Authentication for changing email -->
@@ -2009,7 +2009,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Dorești să deschizi Google Play pentru a putea instala o aplicație de autentificare?</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Magazin Play</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Ai nevoie de o aplicație de autentificare pentru a activa 2FA pe MEGA. Poți descărca și instala aplicația Google Authenticator, Duo Mobile, Authy sau Microsoft Authenticator pentru telefon sau tabletă.</string>
     <!-- error message when importing multiple files from chat -->
@@ -3466,7 +3466,7 @@
     <!-- The question in on-boarding screen asking if the user is going to join meeting as guest-->
     <string name="join_meeting_as_guest">Alătură-te întâlnirii ca invitat</string>
     <!-- The title of the paste meeting link dialog for guest-->
-    <string name="paste_meeting_link_guest_dialog_title">Ești invitat la o întâlnire.</string>
+    <string name="paste_meeting_link_guest_dialog_title">Ești invitat(ă) la o întâlnire.</string>
     <!-- Tell the guest to paste the meeting link in the edit box-->
     <string name="paste_meeting_link_guest_instruction">Atinge linkul întâlnirii care ți-a fost trimis sau lipește-l aici</string>
     <!-- the message in the alert dialog for notifying the meeting has ended-->
@@ -4913,7 +4913,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">Introdu mai puțin de 30&#160;de caractere</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Introdu mai puțin de 4 000&#160;de caractere</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Meeting scheduled</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->

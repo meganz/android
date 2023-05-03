@@ -1425,7 +1425,7 @@
     <!-- title of the section for install megasync in achivements section (maximum 24 chars) -->
     <string name="title_regitration">註冊獎勵</string>
     <!-- title of the section for install a mobile app bonuses in achivements section (maximum 24 chars) -->
-    <string name="title_install_desktop">Install a MEGA Desktop App</string>
+    <string name="title_install_desktop">安裝MEGA桌面應用程式</string>
     <!-- indicates the number of days left related to a achievement -->
     <string name="general_num_days_left">還剩%1$d天</string>
     <!-- State to indicate an achievement has expired -->
@@ -1916,7 +1916,7 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">您想開啟Google Play來安裝身份驗證程式嗎？</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Play商店</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">您需要身份驗證應用程式才能在MEGA上啟用雙重驗證。您可以在手機或平板電腦裡下載並安裝Google Authenticator、Duo Mobile，Authy或Microsoft Authenticator應用程式。</string>
     <!-- error message when importing multiple files from chat -->
@@ -4534,7 +4534,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">輸入少於30&#160;個字元</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">輸入少於4,000&#160;個字元</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Enter fewer than 3,000&#160;characters</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">已安排會議</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
@@ -4557,8 +4557,7 @@
     </plurals>
     <!-- error message when removing access of contact(s) to a selected folder -->
     <plurals name="shared_items_outgoing_shares_snackbar_remove_contact_access_failed">
-        <item quantity="one">Couldn’t remove access for %1$d contact</item>
-        <item quantity="other">Couldn’t remove access for %1$d contacts</item>
+        <item quantity="other">無法移除%1$d個聯絡人的存取權限</item>
     </plurals>
     <!-- error message when updating permissions of contacts for a shared folder(s) fails -->
     <plurals name="shared_items_outgoing_shares_update_contact_permission_failed">

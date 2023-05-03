@@ -439,25 +439,25 @@
         <item quantity="other">Перемещено %d элемента</item>
     </plurals>
     <!-- success message when moving a node -->
-    <string name="number_incorrectly_moved">Элементы не перемещены (%d)</string>
+    <string name="number_incorrectly_moved">Не удалось переместить элементы (%d)</string>
     <!-- success message when moving a node -->
     <string name="context_correctly_moved_to_rubbish">Перемещено в Корзину</string>
     <!-- error message -->
     <string name="context_no_moved">Ошибка. Не перемещено</string>
     <!-- success message when sharing a folder -->
-    <string name="context_correctly_shared">Общие</string>
+    <string name="context_correctly_shared">Общий доступ открыт</string>
     <!-- error message when sharing a folder -->
     <string name="context_no_shared_number">Ошибка. Доступ не был открыт (%d)</string>
     <!-- error message -->
     <string name="context_no_removed_shared">Ошибка. Не удалось удалить</string>
     <!-- success message when removing a node from MEGA -->
-    <string name="context_correctly_removed">Удалённый</string>
+    <string name="context_correctly_removed">Удалено</string>
     <!-- error message -->
     <string name="context_no_removed">Ошибка. Не удалено</string>
     <!-- success message when moving a node -->
     <string name="number_correctly_removed">Элементы удалены из MEGA (%d)</string>
     <!-- error message when moving a node -->
-    <string name="number_no_removed">Элементы не удалены (%d)</string>
+    <string name="number_no_removed">Не удалось удалить элементы (%d)</string>
     <!-- Success message when left shared folders -->
     <string name="number_correctly_leaved">Папки оставлены (%d)</string>
     <!-- Message shown when a share has been left -->
@@ -467,7 +467,7 @@
     <!-- success message when sending multiple files -->
     <string name="number_correctly_copied">Элементы скопированы (%d)</string>
     <!-- error message when sending multiple files -->
-    <string name="number_no_copied">Элементы не скопированы (%d)</string>
+    <string name="number_no_copied">Не удалось скопировать элементы (%d)</string>
     <!-- success message when emptying the RB -->
     <string name="rubbish_bin_emptied">Корзина очищена</string>
     <!-- error message when emptying the RB -->
@@ -1403,7 +1403,7 @@
     <!--  -->
     <string name="alert_user_is_not_contact">Пользователя нет в контактах</string>
     <!--  -->
-    <string name="camera_uploads_cellular_connection">Использовать данные мобильного устройства</string>
+    <string name="camera_uploads_cellular_connection">Использовать мобильный интернет</string>
     <!--  -->
     <string name="camera_uploads_upload_videos">Загружать видео</string>
     <!-- Message when an user avatar has been changed successfully -->
@@ -2057,11 +2057,11 @@
     <!-- Message shown to ask user if wants to open Google Play to install some authenticator app -->
     <string name="open_play_store_2fa">Открыть Google Play для установки приложения-аутентификатора?</string>
     <!-- Label Play Store -->
-    <string name="play_store_label">Play Store</string>
+    <string name="play_store_label">Google Play</string>
     <!-- Text shown in an alert explaining how to continue to enable Two-Factor Authentication -->
     <string name="text_2fa_help">Вам нужно приложение-аутентификатор, чтобы включить 2FA в MEGA. Вы можете загрузить и установить приложение Google Authenticator, Duo Mobile, Authy или Microsoft Authenticator на свой телефон или планшет.</string>
     <!-- error message when importing multiple files from chat -->
-    <string name="number_no_imported_from_chat">Не удалось импортировать файлы: %d</string>
+    <string name="number_no_imported_from_chat">Не удалось импортировать файлы (%d)</string>
     <!-- button’s text to open a full screen image -->
     <string name="preview_content">Предварительный просмотр</string>
     <!-- message shown when the user clicks on media file chat message, there is no network connection and the file is not been downloaded -->
@@ -2278,7 +2278,7 @@
     <!-- Text of the alert when a FREE user tries to disable the RB scheduler -->
     <string name="settings_rb_scheduler_alert_disabling">Чтобы отключить очистку Корзины по расписанию или выбрать более длительный период хранения, пожалуйста, подпишитесь на план Pro.</string>
     <!-- Picker text to choose custom retention time. This option indicates several days -->
-    <string name="hint_days">д.</string>
+    <string name="hint_days">срок в днях</string>
     <!-- Title of the option to generate a public chat link -->
     <string name="get_chat_link_option">Ссылка на чат</string>
     <!-- Title of the option to make a public chat private -->
@@ -2304,7 +2304,7 @@
     <!-- Title of the dialog to confirm after closing all other sessions -->
     <string name="confirmation_close_sessions_title">Хотите закрыть все остальные сеансы?</string>
     <!-- Subtitle chat screen for groups with permissions and not archived, Plural of participant. 2 participants -->
-    <string name="number_of_participants">Участники (%d)</string>
+    <string name="number_of_participants">Участники: %d</string>
     <!-- Label of the button to join a chat by a chat link -->
     <string name="action_join">Войти</string>
     <!-- Label for observers of a group chat -->
@@ -4998,10 +4998,10 @@
     </plurals>
     <!-- second part of message to inform the x invite request(s) successfully sent but other request(s) were not sent, The string was split in 2 for pluralization.-->
     <plurals name="contact_snackbar_invite_contact_requests_not_sent">
-        <item quantity="one">%1$d не удалось отправить.</item>
-        <item quantity="few">%1$d не удалось отправить.</item>
-        <item quantity="many">%1$d не удалось отправить.</item>
-        <item quantity="other">%1$d не удалось отправить.</item>
+        <item quantity="one">Однако %1$d не удалось отправить.</item>
+        <item quantity="few">Однако %1$d не удалось отправить.</item>
+        <item quantity="many">Однако %1$d не удалось отправить.</item>
+        <item quantity="other">Однако %1$d не удалось отправить.</item>
     </plurals>
     <!-- Result message after copy action will be shown as a snackbar, this plurals template will be used when copy request is successful -->
     <plurals name="general_copy_snackbar_success">
@@ -5143,7 +5143,7 @@
     <!-- Error message shown when a meeting name is longer than 30 characters in Schedule meeting screen -->
     <string name="meetings_schedule_meeting_meeting_name_too_long_error">Введите меньше 30&#160;символов</string>
     <!-- Error message shown when a meeting description is longer than 4000 characters in Schedule meeting screen -->
-    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Введите меньше 4 000&#160;символов</string>
+    <string name="meetings_schedule_meeting_meeting_description_too_long_error">Введите меньше 3 000&#160;символов</string>
     <!-- Success message when scheduled meeting was created in Scheduled meeting info screen -->
     <string name="meetings_scheduled_meeting_info_snackbar_creating_scheduled_meeting_success">Встреча запланирована</string>
     <!-- Subtitle of option to set a recurrence in Schedule meeting screen when the recurrence occurs never -->
