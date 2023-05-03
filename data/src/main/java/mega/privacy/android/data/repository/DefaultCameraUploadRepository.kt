@@ -337,9 +337,13 @@ internal class DefaultCameraUploadRepository @Inject constructor(
         localStorageGateway.setPrimaryFolderInSDCard(isInSDCard)
     }
 
-    override suspend fun getPrimaryFolderSDCardUriPath(): String = withContext(ioDispatcher) {
+    override suspend fun getPrimaryFolderSDCardUriPath() = withContext(ioDispatcher) {
         val uriString = localStorageGateway.getPrimaryFolderSDCardUriPath()
         sdCardGateway.getDirectoryName(uriString)
+    }
+
+    override suspend fun setPrimaryFolderSDCardUriPath(path: String) = withContext(ioDispatcher) {
+        localStorageGateway.setPrimaryFolderSDCardUriPath(path)
     }
 
     override suspend fun isSecondaryMediaFolderEnabled() = withContext(ioDispatcher) {

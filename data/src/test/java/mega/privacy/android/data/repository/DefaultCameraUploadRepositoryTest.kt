@@ -482,6 +482,14 @@ class DefaultCameraUploadRepositoryTest {
                 assertThat(underTest.isPrimaryFolderInSDCard()).isEqualTo(isInSDCard)
             }
 
+        @Test
+        fun `test that the new primary folder SD card path is set`() = runTest {
+            val testSDCardPath = "test/sd/card/path"
+
+            underTest.setPrimaryFolderSDCardUriPath(testSDCardPath)
+            verify(localStorageGateway).setPrimaryFolderSDCardUriPath(testSDCardPath)
+        }
+
         @ParameterizedTest(name = "is in SD card: {0}")
         @ValueSource(booleans = [true, false])
         fun `test that the primary folder in the SD card is handled`(isInSDCard: Boolean) =
