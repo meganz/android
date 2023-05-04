@@ -95,6 +95,11 @@ class EditProfileViewModel @Inject constructor(
     }
 
     /**
+     * Whether my avatar exists or not
+     */
+    fun existsMyAvatar(): Boolean = state.value.avatarFile?.exists() == true
+
+    /**
      * Get first name
      *
      */

@@ -129,19 +129,6 @@ class AccountController @Inject constructor(
         fun stopCameraUploadAndHeartbeatUseCase(): StopCameraUploadAndHeartbeatUseCase
     }
 
-    fun existsAvatar(): Boolean {
-        val avatar = buildAvatarFile(
-            context, MegaApplication.getInstance().megaApi.myEmail + JPG_EXTENSION
-        )
-
-        if (avatar?.exists() == true) {
-            Timber.d("Avatar exists in: ${avatar.absolutePath}")
-            return true
-        }
-
-        return false
-    }
-
     fun printRK(onAfterPrint: () -> Unit = {}) {
         val rKBitmap = createRkBitmap()
 

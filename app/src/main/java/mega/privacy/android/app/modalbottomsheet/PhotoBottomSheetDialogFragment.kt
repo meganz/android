@@ -5,12 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import mega.privacy.android.app.databinding.BottomSheetPhotoBinding
-import mega.privacy.android.app.main.controllers.AccountController
+import mega.privacy.android.app.presentation.editProfile.EditProfileViewModel
 
 class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
 
     private lateinit var binding: BottomSheetPhotoBinding
+    private val editProfileViewModel: EditProfileViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,7 +39,7 @@ class PhotoBottomSheetDialogFragment : BaseBottomSheetDialogFragment() {
         }
 
         binding.deletePictureAction.apply {
-            isVisible = AccountController(requireActivity()).existsAvatar()
+            isVisible = editProfileViewModel.existsMyAvatar()
 
             if (isVisible) {
                 setOnClickListener {
