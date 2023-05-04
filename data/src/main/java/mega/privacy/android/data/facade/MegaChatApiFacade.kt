@@ -445,4 +445,8 @@ internal class MegaChatApiFacade @Inject constructor(
             listener
         )
     }
+
+    override fun getConnectedState() = chatApi.connectionState
+
+    override fun getChatConnectionState(chatId: Long) = chatApi.getChatConnectionState(chatId)
 }

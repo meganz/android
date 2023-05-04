@@ -3,9 +3,11 @@ package mega.privacy.android.domain.repository
 import kotlinx.coroutines.flow.Flow
 import mega.privacy.android.domain.entity.ChatRequest
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
 import mega.privacy.android.domain.entity.chat.ChatListItem
 import mega.privacy.android.domain.entity.chat.ChatRoom
 import mega.privacy.android.domain.entity.chat.CombinedChatRoom
+import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.entity.node.NodeId
 
@@ -245,4 +247,19 @@ interface ChatRepository {
      * @return The chat conversation handle.
      */
     suspend fun createChat(isGroup: Boolean, userHandles: List<Long>): Long
+
+    /**
+     * Returns the current state of the connection
+     *
+     * @return [ConnectionState]
+     */
+    suspend fun getConnectionState(): ConnectionState
+
+    /**
+     * Returns the current state of the connection to chatId
+     *
+     * @param chatId
+     * @return [ChatConnectionStatus]
+     */
+    suspend fun getChatConnectionState(chatId: Long): ChatConnectionStatus
 }

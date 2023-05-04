@@ -14,12 +14,16 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
+import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.domain.entity.ChatRoomPermission
+import mega.privacy.android.domain.entity.chat.ChatConnectionStatus
+import mega.privacy.android.domain.entity.chat.ConnectionState
 import mega.privacy.android.domain.entity.contacts.InviteContactRequest
 import mega.privacy.android.domain.repository.ChatRepository
 import nz.mega.sdk.MegaChatContainsMeta
@@ -58,6 +62,8 @@ class ChatRepositoryImplTest {
     private val deviceEventGateway = mock<DeviceEventGateway>()
     private val megaChatPeerListMapper = mock<MegaChatPeerListMapper>()
     private val testDispatcher = UnconfinedTestDispatcher()
+    private val chatConnectionStatusMapper = ChatConnectionStatusMapper()
+    private val connectionStateMapper = ConnectionStateMapper()
     private val chatId = Random.nextLong()
     private val userHandle = Random.nextLong()
     private val userEmail = "test@email.com"
@@ -86,6 +92,8 @@ class ChatRepositoryImplTest {
             ioDispatcher = testDispatcher,
             deviceEventGateway = deviceEventGateway,
             megaChatPeerListMapper = megaChatPeerListMapper,
+            connectionStateMapper = connectionStateMapper,
+            chatConnectionStatusMapper = chatConnectionStatusMapper,
         )
 
         whenever(chatRoom.chatId).thenReturn(chatId)
@@ -428,6 +436,20 @@ class ChatRepositoryImplTest {
         val actual = underTest.createChat(isGroup = true, userHandles = listOf(userHandle))
         assertThat(actual).isEqualTo(chatId)
         verify(megaChatApiGateway).createChat(any(), any(), any())
+    }
+
+    @Test
+    fun `test that get connection state returns ConnectionStatus`() = runTest {
+        whenever(megaChatApiGateway.getConnectedState()).thenReturn(2)
+        val actual = underTest.getConnectionState()
+        assertThat(actual).isEqualTo(ConnectionState.Connected)
+    }
+
+    @Test
+    fun `test that get chat connection state returns ChatConnectionState`() = runTest {
+        whenever(megaChatApiGateway.getChatConnectionState(chatId = chatId)).thenReturn(3)
+        val actual = underTest.getChatConnectionState(chatId = chatId)
+        assertThat(actual).isEqualTo(ChatConnectionStatus.Online)
     }
 
 }

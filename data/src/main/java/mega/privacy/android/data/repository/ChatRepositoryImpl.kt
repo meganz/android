@@ -22,10 +22,12 @@ import mega.privacy.android.data.gateway.api.MegaApiGateway
 import mega.privacy.android.data.gateway.api.MegaChatApiGateway
 import mega.privacy.android.data.listener.OptionalMegaChatRequestListenerInterface
 import mega.privacy.android.data.listener.OptionalMegaRequestListenerInterface
+import mega.privacy.android.data.mapper.chat.ChatConnectionStatusMapper
 import mega.privacy.android.data.mapper.chat.ChatListItemMapper
 import mega.privacy.android.data.mapper.chat.ChatRequestMapper
 import mega.privacy.android.data.mapper.chat.ChatRoomMapper
 import mega.privacy.android.data.mapper.chat.CombinedChatRoomMapper
+import mega.privacy.android.data.mapper.chat.ConnectionStateMapper
 import mega.privacy.android.data.mapper.chat.MegaChatPeerListMapper
 import mega.privacy.android.data.model.ChatRoomUpdate
 import mega.privacy.android.data.model.ChatSettings
@@ -81,6 +83,8 @@ internal class ChatRepositoryImpl @Inject constructor(
     private val combinedChatRoomMapper: CombinedChatRoomMapper,
     private val chatListItemMapper: ChatListItemMapper,
     private val megaChatPeerListMapper: MegaChatPeerListMapper,
+    private val chatConnectionStatusMapper: ChatConnectionStatusMapper,
+    private val connectionStateMapper: ConnectionStateMapper,
     @ApplicationScope private val sharingScope: CoroutineScope,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val deviceEventGateway: DeviceEventGateway,
@@ -457,4 +461,12 @@ internal class ChatRepositoryImpl @Inject constructor(
             }
 
         }
+
+    override suspend fun getConnectionState() = withContext(ioDispatcher) {
+        connectionStateMapper(megaChatApiGateway.getConnectedState())
+    }
+
+    override suspend fun getChatConnectionState(chatId: Long) = withContext(ioDispatcher) {
+        chatConnectionStatusMapper(megaChatApiGateway.getChatConnectionState(chatId))
+    }
 }

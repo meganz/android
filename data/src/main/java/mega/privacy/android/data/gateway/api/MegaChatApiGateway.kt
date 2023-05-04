@@ -628,4 +628,30 @@ interface MegaChatApiGateway {
         attributes: String?,
         listener: MegaChatRequestListenerInterface,
     )
+
+    /**
+     * Returns the current state of the connection
+     *
+     * It can be one of the following values:
+     *  - MegaChatApi::DISCONNECTED = 0
+     *  - MegaChatApi::CONNECTING   = 1
+     *  - MegaChatApi::CONNECTED    = 2
+     *
+     * @return The state of connection
+     */
+    fun getConnectedState(): Int
+
+    /**
+     * Returns the current state of the connection to chatId
+     *
+     * The possible values are:
+     *  - MegaChatApi::CHAT_CONNECTION_OFFLINE      = 0
+     *  - MegaChatApi::CHAT_CONNECTION_IN_PROGRESS  = 1
+     *  - MegaChatApi::CHAT_CONNECTION_LOGGING      = 2
+     *  - MegaChatApi::CHAT_CONNECTION_ONLINE       = 3
+     *
+     * @param chatId MegaChatHandle that identifies the chat room
+     * @return The state of connection
+     */
+    fun getChatConnectionState(chatId: Long): Int
 }
