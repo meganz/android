@@ -605,8 +605,8 @@ class ManagerViewModel @Inject constructor(
      *
      * @param node
      */
-    suspend fun initShareKey(node: MegaNode) = runCatching {
-        createShareKey(node)
+    suspend fun initShareKey(node: MegaNode?) = runCatching {
+        node?.let { createShareKey(it) }
     }.onFailure {
         Timber.e(it)
     }

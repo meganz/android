@@ -92,7 +92,7 @@ class FileBackupManager(
 
         override fun actionExecute(
             handleList: ArrayList<Long>?,
-            pNodeBackup: MegaNode,
+            pNodeBackup: MegaNode?,
             nodeType: Int,
             actionType: Int,
         ) {
@@ -102,7 +102,7 @@ class FileBackupManager(
 
         override fun actionConfirmed(
             handleList: ArrayList<Long>?,
-            pNodeBackup: MegaNode,
+            pNodeBackup: MegaNode?,
             nodeType: Int,
             actionType: Int,
         ) = Unit
@@ -119,7 +119,7 @@ class FileBackupManager(
 
         override fun actionExecute(
             handleList: ArrayList<Long>?,
-            pNodeBackup: MegaNode,
+            pNodeBackup: MegaNode?,
             nodeType: Int,
             actionType: Int,
         ) {
@@ -132,7 +132,7 @@ class FileBackupManager(
                         activity,
                         FileContactListActivity::class.java
                     )
-                    i.putExtra(Constants.NAME, pNodeBackup.handle)
+                    i.putExtra(Constants.NAME, pNodeBackup?.handle)
                     activity.startActivity(i)
                 } else {
                     nodeController?.selectContactToShareFolder(pNodeBackup)
@@ -151,7 +151,7 @@ class FileBackupManager(
 
         override fun actionConfirmed(
             handleList: ArrayList<Long>?,
-            pNodeBackup: MegaNode,
+            pNodeBackup: MegaNode?,
             nodeType: Int,
             actionType: Int,
         ) {
@@ -254,13 +254,13 @@ class FileBackupManager(
      */
     fun actWithBackupTips(
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode,
+        pNodeBackup: MegaNode?,
         nodeType: Int,
         actionType: Int,
         actionBackupNodeCallback: ActionBackupNodeCallback,
     ) {
         backupHandleList = handleList
-        backupNodeHandle = pNodeBackup.handle
+        backupNodeHandle = pNodeBackup?.handle
         backupNodeType = nodeType
         backupActionType = actionType
         backupDialogType = BACKUP_DIALOG_SHOW_WARNING
@@ -293,13 +293,13 @@ class FileBackupManager(
      */
     fun confirmationActionForBackup(
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode,
+        pNodeBackup: MegaNode?,
         nodeType: Int,
         actionType: Int,
         actionBackupNodeCallback: ActionBackupNodeCallback,
     ) {
         backupHandleList = handleList
-        backupNodeHandle = pNodeBackup.handle
+        backupNodeHandle = pNodeBackup?.handle
         backupNodeType = nodeType
         backupActionType = actionType
         backupDialogType = BACKUP_DIALOG_SHOW_CONFIRM

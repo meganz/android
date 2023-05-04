@@ -23,7 +23,7 @@ class EncryptLinkWithPasswordUseCase @Inject constructor(
      * @param password Password to encrypt the link.
      * @return Single<String> The encrypted link if the request finished with success, error if not.
      */
-    fun encrypt(link: String, password: String): Single<String> =
+    fun encrypt(link: String?, password: String): Single<String> =
         Single.create { emitter ->
             megaApi.encryptLinkWithPassword(link, password, OptionalMegaRequestListenerInterface(
                 onRequestFinish = { request, error ->

@@ -340,7 +340,7 @@ class TextEditorViewModel @Inject constructor(
                 )
                 textEditorData.value?.let {
                     it.node = node
-                    it.viewerNode = ViewerNode.GeneralNode(node.handle)
+                    it.viewerNode = node?.let { n -> ViewerNode.GeneralNode(n.handle) }
                 }
             }
         }

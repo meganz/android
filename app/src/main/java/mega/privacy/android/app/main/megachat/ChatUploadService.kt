@@ -1457,7 +1457,7 @@ class ChatUploadService : Service(), MegaRequestListenerInterface,
                 requestSent++
                 val nodePdf = megaApi.getNodeByHandle(nodeHandle)
 
-                if (nodePdf.hasPreview()) {
+                if (nodePdf?.hasPreview() == true) {
                     Timber.d("The pdf node has preview")
                 }
 

@@ -110,7 +110,7 @@ object MegaNodeDialogUtil {
     @JvmStatic
     fun showRenameNodeDialog(
         context: Context,
-        node: MegaNode,
+        node: MegaNode?,
         snackbarShower: SnackbarShower?,
         actionNodeCallback: ActionNodeCallback?,
     ): AlertDialog {
@@ -140,7 +140,7 @@ object MegaNodeDialogUtil {
     fun showNewFolderDialog(
         context: Context,
         actionNodeCallback: ActionNodeCallback?,
-        parentNode: MegaNode,
+        parentNode: MegaNode?,
         typedText: String? = null,
     ): AlertDialog {
         val newFolderDialogBuilder = MaterialAlertDialogBuilder(context)
@@ -785,7 +785,7 @@ object MegaNodeDialogUtil {
         activity: Activity,
         actionBackupNodeCallback: ActionBackupNodeCallback,
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode,
+        pNodeBackup: MegaNode?,
         nodeType: Int,
         actionType: Int,
     ): AlertDialog {
@@ -832,7 +832,7 @@ object MegaNodeDialogUtil {
         val view = layout.inflate(R.layout.dialog_backup_operate_tip, null)
         val tvTitle = view.findViewById<TextView>(R.id.title)
         val tvContent = view.findViewById<TextView>(R.id.backup_tip_content)
-        val nodeName = pNodeBackup.name
+        val nodeName = pNodeBackup?.name
 
         when (actionType) {
             ACTION_BACKUP_FAB -> {
@@ -928,7 +928,7 @@ object MegaNodeDialogUtil {
         activity: Activity,
         actionBackupNodeCallback: ActionBackupNodeCallback,
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode,
+        pNodeBackup: MegaNode?,
         nodeType: Int,
         actionType: Int,
     ): AlertDialog {
@@ -954,7 +954,7 @@ object MegaNodeDialogUtil {
         tvConfirmString.text = confirmInfo
 
 
-        val nodeName = pNodeBackup.name
+        val nodeName = pNodeBackup?.name
 
         when (actionType) {
             ACTION_BACKUP_FAB -> {

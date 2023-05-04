@@ -5,6 +5,7 @@ import mega.privacy.android.data.qualifier.MegaApi
 import mega.privacy.android.app.listeners.OptionalMegaRequestListenerInterface
 import mega.privacy.android.app.usecase.exception.toMegaException
 import nz.mega.sdk.MegaApiAndroid
+import nz.mega.sdk.MegaApiJava
 import nz.mega.sdk.MegaError.API_EEXIST
 import nz.mega.sdk.MegaError.API_OK
 import nz.mega.sdk.MegaNode
@@ -16,7 +17,7 @@ import javax.inject.Inject
  * @property megaApi    MegaApiAndroid instance to create folders.
  */
 class CreateFolderUseCase @Inject constructor(
-    @MegaApi private val megaApi: MegaApiAndroid
+    @MegaApi private val megaApi: MegaApiAndroid,
 ) {
 
     /**
@@ -36,9 +37,13 @@ class CreateFolderUseCase @Inject constructor(
                         return@OptionalMegaRequestListenerInterface
                     }
 
-                    when (error.errorCode) {
-                        API_OK -> emitter.onSuccess(megaApi.getNodeByHandle(request.nodeHandle))
-                        API_EEXIST -> megaApi.getChildNode(parent, folderName)
+                    val nodeHandle = megaApi.getNodeByHandle(request.nodeHandle)
+
+                    when {
+                        error.errorCode == API_OK && nodeHandle != null -> {
+                            emitter.onSuccess(nodeHandle)
+                        }
+                        error.errorCode == API_EEXIST -> megaApi.getChildNode(parent, folderName)
                             ?.let { emitter.onSuccess(it) }
                         else -> emitter.onError(error.toMegaException())
                     }

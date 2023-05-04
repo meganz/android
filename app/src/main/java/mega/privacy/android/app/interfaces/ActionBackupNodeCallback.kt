@@ -32,7 +32,7 @@ interface ActionBackupNodeCallback {
      */
     fun actionConfirmed(
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode,
+        pNodeBackup: MegaNode?,
         nodeType: Int,
         actionType: Int
     )
@@ -56,7 +56,7 @@ interface ActionBackupNodeCallback {
      */
     fun actionExecute(
         handleList: ArrayList<Long>?,
-        pNodeBackup: MegaNode,
+        pNodeBackup: MegaNode?,
         nodeType: Int,
         actionType: Int
     )

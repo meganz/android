@@ -126,10 +126,10 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         setThumbnail()
 
         val node = viewModel.getNode()
-        binding.nodeName.text = node.name
+        binding.nodeName.text = node?.name
         binding.nodeInfo.text =
-            if (node.isFolder) getMegaNodeFolderInfo(node, requireContext())
-            else getSizeString(node.size, requireContext())
+            if (node?.isFolder == true) getMegaNodeFolderInfo(node, requireContext())
+            else getSizeString(node?.size ?: 0, requireContext())
 
         binding.learnMoreTextButton.setOnClickListener {
             checkIfShouldHidePassword()
@@ -174,7 +174,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             binding.passwordProtectionProOnlyText.isVisible = true
         }
 
-        if (!node.isExported) {
+        if (node?.isExported == false) {
             viewModel.export()
         }
 
@@ -210,13 +210,13 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         binding.linkText.text = text
 
         val node = viewModel.getNode()
-        val alpha = if (node.isExported) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
+        val alpha = if (node?.isExported == true) ALPHA_VIEW_ENABLED else ALPHA_VIEW_DISABLED
 
         binding.decryptedKeyLayout.alpha = alpha
         binding.expiryDateLayout.alpha = alpha
         binding.passwordProtectionLayout.alpha = alpha
 
-        if (node.isExported) {
+        if (node?.isExported == true) {
             binding.decryptedKeyLayout.setOnClickListener { sendDecryptedKeySeparatelyClick(false) }
             binding.decryptedKeySwitch.apply {
                 setOnClickListener { sendDecryptedKeySeparatelyClick(true) }
@@ -289,7 +289,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
 
         binding.copyPasswordButton.visibility = visibility
 
-        if (isPasswordSet || !viewModel.getNode().isExported) {
+        if (isPasswordSet || viewModel.getNode()?.isExported == false) {
             binding.passwordProtectionLayout.setOnClickListener(null)
         } else {
             binding.passwordProtectionLayout.setOnClickListener { setPasswordProtectionClick() }
@@ -303,7 +303,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         var thumb: Bitmap? = null
         val node = viewModel.getNode()
 
-        if (node.isFolder) {
+        if (node?.isFolder == true) {
             binding.nodeThumbnail.setImageDrawable(
                 ResourcesCompat.getDrawable(
                     resources,
@@ -313,7 +313,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             )
 
             return
-        } else if (node.hasThumbnail()) {
+        } else if (node?.hasThumbnail() == true) {
             thumb = ThumbnailUtils.getThumbnailFromCache(node)
             if (thumb == null) {
                 thumb = ThumbnailUtils.getThumbnailFromFolder(node, context)
@@ -329,7 +329,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
                 )
             )
         } else {
-            binding.nodeThumbnail.setImageResource(typeForName(node.name).iconResourceId)
+            binding.nodeThumbnail.setImageResource(typeForName(node?.name).iconResourceId)
         }
     }
 
@@ -375,8 +375,9 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
         checkIfShouldHidePassword()
         val node = viewModel.getNode()
         val isPro = viewModel.isPro()
+        val hasExpiration = (node?.expirationTime ?: 0) > 0
 
-        if (!isPro || (isSwitchClick && node.expirationTime <= 0)) {
+        if (!isPro || (isSwitchClick && hasExpiration.not())) {
             binding.expiryDateSwitch.isChecked = false
         }
 
@@ -385,7 +386,7 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
             return
         }
 
-        if (isSwitchClick && node.expirationTime > 0) {
+        if (isSwitchClick && hasExpiration) {
             binding.expiryDateSetText.apply {
                 isVisible = false
                 text = null
@@ -426,8 +427,8 @@ class GetLinkFragment : Fragment(), DatePickerDialog.OnDateSetListener, Scrollab
     private fun showDatePicker() {
         val node = viewModel.getNode()
         val calendar =
-            if (node.expirationTime == INVALID_EXPIRATION_TIME) Calendar.getInstance()
-            else calculateDateFromTimestamp(node.expirationTime)
+            if (node?.expirationTime == INVALID_EXPIRATION_TIME) Calendar.getInstance()
+            else calculateDateFromTimestamp(node?.expirationTime ?: 0)
 
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)

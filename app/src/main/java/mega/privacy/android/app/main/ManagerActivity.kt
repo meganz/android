@@ -3518,7 +3518,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     viewModel.setIsFirstNavigationLevel(true)
                 } else {
                     val node = megaApi.getNodeByHandle(this.inboxState().inboxHandle)
-                    supportActionBar?.title = node.name
+                    supportActionBar?.title = node?.name
                     viewModel.setIsFirstNavigationLevel(false)
                 }
             }
@@ -3640,7 +3640,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                     if (this.outgoingSharesState().outgoingHandle != -1L) {
                         val node =
                             megaApi.getNodeByHandle(this.outgoingSharesState().outgoingHandle)
-                        supportActionBar?.title = node.name
+                        supportActionBar?.title = node?.name
                         viewModel.setIsFirstNavigationLevel(false)
                     } else {
                         supportActionBar?.title = resources.getString(R.string.title_shared_items)
@@ -3655,7 +3655,7 @@ class ManagerActivity : TransfersManagementActivity(), MegaRequestListenerInterf
                 } else {
                     val node =
                         megaApi.getNodeByHandle(this.linksState().linksHandle)
-                    supportActionBar?.title = node.name
+                    supportActionBar?.title = node?.name
                     viewModel.setIsFirstNavigationLevel(false)
                 }
             }

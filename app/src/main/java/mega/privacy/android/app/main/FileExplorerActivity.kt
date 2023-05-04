@@ -262,6 +262,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                             }
                         }
                     }
+
                     IMPORT_FRAGMENT -> {
                         finishAndRemoveTask()
                     }
@@ -291,6 +292,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 Timber.d("Create chat request finish.")
                 onRequestFinishCreateChat(e.errorCode)
             }
+
             MegaChatRequest.TYPE_ATTACH_NODE_MESSAGE -> {
                 Timber.d("Attach file request finish.")
                 if (e.errorCode == MegaChatError.ERROR_OK) {
@@ -678,6 +680,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     setView(CLOUD_TAB, false)
                     tabShown = NO_TABS
                 }
+
                 ACTION_MULTISELECT_FILE -> {
                     Timber.d("action = ACTION_MULTISELECT_FILE")
                     //Just show Cloud Drive, no INCOMING tab , no need of tabhost
@@ -687,6 +690,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     title = resources.getQuantityString(R.plurals.plural_select_file, 10)
                     setView(SHOW_TABS, true)
                 }
+
                 ACTION_PICK_MOVE_FOLDER -> {
                     Timber.d("ACTION_PICK_MOVE_FOLDER")
                     mode = MOVE
@@ -702,6 +706,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
                     title = getString(R.string.title_share_folder_explorer)
                 }
+
                 ACTION_PICK_COPY_FOLDER -> {
                     Timber.d("ACTION_PICK_COPY_FOLDER")
                     mode = COPY
@@ -715,18 +720,21 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
 
                     title = getString(R.string.title_share_folder_explorer)
                 }
+
                 ACTION_CHOOSE_MEGA_FOLDER_SYNC -> {
                     Timber.d("action = ACTION_CHOOSE_MEGA_FOLDER_SYNC")
                     mode = SELECT_CAMERA_FOLDER
                     title = getString(R.string.title_share_folder_explorer)
                     setView(SHOW_TABS, true)
                 }
+
                 ACTION_PICK_IMPORT_FOLDER -> {
                     mode = IMPORT
                     importChatHandles = intent.getLongArrayExtra("HANDLES_IMPORT_CHAT")
                     title = getString(R.string.title_share_folder_explorer)
                     setView(SHOW_TABS, true)
                 }
+
                 ACTION_SAVE_TO_CLOUD -> {
                     Timber.d("action = SAVE to Cloud Drive")
                     mode = SAVE
@@ -739,6 +747,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     setView(CLOUD_TAB, false)
                     tabShown = NO_TABS
                 }
+
                 else -> {
                     Timber.d("action = UPLOAD")
                     mode = UPLOAD
@@ -835,6 +844,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     explorerTabsPager.isVisible = false
                 }
             }
+
             SHOW_TABS -> {
                 tabShown = SHOW_TABS
                 if (mTabsAdapterExplorer == null || importFileF) {
@@ -887,12 +897,14 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 binding.cloudDriveFrameLayout.isVisible = false
                 setView(SHOW_TABS, true)
             }
+
             CHAT_FRAGMENT -> {
                 if (chatExplorer == null) {
                     chatExplorer = ChatExplorerFragment()
                 }
                 ft.replace(R.id.cloudDriveFrameLayout, chatExplorer ?: return, "chatExplorer")
             }
+
             IMPORT_FRAGMENT -> {
                 tabShown = NO_TABS
 
@@ -1120,6 +1132,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                             cDriveExplorer != null && cDriveExplorer?.isFolderEmpty() == false
                     }
                 }
+
                 INCOMING_TAB -> {
                     iSharesExplorer = incomingExplorerFragment
 
@@ -1147,6 +1160,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         searchMenuItem?.isVisible = iSharesExplorer?.isFolderEmpty() == false
                     }
                 }
+
                 CHAT_TAB -> {
                     searchMenuItem?.isVisible = true
                     createFolderMenuItem?.isVisible = false
@@ -1162,6 +1176,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                         CLOUD_FRAGMENT -> {
                             createFolderMenuItem?.isVisible = true
                         }
+
                         INCOMING_FRAGMENT -> {
                             iSharesExplorer = incomingExplorerFragment
                             if (iSharesExplorer != null) {
@@ -1174,6 +1189,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                             MegaShare.ACCESS_OWNER, MegaShare.ACCESS_READWRITE, MegaShare.ACCESS_FULL -> {
                                                 createFolderMenuItem?.isVisible = true
                                             }
+
                                             MegaShare.ACCESS_READ -> {
                                                 createFolderMenuItem?.isVisible = false
                                             }
@@ -1182,6 +1198,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                 }
                             }
                         }
+
                         CHAT_FRAGMENT -> {
                             newChatMenuItem?.isVisible = false
                             searchMenuItem?.isVisible = true
@@ -1207,15 +1224,19 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     getString(R.string.title_share_folder_explorer)
                 }
             }
+
             mode == MOVE || mode == COPY || mode == SELECT_CAMERA_FOLDER || mode == IMPORT -> {
                 getString(R.string.title_share_folder_explorer)
             }
+
             mode == UPLOAD && !importFileF -> {
                 getString(R.string.title_file_explorer_send_link)
             }
+
             mode == SAVE -> {
                 getString(R.string.section_cloud_drive)
             }
+
             mode == UPLOAD -> {
                 when (importFragmentSelected) {
                     CHAT_FRAGMENT -> getString(R.string.title_chat_explorer)
@@ -1223,6 +1244,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     else -> null
                 }
             }
+
             else -> null
         }
     }
@@ -1255,11 +1277,12 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                                     supportActionBar?.setTitle(
                                         megaApi.getNodeByHandle(
                                             cDriveExplorer?.parentHandle ?: return
-                                        ).name
+                                        )?.name
                                     )
                                 }
                             }
                         }
+
                         CHAT_FRAGMENT, IMPORT_FRAGMENT -> setRootTitle()
                     }
                 }
@@ -1272,7 +1295,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                             megaApi.getNodeByHandle(
                                 cDriveExplorer?.parentHandle
                                     ?: return
-                            ).name
+                            )?.name
                         )
                     }
                 }
@@ -1298,7 +1321,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode.handle) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle).name)
+                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
 
                     showFabButton(false)
@@ -1312,7 +1335,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     if (deepBrowserTree == 0) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle).name)
+                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
                 } else if (f is CloudDriveExplorerFragment) {
                     if (tabShown != NO_TABS) {
@@ -1322,7 +1345,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     if (f.parentHandle == -1L || f.parentHandle == megaApi.rootNode.handle) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle).name)
+                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
                 }
                 showFabButton(false)
@@ -1341,7 +1364,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     if (deepBrowserTree == 0) {
                         setRootTitle()
                     } else {
-                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle).name)
+                        supportActionBar?.setTitle(megaApi.getNodeByHandle(f.parentHandle)?.name)
                     }
 
                     showFabButton(false)
@@ -1581,10 +1604,12 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 dismissAlertDialogIfExists(statusDialog)
                 showSnackbar(getString(R.string.upload_can_not_open))
             }
+
             existsMyChatFilesFolder() -> {
                 setMyChatFilesFolder(myChatFilesFolder)
                 checkIfFilesExistsInMEGA()
             }
+
             else -> {
                 megaApi.getMyChatFilesFolder(GetAttrUserListener(this))
             }
@@ -1734,6 +1759,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 Timber.d("finish!")
                 finishAndRemoveTask()
             }
+
             COPY -> {
                 val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                 val intent = Intent()
@@ -1743,6 +1769,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 Timber.d("finish!")
                 finishAndRemoveTask()
             }
+
             UPLOAD, SAVE -> {
                 Timber.d("mode UPLOAD")
                 if (viewModel.isImportingText(intent)) {
@@ -1768,6 +1795,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     onIntentProcessed()
                 }
             }
+
             IMPORT -> {
                 val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
 
@@ -1789,6 +1817,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 Timber.d("finish!")
                 finishAndRemoveTask()
             }
+
             SELECT -> {
                 if (isSelectFile) {
                     val intent = Intent()
@@ -1805,6 +1834,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                     finishAndRemoveTask()
                 }
             }
+
             SELECT_CAMERA_FOLDER -> {
                 val parentNode = megaApi.getNodeByHandle(handle) ?: megaApi.rootNode
                 val intent = Intent()
@@ -1923,7 +1953,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
      *
      * @return  The current parent node.
      */
-    private val currentParentNode: MegaNode
+    private val currentParentNode: MegaNode?
         get() {
             cDriveExplorer = cloudExplorerFragment
             iSharesExplorer = incomingExplorerFragment
@@ -2185,12 +2215,16 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             android.R.id.home -> {
                 onBackPressedDispatcher.onBackPressed()
             }
+
             R.id.cab_menu_create_folder -> {
                 newFolderDialog = showNewFolderDialog(
-                    this, this,
-                    currentParentNode, null
+                    this,
+                    this,
+                    currentParentNode,
+                    null
                 )
             }
+
             R.id.cab_menu_new_chat -> {
                 if (megaApi.rootNode != null) {
                     val contacts = megaApi.contacts
@@ -2296,6 +2330,7 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
                 chatExplorer = chatExplorerFragment
                 chatExplorer?.let { getChatAdded(it.addedChats ?: return) }
             }
+
             R.id.new_group_button -> {
                 if (megaApi.rootNode != null) {
                     val contacts = megaApi.contacts
@@ -2567,11 +2602,13 @@ class FileExplorerActivity : TransfersManagementActivity(), MegaRequestListenerI
             ) {
                 return
             }
+
             INCOMING_FRAGMENT -> if (incomingExplorerFragment == null
                 || !hide && parentHandleIncoming != INVALID_HANDLE
             ) {
                 return
             }
+
             CHAT_FRAGMENT -> if (chatExplorerFragment == null) {
                 return
             }

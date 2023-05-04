@@ -1386,7 +1386,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
                             Timber.d("Now copy the file to the SD Card")
                             openFile = false
                             val node = megaApi.getNodeByHandle(transfer.nodeHandle)
-                            alterDocument(transfersUri, node.name)
+                            alterDocument(transfersUri, node?.name)
                         }
                         if (!TextUtil.isTextEmpty(path) && path.contains(OfflineUtils.OFFLINE_DIR)) {
                             Timber.d("It is Offline file")
@@ -1448,7 +1448,7 @@ internal class DownloadService : Service(), MegaRequestListenerInterface {
         sendBroadcast(intent)
     }
 
-    private fun alterDocument(uri: Uri, fileName: String) {
+    private fun alterDocument(uri: Uri, fileName: String?) {
         Timber.d("alterUri")
         try {
             val tempFolder = getCacheFolder(applicationContext, CacheFolderManager.TEMPORARY_FOLDER)

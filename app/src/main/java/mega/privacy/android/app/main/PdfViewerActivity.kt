@@ -853,7 +853,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 chatRemoveMenuItem.isVisible = false
             } else if (type == Constants.SEARCH_ADAPTER && !fromIncoming) {
                 val node = megaApi.getNodeByHandle(handle)
-                if (node.isExported) {
+                if (node?.isExported == true) {
                     removeLinkMenuItem.isVisible = true
                     getLinkMenuItem.isVisible = false
                 } else {
@@ -870,7 +870,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                 while (megaApi.getParentNode(parent) != null) {
                     parent = megaApi.getParentNode(parent)
                 }
-                if (parent.handle != megaApi.rubbishNode.handle) {
+                if (parent?.handle != megaApi.rubbishNode.handle) {
                     moveToTrashMenuItem.isVisible = true
                     removeMenuItem.isVisible = false
                 } else {
@@ -1092,7 +1092,7 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
                     renameMenuItem.isVisible = true
                     moveMenuItem.isVisible = true
                     node = megaApi.getNodeByHandle(handle)
-                    val handle = node.handle
+                    val handle = node?.handle ?: MegaApiJava.INVALID_HANDLE
                     var parent = megaApi.getNodeByHandle(handle)
                     while (megaApi.getParentNode(parent) != null) {
                         parent = megaApi.getParentNode(parent)
@@ -1267,8 +1267,8 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
             i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         } else {
             val node = megaApi.getNodeByHandle(handle)
-            i.putExtra("handle", node.handle)
-            i.putExtra(Constants.NAME, node.name)
+            i.putExtra("handle", node?.handle)
+            i.putExtra(Constants.NAME, node?.name)
             if (nC == null) {
                 nC = NodeController(this)
             }

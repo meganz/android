@@ -502,8 +502,8 @@ object MegaNodeUtil {
      * @return True if the node is a outgoing or a pending outgoing share, false otherwise
      */
     @JvmStatic
-    fun isOutShare(node: MegaNode): Boolean {
-        return node.isOutShare || MegaApplication.getInstance().megaApi.isPendingShare(node)
+    fun isOutShare(node: MegaNode?): Boolean {
+        return node?.isOutShare == true || MegaApplication.getInstance().megaApi.isPendingShare(node)
     }
 
     /**

@@ -405,7 +405,7 @@ class SearchFragment : RotatableFragment() {
                         parent = megaApi.getParentNode(parent)
                     }
 
-                    if (parent.handle != megaApi.rubbishNode.handle) {
+                    if (parent?.handle != megaApi.rubbishNode.handle) {
                         trashIcon?.title = getString(R.string.context_move_to_trash)
                     } else {
                         trashIcon?.title = getString(R.string.context_remove)
@@ -420,7 +420,7 @@ class SearchFragment : RotatableFragment() {
                         while (megaApi.getParentNode(parent) != null) {
                             parent = megaApi.getParentNode(parent)
                         }
-                        if (parent.handle != megaApi.rubbishNode.handle) {
+                        if (parent?.handle != megaApi.rubbishNode.handle) {
                             itemsSelected = true
                         }
                     }

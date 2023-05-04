@@ -54,7 +54,7 @@ class GetLinkViewModel @Inject constructor(
     private val withElevation: MutableLiveData<Boolean> = MutableLiveData()
 
     private lateinit var linkFragmentTitle: String
-    private lateinit var node: MegaNode
+    private var node: MegaNode? = null
     private var linkWithPassword: String? = null
     private lateinit var linkWithoutKey: String
     private lateinit var key: String
@@ -74,7 +74,7 @@ class GetLinkViewModel @Inject constructor(
         this.withElevation.value = withElevation
     }
 
-    fun getNode(): MegaNode = node
+    fun getNode(): MegaNode? = node
 
     fun getLinkWithoutKey(): String = linkWithoutKey
 
@@ -100,7 +100,7 @@ class GetLinkViewModel @Inject constructor(
     fun getLinkFragmentTitle(): String {
         if (!this::linkFragmentTitle.isInitialized) {
             linkFragmentTitle =
-                if (node.isExported) {
+                if (node?.isExported == true) {
                     context.getString(R.string.edit_link_option)
                 } else {
                     context.resources.getQuantityString(R.plurals.get_links, 1)
@@ -126,7 +126,7 @@ class GetLinkViewModel @Inject constructor(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    updateLink(node.handle)
+                    updateLink(node?.handle)
                     password.notifyObserver()
                 },
                 onError = Timber::w
@@ -144,7 +144,7 @@ class GetLinkViewModel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { updateLink(node.handle) },
+                onSuccess = { updateLink(node?.handle) },
                 onError = Timber::w
             )
             .addTo(composite)
@@ -161,7 +161,7 @@ class GetLinkViewModel @Inject constructor(
                 when {
                     isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
                     !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
-                    else -> node.publicLink
+                    else -> node?.publicLink.orEmpty()
                 }, context.resources.getQuantityString(R.plurals.links_copied_clipboard, 1)
             )
         )
@@ -251,18 +251,18 @@ class GetLinkViewModel @Inject constructor(
      *
      * @param handle The identifier of the MegaNode from which the link has to be managed.
      */
-    private fun updateLink(handle: Long) {
-        node = megaApi.getNodeByHandle(handle)
+    private fun updateLink(handle: Long?) {
+        node = handle?.let { megaApi.getNodeByHandle(it) }
 
-        if (node.isExported) {
-            val link = node.publicLink
+        if (node?.isExported == true) {
+            val link = node?.publicLink
             linkWithoutKey = LinksUtil.getLinkWithoutKey(link)
             key = LinksUtil.getKeyLink(link)
         }
 
         updateLink()
 
-        expiryDate.value = if (node.expirationTime > 0) getExpiredDateText() else ""
+        expiryDate.value = if ((node?.expirationTime ?: 0) > 0) getExpiredDateText() else ""
     }
 
     /**
@@ -270,10 +270,10 @@ class GetLinkViewModel @Inject constructor(
      */
     private fun updateLink() {
         linkText.value = when {
-            !node.isExported -> context.getString(R.string.link_request_status)
+            node?.isExported == false -> context.getString(R.string.link_request_status)
             isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
             !linkWithPassword.isNullOrEmpty() -> linkWithPassword
-            else -> node.publicLink
+            else -> node?.publicLink
         }
     }
 
@@ -293,7 +293,7 @@ class GetLinkViewModel @Inject constructor(
     fun shareLink(link: String? = null, action: (Intent) -> Unit) {
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = Constants.TYPE_TEXT_PLAIN
-        intent.putExtra(Intent.EXTRA_TEXT, link ?: node.publicLink)
+        intent.putExtra(Intent.EXTRA_TEXT, link ?: node?.publicLink)
         action.invoke(Intent.createChooser(intent, context.getString(R.string.context_get_link)))
     }
 
@@ -319,7 +319,7 @@ class GetLinkViewModel @Inject constructor(
         shouldAttachKeyOrPassword: Boolean,
         action: (Intent?) -> Unit,
     ) {
-        data?.putExtra(Constants.EXTRA_LINK, link ?: node.publicLink)
+        data?.putExtra(Constants.EXTRA_LINK, link ?: node?.publicLink)
 
         if (shouldAttachKeyOrPassword) {
             if (!linkWithPassword.isNullOrEmpty()) {
@@ -355,7 +355,7 @@ class GetLinkViewModel @Inject constructor(
     fun getLinkToShare(): String = when {
         !linkWithPassword.isNullOrEmpty() -> linkWithPassword!!
         isSendDecryptedKeySeparatelyEnabled -> linkWithoutKey
-        else -> node.publicLink
+        else -> node?.publicLink.orEmpty()
     }
 
     /**
@@ -373,7 +373,7 @@ class GetLinkViewModel @Inject constructor(
      * @param password Password to encrypt the link.
      */
     fun encryptLink(password: String) {
-        encryptLinkWithPasswordUseCase.encrypt(node.publicLink, password)
+        encryptLinkWithPasswordUseCase.encrypt(node?.publicLink, password)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -394,7 +394,7 @@ class GetLinkViewModel @Inject constructor(
      */
     private fun getExpiredDateText(): String {
         val df = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM, Locale.getDefault())
-        val cal = Util.calculateDateFromTimestamp(node.expirationTime)
+        val cal = Util.calculateDateFromTimestamp(node?.expirationTime ?: -1)
         val tz = cal.timeZone
         df.timeZone = tz
         val date = cal.time
