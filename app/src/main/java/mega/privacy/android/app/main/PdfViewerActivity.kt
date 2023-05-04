@@ -170,7 +170,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
     // it's only used for enter animation
     private val dragToExit = DragToExitSupport(this, null, null)
     private var nC: NodeController? = null
-    private var typeExport = -1
     private var handler: Handler? = null
     private var fromChat = false
     private var isDeleteDialogShow = false
@@ -1316,7 +1315,6 @@ class PdfViewerActivity : BaseActivity(), MegaGlobalListenerInterface, OnPageCha
         }
         builder.setView(dialogLayout)
         builder.setPositiveButton(getString(R.string.context_remove)) { _: DialogInterface?, _: Int ->
-            typeExport = FileInfoActivity.TYPE_EXPORT_REMOVE
             megaApi.disableExport(megaApi.getNodeByHandle(handle), this@PdfViewerActivity)
         }
         builder.setNegativeButton(getString(R.string.general_cancel)) { _: DialogInterface?, _: Int -> }

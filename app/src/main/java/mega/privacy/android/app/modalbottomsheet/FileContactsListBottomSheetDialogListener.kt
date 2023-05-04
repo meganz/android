@@ -13,4 +13,9 @@ internal interface FileContactsListBottomSheetDialogListener {
      * remove share option has been selected
      */
     fun removeFileContactShare(userEmail: String)
+
+    /**
+     * dialog has been dismissed
+     */
+    fun fileContactsDialogDismissed() {}
 }

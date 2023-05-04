@@ -4,9 +4,9 @@ import com.google.common.truth.Truth
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState.Companion.MAX_NUMBER_OF_CONTACTS_IN_LIST
 import mega.privacy.android.domain.entity.FolderTreeInfo
+import mega.privacy.android.domain.entity.contacts.ContactPermission
 import mega.privacy.android.domain.entity.node.TypedFileNode
 import mega.privacy.android.domain.entity.node.TypedFolderNode
-import nz.mega.sdk.MegaShare
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -18,16 +18,16 @@ class FileInfoViewStateTest {
 
     @Test
     fun `test outSharesCoerceMax is returning all outShares if maximum is not surpassed`() {
-        val outShares = List<MegaShare>(MAX_NUMBER_OF_CONTACTS_IN_LIST) { mock() }
-        underTest = FileInfoViewState(outSharesDeprecated = outShares)
+        val outShares = List<ContactPermission>(MAX_NUMBER_OF_CONTACTS_IN_LIST) { mock() }
+        underTest = FileInfoViewState(outShares = outShares)
         Truth.assertThat(underTest.outSharesCoerceMax.size)
             .isEqualTo(MAX_NUMBER_OF_CONTACTS_IN_LIST)
     }
 
     @Test
     fun `test outSharesCoerceMax is returning no more than maximum out shares`() {
-        val outShares = List<MegaShare>(MAX_NUMBER_OF_CONTACTS_IN_LIST + 1) { mock() }
-        underTest = FileInfoViewState(outSharesDeprecated = outShares)
+        val outShares = List<ContactPermission>(MAX_NUMBER_OF_CONTACTS_IN_LIST + 1) { mock() }
+        underTest = FileInfoViewState(outShares = outShares)
         Truth.assertThat(underTest.outSharesCoerceMax.size)
             .isEqualTo(MAX_NUMBER_OF_CONTACTS_IN_LIST)
     }

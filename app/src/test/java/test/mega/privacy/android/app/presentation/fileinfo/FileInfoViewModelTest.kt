@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import app.cash.turbine.test
 import com.google.common.truth.Truth
+import de.palm.composestateevents.StateEventWithContentTriggered
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,11 +29,15 @@ import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgres
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
+import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.EventType
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.StorageStateEvent
+import mega.privacy.android.domain.entity.contacts.ContactPermission
+import mega.privacy.android.domain.entity.node.ExportedData
 import mega.privacy.android.domain.entity.node.NodeChanges
 import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.entity.node.TypedFileNode
@@ -64,6 +69,7 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import nz.mega.sdk.MegaNode
@@ -115,6 +121,7 @@ internal class FileInfoViewModelTest {
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle = mock()
     private val getNodeLocationInfo: GetNodeLocationInfo = mock()
     private val getOutShares: GetOutShares = mock()
+    private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase = mock()
     private val isAvailableOffline: IsAvailableOfflineUseCase = mock()
     private val setNodeAvailableOffline: SetNodeAvailableOffline = mock()
     private val getNodeAccessPermission: GetNodeAccessPermission = mock()
@@ -123,6 +130,7 @@ internal class FileInfoViewModelTest {
     private val nodeActionMapper: NodeActionMapper = mock()
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase = mock()
     private val monitorOnlineStatusUpdates = mock<MonitorOnlineStatusUseCase>()
+    private val clipboardGateway = mock<ClipboardGateway>()
 
     private val typedFileNode: TypedFileNode = mock()
 
@@ -167,6 +175,7 @@ internal class FileInfoViewModelTest {
             getNodeVersionsByHandle = getNodeVersionsByHandle,
             getNodeLocationInfo = getNodeLocationInfo,
             getOutShares = getOutShares,
+            getNodeOutSharesUseCase = getNodeOutSharesUseCase,
             isAvailableOfflineUseCase = isAvailableOffline,
             setNodeAvailableOffline = setNodeAvailableOffline,
             getNodeAccessPermission = getNodeAccessPermission,
@@ -175,6 +184,7 @@ internal class FileInfoViewModelTest {
             getAvailableNodeActionsUseCase = getAvailableNodeActionsUseCase,
             nodeActionMapper = nodeActionMapper,
             monitorOnlineStatusUpdates = monitorOnlineStatusUpdates,
+            clipboardGateway = clipboardGateway,
         )
     }
 
@@ -276,7 +286,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(false))
             underTest.moveNodeCheckingCollisions(parentId)
-            Truth.assertThat(underTest.uiState.value.oneOffViewEvent)
+            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
                 .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
 
         }
@@ -286,7 +296,7 @@ internal class FileInfoViewModelTest {
         runTest {
             whenever(monitorConnectivityUseCase.invoke()).thenReturn(MutableStateFlow(false))
             underTest.copyNodeCheckingCollisions(parentId)
-            Truth.assertThat(underTest.uiState.value.oneOffViewEvent)
+            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
                 .isEqualTo(FileInfoOneOffViewEvent.NotConnected)
         }
 
@@ -549,9 +559,11 @@ internal class FileInfoViewModelTest {
     fun `test on-off event is removed from state once is consumed`() {
         `test CollisionDetected event is launched when a collision is found while copying`()
         runTest {
-            Truth.assertThat(underTest.uiState.value.oneOffViewEvent).isNotNull()
-            underTest.consumeOneOffEvent(underTest.uiState.value.oneOffViewEvent ?: return@runTest)
-            Truth.assertThat(underTest.uiState.value.oneOffViewEvent).isNull()
+            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
+                .isNotNull()
+            underTest.consumeOneOffEvent()
+            Truth.assertThat((underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content)
+                .isNull()
         }
     }
 
@@ -671,10 +683,13 @@ internal class FileInfoViewModelTest {
 
     @Test
     fun `test getOutShares result is set on uiState`() = runTest {
-        val expected = mock<List<MegaShare>>()
-        whenever(getOutShares.invoke(nodeId)).thenReturn(expected)
+        val expectedDeprecated = mock<List<MegaShare>>()
+        val expected = mock<List<ContactPermission>>()
+        whenever(getOutShares.invoke(nodeId)).thenReturn(expectedDeprecated)
+        whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
         underTest.setNode(node.handle)
-        Truth.assertThat(underTest.uiState.value.outSharesDeprecated).isEqualTo(expected)
+        Truth.assertThat(underTest.uiState.value.outSharesDeprecated).isEqualTo(expectedDeprecated)
+        Truth.assertThat(underTest.uiState.value.outShares).isEqualTo(expected)
     }
 
     @Test
@@ -689,8 +704,10 @@ internal class FileInfoViewModelTest {
     @Test
     fun `test getOutShares is fetched when contacts update is received and there are out shares`() =
         runTest {
-            val outShares = mock<List<MegaShare>>()
-            whenever(getOutShares.invoke(nodeId)).thenReturn(outShares)
+            val expectedDeprecated = mock<List<MegaShare>>()
+            val expected = mock<List<ContactPermission>>()
+            whenever(getOutShares.invoke(nodeId)).thenReturn(expectedDeprecated)
+            whenever(getNodeOutSharesUseCase.invoke(nodeId)).thenReturn(expected)
             val updateChanges = mapOf(Pair(UserId(1L), listOf(UserChanges.Alias)))
             val update = mock<UserUpdate> {
                 on { changes }.thenReturn(updateChanges)
@@ -698,6 +715,7 @@ internal class FileInfoViewModelTest {
             whenever(monitorContactUpdates.invoke()).thenReturn(flowOf(update))
             underTest.setNode(node.handle)
             verify(getOutShares, times(2)).invoke(nodeId)
+            verify(getNodeOutSharesUseCase, times(2)).invoke(nodeId)
         }
 
     @Test
@@ -763,6 +781,16 @@ internal class FileInfoViewModelTest {
                 .invoke(folderNode, AccessPermission.UNKNOWN, *emails)
         }
 
+    @Test
+    fun `test that clipboard gateway is called with the correct link`() = runTest {
+        val link = "https://megalink"
+        val exportedData = ExportedData(link, 100L)
+        whenever(typedFileNode.exportedData).thenReturn(exportedData)
+        underTest.setNode(node.handle)
+        underTest.copyPublicLink()
+        verify(clipboardGateway, times(1)).setClip(Constants.COPIED_TEXT_LABEL, link)
+    }
+
     private fun mockMonitorStorageStateEvent(state: StorageState) {
         val storageStateEvent = StorageStateEvent(
             1L, "", 1L, "", EventType.Storage,
@@ -793,8 +821,9 @@ internal class FileInfoViewModelTest {
     }
 
     private suspend fun getEvent(): FileInfoOneOffViewEvent =
-        underTest.uiState.value.oneOffViewEvent
-            ?: underTest.uiState.mapNotNull { it.oneOffViewEvent }.first()
+        (underTest.uiState.value.oneOffViewEvent as? StateEventWithContentTriggered)?.content
+            ?: (underTest.uiState.mapNotNull { it.oneOffViewEvent }
+                .first() as StateEventWithContentTriggered).content
 
 
     private suspend fun mockCollisionCopying() {

@@ -694,10 +694,15 @@ public class FileContactListActivity extends PasscodeActivity implements OnClick
         }
     }
 
+    @Override
     public void removeFileContactShare(String userEmail) {
         notifyDataSetChanged();
 
         showConfirmationRemoveContactFromShare(selectedShare.getUser());
+    }
+
+    @Override
+    public void fileContactsDialogDismissed() {
     }
 
     public void changePermissions(String userEmail) {

@@ -37,6 +37,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import de.palm.composestateevents.consumed
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
 import mega.privacy.android.app.presentation.extensions.description
@@ -48,7 +49,7 @@ import mega.privacy.android.app.utils.Util
 import mega.privacy.android.core.ui.controls.LoadingDialog
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.black_white
+import mega.privacy.android.core.ui.theme.black
 import mega.privacy.android.core.ui.theme.white
 import mega.privacy.android.domain.entity.FolderTreeInfo
 import mega.privacy.android.domain.entity.contacts.ContactPermission
@@ -125,7 +126,8 @@ internal fun FileInfoScreen(
                 ?.takeIf { viewState.isIncomingSharedNode },
             modifier = Modifier
                 .alpha(alpha)
-                .height(headerHeight.dp)
+                .height(headerHeight.dp),
+            statusBarHeight = statusBarHeight.dp,
         )
         Scaffold(
             modifier = Modifier.systemBarsPadding(),
@@ -156,7 +158,7 @@ internal fun FileInfoScreen(
                     Snackbar(
                         modifier = Modifier.testTag(SNACKBAR_TEST_TAG),
                         snackbarData = data,
-                        backgroundColor = MaterialTheme.colors.black_white
+                        backgroundColor = black.takeIf { MaterialTheme.colors.isLight } ?: white
                     )
                 }
             },
@@ -234,7 +236,7 @@ private fun FileInfoScreenPreview(
                     }
                     FileInfoMenuAction.SelectionModeAction.SelectAll -> {
                         state = state.copy(
-                            outShareContactsSelected = state.outShares.map { it.contactItem.email })
+                            outShareContactsSelected = state.outSharesCoerceMax.map { it.contactItem.email })
                     }
                     else -> {}
                 }
@@ -268,7 +270,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
         val viewStateFile = FileInfoViewState(
             title = "File",
             isFile = true,
-            oneOffViewEvent = null,
+            oneOffViewEvent = consumed(),
             jobInProgressState = null,
             historyVersions = 5,
             isNodeInInbox = false,
@@ -282,7 +284,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             isAvailableOfflineAvailable = true,
             inShareOwnerContactItem = null,
             accessPermission = AccessPermission.FULL,
-            outShareContactShowOptions = null,
+            contactToShowOptions = null,
             outShareContactsSelected = emptyList(),
             iconResource = R.drawable.ic_text_thumbnail,
             sizeInBytes = 1024,
@@ -298,9 +300,9 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
         )
 
         val viewStateFile2 = FileInfoViewState(
-            title = "File with very long name",
+            title = "File with long name taken down",
             isFile = true,
-            oneOffViewEvent = null,
+            oneOffViewEvent = consumed(),
             jobInProgressState = null,
             historyVersions = 0,
             isNodeInInbox = false,
@@ -317,12 +319,12 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             isAvailableOfflineAvailable = true,
             inShareOwnerContactItem = null,
             accessPermission = AccessPermission.FULL,
-            outShareContactShowOptions = null,
+            contactToShowOptions = null,
             outShareContactsSelected = emptyList(),
             iconResource = R.drawable.ic_text_thumbnail,
             sizeInBytes = 1024,
             isExported = true,
-            isTakenDown = false,
+            isTakenDown = true,
             publicLink = null,
             publicLinkCreationTime = null,
             showLink = false,
@@ -335,7 +337,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
         val viewStateFolder = FileInfoViewState(
             title = "Folder with a very long name",
             isFile = false,
-            oneOffViewEvent = null,
+            oneOffViewEvent = consumed(),
             jobInProgressState = null,
             historyVersions = 0,
             isNodeInInbox = false,
@@ -349,7 +351,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             isAvailableOfflineAvailable = true,
             inShareOwnerContactItem = null,
             accessPermission = AccessPermission.FULL,
-            outShareContactShowOptions = null,
+            contactToShowOptions = null,
             outShareContactsSelected = emptyList(),
             iconResource = R.drawable.ic_folder_incoming,
             sizeInBytes = 1024,
@@ -367,7 +369,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
         val viewStateFolder2 = FileInfoViewState(
             title = "Folder",
             isFile = false,
-            oneOffViewEvent = null,
+            oneOffViewEvent = consumed(),
             jobInProgressState = null,
             historyVersions = 0,
             isNodeInInbox = false,
@@ -384,7 +386,7 @@ internal class FileInfoViewStatePreviewsProvider : PreviewParameterProvider<File
             },
             inShareOwnerContactItem = contactItemForPreviews,
             accessPermission = AccessPermission.FULL,
-            outShareContactShowOptions = null,
+            contactToShowOptions = null,
             outShareContactsSelected = emptyList(),
             iconResource = R.drawable.ic_folder_incoming,
             sizeInBytes = 1024,

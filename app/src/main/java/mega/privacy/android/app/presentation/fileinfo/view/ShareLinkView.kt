@@ -64,7 +64,7 @@ internal fun ShareLinkView(
     ) {
         Text(
             text = stringResource(id = R.string.context_copy),
-            style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.secondary),
+            style = MaterialTheme.typography.subtitle2medium.copy(color = MaterialTheme.colors.secondary),
         )
     }
     Spacer(modifier = Modifier.height(verticalSpace.dp))

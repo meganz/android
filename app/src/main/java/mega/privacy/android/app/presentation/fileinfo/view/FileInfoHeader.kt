@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +19,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstrainedLayoutReference
@@ -40,6 +40,7 @@ internal fun FileInfoHeader(
     iconResource: Int?,
     accessPermissionDescription: Int?,
     modifier: Modifier = Modifier,
+    statusBarHeight: Dp = 0.dp,
 ) {
     ConstraintLayout(
         modifier = modifier
@@ -59,11 +60,10 @@ internal fun FileInfoHeader(
             iconResource?.let { icRes ->
                 Image(
                     modifier = Modifier
-                        .systemBarsPadding()
                         .testTag(TEST_TAG_ICON)
                         .constrainAs(icon) {
                             start.linkTo(parent.start, 16.dp)
-                            top.linkTo(parent.top, 44.dp)
+                            top.linkTo(parent.top, 44.dp + statusBarHeight)
                             width = Dimension.value(24.dp)
                             height = Dimension.value(24.dp)
                         },

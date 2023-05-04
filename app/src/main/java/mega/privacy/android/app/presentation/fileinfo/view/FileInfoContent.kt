@@ -55,7 +55,7 @@ internal fun FileInfoContent(
         val paddingHorizontal = Modifier.padding(start = 72.dp, end = 16.dp)
         with(viewState) {
             //take down alert
-            var showTakeDownWarning by remember { mutableStateOf(isTakenDown) }
+            var showTakeDownWarning by remember(isTakenDown) { mutableStateOf(isTakenDown) }
             if (showTakeDownWarning) {
                 TakeDownWarningView(
                     isFile = isFile,

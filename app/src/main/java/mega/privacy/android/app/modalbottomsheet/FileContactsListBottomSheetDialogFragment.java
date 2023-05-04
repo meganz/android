@@ -6,6 +6,7 @@ import static mega.privacy.android.app.utils.Constants.INVALID_ID;
 import static mega.privacy.android.app.utils.ContactUtil.getMegaUserNameDB;
 import static mega.privacy.android.app.utils.Util.scaleWidthPx;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,6 +87,12 @@ public class FileContactsListBottomSheetDialogFragment extends BaseBottomSheetDi
             }
         }
         return contentView;
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        listener.fileContactsDialogDismissed();
     }
 
     @Override

@@ -31,6 +31,11 @@ sealed interface FileInfoOneOffViewEvent {
     object OverDiskQuota : FileInfoOneOffViewEvent
 
     /**
+     * Public link has been copied to the clipboard
+     */
+    object PublicLinkCopiedToClipboard : FileInfoOneOffViewEvent
+
+    /**
      * A message should be shown
      * @param message the [StringRes] of the message to be shown
      */

@@ -7,10 +7,13 @@ import mega.privacy.android.core.ui.model.MenuActionString
 import mega.privacy.android.core.ui.model.MenuActionWithoutIcon
 
 internal sealed interface FileInfoMenuAction : MenuAction {
+
     object Download : MenuActionString(
         R.drawable.ic_download_white,
         R.string.general_save_to_device,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 95
+    }
 
     object ShareFolder : MenuActionString(
         R.drawable.ic_share,
@@ -25,11 +28,15 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     object SendToChat : MenuActionString(
         R.drawable.ic_send_to_contact,
         R.string.context_send_file_to_chat,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 115
+    }
 
     object ManageLink : MenuActionWithoutIcon(
         R.string.edit_link_option,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 95
+    }
 
     object RemoveLink : MenuActionString(
         R.drawable.ic_remove_link,
@@ -39,36 +46,50 @@ internal sealed interface FileInfoMenuAction : MenuAction {
     object DisputeTakedown : MenuActionString(
         R.drawable.ic_taken_down_file_info,
         R.string.dispute_takendown_file,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 105
+    }
 
     object Rename : MenuActionString(
         R.drawable.ic_rename,
         R.string.context_rename,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 110
+    }
 
     object Move : MenuActionString(
         R.drawable.ic_move_white,
         R.string.general_move,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 120
+    }
 
     object Copy : MenuActionString(
         R.drawable.ic_copy_white,
         R.string.context_copy,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 120
+    }
 
     object MoveToRubbishBin : MenuActionString(
         R.drawable.ic_move_to_rubbish_bin,
         R.string.context_move_to_trash,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 130
+    }
 
     object Leave : MenuActionString(
         R.drawable.ic_leave_share_w,
         R.string.general_leave,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 130
+    }
 
     object Delete : MenuActionWithoutIcon(
         R.string.general_remove,
-    ), FileInfoMenuAction
+    ), FileInfoMenuAction {
+        override val orderInCategory = 130
+    }
 
     sealed interface SelectionModeAction : FileInfoMenuAction {
         object SelectAll : MenuActionWithoutIcon(

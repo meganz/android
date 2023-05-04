@@ -4,6 +4,8 @@ import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,12 +22,13 @@ import mega.privacy.android.app.namecollision.data.NameCollisionType
 import mega.privacy.android.app.presentation.extensions.getState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoJobInProgressState
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOneOffViewEvent
-import mega.privacy.android.app.presentation.fileinfo.model.FileInfoOrigin
 import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState
 import mega.privacy.android.app.presentation.fileinfo.model.getNodeIcon
 import mega.privacy.android.app.presentation.fileinfo.model.mapper.NodeActionMapper
 import mega.privacy.android.app.usecase.exception.MegaNodeException
+import mega.privacy.android.app.utils.Constants
 import mega.privacy.android.app.utils.wrapper.FileUtilWrapper
+import mega.privacy.android.data.gateway.ClipboardGateway
 import mega.privacy.android.data.repository.MegaNodeRepository
 import mega.privacy.android.domain.entity.StorageState
 import mega.privacy.android.domain.entity.node.FileNode
@@ -66,10 +69,10 @@ import mega.privacy.android.domain.usecase.network.MonitorConnectivityUseCase
 import mega.privacy.android.domain.usecase.node.GetAvailableNodeActionsUseCase
 import mega.privacy.android.domain.usecase.shares.GetContactItemFromInShareFolder
 import mega.privacy.android.domain.usecase.shares.GetNodeAccessPermission
+import mega.privacy.android.domain.usecase.shares.GetNodeOutSharesUseCase
 import mega.privacy.android.domain.usecase.shares.SetOutgoingPermissions
 import mega.privacy.android.domain.usecase.shares.StopSharingNode
 import nz.mega.sdk.MegaNode
-import nz.mega.sdk.MegaShare
 import timber.log.Timber
 import java.io.File
 import java.lang.ref.WeakReference
@@ -103,6 +106,7 @@ class FileInfoViewModel @Inject constructor(
     private val monitorOnlineStatusUpdates: MonitorOnlineStatusUseCase,
     private val getNodeVersionsByHandle: GetNodeVersionsByHandle,
     private val getOutShares: GetOutShares,
+    private val getNodeOutSharesUseCase: GetNodeOutSharesUseCase,
     private val getNodeLocationInfo: GetNodeLocationInfo,
     private val isAvailableOfflineUseCase: IsAvailableOfflineUseCase,
     private val setNodeAvailableOffline: SetNodeAvailableOffline,
@@ -111,6 +115,7 @@ class FileInfoViewModel @Inject constructor(
     private val stopSharingNode: StopSharingNode,
     private val getAvailableNodeActionsUseCase: GetAvailableNodeActionsUseCase,
     private val nodeActionMapper: NodeActionMapper,
+    private val clipboardGateway: ClipboardGateway,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FileInfoViewState())
@@ -139,22 +144,6 @@ class FileInfoViewModel @Inject constructor(
      * the [NodeId] of the current node for this screen
      */
     val nodeId get() = typedNode.id
-
-    /**
-     * This initial setup will be removed once MegaNode is not needed anymore in future tasks
-     */
-    @Deprecated(
-        message = "This initial setup will be removed once MegaNode is not needed",
-        replaceWith = ReplaceWith("setNode(handleNode: Long)")
-    )
-    fun tempInit(node: MegaNode, origin: FileInfoOrigin) {
-        Timber.d("FileInfo tempInit $origin")
-        this.node = node
-        _uiState.update {
-            it.copy(origin = origin)
-        }
-        setNode(node.handle)
-    }
 
     /**
      * Sets the node and updates its state
@@ -274,17 +263,8 @@ class FileInfoViewModel @Inject constructor(
     /**
      * Some events need to be consumed to don't be missed or fired more than once
      */
-    fun consumeOneOffEvent(event: FileInfoOneOffViewEvent) {
-        if (_uiState.value.oneOffViewEvent == event) {
-            _uiState.updateEventAndClearProgress(null)
-        }
-    }
-
-    /**
-     * change the state of isShareContactExpanded
-     */
-    fun expandOutSharesClick() {
-        updateState { it.copy(isShareContactExpandedDeprecated = !it.isShareContactExpandedDeprecated) }
+    fun consumeOneOffEvent() {
+        _uiState.updateEventAndClearProgress(null)
     }
 
     /**
@@ -296,7 +276,7 @@ class FileInfoViewModel @Inject constructor(
     ) {
         if (availableOffline == _uiState.value.isAvailableOffline) return
         if (availableOffline && monitorStorageStateEventUseCase.getState() == StorageState.PayWall) {
-            updateState { it.copy(oneOffViewEvent = FileInfoOneOffViewEvent.OverDiskQuota) }
+            updateState { it.copy(oneOffViewEvent = triggered(FileInfoOneOffViewEvent.OverDiskQuota)) }
             return
         }
         updateState {
@@ -310,7 +290,7 @@ class FileInfoViewModel @Inject constructor(
             )
             updateState {
                 it.copy(
-                    oneOffViewEvent = if (!availableOffline) FileInfoOneOffViewEvent.Message.RemovedOffline else null,
+                    oneOffViewEvent = if (!availableOffline) triggered(FileInfoOneOffViewEvent.Message.RemovedOffline) else consumed(),
                     isAvailableOffline = availableOffline,
                     isAvailableOfflineEnabled = !typedNode.isTakenDown && !it.isNodeInRubbish,
                 )
@@ -330,32 +310,42 @@ class FileInfoViewModel @Inject constructor(
     /**
      * A contact is selected to show Sharing info
      */
-    fun contactSelectedToShowOptions(share: MegaShare?) {
-        if (_uiState.value.outShareContactShowOptions == share) {
-            //this won't be needed once migrated to compose because outShareContactShowOptions will be set to null when hided
-            _uiState.update {
-                it.copy(
-                    outShareContactShowOptions = null,
-                    outShareContactsSelected = emptyList(),
-                )
-            }
-        }
+    fun contactToShowOptions(email: String?) {
         updateState {
             it.copy(
-                outShareContactShowOptions = share,
+                contactToShowOptions = email,
                 outShareContactsSelected = emptyList(),
             )
         }
     }
 
     /**
-     * Contacts of the shared list are selected
+     * gets the [MegaShare] of the given email if it exists
      */
-    fun contactsSelectedInSharedList(emails: List<String>) {
+    @Deprecated("this should be avoided, need while using FileContactsListBottomSheetDialogFragment. To be removed once migrated to compose")
+    fun getShareFromEmail(email: String?) =
+        _uiState.value.outSharesDeprecated.firstOrNull { it.user == email }
+
+    /**
+     * A new contact of the shared list are selected
+     */
+    fun contactSelectedInSharedList(email: String) {
         updateState {
             it.copy(
-                outShareContactsSelected = emails,
-                outShareContactShowOptions = null,
+                outShareContactsSelected = it.outShareContactsSelected + email,
+                contactToShowOptions = null,
+            )
+        }
+    }
+
+    /**
+     * A contact of the shared list are unselected
+     */
+    fun contactUnselectedInSharedList(email: String) {
+        updateState {
+            it.copy(
+                outShareContactsSelected = it.outShareContactsSelected - email,
+                contactToShowOptions = null,
             )
         }
     }
@@ -364,27 +354,24 @@ class FileInfoViewModel @Inject constructor(
      * All visible contacts of the shared list are selected
      */
     fun selectAllVisibleContacts() =
-        contactsSelectedInSharedList(_uiState.value.outSharesCoerceMax.map { it.user })
-
-    /**
-     * Set out sharing permission for the current selected contact to show info. Set with [contactSelectedToShowOptions]
-     */
-    fun setSharePermissionForCurrentSelectedOptions(accessPermission: AccessPermission) =
-        _uiState.value.outShareContactShowOptions?.user?.let { email ->
-            changeSharePermissionForUsers(
-                accessPermission,
-                FileInfoJobInProgressState.ChangeSharePermission.Change,
-                email
+        updateState { viewState ->
+            viewState.copy(
+                outShareContactsSelected = _uiState.value.outSharesCoerceMax.map { it.contactItem.email },
+                contactToShowOptions = null,
             )
         }
 
     /**
-     * Set out sharing permission for the current selected contacts in list. Set with [contactsSelectedInSharedList]
+     * unselect all contacts of the shared list
      */
-    fun setSharePermissionForCurrentSelectedList(accessPermission: AccessPermission) =
-        _uiState.value.outShareContactsSelected.takeIf { it.isNotEmpty() }?.let { emails ->
-            setSharePermissionForUsers(accessPermission, emails)
+    fun unselectAllContacts() {
+        updateState {
+            it.copy(
+                outShareContactsSelected = emptyList(),
+                contactToShowOptions = null,
+            )
         }
+    }
 
     /**
      * Set out sharing permission for contacts in [emails] list.
@@ -399,6 +386,12 @@ class FileInfoViewModel @Inject constructor(
     }
 
     /**
+     * Set out sharing permission for selected contacts, see [FileInfoViewState.outShareContactsSelected].
+     */
+    fun setSharePermissionForSelectedUsers(accessPermission: AccessPermission) =
+        setSharePermissionForUsers(accessPermission, _uiState.value.outShareContactsSelected)
+
+    /**
      * Removes permission for contacts in [emails]
      */
     fun removeSharePermissionForUsers(vararg emails: String) =
@@ -408,6 +401,26 @@ class FileInfoViewModel @Inject constructor(
             *emails
         )
 
+    /**
+     * Copies the public link to the clipboard and send the related event
+     */
+    fun copyPublicLink() {
+        Timber.d("Copy link button")
+        _uiState.value.publicLink?.let {
+            clipboardGateway.setClip(Constants.COPIED_TEXT_LABEL, it)
+            _uiState.updateEventAndClearProgress(FileInfoOneOffViewEvent.PublicLinkCopiedToClipboard)
+        }
+    }
+
+    /**
+     * @return true if the node is available offline
+     */
+    fun isAvailableOffline() = _uiState.value.isAvailableOffline
+
+    /**
+     * @return true if the node is a file
+     */
+    fun isFile() = typedNode is FileNode
     private fun changeSharePermissionForUsers(
         accessPermission: AccessPermission,
         progress: FileInfoJobInProgressState.ChangeSharePermission,
@@ -417,7 +430,7 @@ class FileInfoViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 outShareContactsSelected = emptyList(),
-                outShareContactShowOptions = null,
+                contactToShowOptions = null,
             )
         }
         //update permissions
@@ -639,7 +652,10 @@ class FileInfoViewModel @Inject constructor(
     }
 
     private fun updateOutShares() = updateState {
-        it.copy(outSharesDeprecated = getOutShares(typedNode.id) ?: emptyList())
+        it.copy(
+            outSharesDeprecated = getOutShares(typedNode.id) ?: emptyList(),
+            outShares = getNodeOutSharesUseCase(typedNode.id),
+        )
     }
 
     /**
@@ -735,7 +751,7 @@ class FileInfoViewModel @Inject constructor(
     private fun MutableStateFlow<FileInfoViewState>.updateEventAndClearProgress(event: FileInfoOneOffViewEvent?) =
         this.update {
             it.copy(
-                oneOffViewEvent = event,
+                oneOffViewEvent = event?.let { triggered(event) } ?: consumed(),
                 jobInProgressState = null,
             )
         }

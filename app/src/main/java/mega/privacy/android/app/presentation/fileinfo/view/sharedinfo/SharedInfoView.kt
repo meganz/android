@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.presentation.contact.view.contactItemForPreviews
+import mega.privacy.android.app.presentation.fileinfo.model.FileInfoViewState.Companion.MAX_NUMBER_OF_CONTACTS_IN_LIST
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHARES_HEADER
 import mega.privacy.android.app.presentation.fileinfo.view.TEST_TAG_SHOW_MORE
 import mega.privacy.android.core.ui.preview.CombinedThemePreviews
@@ -152,7 +153,7 @@ private fun ColumnScope.ContactsList(
     }
 }
 
-internal const val MAX_CONTACTS_TO_SHOW = 5
+internal const val MAX_CONTACTS_TO_SHOW = MAX_NUMBER_OF_CONTACTS_IN_LIST
 
 /**
  * Preview for [SharedInfoView]
