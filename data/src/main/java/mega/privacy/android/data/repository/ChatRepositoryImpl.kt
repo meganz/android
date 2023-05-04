@@ -41,6 +41,7 @@ import mega.privacy.android.domain.entity.node.NodeId
 import mega.privacy.android.domain.qualifier.ApplicationScope
 import mega.privacy.android.domain.qualifier.IoDispatcher
 import mega.privacy.android.domain.repository.ChatRepository
+import nz.mega.sdk.MegaChatApi
 import nz.mega.sdk.MegaChatContainsMeta
 import nz.mega.sdk.MegaChatError
 import nz.mega.sdk.MegaChatMessage
@@ -114,6 +115,14 @@ internal class ChatRepositoryImpl @Inject constructor(
             megaChatApiGateway.getChatRoomByUser(userHandle)?.let { chat ->
                 return@withContext chatRoomMapper(chat)
             }
+        }
+
+    override suspend fun getAllChatListItems(): List<ChatListItem> =
+        withContext(ioDispatcher) {
+            megaChatApiGateway.getChatListItems(
+                MegaChatApi.CHAT_FILTER_BY_NO_FILTER,
+                MegaChatApi.CHAT_GET_GROUP
+            ).map { chatListItemMapper(it) }
         }
 
     override suspend fun setOpenInvite(chatId: Long): Boolean =

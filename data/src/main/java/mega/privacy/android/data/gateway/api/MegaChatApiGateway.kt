@@ -246,6 +246,15 @@ interface MegaChatApiGateway {
     fun getChatListItem(chatId: Long): MegaChatListItem?
 
     /**
+     * Get chat list items
+     *
+     * @param mask      Values to apply in the filter
+     * @param filter    Filters to apply to the list of chats
+     * @return          Chat list items
+     */
+    fun getChatListItems(mask: Int, filter: Int): List<MegaChatListItem>
+
+    /**
      * Gets the MegaChatCall
      *
      * @param chatId The chat id.

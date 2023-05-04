@@ -13,7 +13,7 @@ import javax.inject.Inject
  * @property megaChatApi    Needed to retrieve chat list items
  */
 class SearchChatsUseCase @Inject constructor(
-    private val megaChatApi: MegaChatApiAndroid
+    private val megaChatApi: MegaChatApiAndroid,
 ) {
 
     /**
@@ -25,25 +25,32 @@ class SearchChatsUseCase @Inject constructor(
      */
     fun search(query: String, archivedChats: Boolean): Single<List<MegaChatListItem>> =
         Single.fromCallable {
-            val items = mutableListOf<MegaChatListItem>().apply {
-                addAll(megaChatApi.getChatListItemsByType(MegaChatApi.CHAT_TYPE_NON_MEETING))
-                if (archivedChats) addAll(megaChatApi.archivedChatListItems)
-            }
-
-            items
-                .filter { item ->
-                    val chatDateTitle = ChatUtil.getTitleChat(megaChatApi.getChatRoom(item.chatId))
-                    val userAlias = megaChatApi.getUserAliasFromCache(item.peerHandle)
-                    val userEmail = megaChatApi.getUserEmailFromCache(item.peerHandle)
-                    val userFullName = megaChatApi.getUserFullnameFromCache(item.peerHandle)
-
-                    item.title.contains(query, true)
-                            || chatDateTitle.contains(query, true)
-                            || item.lastMessage?.contains(query, true) == true
-                            || userAlias?.contains(query, true) == true
-                            || userEmail?.contains(query, true) == true
-                            || userFullName?.contains(query, true) == true
+            mutableListOf<MegaChatListItem>().apply {
+                val mask: Int
+                val filter: Int
+                if (archivedChats) {
+                    mask = MegaChatApi.CHAT_FILTER_BY_ARCHIVED_OR_NON_ARCHIVED
+                    filter = MegaChatApi.CHAT_GET_ARCHIVED
+                } else {
+                    mask = MegaChatApi.CHAT_FILTER_BY_ARCHIVED_OR_NON_ARCHIVED or
+                            MegaChatApi.CHAT_FILTER_BY_MEETING_OR_NON_MEETING
+                    filter = MegaChatApi.CHAT_GET_NON_ARCHIVED or
+                            MegaChatApi.CHAT_GET_NON_MEETING
                 }
-                .sortedByDescending { it.lastTimestamp }
+
+                addAll(megaChatApi.getChatListItems(mask, filter))
+            }.filter { item ->
+                val chatDateTitle = ChatUtil.getTitleChat(megaChatApi.getChatRoom(item.chatId))
+                val userAlias = megaChatApi.getUserAliasFromCache(item.peerHandle)
+                val userEmail = megaChatApi.getUserEmailFromCache(item.peerHandle)
+                val userFullName = megaChatApi.getUserFullnameFromCache(item.peerHandle)
+
+                item.title.contains(query, true)
+                        || chatDateTitle.contains(query, true)
+                        || item.lastMessage?.contains(query, true) == true
+                        || userAlias?.contains(query, true) == true
+                        || userEmail?.contains(query, true) == true
+                        || userFullName?.contains(query, true) == true
+            }.sortedByDescending { it.lastTimestamp }
         }
 }
