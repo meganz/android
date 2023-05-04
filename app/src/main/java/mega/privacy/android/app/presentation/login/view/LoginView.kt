@@ -3,6 +3,8 @@ package mega.privacy.android.app.presentation.login.view
 import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +36,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -82,6 +85,9 @@ import mega.privacy.android.domain.entity.login.FetchNodesUpdate
  * @param on2FAChanged              Action when a 2FA code was pasted.
  * @param onLostAuthenticatorDevice Action when Lost authenticator device is pressed.
  * @param onBackPressed             Action when back is pressed.
+ * @param onUpdateKarereLogs        Action when needs to update MegaChat logs.
+ * @param onUpdateSdkLogs           Action when needs to update Sdk logs.
+ * @param onChangeApiServer         Action when needs to update API server.
  * @param modifier                  [Modifier]
  */
 @Composable
@@ -90,13 +96,16 @@ fun LoginView(
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onLoginClicked: () -> Unit,
-    onForgotPassword: (String?) -> Unit,
+    onForgotPassword: () -> Unit,
     onCreateAccount: () -> Unit,
     onSnackbarMessageConsumed: () -> Unit,
     on2FAPinChanged: (String, Int) -> Unit,
     on2FAChanged: (String) -> Unit,
     onLostAuthenticatorDevice: () -> Unit,
     onBackPressed: () -> Unit,
+    onUpdateKarereLogs: () -> Unit,
+    onUpdateSdkLogs: () -> Unit,
+    onChangeApiServer: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -126,7 +135,10 @@ fun LoginView(
                     onForgotPassword = onForgotPassword,
                     onCreateAccount = onCreateAccount,
                     paddingValues = paddingValues,
-                    modifier = modifier
+                    onUpdateKarereLogs = onUpdateKarereLogs,
+                    onUpdateSdkLogs = onUpdateSdkLogs,
+                    onChangeApiServer = onChangeApiServer,
+                    modifier = modifier,
                 )
 
                 isLoginInProgress || fetchNodesUpdate != null -> LoginInProgress(
@@ -166,15 +178,38 @@ private fun RequireLogin(
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
     onLoginClicked: () -> Unit,
-    onForgotPassword: (String?) -> Unit,
+    onForgotPassword: () -> Unit,
     onCreateAccount: () -> Unit,
     paddingValues: PaddingValues,
+    onUpdateKarereLogs: () -> Unit,
+    onUpdateSdkLogs: () -> Unit,
+    onChangeApiServer: () -> Unit,
     modifier: Modifier = Modifier,
 ) = Column(modifier = modifier.padding(paddingValues)) {
     val focusRequester = remember { FocusRequester() }
+    var pendingClicksKarere by remember { mutableStateOf(CLICKS_TO_ENABLE_LOGS) }
+    var pendingClicksSDK by remember { mutableStateOf(CLICKS_TO_ENABLE_LOGS) }
 
     Text(
-        modifier = Modifier.padding(start = 22.dp, top = 17.dp, end = 22.dp),
+        modifier = Modifier
+            .padding(start = 22.dp, top = 17.dp, end = 22.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(onPress = {
+                    val downTime = System.currentTimeMillis()
+                    tryAwaitRelease()
+                    val upTime = System.currentTimeMillis()
+                    if (upTime - downTime >= LONG_PRESS_DELAY) {
+                        onChangeApiServer()
+                    } else {
+                        pendingClicksKarere = if (pendingClicksKarere == 1) {
+                            onUpdateKarereLogs()
+                            CLICKS_TO_ENABLE_LOGS
+                        } else {
+                            pendingClicksKarere - 1
+                        }
+                    }
+                })
+            },
         text = stringResource(id = R.string.login_to_mega),
         style = MaterialTheme.typography.subtitle1.copy(
             fontWeight = FontWeight.Medium,
@@ -235,11 +270,20 @@ private fun RequireLogin(
     TextMegaButton(
         modifier = Modifier.padding(start = 14.dp, top = 34.dp),
         textId = R.string.forgot_pass,
-        onClick = { onForgotPassword(state.accountSession?.email) }
+        onClick = onForgotPassword
     )
     Row(modifier = Modifier.padding(end = 22.dp)) {
         Text(
-            modifier = Modifier.padding(start = 22.dp, top = 18.dp),
+            modifier = Modifier
+                .padding(start = 22.dp, top = 18.dp)
+                .clickable {
+                    pendingClicksSDK = if (pendingClicksSDK == 1) {
+                        onUpdateSdkLogs()
+                        CLICKS_TO_ENABLE_LOGS
+                    } else {
+                        pendingClicksSDK - 1
+                    }
+                },
             text = stringResource(id = R.string.new_to_mega),
             style = MaterialTheme.typography.subtitle2.copy(color = MaterialTheme.colors.textColorPrimary),
         )
@@ -404,7 +448,10 @@ private fun PreviewEmptyLoginView() {
             onLoginClicked = {},
             onForgotPassword = {},
             onCreateAccount = {},
-            paddingValues = PaddingValues()
+            paddingValues = PaddingValues(),
+            onUpdateKarereLogs = {},
+            onUpdateSdkLogs = {},
+            onChangeApiServer = {},
         )
     }
 }
@@ -427,7 +474,10 @@ private fun PreviewLoginView(
             on2FAPinChanged = { _, _ -> },
             on2FAChanged = {},
             onLostAuthenticatorDevice = {},
-            onBackPressed = {}
+            onBackPressed = {},
+            onUpdateKarereLogs = {},
+            onUpdateSdkLogs = {},
+            onChangeApiServer = {}
         )
     }
 }
@@ -478,3 +528,5 @@ internal const val MEGA_LOGO_TEST_TAG = "MEGA_LOGO"
 internal const val FETCH_NODES_PROGRESS_TEST_TAG = "FETCH_NODES_PROGRESS"
 internal const val LOGIN_PROGRESS_TEST_TAG = "LOGIN_PROGRESS"
 internal const val TWO_FA_PROGRESS_TEST_TAG = "TWO_FA_PROGRESS"
+internal const val CLICKS_TO_ENABLE_LOGS = 5
+private const val LONG_PRESS_DELAY = 5000L

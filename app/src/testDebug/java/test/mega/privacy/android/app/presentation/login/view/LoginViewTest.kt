@@ -44,7 +44,10 @@ class LoginViewTest {
                 on2FAPinChanged = { _, _ -> },
                 on2FAChanged = {},
                 onLostAuthenticatorDevice = {},
-                onBackPressed = {}
+                onBackPressed = {},
+                onUpdateKarereLogs = {},
+                onUpdateSdkLogs = {},
+                onChangeApiServer = {}
             )
         }
     }
