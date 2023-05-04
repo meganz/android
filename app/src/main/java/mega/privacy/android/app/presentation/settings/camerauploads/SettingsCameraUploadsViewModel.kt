@@ -43,6 +43,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsNewPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
@@ -77,6 +78,7 @@ import javax.inject.Inject
  * @property isNewPrimaryFolderPathValidUseCase Checks whether the newly selected Primary Folder
  * path from the File Explorer is valid or not
  * @property monitorConnectivityUseCase Monitors the device online status
+ * @property preparePrimaryFolderPathUseCase Prepares the Primary Folder path
  * @property resetCameraUploadTimeStamps Resets the Primary and Secondary Timestamps
  * @property resetMediaUploadTimeStamps Resets the Secondary Timestamps
  * @property restorePrimaryTimestamps Restores the Primary Timestamps
@@ -114,6 +116,7 @@ class SettingsCameraUploadsViewModel @Inject constructor(
     private val isChargingRequiredForVideoCompressionUseCase: IsChargingRequiredForVideoCompressionUseCase,
     private val isNewPrimaryFolderPathValidUseCase: IsNewPrimaryFolderPathValidUseCase,
     private val monitorConnectivityUseCase: MonitorConnectivityUseCase,
+    private val preparePrimaryFolderPathUseCase: PreparePrimaryFolderPathUseCase,
     private val resetCameraUploadTimeStamps: ResetCameraUploadTimeStamps,
     private val resetMediaUploadTimeStamps: ResetMediaUploadTimeStamps,
     private val restorePrimaryTimestamps: RestorePrimaryTimestamps,
@@ -462,6 +465,8 @@ class SettingsCameraUploadsViewModel @Inject constructor(
      */
     private fun initializeSettings() {
         viewModelScope.launch {
+            preparePrimaryFolderPathUseCase()
+
             val areLocationTagsIncluded = async { areLocationTagsEnabledUseCase() }
             val areUploadFileNamesKept = async { areUploadFileNamesKeptUseCase() }
             val isChargingRequiredForVideoCompression =

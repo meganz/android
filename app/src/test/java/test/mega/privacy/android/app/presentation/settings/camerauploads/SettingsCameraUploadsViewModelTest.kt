@@ -37,6 +37,7 @@ import mega.privacy.android.domain.usecase.camerauploads.GetVideoCompressionSize
 import mega.privacy.android.domain.usecase.camerauploads.IsCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.IsNewPrimaryFolderPathValidUseCase
+import mega.privacy.android.domain.usecase.camerauploads.PreparePrimaryFolderPathUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetCameraUploadsByWifiUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetChargingRequiredForVideoCompressionUseCase
 import mega.privacy.android.domain.usecase.camerauploads.SetLocationTagsEnabledUseCase
@@ -84,6 +85,7 @@ class SettingsCameraUploadsViewModelTest {
     private val isChargingRequiredForVideoCompressionUseCase =
         mock<IsChargingRequiredForVideoCompressionUseCase>()
     private val isNewPrimaryFolderPathValidUseCase = mock<IsNewPrimaryFolderPathValidUseCase>()
+    private val preparePrimaryFolderPathUseCase = mock<PreparePrimaryFolderPathUseCase>()
     private val resetCameraUploadTimeStamps = mock<ResetCameraUploadTimeStamps>()
     private val resetMediaUploadTimeStamps = mock<ResetMediaUploadTimeStamps>()
     private val restorePrimaryTimestamps = mock<RestorePrimaryTimestamps>()
@@ -137,6 +139,7 @@ class SettingsCameraUploadsViewModelTest {
             isChargingRequiredForVideoCompressionUseCase = isChargingRequiredForVideoCompressionUseCase,
             isNewPrimaryFolderPathValidUseCase = isNewPrimaryFolderPathValid,
             monitorConnectivityUseCase = mock(),
+            preparePrimaryFolderPathUseCase = preparePrimaryFolderPathUseCase,
             resetCameraUploadTimeStamps = resetCameraUploadTimeStamps,
             resetMediaUploadTimeStamps = resetMediaUploadTimeStamps,
             restorePrimaryTimestamps = restorePrimaryTimestamps,

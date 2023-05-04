@@ -3,16 +3,21 @@ package mega.privacy.android.app.domain.usecase
 import android.provider.MediaStore
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import timber.log.Timber
 import javax.inject.Inject
 
 /**
- * Get camera upload selection query
+ * Default implementation of [GetCameraUploadSelectionQuery]
+ *
+ * @property cameraUploadRepository [CameraUploadRepository]
+ * @property getCameraUploadLocalPathSecondary [GetCameraUploadLocalPathSecondary]
+ * @property getPrimaryFolderPathUseCase [GetPrimaryFolderPathUseCase],
  */
 class DefaultGetCameraUploadSelectionQuery @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
-    private val getCameraUploadLocalPath: GetCameraUploadLocalPath,
     private val getCameraUploadLocalPathSecondary: GetCameraUploadLocalPathSecondary,
+    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
 ) : GetCameraUploadSelectionQuery {
 
     override suspend fun invoke(timestampType: SyncTimeStamp): String? {
@@ -28,7 +33,7 @@ class DefaultGetCameraUploadSelectionQuery @Inject constructor(
 
         Timber.d("%s timestamp is: %s", timestampType.toString(), currentTimeStamp)
         val localPath = when (timestampType) {
-            SyncTimeStamp.PRIMARY_PHOTO, SyncTimeStamp.PRIMARY_VIDEO -> getCameraUploadLocalPath()
+            SyncTimeStamp.PRIMARY_PHOTO, SyncTimeStamp.PRIMARY_VIDEO -> getPrimaryFolderPathUseCase()
             SyncTimeStamp.SECONDARY_PHOTO, SyncTimeStamp.SECONDARY_VIDEO -> getCameraUploadLocalPathSecondary()
         }
 

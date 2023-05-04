@@ -5,30 +5,42 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
-import mega.privacy.android.domain.entity.BackupState
-import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
 import mega.privacy.android.data.mapper.MediaStoreFileTypeMapper
+import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.CameraUploadMedia
 import mega.privacy.android.domain.entity.MediaStoreFileType
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.repository.CameraUploadRepository
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import nz.mega.sdk.MegaNode
 import java.util.LinkedList
 import java.util.Queue
 import javax.inject.Inject
 
 /**
- * Use case to collect and save photos and videos for camera upload
+ * Default implementation of [ProcessMediaForUpload]
+ *
+ * @property cameraUploadRepository [CameraUploadRepository]
+ * @property getPrimaryFolderPathUseCase [GetPrimaryFolderPathUseCase]
+ * @property getSyncFileUploadUris [GetSyncFileUploadUris]
+ * @property isSecondaryFolderEnabled [IsSecondaryFolderEnabled]
+ * @property selectionQuery [GetCameraUploadSelectionQuery]
+ * @property localPathSecondary [GetCameraUploadLocalPathSecondary]
+ * @property updateTimeStamp [UpdateCameraUploadTimeStamp]
+ * @property getPendingUploadList [GetPendingUploadList]
+ * @property saveSyncRecordsToDB [SaveSyncRecordsToDB]
+ * @property mediaStoreFileTypeMapper [MediaStoreFileTypeMapper]
+ * @property cameraUploadRepository [CameraUploadSyncManagerWrapper]
  */
-
 class DefaultProcessMediaForUpload @Inject constructor(
     private val cameraUploadRepository: CameraUploadRepository,
+    private val getPrimaryFolderPathUseCase: GetPrimaryFolderPathUseCase,
     private val getSyncFileUploadUris: GetSyncFileUploadUris,
     private val isSecondaryFolderEnabled: IsSecondaryFolderEnabled,
     private val selectionQuery: GetCameraUploadSelectionQuery,
-    private val localPath: GetCameraUploadLocalPath,
     private val localPathSecondary: GetCameraUploadLocalPathSecondary,
     private val updateTimeStamp: UpdateCameraUploadTimeStamp,
     private val getPendingUploadList: GetPendingUploadList,
@@ -47,30 +59,38 @@ class DefaultProcessMediaForUpload @Inject constructor(
         coroutineScope {
             val list = mutableListOf<Job>()
             list.add(
-                preparePrimaryPhotos(mediaStoreTypes,
-                    primaryUploadNode,
-                    secondaryUploadNode,
-                    tempRoot)
+                preparePrimaryPhotos(
+                    types = mediaStoreTypes,
+                    primaryUploadNode = primaryUploadNode,
+                    secondaryUploadNode = secondaryUploadNode,
+                    tempRoot = tempRoot,
+                )
             )
             list.add(
-                prepareSecondaryPhotos(mediaStoreTypes,
-                    primaryUploadNode,
-                    secondaryUploadNode,
-                    tempRoot,
-                    secondaryEnabled)
+                prepareSecondaryPhotos(
+                    types = mediaStoreTypes,
+                    primaryUploadNode = primaryUploadNode,
+                    secondaryUploadNode = secondaryUploadNode,
+                    tempRoot = tempRoot,
+                    isSecondaryEnabled = secondaryEnabled,
+                )
             )
             list.add(
-                preparePrimaryVideos(mediaStoreTypes,
-                    primaryUploadNode,
-                    secondaryUploadNode,
-                    tempRoot)
+                preparePrimaryVideos(
+                    types = mediaStoreTypes,
+                    primaryUploadNode = primaryUploadNode,
+                    secondaryUploadNode = secondaryUploadNode,
+                    tempRoot = tempRoot,
+                )
             )
             list.add(
-                prepareSecondaryVideos(mediaStoreTypes,
-                    primaryUploadNode,
-                    secondaryUploadNode,
-                    tempRoot,
-                    secondaryEnabled)
+                prepareSecondaryVideos(
+                    types = mediaStoreTypes,
+                    primaryUploadNode = primaryUploadNode,
+                    secondaryUploadNode = secondaryUploadNode,
+                    tempRoot = tempRoot,
+                    isSecondaryEnabled = secondaryEnabled,
+                )
             )
             list.joinAll()
             // Reset backup state as active.
@@ -89,21 +109,24 @@ class DefaultProcessMediaForUpload @Inject constructor(
             if (type == MediaStoreFileType.IMAGES_INTERNAL || type == MediaStoreFileType.IMAGES_EXTERNAL) {
                 primaryPhotos.addAll(
                     cameraUploadRepository.getMediaQueue(
-                        type,
-                        localPath(),
-                        false,
-                        selectionQuery(SyncTimeStamp.PRIMARY_PHOTO)
+                        mediaStoreFileType = type,
+                        parentPath = getPrimaryFolderPathUseCase(),
+                        isVideo = false,
+                        selectionQuery = selectionQuery(SyncTimeStamp.PRIMARY_PHOTO),
                     )
                 )
             }
         }
         val pendingUploadsList = getPendingUploadList(
-            primaryPhotos,
+            mediaList = primaryPhotos,
             isSecondary = false,
-            isVideo = false
+            isVideo = false,
         )
         saveSyncRecordsToDB(
-            pendingUploadsList, primaryUploadNode, secondaryUploadNode, tempRoot
+            list = pendingUploadsList,
+            primaryUploadNode = primaryUploadNode,
+            secondaryUploadNode = secondaryUploadNode,
+            rootPath = tempRoot,
         )
         updateTimeStamp(null, SyncTimeStamp.PRIMARY_PHOTO)
     }
@@ -118,21 +141,24 @@ class DefaultProcessMediaForUpload @Inject constructor(
             if (type == MediaStoreFileType.VIDEO_INTERNAL || type == MediaStoreFileType.VIDEO_EXTERNAL) {
                 primaryVideos.addAll(
                     cameraUploadRepository.getMediaQueue(
-                        type,
-                        localPath(),
-                        true,
-                        selectionQuery(SyncTimeStamp.PRIMARY_VIDEO)
+                        mediaStoreFileType = type,
+                        parentPath = getPrimaryFolderPathUseCase(),
+                        isVideo = true,
+                        selectionQuery = selectionQuery(SyncTimeStamp.PRIMARY_VIDEO),
                     )
                 )
             }
         }
         val pendingVideoUploadsList = getPendingUploadList(
-            primaryVideos,
+            mediaList = primaryVideos,
             isSecondary = false,
-            isVideo = true
+            isVideo = true,
         )
         saveSyncRecordsToDB(
-            pendingVideoUploadsList, primaryUploadNode, secondaryUploadNode, tempRoot
+            list = pendingVideoUploadsList,
+            primaryUploadNode = primaryUploadNode,
+            secondaryUploadNode = secondaryUploadNode,
+            rootPath = tempRoot,
         )
         updateTimeStamp(null, SyncTimeStamp.PRIMARY_VIDEO)
     }
@@ -148,21 +174,24 @@ class DefaultProcessMediaForUpload @Inject constructor(
                 if (type == MediaStoreFileType.IMAGES_INTERNAL || type == MediaStoreFileType.IMAGES_EXTERNAL) {
                     secondaryPhotos.addAll(
                         cameraUploadRepository.getMediaQueue(
-                            type,
-                            localPathSecondary(),
-                            false,
-                            selectionQuery(SyncTimeStamp.SECONDARY_PHOTO)
+                            mediaStoreFileType = type,
+                            parentPath = localPathSecondary(),
+                            isVideo = false,
+                            selectionQuery = selectionQuery(SyncTimeStamp.SECONDARY_PHOTO),
                         )
                     )
                 }
             }
             val pendingUploadsListSecondary = getPendingUploadList(
-                secondaryPhotos,
+                mediaList = secondaryPhotos,
                 isSecondary = true,
-                isVideo = false
+                isVideo = false,
             )
             saveSyncRecordsToDB(
-                pendingUploadsListSecondary, primaryUploadNode, secondaryUploadNode, tempRoot
+                list = pendingUploadsListSecondary,
+                primaryUploadNode = primaryUploadNode,
+                secondaryUploadNode = secondaryUploadNode,
+                rootPath = tempRoot,
             )
             updateTimeStamp(null, SyncTimeStamp.SECONDARY_PHOTO)
         }
@@ -180,24 +209,24 @@ class DefaultProcessMediaForUpload @Inject constructor(
 
                     secondaryVideos.addAll(
                         cameraUploadRepository.getMediaQueue(
-                            type,
-                            localPathSecondary(),
-                            true,
-                            selectionQuery(SyncTimeStamp.SECONDARY_VIDEO)
+                            mediaStoreFileType = type,
+                            parentPath = localPathSecondary(),
+                            isVideo = true,
+                            selectionQuery = selectionQuery(SyncTimeStamp.SECONDARY_VIDEO),
                         )
                     )
                 }
             }
             val pendingVideoUploadsListSecondary = getPendingUploadList(
-                secondaryVideos,
+                mediaList = secondaryVideos,
                 isSecondary = true,
-                isVideo = true
+                isVideo = true,
             )
             saveSyncRecordsToDB(
-                pendingVideoUploadsListSecondary,
-                primaryUploadNode,
-                secondaryUploadNode,
-                tempRoot
+                list = pendingVideoUploadsListSecondary,
+                primaryUploadNode = primaryUploadNode,
+                secondaryUploadNode = secondaryUploadNode,
+                rootPath = tempRoot,
             )
             updateTimeStamp(null, SyncTimeStamp.SECONDARY_VIDEO)
         }

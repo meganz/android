@@ -16,7 +16,6 @@ import mega.privacy.android.data.gateway.DeviceEventGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -71,7 +70,6 @@ import kotlin.coroutines.Continuation
  * @property deviceEventGateway [DeviceEventGateway]
  * @property workerGateway [WorkerGateway]
  * @property videoQualityMapper [VideoQualityMapper]
- * @property sdCardGateway [SDCardGateway]
  * @property syncStatusIntMapper [SyncStatusIntMapper]
  * @property cameraUploadsHandlesMapper [CameraUploadsHandlesMapper]
  * @property uploadOptionMapper [UploadOptionMapper]
@@ -92,7 +90,6 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val videoQualityIntMapper: VideoQualityIntMapper,
     private val videoQualityMapper: VideoQualityMapper,
-    private val sdCardGateway: SDCardGateway,
     private val syncStatusIntMapper: SyncStatusIntMapper,
     private val cameraUploadsHandlesMapper: CameraUploadsHandlesMapper,
     private val videoCompressorGateway: VideoCompressorGateway,
@@ -338,8 +335,7 @@ internal class DefaultCameraUploadRepository @Inject constructor(
     }
 
     override suspend fun getPrimaryFolderSDCardUriPath() = withContext(ioDispatcher) {
-        val uriString = localStorageGateway.getPrimaryFolderSDCardUriPath()
-        sdCardGateway.getDirectoryName(uriString)
+        localStorageGateway.getPrimaryFolderSDCardUriPath()
     }
 
     override suspend fun setPrimaryFolderSDCardUriPath(path: String) = withContext(ioDispatcher) {

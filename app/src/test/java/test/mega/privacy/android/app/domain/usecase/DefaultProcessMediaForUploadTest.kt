@@ -15,11 +15,12 @@ import mega.privacy.android.app.domain.usecase.GetPendingUploadList
 import mega.privacy.android.app.domain.usecase.GetSyncFileUploadUris
 import mega.privacy.android.app.domain.usecase.ProcessMediaForUpload
 import mega.privacy.android.app.domain.usecase.SaveSyncRecordsToDB
-import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.data.wrapper.CameraUploadSyncManagerWrapper
+import mega.privacy.android.domain.entity.BackupState
 import mega.privacy.android.domain.entity.SyncTimeStamp
 import mega.privacy.android.domain.usecase.IsSecondaryFolderEnabled
 import mega.privacy.android.domain.usecase.UpdateCameraUploadTimeStamp
+import mega.privacy.android.domain.usecase.camerauploads.GetPrimaryFolderPathUseCase
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.inOrder
@@ -31,11 +32,11 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-
 @OptIn(ExperimentalCoroutinesApi::class)
 class DefaultProcessMediaForUploadTest {
     private lateinit var underTest: ProcessMediaForUpload
 
+    private val getPrimaryFolderPathUseCase = mock<GetPrimaryFolderPathUseCase>()
     private val getSyncFileUploadUris = mock<GetSyncFileUploadUris>()
     private val isSecondaryFolderEnabled = mock<IsSecondaryFolderEnabled>()
     private val updateTimeStamp = mock<UpdateCameraUploadTimeStamp>()
@@ -47,10 +48,10 @@ class DefaultProcessMediaForUploadTest {
     fun setUp() {
         underTest = DefaultProcessMediaForUpload(
             cameraUploadRepository = mock(),
+            getPrimaryFolderPathUseCase = getPrimaryFolderPathUseCase,
             getSyncFileUploadUris = getSyncFileUploadUris,
             isSecondaryFolderEnabled = isSecondaryFolderEnabled,
             selectionQuery = mock(),
-            localPath = mock(),
             localPathSecondary = mock(),
             updateTimeStamp = updateTimeStamp,
             getPendingUploadList = getPendingUploadList,
@@ -62,76 +63,86 @@ class DefaultProcessMediaForUploadTest {
 
     @Test
     fun `test that primary photos are prepared when video upload is disabled`() = runTest {
-        whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
-            MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-        ))
+        whenever(getSyncFileUploadUris.invoke()).thenReturn(
+            listOf(
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            )
+        )
         whenever(isSecondaryFolderEnabled.invoke()).thenReturn(false)
         val inOrder = inOrder(updateTimeStamp, cameraUploadSyncManagerWrapper)
         underTest(null, null, null)
-        inOrder.verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
-        inOrder.verify(cameraUploadSyncManagerWrapper, Times(1))
+        inOrder.verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
+        inOrder.verify(cameraUploadSyncManagerWrapper)
             .updatePrimaryFolderBackupState(BackupState.ACTIVE)
     }
 
     @Test
     fun `test that primary and secondary photos are prepared when secondary folder is enabled`() =
         runTest {
-            whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
-                MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            ))
+            whenever(getSyncFileUploadUris.invoke()).thenReturn(
+                listOf(
+                    MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                )
+            )
             whenever(isSecondaryFolderEnabled.invoke()).thenReturn(true)
             underTest(null, null, null)
             val inOrder = inOrder(updateTimeStamp, cameraUploadSyncManagerWrapper)
-            inOrder.verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
-            inOrder.verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
-            inOrder.verify(cameraUploadSyncManagerWrapper, Times(1))
+            inOrder.verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
+            inOrder.verify(updateTimeStamp).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
+            inOrder.verify(cameraUploadSyncManagerWrapper)
                 .updateSecondaryFolderBackupState(BackupState.ACTIVE)
         }
 
     @Test
     fun `test that both primary photos and videos are prepared when video upload is enabled`() =
         runTest {
-            whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
-                MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.Video.Media.INTERNAL_CONTENT_URI,
-            ))
+            whenever(getSyncFileUploadUris.invoke()).thenReturn(
+                listOf(
+                    MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Video.Media.INTERNAL_CONTENT_URI,
+                )
+            )
             whenever(isSecondaryFolderEnabled.invoke()).thenReturn(false)
             underTest(null, null, null)
-            verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
-            verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_VIDEO)
+            verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
+            verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_VIDEO)
         }
 
     @Test
     fun `test that both primary and secondary photos and videos are prepared when secondary folder upload is enabled`() =
         runTest {
-            whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
-                MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                MediaStore.Video.Media.INTERNAL_CONTENT_URI,
-            ))
+            whenever(getSyncFileUploadUris.invoke()).thenReturn(
+                listOf(
+                    MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    MediaStore.Video.Media.INTERNAL_CONTENT_URI,
+                )
+            )
             whenever(isSecondaryFolderEnabled.invoke()).thenReturn(true)
             underTest(null, null, null)
-            verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
-            verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.PRIMARY_VIDEO)
-            verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
-            verify(updateTimeStamp, Times(1)).invoke(null, SyncTimeStamp.SECONDARY_VIDEO)
+            verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_PHOTO)
+            verify(updateTimeStamp).invoke(null, SyncTimeStamp.PRIMARY_VIDEO)
+            verify(updateTimeStamp).invoke(null, SyncTimeStamp.SECONDARY_PHOTO)
+            verify(updateTimeStamp).invoke(null, SyncTimeStamp.SECONDARY_VIDEO)
         }
 
     @Test
     fun `test that cancellation exception is thrown when the operation is cancelled`() =
         runTest {
             val job = launch {
-                whenever(getSyncFileUploadUris.invoke()).thenReturn(listOf(
-                    MediaStore.Images.Media.INTERNAL_CONTENT_URI,
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                    MediaStore.Video.Media.INTERNAL_CONTENT_URI,
-                ))
+                whenever(getSyncFileUploadUris.invoke()).thenReturn(
+                    listOf(
+                        MediaStore.Images.Media.INTERNAL_CONTENT_URI,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                        MediaStore.Video.Media.INTERNAL_CONTENT_URI,
+                    )
+                )
                 getPendingUploadList.stub {
                     onBlocking { invoke(any(), any(), any()) }.doSuspendableAnswer {
                         delay(2000)
@@ -152,9 +163,11 @@ class DefaultProcessMediaForUploadTest {
                 verify(saveSyncRecordsToDB, Times(0)).invoke(any(), any(), any(), any())
                 verify(saveSyncRecordsToDB, Times(0)).invoke(any(), any(), any(), any())
                 verify(cameraUploadSyncManagerWrapper, Times(0)).updatePrimaryFolderBackupState(
-                    BackupState.ACTIVE)
+                    BackupState.ACTIVE
+                )
                 verify(cameraUploadSyncManagerWrapper, Times(0)).updateSecondaryFolderBackupState(
-                    BackupState.ACTIVE)
+                    BackupState.ACTIVE
+                )
             }
             runCurrent()
             advanceTimeBy(3000)

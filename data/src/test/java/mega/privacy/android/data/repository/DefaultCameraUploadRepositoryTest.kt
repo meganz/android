@@ -13,7 +13,6 @@ import mega.privacy.android.data.gateway.CameraUploadMediaGateway
 import mega.privacy.android.data.gateway.FileAttributeGateway
 import mega.privacy.android.data.gateway.FileGateway
 import mega.privacy.android.data.gateway.MegaLocalStorageGateway
-import mega.privacy.android.data.gateway.SDCardGateway
 import mega.privacy.android.data.gateway.VideoCompressorGateway
 import mega.privacy.android.data.gateway.WorkerGateway
 import mega.privacy.android.data.gateway.api.MegaApiGateway
@@ -80,7 +79,6 @@ class DefaultCameraUploadRepositoryTest {
     private val syncRecordTypeIntMapper = mock<SyncRecordTypeIntMapper>()
     private val mediaStoreFileTypeUriWrapper = mock<MediaStoreFileTypeUriMapper>()
     private val cameraUploadsHandlesMapper = mock<CameraUploadsHandlesMapper>()
-    private val sdCardGateway = mock<SDCardGateway>()
     private val videoCompressorGateway = mock<VideoCompressorGateway>()
     private val appEventGateway = mock<AppEventGateway>()
     private val uploadOptionIntMapper = mock<UploadOptionIntMapper>()
@@ -121,7 +119,6 @@ class DefaultCameraUploadRepositoryTest {
             deviceEventGateway = mock(),
             videoQualityIntMapper = ::videoQualityToInt,
             videoQualityMapper = ::toVideoQuality,
-            sdCardGateway = sdCardGateway,
             syncStatusIntMapper = ::syncStatusToInt,
             videoCompressorGateway = videoCompressorGateway,
             videoAttachmentMapper = ::toVideoAttachment,
@@ -143,7 +140,6 @@ class DefaultCameraUploadRepositoryTest {
             syncRecordTypeIntMapper,
             mediaStoreFileTypeUriWrapper,
             cameraUploadsHandlesMapper,
-            sdCardGateway,
             videoCompressorGateway,
             appEventGateway,
             uploadOptionMapper,
@@ -501,10 +497,7 @@ class DefaultCameraUploadRepositoryTest {
         @Test
         fun `test that the primary folder SD card URI path is retrieved`() = runTest {
             val testPath = "test/sd/primary/directory/path"
-
-            whenever(localStorageGateway.getPrimaryFolderSDCardUriPath()).thenReturn("test/sd/")
-            whenever(sdCardGateway.getDirectoryName(any())).thenReturn(testPath)
-
+            whenever(localStorageGateway.getPrimaryFolderSDCardUriPath()).thenReturn(testPath)
             assertThat(underTest.getPrimaryFolderSDCardUriPath()).isEqualTo(testPath)
         }
 
