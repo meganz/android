@@ -22,9 +22,9 @@ import mega.privacy.android.core.ui.theme.teal_300_alpha_038
 
 @Composable
 fun TextMegaButton(
-    modifier: Modifier = Modifier,
-    textId: Int,
+    text: String,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) = TextButton(
     modifier = modifier,
@@ -34,10 +34,23 @@ fun TextMegaButton(
     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp)
 ) {
     Text(
-        text = stringResource(id = textId),
+        text = text,
         style = MaterialTheme.typography.button
     )
 }
+
+@Composable
+fun TextMegaButton(
+    textId: Int,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+) = TextMegaButton(
+    text = stringResource(id = textId),
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+)
 
 @Composable
 private fun lightColors() = ButtonDefaults.buttonColors(

@@ -1,6 +1,5 @@
 package mega.privacy.android.app.presentation.fileinfo.view
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -18,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mega.privacy.android.app.R
 import mega.privacy.android.app.utils.TimeUtils
+import mega.privacy.android.core.ui.controls.buttons.OutlinedMegaButton
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
 import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
@@ -55,18 +54,13 @@ internal fun ShareLinkView(
         ),
     )
     Spacer(modifier = Modifier.height(14.dp))
-    TextButton(
+    OutlinedMegaButton(
         modifier = Modifier
             .widthIn(min = 100.dp)
             .testTag(TEST_SHARE_LINK_COPY),
-        onClick = onCopyLinkClick,
-        border = BorderStroke(1.dp, MaterialTheme.colors.secondary)
-    ) {
-        Text(
-            text = stringResource(id = R.string.context_copy),
-            style = MaterialTheme.typography.subtitle2medium.copy(color = MaterialTheme.colors.secondary),
-        )
-    }
+        textId = R.string.context_copy,
+        onClick = onCopyLinkClick
+    )
     Spacer(modifier = Modifier.height(verticalSpace.dp))
 }
 

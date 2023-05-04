@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -16,11 +17,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import mega.privacy.android.core.ui.preview.CombinedTextAndThemePreviews
 import mega.privacy.android.core.ui.theme.AndroidTheme
-import mega.privacy.android.core.ui.theme.extensions.subtitle2medium
+import mega.privacy.android.core.ui.theme.teal_200
+import mega.privacy.android.core.ui.theme.teal_200_alpha_038
+import mega.privacy.android.core.ui.theme.teal_300
+import mega.privacy.android.core.ui.theme.teal_300_alpha_038
 
 /**
  * Plain button with an outlined border
@@ -56,23 +61,40 @@ fun OutlinedMegaButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
 ) {
-    val color =
-        if (enabled) MaterialTheme.colors.secondary else MaterialTheme.colors.secondary.copy(alpha = 0.38f)
+    val colors = if (MaterialTheme.colors.isLight) lightColors() else darkColors()
     TextButton(
         modifier = modifier
             .widthIn(min = 100.dp),
         enabled = enabled,
+        colors = colors,
         onClick = onClick,
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(1.dp, color)
+        border = BorderStroke(1.dp, colors.contentColor(enabled = enabled).value)
     ) {
         Text(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 0.dp),
             text = text,
-            style = MaterialTheme.typography.subtitle2medium.copy(color = color),
+            style = MaterialTheme.typography.button,
         )
     }
 }
+
+
+@Composable
+private fun lightColors() = ButtonDefaults.buttonColors(
+    backgroundColor = Color.Transparent,
+    contentColor = teal_300,
+    disabledContentColor = teal_300_alpha_038,
+    disabledBackgroundColor = Color.Transparent,
+)
+
+@Composable
+private fun darkColors() = ButtonDefaults.buttonColors(
+    backgroundColor = Color.Transparent,
+    contentColor = teal_200,
+    disabledContentColor = teal_200_alpha_038,
+    disabledBackgroundColor = Color.Transparent,
+)
 
 
 @CombinedTextAndThemePreviews
